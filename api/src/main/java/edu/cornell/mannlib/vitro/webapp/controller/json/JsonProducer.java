@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
@@ -7,12 +7,12 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
-import org.apache.commons.lang.StringUtils;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -27,19 +27,15 @@ public abstract class JsonProducer {
 	/**
 	 * Process a list of Individuals into a JSON array that holds the Names and URIs.
 	 */
-    protected JSONArray individualsToJson(List<Individual> individuals) throws ServletException {
-        try{
-        	JSONArray ja = new JSONArray();
-        	for (Individual ent: individuals) {
-                JSONObject entJ = new JSONObject();
-                entJ.put("name", ent.getName());
-                entJ.put("URI", ent.getURI());
-                ja.put( entJ );
-            }
-        	return ja;
-        }catch(JSONException ex){
-            throw new ServletException("could not convert list of Individuals into JSON: " +  ex);
-        }
+    protected ArrayNode individualsToJson(List<Individual> individuals) throws ServletException {
+		ArrayNode ja = JsonNodeFactory.instance.arrayNode();
+		for (Individual ent: individuals) {
+			ObjectNode entJ = JsonNodeFactory.instance.objectNode();
+			entJ.put("name", ent.getName());
+			entJ.put("URI", ent.getURI());
+			ja.add( entJ );
+		}
+		return ja;
     }
 
 	/**

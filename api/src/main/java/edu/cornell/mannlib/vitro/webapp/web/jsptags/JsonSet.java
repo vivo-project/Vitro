@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
@@ -33,7 +33,7 @@ public class JsonSet extends BodyTagSupport {
 	private String escape(String s){
 		if(s==null)
 			return null;
-		StringBuffer sb=new StringBuffer();
+		StringBuilder sb=new StringBuilder();
 		for(int i=0;i<s.length();i++){
 			char ch=s.charAt(i);
 			switch(ch){

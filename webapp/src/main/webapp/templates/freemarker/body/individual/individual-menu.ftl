@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- Menu management page (uses individual display mechanism) -->
 
@@ -43,7 +43,7 @@
     ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />',
                       '<link rel="stylesheet" href="${urls.base}/css/individual/menuManagement-menuItems.css" />')}
                       
-    ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
+    ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
     
     <#assign positionPredicate = "${namespaces.display}menuPosition" />
     

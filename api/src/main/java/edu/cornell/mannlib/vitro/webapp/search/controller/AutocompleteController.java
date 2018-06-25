@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
@@ -7,19 +7,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -42,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
  * via the search index.
  */
 
+@WebServlet(name = "AutocompleteController", urlPatterns = {"/autocomplete","/populateselect"} )
 public class AutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
@@ -146,10 +147,10 @@ public class AutocompleteController extends VitroAjaxController {
 			
             Collections.sort(results);
 
-            JSONArray jsonArray = new JSONArray();
+            ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
             for (SearchResult result : results) {
                 //jsonArray.put(result.toMap());
-            	jsonArray.put(result.toJSONObject());
+            	jsonArray.add(result.toJSONObject());
             }
             response.getWriter().write(jsonArray.toString());
 
@@ -333,18 +334,10 @@ public class AutocompleteController extends VitroAjaxController {
             return label;
         }
 
-        public String getJsonLabel() {
-            return JSONObject.quote(label);
-        }
-
         public String getUri() {
             return uri;
         }
 
-        public String getJsonUri() {
-            return JSONObject.quote(uri);
-        }
-        
         public String getMsType() {
             return msType;
         }
@@ -360,15 +353,10 @@ public class AutocompleteController extends VitroAjaxController {
 			return theType;
 		}
 
-        public String getJsonMsType() {
-            return JSONObject.quote(msType);
-        }
-        
-        
         //Simply passing in the array in the map converts it to a string and not to an array
         //which is what we want so need to convert to an object instad
-        JSONObject toJSONObject() {
-        	JSONObject jsonObj = new JSONObject();
+        ObjectNode toJSONObject() {
+        	ObjectNode jsonObj = JsonNodeFactory.instance.objectNode();
         	try {
         	 jsonObj.put("label", label);
              jsonObj.put("uri", uri);
@@ -376,7 +364,10 @@ public class AutocompleteController extends VitroAjaxController {
              //But this should really be changed so that the entire array is all that should be returned
              jsonObj.put("msType", msType);
              //map.put("allMsTypes", allMsTypes);
-             JSONArray allMsTypesArray = new JSONArray(allMsTypes);
+             ArrayNode allMsTypesArray = JsonNodeFactory.instance.arrayNode();
+             for (String msType : allMsTypes) {
+                 allMsTypesArray.add(msType);
+             }
              jsonObj.put("allMsTypes", allMsTypesArray);
         	} catch(Exception ex) {
         		log.error("Error occurred in converting values to JSON object", ex);

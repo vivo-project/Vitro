@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntologyDaoJena;
 
+@WebServlet(name = "OntologyEditController", urlPatterns = {"/ontologyEdit"} )
 public class OntologyEditController extends BaseEditController {
     private static final Log log = LogFactory.getLog(OntologyEditController.class.getName());
 
@@ -84,14 +86,12 @@ public class OntologyEditController extends BaseEditController {
         request.setAttribute("realURI", realURI);
         request.setAttribute("exportURL", request.getContextPath() + Controllers.EXPORT_RDF);
         
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
-        request.setAttribute("bodyJsp","/templates/edit/specific/ontologies_edit.jsp");
         request.setAttribute("title","Ontology Control Panel");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/ontologies_edit.jsp");
         } catch (Exception e) {
             log.error("OntologyEditController could not forward to view.");
             log.error(e.getMessage());

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -76,7 +76,7 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
             return WrappedIterator.create(tripList.iterator());
         }
         if (subject.isConcrete() && predicate.isConcrete() && !object.isConcrete()) {
-            Collections.sort(tripList, new TripleSortByLang());
+            tripList.sort(new TripleSortByLang());
             LinkedList<Triple> tripl = new LinkedList<Triple>();
             if (!tripList.get(0).getObject().isLiteral()) {
                 tripl.addAll(tripList);

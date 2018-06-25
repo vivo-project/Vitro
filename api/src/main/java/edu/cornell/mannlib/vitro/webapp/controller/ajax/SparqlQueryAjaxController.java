@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.ajax;
 
@@ -8,6 +8,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  * 
  * The result is delivered in JSON format.
  */
+@WebServlet(name = "ajaxSparqlQuery", urlPatterns = {"/ajax/sparqlQuery"} )
 public class SparqlQueryAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(SparqlQueryAjaxController.class);
@@ -59,8 +61,7 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 			String queryParam = locateQueryParam(vreq);
 			Query query = SparqlUtils.createQuery(queryParam);
 			SparqlUtils.executeQuery(response, query, model);
-			return;
-		} catch (AjaxControllerException e) {
+        } catch (AjaxControllerException e) {
 			log.error(e.getMessage());
 			response.sendError(e.getStatusCode());
 		}

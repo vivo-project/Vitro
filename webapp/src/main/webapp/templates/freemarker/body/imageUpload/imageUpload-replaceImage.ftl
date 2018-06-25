@@ -1,9 +1,8 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- Upload a replacement main image for an Individual. -->
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>')}
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.css" />')}
 
@@ -38,5 +37,5 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.cs
 </section>
 
 <script type="text/javascript">
-    i18n_confirmDelete = "${i18n.confirm_delete}"
+    i18n_confirmDelete = "${i18n.confirm_delete}";
 </script>

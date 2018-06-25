@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -8,10 +8,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstanceIface;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -123,9 +122,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         indList.addAll(possIndSet);
         sortForPickList(indList, vreq);
         List objectEntOptionList = new LinkedList();
-        Iterator<Individual> indIt = indList.iterator();
-        while (indIt.hasNext()) {
-            Individual objInd = indIt.next();
+        for (Individual objInd : indList) {
             Option objIndOpt = new Option(objInd.getURI(), objInd.getName());
             if (objectForEditing.getObjectEntURI() != null && objectForEditing.getObjectEntURI().equals(objInd.getURI())) {
                 objIndOpt.setSelected(true);
@@ -142,8 +139,6 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
 
         FormUtils.populateFormFromBean(objectForEditing,action,foo);
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/ents2ents_retry_domainSide.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Object Property Instance Editing Form");
@@ -152,7 +147,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("ObjectPropertyStatementRetryController could not forward to view.");
             log.error(e.getMessage());

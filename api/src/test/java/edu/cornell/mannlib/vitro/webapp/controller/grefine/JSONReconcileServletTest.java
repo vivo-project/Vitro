@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.grefine;
 
@@ -10,8 +10,7 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,14 +52,12 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 		String defaultTypeList = null;
 		String serverName = null;
 		String schemaSpaceOutput = null;
-		JSONObject jsonResult = null;
+		ObjectNode jsonResult = null;
 		try {
 			jsonResult = reconcile.getMetadata(request, response, defaultNamespace, defaultTypeList, serverName, serverPort);
-			schemaSpaceOutput = jsonResult.getString("schemaSpace");
+			schemaSpaceOutput = jsonResult.get("schemaSpace").asText();
 		} catch (ServletException e) {
 			System.err.println("JSONReconcileServletTest getMetadata ServletException: " + e);
-		} catch (JSONException e) {
-			System.err.println("JSONReconcileServletTest getMetadata JSONException: " + e);
 		}
 		Assert.assertNotNull("output should not be null", jsonResult);
 		Assert.assertEquals("schemaSpaceOutput", defaultNamespace, schemaSpaceOutput);

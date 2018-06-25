@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
@@ -45,8 +45,7 @@ public class PermissionSet {
 	}
 
 	public void setForNewUsers(Boolean forNewUsers) {
-		this.forNewUsers = (forNewUsers == null) ? false
-				: forNewUsers.booleanValue();
+		this.forNewUsers = (forNewUsers != null) && forNewUsers.booleanValue();
 	}
 
 	public boolean isForPublic() {
@@ -54,8 +53,7 @@ public class PermissionSet {
 	}
 
 	public void setForPublic(Boolean forPublic) {
-		this.forPublic = (forPublic == null) ? false
-				: forPublic.booleanValue();
+		this.forPublic = (forPublic != null) && forPublic.booleanValue();
 	}
 
 	public Set<String> getPermissionUris() {

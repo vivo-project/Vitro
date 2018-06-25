@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.Work
  * 
  * Otherwise, the result will be 200 (OK), with a brief message.
  */
+@WebServlet(name = "WaitForBackgroundThreads", urlPatterns = {"/admin/wait"} )
 public class WaitForBackgroundThreadsController extends VitroHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(WaitForBackgroundThreadsController.class);

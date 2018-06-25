@@ -1,4 +1,4 @@
-<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <!-- <script type='text/javascript' src='dojo.js'></script> -->
 
@@ -42,7 +42,7 @@ function monikerInit(){
 
 function update(){ //updates moniker list when type is changed
 
-  DWRUtil.useLoadingMessage();
+  dwr.util.useLoadingMessage();
 
   EntityDWR.monikers(createList,  document.getElementById("VClassURI").value );
   
@@ -62,7 +62,7 @@ function createList(data) { //puts options in moniker select list
   var opt = new Option("[new moniker]","");
   ele.options[ele.options.length] = opt;
 
-  DWRUtil.setValue("Moniker",getCurrentMoniker()); // getCurrentMoniker() is defined on jsp
+  dwr.util.setValue("Moniker",getCurrentMoniker()); // getCurrentMoniker() is defined on jsp
 
   checkMonikers();
 }
@@ -111,7 +111,7 @@ function fillList(id, data, selectedtext) {
 
   for (var i = 0; i < data.length; i++)    {
 
-    var text = DWRUtil.toDescriptiveString(data[i]);
+    var text = dwr.util.toDescriptiveString(data[i]);
 
     var value = text;
 

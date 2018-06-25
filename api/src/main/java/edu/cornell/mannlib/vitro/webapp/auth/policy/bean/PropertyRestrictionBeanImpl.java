@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy.bean;
 
@@ -145,11 +145,8 @@ public class PropertyRestrictionBeanImpl extends PropertyRestrictionBean {
 		if (resourceUri == null || userRole == null) {
 			return false;
 		}
-		if (prohibitedNamespaces.contains(namespace(resourceUri))
-				&& !permittedExceptions.contains(resourceUri)) {
-			return false;
-		}
-		return true;
+		return !prohibitedNamespaces.contains(namespace(resourceUri))
+				|| permittedExceptions.contains(resourceUri);
 	}
 
 	@Override
@@ -241,9 +238,7 @@ public class PropertyRestrictionBeanImpl extends PropertyRestrictionBean {
 
 		StringBuilder buffer = new StringBuilder();
 		for (FullPropertyKey key : keys) {
-			buffer.append(key + " " + thresholdMap.get(key).getLevel(DISPLAY)
-					+ " " + thresholdMap.get(key).getLevel(MODIFY) + " "
-					+ thresholdMap.get(key).getLevel(PUBLISH) + "\n");
+			buffer.append(key).append(" ").append(thresholdMap.get(key).getLevel(DISPLAY)).append(" ").append(thresholdMap.get(key).getLevel(MODIFY)).append(" ").append(thresholdMap.get(key).getLevel(PUBLISH)).append("\n");
 		}
 		return buffer.toString();
 

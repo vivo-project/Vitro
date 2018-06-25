@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.threads;
 
@@ -70,7 +70,7 @@ public class VitroBackgroundThread extends Thread {
 
 	public void setWorkLevel(WorkLevel level, String... flags) {
 		log.debug("Set work level on '" + this.getName() + "' to " + level
-				+ ", flags=" + flags);
+				+ ", flags=" + Arrays.toString(flags));
 		stamp = new WorkLevelStamp(level, flags);
 	}
 

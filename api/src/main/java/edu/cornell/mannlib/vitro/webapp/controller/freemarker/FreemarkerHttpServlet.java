@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -17,7 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -250,8 +250,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 		// This method does a redirect if the required authorizations are 
 		// not met (and they won't be), so just return.
 		isAuthorizedToDisplayPage(vreq, response, values.getUnauthorizedAction());
-		return;
-	}
+    }
 
 	protected void doTemplate(VitroRequest vreq, HttpServletResponse response, 
             ResponseValues values) throws TemplateProcessingException {
@@ -489,8 +488,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
     }
 
     protected StringWriter processTemplate(String templateName, Map<String, Object> map, 
-            HttpServletRequest request) throws TemplateProcessingException {    
-        TemplateProcessingHelper helper = new TemplateProcessingHelper(request, getServletContext());
+            HttpServletRequest request) throws TemplateProcessingException {
+        TemplateProcessingHelper helper = new TemplateProcessingHelper(request);
         return helper.processTemplate(templateName, map);
     }
     

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import java.text.SimpleDateFormat;
@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -618,9 +618,9 @@ public class EditConfigurationVTwo {
         Map<String, String> dest = new HashMap<String, String>();        
         for( String key : source.keySet()){
             if( source.get(key) != null )
-                dest.put(new String(key), source.get(key));
+                dest.put(key, source.get(key));
             else 
-                dest.put(new String(key), null);
+                dest.put(key, null);
         }
         return dest;
     }

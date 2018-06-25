@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 
@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,7 +41,7 @@ public class PropertyListConfig {
     private final ObjectPropertyTemplateModel optm;
     private final VitroRequest vreq;
     private final TemplateLoader templateLoader;
-    
+
     private boolean isDefaultConfig;
     private Set<String> constructQueries;
     private String selectQuery;
@@ -140,7 +141,7 @@ public class PropertyListConfig {
 			
 			boolean collated = optm instanceof CollatedObjectPropertyTemplateModel;
 
-			selectQuery = configFileContents.getSelectQuery(collated, editing);
+			selectQuery = configFileContents.getSelectQuery(collated, editing, ListConfigUtils.getUsePreciseSubquery(vreq));
 			templateName = configFileContents.getTemplateName();
 			constructQueries = configFileContents.getConstructQueries();
 

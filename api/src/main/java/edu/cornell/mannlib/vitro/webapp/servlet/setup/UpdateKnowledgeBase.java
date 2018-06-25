@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
@@ -508,8 +508,8 @@ public class UpdateKnowledgeBase {
 					"containing RDF files.");
 		}
 		File[] rdfFiles = directory.listFiles();
-		for (int i = 0; i < rdfFiles.length; i++) {
-			readFile(rdfFiles[i], om, directoryPath);
+		for (File rdfFile : rdfFiles) {
+			readFile(rdfFile, om, directoryPath);
 		}
 		return om;
 	}

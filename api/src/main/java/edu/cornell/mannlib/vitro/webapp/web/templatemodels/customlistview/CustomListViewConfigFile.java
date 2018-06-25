@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 
@@ -20,6 +20,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -56,6 +58,7 @@ public class CustomListViewConfigFile {
 	private static final String TAG_POSTPROCESSOR = "postprocessor";
 	private static final String TAG_COLLATED = "collated";
 	private static final String TAG_CRITICAL = "critical-data-required";
+	private static final String TAG_PRECISE = "precise-subquery";
 
 	// Will not be null. This is mutable, but don't modify it. Clone it and
 	// modify the clone.
@@ -198,7 +201,7 @@ public class CustomListViewConfigFile {
 		}
 	}
 
-	public String getSelectQuery(boolean collated, boolean editing) {
+	public String getSelectQuery(boolean collated, boolean editing, boolean usePreciseSubquery) {
 		Element cloned = (Element) selectQueryElement.cloneNode(true);
 
 		if (!collated) {
@@ -206,6 +209,9 @@ public class CustomListViewConfigFile {
 		}
 		if (editing) {
 			removeChildElements(cloned, TAG_CRITICAL);
+		}
+		if (!usePreciseSubquery) {
+			removeChildElements(cloned, TAG_PRECISE);
 		}
 
 		return cloned.getTextContent();

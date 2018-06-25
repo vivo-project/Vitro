@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.i18n.selection;
 
@@ -14,6 +14,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -29,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * Otherwise, just process the request as usual.
  */
+@WebFilter(filterName = "Locale selection filter", urlPatterns = {"/*"})
 public class LocaleSelectionFilter implements Filter {
 	private static final Log log = LogFactory
 			.getLog(LocaleSelectionFilter.class);

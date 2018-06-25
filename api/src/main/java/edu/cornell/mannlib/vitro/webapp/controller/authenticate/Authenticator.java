@@ -1,22 +1,24 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.codec.binary.Hex;
-
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import org.apache.commons.codec.binary.Hex;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
 
 /**
  * The tool that a login process will use to interface with the user records in
@@ -55,6 +57,7 @@ public abstract class Authenticator {
 	 * 
 	 * If there is no factory, configure a Basic one.
 	 */
+
 	public static Authenticator getInstance(HttpServletRequest request) {
 		ServletContext ctx = request.getSession().getServletContext();
 		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
@@ -111,6 +114,22 @@ public abstract class Authenticator {
 	 */
 	public abstract boolean isCurrentPassword(UserAccount userAccount,
 			String clearTextPassword);
+
+
+
+	/**
+	 * Does this UserAccount have this Argon2 password? False if the
+	 * userAccount is null.
+	 */
+	public abstract boolean isCurrentPasswordArgon2(UserAccount userAccount,
+											  String clearTextPassword);
+
+
+	/**
+	 *
+	 * Checks if the user still has got an MD5 Password
+	 */
+	public abstract boolean md5HashIsNull(UserAccount userAccount);
 
 	/**
 	 * Internal: record a new password for the user. Takes no action if the
@@ -180,6 +199,46 @@ public abstract class Authenticator {
 		}
 	}
 
+
+	/**
+	 * Applies Argon2i hashing on a string. Obtains the argon2i parameters
+	 * from the configuration properties specified in the runtime.properties
+	 * through this class "Authenticator".
+	 **/
+
+
+	public static String applyArgon2iEncoding(String raw) {
+		ServletContext ctx = ApplicationUtils.instance().getServletContext();
+		ConfigurationProperties configProp = ConfigurationProperties.getBean(ctx);
+
+		Argon2 argon2 = Argon2Factory.create();
+		if (configProp.getProperty("argon2.time") != null
+				&& configProp.getProperty("argon2.memory") != null
+				&& configProp.getProperty("argon2.parallelism") != null) {
+			return argon2.hash(
+					Integer.parseInt(configProp.getProperty("argon2.time")),
+					Integer.parseInt(configProp.getProperty("argon2.memory")),
+					Integer.parseInt(configProp.getProperty("argon2.parallelism")), raw);
+		} else {
+			throw new RuntimeException(
+					"Parameters \"argon2.time\", \"argon2.memory\" and "
+							+ "\"argon2.parallelism\" are either missing in the "
+							+ "\"runtime.properties\" file or are not defined correctly");
+		}
+	}
+
+
+
+    /**
+     Verifies the string against the Argon2i hash stored for a user account
+     */
+
+	public static boolean verifyArgon2iHash(String hash, String raw)
+	{
+		Argon2 argon2 = Argon2Factory.create();
+		return argon2.verify(hash, raw);
+	}
+
 	/**
 	 * Check whether the form of the emailAddress is syntactically correct. Does
 	 * not allow multiple addresses. Does not allow local addresses (without a
@@ -197,11 +256,7 @@ public abstract class Authenticator {
 
 			// InternetAddress permits a localname without hostname.
 			// Guard against that.
-			if (emailAddress.indexOf('@') == -1) {
-				return false;
-			}
-
-			return true;
+			return emailAddress.indexOf('@') != -1;
 		} catch (AddressException e) {
 			return false;
 		}

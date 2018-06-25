@@ -11,7 +11,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>.</outputDirectory>
             <includes>
                 <include>README*</include>
                 <include>LICENSE*</include>
@@ -20,7 +20,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
         <!-- fileSet>
             <directory>${project.build.directory}</directory>
@@ -30,4 +30,14 @@
             </includes>
         </fileSet -->
     </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <includes>
+                <include>org.vivoweb:jena2tools:jar:*</include>
+                <include>org.vivoweb:jena3tools:jar:*</include>
+            </includes>
+            <outputDirectory>bin</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+        </dependencySet>
+    </dependencySets>
 </assembly>

@@ -1,9 +1,8 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Comparator;
-import java.util.Date;
 
 /**
  * a class representing a particular instance of an object property

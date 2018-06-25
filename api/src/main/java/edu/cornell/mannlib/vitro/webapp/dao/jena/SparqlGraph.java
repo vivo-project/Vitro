@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -8,14 +8,13 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 
 import org.apache.jena.graph.Capabilities;
@@ -175,9 +174,9 @@ public class SparqlGraph implements GraphWithPerform {
 				|| (object != null && object.isBlank())) {
             return false;
         }
-        StringBuffer containsQuery = new StringBuffer("ASK { \n");
+        StringBuilder containsQuery = new StringBuilder("ASK { \n");
         if (graphURI != null) {
-            containsQuery.append("  GRAPH <" + graphURI + "> { ");
+            containsQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         containsQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
@@ -226,7 +225,7 @@ public class SparqlGraph implements GraphWithPerform {
         } else if (node.isBlank()) {
             return "<fake:blank>"; // or throw exception?
         } else if (node.isURI()) {
-            StringBuffer uriBuff = new StringBuffer();
+            StringBuilder uriBuff = new StringBuilder();
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
         } else if (node.isLiteral()) {
             StringBuffer literalBuff = new StringBuffer();
@@ -235,7 +234,7 @@ public class SparqlGraph implements GraphWithPerform {
             literalBuff.append("\"");
             if (node.getLiteralDatatypeURI() != null) {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
+            } else if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             }
             return literalBuff.toString();
@@ -269,9 +268,9 @@ public class SparqlGraph implements GraphWithPerform {
                 return WrappedIterator.create(Collections.<Triple>emptyIterator());
             }
         }
-        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder findQuery = new StringBuilder("SELECT * WHERE { \n");
         if (graphURI != null) {
-            findQuery.append("  GRAPH <" + graphURI + "> { ");
+            findQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         findQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
@@ -415,11 +414,8 @@ public class SparqlGraph implements GraphWithPerform {
     
     private boolean execAsk(String queryStr) {
         Query askQuery = QueryFactory.create(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery);
-        try {
+        try (QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery)) {
             return qe.execAsk();
-        } finally {
-            qe.close();
         }
     }
     
@@ -444,11 +440,8 @@ public class SparqlGraph implements GraphWithPerform {
 //        log.info((System.currentTimeMillis() - startTime1) + " to execute via sesame");
         
         Query askQuery = QueryFactory.create(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery);
-        try {
+        try (QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery)) {
             return new ResultSetMem(qe.execSelect());
-        } finally {
-            qe.close();
         }
     }
     

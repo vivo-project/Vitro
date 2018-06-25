@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
@@ -88,7 +88,7 @@ public class ThemeInfoSetup implements ServletContextListener {
 			}
 		}
 
-		Collections.sort(themeNames, String.CASE_INSENSITIVE_ORDER);
+		themeNames.sort(String.CASE_INSENSITIVE_ORDER);
 		return themeNames;
 	}
 

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
@@ -68,7 +68,7 @@ public class ExtendedLinkedDataUtils {
 		try {
 			try {
 				reader = new BufferedReader(new FileReader(sparqlFile));
-				StringBuffer fileContents = new StringBuffer();
+				StringBuilder fileContents = new StringBuilder();
 				String ln;
 			
 				while ( (ln = reader.readLine()) != null) {

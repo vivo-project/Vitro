@@ -1,8 +1,6 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package freemarker.ext.beans;
-
-import java.util.Set;
 
 /**
  * Class to extract wrapper used to wrap an object into a template model object. 

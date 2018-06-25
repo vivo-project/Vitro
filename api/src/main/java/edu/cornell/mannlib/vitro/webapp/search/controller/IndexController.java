@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessing
  * can maintain a history of activity. This will provide the contents of the
  * display.
  */
+@WebServlet(name = "IndexController", urlPatterns = {"/SearchIndex"} )
 public class IndexController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory.getLog(IndexController.class);
 

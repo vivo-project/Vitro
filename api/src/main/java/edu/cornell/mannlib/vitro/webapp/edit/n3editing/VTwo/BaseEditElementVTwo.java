@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
@@ -41,9 +41,7 @@ public abstract class BaseEditElementVTwo  implements EditElementVTwo {
         StringWriter writer = new StringWriter();
         try {
             template.process(map, writer);
-        } catch (TemplateException e) {
-            log.error(e,e);
-        } catch (IOException e) {
+        } catch (TemplateException | IOException e) {
             log.error(e,e);
         }
         return writer.toString();        

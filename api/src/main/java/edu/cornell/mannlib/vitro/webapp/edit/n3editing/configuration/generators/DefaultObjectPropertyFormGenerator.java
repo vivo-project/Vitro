@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
@@ -68,14 +68,6 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	protected long maxNonACRangeIndividualCount = 300;
 	protected String customErrorMessages = null;
 	
-	private static HashMap<String,String> defaultsForXSDtypes ;
-	  static {
-		defaultsForXSDtypes = new HashMap<String,String>();
-		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
-		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-	  }
-	  
-	  
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
             HttpSession session) throws Exception {
@@ -145,9 +137,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	   		    if (!rangeVClass.isUnion()) {
 	   		        types.add(rangeVClass);    
 	   		    } else {
-	   		        for (VClass unionComponent : rangeVClass.getUnionComponents()) {
-	   		            types.add(unionComponent);
-	   		        }
+					types.addAll(rangeVClass.getUnionComponents());
 	   		    }
 	   		    return types;
    		    } else {
@@ -340,8 +330,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		this.processObjectPropForm(vreq, editConfiguration);
     	} else {
     		log.debug("This is a data property: " + predicateUri);
-    		return;
-    	}
+        }
     }    
 
     
@@ -538,7 +527,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         	types = new ArrayList<VClass>();
         }
 		
-        StringBuffer typesBuff = new StringBuffer();
+        StringBuilder typesBuff = new StringBuilder();
         for (VClass type : types) {
             if (type.getURI() != null) {
                 typesBuff.append(type.getURI()).append(",");

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -8,18 +8,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.map.ListOrderedMap;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,6 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.listener.impl.IndividualDataPropertyStatementProcessor;
 
+@WebServlet(name = "EntityRetryController", urlPatterns = {"/entity_retry"} )
 public class EntityRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(EntityRetryController.class.getName());
@@ -210,30 +211,26 @@ public class EntityRetryController extends BaseEditController {
         Collections.sort(allApplicableDataprops);
         
         if (allApplicableDataprops != null) {
-            Iterator<DataProperty> datapropsIt = allApplicableDataprops.iterator();
 
-            while (datapropsIt.hasNext()){
-                DataProperty d = datapropsIt.next();
+            for (DataProperty d : allApplicableDataprops) {
                 if (!dpMap.containsKey(d.getURI())) {
-                    dpMap.put(d.getURI(),d);
+                    dpMap.put(d.getURI(), d);
                 }
-				
+
             }
 
             if (individualForEditing.getDataPropertyList() != null) {
-                Iterator<DataProperty> existingDps = individualForEditing.getDataPropertyList().iterator();
-                while (existingDps.hasNext()) {
-                    DataProperty existingDp = existingDps.next();
-					// Since the edit form begins with a "name" field, which gets saved as the rdfs:label,
-					// do not want to include the label as well. 
-					if ( !existingDp.getPublicName().equals("label") ) {
-						dpMap.put(existingDp.getURI(),existingDp);
-					}
+                for (DataProperty existingDp : individualForEditing.getDataPropertyList()) {
+                    // Since the edit form begins with a "name" field, which gets saved as the rdfs:label,
+                    // do not want to include the label as well.
+                    if (!existingDp.getPublicName().equals("label")) {
+                        dpMap.put(existingDp.getURI(), existingDp);
+                    }
                 }
             }
 
             List<DynamicField> dynamicFields = new ArrayList();
-            Iterator<String> dpHashIt = dpMap.orderedMapIterator();
+            Iterator<String> dpHashIt = dpMap.mapIterator();
             while (dpHashIt.hasNext()) {
                 String uri = dpHashIt.next();
                 DataProperty dp = (DataProperty) dpMap.get(uri);
@@ -248,9 +245,7 @@ public class EntityRetryController extends BaseEditController {
                 rowTemplate.setParameterMap(parameterMap);
                 dynamo.setRowTemplate(rowTemplate);
                 try {
-                    Iterator<DataPropertyStatement> existingValues = dp.getDataPropertyStatements().iterator();
-                    while (existingValues.hasNext()) {
-                        DataPropertyStatement existingValue = existingValues.next();
+                    for (DataPropertyStatement existingValue : dp.getDataPropertyStatements()) {
                         DynamicFieldRow row = new DynamicFieldRow();
                         //TODO: UGH
                         //row.setId(existingValue.getId());
@@ -290,8 +285,6 @@ public class EntityRetryController extends BaseEditController {
 
         ApplicationBean appBean = vreq.getAppBean();
         
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/entity_retry.jsp");
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("title","Individual Editing Form");
@@ -303,7 +296,7 @@ public class EntityRetryController extends BaseEditController {
         request.setAttribute("unqualifiedClassName","Individual");
         setRequestAttributes(request,epo);
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("EntityRetryController could not forward to view.");
             log.error(e.getMessage());

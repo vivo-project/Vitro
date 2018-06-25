@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <!-- VIVO-specific default list view config file for object properties 
     
@@ -15,13 +15,5 @@
         } ORDER BY ?value
     </query-select>
 
-    <query-construct>        
-        CONSTRUCT {
-            ?subject ?property ?value 
-        } WHERE {
-                ?subject ?property ?value
-        }
-    </query-construct>
-    
     <template>propStatement-dataDefault.ftl</template>
 </list-view-config>

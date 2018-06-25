@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
@@ -15,10 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,6 +58,7 @@ import edu.ucsf.vitro.opensocial.OpenSocialManager;
  * Paged search controller that uses the search engine
  */
 
+@WebServlet(name = "SearchController", urlPatterns = {"/search","/search.jsp","/fedsearch","/searchcontroller"} )
 public class PagedSearchController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -195,18 +197,16 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             }            
             
             List<Individual> individuals = new ArrayList<Individual>(docs.size());
-            Iterator<SearchResultDocument> docIter = docs.iterator();
-            while( docIter.hasNext() ){
-                try {                                    
-                    SearchResultDocument doc = docIter.next();
-                    String uri = doc.getStringValue(VitroSearchTermNames.URI);                    
+            for (SearchResultDocument doc : docs) {
+                try {
+                    String uri = doc.getStringValue(VitroSearchTermNames.URI);
                     Individual ind = iDao.getIndividualByURI(uri);
-                    if(ind != null) {
-                      ind.setSearchSnippet( getSnippet(doc, response) );
-                      individuals.add(ind);
+                    if (ind != null) {
+                        ind.setSearchSnippet(getSnippet(doc, response));
+                        individuals.add(ind);
                     }
-                } catch(Exception e) {
-                    log.error("Problem getting usable individuals from search hits. ",e);
+                } catch (Exception e) {
+                    log.error("Problem getting usable individuals from search hits. ", e);
                 }
             }          
   
@@ -416,10 +416,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
         
         
-        Collections.sort(classes, new Comparator<VClass>(){
-            public int compare(VClass o1, VClass o2) {                
+        classes.sort(new Comparator<VClass>() {
+            public int compare(VClass o1, VClass o2) {
                 return o1.compareTo(o2);
-            }});
+            }
+        });
         
         List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(classes.size());
         for (VClass vc : classes) {                        
@@ -450,12 +451,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     
     private String getSnippet(SearchResultDocument doc, SearchResponse response) {
         String docId = doc.getStringValue(VitroSearchTermNames.DOCID);
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         Map<String, Map<String, List<String>>> highlights = response.getHighlighting();
         if (highlights != null && highlights.get(docId) != null) {
             List<String> snippets = highlights.get(docId).get(VitroSearchTermNames.ALLTEXT);
             if (snippets != null && snippets.size() > 0) {
-                text.append("... " + snippets.get(0) + " ...");
+                text.append("... ").append(snippets.get(0)).append(" ...");
             }       
         }
         return text.toString();
@@ -647,11 +648,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     protected boolean isRequestedFormatXml(VitroRequest req){
         if( req != null ){
             String param = req.getParameter(PARAM_XML_REQUEST);
-            if( param != null && "1".equals(param)){
-                return true;
-            }else{
-                return false;
-            }
+            return param != null && "1".equals(param);
         }else{
             return false;
         }
@@ -660,11 +657,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     protected boolean isRequestedFormatCSV(VitroRequest req){
         if( req != null ){
             String param = req.getParameter(PARAM_CSV_REQUEST);
-            if( param != null && "1".equals(param)){
-                return true;
-            }else{
-                return false;
-            }
+            return param != null && "1".equals(param);
         }else{
             return false;
         }

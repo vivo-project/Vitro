@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
@@ -35,7 +35,7 @@ public class VClassList extends VClass {
     }
 
     public void sort(){
-        Collections.sort(getEntities(), getCompare() );
+        getEntities().sort(getCompare());
     }
 
     public int getSize(){

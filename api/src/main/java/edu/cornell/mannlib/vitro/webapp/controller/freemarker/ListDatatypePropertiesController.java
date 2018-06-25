@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,8 +26,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "ListDatatypePropertiesController", urlPatterns = {"/listDatatypeProperties"} )
 public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
 
     private static Log log = LogFactory.getLog( ListDatatypePropertiesController.class );
@@ -98,27 +100,27 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
         	    sortForPickList(props, vreq);
             }
 
-            String json = new String();
+            StringBuilder json = new StringBuilder();
             int counter = 0;
 
             if (props != null) {
                 if (props.size()==0) {
-                    json = "{ \"name\": \"" + noResultsMsgStr + "\" }";
+                    json = new StringBuilder("{ \"name\": \"" + noResultsMsgStr + "\" }");
                 } else {
             	    for (DataProperty prop: props) {
                         if ( counter > 0 ) {
-                            json += ", ";
+                            json.append(", ");
                         }
                         
                         String nameStr = prop.getPickListName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPickListName();
 
                         try {
-                            json += "{ \"name\": " + JSONUtils.quote("<a href='datapropEdit?uri="+ URLEncoder.encode(prop.getURI())+"'>" + nameStr + "</a>") + ", "; 
+                            json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='datapropEdit?uri=" + URLEncoder.encode(prop.getURI()) + "'>" + nameStr + "</a>")).append(", ");
                         } catch (Exception e) {
-                            json += "{ \"name\": " + JSONUtils.quote(nameStr) + ", ";
+                            json.append("{ \"name\": ").append(JacksonUtils.quote(nameStr)).append(", ");
                         }
                         
-                        json += "\"data\": { \"internalName\": " + JSONUtils.quote(prop.getPickListName()) + ", ";
+                        json.append("\"data\": { \"internalName\": ").append(JacksonUtils.quote(prop.getPickListName())).append(", ");
                         
 /*                        VClass vc = null;
                         String domainStr="";
@@ -138,22 +140,22 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                             dpLangNeut = prop;
                         }
                         String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut); 
-                        json += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
+                        json.append("\"domainVClass\": ").append(JacksonUtils.quote(domainStr)).append(", ");
 
                         Datatype rangeDatatype = dDao.getDatatypeByURI(prop.getRangeDatatypeURI());
                         String rangeDatatypeStr = (rangeDatatype==null)?prop.getRangeDatatypeURI():rangeDatatype.getName();
-                        json += "\"rangeVClass\": " + JSONUtils.quote(rangeDatatypeStr) + ", " ; 
+                        json.append("\"rangeVClass\": ").append(JacksonUtils.quote(rangeDatatypeStr)).append(", ");
 
                         if (prop.getGroupURI() != null) {
                             PropertyGroup pGroup = pgDao.getGroupByURI(prop.getGroupURI());
-                            json += "\"group\": " + JSONUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()) + " } } " ; 
+                            json.append("\"group\": ").append(JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName())).append(" } } ");
                         } else {
-                             json += "\"group\": \"unspecified\" } }" ;
+                             json.append("\"group\": \"unspecified\" } }");
                         }
                         counter += 1;
                     }
                 }
-                body.put("jsonTree",json);
+                body.put("jsonTree", json.toString());
             }
         } catch (Throwable t) {
             t.printStackTrace();

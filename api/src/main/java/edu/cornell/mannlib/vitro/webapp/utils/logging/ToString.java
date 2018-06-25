@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.logging;
 
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.compose.Polyadic;
@@ -127,7 +127,7 @@ public class ToString {
 	}
 
 	public static boolean isVitroClass(Object o) {
-		return (o == null) ? false : o.getClass().getName()
+		return (o != null) && o.getClass().getName()
 				.startsWith("edu.cornell");
 	}
 

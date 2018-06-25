@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.virtuoso;
 
@@ -6,7 +6,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,12 +126,7 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 	private HttpPost createHttpRequest(String updateString) {
 		HttpPost meth = new HttpPost(updateEndpointURI);
 		meth.addHeader("Content-Type", "application/sparql-query");
-		try {
-			meth.setEntity(new StringEntity(updateString, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			// UTF-8 is unsupported?
-			throw new RuntimeException(e);
-		}
+		meth.setEntity(new StringEntity(updateString, "UTF-8"));
 		return meth;
 	}
 

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -190,11 +190,11 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
                 return WrappedIterator.create(Collections.<Quad>emptyIterator());
             }
         }
-        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder findQuery = new StringBuilder("SELECT * WHERE { \n");
         String graphURI = !isVar(graph) ? graph.getURI() : null;
         findQuery.append("  GRAPH ");
         if (graphURI != null) {
-            findQuery.append("  <" + graphURI + ">");
+            findQuery.append("  <").append(graphURI).append(">");
         } else {
             findQuery.append("?g");
         }
@@ -259,7 +259,12 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
             return graph;
         }
     }
-    
+
+    @Override
+    public RDFServiceGraph getUnionGraph() {
+        return defaultGraph;
+    }
+
     private boolean supportsTransactions(Graph graph) {
         return (graph.getTransactionHandler() != null 
                 && graph.getTransactionHandler().transactionsSupported());

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -104,7 +104,7 @@ public class DisplayModelDaoJena implements DisplayModelDao {
         if( text == null ){       
             //text of file is not yet in model
             File oldMenuFile = new File(context.getRealPath(MENU_N3_FILE));
-            StringBuffer str = new StringBuffer(2000);
+            StringBuilder str = new StringBuilder(2000);
             BufferedReader reader = new BufferedReader(new FileReader(oldMenuFile));
             char[] buf = new char[1024];
             int numRead=0;

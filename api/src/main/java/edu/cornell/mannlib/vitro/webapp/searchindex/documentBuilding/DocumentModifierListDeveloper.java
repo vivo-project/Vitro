@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding;
 
@@ -61,19 +61,19 @@ public class DocumentModifierListDeveloper implements DocumentModifierList {
 	 */
 	@Override
 	public void stopIndexing() {
-		String message = String.format(
+		StringBuilder message = new StringBuilder(String.format(
 				"Timings for %d modifiers after %d calls:", timings.size(),
-				count.get());
+				count.get()));
 		for (ModifierTiming timing : timings) {
 			int totalMillis = timing.getTotal();
 			float totalSeconds = totalMillis / 1000.0F;
 			int average = (count.get() == 0) ? 0 : totalMillis / count.get();
-			message += String
+			message.append(String
 					.format("\n   count: %7d, total: %9.3fsec, average: %4dms-- %1.200s",
 							count.get(), totalSeconds, average,
-							timing.getModifier());
+							timing.getModifier()));
 		}
-		log.info(message);
+		log.info(message.toString());
 	}
 
 	private static class ModifierTiming {

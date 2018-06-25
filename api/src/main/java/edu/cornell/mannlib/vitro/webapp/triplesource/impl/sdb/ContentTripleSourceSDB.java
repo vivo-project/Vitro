@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
@@ -26,7 +26,7 @@ import org.apache.jena.sdb.sql.SDBConnection;
 import org.apache.jena.sdb.store.DatabaseType;
 import org.apache.jena.sdb.store.LayoutType;
 import org.apache.jena.sdb.util.StoreUtils;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
@@ -86,7 +86,7 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	static final boolean DEFAULT_TESTONRETURN = true;
 
 	private ServletContext ctx;
-	private ComboPooledDataSource ds;
+	private BasicDataSource ds;
 	private RDFServiceFactory rdfServiceFactory;
 	private RDFService rdfService;
 	private Dataset dataset;
@@ -233,10 +233,14 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 			this.rdfService.close();
 		}
 		if (ds != null) {
-			String driverClassName = ds.getDriverClass();
-			ds.close();
-			attemptToDeregisterJdbcDriver(driverClassName);
-			cleanupAbandonedConnectionThread(driverClassName);
+			String driverClassName = ds.getDriverClassName();
+			try {
+				ds.close();
+			} catch (SQLException e) {
+			}finally {
+				attemptToDeregisterJdbcDriver(driverClassName);
+				cleanupAbandonedConnectionThread(driverClassName);
+			}
 		}
 	}
 

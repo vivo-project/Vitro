@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
@@ -218,15 +218,11 @@ public class ABoxRecomputer {
         Model assertions = getAssertions(individualURI);
         log.debug((System.currentTimeMillis() - start) + " ms to get assertions.");
         long prevRebuildSize = (simpleReasoner.getSameAsEnabled()) ? rebuildModel.size() : 0;
-        Model additionalInferences = recomputeIndividual(
-                individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
         if (simpleReasoner.getSameAsEnabled()) {
             Set<String> sameAsInds = getSameAsIndividuals(individualURI);
             for (String sameAsInd : sameAsInds) {
                 // sameAs for plugins is handled by the SimpleReasoner
                 Model sameAsIndAssertions = getAssertions(sameAsInd);
-                recomputeIndividual(
-                        sameAsInd, individualURI, sameAsIndAssertions, rebuildModel, caches, SKIP_PLUGINS);
                 rebuildModel.add(
                         rewriteInferences(getAssertions(sameAsInd), individualURI));
                 Resource indRes = ResourceFactory.createResource(individualURI);
@@ -239,11 +235,11 @@ public class ABoxRecomputer {
                 }
             }
             if(rebuildModel.size() - prevRebuildSize > 0) {
-                for (String sameAsInd : sameAsInds) {
-                    individualQueue.add(sameAsInd);
-                }
+                individualQueue.addAll(sameAsInds);
             }
         }
+        Model additionalInferences = recomputeIndividual(
+                individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
         return additionalInferences;
     }
 
@@ -264,6 +260,7 @@ public class ABoxRecomputer {
         long start = System.currentTimeMillis();
         Model types = ModelFactory.createDefaultModel();
         types.add(assertions.listStatements(null, RDF.type, (RDFNode) null));
+        types.add(rebuildModel.listStatements(null, RDF.type, (RDFNode) null));
         Model inferredTypes = rewriteInferences(getInferredTypes(individual, types, caches), aliasURI);
         rebuildModel.add(inferredTypes);
         log.trace((System.currentTimeMillis() - start) + " to infer " + inferredTypes.size() + " types");
@@ -498,14 +495,12 @@ public class ABoxRecomputer {
     protected void addInferenceStatementsFor(String individualUri, Model addTo) throws RDFServiceException {
         StringBuilder builder = new StringBuilder();
         builder.append("CONSTRUCT\n")
-                .append("{\n")
-                .append("   <" + individualUri + "> ?p ?o .\n")
+                .append("{\n").append("   <").append(individualUri).append("> ?p ?o .\n")
                 .append("}\n")
                 .append("WHERE\n")
                 .append("{\n")
                 .append("   GRAPH <").append(ModelNames.ABOX_INFERENCES).append(">\n")
-                .append("   {\n")
-                .append("       <" + individualUri + "> ?p ?o .\n")
+                .append("   {\n").append("       <").append(individualUri).append("> ?p ?o .\n")
                 .append("   }\n")
                 .append("}\n");
 
@@ -563,10 +558,8 @@ public class ABoxRecomputer {
                     .append("   ?object\n")
                     .append("WHERE {\n")
                     .append("    GRAPH ?g { \n")
-                    .append("        {\n")
-                    .append("            <" + individualUri + "> <" + OWL.sameAs + "> ?object .\n")
-                    .append("        } UNION {\n")
-                    .append("            ?object <" + OWL.sameAs + "> <" + individualUri + "> .\n")
+                    .append("        {\n").append("            <").append(individualUri).append("> <").append(OWL.sameAs).append("> ?object .\n")
+                    .append("        } UNION {\n").append("            ?object <").append(OWL.sameAs).append("> <").append(individualUri).append("> .\n")
                     .append("        }\n")
                     .append("    } \n")
                     .append("    FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">)\n") 

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish;
 
@@ -6,7 +6,6 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAct
 
 import org.apache.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 

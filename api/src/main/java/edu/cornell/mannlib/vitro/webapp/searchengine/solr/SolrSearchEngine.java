@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
@@ -31,7 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
  * The Solr-based implementation of SearchEngine.
  */
 public class SolrSearchEngine implements SearchEngine {
-	private HttpSolrServer server;
+	private HttpSolrServer queryEngine;
+	private ConcurrentUpdateSolrServer updateEngine;
 
 	/**
 	 * Set up the http connection with the solr server
@@ -51,14 +53,18 @@ public class SolrSearchEngine implements SearchEngine {
 		}
 
 		try {
-			server = new HttpSolrServer(solrServerUrlString);
-			server.setSoTimeout(10000); // socket read timeout
-			server.setConnectionTimeout(10000);
-			server.setDefaultMaxConnectionsPerHost(100);
-			server.setMaxTotalConnections(100);
-			server.setMaxRetries(1);
-			css.info("Set up the Solr search engine; URL = '"
-					+ solrServerUrlString + "'.");
+			queryEngine = new HttpSolrServer(solrServerUrlString);
+			queryEngine.setSoTimeout(10000); // socket read timeout
+			queryEngine.setConnectionTimeout(10000);
+			queryEngine.setDefaultMaxConnectionsPerHost(100);
+			queryEngine.setMaxTotalConnections(100);
+			queryEngine.setMaxRetries(1);
+
+			updateEngine = new ConcurrentUpdateSolrServer(solrServerUrlString, 100, 1);
+			updateEngine.setConnectionTimeout(10000);
+			updateEngine.setPollQueueTime(25);
+
+			css.info("Set up the Solr search engine; URL = '" + solrServerUrlString + "'.");
 		} catch (Exception e) {
 			css.fatal("Could not set up the Solr search engine", e);
 		}
@@ -66,13 +72,14 @@ public class SolrSearchEngine implements SearchEngine {
 
 	@Override
 	public void shutdown(Application application) {
-		server.shutdown();
+		queryEngine.shutdown();
+		updateEngine.shutdown();
 	}
 
 	@Override
 	public void ping() throws SearchEngineException {
 		try {
-			server.ping();
+			queryEngine.ping();
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Solr server did not respond to ping.",
 					e);
@@ -93,7 +100,7 @@ public class SolrSearchEngine implements SearchEngine {
 	public void add(Collection<SearchInputDocument> docs)
 			throws SearchEngineException {
 		try {
-			server.add(SolrConversionUtils.convertToSolrInputDocuments(docs));
+			updateEngine.add(SolrConversionUtils.convertToSolrInputDocuments(docs), 100);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Solr server failed to add documents "
 					+ docs, e);
@@ -103,7 +110,8 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void commit() throws SearchEngineException {
 		try {
-			server.commit();
+			updateEngine.commit();
+			updateEngine.optimize();
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Failed to commit to Solr server.", e);
 		}
@@ -112,7 +120,8 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void commit(boolean wait) throws SearchEngineException {
 		try {
-			server.commit(wait, wait);
+			updateEngine.commit(wait, wait);
+			updateEngine.optimize(wait, wait);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Failed to commit to Solr server.", e);
 		}
@@ -126,7 +135,7 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void deleteById(Collection<String> ids) throws SearchEngineException {
 		try {
-			server.deleteById(new ArrayList<>(ids));
+			updateEngine.deleteById(new ArrayList<>(ids), 100);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException(
 					"Solr server failed to delete documents: " + ids, e);
@@ -136,7 +145,7 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void deleteByQuery(String query) throws SearchEngineException {
 		try {
-			server.deleteByQuery(query);
+			updateEngine.deleteByQuery(query, 100);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException(
 					"Solr server failed to delete documents: " + query, e);
@@ -159,7 +168,7 @@ public class SolrSearchEngine implements SearchEngine {
 	public SearchResponse query(SearchQuery query) throws SearchEngineException {
 		try {
 			SolrQuery solrQuery = SolrConversionUtils.convertToSolrQuery(query);
-			QueryResponse response = server.query(solrQuery);
+			QueryResponse response = queryEngine.query(solrQuery);
 			return SolrConversionUtils.convertToSearchResponse(response);
 		} catch (SolrServerException e) {
 			throw appropriateException(

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sparql;
 
@@ -19,7 +19,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -41,34 +40,14 @@ public class ContentTripleSourceSPARQL extends ContentTripleSource {
 	private Dataset dataset;
 	private ModelMaker modelMaker;
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasEndpointURI")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasEndpointURI", minOccurs = 1, maxOccurs = 1)
 	public void setEndpointURI(String eUri) {
-		if (endpointURI == null) {
-			endpointURI = eUri;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple instances of EndpointURI: "
-							+ endpointURI + ", and " + eUri);
-		}
+		endpointURI = eUri;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasUpdateEndpointURI")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasUpdateEndpointURI", maxOccurs = 1)
 	public void setUpdateEndpointURI(String ueUri) {
-		if (updateEndpointURI == null) {
-			updateEndpointURI = ueUri;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple instances of UpdateEndpointURI: "
-							+ updateEndpointURI + ", and " + ueUri);
-		}
-	}
-
-	@Validation
-	public void validate() throws Exception {
-		if (endpointURI == null) {
-			throw new IllegalStateException(
-					"Configuration did not include an EndpointURI.");
-		}
+		updateEndpointURI = ueUri;
 	}
 
 	@Override

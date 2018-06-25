@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- Login widget -->
 
@@ -10,7 +10,7 @@
     <#if ! user.loggedIn> -->
         ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/login.css" />')}
         <#-- ${scripts.add("")} -->
-        ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/login/loginUtils.js"></script>')}
+        ${scripts.add('<script async type="text/javascript" src="${urls.base}/js/login/loginUtils.js"></script>')}
     <#-- </#if> -->
 </#macro>
 

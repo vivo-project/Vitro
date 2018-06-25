@@ -1,7 +1,8 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -27,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.ProcessRdfFormController.Utilities;
 
 
+@WebServlet(name = "PostEditCleanupController", urlPatterns = {"/postEditCleanupController"} )
 public class PostEditCleanupController extends FreemarkerHttpServlet{
 	
     private static Log log = LogFactory.getLog(PostEditCleanupController.class);    	    

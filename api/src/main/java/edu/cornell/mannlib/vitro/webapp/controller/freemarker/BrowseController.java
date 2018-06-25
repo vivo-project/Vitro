@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -18,6 +18,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "browsecontroller", urlPatterns = {"/browse"}, loadOnStartup = 5)
 public class BrowseController extends FreemarkerHttpServlet {
     static final long serialVersionUID=2006030721126L;
     

@@ -1,10 +1,9 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
 
-import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.graph.NodeFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,14 +25,11 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.OntResource;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
-import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -62,9 +57,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetM
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-
-import javax.xml.soap.Node;
 
 public class IndividualSDB extends IndividualImpl implements Individual {
 
@@ -610,12 +602,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		if (this.propertyList == null) {
     			getObjectPropertyList();
     		}
-    		for (Iterator i = this.propertyList.iterator(); i.hasNext();) { 
-    			ObjectProperty op = (ObjectProperty) i.next();
-    			if (op.getURI() != null) {
-    				map.put(op.getURI(), op);
-    			}
-    		}
+			for (ObjectProperty op : this.propertyList) {
+				if (op.getURI() != null) {
+					map.put(op.getURI(), op);
+				}
+			}
     		this.objectPropertyMap = map;
     		return map;    		
     	}
@@ -668,12 +659,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		if (this.datatypePropertyList == null) {
     			getDataPropertyList();
     		}
-    		for (Iterator i = this.datatypePropertyList.iterator(); i.hasNext();) { 
-    			DataProperty dp = (DataProperty) i.next();
-    			if (dp.getURI() != null) {
-    				map.put(dp.getURI(), dp);
-    			}
-    		}
+			for (DataProperty dp : this.datatypePropertyList) {
+				if (dp.getURI() != null) {
+					map.put(dp.getURI(), dp);
+				}
+			}
     		this.dataPropertyMap = map;
     		return map;    		
     	}
@@ -963,15 +953,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     protected void sortEnts2EntsForDisplay(){ 
         if( getObjectPropertyList() == null ) return;
 
-        Iterator it = getObjectPropertyList().iterator();
-        while(it.hasNext()){
-            ObjectProperty prop = (ObjectProperty)it.next();
-        /*  if (prop.getObjectIndividualSortPropertyURI()==null) {
+		for (ObjectProperty prop : getObjectPropertyList()) {
+			/*  if (prop.getObjectIndividualSortPropertyURI()==null) {
             	prop.sortObjectPropertyStatementsForDisplay(prop,prop.getObjectPropertyStatements());
             } else {*/
-            	prop.sortObjectPropertyStatementsForDisplay(prop,prop.getObjectPropertyStatements());
+			prop.sortObjectPropertyStatementsForDisplay(prop, prop.getObjectPropertyStatements());
         /*  }*/
-        }
+		}
     }
     
     private Collator collator = Collator.getInstance();
@@ -1050,7 +1038,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 }
             };
             try {
-                Collections.sort(getObjectPropertyStatements(), comp);
+                getObjectPropertyStatements().sort(comp);
             } catch (Exception e) {
                 log.error("Exception sorting object property statements for object property "+this.getURI());
             }

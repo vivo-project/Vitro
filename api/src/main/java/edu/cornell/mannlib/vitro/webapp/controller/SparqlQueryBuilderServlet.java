@@ -1,16 +1,17 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
  *  This servlet works as a RequestDispatcher to direct to the sparl query builder page.
  *  @author yuysun
  */
+@WebServlet(name = "SparlQueryBuilder", urlPatterns = {"/admin/sparqlquerybuilder"})
 public class SparqlQueryBuilderServlet extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(SparqlQueryBuilderServlet.class.getName());
@@ -85,7 +87,6 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
         }
 
         doHelp(request,response);
-        return;
     }
     
     private void doNoModelInContext(HttpServletRequest request, HttpServletResponse res){
@@ -100,10 +101,8 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     }
 
     private void doHelp(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-            req.setAttribute("title","SPARQL Query Builder");
-            req.setAttribute("bodyJsp", "/admin/sparql.jsp");
-            
-            RequestDispatcher rd = req.getRequestDispatcher("/"+Controllers.BASIC_JSP);
-            rd.forward(req,res);
+        req.setAttribute("title","SPARQL Query Builder");
+
+        JSPPageHandler.renderBasicPage(req, res, "/admin/sparql.jsp");
     }
 }

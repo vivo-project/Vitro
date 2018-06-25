@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.api;
 
@@ -9,12 +9,12 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
  * 500 Unknown error
  * </pre>
  */
+@WebServlet(name = "SparqlUpdateApi", urlPatterns = {"/api/sparqlUpdate"})
 public class SparqlUpdateApiController extends VitroApiServlet {
 	private static final Log log = LogFactory
 			.getLog(SparqlUpdateApiController.class);
@@ -81,11 +82,11 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 			throw new ParseException("No 'update' parameter.");
 		}
 
-		if (!StringUtils.containsIgnoreCase(update, "GRAPH")) {
+		if (!StringUtils.containsIgnoreCase(update, "GRAPH") && !StringUtils.containsIgnoreCase(update, "WITH")) {
 			if (log.isDebugEnabled()) {
-				log.debug("No GRAPH uri in '" + update + "'");
+				log.debug("No GRAPH or WITH uri in '" + update + "'");
 			}
-			throw new ParseException("SPARQL update must specify a GRAPH URI.");
+			throw new ParseException("SPARQL update must specify a GRAPH ( or WITH) URI.");
 		}
 
 		try {

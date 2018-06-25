@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.log;
 
@@ -45,11 +45,11 @@ public class LogUtils {
 		@SuppressWarnings("unchecked")
 		Map<String, String[]> map = req.getParameterMap();
 
-		String s = req.getRequestURL().append('\n').toString();
+		StringBuilder s = new StringBuilder(req.getRequestURL().append('\n').toString());
 		for (String name : new TreeSet<String>(map.keySet())) {
-			s += "   " + name + " = " + Arrays.toString(map.get(name)) + '\n';
+			s.append("   ").append(name).append(" = ").append(Arrays.toString(map.get(name))).append('\n');
 		}
-		return s.trim();
+		return s.toString().trim();
 	}
 
 	private static boolean isLevelEnabled(Log log, String level) {

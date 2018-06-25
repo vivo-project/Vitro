@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vedit.util;
 
@@ -46,19 +46,21 @@ public class OperationUtils {
 
 			}
 		}
-		Object[] arglist = new Object[1];
-		if (isInt)
-			arglist[0] = Integer.decode(value);
-		else if (isBoolean)
-			arglist[0] = (value.equalsIgnoreCase("TRUE"));
-		else
-			arglist[0] = value;
-		try {
-			setterMethod.invoke(newObj, arglist);
-		} catch (Exception e) {
-			log.error("Couldn't invoke method");
-			log.error(e.getMessage());
-			log.error(field + " " + arglist[0]);
+		if (setterMethod != null) {
+			Object[] arglist = new Object[1];
+			if (isInt)
+				arglist[0] = Integer.decode(value);
+			else if (isBoolean)
+				arglist[0] = (value.equalsIgnoreCase("TRUE"));
+			else
+				arglist[0] = value;
+			try {
+				setterMethod.invoke(newObj, arglist);
+			} catch (Exception e) {
+				log.error("Couldn't invoke method");
+				log.error(e.getMessage());
+				log.error(field + " " + arglist[0]);
+			}
 		}
 	}
 

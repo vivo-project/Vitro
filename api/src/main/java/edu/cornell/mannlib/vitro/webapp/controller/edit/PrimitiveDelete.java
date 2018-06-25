@@ -1,12 +1,13 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
+@WebServlet(name = "primitiveDelete", urlPatterns = {"/edit/primitiveDelete"})
 public class PrimitiveDelete extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;

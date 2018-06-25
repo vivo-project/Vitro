@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
@@ -463,7 +463,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                 }
             };
             try {
-                Collections.sort(objPropStmtsList, fieldComp);
+                objPropStmtsList.sort(fieldComp);
             } catch (Exception e) {
                 log.error("Exception sorting object property statements for object property "+prop.getURI());
             }
@@ -562,7 +562,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                 }
             };
             try {
-                Collections.sort(objPropStmtsList, dpComp);
+                objPropStmtsList.sort(dpComp);
             } catch (Exception e) {
                 log.error("Exception sorting object property statements " +
                           "for object property " + prop.getURI(), e);
@@ -576,16 +576,16 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
      * @return Readable text identifying this property's attributes
      */
     public String toString(){
-        String list = "null";
+        StringBuilder list = new StringBuilder("null");
         if( getObjectPropertyStatements() != null ){
             Iterator it = getObjectPropertyStatements().iterator();
-            if( !it.hasNext() ) list = " none";
+            if( !it.hasNext() ) list = new StringBuilder(" none");
             while(it.hasNext()){
                 Object obj = it.next();
                 if( obj != null && obj instanceof ObjectPropertyStatement){
-                    list += "\n\t\t" + ((ObjectPropertyStatement)obj).toString();
+                    list.append("\n\t\t").append(((ObjectPropertyStatement) obj).toString());
                 }else{
-                    list += "\n\t\t" + obj.toString();
+                    list.append("\n\t\t").append(obj.toString());
                 }
             }
         }

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 var associateProfileFields = {
     onLoad: function() {
@@ -169,7 +169,7 @@ var associateProfileFields = {
     
     newProfileClassHasChanged: function() {
         if (this.newProfileClassSelector.val().length == 0) {
-            this.associateProfileNameField.attr("disabled","");
+            this.associateProfileNameField.attr("disabled",false);
         } else {
             this.associateProfileNameField.val('');
             this.associateProfileNameField.attr("disabled","disabled");

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
@@ -24,10 +24,8 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -564,19 +562,17 @@ public class SimpleReasoner extends StatementListener
 	    sameIndividuals.add(resource);
 
 	    aboxModel.enterCriticalSection(Lock.READ);
-	    try {           
-	        Iterator<Resource> sameIter = sameIndividuals.iterator();
-	        while (sameIter.hasNext()) {
-	            Resource res = sameIter.next();
-	            StmtIterator typeIt = aboxModel.listStatements(res, RDF.type, (RDFNode) null);
-	            while (typeIt.hasNext()) {
-	                Statement stmt = typeIt.nextStatement();
-	                if (stmt.getObject().isURIResource()) {
-	                    String typeURI = stmt.getObject().asResource().getURI();
-	                    typeURIs.add(typeURI);
-	                }
-	            }
-	        }
+	    try {
+			for (Resource res : sameIndividuals) {
+				StmtIterator typeIt = aboxModel.listStatements(res, RDF.type, (RDFNode) null);
+				while (typeIt.hasNext()) {
+					Statement stmt = typeIt.nextStatement();
+					if (stmt.getObject().isURIResource()) {
+						String typeURI = stmt.getObject().asResource().getURI();
+						typeURIs.add(typeURI);
+					}
+				}
+			}
 	    } finally { 
 	        aboxModel.leaveCriticalSection();
 	    }   
@@ -804,20 +800,17 @@ public class SimpleReasoner extends StatementListener
 				if (handleSameAs) {
 					List<Resource> sameIndividuals = 
                         getSameIndividuals(infStmt.getSubject().asResource(), inferenceModel);
-					Iterator<Resource> sameIter = sameIndividuals.iterator();
-					while (sameIter.hasNext()) {
-						Resource subject = sameIter.next();
-						
-						Statement sameStmt = 
-                            ResourceFactory.createStatement(subject,infStmt.getPredicate(),
-                                                            infStmt.getObject());
-						if (subject.equals(infStmt.getObject()) 
-                            && OWL.sameAs.equals(infStmt.getPredicate())) {
+					for (Resource subject : sameIndividuals) {
+						Statement sameStmt =
+								ResourceFactory.createStatement(subject, infStmt.getPredicate(),
+										infStmt.getObject());
+						if (subject.equals(infStmt.getObject())
+								&& OWL.sameAs.equals(infStmt.getPredicate())) {
 							continue;
 						}
-						
-						if (!inferenceModel.contains(sameStmt) 
-                            && !aboxModel.contains(sameStmt)) {
+
+						if (!inferenceModel.contains(sameStmt)
+								&& !aboxModel.contains(sameStmt)) {
 							inferenceModel.add(sameStmt);
 						}
 					}				
@@ -861,18 +854,17 @@ public class SimpleReasoner extends StatementListener
 			try {	
 			    List<Resource> sameIndividuals = 
                     getSameIndividuals(infStmt.getSubject().asResource(), inferenceModel);
-			   
-			    Iterator<Resource> sameIter = sameIndividuals.iterator();	 
-			    while (sameIter.hasNext()) {
-				  Statement infStmtSame = 
-                      ResourceFactory.createStatement(sameIter.next(), 
-                                                      infStmt.getPredicate(), infStmt.getObject());
-				  if ((!checkEntailment 
-                       || !entailedStatement(infStmtSame)) 
-                      && inferenceModel.contains(infStmtSame)) { 
-					inferenceModel.remove(infStmtSame);
-				  }					 		   
-			    }
+
+				for (Resource sameIndividual : sameIndividuals) {
+					Statement infStmtSame =
+							ResourceFactory.createStatement(sameIndividual,
+									infStmt.getPredicate(), infStmt.getObject());
+					if ((!checkEntailment
+							|| !entailedStatement(infStmtSame))
+							&& inferenceModel.contains(infStmtSame)) {
+						inferenceModel.remove(infStmtSame);
+					}
+				}
 			} finally {
 				inferenceModel.leaveCriticalSection();
 			}
@@ -937,50 +929,40 @@ public class SimpleReasoner extends StatementListener
 	
 			List<OntClass> types2 = new ArrayList<OntClass>();
 			types2.addAll(types);
-			
-			Iterator<OntClass> typeIter = types.iterator();
-			
-			while (typeIter.hasNext()) {
-			    OntClass type = typeIter.next();
-			    			    
-			    boolean add = true;
-			    Iterator<OntClass> typeIter2 = types2.iterator();
-			    while (typeIter2.hasNext()) {
-			    	OntClass type2 = typeIter2.next();
-			    				    	
-			    	if (type.equals(type2)) { 
-			    		continue;
-			    	}
-			    	
-			    	if (type.hasSubClass(type2, false) && !type2.hasSubClass(type, false)) {
-			    		add = false;
-			    		break;
-			    	}
-			    }	
-			    
-			    if (add) {
-			    	typeURIs.add(type.getURI());
-			    	
-			    	ArrayList<Resource> equivalentClasses = new ArrayList<Resource>();
-			    	
-			    	Iterator<Statement> iter = tboxModel.listStatements((Resource) null, OWL.equivalentClass, type);
-			    	while (iter.hasNext()) {
-			    		Statement stmt = iter.next();
-			    		Resource res = stmt.getSubject();
-			    		if ((res == null) || res.isAnon() || equivalentClasses.contains(res)  ) {
-			    			continue;
-			    		}
-			    		equivalentClasses.add(res);
-			    	}
-			    	
-		            Iterator<Resource> eIter = equivalentClasses.iterator();
-		                
-		            while (eIter.hasNext()) {
-		                Resource equivClass = eIter.next();
-		                if (equivClass.isAnon()) continue;
-		                typeURIs.add(equivClass.getURI());
-		            }    
-			    }    	
+
+			for (OntClass type : types) {
+				boolean add = true;
+				for (OntClass type2 : types2) {
+					if (type.equals(type2)) {
+						continue;
+					}
+
+					if (type.hasSubClass(type2, false) && !type2.hasSubClass(type, false)) {
+						add = false;
+						break;
+					}
+				}
+
+				if (add) {
+					typeURIs.add(type.getURI());
+
+					ArrayList<Resource> equivalentClasses = new ArrayList<Resource>();
+
+					Iterator<Statement> iter = tboxModel.listStatements((Resource) null, OWL.equivalentClass, type);
+					while (iter.hasNext()) {
+						Statement stmt = iter.next();
+						Resource res = stmt.getSubject();
+						if ((res == null) || res.isAnon() || equivalentClasses.contains(res)) {
+							continue;
+						}
+						equivalentClasses.add(res);
+					}
+
+					for (Resource equivClass : equivalentClasses) {
+						if (equivClass.isAnon()) continue;
+						typeURIs.add(equivClass.getURI());
+					}
+				}
 			}
 		} finally {
 			inferenceModel.leaveCriticalSection();
@@ -989,8 +971,7 @@ public class SimpleReasoner extends StatementListener
 		}
 	
 		setMostSpecificTypes(individual, typeURIs, inferenceModel);
-	    return;	
-	}
+    }
 	
 	protected void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs, Model inferenceModel) {
 		
@@ -1020,17 +1001,14 @@ public class SimpleReasoner extends StatementListener
 		Iterator<Statement> rIter = retractions.listStatements();
 		while (rIter.hasNext()) {
 			removeInference(rIter.next(), inferenceModel, true, false);
-		}	
-		
-		Iterator<String> typeIter = typeURIs.iterator();		
-		while (typeIter.hasNext()) {
-			String typeURI = typeIter.next();
-			Statement mstStmt = ResourceFactory.createStatement(individual,mostSpecificType,ResourceFactory.createResource(typeURI));
-			addInference(mstStmt,inferenceModel,true);
-		}		
-		
-        return;
-	}
+		}
+
+		for (String typeURI : typeURIs) {
+			Statement mstStmt = ResourceFactory.createStatement(individual, mostSpecificType, ResourceFactory.createResource(typeURI));
+			addInference(mstStmt, inferenceModel, true);
+		}
+
+    }
 	
 	protected List<Resource> getParents(Resource cls, OntModel tboxModel) {
 		

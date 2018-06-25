@@ -1,10 +1,11 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import net.sf.jga.algorithms.Filter;
 import net.sf.jga.fn.UnaryFunctor;
 import net.sf.jga.fn.adaptor.AndUnary;
@@ -32,7 +33,7 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
         return filterAndWrap(innerObjectPropertyDao.getAllObjectProperties(), filters);        
     }
 
-    public List getObjectPropertiesForObjectPropertyStatements(List objectPropertyStatements) {
+    public List getObjectPropertiesForObjectPropertyStatements(List<ObjectPropertyStatement> objectPropertyStatements) {
         //assume that the objPropStmts are already filtered
         List<ObjectProperty> list =
             innerObjectPropertyDao

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,17 +69,15 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         HashSet<String> nonExternalIdPropURISet = new HashSet<String>();
         if (ind != null) {
             Collection<DataPropertyStatement> dpsColl = getWebappDaoFactory().getDataPropertyStatementDao().getDataPropertyStatementsForIndividualByDataPropertyURI(ind, dataPropertyURI);
-            Iterator<DataPropertyStatement> dpsIt = dpsColl.iterator();
-            while (dpsIt.hasNext()) {
-                DataPropertyStatement dps = dpsIt.next();
+            for (DataPropertyStatement dps : dpsColl) {
                 if (externalIdPropURISet.contains(dps.getDatapropURI())) {
                     externalIdStatements.add(dps);
                 } else if (!nonExternalIdPropURISet.contains(dps.getDatapropURI())) {
-                	OntModel tboxOntModel = getOntModelSelector().getTBoxModel();
+                    OntModel tboxOntModel = getOntModelSelector().getTBoxModel();
                     tboxOntModel.enterCriticalSection(Lock.READ);
                     try {
                         Resource dataprop = tboxOntModel.getResource(dps.getDatapropURI());
-                        if (dataprop != null && (tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, ResourceFactory.createTypedLiteral(true)) || tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, "TRUE") )) {
+                        if (dataprop != null && (tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, ResourceFactory.createTypedLiteral(true)) || tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, "TRUE"))) {
                             externalIdPropURISet.add(dps.getDatapropURI());
                             externalIdStatements.add(dps);
                         } else {
@@ -219,12 +217,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
          
-            entURI = new String(preferredURI);          
+            entURI = preferredURI;
             org.apache.jena.ontology.Individual test = ontModel.getIndividual(entURI);
             int count = 0;
             while (test != null) {
                 ++count;
-                entURI = new String(preferredURI) + count;
+                entURI = preferredURI + count;
                 test = ontModel.getIndividual(entURI);
             }
             
@@ -236,8 +234,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 }
                 List<VClass> vclasses = ent.getVClasses(false);
                 if (vclasses != null) {
-                    for (Iterator<VClass> typeIt = vclasses.iterator(); typeIt.hasNext(); ) {
-                        VClass vc = typeIt.next();
+                    for (VClass vc : vclasses) {
                         ind.addRDFType(ResourceFactory.createResource(vc.getURI()));
                     }
                 }
@@ -316,24 +313,21 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     if (vcl == null) {
                         conservativeTypeDeletion = true; // if the bean has null here instead of an empty list, we don't want to trust it and just start deleting any existing types.  So we'll just update the Vitro flag-related types and leave the rest alone.
                     } else {
-                        for (Iterator<VClass> typeIt = vcl.iterator(); typeIt.hasNext(); ) {
-                            VClass vc = typeIt.next();
+                        for (VClass vc : vcl) {
                             newTypeURIsSet.add(vc.getURI());
                         }
                     }
                 } catch (Exception e) {
                     log.error(e, e);
                 }
-                for (Iterator<String> oldIt = oldTypeURIsSet.iterator(); oldIt.hasNext();) {
-                    String uri = oldIt.next();
+                for (String uri : oldTypeURIsSet) {
                     if (!newTypeURIsSet.contains(uri)) {
-                        if ( (!conservativeTypeDeletion) || (uri.indexOf(VitroVocabulary.vitroURI) == 0) ) {
+                        if ((!conservativeTypeDeletion) || (uri.indexOf(VitroVocabulary.vitroURI) == 0)) {
                             ind.removeRDFType(ResourceFactory.createResource(uri));
                         }
                     }
                 }
-                for (Iterator<String> newIt = newTypeURIsSet.iterator(); newIt.hasNext();) {
-                    String uri = newIt.next();
+                for (String uri : newTypeURIsSet) {
                     if (!oldTypeURIsSet.contains(uri)) {
                         ind.addRDFType(ResourceFactory.createResource(uri));
                     }
@@ -605,12 +599,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 
     public Collection<String> getAllIndividualUris() {
         //this is implemented in IndivdiualSDB
-        throw new NotImplementedException();
+        throw new NotImplementedException("");
     }  
 
     public Iterator<String> getUpdatedSinceIterator(long updatedSince){
         //this is implemented in IndivdiualSDB
-        throw new NotImplementedException();
+        throw new NotImplementedException("");
     }
 
     public boolean isIndividualOfClass(String vclassURI, String indURI) {
@@ -677,7 +671,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 		
 		int attempts = 0;
 		
-		while( uriIsGood == false && attempts < 30 ){	
+		while(!uriIsGood && attempts < 30 ){
 			log.debug("While loop: Uri is good false, attempt=" + attempts);
 			String localName = "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
 			uri = namespace + localName;

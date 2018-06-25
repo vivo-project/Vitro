@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
@@ -39,7 +39,6 @@ public class Controllers {
     
     public static final String TAB = "/index.jsp";
 
-    public static final String BASIC_JSP = "/templates/page/basicPage.jsp";
     public static final String DEBUG_JSP = "/templates/page/debug.jsp";
     public static final Object BODY_MSG = "/templates/page/bodyMsg.jsp";
     
@@ -74,8 +73,8 @@ public class Controllers {
         if (Controllers.letters == null) {
             char c[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
             Controllers.letters = new ArrayList<String>(c.length);
-            for (int i = 0; i < c.length; i++) {
-                letters.add("" + c[i]);
+            for (char aC : c) {
+                letters.add("" + aC);
             }
         }
         return Controllers.letters;

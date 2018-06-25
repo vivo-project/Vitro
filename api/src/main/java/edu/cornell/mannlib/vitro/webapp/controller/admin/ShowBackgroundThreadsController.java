@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
@@ -17,10 +17,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Show the list of living background threads (instances of
  * VitroBackgroundThread), and their status.
  */
+@WebServlet(name = "ShowBackgroundThreads", urlPatterns = {"/admin/showThreads"} )
 public class ShowBackgroundThreadsController extends FreemarkerHttpServlet {
 
 	private static final String TEMPLATE_NAME = "admin-showThreads.ftl";

@@ -1,15 +1,12 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -162,8 +158,10 @@ public class FileGraphSetup implements ServletContextListener {
                     String fn = p.getFileName().toString().toLowerCase();
                     if ( fn.endsWith(".nt") ) {
                         model.read( fis, null, "N-TRIPLE" );
-                    } else if ( fn.endsWith(".n3") || fn.endsWith(".ttl") ) {
-                        model.read( fis, null, "N3" );
+                    } else if ( fn.endsWith(".n3") ) {
+                        model.read(fis, null, "N3");
+                    } else if ( fn.endsWith(".ttl") ) {
+                        model.read(fis, null, "TURTLE");
                     } else if ( fn.endsWith(".owl") || fn.endsWith(".rdf") || fn.endsWith(".xml") ) {
                         model.read( fis, null, "RDF/XML" );
                     } else if ( fn.endsWith(".md") ) {
@@ -261,7 +259,6 @@ public class FileGraphSetup implements ServletContextListener {
             }            
         }
 
-        return;
     }
 
 	/*

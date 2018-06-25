@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
 import java.util.ArrayList;
@@ -28,9 +28,9 @@ public class IndividualsViaVClassOptions implements FieldOptions {
             throw new Exception("vclassURIs must not be null or empty ");
                 
         this.vclassURIs = new ArrayList<String>(vclassURIs.length);
-        for(int i=0;i<vclassURIs.length;i++){
-            if( vclassURIs[i] != null && !vclassURIs[i].trim().isEmpty() )
-                this.vclassURIs.add(vclassURIs[i]);
+        for (String vclassURI : vclassURIs) {
+            if (vclassURI != null && !vclassURI.trim().isEmpty())
+                this.vclassURIs.add(vclassURI);
         }                              
     }
 
@@ -76,11 +76,11 @@ public class IndividualsViaVClassOptions implements FieldOptions {
     
     
     private Map<? extends String, ? extends String> notFoundMsg() {
-        String msg = "No individuals found for "+ (vclassURIs.size() > 1?"types":"type");
+        StringBuilder msg = new StringBuilder("No individuals found for " + (vclassURIs.size() > 1 ? "types" : "type"));
         for( String uri : vclassURIs ){
-            msg += " " + uri;
+            msg.append(" ").append(uri);
         }
-        return Collections.singletonMap("", msg);
+        return Collections.singletonMap("", msg.toString());
     }
 
     protected Map<String,Individual> getIndividualsForClass(String vclassURI, WebappDaoFactory wDaoFact ){

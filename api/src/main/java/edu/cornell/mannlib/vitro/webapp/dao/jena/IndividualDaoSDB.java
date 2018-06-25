@@ -1,8 +1,7 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -28,7 +27,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Property;
@@ -313,12 +311,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     private void fillIndividualsForObjectPropertyStatements(Individual entity){
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            Iterator e2eIt = entity.getObjectPropertyStatements().iterator();
-            while (e2eIt.hasNext()) {
-                ObjectPropertyStatement e2e = 
-                		(ObjectPropertyStatement) e2eIt.next();
+            for (ObjectPropertyStatement e2e : entity.getObjectPropertyStatements()) {
                 e2e.setSubject(makeIndividual(e2e.getSubjectURI()));
-                e2e.setObject(makeIndividual(e2e.getObjectURI()));       
+                e2e.setObject(makeIndividual(e2e.getObjectURI()));
             }
         } finally {
             getOntModel().leaveCriticalSection();

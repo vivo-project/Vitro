@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -42,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
+@WebServlet(name = "authenticate", urlPatterns = {"/authenticate"})
 public class Authenticate extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
@@ -329,15 +331,37 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
+
 		if (!getAuthenticator(request).isUserPermittedToLogin(user)) {
 			bean.setMessage(request, ERROR, "logins_disabled_for_maintenance");
 			return;
 		}
 
-		if (!getAuthenticator(request).isCurrentPassword(user, password)) {
-			bean.setMessage(request, ERROR, "error_incorrect_credentials");
-			return;
+
+		if(getAuthenticator(request).md5HashIsNull(user)) {
+			if (!getAuthenticator(request)
+					.isCurrentPasswordArgon2(user, password)) {
+				bean.setMessage(request, ERROR,
+						"error_incorrect_credentials");
+				return;
+			}
 		}
+		else {
+				if (!getAuthenticator(request)
+						.isCurrentPassword(user, password)) {
+					bean.setMessage(request, ERROR,
+							"error_incorrect_credentials");
+					return;
+				}
+				else {
+					user.setPasswordChangeRequired(true);
+					user.setMd5Password("");
+					bean.setMessage(request, ERROR,
+							"password_system_has_changed");
+				}
+		}
+
+
 
 		// Username and password are correct. What next?
 		if (user.isPasswordChangeRequired()) {
@@ -349,8 +373,7 @@ public class Authenticate extends VitroHttpServlet {
 				// This should have been caught by isUserPermittedToLogin()
 				bean.setMessage(request, ERROR,
 						"logins_disabled_for_maintenance");
-				return;
-			}
+            }
 		}
 	}
 
@@ -400,7 +423,7 @@ public class Authenticate extends VitroHttpServlet {
 
 		UserAccount user = getAuthenticator(request).getAccountForInternalAuth(
 				username);
-		if (getAuthenticator(request).isCurrentPassword(user, newPassword)) {
+		if (getAuthenticator(request).isCurrentPasswordArgon2(user, newPassword)) {
 			bean.setMessage(request, ERROR, "error_previous_password");
 			return;
 		}
@@ -411,8 +434,7 @@ public class Authenticate extends VitroHttpServlet {
 		} catch (LoginNotPermitted e) {
 			// This should have been caught by isUserPermittedToLogin()
 			bean.setMessage(request, ERROR, "logins_disabled_for_maintenance");
-			return;
-		}
+        }
 	}
 
 	/**
@@ -495,8 +517,7 @@ public class Authenticate extends VitroHttpServlet {
 		String loginProcessPage = LoginProcessBean.getBean(vreq)
 				.getLoginPageUrl();
 		response.sendRedirect(loginProcessPage);
-		return;
-	}
+    }
 
 	/**
 	 * Exit: user has completed the login. Redirect appropriately and clear the

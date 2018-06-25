@@ -1,13 +1,12 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * User: bdc34
@@ -97,7 +96,7 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
 
     void sortForDisplay();
 
-    JSONObject toJSON() throws JSONException;
+    JsonNode toJSON();
     
     Float getSearchBoost();
     void setSearchBoost( Float boost );

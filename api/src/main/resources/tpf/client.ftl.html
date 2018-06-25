@@ -1,0 +1,43 @@
+<h2>Query from your browser</h2>
+<p>
+    Your browser executes these queries locally
+    using <a href="http://linkeddatafragments.org/in-depth/#tpf" target="_blank">Triple Pattern Fragments</a>.
+</p>
+<fieldset class="ldf-client">
+    <ul>
+        <li>
+            <label>Query</label>
+            <textarea class="queryText"></textarea>
+        </li>
+        <li>
+            <button class="start" style="display: inline-block;">Execute query</button>
+            <button class="stop" style="display: none;">Stop execution</button>
+            <span class="timing"></span>
+        </li>
+        <!-- example queries -->
+        <li>
+            <label>Query results</label>
+            <div class="results"><div class="text"></div><div class="scrollRunway" style="position: absolute; height: 1px; width: 1px; transition: transform 0.2s; -webkit-transition: transform 0.2s; transform: translate(0px, 0px);"> </div></div>
+        </li>
+    </ul>
+</fieldset>
+<link rel="stylesheet" href="${ assetsPath }ldf-client.css">
+<script>
+    var ldfAssetsPath = '${ assetsPath }';
+</script>
+<script src="${ assetsPath }ldf-client-ui-packaged.js"></script>
+<script>jQuery(function($){$(".ldf-client").queryui(
+    {
+        "datasources": [
+            <#if datasources??>
+                <#list datasources?keys as datasourceName>
+                    {
+                        "name": "${datasources[datasourceName].getTitle() }",
+                        "url": "${homePath}/${datasourceName}"
+                    }<#if datasourceName?has_next>, </#if>
+                </#list>
+            </#if>
+        ]
+
+    }
+)})</script>

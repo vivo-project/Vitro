@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.tdb;
 
@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -49,23 +48,9 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	private Dataset dataset;
 	private ModelMaker modelMaker;
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTdbDirectory")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTdbDirectory", minOccurs = 1, maxOccurs = 1)
 	public void setTdbPath(String path) {
-		if (tdbPath == null) {
-			tdbPath = path;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple instances of TdbDirectory: "
-							+ tdbPath + ", and " + path);
-		}
-	}
-
-	@Validation
-	public void validate() throws Exception {
-		if (tdbPath == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a TdbDirectory.");
-		}
+		tdbPath = path;
 	}
 
 	@Override
@@ -106,7 +91,8 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	}
 
 	private void checkForFirstTimeStartup() {
-		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).getGraph().isEmpty()) {
+		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).getGraph()
+				.isEmpty()) {
 			JenaDataSourceSetupBase.thisIsFirstStartup();
 		}
 	}

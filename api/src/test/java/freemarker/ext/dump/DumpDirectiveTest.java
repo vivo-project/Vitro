@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package freemarker.ext.dump;
 
@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -1063,9 +1063,7 @@ public class DumpDirectiveTest {
         }
          
         public void setFavoriteColors(String...colors) {
-            for (String color : colors) {
-                favoriteColors.add(color);
-            }
+            Collections.addAll(favoriteColors, colors);
         }
         
 //        void setDegrees(Map<String, String> degrees) {
@@ -1087,7 +1085,7 @@ public class DumpDirectiveTest {
         }
         
         public String getName(String which) {
-            return which == "first" ? firstName : lastName;
+            return "first".equals(which) ? firstName : lastName;
         }
         
         public String getMiddleName() {

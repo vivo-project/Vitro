@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.AC_NAME_STEMMED;
@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
@@ -107,7 +106,7 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException {
 		if (term.isEmpty()) {
 			return EMPTY_RESPONSE;
 		}

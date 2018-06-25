@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,7 +22,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
+@WebServlet(name = "IndividualsListingController", urlPatterns = {"/listIndividuals"} )
 public class IndividualsListingController extends BaseEditController {
 
     //private static final int MAX_INDIVIDUALS = 50;
@@ -53,7 +55,7 @@ public class IndividualsListingController extends BaseEditController {
         String vclassURI = request.getParameter("VClassURI");
         VClass vc = vcDao.getVClassByURI(vclassURI);
         
-        List inds = dao.getIndividualsByVClassURI(vclassURI);
+        List<Individual> inds = dao.getIndividualsByVClassURI(vclassURI);
         //List inds = dao.getIndividualsByVClassURI(vclassURI,1,MAX_INDIVIDUALS);
 
         ArrayList results = new ArrayList();
@@ -62,16 +64,13 @@ public class IndividualsListingController extends BaseEditController {
         results.add("class");
 
         if (inds != null && inds.size()>0) {
-            Iterator indsIt = inds.iterator();
-            while (indsIt.hasNext()) {
-                Individual ind = (Individual) indsIt.next();
-
+            for (Individual ind : inds) {
                 results.add("XX");
 
                 if (ind.getName() != null) {
                     try {
-                        String individualName = (ind.getName()==null || ind.getName().length()==0) ? ind.getURI() : ind.getName();
-                        results.add("<a href=\"./entityEdit?uri="+URLEncoder.encode(ind.getURI(),"UTF-8")+"\">"+individualName+"</a>");
+                        String individualName = (ind.getName() == null || ind.getName().length() == 0) ? ind.getURI() : ind.getName();
+                        results.add("<a href=\"./entityEdit?uri=" + URLEncoder.encode(ind.getURI(), "UTF-8") + "\">" + individualName + "</a>");
                     } catch (Exception e) {
                         results.add(ind.getName());
                     }
@@ -82,8 +81,8 @@ public class IndividualsListingController extends BaseEditController {
 
                 if (vc != null) {
                     try {
-                        String vclassName = (vc.getName()==null || vc.getName().length()==0) ? vc.getURI() : vc.getName();
-                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(vc.getURI(),"UTF-8")+"\">"+vclassName+"</a>");
+                        String vclassName = (vc.getName() == null || vc.getName().length() == 0) ? vc.getURI() : vc.getName();
+                        results.add("<a href=\"./vclassEdit?uri=" + URLEncoder.encode(vc.getURI(), "UTF-8") + "\">" + vclassName + "</a>");
                     } catch (Exception e) {
                         results.add(vc.getName());
                     }
@@ -102,7 +101,6 @@ public class IndividualsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(3));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", "Individuals in Class "+ ( (vc != null) ? vc.getName() : vclassURI ) );
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
 
         // new individual button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
@@ -113,9 +111,8 @@ public class IndividualsListingController extends BaseEditController {
         buttons.add(newIndividualButton);
         request.setAttribute("topButtons", buttons);
           
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+            JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

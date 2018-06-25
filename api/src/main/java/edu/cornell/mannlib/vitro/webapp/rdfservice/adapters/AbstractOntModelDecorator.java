@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Graph;
@@ -1774,5 +1775,35 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	@Override
 	public Model writeAll(OutputStream out, String lang, String base) {
 		return inner.writeAll(out, lang, base);
+	}
+
+	@Override
+	public Statement getRequiredProperty(Resource resource, Property property, String s) {
+		return inner.getRequiredProperty(resource, property, s);
+	}
+
+	@Override
+	public Statement getProperty(Resource resource, Property property, String s) {
+		return inner.getProperty(resource, property, s);
+	}
+
+	@Override
+	public void executeInTxn(Runnable runnable) {
+		inner.executeInTxn(runnable);
+	}
+
+	@Override
+	public <T> T calculateInTxn(Supplier<T> supplier) {
+		return inner.calculateInTxn(supplier);
+	}
+
+	@Override
+	public PrefixMapping clearNsPrefixMap() {
+		return inner.clearNsPrefixMap();
+	}
+
+	@Override
+	public int numPrefixes() {
+		return inner.numPrefixes();
 	}
 }

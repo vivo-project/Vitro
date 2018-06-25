@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
@@ -14,7 +14,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -76,7 +75,7 @@ public class SelectListGeneratorVTwo {
         	comparator = new MapPairsComparator(vreq);
         }
         
-        Collections.sort(objectsToSort, comparator);
+        objectsToSort.sort(comparator);
 
         HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
         for (String[] pair:objectsToSort) {

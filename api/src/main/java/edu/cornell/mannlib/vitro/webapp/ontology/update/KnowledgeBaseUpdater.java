@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
@@ -171,7 +171,7 @@ public class KnowledgeBaseUpdater {
             if(sparqlFile.isDirectory()) {
                 continue;
             }
-            StringBuffer fileContents = new StringBuffer();
+            StringBuilder fileContents = new StringBuilder();
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(sparqlFile));
                 String ln;
@@ -371,7 +371,7 @@ public class KnowledgeBaseUpdater {
 			throw new RuntimeException("SPARQL file not found at " + filePath);
 		}
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		StringBuffer fileContents = new StringBuffer();
+		StringBuilder fileContents = new StringBuilder();
 		String ln;		
 		while ((ln = reader.readLine()) != null) {
 			fileContents.append(ln).append('\n');
@@ -418,41 +418,38 @@ public class KnowledgeBaseUpdater {
 		public AtomicOntologyChangeLists (
 				List<AtomicOntologyChange> changeList, OntModel newTboxModel,
 				OntModel oldTboxModel) throws IOException {
-			
-			Iterator<AtomicOntologyChange> listItr = changeList.iterator();
-			
-			while(listItr.hasNext()) {
-				AtomicOntologyChange changeObj = listItr.next();
-				if (changeObj.getSourceURI() != null){
-			        log.debug("triaging " + changeObj);
-					if (oldTboxModel.getOntProperty(changeObj.getSourceURI()) != null){
-						 atomicPropertyChanges.add(changeObj);
-						 log.debug("added to property changes");
+
+			for (AtomicOntologyChange changeObj : changeList) {
+				if (changeObj.getSourceURI() != null) {
+					log.debug("triaging " + changeObj);
+					if (oldTboxModel.getOntProperty(changeObj.getSourceURI()) != null) {
+						atomicPropertyChanges.add(changeObj);
+						log.debug("added to property changes");
 					} else if (oldTboxModel.getOntClass(changeObj.getSourceURI()) != null) {
-						 atomicClassChanges.add(changeObj);
-						 log.debug("added to class changes");
+						atomicClassChanges.add(changeObj);
+						log.debug("added to class changes");
 					} else if ("Prop".equals(changeObj.getNotes())) {
-						 atomicPropertyChanges.add(changeObj);
+						atomicPropertyChanges.add(changeObj);
 					} else if ("Class".equals(changeObj.getNotes())) {
-						 atomicClassChanges.add(changeObj);
-					} else{
-						 logger.log("WARNING: Source URI is neither a Property" +
-						    		" nor a Class. " + "Change Object skipped for sourceURI: " + changeObj.getSourceURI());
+						atomicClassChanges.add(changeObj);
+					} else {
+						logger.log("WARNING: Source URI is neither a Property" +
+								" nor a Class. " + "Change Object skipped for sourceURI: " + changeObj.getSourceURI());
 					}
-					
-				} else if(changeObj.getDestinationURI() != null){
-					
+
+				} else if (changeObj.getDestinationURI() != null) {
+
 					if (newTboxModel.getOntProperty(changeObj.getDestinationURI()) != null) {
 						atomicPropertyChanges.add(changeObj);
-					} else if(newTboxModel.getOntClass(changeObj.
-						getDestinationURI()) != null) {
+					} else if (newTboxModel.getOntClass(changeObj.
+							getDestinationURI()) != null) {
 						atomicClassChanges.add(changeObj);
-					} else{
+					} else {
 						logger.log("WARNING: Destination URI is neither a Property" +
 								" nor a Class. " + "Change Object skipped for destinationURI: " + changeObj.getDestinationURI());
 					}
-				} else{
-					logger.log("WARNING: Source and Destination URI can't be null. " + "Change Object skipped" );
+				} else {
+					logger.log("WARNING: Source and Destination URI can't be null. " + "Change Object skipped");
 				}
 			}
 			//logger.log("Property and Class change Object lists have been created");

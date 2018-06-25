@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -8,12 +8,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
@@ -31,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
  *Process edits from display model editing, so form should submit to this page which should
  *then process the parameters and then make the necessary changes to the model.
  */
+@WebServlet(name = "MenuManagementEdit", urlPatterns = {"/menuManagementEdit"} )
 public class MenuManagementEdit extends VitroHttpServlet {
    private static final String CMD_PARAM = "cmd";   
    private final static String REORDER_PARAM_VALUE = "Reorder";
@@ -137,7 +140,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     
     private void sendReorderResponse(String errorMessage, HttpServletResponse resp) {
     	try{
-			JSONObject rObj = new JSONObject();
+			ObjectNode rObj = JsonNodeFactory.instance.objectNode();
 			resp.setCharacterEncoding("UTF-8");
 			resp.setContentType("application/json;charset=UTF-8");
       

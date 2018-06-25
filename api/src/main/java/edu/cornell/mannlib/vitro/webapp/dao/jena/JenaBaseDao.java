@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -32,7 +32,6 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.Syntax;
-import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -217,12 +216,12 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                 }
             }
             if ( (existingValue!=null && value == null) || (existingValue!=null && value != null && !(existingValue.equals(value)))
-                    || (existingValue!=null && existingValue == false && keepOnlyIfTrue)) {
+                    || (existingValue!=null && !existingValue && keepOnlyIfTrue)) {
                 model.removeAll(res, dataprop, null);
             }
             if ( (existingValue==null && value != null) || (existingValue!=null && value != null && !(existingValue.equals(value)) ) ) {
                 if (keepOnlyIfTrue) {
-                    if (value==true) {
+                    if (value) {
                         model.add(res, dataprop, model.createTypedLiteral(value));
                     }
                 } else {
@@ -772,20 +771,18 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     }
     
     private Literal getLabel(String lang, List<RDFNode>labelList) {
-    	Iterator<RDFNode> labelIt = labelList.iterator();
-    	while (labelIt.hasNext()) {
-    		RDFNode label = labelIt.next();
-    		if (label.isLiteral()) {
-    			Literal labelLit = ((Literal)label);
-    			String labelLanguage = labelLit.getLanguage();
-    			if ( (labelLanguage == null) && (lang == null || lang.isEmpty()) ) {
-    				return labelLit;
-    			}
-    			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
-    				return labelLit;
-    			}
-    		}
-    	}
+        for (RDFNode label : labelList) {
+            if (label.isLiteral()) {
+                Literal labelLit = ((Literal) label);
+                String labelLanguage = labelLit.getLanguage();
+                if ((labelLanguage == null) && (lang == null || lang.isEmpty())) {
+                    return labelLit;
+                }
+                if ((lang != null) && (lang.equals(labelLanguage))) {
+                    return labelLit;
+                }
+            }
+        }
     	return null;
     }
     
@@ -899,18 +896,18 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	    }
 
 	    // Sort by lexical value to guarantee consistent results
-	    Collections.sort(labels, new Comparator<RDFNode>() {
-	        public int compare(RDFNode left, RDFNode right) {
-	            if (left == null) {
-	                return (right == null) ? 0 : -1;
-	            }
-	            if ( left.isLiteral() && right.isLiteral()) {
-	                return ((Literal) left).getLexicalForm().compareTo(((Literal) right).getLexicalForm());
-	            } 
-	            // Can't sort meaningfully if both are not literals
-	            return 0;	            
-	        }
-	    });
+	    labels.sort(new Comparator<RDFNode>() {
+            public int compare(RDFNode left, RDFNode right) {
+                if (left == null) {
+                    return (right == null) ? 0 : -1;
+                }
+                if (left.isLiteral() && right.isLiteral()) {
+                    return ((Literal) left).getLexicalForm().compareTo(((Literal) right).getLexicalForm());
+                }
+                // Can't sort meaningfully if both are not literals
+                return 0;
+            }
+        });
 	    
 	    for (String lang : PREFERRED_LANGUAGES) {
 	    	label = getLabel(lang,labels);
@@ -970,7 +967,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
     			String idStr = vitroURIStr.split("#")[1];
     			log.debug("Trying to get bnode " + idStr);
-    			RDFNode rdfNode = ontModel.getRDFNode(NodeFactory.createAnon(idStr));
+    			RDFNode rdfNode = ontModel.getRDFNode(NodeFactory.createBlankNode(idStr));
     			if ( (rdfNode != null) && (rdfNode.canAs(OntClass.class)) ) {
     			    log.debug("found it");
     				cls = rdfNode.as(OntClass.class);
@@ -998,7 +995,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     protected Node makeNodeForURI(String vitroURIStr) {
     	if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
-			return NodeFactory.createAnon(vitroURIStr.split("#")[1]);
+			return NodeFactory.createBlankNode(vitroURIStr.split("#")[1]);
     	} else {
     		return NodeFactory.createURI(vitroURIStr);
     	}
@@ -1020,22 +1017,20 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	}
     	// Now for each value, work backwards and see if it has an alternate path to the original resource.
     	// If not, add it to the list of direct values.
-    	Iterator<Resource> possibleValueIt = possibleValueSet.iterator();
-    	while (possibleValueIt.hasNext()) {
-    		Resource possibleRes = possibleValueIt.next();
-    		StmtIterator pStmtIt = getOntModel().listStatements((Resource)null, prop, possibleRes);
-    		boolean hasAlternatePath = false;
-        	while (stmtIt.hasNext()) {
-        		Statement stmt = stmtIt.nextStatement();
-        		if (possibleValueSet.contains(stmt.getSubject())) {
-        			hasAlternatePath = true;
-        			break;
-        		}
-        	}
-        	if (!hasAlternatePath) {
-        		directValueList.add(possibleRes);
-        	}
-    	}
+        for (Resource possibleRes : possibleValueSet) {
+            StmtIterator pStmtIt = getOntModel().listStatements((Resource) null, prop, possibleRes);
+            boolean hasAlternatePath = false;
+            while (stmtIt.hasNext()) {
+                Statement stmt = stmtIt.nextStatement();
+                if (possibleValueSet.contains(stmt.getSubject())) {
+                    hasAlternatePath = true;
+                    break;
+                }
+            }
+            if (!hasAlternatePath) {
+                directValueList.add(possibleRes);
+            }
+        }
     	return directValueList;
     }
     
@@ -1049,22 +1044,20 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		possibleSubjectSet.add(stmt.getSubject());
     		
     	}
-    	Iterator<Resource> possibleSubjectIt = possibleSubjectSet.iterator();
-    	while (possibleSubjectIt.hasNext()) {
-    		Resource possibleRes = possibleSubjectIt.next();
-    		StmtIterator pStmtIt = getOntModel().listStatements(possibleRes, prop, (RDFNode)null);
-    		boolean hasAlternatePath = false;
-        	while (stmtIt.hasNext()) {
-        		Statement stmt = stmtIt.nextStatement();
-        		if (stmt.getObject().isResource() && possibleSubjectSet.contains(stmt.getObject())) {
-        			hasAlternatePath = true;
-        			break;
-        		}
-        	}
-        	if (!hasAlternatePath) {
-        		directSubjectList.add(possibleRes);
-        	}
-    	}
+        for (Resource possibleRes : possibleSubjectSet) {
+            StmtIterator pStmtIt = getOntModel().listStatements(possibleRes, prop, (RDFNode) null);
+            boolean hasAlternatePath = false;
+            while (stmtIt.hasNext()) {
+                Statement stmt = stmtIt.nextStatement();
+                if (stmt.getObject().isResource() && possibleSubjectSet.contains(stmt.getObject())) {
+                    hasAlternatePath = true;
+                    break;
+                }
+            }
+            if (!hasAlternatePath) {
+                directSubjectList.add(possibleRes);
+            }
+        }
     	return directSubjectList;
     }
     
@@ -1171,7 +1164,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	
     	String describeQueryStr =    "DESCRIBE <" + res.getURI() + ">" ;
     	
-//    	?	"PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n\n" +
+//    	?	"PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
 //    		"DESCRIBE ?bnode \n" +
 //    	    "WHERE { \n" +
 //    		"    FILTER(afn:bnode(?bnode) = \"" + res.getId().toString() + "\")\n" +

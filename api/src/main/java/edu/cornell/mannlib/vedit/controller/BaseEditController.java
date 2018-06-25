@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vedit.controller;
 
@@ -32,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class BaseEditController extends VitroHttpServlet {
@@ -137,10 +136,8 @@ public class BaseEditController extends VitroHttpServlet {
             String value = "";
             if (key.equals(MULTIPLEXED_PARAMETER_NAME)) {
                 String multiplexedStr = request.getParameterValues(key)[0];
-                Map paramMap = FormUtils.beanParamMapFromString(multiplexedStr);
-                Iterator paramIt = paramMap.keySet().iterator();
-                while (paramIt.hasNext()) {
-                    String param = (String) paramIt.next();
+                Map<String, String> paramMap = FormUtils.beanParamMapFromString(multiplexedStr);
+                for (String param : paramMap.keySet()) {
                     String demultiplexedValue = (String) paramMap.get(param);
                     FormUtils.beanSet(bean, param, demultiplexedValue);
                 }
@@ -179,19 +176,16 @@ public class BaseEditController extends VitroHttpServlet {
 
        List<String> bodyVal = new ArrayList<String>();
        List<Option> options = new ArrayList<Option>();
-       Iterator<Option> itr = optionList.iterator();
-        while(itr.hasNext()){
-            Option option = itr.next();
-            hashMap.put(option.getBody(),option);
-           bodyVal.add(option.getBody());
+        for (Option option : optionList) {
+            hashMap.put(option.getBody(), option);
+            bodyVal.add(option.getBody());
         }
         
                 
-       Collections.sort(bodyVal, new ListComparator(vreq.getCollator()));
-       ListIterator<String> itrStr = bodyVal.listIterator();
-       while(itrStr.hasNext()){
-           options.add(hashMap.get(itrStr.next()));
-       }
+       bodyVal.sort(new ListComparator(vreq.getCollator()));
+        for (String aBodyVal : bodyVal) {
+            options.add(hashMap.get(aBodyVal));
+        }
        return options;
    }
     

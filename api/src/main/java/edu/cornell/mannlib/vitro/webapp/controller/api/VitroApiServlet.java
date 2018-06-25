@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.api;
 
@@ -54,7 +54,7 @@ public class VitroApiServlet extends HttpServlet {
 					+ "last names and a valid email address.");
 		}
 
-		if (!auth.isCurrentPassword(account, password)) {
+		if (!auth.isCurrentPasswordArgon2(account, password)) {
 			log.debug("Invalid: '" + email + "'/'" + password + "'");
 			throw new AuthException("email/password combination is not valid");
 		}

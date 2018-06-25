@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web;
 
@@ -12,7 +12,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -143,75 +143,63 @@ public class MiscWebUtils {
      * @param req Servlet Request
      */
     public static String getRequestAttributes( HttpServletRequest req){
-        String val = "<table>";
+        StringBuilder val = new StringBuilder("<table>");
         Enumeration names = req.getAttributeNames();
         while(names.hasMoreElements() ){
             String name = (String)names.nextElement();
-            val += "\n\t<tr><td>" + name + "</td><td><pre>";
+            val.append("\n\t<tr><td>").append(name).append("</td><td><pre>");
             String value = null;
             try{
                 Object obj = req.getAttribute(name);
                 value = (obj instanceof Model || obj instanceof ModelCom) ? "[Jena model object]" :
                 	(obj == null) ? "[null]" : 
-                		StringEscapeUtils.escapeHtml(obj.toString());
-            }catch(Exception ex){
-                value = "unable to get value" ;
-            }  catch (Error er){
-                value="unable to get value";
+                		StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             } catch (Throwable th){
                 value = "unable to get value";
             }
-            val += value + "</pre></td></tr>\n";
+            val.append(value).append("</pre></td></tr>\n");
         }
-        return val + "</table>";
+        return val.append("</table>").toString();
     }
 
     public static String getRequestParam( HttpServletRequest req){
-        String val = "<table>";
+        StringBuilder val = new StringBuilder("<table>");
         Enumeration names = req.getParameterNames();
         while(names.hasMoreElements() ){
 
             String name = (String)names.nextElement();
-            val += "\n\t<tr><td><h3>" + name + "</h3><td><pre>";
+            val.append("\n\t<tr><td><h3>").append(name).append("</h3><td><pre>");
             String value = null;
             try{
                 Object obj = req.getParameter(name);
                 value = (obj == null) ? "[null]" : 
-                	StringEscapeUtils.escapeHtml(obj.toString());
-            }catch(Exception ex){
-                value = "unable to get value" ;
-            }  catch (Error er){
-                value="unable to get value";
+                	StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             } catch (Throwable th){
                 value = "unable to get value";
             }
-            val += value + "</pre><td></tr>\n";
+            val.append(value).append("</pre><td></tr>\n");
         }
-        return val + "</table>";
+        return val.append("</table>").toString();
     }
 
     public static String getSessionAttributes(HttpServletRequest req){
-        String val = "<table>";
+        StringBuilder val = new StringBuilder("<table>");
         Enumeration names = req.getSession().getAttributeNames();
         while(names.hasMoreElements() ){
             String name = (String)names.nextElement();
-            val += "\n\t<tr><td><h3>" + name + "</h3><td><pre>";
+            val.append("\n\t<tr><td><h3>").append(name).append("</h3><td><pre>");
             String value = null;
             try{
                 Object obj = req.getSession().getAttribute(name);
                 value = (obj instanceof Model || obj instanceof ModelCom) ? "[Jena model object]" :
                 	(obj == null) ? "[null]" : 
-                		StringEscapeUtils.escapeHtml(obj.toString());
-            }catch(Exception ex){
-                value = "unable to get value" ;
-            }  catch (Error er){
-                value="unable to get value";
+                		StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             } catch (Throwable th){
                 value = "unable to get value";
             }
-            val += value + "</pre></td></tr>\n";
+            val.append(value).append("</pre></td></tr>\n");
         }
-        return val + "</table>";
+        return val.append("</table>").toString();
     }
 
     public static String getReqInfo( HttpServletRequest req){
@@ -265,7 +253,7 @@ public class MiscWebUtils {
 	public static String escape(String s){
 		if(s==null)
 			return null;
-		StringBuffer sb=new StringBuffer();
+		StringBuilder sb=new StringBuilder();
 		for(int i=0;i<s.length();i++){
 			char ch=s.charAt(i);
 			switch(ch){

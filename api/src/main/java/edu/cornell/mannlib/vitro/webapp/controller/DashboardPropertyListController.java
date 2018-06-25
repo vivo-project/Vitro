@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
@@ -9,12 +9,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author bdc34
  *
  */
+@WebServlet(name = "DashboardPropertyListController", urlPatterns = {"/dashboardPropList"} )
 public class DashboardPropertyListController extends VitroHttpServlet {
 
     /**
@@ -155,7 +157,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             
             if (mergedPropertyList!=null) {
                 try {
-                    Collections.sort(mergedPropertyList,new PropertyRanker(vreq));
+                    mergedPropertyList.sort(new PropertyRanker(vreq));
                 } catch (Exception ex) {
                     log.error("Exception sorting merged property list: " + ex.getMessage());
                 }
@@ -205,14 +207,12 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             }
             req.setAttribute("entity",subject);
 
-            RequestDispatcher rd = req.getRequestDispatcher(Controllers.DASHBOARD_PROP_LIST_JSP);
-            rd.include(req,res);
+            JSPPageHandler.renderPlainInclude(req, res, Controllers.DASHBOARD_PROP_LIST_JSP);
         } catch (HelpException help){
             doHelp(res);
         } catch (Throwable e) {
             req.setAttribute("javax.servlet.jsp.jspException",e);
-            RequestDispatcher rd = req.getRequestDispatcher("/error.jsp");
-            rd.forward(req, res);
+            JSPPageHandler.renderPlainPage(req, res, "/error.jsp");
         }
     }
 
@@ -276,7 +276,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
              }
              if (pg.getPropertyList().size()>1) {
                  try {
-                     Collections.sort(pg.getPropertyList(),new Property.DisplayComparatorIgnoringPropertyGroup());
+                     pg.getPropertyList().sort(new Property.DisplayComparatorIgnoringPropertyGroup());
                  } catch (Exception ex) {
                      log.error("Exception sorting property group "+pg.getName()+" property list: "+ex.getMessage());
                  }

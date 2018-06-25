@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
@@ -599,9 +599,9 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	private void dumpMethodCalls(String message, Object proxy) {
 		System.out.println(message + " method calls:");
 		for (MethodCall call : ((MethodCallRecorder) proxy).getMethodCalls()) {
-			String formatted = "   " + call.getName();
+			StringBuilder formatted = new StringBuilder("   " + call.getName());
 			for (Object arg : call.getArgList()) {
-				formatted += "  " + arg.getClass();
+				formatted.append("  ").append(arg.getClass());
 			}
 			System.out.println(formatted);
 		}

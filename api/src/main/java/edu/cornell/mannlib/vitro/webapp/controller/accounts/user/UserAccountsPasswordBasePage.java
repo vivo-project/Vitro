@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 
@@ -121,8 +121,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 						+ "' when already logged in as '" + currentUserEmail
 						+ "'");
 				bogusMessage = alreadyLoggedInMessage(currentUserEmail);
-				return;
-			}
+            }
 		}
 	}
 

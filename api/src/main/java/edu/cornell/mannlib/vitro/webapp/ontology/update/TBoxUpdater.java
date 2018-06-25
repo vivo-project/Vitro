@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -33,8 +32,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**  
  * Performs knowledge base updates to the tbox to align with a new ontology version
@@ -398,7 +395,7 @@ public class TBoxUpdater {
         model.enterCriticalSection(Lock.READ);
 
         try {	   
-            return (model.contains((Resource) null, inClassGroupProp, theClassGroup) ? true : false);
+            return (model.contains((Resource) null, inClassGroupProp, theClassGroup));
         } finally {
             model.leaveCriticalSection();
         }

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
@@ -205,7 +205,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	
 	protected void sortForPickList(List<? extends ResourceBean> beans, 
 	        VitroRequest vreq) {
-	    Collections.sort(beans, new PickListSorter(vreq));
+	    beans.sort(new PickListSorter(vreq));
 	}
 	
 	protected class PickListSorter implements Comparator<ResourceBean> {

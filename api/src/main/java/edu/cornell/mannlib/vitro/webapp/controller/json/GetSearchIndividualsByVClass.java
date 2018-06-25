@@ -1,10 +1,10 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -21,8 +21,8 @@ public class GetSearchIndividualsByVClass extends JsonObjectProducer {
 	}
 
 	@Override
-	protected JSONObject process() throws Exception {
-        VClass vclass=null;
+	protected ObjectNode process() throws Exception {
+        VClass vclass = null;
         
         String queryType = (String) vreq.getAttribute("queryType");
         String vitroClassIdStr = vreq.getParameter("vclassId");            

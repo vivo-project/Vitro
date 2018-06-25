@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 /**
  *Process deletions for page, deleting page, data getters and any associated menu items.
  */
+@WebServlet(name = "DeletePageController", urlPatterns = {"/deletePageController"} )
 public class DeletePageController extends VitroHttpServlet {
    
    private final static String REDIRECT_URL = "/pageList";

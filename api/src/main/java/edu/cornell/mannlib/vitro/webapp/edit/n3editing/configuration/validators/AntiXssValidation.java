@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators;
 
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.PolicyException;
@@ -92,9 +92,7 @@ public class AntiXssValidation implements N3ValidatorVTwo{
             String error = null;
             try {
                 error = literalHasXSS( editSub.getLiteralsFromForm().get(fieldName) );
-            } catch (ScanException e) {
-                error = e.getMessage();
-            } catch (PolicyException e) {
+            } catch (ScanException | PolicyException e) {
                 error = e.getMessage();
             }
             if( error != null ){                        
@@ -109,9 +107,7 @@ public class AntiXssValidation implements N3ValidatorVTwo{
             String error;
             try {
                 error = uriHasXSS( editSub.getUrisFromForm().get(fieldName));
-            } catch (ScanException e) {
-                error = e.getMessage();
-            } catch (PolicyException e) {
+            } catch (ScanException | PolicyException e) {
                 error = e.getMessage();
             }
             if( error != null ){

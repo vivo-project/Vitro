@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 span#toggleContainer {
     float:right;
@@ -19,7 +19,7 @@ section.property-group h2 {
    top: 8px; /* changed for redesign, was 0 */
    right: 12px; /* changed for redesign, was -21px;*/
 }
-section.property-group div {
+section.property-group > div {
     margin-top:15px;
 /*    display:none; */
 }

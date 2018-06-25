@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
@@ -15,10 +15,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Parcel out the different actions required of the Administrators portion of
  * the UserAccounts GUI.
  */
+@WebServlet(name = "AccountsAdmin", urlPatterns = {"/accountsAdmin/*"} )
 public class UserAccountsAdminController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsAdminController.class);

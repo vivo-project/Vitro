@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
+@WebServlet(name = "ontology", urlPatterns = {"/ontology/*"})
 public class OntologyController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(OntologyController.class.getName());
     
@@ -56,8 +58,7 @@ public class OntologyController extends VitroHttpServlet{
    
        if( rdfFormat != null ){
         	doRdf(req, res, rdfFormat );
-        	return;
-        }         
+       }
 	}
 	
 	private static Pattern RDF_REQUEST = Pattern.compile("^/ontology/([^/]*)/([^/]*).rdf$");
@@ -157,8 +158,7 @@ public class OntologyController extends VitroHttpServlet{
         if( ! found ){
             //respond to HTTP outside of critical section
             doNotFound(req,res);
-            return;
-        } else {	
+        } else {
         	JenaOutputUtils.setNameSpacePrefixes(newModel,vreq.getWebappDaoFactory());
             res.setContentType(rdfFormat.getMediaType());
             String format = ""; 
@@ -169,8 +169,7 @@ public class OntologyController extends VitroHttpServlet{
             else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
                 format ="TTL";
 		
-            newModel.write( res.getOutputStream(), format );		
-            return;
+            newModel.write( res.getOutputStream(), format );
         }
 	}
 	
@@ -245,10 +244,7 @@ public class OntologyController extends VitroHttpServlet{
             + "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
         req.setAttribute("css",css);
 
-        req.setAttribute("bodyJsp","/"+Controllers.ENTITY_NOT_FOUND_JSP);
-
-        RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
-        rd.forward(req,res);
+		JSPPageHandler.renderBasicPage(req, res, "/"+Controllers.ENTITY_NOT_FOUND_JSP);
     }
 	
 	

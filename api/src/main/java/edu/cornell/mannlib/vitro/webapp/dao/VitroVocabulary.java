@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
@@ -33,7 +33,7 @@ public class VitroVocabulary {
     public static final String OWL_ONTOLOGY = OWL+"Ontology";
     public static final String OWL_THING = OWL+"Thing";
     
-    public static final String AFN = "http://jena.hpl.hp.com/ARQ/function#";
+    public static final String AFN = "http://jena.apache.org/ARQ/function#";
 
     public static final String label = vitroURI + "label";
     
@@ -149,6 +149,7 @@ public class VitroVocabulary {
     public static final String USERACCOUNT_EMAIL_ADDRESS = VITRO_AUTH + "emailAddress";
     public static final String USERACCOUNT_FIRST_NAME = VITRO_AUTH + "firstName";
     public static final String USERACCOUNT_LAST_NAME = VITRO_AUTH + "lastName";
+    public static final String USERACCOUNT_ARGON2_PASSWORD = VITRO_AUTH + "argon2password";
     public static final String USERACCOUNT_MD5_PASSWORD = VITRO_AUTH + "md5password";
     public static final String USERACCOUNT_OLD_PASSWORD = VITRO_AUTH + "oldpassword";
     public static final String USERACCOUNT_LOGIN_COUNT = VITRO_AUTH + "loginCount";

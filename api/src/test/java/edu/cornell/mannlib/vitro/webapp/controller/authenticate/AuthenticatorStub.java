@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -101,6 +103,49 @@ public class AuthenticatorStub extends Authenticator {
 	public boolean isUserPermittedToLogin(UserAccount userAccount) {
 		return true;
 	}
+
+	@Override
+	public boolean md5HashIsNull(UserAccount userAccount){
+		if(userAccount!=null) {
+			if (userAccount.getMd5Password().compareTo("") == 0 ||
+					userAccount.getMd5Password() == null)
+				return true;
+			else
+				return false;
+		}
+		return false;
+	}
+
+	/**
+	 * Applies Argon2i hashing on a string.
+	 * Used by tests only with pre-specified values because the configuration
+	 * properties (runtime.properties) is not set at compile time.
+	 **/
+
+	public static String applyArgon2iEncodingStub(String raw) {
+		Argon2 argon2 = Argon2Factory.create();
+		try {
+			return argon2.hash(200, 500, 1, raw);
+		} catch (Exception e) {
+			// This can't happen with a normal Java runtime.
+			throw new RuntimeException(e);
+		}
+	}
+
+
+	@Override
+	public boolean isCurrentPasswordArgon2(UserAccount userAccount,
+										   String clearTextPassword) {
+		if (userAccount == null) {
+			return false;
+		}
+		if (clearTextPassword == null) {
+			return false;
+		}
+		return verifyArgon2iHash(userAccount.getArgon2Password(),
+				clearTextPassword);
+	}
+
 
 	@Override
 	public boolean isCurrentPassword(UserAccount userAccount,

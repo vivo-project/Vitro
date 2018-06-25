@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
@@ -7,12 +7,13 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -119,9 +120,9 @@ class VitroURL {
             if (len>0) {
                 String[] temp = new String[len];
                 int tempI = 0;
-                for (int i=0; i<splitStr.length; i++) {
-                    if (!splitStr[i].equals("")) {
-                        temp[tempI] = splitStr[i];
+                for (String aSplitStr : splitStr) {
+                    if (!aSplitStr.equals("")) {
+                        temp[tempI] = aSplitStr;
                         tempI++;
                     }
                 }
@@ -130,9 +131,7 @@ class VitroURL {
         }
         // TODO: rewrite the chunk above with lists in mind. 
         List<String> strList = new ArrayList<String>();
-        for (int i=0; i<splitStr.length; i++) {
-            strList.add(splitStr[i]);
-        }
+        Collections.addAll(strList, splitStr);
         return strList;
     }   
     
@@ -238,7 +237,7 @@ class VitroURL {
     }
     
     public String toString() {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
             try {
             if (this.protocol != null) {
                 out.append(this.protocol);

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import org.apache.jena.rdf.model.RDFNode;
 
 /**
  * An RDFServiceFactory that always returns the same RDFService object
@@ -190,6 +191,21 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         @Override
         public ChangeSet manufactureChangeSet() {
             return s.manufactureChangeSet();
+        }
+
+        @Override
+        public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
+            return s.countTriples(subject, predicate, object);
+        }
+
+        @Override
+        public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+            return s.getTriples(subject, predicate, object, limit, offset);
+        }
+
+        @Override
+        public boolean preferPreciseOptionals() {
+            return s.preferPreciseOptionals();
         }
 
         @Override

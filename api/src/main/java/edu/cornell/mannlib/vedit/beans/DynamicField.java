@@ -1,9 +1,8 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vedit.beans;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DynamicField {

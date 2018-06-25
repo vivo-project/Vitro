@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
@@ -81,7 +81,8 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertEquals("email", "email@jones.edu", acct.getEmailAddress());
 		assertEquals("firstName", "Bob", acct.getFirstName());
 		assertEquals("lastName", "Caruso", acct.getLastName());
-		assertEquals("password", "garbage", acct.getMd5Password());
+		assertEquals("md5password", "garbage", acct.getMd5Password());
+		assertEquals("argon2password", "betterGarbage", acct.getArgon2Password());
 		assertEquals("expires", 1100234965897L, acct.getPasswordLinkExpires());
 		assertEquals("loginCount", 50, acct.getLoginCount());
 		assertEquals("lastLogin", 1020304050607080L, acct.getLastLoginTime());
@@ -105,7 +106,8 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertEquals("email", "email@henry.edu", acct.getEmailAddress());
 		assertEquals("firstName", "Mary", acct.getFirstName());
 		assertEquals("lastName", "McInerney", acct.getLastName());
-		assertEquals("password", "garbage", acct.getMd5Password());
+		assertEquals("md5password", "garbage", acct.getMd5Password());
+		assertEquals("argon2password", "betterGarbage", acct.getArgon2Password());
 		assertEquals("expires", 0L, acct.getPasswordLinkExpires());
 		assertEquals("loginCount", 7, acct.getLoginCount());
 		assertEquals("lastLogin", 1122334455667788L, acct.getLastLoginTime());

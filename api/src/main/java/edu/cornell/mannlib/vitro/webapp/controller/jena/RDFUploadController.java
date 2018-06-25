@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
@@ -14,12 +14,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +35,6 @@ import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
@@ -51,6 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
+@WebServlet(name = "RDFUploadController", urlPatterns = {"/uploadRDF"} )
 public class RDFUploadController extends JenaIngestController {
     
     private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb
@@ -223,15 +224,11 @@ public class RDFUploadController extends JenaIngestController {
         } else {
             request.setAttribute("uploadDesc", "RDF upload successful.");
         }
-        
-        RequestDispatcher rd = request.getRequestDispatcher(
-                Controllers.BASIC_JSP);
-        request.setAttribute(
-                "bodyJsp", "/templates/edit/specific/upload_rdf_result.jsp");
+
         request.setAttribute("title","Ingest RDF Data");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/upload_rdf_result.jsp");
         } catch (Exception e) {
             log.error("Could not forward to view: " + e.getLocalizedMessage());            
         }
@@ -274,10 +271,11 @@ public class RDFUploadController extends JenaIngestController {
         String docLoc = request.getParameter("docLoc");
         String languageStr = request.getParameter("language");
         ModelMaker maker = getModelMaker(request);
-        
+
+        String bodyJsp;
         if (modelName == null) {
             request.setAttribute("title","Load RDF Data");
-            request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);  
+            bodyJsp = LOAD_RDF_DATA_JSP;
         } else {          
             RDFService rdfService = getRDFService(request, maker, modelName);
             try {
@@ -286,14 +284,11 @@ public class RDFUploadController extends JenaIngestController {
                 rdfService.close();
             }
             WhichService modelType = getModelType(request);
-            showModelList(request, maker, modelType);
+            bodyJsp = showModelList(request, maker, modelType);
         } 
         
-        RequestDispatcher rd = request.getRequestDispatcher(
-                Controllers.BASIC_JSP);      
-
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, bodyJsp);
         } catch (Exception e) {
             String errMsg = " could not forward to view.";
             log.error(errMsg, e);
@@ -398,15 +393,14 @@ public class RDFUploadController extends JenaIngestController {
                     files = new File[1];
                     files[0] = file;
                 }
-                for (int i=0; i<files.length; i++) {
-                    File currentFile = files[i];
+                for (File currentFile : files) {
                     log.debug("Reading file " + currentFile.getName());
                     try {
-                        readIntoModel(fileStream.getInputStream(), language, 
+                        readIntoModel(fileStream.getInputStream(), language,
                                 rdfService, modelName);
                         fileStream.delete();
                     } catch (IOException ioe) {
-                        String errMsg = "Error loading RDF from " + 
+                        String errMsg = "Error loading RDF from " +
                                 currentFile.getName();
                         log.error(errMsg, ioe);
                         throw new RuntimeException(errMsg, ioe);
@@ -448,21 +442,17 @@ public class RDFUploadController extends JenaIngestController {
                                                     throws ServletException{
          VitroRequest vreq = new VitroRequest(req);
          req.setAttribute("title","RDF Upload Error ");
-         req.setAttribute("bodyJsp","/jsp/fileUploadError.jsp");
          req.setAttribute("errors", errrorMsg);
          
-         RequestDispatcher rd = req.getRequestDispatcher(
-                 Controllers.BASIC_JSP);      
-         req.setAttribute("css", 
+         req.setAttribute("css",
                  "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
                  vreq.getAppBean().getThemeDir() + "css/edit.css\"/>");
          try {
-             rd.forward(req, response);
+             JSPPageHandler.renderBasicPage(req, response, "/jsp/fileUploadError.jsp");
          } catch (IOException e1) {
              log.error(e1);
              throw new ServletException(e1);
-         }            
-         return;
+         }
      }
      
      private OntModel getABoxModel(ServletContext ctx) {   

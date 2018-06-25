@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package stubs.edu.cornell.mannlib.vitro.webapp.beans;
 
@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
@@ -472,7 +470,7 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
-	public JSONObject toJSON() throws JSONException {
+	public JsonNode toJSON() {
 		throw new RuntimeException("Individual.toJSON() not implemented.");
 	}
 

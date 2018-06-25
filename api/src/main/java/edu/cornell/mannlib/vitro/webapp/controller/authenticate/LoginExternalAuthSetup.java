@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
  * Send a request to the external authorization server that will return us to
  * the LoginExternalAuthReturn servlet for further processing.
  */
+@WebServlet(name = "loginExternalAuthSetup", urlPatterns = {"/loginExternalAuth"})
 public class LoginExternalAuthSetup extends BaseLoginServlet {
 	private static final Log log = LogFactory
 			.getLog(LoginExternalAuthSetup.class);

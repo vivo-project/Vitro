@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -348,12 +348,11 @@ public class IndividualJena extends IndividualImpl implements Individual {
     		if (this.propertyList == null) {
     			getObjectPropertyList();
     		}
-    		for (Iterator i = this.propertyList.iterator(); i.hasNext();) { 
-    			ObjectProperty op = (ObjectProperty) i.next();
-    			if (op.getURI() != null) {
-    				map.put(op.getURI(), op);
-    			}
-    		}
+			for (ObjectProperty op : this.propertyList) {
+				if (op.getURI() != null) {
+					map.put(op.getURI(), op);
+				}
+			}
     		this.objectPropertyMap = map;
     		return map;    		
     	}
@@ -402,12 +401,11 @@ public class IndividualJena extends IndividualImpl implements Individual {
     		if (this.datatypePropertyList == null) {
     			getDataPropertyList();
     		}
-    		for (Iterator i = this.datatypePropertyList.iterator(); i.hasNext();) { 
-    			DataProperty dp = (DataProperty) i.next();
-    			if (dp.getURI() != null) {
-    				map.put(dp.getURI(), dp);
-    			}
-    		}
+			for (DataProperty dp : this.datatypePropertyList) {
+				if (dp.getURI() != null) {
+					map.put(dp.getURI(), dp);
+				}
+			}
     		this.dataPropertyMap = map;
     		return map;    		
     	}
@@ -519,15 +517,13 @@ public class IndividualJena extends IndividualImpl implements Individual {
     protected void sortEnts2EntsForDisplay(){
         if( getObjectPropertyList() == null ) return;
 
-        Iterator it = getObjectPropertyList().iterator();
-        while(it.hasNext()){
-            ObjectProperty prop = (ObjectProperty)it.next();
-        /*  if (prop.getObjectIndividualSortPropertyURI()==null) {
+		for (ObjectProperty prop : getObjectPropertyList()) {
+			/*  if (prop.getObjectIndividualSortPropertyURI()==null) {
             	prop.sortObjectPropertyStatementsForDisplay(prop,prop.getObjectPropertyStatements());
             } else {*/
-            	prop.sortObjectPropertyStatementsForDisplay(prop,prop.getObjectPropertyStatements());
+			prop.sortObjectPropertyStatementsForDisplay(prop, prop.getObjectPropertyStatements());
         /*  }*/
-        }
+		}
     }
     
     private Collator collator = Collator.getInstance();
@@ -606,7 +602,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
                 }
             };
             try {
-                Collections.sort(getObjectPropertyStatements(), comp);
+                getObjectPropertyStatements().sort(comp);
             } catch (Exception e) {
                 log.error("Exception sorting object property statements for object property "+this.getURI());
             }

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
@@ -67,6 +67,7 @@ public class RootUserPolicy implements PolicyIface {
 		private ServletContext ctx;
 		private StartupStatus ss;
 		private UserAccountsDao uaDao;
+		private ConfigurationProperties cp;
 		private String configuredRootUser;
 		private boolean configuredRootUserExists;
 		private TreeSet<String> otherRootUsers;
@@ -75,6 +76,7 @@ public class RootUserPolicy implements PolicyIface {
 		public void contextInitialized(ServletContextEvent sce) {
 			ctx = sce.getServletContext();
 			ss = StartupStatus.getBean(ctx);
+			cp = ConfigurationProperties.getBean(ctx);
 
 			try {
 				uaDao = ModelAccess.on(ctx).getWebappDaoFactory()
@@ -148,8 +150,9 @@ public class RootUserPolicy implements PolicyIface {
 			ua.setEmailAddress(configuredRootUser);
 			ua.setFirstName("root");
 			ua.setLastName("user");
-			ua.setMd5Password(Authenticator
-					.applyMd5Encoding(ROOT_USER_INITIAL_PASSWORD));
+			ua.setArgon2Password(Authenticator.applyArgon2iEncoding(
+					ROOT_USER_INITIAL_PASSWORD));
+			ua.setMd5Password("");
 			ua.setPasswordChangeRequired(true);
 			ua.setStatus(Status.ACTIVE);
 			ua.setRootUser(true);

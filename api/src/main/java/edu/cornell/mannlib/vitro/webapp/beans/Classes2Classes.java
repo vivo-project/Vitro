@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
@@ -22,18 +22,18 @@ public class Classes2Classes {
     public void setSuperclassURI(String in){ superclassURI=in;}
 
     public String getSuperclassNamespace(){ return superclassNamespace; }
-    public void setSuperclassNamespace(){ this.superclassNamespace=superclassNamespace;}
+    public void setSuperclassNamespace(String superclassNamespace){ this.superclassNamespace=superclassNamespace;}
 
     public String getSuperclassLocalName(){ return superclassLocalName; }
-    public void setSuperclassLocalName(){ this.superclassLocalName=superclassLocalName;}
+    public void setSuperclassLocalName(String superclassLocalName){ this.superclassLocalName=superclassLocalName;}
 
     public String getSubclassURI(){ return subclassURI;}
     public void setSubclassURI(String in){ subclassURI=in;}
 
     public String getSubclassNamespace(){ return subclassNamespace; }
-    public void setSubclassNamespace(){ this.subclassNamespace=subclassNamespace;}
+    public void setSubclassNamespace(String subclassNamespace){ this.subclassNamespace=subclassNamespace;}
 
     public String getSubclassLocalName(){ return subclassLocalName; }
-    public void setSubclassLocalName(){ this.subclassLocalName=subclassLocalName;}
+    public void setSubclassLocalName(String subclassLocalName){ this.subclassLocalName=subclassLocalName;}
 
 }

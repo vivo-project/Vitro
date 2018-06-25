@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -112,6 +112,7 @@ public class JenaBaseDaoCon {
     protected  DatatypeProperty   USERACCOUNT_EMAIL_ADDRESS = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_EMAIL_ADDRESS);
     protected  DatatypeProperty   USERACCOUNT_FIRST_NAME = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_FIRST_NAME);
     protected  DatatypeProperty   USERACCOUNT_LAST_NAME = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_LAST_NAME);
+    protected  DatatypeProperty   USERACCOUNT_ARGON2_PASSWORD = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_ARGON2_PASSWORD);
     protected  DatatypeProperty   USERACCOUNT_MD5_PASSWORD = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_MD5_PASSWORD);
     protected  DatatypeProperty   USERACCOUNT_OLD_PASSWORD = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_OLD_PASSWORD);
     protected  DatatypeProperty   USERACCOUNT_LOGIN_COUNT = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_LOGIN_COUNT);

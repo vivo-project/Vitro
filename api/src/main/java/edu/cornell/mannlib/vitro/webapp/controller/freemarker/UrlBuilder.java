@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -71,7 +71,7 @@ public class UrlBuilder {
     
     public enum Css {
         CUSTOM_FORM("/edit/forms/css/customForm.css"),
-        JQUERY_UI("/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css");        
+        JQUERY_UI("/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css");
 
         private final String path;
         
@@ -90,8 +90,9 @@ public class UrlBuilder {
     
     public enum JavaScript {
         CUSTOM_FORM_UTILS("/js/customFormUtils.js"),
-        JQUERY("/js/jquery.js"),
-        JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"),
+        JQUERY("/js/jquery-1.12.4.min.js"),
+        JQUERY_MIGRATE("/js/jquery-migrate-1.4.1.js"),
+        JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.12.1.min.js"),
         UTILS("/js/utils.js");
         
         private final String path;
@@ -207,19 +208,24 @@ public class UrlBuilder {
     }
     
     private static String addParams(String url, ParamMap params, String glue) {
-        for (String key: params.keySet()) {
-            String value = params.get(key);
-            // rjy7 Some users might require nulls to be converted to empty
-            // string, others to eliminate params with null values.
-            // Here we convert to empty string to prevent an exception
-            // from UrlEncoder.encode() when passed a null. Callers are advised
-            // to remove null values or convert to empty strings, whichever
-            // is desired in the particular instance.
-            value = (value == null) ? "" : urlEncode(value);
-            url += glue + key + "=" + value;
-            glue = "&";
+        if (params.size() > 0) {
+            StringBuilder sb = new StringBuilder(url);
+            for (String key: params.keySet()) {
+                String value = params.get(key);
+                // rjy7 Some users might require nulls to be converted to empty
+                // string, others to eliminate params with null values.
+                // Here we convert to empty string to prevent an exception
+                // from UrlEncoder.encode() when passed a null. Callers are advised
+                // to remove null values or convert to empty strings, whichever
+                // is desired in the particular instance.
+                value = (value == null) ? "" : urlEncode(value);
+                sb.append(glue).append(key).append("=").append(value);
+                glue = "&";
+            }
+            url = sb.toString();
         }
-        return url;        
+
+        return url;
     }
     
     public static String addParams(String url, ParamMap params) {

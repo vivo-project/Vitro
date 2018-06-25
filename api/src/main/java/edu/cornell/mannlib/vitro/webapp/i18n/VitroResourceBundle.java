@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -48,6 +50,22 @@ public class VitroResourceBundle extends ResourceBundle {
 
 	private static final String FILE_FLAG = "@@file ";
 	private static final String MESSAGE_FILE_NOT_FOUND = "File {1} not found for property {0}.";
+
+	private static final List<String> appPrefixes = new ArrayList<>();
+
+	static {
+		addAppPrefix("vitro");
+	}
+
+	public static void addAppPrefix(String prefix) {
+		if (!prefix.endsWith("-") && !prefix.endsWith("_")) {
+			prefix = prefix + "_";
+		}
+
+		if (!appPrefixes.contains(prefix)) {
+			appPrefixes.add(prefix);
+		}
+	}
 
 	// ----------------------------------------------------------------------
 	// Factory method
@@ -94,7 +112,6 @@ public class VitroResourceBundle extends ResourceBundle {
 	private final String appI18nPath;
 	private final String themeI18nPath;
 	private final Control control;
-	private final Properties defaults;
 	private final Properties properties;
 
 	private VitroResourceBundle(String bundleName, ServletContext ctx,
@@ -105,49 +122,58 @@ public class VitroResourceBundle extends ResourceBundle {
 		this.appI18nPath = appI18nPath;
 		this.themeI18nPath = themeI18nPath;
 		this.control = control;
-
-		this.defaults = new Properties();
-		this.properties = new Properties(this.defaults);
-
-		loadProperties();
+		this.properties = loadProperties();
 		loadReferencedFiles();
 	}
 
-	private void loadProperties() throws IOException {
+	private Properties loadProperties() throws IOException {
 		String resourceName = control.toResourceName(bundleName, "properties");
+		Properties props = null;
 
-		String defaultsPath = joinPath(appI18nPath, resourceName);
-		String propertiesPath = joinPath(themeI18nPath, resourceName);
-		File defaultsFile = locateFile(defaultsPath);
-		File propertiesFile = locateFile(propertiesPath);
+		File defaultsPath = locateFile(joinPath(appI18nPath, resourceName));
+		File propertiesPath = locateFile(joinPath(themeI18nPath, resourceName));
 
-		if ((defaultsFile == null) && (propertiesFile == null)) {
-			throw new FileNotFoundException("Property file not found at '"
-					+ defaultsPath + "' or '" + propertiesPath + "'");
-		}
-
-		if (defaultsFile != null) {
-			log.debug("Loading bundle '" + bundleName + "' defaults from '"
-					+ defaultsPath + "'");
-			FileInputStream stream = new FileInputStream(defaultsFile);
-			Reader reader = new InputStreamReader(stream, "UTF-8");
-			try {
-				this.defaults.load(reader);
-			} finally {
-				reader.close();
+		props = loadProperties(props, defaultsPath);
+		if (appPrefixes != null && appPrefixes.size() > 0) {
+			for (String appPrefix : appPrefixes) {
+				props = loadProperties(props, locateFile(joinPath(appI18nPath, (appPrefix + resourceName))));
 			}
 		}
-		if (propertiesFile != null) {
-			log.debug("Loading bundle '" + bundleName + "' overrides from '"
-					+ propertiesPath + "'");
-			FileInputStream stream = new FileInputStream(propertiesFile);
-			Reader reader = new InputStreamReader(stream, "UTF-8");
-			try {
-				this.properties.load(reader);
-			} finally {
-				reader.close();
-			}
+		props = loadProperties(props, propertiesPath);
+		if (props == null) {
+			throw new FileNotFoundException("Property file not found at '" + defaultsPath + "' or '" + propertiesPath + "'");
 		}
+		props = loadProperties(props, locateFile(joinPath("/local/i18n/", resourceName)));
+
+		return props;
+	}
+
+	private Properties loadProperties(Properties defProps, File file) throws IOException {
+		if (file == null || !file.isFile()) {
+			return defProps;
+		}
+
+		Properties props = null;
+		if (defProps != null) {
+			props = new Properties(defProps);
+		} else {
+			props = new Properties();
+		}
+
+		log.debug("Loading bundle '" + bundleName + "' defaults from '" + file + "'");
+		FileInputStream stream = new FileInputStream(file);
+		Reader reader = new InputStreamReader(stream, "UTF-8");
+		try {
+			props.load(reader);
+		} finally {
+			reader.close();
+		}
+
+		if (props.size() > 0) {
+			return props;
+		}
+
+		return defProps;
 	}
 
 	private void loadReferencedFiles() throws IOException {

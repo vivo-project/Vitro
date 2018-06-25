@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
@@ -10,6 +10,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -23,6 +24,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
  * <li>Other sessions are trivial, and should have a short interval.</li>
  * </ul>
  */
+@WebFilter(filterName = "Session Timeout Limiting Filter", urlPatterns = {"/*"})
 public class SessionTimeoutLimitingFilter implements Filter {
 	/** Maximum inactive interval for a trivial session object, in seconds. */
 	private static final int TRIVIAL_SESSION_LIFETIME = 120;

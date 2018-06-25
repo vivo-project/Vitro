@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.TransactionHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.LabelExistsException;
 import org.apache.jena.query.ReadWrite;
@@ -56,7 +55,12 @@ public class RDFServiceDataset implements Dataset {
         return RDFServiceGraph.createRDFServiceModel(g.getDefaultGraph());
     }
 
-    @Override
+	@Override
+	public Model getUnionModel() {
+		return RDFServiceGraph.createRDFServiceModel(g.getUnionGraph());
+	}
+
+	@Override
     public Lock getLock() {
         return g.getLock();
     }
@@ -162,6 +166,11 @@ public class RDFServiceDataset implements Dataset {
 	@Override
 	public String toString() {
 		return "RDFServiceDataset[" + ToString.hashHex(this) + ", " + g + "]";
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return g.isEmpty();
 	}
 
 }

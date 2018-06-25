@@ -1,4 +1,4 @@
-<%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
+<%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -17,7 +17,7 @@
     if (conceptIdStr != null) {
     	
     	String describeQueryStr = 
-    		"PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n\n" +
+    		"PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
     		"DESCRIBE ?bnode \n" +
     	    "WHERE { \n" +
     		"    FILTER(afn:bnode(?bnode) = \"" + conceptIdStr + "\")\n" +

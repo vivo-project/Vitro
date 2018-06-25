@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
@@ -57,18 +57,19 @@ public class BasicValidationVTwo {
             if( validations!= null){
                 for( String validationType : validations){
                 	//Appending validate message if same field has multiple values 
-                	String validateMsg = null;
+                	StringBuilder validateMsg = null;
                 	for(String value: values){
                 		String thisValidateMsg = validate(validationType,value);
-                		if(validateMsg != null && thisValidateMsg != null) {
-                			validateMsg += ", " + thisValidateMsg;
+                        if (thisValidateMsg != null) {
+                            if (validateMsg != null) {
+                			    validateMsg.append(", ").append(thisValidateMsg);
                 		} else {
-                			validateMsg = thisValidateMsg;
-
+                                validateMsg = new StringBuilder(thisValidateMsg);
+                            }
                 		}
                 	}
                     if( validateMsg != null) {
-                        errors.put(name,validateMsg);
+                        errors.put(name, validateMsg.toString());
                     }    
                 }
             }
@@ -89,7 +90,7 @@ public class BasicValidationVTwo {
                 
                 for( String validationType : validations){
                     String value = null;
-                    String validateMsg = null;
+                    StringBuilder validateMsg = null;
                     //If no literals and this field was required, this is an error message
                     //and can return
                     if((literals == null || literals.size() == 0) && isRequiredField) {
@@ -117,16 +118,17 @@ public class BasicValidationVTwo {
 		                        break;
 		                    }
 		                    String thisValidateMsg = validate(validationType,value);
-	                		if(validateMsg != null && thisValidateMsg != null) {
-	                			validateMsg += ", " + thisValidateMsg;
-	                		} else {
-	                			validateMsg = thisValidateMsg;
-	
-	                		}
+		                    if (thisValidateMsg != null) {
+                                if (validateMsg != null) {
+                                    validateMsg.append(", ").append(thisValidateMsg);
+                                } else {
+                                    validateMsg = new StringBuilder(thisValidateMsg);
+                                }
+                            }
 	                    }
                     }
                     if( validateMsg != null) {
-                        errors.put(name,validateMsg);
+                        errors.put(name, validateMsg.toString());
                     }
                 }
             }
@@ -269,7 +271,7 @@ public class BasicValidationVTwo {
         if( unknown.isEmpty() )
             return ;
 
-        throw new Error( "Unknown basic validators: " + unknown.toArray());
+        throw new Error( "Unknown basic validators: " + Arrays.toString(unknown.toArray()));
     }
     
     private static boolean isEmpty(String value) {

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -356,7 +356,7 @@ public class IndividualRdfAssembler {
 	}
 
 	private Literal createDateLiteral(OntModel o) {
-		String date = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss")
+		String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 				.format(new Date());
 		return o.createTypedLiteral(date, XSDDatatype.XSDdateTime);
 	}

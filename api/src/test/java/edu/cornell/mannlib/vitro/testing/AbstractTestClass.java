@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.testing;
 
@@ -198,7 +198,7 @@ public abstract class AbstractTestClass {
 			file.listFiles(new FileFilter() {
 				@Override
 				public boolean accept(File pathname) {
-					message.append("   contains file '" + pathname + "'\n");
+					message.append("   contains file '").append(pathname).append("'\n");
 					return true;
 				}
 			});
@@ -421,16 +421,10 @@ public abstract class AbstractTestClass {
 			StringReader reader = new StringReader(docString);
 			Document doc = builder.parse(new InputSource(reader));
 			xformer.transform(new DOMSource(doc), new StreamResult(result));
-		} catch (ParserConfigurationException e) {
-			fail(e.toString());
-		} catch (SAXException e) {
-			fail(e.toString());
-		} catch (IOException e) {
-			fail(e.toString());
-		} catch (TransformerException e) {
+		} catch (ParserConfigurationException | TransformerException | IOException | SAXException e) {
 			fail(e.toString());
 		}
-		return result.toString().replaceAll(">\\s+<", "><");
+        return result.toString().replaceAll(">\\s+<", "><");
 	}
 
 	protected <T extends Comparable<T>> void assertEqualSets(String label,

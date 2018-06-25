@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
@@ -98,7 +98,8 @@ public class ProgramLoginTest extends AbstractTestClass {
 		user.setUri(uri);
 		user.setPermissionSetUris(Collections
 				.singleton(PermissionSets.URI_DBA));
-		user.setMd5Password(Authenticator.applyMd5Encoding(password));
+		user.setArgon2Password(AuthenticatorStub.applyArgon2iEncodingStub(password));
+		user.setMd5Password("");
 		user.setLoginCount(loginCount);
 		user.setPasswordChangeRequired(loginCount == 0);
 		return user;
@@ -189,14 +190,11 @@ public class ProgramLoginTest extends AbstractTestClass {
 
 		try {
 			servlet.doGet(request, response);
-		} catch (ServletException e) {
-			log.error(e, e);
-			fail(e.toString());
-		} catch (IOException e) {
+		} catch (ServletException | IOException e) {
 			log.error(e, e);
 			fail(e.toString());
 		}
-	}
+    }
 
 	private void assert403() {
 		assertEquals("status", 403, response.getStatus());

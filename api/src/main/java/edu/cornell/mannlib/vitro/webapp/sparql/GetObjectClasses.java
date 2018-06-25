@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.sparql;
 
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
  * This servlet gets all the range classes for a given predicate.
  */
 
+@WebServlet(name = "GetObjectClasses", urlPatterns = {"/admin/getObjectClasses"})
 public class GetObjectClasses extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(GetObjectClasses.class);
@@ -70,28 +72,21 @@ public class GetObjectClasses extends BaseEditController {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 		if (vClass != null) {
-			respo += "<option>" + "<key>" + vClass.getPickListName() + "</key>"
-					+ "<value>" + vClass.getURI() + "</value>" + "</option>";
+			respo.append("<option>" + "<key>").append(vClass.getPickListName()).append("</key>").append("<value>").append(vClass.getURI()).append("</value>").append("</option>");
 		} else {
-			List classGroups = vreq.getUnfilteredWebappDaoFactory()
+			List<VClassGroup> classGroups = vreq.getUnfilteredWebappDaoFactory()
 					.getVClassGroupDao().getPublicGroupsWithVClasses(true,
 							true, false); // order by displayRank, include
 											// uninstantiated classes, don't get
 											// the counts of individuals
 
-			Iterator classGroupIt = classGroups.iterator();
-			while (classGroupIt.hasNext()) {
-				VClassGroup group = (VClassGroup) classGroupIt.next();
-				List classes = group.getVitroClassList();
-				Iterator classIt = classes.iterator();
-				while (classIt.hasNext()) {
-					VClass clazz = (VClass) classIt.next();
-					respo += "<option>" + "<key>" + clazz.getPickListName()
-							+ "</key>" + "<value>" + clazz.getURI()
-							+ "</value>" + "</option>";
+			for (VClassGroup group : classGroups) {
+				List<VClass> classes = group.getVitroClassList();
+				for (VClass clazz : classes) {
+					respo.append("<option>" + "<key>").append(clazz.getPickListName()).append("</key>").append("<value>").append(clazz.getURI()).append("</value>").append("</option>");
 				}
 			}
 		}
@@ -120,7 +115,7 @@ public class GetObjectClasses extends BaseEditController {
 		 * 
 		 * }
 		 */
-		respo += "</options>";
+		respo.append("</options>");
 		out.println(respo);
 		out.flush();
 		out.close();

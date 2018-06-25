@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -6,6 +6,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -172,9 +173,7 @@ public class DumpTestController extends FreemarkerHttpServlet {
         }
          
         public void setFavoriteColors(String...colors) {
-            for (String color : colors) {
-                favoriteColors.add(color);
-            }
+            Collections.addAll(favoriteColors, colors);
         }
 
         float getSalary() {
@@ -192,7 +191,7 @@ public class DumpTestController extends FreemarkerHttpServlet {
         }
         
         public String getName(String which) {
-            return which == "first" ? firstName : lastName;
+            return "first".equals(which) ? firstName : lastName;
         }
         
         public String getMiddleName() {

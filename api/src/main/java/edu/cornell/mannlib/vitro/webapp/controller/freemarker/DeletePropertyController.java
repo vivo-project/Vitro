@@ -1,9 +1,10 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.HashMap;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -28,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
  * Custom deletion controller to which deletion requests from default property form are sent. May be replaced 
  * later with additional features in process rdf form controller or alternative location.
  */
+@WebServlet(name = "DeletePropertyController", urlPatterns = {"/deletePropertyController"} )
 public class DeletePropertyController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(DeletePropertyController.class);
  

@@ -1,21 +1,17 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
-import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * This tag will build an option list for individuals of a VClass.
@@ -58,11 +54,11 @@ public class OptionsForClassTag extends TagSupport {
             for( Individual ind : individuals ){
                 String uri = ind.getURI()  ;
                 if( uri != null ){
-                    out.print("<option value=\"" + StringEscapeUtils.escapeHtml( uri ) + '"');
+                    out.print("<option value=\"" + StringEscapeUtils.ESCAPE_HTML4.translate( uri ) + '"');
                     if( uri.equals(getSelectedUri()))
                         out.print(" selected=\"selected\"");
                     out.print('>');
-                    out.print(StringEscapeUtils.escapeHtml( ind.getName() ));
+                    out.print(StringEscapeUtils.ESCAPE_HTML4.translate( ind.getName() ));
                     out.println("</option>");
                 }
 

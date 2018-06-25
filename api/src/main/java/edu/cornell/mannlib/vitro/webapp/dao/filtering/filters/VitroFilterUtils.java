@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
@@ -63,7 +63,7 @@ public class VitroFilterUtils {
 
         @Override
 		public List<Individual> fn(List<Individual> individuals) {
-            Collections.sort(individuals,comparator);
+            individuals.sort(comparator);
             return individuals;
         }
 

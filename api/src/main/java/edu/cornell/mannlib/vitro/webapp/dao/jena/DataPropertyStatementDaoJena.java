@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -470,7 +470,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                                                  String propertyUri,
                                                  Set<String> constructQueries) {
         
-        if (constructQueries == null) {
+        if (constructQueries == null || constructQueries.isEmpty() ) {
             return null;
         }
         

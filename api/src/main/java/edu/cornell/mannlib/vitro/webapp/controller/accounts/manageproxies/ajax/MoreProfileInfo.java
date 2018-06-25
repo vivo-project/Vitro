@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ajax;
 
@@ -9,10 +9,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -42,7 +43,7 @@ public class MoreProfileInfo extends AbstractAjaxResponder {
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException {
 		log.debug("profile URI is '" + profileUri + "'");
 		if (profileUri.isEmpty()) {
 			return EMPTY_RESPONSE;
@@ -58,8 +59,12 @@ public class MoreProfileInfo extends AbstractAjaxResponder {
 		map.put("imageUrl", getFullImageUrl(profileInd));
 		map.put("classLabel", getMostSpecificTypeLabel(profileInd.getURI()));
 
-		JSONArray jsonArray = new JSONArray();
-		jsonArray.put(map);
+		ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
+		ObjectNode jsonObj = JsonNodeFactory.instance.objectNode();
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			jsonObj.put(entry.getKey(), entry.getValue());
+		}
+		jsonArray.add(jsonObj);
 		String response = jsonArray.toString();
 
 		log.debug("response is '" + response + "'");

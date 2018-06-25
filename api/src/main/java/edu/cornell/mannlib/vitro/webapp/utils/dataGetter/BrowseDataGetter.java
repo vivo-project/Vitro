@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
@@ -11,11 +11,11 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividualBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import org.apache.jena.rdf.model.Model;
 
@@ -109,12 +109,12 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
-        JSONObject vclassRes = JsonServlet.getSearchIndividualsByVClass(vclass.getURI(), request);        
-        map.put("totalCount", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
-        map.put("alpha", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
-        map.put("individuals", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));
-        map.put("pages", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("pages") ));
-        map.put("letters", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("letters") ));
+        ObjectNode vclassRes = JsonServlet.getSearchIndividualsByVClass(vclass.getURI(), request);
+        map.put("totalCount", JsonToFmModel.convertJSONObjectToMap( (ObjectNode) vclassRes.get("totalCount") ));
+        map.put("alpha", JsonToFmModel.convertJSONObjectToMap( (ObjectNode) vclassRes.get("alpha") ));
+        map.put("individuals", JsonToFmModel.convertJSONArrayToList( (ArrayNode) vclassRes.get("individuals") ));
+        map.put("pages", JsonToFmModel.convertJSONArrayToList( (ArrayNode) vclassRes.get("pages") ));
+        map.put("letters", JsonToFmModel.convertJSONArrayToList( (ArrayNode) vclassRes.get("letters") ));
         
         return map;
     }
@@ -253,10 +253,7 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
     /**
      * For processig of JSONObject
      */
-    public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
-    	JSONObject rObj = null;
-    	return rObj;
+    public ObjectNode convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
+    	return null;
     }
-
-
 }

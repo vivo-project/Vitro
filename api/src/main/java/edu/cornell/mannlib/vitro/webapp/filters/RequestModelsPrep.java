@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
@@ -7,12 +7,14 @@ import java.text.Collator;
 import java.util.Enumeration;
 import java.util.Locale;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  * 
  * This is done in a filter, so it applies to both Servlets and JSPs.
  */
+@WebFilter(filterName = "RequestModelsPrep", urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD})
 public class RequestModelsPrep implements Filter {
 	private final static Log log = LogFactory.getLog(RequestModelsPrep.class);
 

@@ -2,7 +2,6 @@
 /.classpath
 /.project
 /.settings
-/bin/
 /webapp/config/deploy.properties
 /webapp/config/build.properties
 /webapp/config/runtime.properties
@@ -17,3 +16,9 @@ utilities/sdb_to_tdb/.work
 **/target
 
 **/overlays
+
+# Eclipse artifacts
+**/.settings
+**/.classpath
+**/.project
+**/bin/

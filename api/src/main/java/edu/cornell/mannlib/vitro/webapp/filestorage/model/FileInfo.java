@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.filestorage.model;
 
@@ -62,9 +62,9 @@ public class FileInfo {
 				.getObjectPropertyStatements(opStmt);
 
 		if (stmts.size() > 1) {
-			String uris = "";
+			StringBuilder uris = new StringBuilder();
 			for (ObjectPropertyStatement stmt : stmts) {
-				uris += "'" + stmt.getSubjectURI() + "' ";
+				uris.append("'").append(stmt.getSubjectURI()).append("' ");
 			}
 			log.warn("Found " + stmts.size() + " Individuals that claim '"
 					+ entity.getURI() + "' as its bytestream:" + uris);

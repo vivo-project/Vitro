@@ -1,10 +1,6 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
-
-import java.util.Date;
-
-import org.apache.jena.rdf.model.Property;
 
 /**
  * a class representing a particular instance of a data property

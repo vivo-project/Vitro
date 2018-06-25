@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
@@ -219,7 +219,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 		// Throws an exception because we don't test for a null path from the
 		// ServletContext.
-		assertLogMessagesContains("no real path", "at java.io.File.<init>");
+		assertLogMessagesContains("no real path", "java.io.File.<init>");
 	}
 
 	@Test

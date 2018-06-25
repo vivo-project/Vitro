@@ -1,15 +1,17 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.MLevel.ERROR;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.Lo
  * Provide a means for programmatic login If they provide the right parameters,
  * log them in and send 200. Otherwise, send 403 error.
  */
+@WebServlet(name = "programLogin", urlPatterns = {"/programLogin"})
 public class ProgramLogin extends HttpServlet {
 	private static final Log log = LogFactory.getLog(ProgramLogin.class);
 
@@ -142,8 +145,7 @@ public class ProgramLogin extends HttpServlet {
 				}
 				recordLoginWithPasswordChange();
 				sendSuccess(MESSAGE_SUCCESS_FIRST_TIME);
-				return;
-			}
+            }
 
 		}
 
@@ -157,7 +159,19 @@ public class ProgramLogin extends HttpServlet {
 		}
 
 		private boolean usernameAndPasswordAreValid() {
-			return auth.isCurrentPassword(userAccount, password);
+
+			if(auth.md5HashIsNull(userAccount)) {
+				if (!auth.isCurrentPasswordArgon2(userAccount, password))
+					return false;
+			}
+			else {
+				if (!auth.isCurrentPassword(userAccount, password))
+					return false;
+				else {
+					userAccount.setPasswordChangeRequired(true);
+				}
+			}
+			return true;
 		}
 
 		private boolean loginDisabled() {

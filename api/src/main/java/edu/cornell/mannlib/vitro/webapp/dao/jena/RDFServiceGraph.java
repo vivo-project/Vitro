@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,12 +88,11 @@ public class RDFServiceGraph implements GraphWithPerform {
         performAdd(arg0);
     }
     
-    private String serialize(Triple t) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(sparqlNodeUpdate(t.getSubject(), "")).append(" ") 
+    private StringBuilder serialize(StringBuilder sb, Triple t) {
+        sb.append(sparqlNodeUpdate(t.getSubject(), "")).append(" ")
                .append(sparqlNodeUpdate(t.getPredicate(), "")).append(" ") 
                .append(sparqlNodeUpdate(t.getObject(), "")).append(" .");
-        return sb.toString();
+        return sb;
     }
         
     private synchronized void flush() {                                
@@ -116,12 +117,12 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
     
     private synchronized String serializeGraph(Graph graph) {
-        String triples = "";
+        StringBuilder sb = new StringBuilder();
         Iterator<Triple> tripIt = graph.find(null, null, null);
         while(tripIt.hasNext()) {
-            triples += " \n" + serialize(tripIt.next());
+            serialize(sb.append(" \n"), tripIt.next());
         }
-        return triples;
+        return sb.toString();
     }
     
     @Override
@@ -131,7 +132,7 @@ public class RDFServiceGraph implements GraphWithPerform {
         } else {
             ChangeSet changeSet = rdfService.manufactureChangeSet();
             try {
-                changeSet.addAddition(RDFServiceUtils.toInputStream(serialize(t)),
+                changeSet.addAddition(RDFServiceUtils.toInputStream(serialize(new StringBuilder(), t).toString()),
                         RDFService.ModelSerializationFormat.N3, graphURI);
                 rdfService.changeSetUpdate(changeSet);
             } catch (RDFServiceException rdfse) {
@@ -155,7 +156,7 @@ public class RDFServiceGraph implements GraphWithPerform {
         } else {
             ChangeSet changeSet = rdfService.manufactureChangeSet();
             try {
-                changeSet.addRemoval(RDFServiceUtils.toInputStream(serialize(t)),
+                changeSet.addRemoval(RDFServiceUtils.toInputStream(serialize(new StringBuilder(), t).toString()),
                         RDFService.ModelSerializationFormat.N3, graphURI);
                 rdfService.changeSetUpdate(changeSet);
             } catch (RDFServiceException rdfse) {
@@ -220,9 +221,9 @@ public class RDFServiceGraph implements GraphWithPerform {
 				|| (object != null && object.isBlank())) {
             return false;
         }
-        StringBuffer containsQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder containsQuery = new StringBuilder("SELECT * WHERE { \n");
         if (graphURI != null) {
-            containsQuery.append("  GRAPH <" + graphURI + "> { ");
+            containsQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         containsQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
@@ -282,7 +283,7 @@ public class RDFServiceGraph implements GraphWithPerform {
         } else if (node.isBlank()) {
             return "<fake:blank>"; // or throw exception?
         } else if (node.isURI()) {
-            StringBuffer uriBuff = new StringBuffer();
+            StringBuilder uriBuff = new StringBuilder();
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
         } else if (node.isLiteral()) {
             StringBuffer literalBuff = new StringBuffer();
@@ -291,7 +292,7 @@ public class RDFServiceGraph implements GraphWithPerform {
             literalBuff.append("\"");
             if (node.getLiteralDatatypeURI() != null) {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
+            } else if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             }
             return literalBuff.toString();
@@ -325,9 +326,9 @@ public class RDFServiceGraph implements GraphWithPerform {
                 return WrappedIterator.create(Collections.<Triple>emptyIterator());
             }
         }
-        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder findQuery = new StringBuilder("SELECT * WHERE { \n");
         if (graphURI != null) {
-            findQuery.append("  GRAPH <" + graphURI + "> { ");
+            findQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         findQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
@@ -521,6 +522,16 @@ public class RDFServiceGraph implements GraphWithPerform {
         @Override
         public Object executeInTransaction(Command arg0) {
             // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void execute(Runnable runnable) {
+
+        }
+
+        @Override
+        public <T> T calculate(Supplier<T> supplier) {
             return null;
         }
 

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
@@ -127,8 +127,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 						+ "but is not authorized to do so. Logged in as: "
 						+ LoginStatusBean.getCurrentUser(vreq));
 				bogusMessage = getBogusStandardMessage(vreq);
-				return;
-			}
+            }
 		}
 	}
 

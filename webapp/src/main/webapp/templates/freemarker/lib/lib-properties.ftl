@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-----------------------------------------------------------------------------
     Macros and functions for working with properties and property lists
@@ -120,7 +120,8 @@ name will be used as the label. -->
     </#if>
     -->
     <#if editable> 
-        <h2 id="${property.localName!}" title="${property.publicDescription!}">${label}  ${addLink!} ${verboseDisplay!}</h2>         
+        <h2 id="${property.localName!}" title="${property.publicDescription!}">${label}  ${addLink!}</h2>
+        ${verboseDisplay!}
     </#if>
 </#macro>
 
@@ -146,10 +147,10 @@ name will be used as the label. -->
 <#macro showAddLink propertyLocalName label url rangeUri domainUri="">
     <#if (rangeUri?contains("Authorship") && domainUri?contains("IAO_0000030")) || (rangeUri?contains("Editorship") && domainUri?contains("IAO_0000030"))|| rangeUri?contains("URL") || propertyLocalName == "hasResearchArea">
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
-        <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
+        <img class="add-individual" data-domain="${domainUri}" data-range="${rangeUri}" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().add_new} ${label?lower_case} ${i18n().entry}">
-        <img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="${i18n().add}" /></a>
+        <img class="add-individual" data-domain="${domainUri}" data-range="${rangeUri}" src="${urls.images}/individual/addIcon.gif" alt="${i18n().add}" /></a>
     </#if>
 </#macro>
 
@@ -194,12 +195,12 @@ name will be used as the label. -->
 		        <#local url = url + "&titleUri=" + "${statement.title!}">
 		    </#if>
 		</#if>
-        <@showEditLink propertyLocalName url />
+        <@showEditLink propertyLocalName rangeUri url />
     </#if>
 </#macro>
 
-<#macro showEditLink propertyLocalName url>
-    <a class="edit-${propertyLocalName}" href="${url}" title="${i18n().edit_entry}"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="${i18n().edit_entry}" /></a>
+<#macro showEditLink propertyLocalName rangeUri url>
+    <a class="edit-${propertyLocalName}" href="${url}" title="${i18n().edit_entry}"><img class="edit-individual" data-range="${rangeUri}" src="${urls.images}/individual/editIcon.gif" alt="${i18n().edit_entry}" /></a>
 </#macro>
 
 <#macro deleteLink propertyLocalName propertyName statement rangeUri=""> 
@@ -219,12 +220,12 @@ name will be used as the label. -->
 		        <#local url = url + "&deleteObjectUri=" + "${statement.title!}">
 		    </#if>
 		</#if>
-        <@showDeleteLink propertyLocalName url />
+        <@showDeleteLink propertyLocalName rangeUri url />
     </#if>
 </#macro>
 
-<#macro showDeleteLink propertyLocalName url>
-    <a class="delete-${propertyLocalName}" href="${url}" title="${i18n().delete_entry}"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="${i18n().delete_entry}" /></a>
+<#macro showDeleteLink propertyLocalName rangeUri url>
+    <a class="delete-${propertyLocalName}" href="${url}" title="${i18n().delete_entry}"><img  class="delete-individual" data-range="${rangeUri}" src="${urls.images}/individual/deleteIcon.gif" alt="${i18n().delete_entry}" /></a>
 </#macro>
 
 <#macro verboseDisplay property>

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -622,7 +622,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
             x[1] = hmap.get(key);
             objectsToSort.add(x);
         }
-        Collections.sort(objectsToSort, new MapComparator());
+        objectsToSort.sort(new MapComparator());
 
         HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
         for (String[] pair:objectsToSort) {

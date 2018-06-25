@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
@@ -6,6 +6,7 @@ import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
 public interface ObjectPropertyDao extends PropertyDao {
 
@@ -27,7 +28,7 @@ public interface ObjectPropertyDao extends PropertyDao {
      */
     public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI, ObjectProperty base);
 
-    public List <ObjectProperty> getObjectPropertiesForObjectPropertyStatements(List /*of ObjectPropertyStatement */ objectPropertyStatements);
+    public List <ObjectProperty> getObjectPropertiesForObjectPropertyStatements(List<ObjectPropertyStatement> objectPropertyStatements);
 
     public List<String> getSuperPropertyURIs(String objectPropertyURI, boolean direct);
 

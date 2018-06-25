@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
@@ -14,9 +14,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Display the startup status page.
  */
+@WebServlet(name = "StartupStatus", urlPatterns = {"/startupStatus"} )
 public class StartupStatusController extends FreemarkerHttpServlet {
 
 	@Override

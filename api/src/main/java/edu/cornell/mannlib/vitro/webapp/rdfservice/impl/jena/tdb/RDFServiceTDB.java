@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb;
 
@@ -88,6 +88,8 @@ public class RDFServiceTDB extends RDFServiceJena {
 		} catch (Exception e) {
 			log.error(e, e);
 			throw new RDFServiceException(e);
+		} finally {
+			rebuildGraphURICache = true;
 		}
 	}
 
@@ -208,7 +210,7 @@ public class RDFServiceTDB extends RDFServiceJena {
 			ModelSerializationFormat serializationFormat)
 			throws RDFServiceException {
 		return super.isEquivalentGraph(graphURI,
-				adjustForNonNegativeIntegers(serializedGraph),
+				adjustForIntegers(serializedGraph),
 				serializationFormat);
 	}
 
@@ -231,25 +233,38 @@ public class RDFServiceTDB extends RDFServiceJena {
 	}
 
 	/**
-	 * Convert all of the references to "nonNegativeInteger" to "integer" in
-	 * this serialized graph.
-	 * 
-	 * This isn't rigorous: it could fail if another property contained the text
-	 * "nonNegativeInteger" in its name, or if that text were used as part of a
-	 * string literal. If that happens before this TDB bug is fixed, we'll need
-	 * to improve this method.
-	 * 
+	 * Convert all of the references to integer compatible type to "integer" in the serialized graph.
+	 *
+	 * TDB converts every valid literal that is compatible with xsd:integer to xsd:integer.
+	 *
+	 * This assumes that every literal has been typed validly. But if the type / lexical value aren't matched,
+	 * you've probably got bigger problems.
+	 *
 	 * It also isn't scalable: if we wanted real scalability, we would write to
 	 * a temporary file as we converted.
 	 */
-	private InputStream adjustForNonNegativeIntegers(InputStream serializedGraph)
+	private InputStream adjustForIntegers(InputStream serializedGraph)
 			throws RDFServiceException {
 		try {
 			String raw = IOUtils.toString(serializedGraph, "UTF-8");
-			String modified = raw.replace("nonNegativeInteger", "integer");
+			String modified = raw;
+			modified = modified.replaceAll(integerPattern, "^^<http://www.w3.org/2001/XMLSchema#integer>");
 			return new ByteArrayInputStream(modified.getBytes("UTF-8"));
 		} catch (IOException e) {
 			throw new RDFServiceException(e);
 		}
 	}
+
+	private final String integerPattern =
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#int>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#long>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#short>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#unsignedByte>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#unsignedShort>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#unsignedInt>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#unsignedLong>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#nonPositiveInteger>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#nonNegativeInteger>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#positiveInteger>" + "|" +
+		"\\^\\^<http://www.w3.org/2001/XMLSchema#negativeInteger>";
 }

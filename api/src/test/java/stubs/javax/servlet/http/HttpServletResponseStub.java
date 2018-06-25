@@ -1,12 +1,12 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package stubs.javax.servlet.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -60,6 +61,16 @@ public class HttpServletResponseStub implements HttpServletResponse {
 
 	public String getHeader(String name) {
 		return headers.get(name);
+	}
+
+	@Override
+	public Collection<String> getHeaders(String s) {
+		return null;
+	}
+
+	@Override
+	public Collection<String> getHeaderNames() {
+		return null;
 	}
 
 	// ----------------------------------------------------------------------
@@ -115,6 +126,16 @@ public class HttpServletResponseStub implements HttpServletResponse {
 		}
 
 		return new ServletOutputStream() {
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+
+			@Override
+			public void setWriteListener(WriteListener writeListener) {
+
+			}
+
 			@Override
 			public void write(int thisChar) throws IOException {
 				outputStream.write(thisChar);
@@ -212,6 +233,11 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	public void setContentLength(int arg0) {
 		throw new RuntimeException(
 				"HttpServletResponseStub.setContentLength() not implemented.");
+	}
+
+	@Override
+	public void setContentLengthLong(long l) {
+
 	}
 
 	@Override

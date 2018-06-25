@@ -1,11 +1,11 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,10 +15,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  *  Controller for comments ("contact us") page
  *  * @author bjl23
  */
+@WebServlet(name = "ContactFormController", urlPatterns = {"/contact"} )
 public class ContactFormController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;

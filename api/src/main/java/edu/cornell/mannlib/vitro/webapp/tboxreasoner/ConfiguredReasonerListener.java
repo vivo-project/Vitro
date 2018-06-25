@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.tboxreasoner;
 
@@ -221,8 +221,7 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 
 		if (thereAreNoDrivingPatterns() || statementMatchesDrivingPattern(stmt)) {
 			addIt(stmt);
-			return;
-		}
+        }
 	}
 
 	public void tryRemove(Statement stmt) {
@@ -259,8 +258,7 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 
 		if (thereAreNoDrivingPatterns() || statementMatchesDrivingPattern(stmt)) {
 			removeIt(stmt);
-			return;
-		}
+        }
 	}
 
 	private boolean isDataProperty(Statement stmt) {

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 
@@ -95,11 +95,7 @@ class NQuadLineSplitter {
 		while (!atEnd() && isWhiteSpace()) {
 			i++;
 		}
-		if (atEnd()) {
-			return;
-		} else if (line.charAt(i) == '#') {
-			return;
-		} else {
+		if (!atEnd() && line.charAt(i) != '#') {
 			throw new BadNodeException(
 					"Period was not followed by end of line: '" + line + "'");
 		}

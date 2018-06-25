@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -66,11 +66,9 @@ public class DependentResourceDeleteJena {
 		ListIterator <Statement>removed = removedStmts.listIterator();
 		while( removed.hasNext()){
 			Statement removedStmt = removed.next();
-			ListIterator <Statement>changed = changedStmts.listIterator();			
-			while( changed.hasNext()){
-				Statement changedStmt = changed.next();
-				if( removedStmt.equals(changedStmt) ){
-					removed.remove();					
+			for (Statement changedStmt : changedStmts) {
+				if (removedStmt.equals(changedStmt)) {
+					removed.remove();
 				}
 			}
 		}

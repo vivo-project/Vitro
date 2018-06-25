@@ -1,10 +1,11 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
+@WebServlet(name = "Classes2ClassesOperationController", urlPatterns = {"/classes2ClassesOp"} )
 public class Classes2ClassesOperationController extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(Classes2ClassesOperationController.class.getName());
@@ -70,48 +72,60 @@ public class Classes2ClassesOperationController extends BaseEditController {
 	                if ((subclassURIstrs != null) && (subclassURIstrs.length > 1)) {
 	                    String superclassURIstr = request.getParameter("SuperclassURI");
 	                    if (superclassURIstr != null) {
-	                        for (int i=0; i<subclassURIstrs.length; i++) {
-	                        	if (modeStr.equals("disjointWith")) {
-	                        		vcDao.removeDisjointWithClass(superclassURIstr, subclassURIstrs[i]);
-	                        	} else if (modeStr.equals("equivalentClass")) {
-	                        		vcDao.removeEquivalentClass(superclassURIstr, subclassURIstrs[i]);
-	                        	} else {
-		                            Classes2Classes c2c = new Classes2Classes();
-		                            c2c.setSubclassURI(subclassURIstrs[i]);
-		                            c2c.setSuperclassURI(superclassURIstr);
-		                            vcDao.deleteClasses2Classes(c2c);
-	                        	}
-	                        }
+                            for (String subclassURIstr : subclassURIstrs) {
+                                switch (modeStr) {
+                                    case "disjointWith":
+                                        vcDao.removeDisjointWithClass(superclassURIstr, subclassURIstr);
+                                        break;
+                                    case "equivalentClass":
+                                        vcDao.removeEquivalentClass(superclassURIstr, subclassURIstr);
+                                        break;
+                                    default:
+                                        Classes2Classes c2c = new Classes2Classes();
+                                        c2c.setSubclassURI(subclassURIstr);
+                                        c2c.setSuperclassURI(superclassURIstr);
+                                        vcDao.deleteClasses2Classes(c2c);
+                                        break;
+                                }
+                            }
 	                    }
 	                } else {
 	                    String subclassURIstr = subclassURIstrs[0];
 	                    String[] superclassURIstrs = request.getParameterValues("SuperclassURI");
 	                    if (superclassURIstrs != null) {
-	                        for (int i=0; i<superclassURIstrs.length; i++) {
-	                        	if (modeStr.equals("disjointWith")) {
-	                        		vcDao.removeDisjointWithClass(superclassURIstrs[i],subclassURIstr);
-		                        } else if (modeStr.equals("equivalentClass")) {
-		                        	vcDao.removeEquivalentClass(subclassURIstr,superclassURIstrs[i]);
-		                        } else {
-		                            Classes2Classes c2c = new Classes2Classes();
-		                            c2c.setSuperclassURI(superclassURIstrs[i]);
-		                            c2c.setSubclassURI(subclassURIstr);
-		                            vcDao.deleteClasses2Classes(c2c);
-	                        	}
-	                        }
+                            for (String superclassURIstr : superclassURIstrs) {
+                                switch (modeStr) {
+                                    case "disjointWith":
+                                        vcDao.removeDisjointWithClass(superclassURIstr, subclassURIstr);
+                                        break;
+                                    case "equivalentClass":
+                                        vcDao.removeEquivalentClass(subclassURIstr, superclassURIstr);
+                                        break;
+                                    default:
+                                        Classes2Classes c2c = new Classes2Classes();
+                                        c2c.setSuperclassURI(superclassURIstr);
+                                        c2c.setSubclassURI(subclassURIstr);
+                                        vcDao.deleteClasses2Classes(c2c);
+                                        break;
+                                }
+                            }
 	                    }
 	                }
 	            } else if (request.getParameter("operation").equals("add")) {
-	            	if (modeStr.equals("disjointWith")) {
-	            		vcDao.addDisjointWithClass(request.getParameter("SuperclassURI"), request.getParameter("SubclassURI"));
-	            	} else if (modeStr.equals("equivalentClass")) {
-	            		vcDao.addEquivalentClass(request.getParameter("SuperclassURI"), request.getParameter("SubclassURI"));
-	            	} else {
-		            	Classes2Classes c2c = new Classes2Classes();
-		                c2c.setSuperclassURI(request.getParameter("SuperclassURI"));
-		                c2c.setSubclassURI(request.getParameter("SubclassURI"));
-		                vcDao.insertNewClasses2Classes(c2c);
-	            	}
+                    switch (modeStr) {
+                        case "disjointWith":
+                            vcDao.addDisjointWithClass(request.getParameter("SuperclassURI"), request.getParameter("SubclassURI"));
+                            break;
+                        case "equivalentClass":
+                            vcDao.addEquivalentClass(request.getParameter("SuperclassURI"), request.getParameter("SubclassURI"));
+                            break;
+                        default:
+                            Classes2Classes c2c = new Classes2Classes();
+                            c2c.setSuperclassURI(request.getParameter("SuperclassURI"));
+                            c2c.setSubclassURI(request.getParameter("SubclassURI"));
+                            vcDao.insertNewClasses2Classes(c2c);
+                            break;
+                    }
 	            }
 	        } catch (Exception e) {
 	            log.error(e, e);

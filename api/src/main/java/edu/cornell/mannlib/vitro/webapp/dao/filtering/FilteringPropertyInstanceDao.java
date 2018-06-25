@@ -1,9 +1,8 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import net.sf.jga.algorithms.Filter;
@@ -67,16 +66,13 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
                 //Filter based on subject, property and object.  This could be changed
                 //to filter on the subject's and object's class.
                 Individual sub = individualDao.getIndividualByURI(inst.getSubjectEntURI());
-                if( filters.getIndividualFilter().fn(sub) == false )
+                if(!filters.getIndividualFilter().fn(sub))
                     return false;
                 Individual obj = individualDao.getIndividualByURI(inst.getObjectEntURI());
-                if( filters.getIndividualFilter().fn(obj) == false)
+                if(!filters.getIndividualFilter().fn(obj))
                     return false;
                 ObjectProperty prop = objectPropDao.getObjectPropertyByURI(inst.getPropertyURI());
-                if( filters.getObjectPropertyFilter().fn(prop) == false)
-                    return false;
-                else 
-                    return true;                                
+                return filters.getObjectPropertyFilter().fn(prop);
             }            
         };
     }

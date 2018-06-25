@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 /* browseIndex.css contains styles used in the Index pages.  */
 
@@ -14,9 +14,6 @@
 .pagination li {
     display: inline-block;
     padding-right: 2px;
-}
-.pagination li.selectedNavPage {
-    font-size: 1em;
 }
 .rdfLink {
     padding-left: .5em;

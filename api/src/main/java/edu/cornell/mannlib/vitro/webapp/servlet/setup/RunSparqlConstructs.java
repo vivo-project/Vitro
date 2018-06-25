@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
@@ -62,7 +62,7 @@ public class RunSparqlConstructs implements ServletContextListener {
 				File file = new File(ctx.getRealPath(path));			
 				try {
 					BufferedReader reader = new BufferedReader(new FileReader(file));
-					StringBuffer fileContents = new StringBuffer();
+					StringBuilder fileContents = new StringBuilder();
 					String ln;
 					try {
 						while ( (ln = reader.readLine()) != null) {

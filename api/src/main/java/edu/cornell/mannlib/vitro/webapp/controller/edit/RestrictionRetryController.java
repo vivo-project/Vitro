@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -67,32 +66,39 @@ public class RestrictionRetryController extends BaseEditController {
 					
 			epo.setFormObject(new FormObject());
 			epo.getFormObject().getOptionLists().put("onProperty", onPropertyList);
+
+			switch (restrictionTypeStr) {
+				case "someValuesFrom": {
+					request.setAttribute("specificRestrictionForm", "someValuesFromRestriction_retry.jsp");
+					List<Option> optionList = (propertyType == OBJECT)
+							? getValueClassOptionList(request)
+							: getValueDatatypeOptionList(request);
+					epo.getFormObject().getOptionLists().put("ValueClass", optionList);
+					break;
+				}
+				case "allValuesFrom": {
+					request.setAttribute("specificRestrictionForm", "allValuesFromRestriction_retry.jsp");
+					List<Option> optionList = (propertyType == OBJECT)
+							? getValueClassOptionList(request)
+							: getValueDatatypeOptionList(request);
+					epo.getFormObject().getOptionLists().put("ValueClass", optionList);
+					break;
+				}
+				case "hasValue":
+					request.setAttribute("specificRestrictionForm", "hasValueRestriction_retry.jsp");
+					if (propertyType == OBJECT) {
+						request.setAttribute("propertyType", "object");
+					} else {
+						request.setAttribute("propertyType", "data");
+					}
+					break;
+				case "minCardinality":
+				case "maxCardinality":
+				case "cardinality":
+					request.setAttribute("specificRestrictionForm", "cardinalityRestriction_retry.jsp");
+					break;
+			}
 			
-			if (restrictionTypeStr.equals("someValuesFrom")) {
-				request.setAttribute("specificRestrictionForm","someValuesFromRestriction_retry.jsp");
-				List<Option> optionList = (propertyType == OBJECT) 
-					? getValueClassOptionList(request)
-					: getValueDatatypeOptionList(request) ;
-				epo.getFormObject().getOptionLists().put("ValueClass",optionList);
-			} else if (restrictionTypeStr.equals("allValuesFrom")) {
-				request.setAttribute("specificRestrictionForm","allValuesFromRestriction_retry.jsp");
-				List<Option> optionList = (propertyType == OBJECT) 
-					? getValueClassOptionList(request)
-				    : getValueDatatypeOptionList(request) ;
-				epo.getFormObject().getOptionLists().put("ValueClass",optionList);
-			} else if (restrictionTypeStr.equals("hasValue")) {
-				request.setAttribute("specificRestrictionForm", "hasValueRestriction_retry.jsp");
-				if (propertyType == OBJECT) {
-					request.setAttribute("propertyType", "object");	
-				} else {
-					request.setAttribute("propertyType", "data");
-				}	
-			} else if (restrictionTypeStr.equals("minCardinality") || restrictionTypeStr.equals("maxCardinality") || restrictionTypeStr.equals("cardinality")) {
-				request.setAttribute("specificRestrictionForm", "cardinalityRestriction_retry.jsp");
-			} 
-			
-	        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-	        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
 	        request.setAttribute("formJsp","/templates/edit/specific/restriction_retry.jsp");
 	        request.setAttribute("scripts","/templates/edit/formBasic.js");
 	        request.setAttribute("title","Add Restriction");
@@ -100,7 +106,7 @@ public class RestrictionRetryController extends BaseEditController {
 	        setRequestAttributes(request,epo);
 	
 	        try {
-	            rd.forward(request, response);
+				JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
 	        } catch (Exception e) {
 	            log.error(this.getClass().getName()+"PropertyRetryController could not forward to view.");
 	            log.error(e.getMessage());

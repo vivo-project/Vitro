@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 
@@ -33,7 +33,8 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 	}
 
 	public void resetPassword() {
-		userAccount.setMd5Password(Authenticator.applyMd5Encoding(newPassword));
+		userAccount.setArgon2Password(Authenticator.applyArgon2iEncoding(newPassword));
+		userAccount.setMd5Password("");
 		userAccount.setPasswordLinkExpires(0L);
 		userAccount.setPasswordChangeRequired(false);
 		userAccount.setStatus(Status.ACTIVE);

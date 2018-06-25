@@ -1,13 +1,16 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
 import static org.apache.jena.ontology.OntModelSpec.OWL_MEM;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.graph.compose.Union;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.impl.OntModelImpl;
@@ -16,6 +19,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.impl.ModelCom;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
+import java.util.List;
 
 /**
  * Make models that will do proper bulk updates.
@@ -46,7 +51,7 @@ public class VitroModelFactory {
 
 		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
 
-		return new BulkUpdatingModel(unionModel, baseGraph);
+		return new BulkUpdatingModel(unionModel, baseModel);
 	}
 
 	public static OntModel createUnion(OntModel baseModel, OntModel plusModel) {
@@ -58,7 +63,8 @@ public class VitroModelFactory {
 		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
 		OntModel unionOntModel = ModelFactory.createOntologyModel(OWL_MEM, unionModel);
 
-		return new BulkUpdatingOntModel(unionOntModel, baseGraph);
+
+		return new BulkUpdatingOntModel(unionOntModel, baseModel);
 	}
 
 	public static Model createModelForGraph(Graph g) {

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -191,7 +191,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		user.setEmailAddress(userInfo.username);
 		user.setUri(userInfo.uri);
 		user.setPermissionSetUris(userInfo.permissionSetUris);
-		user.setMd5Password(Authenticator.applyMd5Encoding(userInfo.password));
+		user.setArgon2Password(AuthenticatorStub.applyArgon2iEncodingStub(userInfo.password));
+		user.setMd5Password("");
 		user.setLoginCount(userInfo.loginCount);
 		user.setPasswordChangeRequired(userInfo.loginCount == 0);
 		return user;

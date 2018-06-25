@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
@@ -14,10 +14,11 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 
+@WebServlet(name = "JenaExportController", urlPatterns = {"/export/*"} )
 public class JenaExportController extends BaseEditController {
 	private static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION
 			.or(SimplePermission.EDIT_ONTOLOGY.ACTION);
@@ -104,7 +106,10 @@ public class JenaExportController extends BaseEditController {
 		String formatParam = vreq.getParameter("format");
 		String subgraphParam = vreq.getParameter("subgraph");
 		String assertedOrInferredParam = vreq.getParameter("assertedOrInferred");
-		String ontologyURI = vreq.getParameter("ontologyURI");
+		StringBuilder ontologyURI = new StringBuilder();
+		if (vreq.getParameter("ontologyURI") != null) {
+			ontologyURI.append(vreq.getParameter("ontologyURI"));
+		}
 		
 		Model model = null;
 		OntModel ontModel = ModelFactory.createOntologyModel();
@@ -112,12 +117,13 @@ public class JenaExportController extends BaseEditController {
 		if(!subgraphParam.equalsIgnoreCase("tbox") 
 				&& !subgraphParam.equalsIgnoreCase("abox") 
 				&& !subgraphParam.equalsIgnoreCase("full")){
-			ontologyURI = subgraphParam;
+			ontologyURI = new StringBuilder(subgraphParam);
 			subgraphParam = "tbox";
-			char[] uri =  ontologyURI.toCharArray();
-			ontologyURI="";
-			for(int i =0; i < uri.length-1;i++)
-				ontologyURI = ontologyURI + uri[i];
+			char[] uri =  ontologyURI.toString().toCharArray();
+			ontologyURI = new StringBuilder();
+			for(int i =0; i < uri.length-1;i++) {
+				ontologyURI.append(uri[i]);
+			}
 		}
 	
 		if( "abox".equals(subgraphParam)){
@@ -139,7 +145,7 @@ public class JenaExportController extends BaseEditController {
 		        // only those statements that are in the inferred graph
 		        Model tempModel = xutil.extractTBox(
 		        		ModelAccess.on(getServletContext()).getOntModel(TBOX_UNION),
-		                ontologyURI);
+						ontologyURI.toString());
 		        Model inferenceModel = ModelAccess.on(getServletContext()).getOntModel(TBOX_INFERENCES);
 		        inferenceModel.enterCriticalSection(Lock.READ);
 		        try {
@@ -150,17 +156,17 @@ public class JenaExportController extends BaseEditController {
 		    } else if ("full".equals(assertedOrInferredParam)) {
                 model = xutil.extractTBox(
                 		ModelAccess.on(getServletContext()).getOntModel(TBOX_UNION),
-                        ontologyURI);		        
+						ontologyURI.toString());
 		    } else {
                 model = xutil.extractTBox(
-                        ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS), ontologyURI);              		        
+                        ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS), ontologyURI.toString());
 		    }
 			
 		}
 		else if("full".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(
-						dataset, ontologyURI, ABOX_INFERENCES);
+						dataset, ontologyURI.toString(), ABOX_INFERENCES);
 				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ABOX_INFERENCES));
 				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(TBOX_INFERENCES));
 			}
@@ -212,23 +218,31 @@ public class JenaExportController extends BaseEditController {
 	}
 	
 	private void setHeaders(HttpServletResponse response, String formatParam) {
-	       if ( formatParam == null ) {
-	            formatParam = "RDF/XML-ABBREV";  // default
-	        }
-	        String mime = formatToMimetype.get( formatParam );
-	        if ( mime == null ) {
-	            throw new RuntimeException( "Unsupported RDF format " + formatParam);
-	        }
-	        
-	        response.setContentType( mime );
-	        if(mime.equals("application/rdf+xml"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
-	        else if(mime.equals("text/n3"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
-	        else if(mime.equals("text/plain"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
-	        else if(mime.equals("application/x-turtle"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
+		if ( formatParam == null ) {
+			formatParam = "RDF/XML-ABBREV";  // default
+		}
+
+		String mime = formatToMimetype.get( formatParam );
+		if ( mime == null ) {
+			throw new RuntimeException( "Unsupported RDF format " + formatParam);
+		}
+
+		response.setContentType( mime );
+
+		switch (mime) {
+			case "application/rdf+xml":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
+				break;
+			case "text/n3":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
+				break;
+			case "text/plain":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
+				break;
+			case "application/x-turtle":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
+				break;
+		}
 	}
 	
 	private void outputSparqlConstruct(String queryStr, String formatParam, 
@@ -246,20 +260,16 @@ public class JenaExportController extends BaseEditController {
 	        IOUtils.copy(in, out);
 	        out.flush();
 	        out.close();
-	    } catch (RDFServiceException e) {
+	    } catch (RDFServiceException | IOException e) {
 	        throw new RuntimeException(e);
-	    } catch (IOException ioe) {
-	        throw new RuntimeException(ioe);
 	    } finally {
 	        rdfService.close();
 	    }	    
 	}
 	
 	private void prepareExportSelectionPage( VitroRequest vreq, HttpServletResponse response ) {
-		vreq.setAttribute( "bodyJsp", Controllers.EXPORT_SELECTION_JSP );
-		RequestDispatcher dispatcher = vreq.getRequestDispatcher( Controllers.BASIC_JSP );
 		try {
-			dispatcher.forward( vreq, response );
+			JSPPageHandler.renderBasicPage(vreq, response, Controllers.EXPORT_SELECTION_JSP );
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

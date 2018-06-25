@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
@@ -11,10 +11,10 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.lang.StringUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -359,9 +359,8 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     /**
      * For processig of JSONObject
      */
-    public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
-    	JSONObject rObj = null;
-    	return rObj;
+    public JsonNode convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
+    	return null;
     }
 
     protected static void setAllClassCountsToZero(VClassGroup vcg){

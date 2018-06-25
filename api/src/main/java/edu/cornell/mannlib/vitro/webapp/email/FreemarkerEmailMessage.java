@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.email;
 
@@ -87,8 +87,7 @@ public class FreemarkerEmailMessage {
 		} catch (AddressException e) {
 			log.warn("invalid recipient address: " + type + ", '"
 					+ emailAddress + "'");
-			return;
-		}
+        }
 	}
 
 	public void addRecipient(RecipientType type, String emailAddress,
@@ -110,8 +109,7 @@ public class FreemarkerEmailMessage {
 		} catch (UnsupportedEncodingException e) {
 			log.warn("invalid recipient address: " + type + ", '"
 					+ emailAddress + "', personal name '" + personalName + "'");
-			return;
-		}
+        }
 	}
 
 	public void setSubject(String subject) {
@@ -144,12 +142,10 @@ public class FreemarkerEmailMessage {
 		try {
 			config.getTemplate(templateName).process(bodyMap,
 					new StringWriter());
-		} catch (TemplateException e) {
-			log.error(e, e);
-		} catch (IOException e) {
+		} catch (TemplateException | IOException e) {
 			log.error(e, e);
 		}
-	}
+    }
 
 	public boolean send() {
 		try {

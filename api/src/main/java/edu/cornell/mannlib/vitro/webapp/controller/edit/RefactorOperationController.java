@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -13,10 +13,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,6 +58,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
 
+@WebServlet(name = "RefactorOperationController", urlPatterns = {"/refactorOp"} )
 public class RefactorOperationController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(RefactorOperationController.class.getName());
@@ -71,8 +73,6 @@ public class RefactorOperationController extends BaseEditController {
         }
 		VitroRequest vreq = new VitroRequest(request);
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp", Controllers.CHECK_DATATYPE_PROPERTIES);
         request.setAttribute("title","Check Datatype Properties");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
         
@@ -141,9 +141,8 @@ public class RefactorOperationController extends BaseEditController {
 											results.add("    With:      "+goodState.toString());
 											fixed++;
 										}
-										for(int i = 0; i<queue.size(); i++)
-										{
-											ontModel.add(queue.get(i));
+										for (Statement aQueue : queue) {
+											ontModel.add(aQueue);
 										}
 										ontModel.remove(toRemove);
 										badStatements.close();
@@ -172,7 +171,7 @@ public class RefactorOperationController extends BaseEditController {
 		}
 		request.setAttribute("results", results);
 		try {
-            rd.forward(request, response);
+			JSPPageHandler.renderBasicPage(request, response, Controllers.CHECK_DATATYPE_PROPERTIES);
         } catch (Exception e) {
             log.error(this.getClass().getName()+" could not forward to view.");
             log.error(e.getMessage());
@@ -267,9 +266,9 @@ public class RefactorOperationController extends BaseEditController {
 		if ( (refererStr = epo.getReferer()) != null) {
 			String controllerStr = null;
 			String[] controllers = {"entityEdit", "propertyEdit", "datapropEdit", "ontologyEdit", "vclassEdit"};
-			for (int i=0; i<controllers.length; i++) {
-				if (refererStr.indexOf(controllers[i]) > -1) {
-					controllerStr = controllers[i];
+			for (String controller : controllers) {
+				if (refererStr.indexOf(controller) > -1) {
+					controllerStr = controller;
 				}
 			}
 			if (controllerStr != null) {
@@ -492,14 +491,18 @@ public class RefactorOperationController extends BaseEditController {
         
         if (vreq.getParameter("_cancel") == null) {
 	        if (modeStr != null) {
-	        	
-	        	if (modeStr.equals("renameResource")) {
-	        		redirectStr = doRenameResource(vreq, response, epo);
-	        	} else if (modeStr.equals("movePropertyStatements")) {
-	        		doMovePropertyStatements(vreq, response, epo);
-	        	} else if (modeStr.equals("moveInstances")) {
-	        		doMoveInstances(vreq, response, epo);
-	        	} 
+
+				switch (modeStr) {
+					case "renameResource":
+						redirectStr = doRenameResource(vreq, response, epo);
+						break;
+					case "movePropertyStatements":
+						doMovePropertyStatements(vreq, response, epo);
+						break;
+					case "moveInstances":
+						doMoveInstances(vreq, response, epo);
+						break;
+				}
 	        }
         }
         

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
@@ -10,8 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,13 +43,6 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	private String template = "defaultAddMissingIndividualForm.ftl";
 	private static String createCommand = "create";
 	protected static String objectVarName = "newIndividual";
-	private static HashMap<String,String> defaultsForXSDtypes ;
-
-	static {
-		defaultsForXSDtypes = new HashMap<String,String>();
-		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
-		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-	}
 
 	//Method which checks whether this particular generator should be employed
 	public static final boolean isCreateNewIndividual(VitroRequest vreq, HttpSession session) {
@@ -63,8 +55,8 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 		if(objProp != null) {
 			return(objProp.getOfferCreateNewOption() && 
 					(
-							(command != null && command.equals(createCommand)) || 
-							objProp.getSelectFromExisting() == false
+							(command != null && command.equals(createCommand)) ||
+									!objProp.getSelectFromExisting()
 					)
 				);
 		}
@@ -226,7 +218,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return prefixes;
     }
     
-    private String getN3ForName() {
+    protected String getN3ForName() {
     	return "?" + objectVarName + " rdfs:label ?name .";
     }
     
@@ -434,7 +426,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return (isEditOfExistingStmt 
     			&& "create".equals(command)) 
     	       && (objectProp != null)
-    	       && (objectProp.getOfferCreateNewOption() == true);                
+    	       && (objectProp.getOfferCreateNewOption());
     }
     
     private boolean isForwardToCreateButEdit(VitroRequest vreq) {
@@ -444,8 +436,8 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return (isEditOfExistingStmt 
     			&& (! "create".equals(command))
     			&& (objectProp != null) 
-    	       && (objectProp.getOfferCreateNewOption() == true) 
-    	       && (objectProp.getSelectFromExisting() == false)
+    	       && (objectProp.getOfferCreateNewOption())
+    	       && (!objectProp.getSelectFromExisting())
     	     );
     }
     

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
@@ -198,8 +198,8 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
 			if (!page.isExternalAuthOnly()) {
-				u.setMd5Password(Authenticator
-						.applyMd5Encoding(initialPassword));
+				u.setArgon2Password(Authenticator.applyArgon2iEncoding(initialPassword));
+				u.setMd5Password("");
 				u.setPasswordChangeRequired(true);
 			}
 			u.setStatus(Status.ACTIVE);

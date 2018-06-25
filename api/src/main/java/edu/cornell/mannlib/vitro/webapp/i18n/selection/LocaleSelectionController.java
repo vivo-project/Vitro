@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.i18n.selection;
 
@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.LocaleUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
  * Set the new Locale in the Session using SelectedLocale and return to the
  * referrer.
  */
+@WebServlet(name = "LocaleSelectionController", urlPatterns = {"/selectLocale"})
 public class LocaleSelectionController extends HttpServlet {
 	private static final Log log = LogFactory
 			.getLog(LocaleSelectionController.class);

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.tasks;
 
@@ -153,8 +153,6 @@ public class UpdateUrisTask implements Task {
             }
             pool.waitUntilIdle();
 
-            commitChanges();
-
             excluders.stopIndexing();
             modifiers.stopIndexing();
             listeners.fireEvent(new Event(STOP_URIS, status.getSearchIndexerStatus()));
@@ -221,9 +219,6 @@ public class UpdateUrisTask implements Task {
 
         private void fireEvent(Event event) {
             listeners.fireEvent(event);
-            if (event.getType() == PROGRESS || event.getType() == STOP_URIS) {
-                commitChanges();
-            }
         }
 
         private void commitChanges() {

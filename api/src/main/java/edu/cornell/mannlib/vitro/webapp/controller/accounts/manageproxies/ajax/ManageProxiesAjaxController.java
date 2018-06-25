@@ -1,10 +1,11 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ajax;
 
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 /**
  * Handle the AJAX functions that are specific to the ManageProxies pages.
  */
+@WebServlet(name = "ProxiesAjax", urlPatterns = {"/proxiesAjax/*"} )
 public class ManageProxiesAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(ManageProxiesAjaxController.class);

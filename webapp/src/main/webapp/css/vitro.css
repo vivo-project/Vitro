@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 /****************************************
  Vitro base styles
@@ -297,7 +297,7 @@ ul.language-dropdown ul.sub_menu li a {
 ul.language-dropdown ul.sub_menu li.inactive { 
     color: #aab0ae !important;
     font-size: 1em !important;
-    width: 88px;  */
+    width: 88px;
 }
 ul.language-dropdown ul.sub_menu li a:hover,
 ul.language-dropdown ul.sub_menu li a.hover { 

@@ -1,4 +1,4 @@
-<%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
+<%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <!-- this is a page set up to be parsed by the dynamicFields tag -->
 <!-- the datapropsNN, $$, $foo, and @x symbols are special notations understood by this tag and are not part of JSP -->

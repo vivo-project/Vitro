@@ -1,9 +1,8 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- Crop the replacement main image for an Individual, to produce a thumbnail. -->
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jcrop/jquery.Jcrop.js"></script>',
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jcrop/jquery.Jcrop.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/imageUpload/cropImage.js"></script>')}
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.css" />',

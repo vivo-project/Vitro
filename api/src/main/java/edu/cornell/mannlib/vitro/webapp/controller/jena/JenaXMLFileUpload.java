@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
@@ -34,10 +35,10 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-public class JenaXMLFileUpload  extends JenaIngestController  {	
+@WebServlet(name = "JenaXMLFileUpload", urlPatterns = {"/jenaXmlFileUpload/*"} )
+public class JenaXMLFileUpload  extends JenaIngestController  {
 	Log log = LogFactory.getLog(JenaXMLFileUpload.class);
 	private String baseDirectoryForFiles;
 	private int maxFileSize = 1024 * 1024 * 500;
@@ -142,19 +143,17 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         request.setAttribute("statementCount", count);        	
 		
 		request.setAttribute("title","Uploaded files and converted to RDF");
-		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUploadSuccess.jsp");
-		
+
 		request.setAttribute("fileItems",vreq.getFiles());				
 
-		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, resp);
+			JSPPageHandler.renderBasicPage(request, resp, "/jenaIngest/xmlFileUploadSuccess.jsp");
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+            e.printStackTrace(System.out);
         }
 	}
 	
@@ -170,20 +169,18 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		
 		//make a form for uploading a file
 		request.setAttribute("title","Upload file and convert to RDF");
-		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUpload.jsp");
-		
+
 		request.setAttribute("modelNames", getModelMaker(vreq).listModels().toList());
 		request.setAttribute("models", null);				
 
-		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, response);
+			JSPPageHandler.renderBasicPage(request, response, "/jenaIngest/xmlFileUpload.jsp");
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+			e.printStackTrace(System.out);
         }
 		
 	}
@@ -210,7 +207,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 				XsltTransformer t = xsltExec.load();
 				//this is how to set parameters:
 				//t.setParameter(new QName("someparametername"), new XdmAtomicValue(10));				
-				Serializer out = new Serializer();
+				Serializer out = new Processor(false).newSerializer();
 				out.setOutputProperty(Serializer.Property.METHOD, "xml");
 				out.setOutputProperty(Serializer.Property.INDENT, "yes");
 				File outFile = new File(file.getAbsolutePath() + ".rdfxml");

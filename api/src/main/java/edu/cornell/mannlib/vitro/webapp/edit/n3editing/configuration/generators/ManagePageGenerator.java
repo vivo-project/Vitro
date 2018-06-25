@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
@@ -12,12 +12,8 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -30,6 +26,10 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.XSD;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -258,7 +258,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     		String pageUri, 
     		OntModel queryModel) {
     	//Create json array to be set within form specific data
-    	JSONArray jsonArray = new JSONArray();
+    	ArrayNode jsonArray = new ObjectMapper().createArrayNode();
     	String querystr = getExistingDataGettersQuery();
     	//Bind pageUri to query
     	QuerySolutionMap initialBindings = new QuerySolutionMap();
@@ -291,7 +291,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
         }
     }
     
-    private void addJSONArrayToFormSpecificData(JSONArray jsonArray, EditConfigurationVTwo editConfig) {
+    private void addJSONArrayToFormSpecificData(ArrayNode jsonArray, EditConfigurationVTwo editConfig) {
     	HashMap<String, Object> data = editConfig.getFormSpecificData();		
 		data.put("existingPageContentUnits", jsonArray.toString());
 		//Experimenting with putting actual array in
@@ -300,7 +300,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	}
 
 	private void processExistingDataGetter(int counter, String dataGetterURI, String dgClassName,
-			EditConfigurationVTwo editConfig, OntModel queryModel, JSONArray jsonArray, ServletContext context) {
+			EditConfigurationVTwo editConfig, OntModel queryModel, ArrayNode jsonArray, ServletContext context) {
     	ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dgClassName, null);
     	
 		//Add N3 Optional as well
@@ -323,10 +323,10 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	//including: (i) The JSON object representing the existing information to be returned to template
 	
 	//Takes data getter information, packs within JSON object to send back to the form
-	private void addDataGetterSpecificFormData(String dataGetterURI, ProcessDataGetterN3 pn, OntModel queryModel, JSONArray jsonArray, ServletContext context) {
-		JSONObject jo = pn.getExistingValuesJSON(dataGetterURI, queryModel, context);
+	private void addDataGetterSpecificFormData(String dataGetterURI, ProcessDataGetterN3 pn, OntModel queryModel, ArrayNode jsonArray, ServletContext context) {
+		ObjectNode jo = pn.getExistingValuesJSON(dataGetterURI, queryModel, context);
 		//Add dataGetterURI to jsonObject
-		jo.element("URI", dataGetterURI);
+		jo.put("URI", dataGetterURI);
 		jsonArray.add(jo);
 	}
 
@@ -679,9 +679,7 @@ private String getExistingIsSelfContainedTemplateQuery() {
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> groups = vcgc.getGroups();
         for(VClassGroup vcg: groups) {
-             for( VClass vc : vcg){
-                 vclasses.add(vc);
-             }
+			vclasses.addAll(vcg);
             
         }
        

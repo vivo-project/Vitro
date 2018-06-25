@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
@@ -23,6 +23,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Provide a "hidden" login page for systems where the Login Widget has been
  * modified to only show the link to an External Authentication system.
@@ -30,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
  * This page is only hidden because there is no link to it. Anyone who knows the
  * URL can come here, but they need to pass Internal Authentication to proceed.
  */
+@WebServlet(name = "adminLogin", urlPatterns = {"/admin/login"})
 public class AdminLoginController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(AdminLoginController.class);
@@ -138,8 +141,12 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		}
 
 		private boolean newPasswordRequired() {
-			return auth.isCurrentPassword(userAccount, password)
-					&& (userAccount.isPasswordChangeRequired());
+			if(auth.md5HashIsNull(userAccount)) {
+				return auth.isCurrentPasswordArgon2(userAccount, password)
+						&& userAccount.isPasswordChangeRequired();
+			}
+			else
+				return auth.isCurrentPassword(userAccount, password);  // MD5 password should be changed anyway
 		}
 
 		private boolean isPasswordValidLength(String pw) {
@@ -148,8 +155,18 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		}
 
 		private boolean tryToLogin() {
-			if (!auth.isCurrentPassword(userAccount, password)) {
-				return false;
+			if(auth.md5HashIsNull(userAccount)) {
+				if (!auth.isCurrentPasswordArgon2(userAccount, password))
+					return false;
+			}
+			else {
+				if (!auth.isCurrentPassword(userAccount, password))
+					return false;
+				else {
+					userAccount.setPasswordChangeRequired(true);
+					userAccount.setMd5Password("");
+
+				}
 			}
 
 			try {

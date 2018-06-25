@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,13 +37,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 
 /**
  * Present the SPARQL Query form, and execute the queries.
  */
+@WebServlet(name = "SparqlQuery", urlPatterns = {"/admin/sparqlquery"})
 public class SparqlQueryController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(SparqlQueryController.class);
@@ -94,6 +96,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 				SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION)) {
 			return;
 		}
+		resp.addHeader("X-XSS-Protection", "0");
 		if (req.getParameterMap().containsKey("query")) {
 			respondToQuery(req, resp);
 		} else {

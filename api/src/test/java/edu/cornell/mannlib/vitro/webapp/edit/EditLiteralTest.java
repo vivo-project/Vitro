@@ -1,9 +1,8 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.jena.rdf.model.Literal;

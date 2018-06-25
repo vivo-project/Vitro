@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- 
         Used to display both the object and data property hierarchies, though there are
@@ -103,9 +103,7 @@
 </section>
 
 <script language="javascript" type="text/javascript" >
-    var i18nStrings = {
-        '',
-    };
+    var i18nStrings = { };
 </script>
 
 
@@ -118,6 +116,6 @@ $(document).ready(function() {
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/classHierarchy.css" />')}
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>',
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/siteAdmin/fauxPropertiesListingUtils.js"></script>')}
               

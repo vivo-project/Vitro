@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,8 +26,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "ShowObjectPropertyHierarchyController", urlPatterns = {"/showObjectPropertyHierarchy"} )
 public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet {
 
 	private static final Log log = LogFactory.getLog(ShowObjectPropertyHierarchyController.class.getName());
@@ -82,7 +84,7 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             vcDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
             pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
 
-            String json = new String();
+            StringBuilder json = new StringBuilder();
 
             String ontologyUri = vreq.getParameter("ontologyUri");
             String startPropertyUri = vreq.getParameter("propertyUri");
@@ -100,7 +102,7 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             } else {
                 roots = opDao.getRootObjectProperties();
                 if (roots!=null){
-                    Collections.sort(roots, new ObjectPropertyAlphaComparator(vreq)); // sorts by domain public
+                    roots.sort(new ObjectPropertyAlphaComparator(vreq)); // sorts by domain public
                 }
             }
 
@@ -113,7 +115,7 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
                     op.setURI(ontologyUri+"fake");
                     String notFoundMessage = "<strong>No object properties found.</strong>"; 
                     op.setDomainPublic(notFoundMessage);
-                    json += addObjectPropertyDataToResultsList(op, 0, ontologyUri, counter);
+                    json.append(addObjectPropertyDataToResultsList(op, 0, ontologyUri, counter));
                 } else {
                     while (rootIt.hasNext()) {
                         ObjectProperty root = rootIt.next();
@@ -121,18 +123,18 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
                     		    ( (ontologyUri != null) 
                     		    && (root.getNamespace() != null) 
                     		    && (ontologyUri.equals(root.getNamespace())) ) ) {
-                    	            json += addChildren(root, 0, ontologyUri, counter);
+                    	            json.append(addChildren(root, 0, ontologyUri, counter));
                     	            counter += 1;
                 	    }
                     }	
                     int length = json.length();
                     if ( length > 0 ) {
-                        json += " }"; 
+                        json.append(" }");
                     }
                 }
             }
 
-            body.put("jsonTree",json);
+            body.put("jsonTree", json.toString());
                     
         } catch (Throwable t) {
             t.printStackTrace();
@@ -144,14 +146,12 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
     private String addChildren(ObjectProperty parent, int position, String ontologyUri, int counter) {
         String details = addObjectPropertyDataToResultsList(parent, position, ontologyUri, counter);
         int length = details.length();
-        String leaves = "";
-        leaves += details;
+        StringBuilder leaves = new StringBuilder();
+        leaves.append(details);
         List<String> childURIstrs = opDao.getSubPropertyURIs(parent.getURI());
         if ( (childURIstrs.size() > 0) && (position < MAXDEPTH) ) {
             List<ObjectProperty> childProps = new ArrayList<ObjectProperty>();
-            Iterator<String> childURIstrIt = childURIstrs.iterator();
-            while (childURIstrIt.hasNext()) {
-                String URIstr = childURIstrIt.next();
+            for (String URIstr : childURIstrs) {
                 ObjectProperty child = opDao.getObjectPropertyByURI(URIstr);
                 childProps.add(child);
             }
@@ -159,22 +159,24 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             Iterator<ObjectProperty> childPropIt = childProps.iterator();
             while (childPropIt.hasNext()) {
                 ObjectProperty child = childPropIt.next();
-                leaves += addChildren(child, position+1, ontologyUri, counter);
+                leaves.append(addChildren(child, position + 1, ontologyUri, counter));
                 if (!childPropIt.hasNext()) {
                     if ( ontologyUri == null ) {
-                        leaves += " }] ";
+                        leaves.append(" }] ");
                     }
                     else if ( ontologyUri != null && length > 0 ) {
                         // need this for when we show the classes associated with an ontology
                         String ending = leaves.substring(leaves.length() - 2, leaves.length());
-                        if ( ending.equals("] ") ) {
-                            leaves += "}]";
-                        }
-                        else if  ( ending.equals(" [") ){
-                            leaves += "] ";
-                        }
-                        else {
-                            leaves += "}]";
+                        switch (ending) {
+                            case "] ":
+                                leaves.append("}]");
+                                break;
+                            case " [":
+                                leaves.append("] ");
+                                break;
+                            default:
+                                leaves.append("}]");
+                                break;
                         }
                     }
                 }
@@ -182,13 +184,13 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
         }
         else {
             if ( ontologyUri == null ) {
-                 leaves += "] ";
+                 leaves.append("] ");
             }
             else if ( ontologyUri != null && length > 0 ) {
-                 leaves += "] ";
+                 leaves.append("] ");
             }
         }
-        return leaves;
+        return leaves.toString();
     }
 
     private String addObjectPropertyDataToResultsList(ObjectProperty op, int position, String ontologyUri, int counter) {
@@ -210,11 +212,11 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             
             String nameStr = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
 
-        	tempString += JSONUtils.quote(
+        	tempString += JacksonUtils.quote(
         	        "<a href='propertyEdit?uri=" + URLEncoder.encode(
         	                op.getURI()) + "'>" + nameStr + "</a>") + ", ";
              
-            tempString += "\"data\": { \"internalName\": " + JSONUtils.quote(
+            tempString += "\"data\": { \"internalName\": " + JacksonUtils.quote(
                     op.getLocalNameWithPrefix()) + ", ";
             
             ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(op.getURI());
@@ -225,18 +227,18 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
             
             try {
-            	tempString += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
+            	tempString += "\"domainVClass\": " + JacksonUtils.quote(domainStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
             try {
-            	tempString += "\"rangeVClass\": " + JSONUtils.quote(rangeStr) + ", " ;
+            	tempString += "\"rangeVClass\": " + JacksonUtils.quote(rangeStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
             if (op.getGroupURI() != null) {
                 PropertyGroup pGroup = pgDao.getGroupByURI(op.getGroupURI());
-                tempString += "\"group\": " + JSONUtils.quote(
+                tempString += "\"group\": " + JacksonUtils.quote(
                         (pGroup == null) ? "unknown group" : pGroup.getName());
             } else {
                 tempString += "\"group\": \"unspecified\"";

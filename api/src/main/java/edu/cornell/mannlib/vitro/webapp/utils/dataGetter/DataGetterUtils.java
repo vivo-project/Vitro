@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
 import java.lang.reflect.Constructor;
@@ -10,10 +10,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -33,12 +35,10 @@ import org.apache.jena.vocabulary.OWL;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 
 
 public class DataGetterUtils {
@@ -313,17 +313,14 @@ public class DataGetterUtils {
      * 
      * Convert data to JSON for page uri based on type and related datagetters
      * TODO: How to handle different data getters?  Will this replace json fields or add to them?
-     * @throws ClassNotFoundException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
      */
-    public static JSONObject covertDataToJSONForPage(VitroRequest vreq, String pageUri, Model displayModel) throws InstantiationException, IllegalAccessException, ClassNotFoundException {       
+    public static ObjectNode covertDataToJSONForPage(VitroRequest vreq, String pageUri, Model displayModel) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         //Get PageDataGetter types associated with pageUri
-        JSONObject rObj = null;   
+        ObjectNode rObj = null;
         try{
 	        List<DataGetter> dataGetters = getDataGettersForPage(vreq, displayModel, pageUri);
 	        for(DataGetter getter: dataGetters) {
-	        	 JSONObject typeObj = null;
+                ObjectNode typeObj = null;
 	             try{
 	            	 //Assumes the data getter itself will have a convert to json method
 	            	 /*
@@ -394,12 +391,12 @@ public class DataGetterUtils {
     /*
      * Copied from JSONServlet as expect this to be related to VitroClassGroup
      */
-    public static JSONObject processVClassGroupJSON(VClassGroup vcg) {
-        JSONObject map = new JSONObject();           
+    public static ObjectNode processVClassGroupJSON(VClassGroup vcg) {
+        ObjectNode map = JsonNodeFactory.instance.objectNode();
         try {
-            ArrayList<JSONObject> classes = new ArrayList<JSONObject>(vcg.size());
+            ArrayNode classes = JsonNodeFactory.instance.arrayNode();
             for( VClass vc : vcg){
-                JSONObject vcObj = new JSONObject();
+                ObjectNode vcObj = JsonNodeFactory.instance.objectNode();
                 vcObj.put("name", vc.getName());
                 vcObj.put("URI", vc.getURI());
                 vcObj.put("entityCount", vc.getEntityCount());

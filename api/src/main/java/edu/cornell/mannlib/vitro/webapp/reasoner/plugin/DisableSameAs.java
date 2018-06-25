@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.reasoner.plugin;
 
@@ -47,15 +47,13 @@ public class DisableSameAs implements ReasonerPlugin {
             Model aboxAssertionsModel, 
             Model aboxInferencesModel, 
             OntModel TBoxInferencesModel) {
-        return;
-	}
+    }
 	
 	
     public void removedABoxStatement(Statement stmt, 
             Model aboxAssertionsModel, 
             Model aboxInferencesModel, 
             OntModel TBoxInferencesModel) {
-        return;
     }
 	
 }

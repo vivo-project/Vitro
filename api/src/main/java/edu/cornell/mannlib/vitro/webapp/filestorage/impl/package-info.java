@@ -1,5 +1,5 @@
 /**
- * <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+ * <!-- $This file is distributed under the terms of the license in LICENSE$ -->
  * <p>
  * The code in this package implements the Vitro file-storage system.
  * </p>

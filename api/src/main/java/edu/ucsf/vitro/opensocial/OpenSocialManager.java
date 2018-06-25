@@ -15,11 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
@@ -189,20 +190,26 @@ public class OpenSocialManager {
 
 	// JSON Helper Functions
 	public static String buildJSONPersonIds(List<String> personIds,
-			String message) throws JSONException {
-		JSONObject json = new JSONObject();
+			String message) {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode json = mapper.createObjectNode();
 		json.put("message", message);
-		json.put("personIds", personIds);
+
+		ArrayNode persons = mapper.createArrayNode();
+		for (String personId : personIds) {
+			persons.add(personId);
+		}
+		json.put("personIds", persons);
 		return json.toString();
 	}
 	
-	public static String buildJSONPersonIds(String personId, String message) throws JSONException {
+	public static String buildJSONPersonIds(String personId, String message) {
 		List<String> personIds = new ArrayList<String>();
 		personIds.add(personId);
 		return buildJSONPersonIds(personIds, message);
 	}
 
-	public static String buildJSONPersonIds(Individual ind, String message) throws JSONException {
+	public static String buildJSONPersonIds(Individual ind, String message) {
 		List<String> personIds = new ArrayList<String>();
 		personIds.add(ind.getURI());
 		return buildJSONPersonIds(personIds, message);
@@ -233,9 +240,7 @@ public class OpenSocialManager {
 				}
 			}
 		}
-		for (PreparedGadget gadget : removedGadgets) {
-			gadgets.remove(gadget);
-		}
+		gadgets.removeAll(removedGadgets);
 	}
 
 	public void removeGadget(String name) {
@@ -256,12 +261,11 @@ public class OpenSocialManager {
 	}
 
 	public String getIdToUrlMapJavascript() {
-		String retval = "var idToUrlMap = {";
+		StringBuilder retval = new StringBuilder("var idToUrlMap = {");
 		for (PreparedGadget gadget : gadgets) {
 			// retval += gadget.GetAppId() + ":'" + gadget.GetGadgetURL() +
 			// "', ";
-			retval += "'remote_iframe_" + gadget.getAppId() + "':'"
-					+ gadget.getGadgetURL() + "', ";
+			retval.append("'remote_iframe_").append(gadget.getAppId()).append("':'").append(gadget.getGadgetURL()).append("', ");
 		}
 		return retval.substring(0, retval.length() - 2) + "};";
 	}
@@ -290,28 +294,17 @@ public class OpenSocialManager {
 
 	public void postActivity(int userId, String title, String body,
 			String xtraId1Type, String xtraId1Value) throws SQLException {
-		Connection conn = null;
-		Statement stmt = null;
 		String sqlCommand = "INSERT INTO orng_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ('"
 				+ userId +  "','<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
 				+ System.currentTimeMillis() + "</postedTime><title>" + title + "</title>" 
 				+ (body != null ? "<body>" + body + "</body>" : "") + "</activity>','"
-				+ xtraId1Type + "','" + xtraId1Value + "');";		
-		try {
-			conn = dataSource.getConnection();
-			stmt = conn.createStatement();
-			stmt.executeUpdate(sqlCommand);
-		} finally {
-			try {
-				stmt.close();
-			} catch (Exception e) {
-			}
-			try {
-				conn.close();
-			} catch (Exception e) {
+				+ xtraId1Type + "','" + xtraId1Value + "');";
+
+		try (Connection conn = dataSource.getConnection()) {
+			try (Statement stmt = conn.createStatement()) {
+				stmt.executeUpdate(sqlCommand);
 			}
 		}
-			
 	}
 
 	private String socketSendReceive(String viewer, String owner, String gadget)
@@ -333,15 +326,15 @@ public class OpenSocialManager {
 
 		// Receive the encoded content.
 		int bytes = 0;
-		String page = "";
+		StringBuilder page = new StringBuilder();
 		byte[] bytesReceived = new byte[256];
 
 		// The following will block until the page is transmitted.
 		while ((bytes = s.getInputStream().read(bytesReceived)) > 0) {
-			page += new String(bytesReceived, 0, bytes);
+			page.append(new String(bytesReceived, 0, bytes));
 		};
 
-		return page;
+		return page.toString();
 	}
 	
 	public String getContainerJavascriptSrc() {
@@ -352,38 +345,29 @@ public class OpenSocialManager {
 
 	public String getGadgetJavascript() {
 		String lineSeparator = System.getProperty("line.separator");
-		String gadgetScriptText = "var my = {};" + lineSeparator
+		StringBuilder gadgetScriptText = new StringBuilder("var my = {};" + lineSeparator
 				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, chrome_id, opt_params, visible_scope) {"
 				+ lineSeparator + "this.appId = appId;" + lineSeparator
 				+ "this.name = name;" + lineSeparator + "this.url = url;"
 				+ lineSeparator + "this.secureToken = secureToken;"
 				+ lineSeparator + "this.view = view || 'default';"
-				+ lineSeparator + "this.chrome_id = chrome_id;" 
+				+ lineSeparator + "this.chrome_id = chrome_id;"
 				+ lineSeparator + "this.opt_params = opt_params;" + lineSeparator
 				+ "this.visible_scope = visible_scope;" + lineSeparator + "};"
-				+ lineSeparator + "my.pubsubData = {};" + lineSeparator;
+				+ lineSeparator + "my.pubsubData = {};" + lineSeparator);
 		for (String key : getPubsubData().keySet()) {
-			gadgetScriptText += "my.pubsubData['" + key + "'] = '"
-					+ getPubsubData().get(key) + "';" + lineSeparator;
+			gadgetScriptText.append("my.pubsubData['").append(key).append("'] = '").append(getPubsubData().get(key)).append("';").append(lineSeparator);
 		}
-		gadgetScriptText += "my.openSocialURL = '"
-				+ configuration.getProperty(SHINDIG_URL_PROP) + "';"
-				+ lineSeparator + "my.debug = " + (isDebug() ? "1" : "0") + ";"
-				+ lineSeparator + "my.noCache = " + (noCache() ? "1" : "0")
-				+ ";" + lineSeparator + "my.gadgets = [";
+		gadgetScriptText.append("my.openSocialURL = '").append(configuration.getProperty(SHINDIG_URL_PROP)).append("';").append(lineSeparator).append("my.debug = ").append(isDebug() ? "1" : "0").append(";").append(lineSeparator).append("my.noCache = ").append(noCache() ? "1" : "0").append(";").append(lineSeparator).append("my.gadgets = [");
 		for (PreparedGadget gadget : getVisibleGadgets()) {
-			gadgetScriptText += "new my.gadgetSpec(" + gadget.getAppId() + ",'"
-					+ gadget.getName() + "','" + gadget.getGadgetURL() + "','"
-					+ gadget.getSecurityToken() + "','" + gadget.getView()
-					+ "','" + gadget.getChromeId() + "'," + gadget.getOptParams() + ",'"
-					+ gadget.getGadgetSpec().getVisibleScope() + "'), ";
+			gadgetScriptText.append("new my.gadgetSpec(").append(gadget.getAppId()).append(",'").append(gadget.getName()).append("','").append(gadget.getGadgetURL()).append("','").append(gadget.getSecurityToken()).append("','").append(gadget.getView()).append("','").append(gadget.getChromeId()).append("',").append(gadget.getOptParams()).append(",'").append(gadget.getGadgetSpec().getVisibleScope()).append("'), ");
 		}
-		gadgetScriptText = gadgetScriptText.substring(0,
+		gadgetScriptText = new StringBuilder(gadgetScriptText.substring(0,
 				gadgetScriptText.length() - 2)
 				+ "];"
-				+ lineSeparator;
+				+ lineSeparator);
 
-		return gadgetScriptText;
+		return gadgetScriptText.toString();
 	}
 	
 	Map<String, GadgetSpec> getAllDBGadgets(boolean useCache) throws SQLException 
@@ -393,41 +377,24 @@ public class OpenSocialManager {
 		Map<String, GadgetSpec> allDBGadgets = useCache ? gadgetCache : null;		
 		if (allDBGadgets == null) {
 			allDBGadgets = new HashMap<String, GadgetSpec>();
-			Connection conn = null;
-			Statement stmt = null;
-			ResultSet rset = null;
-			try {
-	
-				String sqlCommand = "select appId, name, url, channels, enabled from orng_apps";
-	
-				conn = dataSource.getConnection();
-				stmt = conn.createStatement();
-				rset = stmt.executeQuery(sqlCommand);
-	
-				while (rset.next()) {
-					String channelsStr = rset.getString(4);
-					List<String> channels = Arrays.asList(channelsStr != null && channelsStr.length() > 0 ? channelsStr.split(" ") : new String[0]);
-					GadgetSpec spec = new GadgetSpec(rset.getInt(1),
-							rset.getString(2), rset.getString(3), channels, dataSource, rset.getBoolean(5), false);
-					String gadgetFileName = getGadgetFileNameFromURL(rset.getString(3));
-	
-					allDBGadgets.put(gadgetFileName, spec);
-				}
-			} 
-			finally {
-				try {
-					rset.close();
-				} catch (Exception e) {
-				}
-				try {
-					stmt.close();
-				} catch (Exception e) {
-				}
-				try {
-					conn.close();
-				} catch (Exception e) {
+			String sqlCommand = "select appId, name, url, channels, enabled from orng_apps";
+
+			try (Connection conn = dataSource.getConnection()) {
+				try (Statement stmt = conn.createStatement()) {
+					try (ResultSet rset = stmt.executeQuery(sqlCommand)) {
+						while (rset.next()) {
+							String channelsStr = rset.getString(4);
+							List<String> channels = Arrays.asList(channelsStr != null && channelsStr.length() > 0 ? channelsStr.split(" ") : new String[0]);
+							GadgetSpec spec = new GadgetSpec(rset.getInt(1),
+									rset.getString(2), rset.getString(3), channels, dataSource, rset.getBoolean(5), false);
+							String gadgetFileName = getGadgetFileNameFromURL(rset.getString(3));
+
+							allDBGadgets.put(gadgetFileName, spec);
+						}
+					}
 				}
 			}
+
 			if (useCache) {
 				gadgetCache = allDBGadgets;
 			}

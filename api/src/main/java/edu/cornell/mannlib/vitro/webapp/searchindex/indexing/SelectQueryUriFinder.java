@@ -1,10 +1,10 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
-import static edu.cornell.mannlib.vitro.webapp.utils.sparql.SelectQueryRunner.createQueryContext;
-import static edu.cornell.mannlib.vitro.webapp.utils.sparql.SelectQueryRunner.selectQuery;
+import static edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.createSelectQueryContext;
+import static edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.queryHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
-import edu.cornell.mannlib.vitro.webapp.utils.sparql.SelectQueryHolder;
+import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
 
 /**
  * Find URIs based on one or more select queries.
@@ -74,7 +74,7 @@ public class SelectQueryUriFinder implements IndexingUriFinder,
 		label = l;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSelectQuery")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSelectQuery", minOccurs = 1)
 	public void addQuery(String query) {
 		queries.add(query);
 	}
@@ -88,10 +88,6 @@ public class SelectQueryUriFinder implements IndexingUriFinder,
 	public void validate() {
 		if (label == null) {
 			label = this.getClass().getSimpleName() + ":" + this.hashCode();
-		}
-		if (queries.isEmpty()) {
-			throw new IllegalStateException(
-					"Configuration contains no queries for " + label);
 		}
 	}
 
@@ -122,7 +118,7 @@ public class SelectQueryUriFinder implements IndexingUriFinder,
 	}
 
 	private List<String> getUrisForQuery(Statement stmt, String queryString) {
-		SelectQueryHolder query = selectQuery(queryString);
+		QueryHolder query = queryHolder(queryString);
 		query = query.bindToUri("predicate", stmt.getPredicate().getURI());
 
 		query = tryToBindUri(query, "subject", stmt.getSubject());
@@ -131,12 +127,12 @@ public class SelectQueryUriFinder implements IndexingUriFinder,
 			return Collections.emptyList();
 		}
 
-		return createQueryContext(rdfService, query).execute()
-				.getStringFields().flatten();
+		return createSelectQueryContext(rdfService, query).execute()
+				.toStringFields().flatten();
 	}
 
-	private SelectQueryHolder tryToBindUri(SelectQueryHolder query,
-			String name, RDFNode node) {
+	private QueryHolder tryToBindUri(QueryHolder query, String name,
+			RDFNode node) {
 		if (query == null) {
 			return null;
 		}

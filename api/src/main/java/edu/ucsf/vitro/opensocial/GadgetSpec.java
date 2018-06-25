@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 public class GadgetSpec {
 	private int appId = 0;
@@ -32,36 +32,20 @@ public class GadgetSpec {
 
 		// Load gadgets from the DB first
 		if (!unknownGadget) {
-			Connection conn = null;
-			Statement stmt = null;
-			ResultSet rset = null;
 
-			try {
-				String sqlCommand = "select page, viewer_req, owner_req, view, chromeId, opt_params, display_order from orng_app_views where appId = "
-						+ appId;
-				conn = ds.getConnection();
-				stmt = conn.createStatement();
-				rset = stmt.executeQuery(sqlCommand);
-				while (rset.next()) {
-					viewRequirements.put(
-							rset.getString(1),
-							new GadgetViewRequirements(rset.getString(1), rset
-									.getString(2), rset.getString(3), rset
-									.getString(4), rset.getString(5), rset
-									.getString(6), rset.getInt(7)));
-				}
-			} finally {
-				try {
-					rset.close();
-				} catch (Exception e) {
-				}
-				try {
-					stmt.close();
-				} catch (Exception e) {
-				}
-				try {
-					conn.close();
-				} catch (Exception e) {
+			String sqlCommand = "select page, viewer_req, owner_req, view, chromeId, opt_params, display_order from orng_app_views where appId = " + appId;
+			try (Connection conn = ds.getConnection()) {
+				try (Statement stmt = conn.createStatement()) {
+					try (ResultSet rset = stmt.executeQuery(sqlCommand)) {
+						while (rset.next()) {
+							viewRequirements.put(
+									rset.getString(1),
+									new GadgetViewRequirements(rset.getString(1), rset
+											.getString(2), rset.getString(3), rset
+											.getString(4), rset.getString(5), rset
+											.getString(6), rset.getInt(7)));
+						}
+					}
 				}
 			}
 		}
@@ -117,7 +101,7 @@ public class GadgetSpec {
 			if ('R' == req.getOwnerReq()) {
 				show &= isRegisteredTo(ownerId, ds);
 			} else if ('S' == req.getOwnerReq()) {
-				show &= (viewerId == ownerId);
+				show &= (viewerId.equals(ownerId));
 			}
 		}
 		return show;
@@ -127,31 +111,15 @@ public class GadgetSpec {
 			throws SQLException {
 		int count = 0;
 
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rset = null;
+		String sqlCommand = "select count(*) from orng_app_registry where appId = " + getAppId() + " and personId = '" + personId + "';";
 
-		try {
-			String sqlCommand = "select count(*) from orng_app_registry where appId = "
-					+ getAppId() + " and personId = '" + personId + "';";
-			conn = ds.getConnection();
-			stmt = conn.createStatement();
-			rset = stmt.executeQuery(sqlCommand);
-			while (rset.next()) {
-				count = rset.getInt(1);
-			}
-		} finally {
-			try {
-				rset.close();
-			} catch (Exception e) {
-			}
-			try {
-				stmt.close();
-			} catch (Exception e) {
-			}
-			try {
-				conn.close();
-			} catch (Exception e) {
+		try (Connection conn = ds.getConnection()) {
+			try (Statement stmt = conn.createStatement()) {
+				try (ResultSet rset = stmt.executeQuery(sqlCommand)) {
+					while (rset.next()) {
+						count = rset.getInt(1);
+					}
+				}
 			}
 		}
 

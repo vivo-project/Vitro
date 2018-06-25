@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ajax;
 
@@ -11,10 +11,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.QuerySolution;
@@ -24,8 +23,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
@@ -68,7 +67,7 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException {
 		log.debug("search term is '" + term + "'");
 		if (term.isEmpty()) {
 			return EMPTY_RESPONSE;
@@ -76,10 +75,10 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 			String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
 			String queryStr = QUERY_BASIC_PROXIES.replace("%term%", cleanTerm);
 
-			JSONArray jsonArray = new SparqlQueryRunner(userAccountsModel)
-					.executeSelect(
-							new BasicProxyInfoParser(placeholderImageUrl),
-							queryStr);
+			ArrayNode jsonArray = SparqlQueryRunner
+					.createSelectQueryContext(userAccountsModel, queryStr)
+					.execute()
+					.parse(new BasicProxyInfoParser(placeholderImageUrl));
 
 			String response = jsonArray.toString();
 			log.debug(response);

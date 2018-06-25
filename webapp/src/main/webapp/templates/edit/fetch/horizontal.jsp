@@ -1,4 +1,4 @@
-<%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
+<%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <%@ page import="java.util.*, java.lang.String.*"%>
 <%@ page import="edu.cornell.mannlib.vedit.beans.ButtonForm" %>
@@ -118,7 +118,7 @@ if (topButtons!=null) {
                 }
 %>
 
-<tr>
+<tr class="row">
     <td class="rownumheader">#</td>
      <%             if ( !("XX".equals(thisResult) )) {
 %>

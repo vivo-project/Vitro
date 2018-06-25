@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
@@ -51,7 +51,7 @@ public class DataPropertyComparator implements Comparator<Individual> {
             if (XSD.xint.toString().equals(datatype)) {
                 int i1 = Integer.valueOf(dps1.getData());
                 int i2 = Integer.valueOf(dps2.getData());
-                result = ((Integer) i1).compareTo(i2);
+                result = Integer.compare(i1, i2);
             }
             else if (XSD.xstring.toString().equals(datatype)) {
                 result = dps1.getData().compareTo(dps2.getData());            

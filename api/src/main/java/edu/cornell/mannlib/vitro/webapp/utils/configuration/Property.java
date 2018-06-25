@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
@@ -15,4 +15,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Property {
 	String uri();
+	int minOccurs() default 0;
+	int maxOccurs() default Integer.MAX_VALUE;
 }

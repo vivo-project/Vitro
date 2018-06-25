@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
@@ -33,6 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ComplexStringFormatter;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
+import javax.servlet.annotation.WebServlet;
 
 /**
  * Show the details of where our RDF data is coming from. What are the
@@ -103,6 +105,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * At the same time, write these to the log as INFO messages, without the fancy formatting.
  * </pre>
  */
+@WebServlet(name = "ShowRDFSources", urlPatterns = {"/admin/showSources"} )
 public class ShowSourcesController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(ShowSourcesController.class);

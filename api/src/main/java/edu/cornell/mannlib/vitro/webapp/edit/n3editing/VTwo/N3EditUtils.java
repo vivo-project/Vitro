@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
@@ -253,7 +253,7 @@ public class N3EditUtils {
         if (in == null) {
             return null;
         }
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         for (int i = 0; i < in.length(); i++) {
             char c = in.charAt(i);
             if (!XMLChar.isInvalid(c)) {

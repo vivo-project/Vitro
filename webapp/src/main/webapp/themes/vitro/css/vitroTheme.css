@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 @charset "UTF-8";
 /* CSS Document */
@@ -709,6 +709,7 @@ p.password-note {
     padding: .25em;
     margin-bottom: 8px;
 }
+#flash-msg-container,
 #welcome-msg-container {
     margin-bottom: 8px;
     margin-top: -10px;

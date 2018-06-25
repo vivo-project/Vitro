@@ -1,12 +1,9 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -47,7 +44,7 @@ public class SubclassTemplateModel extends BaseTemplateModel implements Comparab
         } else if (rankOther < 1) {
             intCompare = -1;
         } else {           
-            intCompare = ((Integer)rank).compareTo(rankOther);
+            intCompare = Integer.compare(rank, rankOther);
         }
 
         if (intCompare != 0) {

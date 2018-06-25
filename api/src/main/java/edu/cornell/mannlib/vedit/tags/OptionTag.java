@@ -1,9 +1,9 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vedit.tags;
 
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.collections.OrderedMapIterator;
+import org.apache.commons.collections4.map.ListOrderedMap;
+import org.apache.commons.collections4.OrderedMapIterator;
 import java.util.List;
 import java.util.Iterator;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import javax.servlet.jsp.JspWriter;
 
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.tags.EditTag;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public class OptionTag extends EditTag {
     private String name = null;
@@ -29,11 +29,11 @@ public class OptionTag extends EditTag {
                 opt.setValue("");
             if (opt.getBody() == null)
                 opt.setBody("");
-            out.print("<option value=\""+StringEscapeUtils.escapeHtml(opt.getValue())+"\"");
+            out.print("<option value=\""+StringEscapeUtils.ESCAPE_HTML4.translate(opt.getValue())+"\"");
             if (opt.getSelected())
                 out.print(" selected=\"selected\"");
             out.print(">");
-            out.print(StringEscapeUtils.escapeHtml(opt.getBody()));
+            out.print(StringEscapeUtils.ESCAPE_HTML4.translate(opt.getBody()));
             out.print("</option>\n");
         }
     }
@@ -51,10 +51,10 @@ public class OptionTag extends EditTag {
             } catch (ClassCastException e){
                 // maybe it's a ListOrderedMap of optgroups
                 optGroups = (ListOrderedMap) getFormObject().getOptionLists().get(name);
-                OrderedMapIterator ogKey = optGroups.orderedMapIterator();
+                OrderedMapIterator ogKey = optGroups.mapIterator();
                 while (ogKey.hasNext()) {
                     String optGroupName = (String) ogKey.next();
-                    out.println("<optgroup label=\""+StringEscapeUtils.escapeHtml(optGroupName)+"\">");
+                    out.println("<optgroup label=\""+StringEscapeUtils.ESCAPE_HTML4.translate(optGroupName)+"\">");
                     outputOptionsMarkup((List)optGroups.get(optGroupName),out);
                     out.println("</optgroup>");
                 }

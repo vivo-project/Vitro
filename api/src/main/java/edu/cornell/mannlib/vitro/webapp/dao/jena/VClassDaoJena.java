@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
@@ -90,69 +90,70 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 if (cls.isRestriction()) {	    		
                     Restriction rest = cls.asRestriction();
                     OntProperty onProperty = rest.getOnProperty();
-                    String labelStr = "restriction on " + getLabelOrId(onProperty) + ": ";
+                    StringBuilder labelStr = new StringBuilder();
+                    labelStr.append("restriction on ").append(getLabelOrId(onProperty)).append(": ");
                     if (rest.isAllValuesFromRestriction() || rest.isSomeValuesFromRestriction()) {
                         Resource fillerRes = null;
                         if (rest.isAllValuesFromRestriction()) {
                             AllValuesFromRestriction avfRest = rest.asAllValuesFromRestriction();
                             fillerRes = avfRest.getAllValuesFrom();
-                            labelStr += "all values from ";
+                            labelStr.append("all values from ");
                         } else {
                             SomeValuesFromRestriction svfRest = rest.asSomeValuesFromRestriction();
                             fillerRes = svfRest.getSomeValuesFrom();
-                            labelStr += "some values from ";
+                            labelStr.append("some values from ");
                         }
                         if (fillerRes.canAs(OntClass.class)) { 
                             OntClass avf = fillerRes.as(OntClass.class);
-                            labelStr += getLabelForClass(avf,withPrefix,forPickList);
+                            labelStr.append(getLabelForClass(avf,withPrefix,forPickList));
                         } else {
                             try {
-                                labelStr += getLabelOrId(fillerRes.as(OntResource.class));
+                                labelStr.append(getLabelOrId(fillerRes.as(OntResource.class)));
                             } catch (Exception e) {
-                                labelStr += "???";
+                                labelStr.append("???");
                             }
                         }		    			
                     } else if (rest.isHasValueRestriction()) {
                         HasValueRestriction hvRest = rest.asHasValueRestriction();
-                        labelStr += "has value ";
+                        labelStr.append("has value ");
                         RDFNode fillerNode = hvRest.getHasValue();
                         try {
                             if (fillerNode.isResource()) {
-                                labelStr += getLabelOrId(fillerNode.as(OntResource.class));
+                                labelStr.append(getLabelOrId(fillerNode.as(OntResource.class)));
                             } else {
-                                labelStr += fillerNode.as(Literal.class).getLexicalForm(); 
+                                labelStr.append(fillerNode.as(Literal.class).getLexicalForm());
                             }
                         } catch (Exception e) {
-                            labelStr += "???";
+                            labelStr.append("???");
                         }
                     } else if (rest.isMinCardinalityRestriction()) {
                         MinCardinalityRestriction mcRest = rest.asMinCardinalityRestriction();
-                        labelStr += "minimum cardinality ";
-                        labelStr += mcRest.getMinCardinality();
+                        labelStr.append("minimum cardinality ");
+                        labelStr.append(mcRest.getMinCardinality());
                     } else if (rest.isMaxCardinalityRestriction()) {
                         MaxCardinalityRestriction mcRest = rest.asMaxCardinalityRestriction();
-                        labelStr += "maximum cardinality ";
-                        labelStr += mcRest.getMaxCardinality();
+                        labelStr.append("maximum cardinality ");
+                        labelStr.append(mcRest.getMaxCardinality());
                     } else if (rest.isCardinalityRestriction()) {
                         CardinalityRestriction cRest = rest.asCardinalityRestriction();
-                        labelStr += "cardinality ";
-                        labelStr += cRest.getCardinality();
+                        labelStr.append("cardinality ");
+                        labelStr.append(cRest.getCardinality());
                     }
-                    return labelStr;
+                    return labelStr.toString();
                 } else if (isBooleanClassExpression(cls)) {
-                    String labelStr = "(";
+                    StringBuilder labelStr = new StringBuilder("(");
                     if (cls.isComplementClass()) {
-                        labelStr += "not ";
+                        labelStr.append("not ");
                         ComplementClass ccls = cls.as(ComplementClass.class);
-                        labelStr += getLabelForClass(ccls.getOperand(),withPrefix,forPickList);		    			
+                        labelStr.append(getLabelForClass(ccls.getOperand(), withPrefix, forPickList));
                     } else if (cls.isIntersectionClass()) {
                         IntersectionClass icls = cls.as(IntersectionClass.class);
                         for (Iterator<? extends OntClass> operandIt = 
                                 icls.listOperands(); operandIt.hasNext();) {
                             OntClass operand = operandIt.next();
-                            labelStr += getLabelForClass(operand,withPrefix,forPickList);
+                            labelStr.append(getLabelForClass(operand, withPrefix, forPickList));
                             if (operandIt.hasNext()) {
-                                labelStr += " and ";
+                                labelStr.append(" and ");
                             }
                         }
                     } else if (cls.isUnionClass()) {
@@ -160,13 +161,13 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         for (Iterator<? extends OntClass> operandIt = 
                                 icls.listOperands(); operandIt.hasNext();) {
                             OntClass operand = operandIt.next();
-                            labelStr += getLabelForClass(operand,withPrefix,forPickList);
+                            labelStr.append(getLabelForClass(operand, withPrefix, forPickList));
                             if (operandIt.hasNext()) {
-                                labelStr += " or ";
+                                labelStr.append(" or ");
                             }
                         }
                     }
-                    return labelStr+")";
+                    return labelStr.append(")").toString();
                 } else {
                     // BJL23 2009-02-19
                     // I'm putting the link markup in because I need it,
@@ -409,13 +410,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     }
 
     public void getAllSubClassURIs(String classURI, HashSet<String> subtree){
-        List<String> directSubclasses = getSubClassURIs(classURI);     
-        Iterator<String> it=directSubclasses.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
+        List<String> directSubclasses = getSubClassURIs(classURI);
+        for (String uri : directSubclasses) {
             if (!subtree.contains(uri)) {
                 subtree.add(uri);
-                getAllSubClassURIs(uri,subtree);
+                getAllSubClassURIs(uri, subtree);
             }
         }
     }
@@ -448,13 +447,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     }
 
     public void getAllSuperClassURIs(String classURI, HashSet<String> subtree){
-        List<String> directSuperclasses = getSuperClassURIs(classURI, true);     
-        Iterator<String> it=directSuperclasses.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
+        List<String> directSuperclasses = getSuperClassURIs(classURI, true);
+        for (String uri : directSuperclasses) {
             if (!subtree.contains(uri)) {
                 subtree.add(uri);
-                getAllSuperClassURIs(uri,subtree);
+                getAllSuperClassURIs(uri, subtree);
             }
         }
     }
@@ -665,7 +662,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         if (getOntModel().getProfile().NAMESPACE().equals(RDFS.getURI())) {
             top.setURI(RDF.getURI()+"Resource");
         } else {
-            top.setURI( (getOntModel().getProfile().THING().getURI()!=null) ? (getOntModel().getProfile().THING().getURI()): null);		
+            top.setURI((getOntModel().getProfile().THING().getURI()));
         }
         if (top.getURI() != null) {
             top.setName(top.getLocalName());
@@ -680,7 +677,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         if (getOntModel().getProfile().NAMESPACE().equals(RDFS.getURI())) {
             return null;
         } else {
-            bottom.setURI( (getOntModel().getProfile().NOTHING().getURI()!=null) ? (getOntModel().getProfile().NOTHING().getURI()): null);		
+            bottom.setURI((getOntModel().getProfile().NOTHING().getURI()));
         }
         if (bottom.getURI() != null) {
             bottom.setName(bottom.getLocalName());
@@ -786,13 +783,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 						// if this model infers types based on the taxonomy, adding the subclasses will only
 						// waste time for no benefit
 						if (!isUnderlyingStoreReasoned()) {
-                        	Iterator classURIs = getAllSubClassURIs(getClassURIStr(superclass)).iterator();
-                        	while (classURIs.hasNext()) {
-                            	String classURI = (String) classURIs.next();
-                            	VClass vClass = getVClassByURI(classURI);
-                            	if (vClass != null)
-                            	    vClasses.add(vClass);
-                        	}
+                            for (String classURI : getAllSubClassURIs(getClassURIStr(superclass))) {
+                                VClass vClass = getVClassByURI(classURI);
+                                if (vClass != null)
+                                    vClasses.add(vClass);
+                            }
 						} 
                     }
                 }
@@ -853,7 +848,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                                         }
                                         vcw.setEntityCount(count);
                                         classIsInstantiated = (count > 0);
-                                    } else if (includeUninstantiatedClasses == false) {
+                                    } else if (!includeUninstantiatedClasses) {
                                         // Note: to support SDB models, may want to do this with 
                                         // SPARQL and LIMIT 1 if SDB can take advantage of it
                                         Model aboxModel = getOntModelSelector().getABoxModel();
@@ -918,12 +913,10 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         getOntModel().enterCriticalSection(Lock.READ);
         try {
             if (groups != null) {
-                Iterator groupIt = groups.iterator();
-                while (groupIt.hasNext()) {
-                    VClassGroup g = (VClassGroup) groupIt.next();
+                for (VClassGroup g : groups) {
                     addVClassesToGroup(g);
                 }
-            } 
+            }
         } finally {
             getOntModel().leaveCriticalSection();
         }

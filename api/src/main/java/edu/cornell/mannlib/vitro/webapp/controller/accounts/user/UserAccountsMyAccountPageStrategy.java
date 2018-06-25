@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 
@@ -155,8 +155,8 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 		@Override
 		public void setAdditionalProperties(UserAccount userAccount) {
 			if (!newPassword.isEmpty() && !page.isExternalAuthOnly()) {
-				userAccount.setMd5Password(Authenticator
-						.applyMd5Encoding(newPassword));
+				userAccount.setArgon2Password(Authenticator.applyArgon2iEncoding(newPassword));
+				userAccount.setMd5Password("");
 				userAccount.setPasswordChangeRequired(false);
 				userAccount.setPasswordLinkExpires(0L);
 			}

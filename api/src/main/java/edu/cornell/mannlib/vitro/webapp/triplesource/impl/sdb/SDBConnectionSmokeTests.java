@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
@@ -52,6 +52,10 @@ public class SDBConnectionSmokeTests {
 					+ PROPERTY_DB_URL + "'");
 			return;
 		}
+		
+		// Get the full URL, with options.
+		url = SDBDataSource.getJdbcUrl(props);
+		
 		String username = props.getProperty(PROPERTY_DB_USERNAME);
 		if (username == null || username.isEmpty()) {
 			ss.fatal("runtime.properties does not contain a value for '"
@@ -94,7 +98,22 @@ public class SDBConnectionSmokeTests {
 
 		try (Connection conn = DriverManager
 				.getConnection(url, connectionProps)) {
-			// Just open the connection and close it.
+			// We have an SQL connection - see if we have any XSD Strings in the database
+			String skip = props.getProperty("skip.Jena3StringTest", "false");
+			if (!Boolean.parseBoolean(skip)) {
+				try {
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery("SELECT COUNT(1) AS total FROM Nodes WHERE datatype='http://www.w3.org/2001/XMLSchema#string'");
+					if (rs != null && rs.next()) {
+						long total = rs.getLong("total");
+						if (total > 0) {
+							ss.fatal("XSD Strings exist in Nodes table. Requires upgrade for Jena 3");
+						}
+					}
+				} catch (SQLException e) {
+					// Ignore SQL Exception here, as it likely represents a triple store that's not initialised yet.
+				}
+			}
 		} catch (SQLException e) {
 			ss.fatal("Can't connect to the database: " + PROPERTY_DB_URL + "='"
 					+ url + "', " + PROPERTY_DB_USERNAME + "='" + username

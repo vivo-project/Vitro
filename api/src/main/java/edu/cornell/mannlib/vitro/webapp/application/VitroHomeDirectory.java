@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.application;
 
@@ -159,8 +159,8 @@ public class VitroHomeDirectory {
 						VHD_BUILD_PROPERTY);
 				throw new IllegalStateException(message);
 			} else if (foundLocations.size() > 1) {
-				String message = String.format("Found multiple values for the "
-						+ "Vitro home directory: " + foundLocations);
+				String message = "Found multiple values for the "
+						+ "Vitro home directory: " + foundLocations;
 				log.warn(message);
 			}
 		}

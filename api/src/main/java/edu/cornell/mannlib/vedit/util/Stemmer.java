@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vedit.util;
 
@@ -71,7 +71,7 @@ class Stemmer
    public void add(char ch)
    {  if (i == b.length)
       {  char[] new_b = new char[i+INC];
-         for (int c = 0; c < i; c++) new_b[c] = b[c];
+          System.arraycopy(b, 0, new_b, 0, i);
          b = new_b;
       }
       b[i++] = ch;
@@ -86,7 +86,7 @@ class Stemmer
    public void add(char[] w, int wLen)
    {  if (i+wLen >= b.length)
       {  char[] new_b = new char[i+wLen+INC];
-         for (int c = 0; c < i; c++) new_b[c] = b[c];
+          System.arraycopy(b, 0, new_b, 0, i);
          b = new_b;
       }
       for (int c = 0; c < wLen; c++) b[i++] = w[c];
@@ -116,7 +116,7 @@ class Stemmer
    private final boolean cons(int i)
    {  switch (b[i])
       {  case 'a': case 'e': case 'i': case 'o': case 'u': return false;
-         case 'y': return (i==0) ? true : !cons(i-1);
+         case 'y': return (i == 0) || !cons(i - 1);
          default: return true;
       }
    }
@@ -368,7 +368,7 @@ class Stemmer
 
     public static String StemString( String inputStr, int maxLength )
     {
-        String outputStr="";
+        StringBuilder outputStr= new StringBuilder();
 
         int previousCh=0;
         char[] w = new char[maxLength];
@@ -396,19 +396,19 @@ class Stemmer
                             {
                             String u;
                             u = s.toString();
-                            outputStr += u;
+                            outputStr.append(u);
                             if ( ch == '-' ) { // replace - with space
-                                outputStr += " ";
+                                outputStr.append(" ");
                             } else if ( ch == '.' ) {
                                 if ( Character.isDigit( (char) previousCh )) {
-                                    outputStr += ".";
+                                    outputStr.append(".");
                                 } else {
-                                    outputStr += " ";
+                                    outputStr.append(" ");
                                     //previousCh = 32; // set to whitespace; extra spaces should be filtered out on next pass
                                 }
                             } else {
                                 Character Ch = new Character((char) ch);
-                                outputStr += Ch.toString();
+                                outputStr.append(Ch.toString());
                             }
                             stemmerInputBufferIndex=0; // to avoid repeats after )
                             }
@@ -422,7 +422,7 @@ class Stemmer
                 if ( !Character.isWhitespace((char) previousCh ) ) {
                     if ( previousCh != '.' ) {
                         Character Ch = new Character((char) ch);
-                        outputStr += Ch.toString();
+                        outputStr.append(Ch.toString());
                     }
                 }
             } else if ( ch == '(' ) { // open paren; copy all characters until close paren
@@ -449,21 +449,21 @@ class Stemmer
                 stemmerInputBufferIndex=0;
             } else if ( ch == ')' ) { // when is last character of input string
                 Character Ch = new Character((char) ch);
-                outputStr += Ch.toString();
+                outputStr.append(Ch.toString());
                 log.trace( Ch.toString() );
                 log.trace("found close paren at position: " + inputArrayIndex + " of input term " + inputStr );
             } else if ( ch == '-' ) { // replace - with space
-                outputStr += " ";
+                outputStr.append(" ");
             } else if ( ch == '.' ) {
                 if ( Character.isDigit( (char) previousCh )) {
-                    outputStr += ".";
+                    outputStr.append(".");
                 } else {
-                    outputStr += " ";
+                    outputStr.append(" ");
                     //previousCh = 32; // set to whitespace; extra spaces should be filtered out on next pass
                 }
             } else {
                 Character Ch = new Character((char) ch);
-                outputStr += Ch.toString();
+                outputStr.append(Ch.toString());
             }
             previousCh = ch;
             if (ch < 0) break;
@@ -477,10 +477,10 @@ class Stemmer
 
             String u;
             u = s.toString();
-            outputStr += u;
+            outputStr.append(u);
         }
 
-        return outputStr == null ? ( outputStr.equals("") ? null : outputStr.trim() ) : outputStr.trim();
+        return outputStr.length() == 0 ? null : outputStr.toString().trim();
     }
 
 /*
@@ -549,8 +549,8 @@ class Stemmer
    {
       char[] w = new char[501];
       Stemmer s = new Stemmer();
-      for (int i = 0; i < args.length; i++) {
-    	  System.out.println( StemString( args[i], 100 ));
-     }
+       for (String arg : args) {
+           System.out.println(StemString(arg, 100));
+       }
    }
 }

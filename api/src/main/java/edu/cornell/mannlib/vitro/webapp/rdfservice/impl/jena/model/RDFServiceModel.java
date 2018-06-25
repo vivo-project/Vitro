@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model;
 
@@ -79,9 +79,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
                 this.notifyListenersOfEvent(o);
             }
 
-            Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
-            while (csIt.hasNext()) {
-                ModelChange modelChange = csIt.next();
+            for (ModelChange modelChange : changeSet.getModelChanges()) {
                 if (!modelChange.getSerializedModel().markSupported()) {
                     byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
                     modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
@@ -95,7 +93,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
                     } else {
                         m = dataset.getDefaultModel();
                     }
-                }                
+                }
                 operateOnModel(m, modelChange, null);
             }
                         

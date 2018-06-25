@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.filter;
 
@@ -304,6 +304,11 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         public boolean isEquivalentGraph(String graphURI,
                                          Model graph) throws RDFServiceException {
             return s.isEquivalentGraph(graphURI, graph);
+        }
+
+        @Override
+        public boolean preferPreciseOptionals() {
+            return s.preferPreciseOptionals();
         }
 
         @Override

@@ -1,12 +1,10 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.api;
 
 import static org.junit.Assert.*;
 
 import java.io.StringReader;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;

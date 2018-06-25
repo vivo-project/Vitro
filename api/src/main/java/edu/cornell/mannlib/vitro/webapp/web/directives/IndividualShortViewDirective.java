@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.directives;
 
@@ -121,9 +121,7 @@ public class IndividualShortViewDirective extends BaseTemplateDirectiveModel {
 	private void renderErrorMessage(Individual individual) {
 		Environment env = Environment.getCurrentEnvironment();
 		try {
-			env.getOut().append(
-					"<span>Can't process the custom short view for "
-							+ individual.getName() + "</span>");
+			env.getOut().append("<span>Can't process the custom short view for ").append(individual.getName()).append("</span>");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

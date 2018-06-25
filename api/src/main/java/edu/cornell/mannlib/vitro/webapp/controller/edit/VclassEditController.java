@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -9,10 +9,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,13 +26,13 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
+@WebServlet(name = "VclassEditController", urlPatterns = {"/vclassEdit"} )
 public class VclassEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
@@ -99,12 +100,12 @@ public class VclassEditController extends BaseEditController {
         
         boolean foundComment = false;
         StringBuffer commSb = null;
-        for (Iterator<String> commIt = request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
-            if (commSb==null) {
+        for (String s : request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI())) {
+            if (commSb == null) {
                 commSb = new StringBuffer();
-                foundComment=true;
+                foundComment = true;
             }
-            commSb.append(commIt.next()).append(" ");
+            commSb.append(s).append(" ");
         }
         if (!foundComment) {
             commSb = new StringBuffer("no comments yet");
@@ -178,18 +179,16 @@ public class VclassEditController extends BaseEditController {
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
-        boolean instantiable = (vcl.getURI().equals(OWL.Nothing.getURI())) ? false : true;
+        boolean instantiable = !vcl.getURI().equals(OWL.Nothing.getURI());
         
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("vclassWebapp", vcl);
         request.setAttribute("instantiable", instantiable);
-        request.setAttribute("bodyJsp","/templates/edit/specific/classes_edit.jsp");
         request.setAttribute("title","Class Control Panel");
         //request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/classes_edit.jsp");
         } catch (Exception e) {
             log.error("VclassEditController could not forward to view.");
             log.error(e.getMessage());
@@ -204,9 +203,7 @@ public class VclassEditController extends BaseEditController {
     
     private List<VClass> getVClassesForURIList(List<String> vclassURIs, VClassDao vcDao) {
         List<VClass> vclasses = new ArrayList<VClass>();
-        Iterator<String> urIt = vclassURIs.iterator();
-        while (urIt.hasNext()) {
-            String vclassURI = urIt.next();
+        for (String vclassURI : vclassURIs) {
             VClass vclass = vcDao.getVClassByURI(vclassURI);
             if (vclass != null) {
                 vclasses.add(vclass);

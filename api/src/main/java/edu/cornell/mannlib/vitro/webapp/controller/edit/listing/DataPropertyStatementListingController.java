@@ -1,11 +1,11 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,7 +19,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
+@WebServlet(name = "DataPropertyStatementListingController", urlPatterns = {"/listDataPropertyStatements"} )
 public class DataPropertyStatementListingController extends BaseEditController {
 
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -80,16 +82,16 @@ public class DataPropertyStatementListingController extends BaseEditController {
         DataProperty dp = dpDao.getDataPropertyByURI(propURIStr);        
         
         int count = 0;
-        
-        for (Iterator<DataPropertyStatement> i = dpsDao.getDataPropertyStatements(dp,startAt,endAt).iterator(); i.hasNext();) {
-        	count++;
-        	DataPropertyStatement dps = i.next();
-        	Individual subj = iDao.getIndividualByURI(dps.getIndividualURI());
-        	results.add("XX");
-        	results.add(ListingControllerWebUtils.formatIndividualLink(subj));
-        	results.add(dp.getPublicName());
-        	results.add(dps.getData());
-        }
+
+       for (DataPropertyStatement dataPropertyStatement : dpsDao.getDataPropertyStatements(dp, startAt, endAt)) {
+           count++;
+           DataPropertyStatement dps = dataPropertyStatement;
+           Individual subj = iDao.getIndividualByURI(dps.getIndividualURI());
+           results.add("XX");
+           results.add(ListingControllerWebUtils.formatIndividualLink(subj));
+           results.add(dp.getPublicName());
+           results.add(dps.getData());
+       }
         
         if (count == 0) {
         	results.add("XX");
@@ -101,10 +103,8 @@ public class DataPropertyStatementListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(4));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Data Property Statements");
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+            JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

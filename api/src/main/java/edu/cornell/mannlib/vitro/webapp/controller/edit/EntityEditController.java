@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -10,10 +10,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,10 +31,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 
+@WebServlet(name = "EntityEditController", urlPatterns = {"/entityEdit"} )
 public class EntityEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(EntityEditController.class.getName());
@@ -52,11 +53,9 @@ public class EntityEditController extends BaseEditController {
         Individual ent = vreq.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (ent == null) {
         	try {
-        		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        		request.setAttribute("bodyJsp","/jenaIngest/notfound.jsp");
         		request.setAttribute("title","Individual Not Found");
         		request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+application.getThemeDir()+"css/edit.css\"/>");
-        		rd.forward(request, response);
+                JSPPageHandler.renderBasicPage(request, response, "/jenaIngest/notfound.jsp");
             } catch (Exception e) {
                 log.error("EntityEditController could not forward to view.");
                 log.error(e.getMessage());
@@ -96,7 +95,7 @@ public class EntityEditController extends BaseEditController {
         }
         results.add(rName);
         
-        String classStr = "";
+        StringBuilder classStr = new StringBuilder();
         List<VClass> classList = inferredEnt.getVClasses(false);
         sortForPickList(classList, vreq);
         if (classList != null) {
@@ -110,13 +109,13 @@ public class EntityEditController extends BaseEditController {
 	            } catch (Exception e) {
 	                rClassName = vc.getLocalNameWithPrefix();
 	            }
-	            classStr += rClassName;
+	            classStr.append(rClassName);
 	            if (classIt.hasNext()) {
-	            	classStr += ", ";
+	            	classStr.append(", ");
 	            }
 	        }
         }
-        results.add(classStr);
+        results.add(classStr.toString());
                 
 		results.add(ent.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified"
 				: ent.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
@@ -145,10 +144,8 @@ public class EntityEditController extends BaseEditController {
         try {
             List<Option> externalIdOptionList = new LinkedList<Option>();
             if (ent.getExternalIds() != null) {
-                Iterator<DataPropertyStatement> externalIdIt = ent.getExternalIds().iterator();
-                while (externalIdIt.hasNext()) {
-                    DataPropertyStatement eid = externalIdIt.next();
-                    String multiplexedString = new String ("DatapropURI:" + new String(Base64.encodeBase64(eid.getDatapropURI().getBytes())) + ";" + "Data:" + new String(Base64.encodeBase64(eid.getData().getBytes())));
+                for (DataPropertyStatement eid : ent.getExternalIds()) {
+                    String multiplexedString = "DatapropURI:" + new String(Base64.encodeBase64(eid.getDatapropURI().getBytes())) + ";" + "Data:" + new String(Base64.encodeBase64(eid.getData().getBytes()));
                     externalIdOptionList.add(new Option(multiplexedString, eid.getData()));
                 }
             }
@@ -170,11 +167,9 @@ public class EntityEditController extends BaseEditController {
         try {
             List epiOptionList = new LinkedList();
             Collection<PropertyInstance> epiColl = piDao.getExistingProperties(ent.getURI(),null);
-            Iterator<PropertyInstance> epiIt = epiColl.iterator();
-            while (epiIt.hasNext()) {
-                PropertyInstance pi = epiIt.next();
-                String multiplexedString = new String ("PropertyURI:" + new String(Base64.encodeBase64(pi.getPropertyURI().getBytes())) + ";" + "ObjectEntURI:" + new String(Base64.encodeBase64(pi.getObjectEntURI().getBytes())));
-                epiOptionList.add(new Option(multiplexedString, pi.getDomainPublic()+" "+pi.getObjectName()));
+            for (PropertyInstance pi : epiColl) {
+                String multiplexedString = "PropertyURI:" + new String(Base64.encodeBase64(pi.getPropertyURI().getBytes())) + ";" + "ObjectEntURI:" + new String(Base64.encodeBase64(pi.getObjectEntURI().getBytes()));
+                epiOptionList.add(new Option(multiplexedString, pi.getDomainPublic() + " " + pi.getObjectName()));
             }
             OptionMap.put("ExistingPropertyInstances", epiOptionList);
         } catch (Exception e) {
@@ -194,16 +189,14 @@ public class EntityEditController extends BaseEditController {
 
         epo.setFormObject(foo);
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("entityWebapp", ent);
-        request.setAttribute("bodyJsp","/templates/edit/specific/ents_edit.jsp");
         request.setAttribute("title","Individual Control Panel");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+application.getThemeDir()+"css/edit.css\"/>");
         request.setAttribute("scripts", "/templates/edit/specific/ents_edit_head.jsp");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/ents_edit.jsp");
         } catch (Exception e) {
             log.error("EntityEditController could not forward to view.");
             log.error(e.getMessage());
@@ -214,7 +207,7 @@ public class EntityEditController extends BaseEditController {
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
     	log.trace("Please don't POST to the "+this.getClass().getName()+". Use GET instead as there should be no change of state.");
-        doPost(request,response);
+        doGet(request,response);
     }
 
 }

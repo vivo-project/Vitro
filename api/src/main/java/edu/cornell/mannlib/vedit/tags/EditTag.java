@@ -1,17 +1,14 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vedit.tags;
 
 import java.util.HashMap;
 
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.jsp.JspWriter;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import org.apache.commons.lang.StringEscapeUtils;
 
 public class EditTag extends TagSupport {
     private String name = null;

@@ -1,9 +1,10 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -190,6 +191,15 @@ public class MultipartRequestWrapper extends HttpServletRequestWrapper {
 		try {
 			return upload.parseRequest(req);
 		} catch (FileSizeLimitExceededException | SizeLimitExceededException e) {
+			// Fully consume input stream, so that error message is displayed
+			try {
+				InputStream in = req.getInputStream();
+				byte[] buffer = new byte[4096];
+				while (in.read(buffer) != -1) ;
+			} catch (IOException ioe) {
+				// Ignore any errors at this point
+			}
+
 			if (strategy.stashFileSizeException()) {
 				req.setAttribute(ATTRIBUTE_FILE_SIZE_EXCEPTION, e);
 				return Collections.emptyList();
@@ -233,7 +243,7 @@ public class MultipartRequestWrapper extends HttpServletRequestWrapper {
 	 * Look in the map of parsed parameters. Make a protective copy.
 	 */
 	@Override
-	public Enumeration<?> getParameterNames() {
+	public Enumeration<String> getParameterNames() {
 		return Collections.enumeration(new HashSet<>(parameters.keySet()));
 	}
 

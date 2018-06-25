@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.sparql;
 
 import java.io.IOException;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
  * This servlet gets all the properties for a given subject.
  */
 
+@WebServlet(name = "GetClazzAllProperties", urlPatterns = {"/admin/getClazzAllProperties"})
 public class GetClazzAllProperties extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(GetClazzAllProperties.class);
@@ -141,20 +143,17 @@ public class GetClazzAllProperties extends BaseEditController {
 				}
 			}
 		}
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 		Object[] keys = hm.keySet().toArray();
 		Arrays.sort(keys);
-		for (int i = 0; i < keys.length; i++) {
-			String key = (String) keys[i];
+		for (Object key1 : keys) {
+			String key = (String) key1;
 			String value = hm.get(key);
 
-			respo += "<option>" + "<key>" + key + "</key>" + "<value>"
-					+ value.substring(0, value.length() - 1) + "</value>"
-					+ "<type>" + value.charAt(value.length() - 1) + "</type>"
-					+ "</option>";
+			respo.append("<option>" + "<key>").append(key).append("</key>").append("<value>").append(value.substring(0, value.length() - 1)).append("</value>").append("<type>").append(value.charAt(value.length() - 1)).append("</type>").append("</option>");
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();

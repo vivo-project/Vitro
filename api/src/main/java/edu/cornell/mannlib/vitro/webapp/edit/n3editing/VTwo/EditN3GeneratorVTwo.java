@@ -1,22 +1,19 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.XSD;
 
 /**
@@ -68,7 +65,7 @@ public class EditN3GeneratorVTwo {
                 }
                 log.debug("The original value String is " + values.toString());                
                 
-                String valueString = org.apache.commons.lang.StringUtils.join(values,
+                String valueString = org.apache.commons.lang3.StringUtils.join(values,
                         ">, <");                                
                 valueString = "<" + valueString + ">";                
                 log.debug("The multiUri value String is " + valueString);
@@ -233,7 +230,7 @@ public class EditN3GeneratorVTwo {
                 log.debug("value of literal for " + var + " was null");        
         	}
         }
-        String valueString = org.apache.commons.lang.StringUtils.join(n3Values, ",");
+        String valueString = org.apache.commons.lang3.StringUtils.join(n3Values, ",");
         
         //Substitute it in to n3
         String varRegex = "\\?" + var + "(?=\\p{Punct}|\\p{Space}|$)";

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.searchengine;
 
@@ -21,11 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumen
 public class Formatter {
 	public static String format(SearchInputDocument doc) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("SearchInputDocument: Name='"
-				+ getValueFromField(doc, "nameRaw") + "', URI='"
-				+ getValueFromField(doc, "URI") + "', boost='"
-				+ doc.getDocumentBoost() + "', " + doc.getFieldMap().size()
-				+ " fields \n");
+		sb.append("SearchInputDocument: Name='").append(getValueFromField(doc, "nameRaw")).append("', URI='").append(getValueFromField(doc, "URI")).append("', boost='").append(doc.getDocumentBoost()).append("', ").append(doc.getFieldMap().size()).append(" fields \n");
 
 		for (SearchInputField field : new TreeMap<>(doc.getFieldMap()).values()) {
 			sb.append(format(field, "   ").append('\n'));
@@ -51,10 +47,7 @@ public class Formatter {
 
 	private static StringBuilder format(SearchInputField field, String padding) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(padding).append(
-				"SearchInputField: Name='" + field.getName() + "', boost='"
-						+ field.getBoost() + "', " + field.getValues().size()
-						+ " values \n");
+		sb.append(padding).append("SearchInputField: Name='").append(field.getName()).append("', boost='").append(field.getBoost()).append("', ").append(field.getValues().size()).append(" values \n");
 
 		for (Object value : field.getValues()) {
 			sb.append(padding).append("   '").append(String.valueOf(value))
@@ -88,10 +81,7 @@ public class Formatter {
 
 	public static String format(SearchResponse response) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("SearchResponse: " + response.getResults().size()
-				+ " results, " + response.getFacetFields().size()
-				+ " facet fields, " + response.getHighlighting().size()
-				+ " highlights\n");
+		sb.append("SearchResponse: ").append(response.getResults().size()).append(" results, ").append(response.getFacetFields().size()).append(" facet fields, ").append(response.getHighlighting().size()).append(" highlights\n");
 		for (SearchFacetField facet : response.getFacetFields()) {
 			sb.append(format(facet, "      "));
 		}
@@ -115,17 +105,10 @@ public class Formatter {
 		for (Collection<Object> values : doc.getFieldValuesMap().values()) {
 			valuesCount += values.size();
 		}
-		sb.append("SearchResultDocument: Name='"
-				+ getValueFromField(doc, "nameRaw") + "', URI='"
-				+ getValueFromField(doc, "URI") + "', "
-				+ doc.getFieldNames().size() + " fields with " + valuesCount
-				+ " values \n");
+		sb.append("SearchResultDocument: Name='").append(getValueFromField(doc, "nameRaw")).append("', URI='").append(getValueFromField(doc, "URI")).append("', ").append(doc.getFieldNames().size()).append(" fields with ").append(valuesCount).append(" values \n");
 
 		for (String fieldName : new TreeMap<>(doc.getFieldValuesMap()).keySet()) {
-			sb.append(padding).append(
-					"Field: Name='" + fieldName + "', "
-							+ doc.getFieldValues(fieldName).size()
-							+ " values \n");
+			sb.append(padding).append("Field: Name='").append(fieldName).append("', ").append(doc.getFieldValues(fieldName).size()).append(" values \n");
 
 			for (Object value : doc.getFieldValues(fieldName)) {
 				sb.append(padding).append("   '").append(String.valueOf(value))

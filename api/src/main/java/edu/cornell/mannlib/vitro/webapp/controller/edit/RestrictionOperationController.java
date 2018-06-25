@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSER
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
+@WebServlet(name = "RestrictionOperationController", urlPatterns = {"/addRestriction"} )
 public class RestrictionOperationController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(RestrictionOperationController.class.getName());
@@ -81,8 +83,7 @@ public class RestrictionOperationController extends BaseEditController {
 	    	log.error(e, e);
 	    	try {
 	    		response.sendRedirect(defaultLandingPage);
-	    		return;
-	    	} catch (Exception f) {
+            } catch (Exception f) {
                 log.error(f, f);
                 throw new RuntimeException(f);
 	    	}
@@ -174,47 +175,54 @@ public class RestrictionOperationController extends BaseEditController {
         if (cardinalityStr != null) {
             cardinality = Integer.decode(cardinalityStr); 
         }
-        
-        if (restrictionTypeStr.equals("allValuesFrom")) {
-            rest = ontModel.createAllValuesFromRestriction(null,onProperty,roleFiller);
-        } else if (restrictionTypeStr.equals("someValuesFrom")) {
-            rest = ontModel.createSomeValuesFromRestriction(null,onProperty,roleFiller);
-        } else if (restrictionTypeStr.equals("hasValue")) {
-            String valueURI = request.getParameter("ValueIndividual");
-            if (valueURI != null) {
-                Resource valueRes = ontModel.getResource(valueURI);
-                if (valueRes != null) {
-                    rest = ontModel.createHasValueRestriction(null, onProperty, valueRes);
-                }
-            } else {
-                String valueLexicalForm = request.getParameter("ValueLexicalForm");
-                if (valueLexicalForm != null) {
-                    String valueDatatype = request.getParameter("ValueDatatype");
-                    Literal value = null;
-                    if (valueDatatype != null && valueDatatype.length() > 0) {
-                        RDFDatatype dtype = null;
-                        try {
-                            dtype = TypeMapper.getInstance().getSafeTypeByName(valueDatatype);
-                        } catch (Exception e) {
-                            log.warn ("Unable to get safe type " + valueDatatype + " using TypeMapper");
-                        }
-                        if (dtype != null) {
-                            value = ontModel.createTypedLiteral(valueLexicalForm, dtype);
+
+        switch (restrictionTypeStr) {
+            case "allValuesFrom":
+                rest = ontModel.createAllValuesFromRestriction(null, onProperty, roleFiller);
+                break;
+            case "someValuesFrom":
+                rest = ontModel.createSomeValuesFromRestriction(null, onProperty, roleFiller);
+                break;
+            case "hasValue":
+                String valueURI = request.getParameter("ValueIndividual");
+                if (valueURI != null) {
+                    Resource valueRes = ontModel.getResource(valueURI);
+                    if (valueRes != null) {
+                        rest = ontModel.createHasValueRestriction(null, onProperty, valueRes);
+                    }
+                } else {
+                    String valueLexicalForm = request.getParameter("ValueLexicalForm");
+                    if (valueLexicalForm != null) {
+                        String valueDatatype = request.getParameter("ValueDatatype");
+                        Literal value = null;
+                        if (valueDatatype != null && valueDatatype.length() > 0) {
+                            RDFDatatype dtype = null;
+                            try {
+                                dtype = TypeMapper.getInstance().getSafeTypeByName(valueDatatype);
+                            } catch (Exception e) {
+                                log.warn("Unable to get safe type " + valueDatatype + " using TypeMapper");
+                            }
+                            if (dtype != null) {
+                                value = ontModel.createTypedLiteral(valueLexicalForm, dtype);
+                            } else {
+                                value = ontModel.createLiteral(valueLexicalForm);
+                            }
                         } else {
                             value = ontModel.createLiteral(valueLexicalForm);
                         }
-                    } else {
-                        value = ontModel.createLiteral(valueLexicalForm);
+                        rest = ontModel.createHasValueRestriction(null, onProperty, value);
                     }
-                    rest = ontModel.createHasValueRestriction(null, onProperty, value);
                 }
-            }
-        } else if (restrictionTypeStr.equals("minCardinality")) {
-            rest = ontModel.createMinCardinalityRestriction(null,onProperty,cardinality);
-        } else if (restrictionTypeStr.equals("maxCardinality")) {
-            rest = ontModel.createMaxCardinalityRestriction(null,onProperty,cardinality);
-        } else if (restrictionTypeStr.equals("cardinality")) {
-            rest = ontModel.createCardinalityRestriction(null,onProperty,cardinality);
+                break;
+            case "minCardinality":
+                rest = ontModel.createMinCardinalityRestriction(null, onProperty, cardinality);
+                break;
+            case "maxCardinality":
+                rest = ontModel.createMaxCardinalityRestriction(null, onProperty, cardinality);
+                break;
+            case "cardinality":
+                rest = ontModel.createCardinalityRestriction(null, onProperty, cardinality);
+                break;
         }
         
         if (conditionTypeStr.equals("necessary")) {

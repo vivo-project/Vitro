@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -38,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
  * . 
  */
 
+@WebServlet(name = "DataAutocompleteController", urlPatterns = {"/dataautocomplete"} )
 public class DataAutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
@@ -80,7 +83,6 @@ public class DataAutocompleteController extends VitroAjaxController {
             Model model = getModel(vreq);
             Query query = SparqlUtils.createQuery(sparqlQuery);
 			outputResults(response, query, model);
-			return;
         } catch(AjaxControllerException ex) {
         	log.error(ex, ex);
 			response.sendError(ex.getStatusCode());
@@ -105,7 +107,10 @@ public class DataAutocompleteController extends VitroAjaxController {
 	    		String dataValue = dataLiteral.getString();
 	    		outputResults.add(dataValue);
 	    	}
-	        JSONArray jsonArray = new JSONArray(outputResults);
+	        ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
+			for (String res : outputResults) {
+				jsonArray.add(res);
+			}
 	        try {
 	        	response.getWriter().write(jsonArray.toString());
 	        } catch (Throwable e) {

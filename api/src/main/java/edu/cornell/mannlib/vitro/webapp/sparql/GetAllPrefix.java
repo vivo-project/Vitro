@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.sparql;
 
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author yuysun
  */
 
+@WebServlet(name = "GetAllPrefix", urlPatterns = {"/admin/getAllPrefix"})
 public class GetAllPrefix extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(GetAllPrefix.class);
@@ -67,15 +69,15 @@ public class GetAllPrefix extends BaseEditController {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 		List<String> prefixList = new ArrayList<String>();
 		prefixList.addAll(prefixMap.keySet());
-		Collections.sort(prefixList, vreq.getCollator());
+		prefixList.sort(vreq.getCollator());
 		for (String prefix : prefixList) {
-		    respo += makeOption(prefix, prefixMap.get(prefix));
+		    respo.append(makeOption(prefix, prefixMap.get(prefix)));
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		out.println(respo);
 		out.flush();
 		out.close();

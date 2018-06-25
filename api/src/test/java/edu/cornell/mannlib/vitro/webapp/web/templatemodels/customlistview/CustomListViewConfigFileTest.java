@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 
@@ -236,7 +236,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 			String selectQuery, String[] constructQueries, String templateName,
 			String postprocessorName) {
 		assertEquals("select query", selectQuery,
-				configFile.getSelectQuery(collated, editing));
+				configFile.getSelectQuery(collated, editing, true));
 		assertEquals("construct queries",
 				new HashSet<String>(Arrays.asList(constructQueries)),
 				configFile.getConstructQueries());

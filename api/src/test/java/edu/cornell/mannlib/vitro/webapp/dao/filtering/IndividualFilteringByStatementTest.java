@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
@@ -785,11 +785,7 @@ public class IndividualFilteringByStatementTest extends AbstractTestClass {
 			@Override
 			public Boolean fn(ObjectPropertyStatement ops) {
 				if (PROPERTY_OBJECT_VISIBLE.equals(ops.getPropertyURI())) {
-					if (isFauxHidden(ops)) {
-						return false;
-					} else {
-						return true;
-					}
+					return !isFauxHidden(ops);
 				}
 				if (PROPERTY_OBJECT_MAYBE.equals(ops.getPropertyURI())
 						&& URI_INDIVIDUAL_SPECIAL.equals(ops.getSubjectURI())) {

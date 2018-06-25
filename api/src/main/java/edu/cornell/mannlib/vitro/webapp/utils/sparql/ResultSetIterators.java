@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.utils.sparql;
 
@@ -83,7 +83,7 @@ public class ResultSetIterators {
 		public static Node toNode(RDFNode rdfNode) {
 			if (rdfNode.isAnon()) {
 				Resource a = rdfNode.asResource();
-				return NodeFactory.createAnon();
+				return NodeFactory.createBlankNode();
 			}
 			if (rdfNode.isLiteral()) {
 				Literal l = rdfNode.asLiteral();

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
@@ -20,9 +20,9 @@ import org.apache.jena.rdf.model.Resource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.ResultSetParser;
+import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner;
 
 /**
  * Pull some UserAccounts from the model, based on a set of criteria.
@@ -37,7 +37,7 @@ public class UserAccountsSelector {
 			+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n";
 
 	private static final String ALL_VARIABLES = "?uri ?email ?firstName "
-			+ "?lastName ?pwd ?expire ?count ?lastLogin ?status ?isRoot";
+			+ "?lastName ?md5pwd ?a2pwd ?expire ?count ?lastLogin ?status ?isRoot";
 
 	private static final String COUNT_VARIABLE = "?uri";
 
@@ -111,8 +111,9 @@ public class UserAccountsSelector {
 				.replace("%offset%", offset());
 		log.debug("main query: " + qString);
 
-		List<UserAccount> accounts = new SparqlQueryRunner(model)
-				.executeSelect(new MainQueryParser(), qString);
+		List<UserAccount> accounts = SparqlQueryRunner
+				.createSelectQueryContext(model, qString).execute()
+				.parse(new MainQueryParser());
 		log.debug("query returns: " + accounts);
 		return accounts;
 	}
@@ -126,8 +127,8 @@ public class UserAccountsSelector {
 				.replace("%filterClauses%", filterClauses());
 		log.debug("count query: " + qString);
 
-		int count = new SparqlQueryRunner(model).executeSelect(
-				new CountQueryParser(), qString);
+		int count = SparqlQueryRunner.createSelectQueryContext(model, qString)
+				.execute().parse(new CountQueryParser());
 		log.debug("result count: " + count);
 		return count;
 	}
@@ -139,8 +140,9 @@ public class UserAccountsSelector {
 					PREFIX_LINES).replace("%uri%", uri);
 			log.debug("permissions query: " + qString);
 
-			Set<String> permissions = new SparqlQueryRunner(model)
-					.executeSelect(new PermissionsQueryParser(), qString);
+			Set<String> permissions = SparqlQueryRunner
+					.createSelectQueryContext(model, qString).execute()
+					.parse(new PermissionsQueryParser());
 			log.debug("permissions for '" + uri + "': " + permissions);
 			account.setPermissionSetUris(permissions);
 		}
@@ -156,7 +158,8 @@ public class UserAccountsSelector {
 	private String optionalClauses() {
 		return "OPTIONAL { ?uri auth:firstName ?firstName } \n"
 				+ "    OPTIONAL { ?uri auth:lastName ?lastName } \n"
-				+ "    OPTIONAL { ?uri auth:md5password ?pwd } \n"
+				+ "    OPTIONAL { ?uri auth:md5password ?md5pwd } \n"
+				+ "    OPTIONAL { ?uri auth:argon2password ?a2pwd } \n"
 				+ "    OPTIONAL { ?uri auth:passwordChangeExpires ?expire } \n"
 				+ "    OPTIONAL { ?uri auth:loginCount ?count } \n"
 				+ "    OPTIONAL { ?uri auth:lastLoginTime ?lastLogin } \n"
@@ -214,7 +217,8 @@ public class UserAccountsSelector {
 		return String.valueOf(offset);
 	}
 
-	private static class MainQueryParser extends QueryParser<List<UserAccount>> {
+	private static class MainQueryParser extends
+			ResultSetParser<List<UserAccount>> {
 		@Override
 		protected List<UserAccount> defaultValue() {
 			return Collections.emptyList();
@@ -242,7 +246,8 @@ public class UserAccountsSelector {
 			user.setEmailAddress(solution.getLiteral("email").getString());
 			user.setFirstName(ifLiteralPresent(solution, "firstName", ""));
 			user.setLastName(ifLiteralPresent(solution, "lastName", ""));
-			user.setMd5Password(ifLiteralPresent(solution, "pwd", ""));
+			user.setMd5Password(ifLiteralPresent(solution, "md5pwd", ""));
+			user.setArgon2Password(ifLiteralPresent(solution, "a2pwd", ""));
 			user.setPasswordLinkExpires(ifLongPresent(solution, "expire", 0L));
 			user.setLoginCount(ifIntPresent(solution, "count", 0));
 			user.setLastLoginTime(ifLongPresent(solution, "lastLogin", 0));
@@ -274,7 +279,7 @@ public class UserAccountsSelector {
 		}
 	}
 
-	private static class CountQueryParser extends QueryParser<Integer> {
+	private static class CountQueryParser extends ResultSetParser<Integer> {
 		@Override
 		protected Integer defaultValue() {
 			return 0;
@@ -299,7 +304,7 @@ public class UserAccountsSelector {
 	}
 
 	private static class PermissionsQueryParser extends
-			QueryParser<Set<String>> {
+			ResultSetParser<Set<String>> {
 		@Override
 		protected Set<String> defaultValue() {
 			return Collections.emptySet();

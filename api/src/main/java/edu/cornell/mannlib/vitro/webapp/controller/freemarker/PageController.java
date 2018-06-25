@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -11,10 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
  *    
  * See implementations of PageDataGetter for more variables. 
  */
+@WebServlet(name = "PageController", urlPatterns = "/pageController")
 public class PageController extends FreemarkerHttpServlet{
     private static final Log log = LogFactory.getLog(PageController.class);
     

@@ -2,7 +2,6 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 
 public class IndividualTemplateModelBuilder {
     static IIndividualTemplateModelBuilder customBuilder = null;

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 /* <------ UPLOAD PICTURE*/
 #photoUpload {
@@ -35,11 +35,11 @@
 }
 /* <------ CROP PICTURE*/
 #photoCropping {
+    float: left;
     margin-left: 0;
-    height: 450px;
+    margin-right: 0;
     background: #fff;
     padding: 15px 0 15px 15px;
-    margin-right: 0;
 }
 #photoCroppingPreview {
     width: 180px;
@@ -48,14 +48,6 @@
 .photoCroppingNote {
     margin-top: 15px;
     font-size: .8em;
-}
-#photoCropping {
-    width: 400px;
-    float: left;
-    padding-top: 30px;
-    padding-left: 15px;
-    margin-left: 0;
-    margin-right: 0;
 }
 .photoCroppedPreview {
     width: 115px;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <!-- Default list view config file for object properties 
     
@@ -7,23 +7,27 @@
 
 <list-view-config>
     <query-select>    
-        PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
+        PREFIX afn:  &lt;http://jena.apache.org/ARQ/function#&gt;
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         
         SELECT <collated> ?subclass </collated>
                ?object 
                ?label 
-               ?localName WHERE {
-               
-            ?subject ?property ?object
-                LET (?localName := afn:localname(?object)) 
+               ?localName
+        WHERE {
+            ?subject ?property ?object .
+            LET (?localName := afn:localname(?object))
                 
-            OPTIONAL { ?object rdfs:label ?label } 
+            OPTIONAL {
+                <precise-subquery>?subject ?property ?object .</precise-subquery>
+                ?object rdfs:label ?label .
+            }
             
             <collated> 
-            OPTIONAL { 
-                ?object a ?subclass.
+            OPTIONAL {
+                <precise-subquery>?subject ?property ?object .</precise-subquery>
+                ?object a ?subclass .
                 # Require the subclasses retrieved to be in a classgroup, since others are not generally
                 # for display. See vivo-dev-all thread titled "Internal Entity and mostSpecificType,"
                 # Aug 9-10, 2011.
@@ -35,31 +39,5 @@
         } ORDER BY <collated> ?subclass </collated> ASC( ?label ) ASC( ?label ) ASC( ?localName )
     </query-select>
 
-    <query-construct>
-        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
-        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
-
-        CONSTRUCT {
-            ?subject ?property ?object .
-            ?object a ?subclass .
-            ?subclass vitro:inClassGroup ?classgroup .
-            ?object rdfs:label ?label .
-        } WHERE {
-            { 
-                ?subject ?property ?object 
-            } UNION {            
-                ?subject ?property ?object .
-                ?object a ?subclass . 
-            } UNION {
-                ?subject ?property ?object .
-                ?object a ?subclass .
-                ?subclass vitro:inClassGroup ?classgroup 
-            } UNION {         
-                ?subject ?property ?object .
-                ?object rdfs:label ?label .
-            }             
-        }
-    </query-construct>
-    
     <template>propStatement-default.ftl</template>
 </list-view-config>

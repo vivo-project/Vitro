@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -7,7 +7,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +25,7 @@ public class TemplateProcessingHelper {
     
     private Configuration config = null;
     
-    public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
+    public TemplateProcessingHelper(HttpServletRequest request) {
         this.config = FreemarkerConfiguration.getConfig(request);
     }
     

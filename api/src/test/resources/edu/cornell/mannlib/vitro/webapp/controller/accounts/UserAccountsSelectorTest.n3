@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in /doc/license.txt$ 
+# $This file is distributed under the terms of the license in LICENSE$ 
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -113,6 +113,7 @@ mydomain:user08
 	auth:firstName "Mary" ;
 	auth:lastName "McInerney" ;
 	auth:md5password "garbage" ;
+	auth:argon2password "betterGarbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 7 ;
 	auth:lastLoginTime 1122334455667788 ;
@@ -138,6 +139,7 @@ mydomain:user10
 	auth:firstName "Bob" ;
 	auth:lastName "Caruso" ;
 	auth:md5password "garbage" ;
+	auth:argon2password "betterGarbage" ;
 	auth:passwordChangeExpires 1100234965897 ;
 	auth:loginCount 50 ;
 	auth:lastLoginTime 1020304050607080 ;
