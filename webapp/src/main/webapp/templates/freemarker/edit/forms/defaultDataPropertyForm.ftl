@@ -67,8 +67,12 @@
         		datatype = "http://www.w3.org/2001/XMLSchema#gYear"	||
         		datatype = "http://www.w3.org/2001/XMLSchema#gMonth" >
         <#include "dateTimeEntryForm.ftl">
+    <#elseif datatype = "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral">
+    	<textarea rows="2" id="literal" name="literal" value="" class="useTinyMce" role="textarea">${literalValues}</textarea>
     <#else>
-    	<textarea rows="2"  id="literal" name="literal" value="" class="useTinyMce" role="textarea">${literalValues}</textarea>
+        <input
+            type="text" size="70" id="literal" name="literal" value="${literalValues}"
+        />
     </#if> 
 
     <br />
