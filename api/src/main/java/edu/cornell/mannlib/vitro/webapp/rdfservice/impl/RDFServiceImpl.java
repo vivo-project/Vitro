@@ -141,8 +141,8 @@ public abstract class RDFServiceImpl implements RDFService {
     }
 	
     protected void notifyListeners(ModelChange modelChange) throws IOException {
-        modelChange.getSerializedModel().reset();
         for (ChangeListener listener : registeredListeners) {
+            modelChange.getSerializedModel().reset();
             listener.notifyModelChange(modelChange);
         }
         log.debug(registeredJenaListeners.size() + " registered Jena listeners");
