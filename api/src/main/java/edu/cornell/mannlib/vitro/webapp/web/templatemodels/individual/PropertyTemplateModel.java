@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -85,18 +84,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         }
 
         verboseDisplay = new HashMap<String, Object>();
-
-        RoleLevel roleLevel = property.getHiddenFromDisplayBelowRoleLevel();
-        String roleLevelLabel = roleLevel != null ? roleLevel.getDisplayLabel() : "";
-        verboseDisplay.put("displayLevel", roleLevelLabel);
-
-        roleLevel = property.getProhibitedFromUpdateBelowRoleLevel();
-        roleLevelLabel = roleLevel != null ? roleLevel.getUpdateLabel() : "";
-        verboseDisplay.put("updateLevel", roleLevelLabel);
-
-        roleLevel = property.getHiddenFromPublishBelowRoleLevel();
-        roleLevelLabel = roleLevel != null ? roleLevel.getDisplayLabel() : "";
-        verboseDisplay.put("publishLevel", roleLevelLabel);
 
         verboseDisplay.put("localName", property.getLocalNameWithPrefix());
         verboseDisplay.put("displayRank", getPropertyDisplayTier(property));

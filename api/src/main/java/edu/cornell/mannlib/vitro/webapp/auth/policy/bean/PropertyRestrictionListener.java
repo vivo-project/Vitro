@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy.bean;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityPermission;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,18 +17,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
  * appropriate.
  */
 public class PropertyRestrictionListener implements ChangeListener {
-	private static final Log log = LogFactory
-			.getLog(PropertyRestrictionListener.class);
+	private static final Log log = LogFactory.getLog(PropertyRestrictionListener.class);
 
 	/**
 	 * If the deleted property had a non-null restriction, rebuild the bean.
 	 */
 	@Override
 	public void doDeleted(Object oldObj, EditProcessObject epo) {
-		if (oldObj instanceof RoleRestrictedProperty) {
-			RoleRestrictedProperty p = (RoleRestrictedProperty) oldObj;
-			FullPropertyKey key = new FullPropertyKey(p);
-			updateLevels(new PropertyRestrictionLevels(key, p));
+		if (oldObj instanceof Property) {
+			EntityPermission.updateAllPermissionsFor((Property)oldObj);
 		} else {
 			log.warn("Not an instance of RoleRestrictedProperty: " + oldObj);
 		}
@@ -37,10 +36,8 @@ public class PropertyRestrictionListener implements ChangeListener {
 	 */
 	@Override
 	public void doInserted(Object newObj, EditProcessObject epo) {
-		if (newObj instanceof RoleRestrictedProperty) {
-			RoleRestrictedProperty p = (RoleRestrictedProperty) newObj;
-			FullPropertyKey key = new FullPropertyKey(p);
-			updateLevels(new PropertyRestrictionLevels(key, p));
+		if (newObj instanceof Property) {
+			EntityPermission.updateAllPermissionsFor((Property)newObj);
 		} else {
 			log.warn("Not an instance of RoleRestrictedProperty: " + newObj);
 		}
@@ -51,17 +48,11 @@ public class PropertyRestrictionListener implements ChangeListener {
 	 */
 	@Override
 	public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
-		if (newObj instanceof RoleRestrictedProperty) {
-			RoleRestrictedProperty newP = (RoleRestrictedProperty) newObj;
-			FullPropertyKey key = new FullPropertyKey(newP);
-			updateLevels(new PropertyRestrictionLevels(key, newP));
+		if (newObj instanceof Property) {
+			EntityPermission.updateAllPermissionsFor((Property)oldObj);
 		} else {
 			log.warn("Not instances of RoleRestrictedProperty: " + oldObj
 					+ ", " + newObj);
 		}
-	}
-
-	private void updateLevels(PropertyRestrictionLevels levels) {
-		PropertyRestrictionBean.getBean().updateProperty(levels);
 	}
 }

@@ -1,7 +1,8 @@
 <%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <%-- colspan set to 6 in PropertyRetryController.java --%>
 <tr class="editformcell">
@@ -186,29 +187,45 @@
     </td>
 </tr>
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
-<tr class="editformcell">
-    <td valign="top" colspan="2">
-        <b>Display level</b><br />
-        <select name="HiddenFromDisplayBelowRoleLevelUsingRoleUri">
-            <form:option name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"/>
-        </select>
-    </td>
-    <td valign="top" colspan="2">
-        <b>Update level</b><br/>
-        <select name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri">
-            <form:option name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"/>
-        </select>
-    </td>
-</tr>
-<tr class="editformcell">
-    <td valign="top" colspan="2">
-        <b>Publish level</b><br />
-        <select name="HiddenFromPublishBelowRoleLevelUsingRoleUri">
-            <form:option name="HiddenFromPublishBelowRoleLevelUsingRoleUri"/>
-        </select>
-    </td>
-</tr>
-<tr><td colspan="5"><hr class="formDivider"/></td></tr>
+<!-- Permissions -->
+<c:if test="${!empty roles}">
+    <input id="_permissions" type="hidden" name="_permissions" value="enabled" />
+    <input id="_permissionsNamespace" type="hidden" name="_permissionsNamespace" value="${_permissionsNamespace}" />
+    <tr class="editformcell">
+        <td valign="top" colspan="5">
+            <b>Display</b> permissions for this property<br/>
+            <c:forEach var="role" items="${roles}">
+                <input id="display${role.label}" type="checkbox" name="displayRoles" value="${role.uri}" ${fn:contains(displayRoles, role.uri)?'checked':''}  />
+                <label class="inline" for="display${role.label}"> ${role.label}</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </c:forEach>
+        </td>
+    </tr>
+    <tr><td colspan="5"><hr class="formDivider"/></td></tr>
+    <tr class="editformcell">
+        <td valign="top" colspan="5">
+            <b>Update</b> permissions for this property<br/>
+            <c:forEach var="role" items="${roles}">
+                <input id="update${role.label}" type="checkbox" name="updateRoles" value="${role.uri}" ${fn:contains(updateRoles, role.uri)?'checked':''} ${role.isForPublic()?'disabled':''} />
+                <label class="inline" for="update${role.label}"> ${role.label}</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </c:forEach>
+        </td>
+    </tr>
+    <tr><td colspan="5"><hr class="formDivider"/></td></tr>
+    <tr class="editformcell">
+        <td valign="top" colspan="5">
+            <b>Publish</b> permissions for this property<br/>
+            <c:forEach var="role" items="${roles}">
+                <input id="publish${role.label}" type="checkbox" name="publishRoles" value="${role.uri}" ${fn:contains(publishRoles, role.uri)?'checked':''}  />
+                <label class="inline" for="publish${role.label}"> ${role.label}</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </c:forEach>
+        </td>
+    </tr>
+    <tr><td colspan="5"><hr class="formDivider"/></td></tr>
+</c:if>
+<!-- Permissions End -->
 <tr class="editformcell">
     <td valign="top" colspan="1">
         <b>Display tier</b> for this property<br/>

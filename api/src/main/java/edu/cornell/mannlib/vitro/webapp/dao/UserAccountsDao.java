@@ -3,9 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.Collection;
+import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import org.apache.jena.ontology.OntModel;
 
 /**
  * Methods for dealing with UserAccount and PermissionSet objects in the User
@@ -104,4 +106,5 @@ public interface UserAccountsDao {
 	 */
 	Collection<PermissionSet> getAllPermissionSets();
 
+	void setEntityPermissions(String entityKey, Collection<PermissionSet> displaySets, Collection<PermissionSet> editSets, Collection<PermissionSet> publishSets);
 }

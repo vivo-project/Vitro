@@ -6,14 +6,11 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 import java.util.Objects;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
-
 /**
  * Represents a specialization on an ObjectProperty, only meaningful for
  * display.
  */
-public class FauxProperty extends BaseResourceBean implements ResourceBean,
-		RoleRestrictedProperty {
+public class FauxProperty extends Property implements ResourceBean {
 	// Must be null on insert. Must not be null on update. Ignored on delete.
 	private String contextUri;
 	// Must be null on insert. Must not be null on update. Ignored on delete.

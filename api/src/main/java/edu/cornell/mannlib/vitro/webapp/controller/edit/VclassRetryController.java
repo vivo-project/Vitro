@@ -165,6 +165,8 @@ public class VclassRetryController extends BaseEditController {
         request.setAttribute("title","Class Editing Form");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","VClass");
+
+        addPermissionAttributes(request, vclassForEditing.getURI());
         setRequestAttributes(request,epo);
 
         try {

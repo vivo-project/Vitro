@@ -9,19 +9,22 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityDisplayPermission;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityPublishPermission;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityUpdatePermission;
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -33,6 +36,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.shared.Lock;
 
 public class BaseEditController extends VitroHttpServlet {
 
@@ -201,4 +212,95 @@ public class BaseEditController extends VitroHttpServlet {
     	return(request.getContextPath() + DEFAULT_LANDING_PAGE);
     }
 
+    protected static void addPermissionAttributes(HttpServletRequest req, String permissionsNamespace) {
+        // Add the permissionsNamespace (if we are creating a new property, this will be empty)
+        req.setAttribute("_permissionsNamespace", permissionsNamespace);
+
+        // Get the available permission sets
+        List<PermissionSet> roles = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
+
+        // Add the permission sets to the request object
+        req.setAttribute("roles", roles);
+
+        // If the namespace is empty (e.e. we are creating a new record)
+        if (StringUtils.isEmpty(permissionsNamespace)) {
+            List<String> displayRoles = new ArrayList<>();
+            List<String> updateRoles = new ArrayList<>();
+            List<String> publishRoles = new ArrayList<>();
+
+            // Generate a default set of permissions (allow everything apart from public edit)
+            for (PermissionSet role : roles) {
+                if (!role.isForPublic()) {
+                    updateRoles.add(role.getUri());
+                }
+                displayRoles.add(role.getUri());
+                publishRoles.add(role.getUri());
+            }
+
+            // Add the generated permission sets to the request object
+            req.setAttribute("displayRoles", displayRoles);
+            req.setAttribute("updateRoles",  updateRoles);
+            req.setAttribute("publishRoles", publishRoles);
+        } else {
+            // Get the User Accounts model
+            OntModel userAccounts = ModelAccess.on(req).getOntModelSelector().getUserAccountsModel();
+
+            // Get the permission sets that are granted permission for this entity
+            req.setAttribute("displayRoles", getGrantedRolesForEntity(userAccounts, permissionsNamespace, EntityDisplayPermission.class));
+            req.setAttribute("updateRoles",  getGrantedRolesForEntity(userAccounts, permissionsNamespace, EntityUpdatePermission.class));
+            req.setAttribute("publishRoles", getGrantedRolesForEntity(userAccounts, permissionsNamespace, EntityPublishPermission.class));
+        }
+    }
+
+    /**
+     * Create a list of all known non-public PermissionSets.
+     */
+    protected static List<PermissionSet> buildListOfSelectableRoles(WebappDaoFactory wadf) {
+        List<PermissionSet> list = new ArrayList<PermissionSet>();
+
+        for (PermissionSet ps: wadf.getUserAccountsDao().getAllPermissionSets()) {
+            if (!ps.isForPublic()) {
+                list.add(ps);
+            }
+        }
+
+        list.sort(new Comparator<PermissionSet>() {
+            @Override
+            public int compare(PermissionSet ps1, PermissionSet ps2) {
+                return ps1.getUri().compareTo(ps2.getUri());
+            }
+        });
+
+        for (PermissionSet ps: wadf.getUserAccountsDao().getAllPermissionSets()) {
+            if (ps.isForPublic()) {
+                list.add(ps);
+            }
+        }
+
+        return list;
+    }
+
+    protected static List<String> getGrantedRolesForEntity(OntModel userAccounts, String key, Class permission) {
+        List<String> roles = new ArrayList<>();
+
+        userAccounts.enterCriticalSection(Lock.READ);
+        try {
+            Query query = QueryFactory.create("SELECT ?role WHERE { ?role <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#hasPermission> ?permission . ?permission a <java:" + permission.getName() + "#Set> .  ?permission <" + VitroVocabulary.PERMISSION_FOR_ENTITY + "> <" + key + "> . }");
+            QueryExecution qexec = QueryExecutionFactory.create(query, userAccounts);
+            try {
+                ResultSet rs = qexec.execSelect();
+                while (rs.hasNext()) {
+                    QuerySolution qs = rs.next();
+                    roles.add(qs.getResource("role").getURI());
+                }
+            } finally {
+                qexec.close();
+                query.clone();
+            }
+        } finally {
+            userAccounts.leaveCriticalSection();
+        }
+
+        return roles;
+    }
 }

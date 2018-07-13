@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  * Also provides some convenience methods for test lists of URIs and for
  * creating PolicyDecisions.
  */
-public class RelationshipChecker {
+public abstract class RelationshipChecker {
 	private static final Log log = LogFactory.getLog(RelationshipChecker.class);
 
 	protected static final String NS_CORE = "http://vivoweb.org/ontology/core#";
@@ -39,16 +39,15 @@ public class RelationshipChecker {
 	protected static final String URI_INHERES_IN = NS_OBO + "RO_0000052";
 	protected static final String URI_REALIZES = NS_OBO + "BFO_0000055";
 
-	private final OntModel ontModel;
-
-	public RelationshipChecker(OntModel ontModel) {
-		this.ontModel = ontModel;
+	public RelationshipChecker() {
 	}
+
+	public abstract boolean isRelated(OntModel ontModel, List<String> fromUris, List<String> toUris);
 
 	/**
 	 * Are there any URIs that appear in both of these lists?
 	 */
-	public boolean anyUrisInCommon(List<String> list1, List<String> list2) {
+	public boolean anyUrisInCommon(OntModel ontModel, List<String> list1, List<String> list2) {
 		List<String> urisInCommon = new ArrayList<String>(list1);
 		urisInCommon.retainAll(list2);
 		return !urisInCommon.isEmpty();
@@ -58,8 +57,8 @@ public class RelationshipChecker {
 	 * Is this resource a member of this type? That is, is there an statement of
 	 * the form: {@code <resourceUri> rdfs:type <typeUri> }
 	 */
-	public boolean isResourceOfType(String resourceUri, String typeUri) {
-		Selector selector = createSelector(resourceUri,
+	public boolean isResourceOfType(OntModel ontModel, String resourceUri, String typeUri) {
+		Selector selector = createSelector(ontModel, resourceUri,
 				VitroVocabulary.RDF_TYPE, typeUri);
 
 		StmtIterator stmts = null;
@@ -90,11 +89,11 @@ public class RelationshipChecker {
 	 *
 	 * May return an empty list, but never returns null.
 	 */
-	public List<String> getObjectsOfProperty(String resourceUri,
+	public List<String> getObjectsOfProperty(OntModel ontModel, String resourceUri,
 			String propertyUri) {
 		List<String> list = new ArrayList<String>();
 
-		Selector selector = createSelector(resourceUri, propertyUri, null);
+		Selector selector = createSelector(ontModel, resourceUri, propertyUri, null);
 
 		StmtIterator stmts = null;
 		ontModel.enterCriticalSection(Lock.READ);
@@ -123,11 +122,11 @@ public class RelationshipChecker {
 	 *
 	 * May return an empty list, but never returns null.
 	 */
-	public List<String> getObjectsOfLinkedProperty(String resourceUri,
+	public List<String> getObjectsOfLinkedProperty(OntModel ontModel, String resourceUri,
 			String linkUri, String propertyUri) {
 		List<String> list = new ArrayList<String>();
 
-		Selector selector = createSelector(resourceUri, linkUri, null);
+		Selector selector = createSelector(ontModel, resourceUri, linkUri, null);
 
 		StmtIterator stmts = null;
 
@@ -139,7 +138,7 @@ public class RelationshipChecker {
 				if (contextNode.isResource()) {
 					log.debug("found context node for '" + resourceUri + "': "
 							+ contextNode);
-					list.addAll(getObjectsOfProperty(contextNode.asResource()
+					list.addAll(getObjectsOfProperty(ontModel, contextNode.asResource()
 							.getURI(), propertyUri));
 				}
 			}
@@ -167,27 +166,27 @@ public class RelationshipChecker {
 	 *
 	 * {@code <linkNodeUri> <property2Uri> <objectUri> }
 	 */
-	public List<String> getObjectsThroughLinkingNode(String resourceUri,
+	public List<String> getObjectsThroughLinkingNode(OntModel ontModel, String resourceUri,
 			String property1Uri, String linkNodeTypeUri, String property2Uri) {
 		List<String> list = new ArrayList<String>();
 
-		for (String linkNodeUri : getObjectsOfProperty(resourceUri, property1Uri)) {
-			if (isResourceOfType(linkNodeUri, linkNodeTypeUri)) {
-				list.addAll(getObjectsOfProperty(linkNodeUri, property2Uri));
+		for (String linkNodeUri : getObjectsOfProperty(ontModel, resourceUri, property1Uri)) {
+			if (isResourceOfType(ontModel, linkNodeUri, linkNodeTypeUri)) {
+				list.addAll(getObjectsOfProperty(ontModel, linkNodeUri, property2Uri));
 			}
 		}
 
 		return list;
 	}
 
-	public Selector createSelector(String subjectUri, String predicateUri,
+	public Selector createSelector(OntModel ontModel, String subjectUri, String predicateUri,
 			String objectUri) {
 		Resource subject = (subjectUri == null) ? null : ontModel
 				.getResource(subjectUri);
-		return createSelector(subject, predicateUri, objectUri);
+		return createSelector(ontModel, subject, predicateUri, objectUri);
 	}
 
-	public Selector createSelector(Resource subject, String predicateUri,
+	public Selector createSelector(OntModel ontModel, Resource subject, String predicateUri,
 			String objectUri) {
 		Property predicate = (predicateUri == null) ? null : ontModel
 				.getProperty(predicateUri);

@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
 import java.text.Collator;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class VitroFilterUtils {
 	 * public view.
 	 */
 	public static VitroFilters getPublicFilter(ServletContext ctx) {
-		return new FilterByRoleLevelPermission(ctx);
+		return new FilterByDisplayPermission(ctx);
 	}
 
     /** Gets a VitroFilters that permits all objects */

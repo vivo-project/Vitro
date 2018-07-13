@@ -552,51 +552,6 @@ public class FauxObjectPropertyWrapper extends ObjectProperty {
 	}
 
 	@Override
-	public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
-		return innerOP.getHiddenFromDisplayBelowRoleLevel();
-	}
-
-	@Override
-	public void setHiddenFromDisplayBelowRoleLevel(RoleLevel level) {
-		innerOP.setHiddenFromDisplayBelowRoleLevel(level);
-	}
-
-	@Override
-	public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
-		innerOP.setHiddenFromDisplayBelowRoleLevelUsingRoleUri(roleUri);
-	}
-
-	@Override
-	public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-		return innerOP.getProhibitedFromUpdateBelowRoleLevel();
-	}
-
-	@Override
-	public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel level) {
-		innerOP.setProhibitedFromUpdateBelowRoleLevel(level);
-	}
-
-	@Override
-	public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
-		innerOP.setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(roleUri);
-	}
-
-	@Override
-	public RoleLevel getHiddenFromPublishBelowRoleLevel() {
-		return innerOP.getHiddenFromPublishBelowRoleLevel();
-	}
-
-	@Override
-	public void setHiddenFromPublishBelowRoleLevel(RoleLevel level) {
-		innerOP.setHiddenFromPublishBelowRoleLevel(level);
-	}
-
-	@Override
-	public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
-		innerOP.setHiddenFromPublishBelowRoleLevelUsingRoleUri(roleUri);
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
