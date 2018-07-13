@@ -12,10 +12,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -147,12 +148,12 @@ public class PermissionRegistry {
 			ServletContext ctx = sce.getServletContext();
 			StartupStatus ss = StartupStatus.getBean(ctx);
 			try {
+				ContextModelAccess models = ModelAccess.on(ctx);
+
 				List<Permission> permissions = new ArrayList<Permission>();
 
 				permissions.addAll(SimplePermission.getAllInstances());
-				permissions.addAll(createDisplayByRolePermissions());
-				permissions.addAll(createEditByRolePermissions());
-				permissions.addAll(createPublishByRolePermissions());
+				permissions.addAll(EntityPermission.getAllInstances(models));
 
 				PermissionRegistry.createRegistry(ctx, permissions);
 
@@ -164,53 +165,9 @@ public class PermissionRegistry {
 			}
 		}
 
-		/**
-		 * There is no DisplayByRolePermission for self-editors. They get the
-		 * same rights as PUBLIC. Other permissions give them their self-editing
-		 * privileges.
-		 */
-		private Collection<Permission> createDisplayByRolePermissions() {
-			List<Permission> list = new ArrayList<Permission>();
-			list.add(new DisplayByRolePermission("Admin", RoleLevel.DB_ADMIN));
-			list.add(new DisplayByRolePermission("Curator", RoleLevel.CURATOR));
-			list.add(new DisplayByRolePermission("Editor", RoleLevel.EDITOR));
-			list.add(new DisplayByRolePermission("Public", RoleLevel.PUBLIC));
-			return list;
-		}
-
-		/**
-		 * There is no EditByRolePermission for PUBLIC or for self-editors. A
-		 * property may be given an edit-level of "PUBLIC", but that may also
-		 * simply be the default assigned to it when editing, and we don't want
-		 * to recognize that.
-		 * 
-		 * Other permissions give self-editors their editing privileges.
-		 */
-		private Collection<Permission> createEditByRolePermissions() {
-			List<Permission> list = new ArrayList<Permission>();
-			list.add(new EditByRolePermission("Admin", RoleLevel.DB_ADMIN));
-			list.add(new EditByRolePermission("Curator", RoleLevel.CURATOR));
-			list.add(new EditByRolePermission("Editor", RoleLevel.EDITOR));
-			return list;
-		}
-
 		@Override
 		public void contextDestroyed(ServletContextEvent sce) {
 			sce.getServletContext().removeAttribute(ATTRIBUTE_NAME);
-		}
-
-		/**
-		 * There is no PublishByRolePermission for self-editors. They get the
-		 * same rights as PUBLIC. Other permissions give them their self-editing
-		 * privileges.
-		 */
-		private Collection<Permission> createPublishByRolePermissions() {
-			List<Permission> list = new ArrayList<Permission>();
-			list.add(new PublishByRolePermission("Admin", RoleLevel.DB_ADMIN));
-			list.add(new PublishByRolePermission("Curator", RoleLevel.CURATOR));
-			list.add(new PublishByRolePermission("Editor", RoleLevel.EDITOR));
-			list.add(new PublishByRolePermission("Public", RoleLevel.PUBLIC));
-			return list;
 		}
 	}
 }

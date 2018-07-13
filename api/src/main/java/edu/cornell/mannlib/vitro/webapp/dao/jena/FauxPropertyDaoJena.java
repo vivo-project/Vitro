@@ -248,17 +248,6 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fp.getCustomEntryForm(), displayModel);
 			addPropertyStringValue(config, LIST_VIEW_FILE,
 					fp.getCustomListView(), displayModel);
-
-			updatePropertyResourceURIValue(config,
-					HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, fp
-							.getHiddenFromDisplayBelowRoleLevel().getURI());
-			updatePropertyResourceURIValue(config,
-					HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, fp
-							.getHiddenFromPublishBelowRoleLevel().getURI());
-			updatePropertyResourceURIValue(config,
-					PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, fp
-							.getProhibitedFromUpdateBelowRoleLevel().getURI());
-
 		} catch (InsertException e) {
 			throw new RuntimeException(e);
 		}
@@ -348,16 +337,6 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fp.getCustomEntryForm(), displayModel);
 			updatePropertyStringValue(config, LIST_VIEW_FILE,
 					fp.getCustomListView(), displayModel);
-
-			updatePropertyResourceURIValue(config,
-					HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, fp
-							.getHiddenFromDisplayBelowRoleLevel().getURI());
-			updatePropertyResourceURIValue(config,
-					HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, fp
-							.getHiddenFromPublishBelowRoleLevel().getURI());
-			updatePropertyResourceURIValue(config,
-					PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, fp
-							.getProhibitedFromUpdateBelowRoleLevel().getURI());
 		}
 	}
 
@@ -456,13 +435,6 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 								PROPERTY_OFFERCREATENEWOPTIONANNOT)));
 				fp.setCustomEntryForm(getPropertyStringValue(config,
 						PROPERTY_CUSTOMENTRYFORMANNOT));
-
-				fp.setHiddenFromDisplayBelowRoleLevel(getMostRestrictiveRoleLevel(
-						config, HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT));
-				fp.setHiddenFromPublishBelowRoleLevel(getMostRestrictiveRoleLevel(
-						config, HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT));
-				fp.setProhibitedFromUpdateBelowRoleLevel(getMostRestrictiveRoleLevel(
-						config, PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT));
 			}
 		}
 	}

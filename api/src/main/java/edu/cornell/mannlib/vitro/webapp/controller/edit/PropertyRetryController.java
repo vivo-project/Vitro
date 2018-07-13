@@ -185,6 +185,8 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Property Editing Form");
         request.setAttribute("_action",action);
+
+        addPermissionAttributes(request, propertyForEditing.getURI());
         setRequestAttributes(request,epo);
 
         try {

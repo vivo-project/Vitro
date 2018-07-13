@@ -92,21 +92,6 @@ public class DataPropertyFiltering extends DataProperty {
     }
 
     @Override
-    public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
-        return innerDataProperty.getHiddenFromDisplayBelowRoleLevel();
-    }
-    
-    @Override
-    public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-        return innerDataProperty.getProhibitedFromUpdateBelowRoleLevel();
-    }
-
-    @Override
-    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
-        return innerDataProperty.getHiddenFromPublishBelowRoleLevel();
-    }
-    
-    @Override
     public String getLocalName() {
         return innerDataProperty.getLocalName();
     }
@@ -179,36 +164,6 @@ public class DataPropertyFiltering extends DataProperty {
     @Override
     public void setGroupURI(String in) {
         innerDataProperty.setGroupURI(in);
-    }
-
-    @Override
-    public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
-        innerDataProperty.setHiddenFromDisplayBelowRoleLevel(eR);
-    }
-    
-    @Override
-    public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
-        innerDataProperty.setHiddenFromDisplayBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
-    }
-
-    @Override
-    public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
-        innerDataProperty.setProhibitedFromUpdateBelowRoleLevel(eR);
-    }
-    
-    @Override
-    public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
-        innerDataProperty.setProhibitedFromUpdateBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
-    }
-
-    @Override
-    public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
-        innerDataProperty.setHiddenFromPublishBelowRoleLevel(eR);
-    }
-    
-    @Override
-    public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
-        innerDataProperty.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
     }
 
     @Override

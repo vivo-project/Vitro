@@ -185,6 +185,8 @@ public class DatapropRetryController extends BaseEditController {
         request.setAttribute("title","Data Property Editing Form");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","DatatypeProperty");
+
+        addPermissionAttributes(request, objectForEditing.getURI());
         setRequestAttributes(request,epo);
 
         try {

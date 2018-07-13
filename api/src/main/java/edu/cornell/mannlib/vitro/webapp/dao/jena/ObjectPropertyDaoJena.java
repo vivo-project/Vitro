@@ -43,7 +43,6 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -163,63 +162,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             }
             p.setDomainEntitySortDirection(getPropertyStringValue(op,PROPERTY_ENTITYSORTDIRECTION));
             p.setRangeEntitySortDirection(getPropertyStringValue(invOp,PROPERTY_ENTITYSORTDIRECTION));
-            
-            //There might be multiple HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-            StmtIterator it = op.listProperties(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-            BaseResourceBean.RoleLevel hiddenRoleLevel = null;
-            while( it.hasNext() ){
-                Statement stmt = it.nextStatement();
-                RDFNode obj;
-                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = obj.as(Resource.class);
-                    if( res != null && res.getURI() != null ){
-                        BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null && 
-                            (hiddenRoleLevel == null || roleFromModel.compareTo(hiddenRoleLevel) > 0 )){
-                            hiddenRoleLevel = roleFromModel;                            
-                        }
-                    }
-                }
-            }            
-            p.setHiddenFromDisplayBelowRoleLevel(hiddenRoleLevel); //this might get set to null
-
-            //There might be multiple PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-            it = op.listProperties(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-            BaseResourceBean.RoleLevel prohibitedRoleLevel = null;
-            while( it.hasNext() ){
-                Statement stmt = it.nextStatement();
-                RDFNode obj;
-                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = obj.as(Resource.class);
-                    if( res != null && res.getURI() != null ){
-                        BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null && 
-                            (prohibitedRoleLevel == null || roleFromModel.compareTo(prohibitedRoleLevel) > 0 )){
-                            prohibitedRoleLevel = roleFromModel;                            
-                        }
-                    }
-                }
-            }            
-            p.setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel); //this might get set to null
-
-            //There might be multiple HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-            it = op.listProperties(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
-            BaseResourceBean.RoleLevel publishRoleLevel = null;
-            while( it.hasNext() ){
-                Statement stmt = it.nextStatement();
-                RDFNode obj;
-                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = obj.as(Resource.class);
-                    if( res != null && res.getURI() != null ){
-                        BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null && 
-                            (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
-                            publishRoleLevel = roleFromModel;                            
-                        }
-                    }
-                }
-            }            
-            p.setHiddenFromPublishBelowRoleLevel(publishRoleLevel); //this might get set to null
 
             p.setCustomEntryForm(getPropertyStringValue(op,PROPERTY_CUSTOMENTRYFORMANNOT));
             Boolean selectFromObj = getPropertyBooleanValue(op,PROPERTY_SELECTFROMEXISTINGANNOT);
@@ -333,8 +275,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT ?range ?rangeRoot ?label ?group ?customForm ?displayRank ?displayLevel " +
-                "    ?updateLevel ?publishLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed \n" +
+                "SELECT ?range ?rangeRoot ?label ?group ?customForm ?displayRank " +
+                "    ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed \n" +
                 "    ?collateBySubclass ?displayLimit ?individualSortProperty \n" +
                 "    ?entitySortDirection ?selectFromExisting ?offerCreateNew \n" +
                 "    ?publicDescription ?stubDeletion \n" + 
@@ -358,9 +300,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "    OPTIONAL { ?configuration config:deleteLinkSuppressed ?deleteLinkSuppressed } \n" +
                 "    OPTIONAL { ?configuration vitro:displayRankAnnot ?displayRank } \n" +
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
-                "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
-                "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
-                "    OPTIONAL { ?configuration vitro:hiddenFromPublishBelowRoleLevelAnnot ?publishLevel } \n" +
                 "    OPTIONAL { ?configuration <" + PROPERTY_COLLATEBYSUBCLASSANNOT.getURI() + "> ?collateBySubclass } \n" +
                 "    OPTIONAL { ?configuration <" + DISPLAY_LIMIT.getURI() + "> ?displayLimit } \n" +
                 "    OPTIONAL { ?configuration <" + PROPERTY_OBJECTINDIVIDUALSORTPROPERTY.getURI() + "> ?individualSortProperty } \n " +
@@ -400,24 +339,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                     op.setDomainDisplayLimit(
                             Integer.parseInt(displayLimitLit.getLexicalForm()));
                 } 
-                Resource displayLevelRes = qsoln.getResource("displayLevel");
-                if (displayLevelRes != null) {
-                    op.setHiddenFromDisplayBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    displayLevelRes.getURI()));
-                }
-                Resource updateLevelRes = qsoln.getResource("updateLevel");
-                if (updateLevelRes != null) {
-                    op.setProhibitedFromUpdateBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    updateLevelRes.getURI()));
-                }
-                Resource publishLevelRes = qsoln.getResource("publishLevel");
-                if (publishLevelRes != null) {
-                    op.setHiddenFromPublishBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    publishLevelRes.getURI()));
-                }
                 Literal labelLit = qsoln.getLiteral("label");
                 if (labelLit != null) {
                     op.setDomainPublic(labelLit.getLexicalForm());
@@ -751,18 +672,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         	if (newObjectIndividualSortProperty != null) {
         		p.addProperty(PROPERTY_OBJECTINDIVIDUALSORTPROPERTY,newObjectIndividualSortProperty);
         	}
-        }
-
-        if (prop.getHiddenFromDisplayBelowRoleLevel() != null) {
-        	updatePropertyResourceURIValue(p, HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, prop.getHiddenFromDisplayBelowRoleLevel().getURI());
-        }
-
-        if (prop.getProhibitedFromUpdateBelowRoleLevel() != null) {
-        	updatePropertyResourceURIValue(p, PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, prop.getProhibitedFromUpdateBelowRoleLevel().getURI());
-        }
-
-        if (prop.getHiddenFromPublishBelowRoleLevel() != null) {
-        	updatePropertyResourceURIValue(p, HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, prop.getHiddenFromPublishBelowRoleLevel().getURI());
         }
 
         updatePropertyStringValue(p,PROPERTY_CUSTOMENTRYFORMANNOT,prop.getCustomEntryForm(),ontModel);
@@ -1133,7 +1042,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             }
             qexec.close();
         }
-        FullPropertyKey key = new FullPropertyKey((RoleRestrictedProperty)op);
+        FullPropertyKey key = new FullPropertyKey(op);
 		String customListViewConfigFileName = customListViewConfigFileMap.get(key);
         if (customListViewConfigFileName == null) {
             log.debug("no list view found for " + key);

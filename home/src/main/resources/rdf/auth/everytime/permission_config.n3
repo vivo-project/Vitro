@@ -3,9 +3,10 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
-@prefix displayByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.DisplayByRolePermission#> .
-@prefix editByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EditByRolePermission#> .
-@prefix publishByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.PublishByRolePermission#> .
+
+@prefix displayPermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityDisplayPermission#> .
+@prefix updatePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityUpdatePermission#> .
+@prefix publishPermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityPublishPermission#> .
 
 auth:ADMIN 
     a auth:PermissionSet ;
@@ -59,11 +60,11 @@ auth:ADMIN
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
 	auth:hasPermission simplePermission:PageViewablePublic ;
-    
+
     # role-based permissions for ADMIN
-    auth:hasPermission displayByRole:Admin ;
-    auth:hasPermission editByRole:Admin ;
-    auth:hasPermission publishByRole:Admin ;
+    auth:hasPermission displayPermission:ADMIN ;
+    auth:hasPermission updatePermission:ADMIN ;
+    auth:hasPermission publishPermission:ADMIN ;
     .
 
 auth:CURATOR 
@@ -97,11 +98,11 @@ auth:CURATOR
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
     auth:hasPermission simplePermission:PageViewablePublic ;
-    
+
     # role-based permissions for CURATOR
-    auth:hasPermission displayByRole:Curator ;
-    auth:hasPermission editByRole:Curator ;
-    auth:hasPermission publishByRole:Curator ;
+    auth:hasPermission displayPermission:CURATOR ;
+    auth:hasPermission updatePermission:CURATOR ;
+    auth:hasPermission publishPermission:CURATOR ;
     .
 
 auth:EDITOR 
@@ -128,11 +129,11 @@ auth:EDITOR
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
    	auth:hasPermission simplePermission:PageViewablePublic ;
-    
+
     # role-based permissions for EDITOR
-    auth:hasPermission displayByRole:Editor ;
-    auth:hasPermission editByRole:Editor ;
-    auth:hasPermission publishByRole:Editor ;
+    auth:hasPermission displayPermission:EDITOR ;
+    auth:hasPermission updatePermission:EDITOR ;
+    auth:hasPermission publishPermission:EDITOR ;
     .
 
 auth:SELF_EDITOR
@@ -154,10 +155,11 @@ auth:SELF_EDITOR
 	auth:hasPermission simplePermission:PageViewablePublic ;
 
     # role-based permissions for SELF_EDITOR
-    #     For role-based display and editing, SelfEditor is like Public. 
+    #     For role-based display and editing, SelfEditor is like Public.
     #     SelfEditor uses its special permissions to edit/display its own values.
-    auth:hasPermission displayByRole:Public ; 
-    auth:hasPermission publishByRole:Public ; 
+    auth:hasPermission displayPermission:SELF_EDITOR ;
+    auth:hasPermission updatePermission:SELF_EDITOR ;
+    auth:hasPermission publishPermission:SELF_EDITOR ;
     .
 
 auth:PUBLIC
@@ -169,7 +171,69 @@ auth:PUBLIC
     auth:hasPermission simplePermission:QueryFullModel ;
 	auth:hasPermission simplePermission:PageViewablePublic ;
 
-    # role-based permissions for PUBLIC
-    auth:hasPermission displayByRole:Public ;
-    auth:hasPermission publishByRole:Public ;
+	auth:hasPermission displayPermission:PUBLIC ;
+    auth:hasPermission publishPermission:PUBLIC ;
+    .
+
+# Register display / update / publish sets that are referenced above
+
+displayPermission:PUBLIC
+    a displayPermission:Set ;
+    .
+
+displayPermission:SELF_EDITOR
+    a displayPermission:Set ;
+    .
+
+displayPermission:EDITOR
+    a displayPermission:Set ;
+    .
+
+displayPermission:CURATOR
+    a displayPermission:Set ;
+    .
+
+displayPermission:ADMIN
+    a displayPermission:Set ;
+    .
+
+updatePermission:PUBLIC
+    a updatePermission:Set ;
+    .
+
+updatePermission:SELF_EDITOR
+    a updatePermission:Set ;
+    a updatePermission:SetLimitToRelatedUser ;
+    .
+
+updatePermission:EDITOR
+    a updatePermission:Set ;
+    .
+
+updatePermission:CURATOR
+    a updatePermission:Set ;
+    .
+
+updatePermission:ADMIN
+    a updatePermission:Set ;
+    .
+
+publishPermission:PUBLIC
+    a publishPermission:Set ;
+    .
+
+publishPermission:SELF_EDITOR
+    a publishPermission:Set ;
+    .
+
+publishPermission:EDITOR
+    a publishPermission:Set ;
+    .
+
+publishPermission:CURATOR
+    a publishPermission:Set ;
+    .
+
+publishPermission:ADMIN
+    a publishPermission:Set ;
     .

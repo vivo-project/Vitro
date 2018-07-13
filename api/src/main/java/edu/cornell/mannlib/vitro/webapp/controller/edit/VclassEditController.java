@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 public class VclassEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
-	private static final int NUM_COLS = 14;
+	private static final int NUM_COLS = 11;
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
@@ -68,13 +68,10 @@ public class VclassEditController extends BaseEditController {
         results.add("example");              // 7
         results.add("editor description");   // 8
         //results.add("curator comments"); 
-        results.add("display level");        // 9
-        results.add("update level");         // 10
-        results.add("display rank");         // 11
-        results.add("custom entry form");    // 12
-        results.add("URI");                  // 13
-        results.add("publish level");        // 14
-        
+        results.add("display rank");         // 9
+        results.add("custom entry form");    // 10
+        results.add("URI");                  // 11
+
         String ontologyName = null;
         if (vcl.getNamespace() != null) {
             Ontology ont = request.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(vcl.getNamespace());
@@ -111,14 +108,6 @@ public class VclassEditController extends BaseEditController {
             commSb = new StringBuffer("no comments yet");
         }
                
-		String hiddenFromDisplay = (vcl.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)"
-				: vcl.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
-		String ProhibitedFromUpdate = (vcl
-				.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)"
-				: vcl.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel());
-		String hiddenFromPublish = (vcl.getHiddenFromPublishBelowRoleLevel() == null ? "(unspecified)"
-				: vcl.getHiddenFromPublishBelowRoleLevel().getDisplayLabel());
-
         String customEntryForm = (vcl.getCustomEntryForm() == null ? "(unspecified)" : vcl.getCustomEntryForm());
         
        //String lastModified = "<i>not implemented yet</i>"; // TODO
@@ -134,12 +123,9 @@ public class VclassEditController extends BaseEditController {
         results.add(example);                // 7
         results.add(description);            // 8
         //results.add(commSb.toString());    // 
-        results.add(hiddenFromDisplay);      // 9
-        results.add(ProhibitedFromUpdate);   // 10
-        results.add(String.valueOf(vcl.getDisplayRank())); // 11
-        results.add(customEntryForm);        // 12
-        results.add(uri);                    // 13
-        results.add(hiddenFromPublish);      // 14
+        results.add(String.valueOf(vcl.getDisplayRank())); // 9
+        results.add(customEntryForm);        // 10
+        results.add(uri);                    // 11
         request.setAttribute("results", results);
         request.setAttribute("columncount", NUM_COLS);
         request.setAttribute("suppressquery", "true");

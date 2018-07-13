@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 
+import java.util.List;
+
 /**
  * This is what the PermissionRegistry hands out if you ask for a Permission
  * that it doesn't know about. Nothing is authorized by this Permission.
@@ -14,7 +16,7 @@ public class BrokenPermission extends Permission {
 	}
 
 	@Override
-	public boolean isAuthorized(RequestedAction whatToAuth) {
+	public boolean isAuthorized(List<String> userUris, RequestedAction whatToAuth) {
 		return false;
 	}
 

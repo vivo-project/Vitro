@@ -74,15 +74,9 @@ public class EntityEditController extends BaseEditController {
         int colCount = 4;
         results.add("Name");
         results.add("class");
-        results.add("display level");
-        results.add("edit level");
         results.add("last updated");
-        colCount++;
         results.add("URI");
-        colCount++;
-        results.add("publish level");
-        colCount++;
-        
+
         String rName = null;
         if (ent.getName() != null && ent.getName().length() > 0) {
         	rName = ent.getName();
@@ -116,17 +110,10 @@ public class EntityEditController extends BaseEditController {
 	        }
         }
         results.add(classStr.toString());
-                
-		results.add(ent.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified"
-				: ent.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
-		results.add(ent.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified"
-				: ent.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel());
 
         String rModTime = (ent.getModTime()==null) ? "" : publicDateFormat.format(ent.getModTime());
         results.add(rModTime);
         results.add( (ent.getURI() == null) ? "[anonymous individual]" : ent.getURI() );
-		results.add(ent.getHiddenFromPublishBelowRoleLevel() == null ? "unspecified"
-				: ent.getHiddenFromPublishBelowRoleLevel().getDisplayLabel());
         request.setAttribute("results",results);
         request.setAttribute("columncount", colCount);
         request.setAttribute("suppressquery","true");
