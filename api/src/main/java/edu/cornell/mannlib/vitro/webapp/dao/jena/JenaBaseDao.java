@@ -140,7 +140,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             model.add(res, dataprop, value, XSDDatatype.XSDstring);
         }
     }
-
+    
     /**
      * convenience method
      */
@@ -163,7 +163,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             return null;
         }
     }
-
+    
     /**
      * convenience method
      */
@@ -172,7 +172,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             model.add(res, prop, model.createTypedLiteral(value));
         }
     }
-
+    
     /**
      * convenience method for use with functional datatype properties
      */
@@ -186,22 +186,22 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     existingValue = ((Literal)object).getString();
                 }
             }
-
+            
             if (value == null  || value.length() == 0) {
                  model.removeAll(res, dataprop, null);
             } else if (existingValue == null ) {
-                 model.add(res, dataprop, value, XSDDatatype.XSDstring);
+                 model.add(res, dataprop, value, XSDDatatype.XSDstring);	
             } else if (!existingValue.equals(value)) {
          		 model.removeAll(res, dataprop, null);
            		 model.add(res, dataprop, value, XSDDatatype.XSDstring);
             }
         }
     }
-
+    
     /**
      * Convenience method for use with functional datatype properties.
-     *
-     * Pass keepOnlyIfTrue if a lack of a value in the model indicates false.
+     * 
+     * Pass keepOnlyIfTrue if a lack of a value in the model indicates false.  
      * See ObjectPropertyDaoJena and PROPERTY_OFFERCREATENEWOPTIONANNOT for an
      * example.
      */
@@ -261,7 +261,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             return null;
         }
     }
-
+    
     /**
      * convenience method
      */
@@ -280,13 +280,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 			model.add(res, dataprop, Long.toString(value), XSDDatatype.XSDlong);
 		}
 	}
-
+	
     /**
      * convenience method for use with functional datatype properties
      */
     protected void updatePropertyIntValue(Resource res, Property dataprop, int value, Model model) {
-
-    	if (dataprop != null) {
+        
+    	if (dataprop != null) {	
             Integer existingValue = null;
             Statement stmt = res.getProperty(dataprop);
             if (stmt != null) {
@@ -295,13 +295,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     existingValue = ((Literal)object).getInt();
                 }
             }
-
+        	
             if (existingValue == null ) {
-                  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
+                  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);	
             } else if (existingValue.intValue() != value) {
         		  model.removeAll(res, dataprop, null);
         		  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
-            }
+            }            
         }
     }
 
@@ -738,11 +738,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 			}
 		}
 	}
-	
+
 	/**
      * Add to an OntResource an rdfs:label value with lexical form and default
      * language tag. Remove any other existing values in default language.
-     * If lexicalForm parameter is null, remove all plain literal values of 
+     * If lexicalForm parameter is null, remove all plain literal values of
      * Property in default language.
      * @param ontRes may not be null
      * @param lexicalForm may be null.  If null, existing values will be deleted
@@ -751,20 +751,20 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	protected void updateRDFSLabel(OntResource ontRes, String lexicalForm) {
         updatePlainLiteralValue(ontRes, RDFS.label, lexicalForm);
     }
-	
+
 	/**
      * Add to an OntResource an rdfs:label value with lexical form and optional
-     * language tag. Remove any other existing plain literal values that match 
+     * language tag. Remove any other existing plain literal values that match
      * specified language or lack language tags if no language is supplied.
-     * If lexicalForm parameter is null, remove all plain literal labels in 
+     * If lexicalForm parameter is null, remove all plain literal labels in
      * specified language, or all existing language-less labels
      * if no language is specified.
      * @param ontRes may not be null
      * @param lexicalForm may be null.  If null, existing values will be deleted
      *        but none will be added.
-     * @param lang may be null.  If null, method acts on language-less plain 
+     * @param lang may be null.  If null, method acts on language-less plain
      *        literal labels and ignores those with language tags.
-     */	
+     */
 	protected void updateRDFSLabel(OntResource ontRes, String lexicalForm, String lang) {
 	    updatePlainLiteralValue(ontRes, RDFS.label, lexicalForm, lang);
 	}
@@ -772,22 +772,22 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     /**
      * Add to an OntResource a Property value with lexical form and default
      * language tag. Remove any other existing values in default language.
-     * If lexicalForm parameter is null, remove all plain literal values of 
+     * If lexicalForm parameter is null, remove all plain literal values of
      * Property in default language.
      * @param ontRes may not be null
      * @param lexicalForm may be null.  If null, existing values will be deleted
      *        but none will be added.
      */
-	protected void updatePlainLiteralValue(OntResource ontRes, Property property, 
+	protected void updatePlainLiteralValue(OntResource ontRes, Property property,
             String lexicalForm) {
         updatePlainLiteralValue(ontRes, property, lexicalForm, getDefaultLanguage());
     }
-    
+
     /**
      * Add to an OntResource a Property value with lexical form and optional
-     * language tag. Remove any other existing plain literal values that match 
+     * language tag. Remove any other existing plain literal values that match
      * specified language or lack language tags if no language is supplied.
-     * If lexicalForm parameter is null, remove all plain literal values of 
+     * If lexicalForm parameter is null, remove all plain literal values of
      * Property in specified language, or all existing language-less literals
      * if no language is specified.
      * @param ontRes may not be null
@@ -806,9 +806,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         StmtIterator existingStmts = ontRes.listProperties(property);
         while(existingStmts.hasNext()) {
             Statement stmt = existingStmts.next();
-            if(stmt.getObject().isLiteral()) {                
+            if(stmt.getObject().isLiteral()) {
                 Literal lit = stmt.getObject().asLiteral();
-                if( (lang == null && isLanguageLessPlainLiteral(lit))  
+                if( (lang == null && isLanguageLessPlainLiteral(lit))
                         || (lang != null && lang.equals(lit.getLanguage())) ) {
                     if(!lit.getLexicalForm().equals(lexicalForm)) {
                         toRemove.add(stmt);
@@ -826,11 +826,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         if (addNew && (lexicalForm != null)) {
             if(!StringUtils.isEmpty(lang)) {
                 ontRes.addProperty(property, ResourceFactory.createLangLiteral(
-                        lexicalForm, lang));    
+                        lexicalForm, lang));
             } else {
                 ontRes.addProperty(property, ResourceFactory.createPlainLiteral(
                         lexicalForm));
-            }            
+            }
         }
     }
     
@@ -838,9 +838,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         // In RDF 1.1 all the language-less literals get datatype xsd:string.
         // The null datatype check is here just in case this gets run on an older
         // version of Jena.  rdf:PlainLiteral is also a datatype, but doesn't
-        // (yet) seem to be used by Jena.        
-        return StringUtils.isEmpty(lit.getLanguage()) 
-                && ((lit.getDatatype() == null) 
+        // (yet) seem to be used by Jena.
+        return StringUtils.isEmpty(lit.getLanguage())
+                && ((lit.getDatatype() == null)
                 || XSDDatatype.XSDstring.equals(lit.getDatatype()) ||
                 (RDF.getURI() + "PlainLiteral").equals(lit.getDatatypeURI()));
     }
