@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.modules;
 import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
+import edu.cornell.mannlib.vitro.webapp.audit.AuditModule;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -34,6 +35,8 @@ public interface Application {
 	ConfigurationTripleSource getConfigurationTripleSource();
 
 	TBoxReasonerModule getTBoxReasonerModule();
+
+	AuditModule getAuditModule();
 
 	void shutdown();
 

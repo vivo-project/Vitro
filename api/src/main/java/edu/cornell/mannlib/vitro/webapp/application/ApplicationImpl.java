@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.audit.AuditModule;
 import org.apache.jena.ontology.OntDocumentManager;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -41,6 +42,7 @@ public class ApplicationImpl implements Application {
 	private SearchIndexer searchIndexer;
 	private ImageProcessor imageProcessor;
 	private FileStorage fileStorage;
+	private AuditModule auditModule;
 	private ContentTripleSource contentTripleSource;
 	private ConfigurationTripleSource configurationTripleSource;
 	private TBoxReasonerModule tboxReasonerModule;
@@ -104,6 +106,15 @@ public class ApplicationImpl implements Application {
 	}
 
 	@Override
+	public AuditModule getAuditModule() {
+		return auditModule;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasAuditModule", minOccurs = 0, maxOccurs = 1)
+	public void setAuditModule(AuditModule am) {
+		auditModule = am;
+	}
+	@Override
 	public ContentTripleSource getContentTripleSource() {
 		return contentTripleSource;
 	}
@@ -165,6 +176,11 @@ public class ApplicationImpl implements Application {
 			fileStorage.startup(app, css);
 			ss.info(this, "Started the FileStorage system: " + fileStorage);
 
+			AuditModule auditModule = app.getAuditModule();
+			if (auditModule != null) {
+				auditModule.startup(app, css);
+			}
+
 			ContentTripleSource contentTripleSource = app
 					.getContentTripleSource();
 			contentTripleSource.startup(app, css);
@@ -213,6 +229,11 @@ public class ApplicationImpl implements Application {
 			app.getFileStorage().shutdown(app);
 			app.getImageProcessor().shutdown(app);
 			app.getSearchEngine().shutdown(app);
+
+			AuditModule auditModule = app.getAuditModule();
+			if (auditModule != null) {
+				auditModule.shutdown(app);
+			}
 		}
 	}
 

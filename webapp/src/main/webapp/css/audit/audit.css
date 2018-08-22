@@ -1,0 +1,17 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+/* Styles for the search index controller. */
+
+section#audit table.history {
+    font-size: smaller;
+    border: 1px solid gray;
+    width: 100%;
+}
+
+section#audit table.history th{
+    font-weight: bolder;
+}
+
+section#audit table.history td{
+    padding: 2px 5px 2px 5px;
+}
