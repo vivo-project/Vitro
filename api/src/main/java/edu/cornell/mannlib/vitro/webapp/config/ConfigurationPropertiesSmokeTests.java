@@ -127,7 +127,7 @@ public class ConfigurationPropertiesSmokeTests implements
 		boolean forceLanguage = StringUtils.isNotBlank(forceString);
 
 		String filterString = props.getProperty(PROPERTY_LANGUAGE_FILTER,
-				"true");
+				"false");
 		boolean languageFilter = Boolean.valueOf(filterString);
 		String i18nDirPath = ctx.getRealPath("/i18n");
 
@@ -154,15 +154,17 @@ public class ConfigurationPropertiesSmokeTests implements
 		/* Make sure language files exist for values in the selectableLocales propery.
 		   The prefixes of vitro and vivo are hard coded into the app,
 		   so we can assume the bundle names must have the same file format */
-		List<String> selectableLanguagesList = Arrays.asList(selectString.split("\\s*,\\s*"));
-		for (String language : selectableLanguagesList) {
-			String vivoBundle = VIVO_BUNDLE_PREFIX + language + ".properties";
-			String vitroBundle = VITRO_BUNDLE_PREFIX + language + ".properties";
-		    if (!i18nNames.contains(vivoBundle) && !i18nNames.contains(vitroBundle)) {
-		      ss.warning(this, language + " was found in the value for "
-							+ PROPERTY_LANGUAGE_SELECTABLE + " but no corresponding "
+		if (selectableLanguages) {
+			List<String> selectableLanguagesList = Arrays.asList(selectString.split("\\s*,\\s*"));
+			for (String language : selectableLanguagesList) {
+				String vivoBundle = VIVO_BUNDLE_PREFIX + language + ".properties";
+				String vitroBundle = VITRO_BUNDLE_PREFIX + language + ".properties";
+				if (!i18nNames.contains(vivoBundle) && !i18nNames.contains(vitroBundle)) {
+					ss.warning(this, language + " was found in the value for "
+						+ PROPERTY_LANGUAGE_SELECTABLE + " but no corresponding "
 							+ "language file was found.");
-		    }
+				}
+			}
 		}
 
 		if (selectableLanguages && forceLanguage) {
