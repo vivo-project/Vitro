@@ -105,18 +105,15 @@
 
     <modules>
         <module>home</module>
+<<<<<<< Updated upstream
         <module>solr</module>
+=======
+>>>>>>> Stashed changes
         <module>webapp</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.vivoweb</groupId>
-                <artifactId>vitro-solr</artifactId>
-                <version>${vitro-version}</version>
-                <type>war</type>
-            </dependency>
             <dependency>
                 <groupId>org.vivoweb</groupId>
                 <artifactId>vitro-home</artifactId>
