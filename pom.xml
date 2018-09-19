@@ -67,10 +67,6 @@
         <module>api</module>
         <module>dependencies</module>
         <module>webapp</module>
-<<<<<<< Updated upstream
-        <module>solr</module>
-=======
->>>>>>> Stashed changes
         <module>home</module>
     </modules>
 
