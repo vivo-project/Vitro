@@ -35,8 +35,10 @@ import org.apache.http.util.EntityUtils;
  * 
  * If we can't connect to Solr, add a Warning item to the StartupStatus.
  */
-public class SolrSmokeTest implements ServletContextListener {
+public class SolrSmokeTest {
 	private static final Log log = LogFactory.getLog(SolrSmokeTest.class);
+
+	private final ServletContextListener listener;
 
 	/*
 	 * We don't want to treat socket timeout as a non-recoverable error like the
@@ -44,14 +46,17 @@ public class SolrSmokeTest implements ServletContextListener {
 	 */
 	private static final int SOCKET_TIMEOUT_STATUS = -500;
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
+	public SolrSmokeTest(ServletContextListener listener) {
+		this.listener = listener;
+	}
+
+	public void doTest(ServletContextEvent sce) {
 		final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
 		String solrUrlString = ConfigurationProperties.getBean(sce)
 				.getProperty("vitro.local.solr.url", "");
 		if (solrUrlString.isEmpty()) {
-			ss.fatal(this, "Can't connect to Solr search engine. "
+			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "runtime.properties must contain a value for "
 					+ "vitro.local.solr.url");
 			return;
@@ -62,27 +67,22 @@ public class SolrSmokeTest implements ServletContextListener {
 		try {
 			solrUrl = new URL(solrUrlString);
 		} catch (MalformedURLException e) {
-			ss.fatal(this, "Can't connect to Solr search engine. "
+			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "The value for vitro.local.solr.url "
 					+ "in runtime.properties is not a valid URL: '"
 					+ solrUrlString + "'", e);
 		}
 
-		ss.info(this, "Starting thread for Solr test.");
-		new SolrSmokeTestThread(this, solrUrl, ss).start();
-	}
-
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		// nothing to tear down.
+		ss.info(listener, "Starting thread for Solr test.");
+		new SolrSmokeTestThread(listener, solrUrl, ss).start();
 	}
 
 	private static class SolrSmokeTestThread extends VitroBackgroundThread {
-		private final SolrSmokeTest listener;
+		private final ServletContextListener listener;
 		private final URL solrUrl;
 		private final StartupStatus ss;
 
-		public SolrSmokeTestThread(SolrSmokeTest listener, URL solrUrl,
+		public SolrSmokeTestThread(ServletContextListener listener, URL solrUrl,
 				StartupStatus ss) {
 			super("SolrSmokeTest");
 			this.listener = listener;
