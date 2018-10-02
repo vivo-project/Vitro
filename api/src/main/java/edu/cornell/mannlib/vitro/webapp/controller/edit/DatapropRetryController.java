@@ -30,7 +30,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionList
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -163,10 +162,6 @@ public class DatapropRetryController extends BaseEditController {
         groupOptList = getSortedList(hashMap,groupOptList,vreq);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
-
-        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(objectForEditing));    
-        optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(objectForEditing));
-        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(objectForEditing));    
 
         foo.setOptionLists(optionMap);
         

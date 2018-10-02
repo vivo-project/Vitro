@@ -30,7 +30,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
@@ -145,10 +144,6 @@ public class VclassRetryController extends BaseEditController {
         } catch (Exception e) {
             log.error(this.getClass().getName() + "unable to create Namespace option list");
         }
-
-        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(vclassForEditing));    
-        optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(vclassForEditing));
-        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(vclassForEditing));    
 
         FormObject foo = new FormObject();
         foo.setErrorMap(epo.getErrMsgMap());

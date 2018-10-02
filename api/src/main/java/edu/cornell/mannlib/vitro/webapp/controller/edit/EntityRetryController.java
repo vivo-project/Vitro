@@ -44,7 +44,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -170,10 +169,6 @@ public class EntityRetryController extends BaseEditController {
 			hash.put("VClassURI", optList);
         }
         
-        hash.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(individualForEditing));    
-        hash.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(individualForEditing));
-        hash.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(individualForEditing));    
-
         FormObject foo = new FormObject();
         foo.setOptionLists(hash);
 
