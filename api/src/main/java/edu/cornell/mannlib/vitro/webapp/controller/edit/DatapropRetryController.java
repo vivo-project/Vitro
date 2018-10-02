@@ -30,7 +30,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionList
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -164,23 +163,6 @@ public class DatapropRetryController extends BaseEditController {
         groupOptList = getSortedList(hashMap,groupOptList,vreq);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
-
-        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(objectForEditing));
-        optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(objectForEditing));
-        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(objectForEditing));
-
-        // Set the value of the editing parameter (as defined in VitroVocabulary.java). 
-        // Use value to control form types as in defaultDataPropertyForm.ftl
-        String editingVal = objectForEditing.getEditing();
-        List<Option> editingOptList = new ArrayList<Option>();
-        editingOptList.add(0,new Option("","plaintext"));
-        editingOptList.add(1,new Option("HTML","rich text"));
-        for (Option val : editingOptList) {
-            if(editingVal != null && editingVal.equals(val.getValue())) {
-                val.setSelected(true);
-            }
-        }
-        optionMap.put("Editing", editingOptList);
 
         foo.setOptionLists(optionMap);
 
