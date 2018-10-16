@@ -235,7 +235,7 @@ public class SolrSmokeTest implements ServletContextListener {
 
 		private void tryToConnect() throws SolrProblemException {
 			try {
-				HttpGet method = new HttpGet(solrUrl.toExternalForm());
+				HttpGet method = new HttpGet(solrUrl.toExternalForm() + "/select");
 				SolrSmokeTest.log.debug("Trying to connect to Solr");
 				HttpResponse response = httpClient.execute(method);
 				try {
