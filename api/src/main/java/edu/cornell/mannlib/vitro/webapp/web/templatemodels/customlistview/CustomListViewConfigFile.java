@@ -197,7 +197,12 @@ public class CustomListViewConfigFile {
 		 */
 		NodeList doomed = element.getElementsByTagName(tagName);
 		for (int i = doomed.getLength() - 1; i >= 0; i--) {
-			element.removeChild(doomed.item(i));
+			/*
+			 * As the node to be removed may be at an arbitrary depth in the DOM tree,
+			 * we need to get the parent of the node that we are trying to remove,
+			 * and then remove the child from there.
+			 */
+			doomed.item(i).getParentNode().removeChild(doomed.item(i));
 		}
 	}
 
