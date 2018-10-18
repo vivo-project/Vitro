@@ -51,7 +51,6 @@ public class SolrConversionUtils {
 			SearchInputDocument doc) {
 		SolrInputDocument solrDoc = new SolrInputDocument(
 				convertToSolrInputFieldMap(doc.getFieldMap()));
-		solrDoc.setDocumentBoost(doc.getDocumentBoost());
 		return solrDoc;
 	}
 
@@ -81,11 +80,10 @@ public class SolrConversionUtils {
 			// No values, nothing to do.
 		} else if (values.size() == 1) {
 			// One value? Insure that it is accepted as such.
-			solrField.addValue(values.iterator().next(),
-					searchInputField.getBoost());
+			solrField.addValue(values.iterator().next());
 		} else {
 			// A collection of values? Add them.
-			solrField.addValue(values, searchInputField.getBoost());
+			solrField.addValue(values);
 		}
 
 		return solrField;
@@ -125,7 +123,6 @@ public class SolrConversionUtils {
 	 * Convert from a SearchQuery to a SolrQuery, so the Solr server may execute
 	 * it.
 	 */
-	@SuppressWarnings("deprecation")
 	static SolrQuery convertToSolrQuery(SearchQuery query) {
 		SolrQuery solrQuery = new SolrQuery(query.getQuery());
 		solrQuery.setStart(query.getStart());
@@ -141,7 +138,7 @@ public class SolrConversionUtils {
 
 		Map<String, Order> sortFields = query.getSortFields();
 		for (String sortField : sortFields.keySet()) {
-			solrQuery.addSortField(sortField,
+			solrQuery.addOrUpdateSort(sortField,
 					convertToSolrOrder(sortFields.get(sortField)));
 		}
 
