@@ -14,6 +14,7 @@ utilities/sdb_to_tdb/.work
 **/.idea
 **/*.iml
 **/target
+*~
 
 **/overlays
 
