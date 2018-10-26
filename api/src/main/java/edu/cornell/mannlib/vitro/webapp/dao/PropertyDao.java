@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 import java.util.List;
 import java.util.Objects;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
-import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import org.apache.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
