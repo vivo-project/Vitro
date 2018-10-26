@@ -46,7 +46,7 @@ public class EntityPublishPermission extends EntityPermission {
             // Previous auth code always evaluated as true when checking permissions for resources
             // Do we need to implement a check on permissions the class for the resource?
 
-            Property predicate = ((PublishDataPropertyStatement)whatToAuth).getPredicate();
+            Property predicate = ((PublishObjectPropertyStatement)whatToAuth).getPredicate();
             result = isAuthorizedFor(predicate);
         }
 
