@@ -34,12 +34,12 @@ public class AuthMigrator implements ServletContextListener {
     /**
      * Old ROLE defintions that were used by the hidden / prohibited assertions
      */
-    public static final String ROLE_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/role#public";
-    public static final String ROLE_SELF = "http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor";
-    public static final String ROLE_EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#editor";
-    public static final String ROLE_CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#curator";
-    public static final String ROLE_DB_ADMIN = "http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin";
-    public static final String ROLE_NOBODY = "http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody";
+    private static final String ROLE_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/role#public";
+    private static final String ROLE_SELF = "http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor";
+    private static final String ROLE_EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#editor";
+    private static final String ROLE_CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#curator";
+    private static final String ROLE_DB_ADMIN = "http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin";
+    private static final String ROLE_NOBODY = "http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {

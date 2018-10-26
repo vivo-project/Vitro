@@ -45,7 +45,7 @@ public abstract class EntityPermission extends Permission {
     /**
      * Static fields for all EntityPermissions
      */
-    private static final Map<String, EntityPermission> allInstances = new HashMap<String, EntityPermission>();
+    private static final Map<String, EntityPermission> allInstances = new HashMap<>();
     private static ContextModelAccess ctxModels = null;
 
     /**

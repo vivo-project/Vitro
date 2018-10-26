@@ -256,8 +256,8 @@ public class BaseEditController extends VitroHttpServlet {
     /**
      * Create a list of all known PermissionSets.
      */
-    protected static List<PermissionSet> buildListOfSelectableRoles(WebappDaoFactory wadf) {
-        List<PermissionSet> list = new ArrayList<PermissionSet>();
+    private static List<PermissionSet> buildListOfSelectableRoles(WebappDaoFactory wadf) {
+        List<PermissionSet> list = new ArrayList<>();
 
         // Get the non-public PermissionSets.
         for (PermissionSet ps: wadf.getUserAccountsDao().getAllPermissionSets()) {
