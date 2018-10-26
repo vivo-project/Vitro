@@ -8,6 +8,12 @@ import org.apache.jena.ontology.OntModel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Holds a registry of all relationship checkers that have been defined by the application.
+ *
+ * Allows the initialisation of supported relationship types (which is linked from the startup configuration),
+ * that can be used by objects deep within the authorisation code.
+ */
 public abstract class RelationshipCheckerRegistry {
     private final static List<RelationshipChecker> allCheckers = new ArrayList<>();
 

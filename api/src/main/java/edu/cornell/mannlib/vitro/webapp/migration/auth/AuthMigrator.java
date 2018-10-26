@@ -266,10 +266,4 @@ public class AuthMigrator implements ServletContextListener {
             );
         }
     }
-
-    private InputStream makeN3InputStream(Model m) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        m.write(out, "N3");
-        return new ByteArrayInputStream(out.toByteArray());
-    }
 }

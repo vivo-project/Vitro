@@ -135,7 +135,7 @@ public class SimplePermission extends Permission {
 	}
 
 	@Override
-	public boolean isAuthorized(List<String> userUris, RequestedAction whatToAuth) {
+	public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
 		if (whatToAuth != null) {
 			if (ACTION.getURI().equals(whatToAuth.getURI())) {
 				log.debug(this + " authorizes " + whatToAuth);

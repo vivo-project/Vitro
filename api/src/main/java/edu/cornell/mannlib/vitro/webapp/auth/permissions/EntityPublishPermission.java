@@ -22,7 +22,7 @@ public class EntityPublishPermission extends EntityPermission {
     }
 
     @Override
-    public boolean isAuthorized(List<String> userUris, RequestedAction whatToAuth) {
+    public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
         boolean result = false;
 
         if (whatToAuth instanceof PublishDataProperty) {
@@ -32,21 +32,22 @@ public class EntityPublishPermission extends EntityPermission {
             ObjectProperty op = ((PublishObjectProperty)whatToAuth).getObjectProperty();
             result = isAuthorizedFor(op);
         } else if (whatToAuth instanceof PublishDataPropertyStatement) {
-            // Check subject as resource
-//            String subjectUri = ((PublishDataPropertyStatement)whatToAuth).getSubjectUri();
+
+            // Subject [((PublishDataPropertyStatement)whatToAuth).getSubjectUri()] is a resource
+            // Previous auth code always evaluated as true when checking permissions for resources
+            // Do we need to implement a check on permissions the class for the resource?
 
             String predicateUri = ((PublishDataPropertyStatement)whatToAuth).getPredicateUri();
             result = isAuthorizedFor(new Property(predicateUri));
         } else if (whatToAuth instanceof PublishObjectPropertyStatement) {
-            // Check subject as resource
-//            String subjectUri = ((PublishObjectPropertyStatement)whatToAuth).getSubjectUri();
-            // Check object as resource
-//            String objectUri = ((PublishObjectPropertyStatement)whatToAuth).getObjectUri();
+
+            // Subject [((PublishObjectPropertyStatement)whatToAuth).getSubjectUri()] is a resource
+            // Object  [((PublishObjectPropertyStatement)whatToAuth).getObjectUri()] is a resource
+            // Previous auth code always evaluated as true when checking permissions for resources
+            // Do we need to implement a check on permissions the class for the resource?
 
             Property predicate = ((PublishDataPropertyStatement)whatToAuth).getPredicate();
             result = isAuthorizedFor(predicate);
-
-            //p.getDomainVClassURI(), p.getURI(), p.getRangeVClassURI()
         }
 
         if (result) {

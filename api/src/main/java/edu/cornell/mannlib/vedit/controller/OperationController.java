@@ -132,7 +132,7 @@ public class OperationController extends BaseEditController {
             // If contains restrictions
             if (request.getParameter("_permissions") != null) {
                 // Get the namespace that we are editing
-                String entityKey = request.getParameter("_permissionsNamespace");
+                String entityKey = request.getParameter("_permissionsEntityURI");
                 if (StringUtils.isEmpty(entityKey)) {
                     // If we don't have a namespace set, we are creating a new entity so use that namespace
                     entityKey = request.getParameter("Namespace");

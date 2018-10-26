@@ -16,8 +16,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.utils.RelationshipCheckerRegistry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
@@ -27,7 +30,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+/**
+ * A permission that is to be applied to "entities"
+ * An entity may be a class, property or faux property defined in the ontologies.
+ * Subclass to define the type of permission that is being granted (e.g. display, update, publish)
+ */
 public abstract class EntityPermission extends Permission {
+    private static final Log log = LogFactory.getLog(EntityPermission.class);
+
     protected EntityPermission(String uri) {
         super(uri);
     }
@@ -65,11 +75,7 @@ public abstract class EntityPermission extends Permission {
         return new ArrayList<EntityPermission>(allInstances.values());
     }
 
-    private static void getAllInstances(Class clazz) {
-        if (!EntityPermission.class.isAssignableFrom(clazz)) {
-            throw new IllegalArgumentException("Must supply a class derived from EntityPermission");
-        }
-
+    private static void getAllInstances(Class<? extends EntityPermission> clazz) {
         OntModel accountsModel = ctxModels.getOntModel(ModelNames.USER_ACCOUNTS);
         try {
             accountsModel.enterCriticalSection(Lock.READ);
@@ -80,25 +86,17 @@ public abstract class EntityPermission extends Permission {
                 if (stmt.getSubject().isURIResource()) {
                     String uri = stmt.getSubject().getURI();
 
-                    Constructor<?> ctor = null;
+                    Constructor<? extends EntityPermission> ctor = null;
                     try {
                         ctor = clazz.getConstructor(String.class);
-                        EntityPermission permission = (EntityPermission) ctor.newInstance(new Object[]{uri});
+                        EntityPermission permission = ctor.newInstance(new Object[]{uri});
 
-                        StmtIterator limitIter = accountsModel.listStatements(stmt.getSubject(), RDF.type, accountsModel.getResource("java:" + clazz.getName() + "#SetLimitToRelatedUser"));
-                        if (limitIter.hasNext()) {
-                            permission.limitToRelatedUser = true;
-                        }
-
+                        Resource limitResource = accountsModel.getResource("java:" + clazz.getName() + "#SetLimitToRelatedUser");
+                        permission.limitToRelatedUser = accountsModel.contains(stmt.getSubject(), RDF.type, limitResource);
                         allInstances.put(uri, permission);
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
+                    } catch (NoSuchMethodException | InstantiationException |
+                            IllegalAccessException | InvocationTargetException e) {
+                        log.error("EntityPermission <" + clazz.getName() + "> could not be created", e);
                     }
                 }
             }
@@ -107,7 +105,7 @@ public abstract class EntityPermission extends Permission {
         }
     }
 
-    public static void updateAllPermissions() {
+    private static void updateAllPermissions() {
         if (allInstances.isEmpty()) {
             return;
         }
@@ -141,7 +139,7 @@ public abstract class EntityPermission extends Permission {
         }
     }
 
-    protected void update(Map<String, PropertyDao.FullPropertyKey> propertyKeyMap) {
+    private void update(Map<String, PropertyDao.FullPropertyKey> propertyKeyMap) {
         List<PropertyDao.FullPropertyKey> newKeys = new ArrayList<>();
         List<String> newResources = new ArrayList<>();
 
@@ -149,7 +147,11 @@ public abstract class EntityPermission extends Permission {
         accountsModel.enterCriticalSection(Lock.READ);
         StmtIterator propIter = null;
         try {
-            propIter = accountsModel.listStatements(accountsModel.getResource(this.uri), accountsModel.getProperty(VitroVocabulary.PERMISSION_FOR_ENTITY), (RDFNode) null);
+            propIter = accountsModel.listStatements(
+                            accountsModel.getResource(this.uri),
+                            accountsModel.getProperty(VitroVocabulary.PERMISSION_FOR_ENTITY),
+                            (RDFNode) null
+                        );
             while (propIter.hasNext()) {
                 Statement proptStmt = propIter.next();
                 if (proptStmt.getObject().isURIResource()) {
@@ -182,8 +184,8 @@ public abstract class EntityPermission extends Permission {
         }
     }
 
-    public void updateFor(Property p) {
-        String uri = null;
+    private void updateFor(Property p) {
+        String uri = null;      // Due to the data model of Vitro, this could be a property or a property config uri
         PropertyDao.FullPropertyKey key = null;
 
         if (p instanceof FauxProperty) {
@@ -198,10 +200,8 @@ public abstract class EntityPermission extends Permission {
         OntModel accountsModel = ctxModels.getOntModel(ModelNames.USER_ACCOUNTS);
         accountsModel.enterCriticalSection(Lock.READ);
 
-        StmtIterator propIter = null;
         try {
-            propIter = accountsModel.listStatements(accountsModel.getResource(this.uri), accountsModel.getProperty(VitroVocabulary.PERMISSION_FOR_ENTITY), accountsModel.getResource(uri));
-            if (propIter.hasNext()) {
+            if (accountsModel.contains(accountsModel.getResource(this.uri), accountsModel.getProperty(VitroVocabulary.PERMISSION_FOR_ENTITY), accountsModel.getResource(uri))) {
                 synchronized (authorizedKeys) {
                     authorizedKeys.add(key);
                 }
@@ -219,18 +219,20 @@ public abstract class EntityPermission extends Permission {
                 }
             }
         } finally {
-            if (propIter != null) {
-                propIter.close();
-            }
             accountsModel.leaveCriticalSection();
         }
     }
 
-    protected boolean isAuthorizedFor(AbstractPropertyStatementAction action, List<String> userUris) {
+    protected boolean isAuthorizedFor(AbstractPropertyStatementAction action, List<String> personUris) {
         // If we are not limiting to only objects that the user has a relationship with
         // We can just authorise the access right now
         if (!limitToRelatedUser) {
             return true;
+        }
+
+        // Nothing to authorise if no person list is supplied
+        if (personUris == null) {
+            return false;
         }
 
         // Obtain the subject and object URIs
@@ -245,17 +247,17 @@ public abstract class EntityPermission extends Permission {
         }
 
         // If the subject or object is a user URI for the current user, authorise access
-        for (String userUri : userUris) {
-            if (subjectUri != null && userUri.equals(subjectUri)) {
+        for (String userUri : personUris) {
+            if (subjectUri != null && subjectUri.equals(userUri)) {
                 return true;
             }
 
-            if (objectUri != null && userUri.equals(subjectUri)) {
+            if (objectUri != null && objectUri.equals(userUri)) {
                 return true;
             }
         }
 
-        return RelationshipCheckerRegistry.anyRelated(action.getOntModel(), Arrays.asList(action.getResourceUris()), userUris);
+        return RelationshipCheckerRegistry.anyRelated(action.getOntModel(), Arrays.asList(action.getResourceUris()), personUris);
     }
 
     protected boolean isAuthorizedFor(Property prop) {

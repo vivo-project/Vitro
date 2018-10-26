@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
-import java.util.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -29,6 +27,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The "standard" implementation of Authenticator.
