@@ -8,7 +8,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasPermissionSet;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityDisplayPermission;
 import edu.cornell.mannlib.vitro.webapp.beans.*;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import net.sf.jga.fn.UnaryFunctor;
 
 import org.apache.commons.logging.Log;
@@ -25,6 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayData
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
 
+import java.util.ArrayList;
+
 /**
  * Filter the properties depending on what DisplayByRolePermission is on the
  * request. If no request, or no permission, use the Public permission.
@@ -32,41 +38,42 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObje
 public class FilterByDisplayPermission extends VitroFiltersImpl {
 	private static final Log log = LogFactory.getLog(FilterByDisplayPermission.class);
 
-	private final String permissionSetUri;
+	private final Permission permission;
 
-	// Set a default permission set uri
-	private static final String defaultPermissionSetUri = "";
-
-	private static String getPermissionSetFromRequest(HttpServletRequest req) {
-		if (req == null) {
-			throw new NullPointerException("request may not be null.");
+	private static Permission getDefaultPermission(ServletContext ctx) {
+		if (ctx == null) {
+			throw new NullPointerException("context may not be null.");
 		}
 
-		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
-		for (String uri : HasPermissionSet.getPermissionSetUris(ids)) {
-			return uri;
+		// Obtain the EntityDisplayPermission that has been registered for the public user
+		WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
+		for (PermissionSet set : wadf.getUserAccountsDao().getAllPermissionSets()) {
+			if (set.isForPublic()) {
+				for (String permissionUri : set.getPermissionUris()) {
+					Permission permission = PermissionRegistry.getRegistry(ctx).getPermission(permissionUri);
+					if (permission instanceof EntityDisplayPermission) {
+						return permission;
+					}
+				}
+			}
 		}
 
-		return defaultPermissionSetUri;
-	}
-
-	/** Get the DisplayByRolePermission from the request, or use Public. */
-	public FilterByDisplayPermission(HttpServletRequest req) {
-		this(getPermissionSetFromRequest(req));
+		// Can't find a public user with an EntityDisplayPermission
+		return null;
 	}
 
 	/** Use the Public permission. */
 	public FilterByDisplayPermission(ServletContext ctx) {
-		this(defaultPermissionSetUri);
+		this(getDefaultPermission(ctx));
 	}
 
 	/** Use the specified permission. */
-	public FilterByDisplayPermission(String uri) {
-		if (uri == null) {
+	public FilterByDisplayPermission(Permission permission) {
+		if (permission == null) {
 			throw new NullPointerException("permission may not be null.");
 		}
 
-		this.permissionSetUri = uri;
+		this.permission = permission;
 
 		setDataPropertyFilter(new DataPropertyFilterByPolicy());
 		setObjectPropertyFilter(new ObjectPropertyFilterByPolicy());
@@ -75,9 +82,7 @@ public class FilterByDisplayPermission extends VitroFiltersImpl {
 	}
 
 	boolean checkAuthorization(RequestedAction whatToAuth) {
-//		boolean decision = permission.isAuthorized(whatToAuth);
-		// TODO Add decision check
-		boolean decision = false;
+		boolean decision = permission.isAuthorized(new ArrayList<String>(), whatToAuth);
 		log.debug("decision is " + decision);
 		return decision;
 	}

@@ -35,7 +35,7 @@ public class EntityUpdatePermission extends EntityPermission {
     }
 
     @Override
-    public boolean isAuthorized(List<String> userUris, RequestedAction whatToAuth) {
+    public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
         boolean isAuthorized = false;
 
         if (whatToAuth instanceof AbstractDataPropertyStatementAction) {
@@ -49,7 +49,7 @@ public class EntityUpdatePermission extends EntityPermission {
             }
 
             if (isAuthorized) {
-                isAuthorized = isAuthorizedFor((AbstractPropertyStatementAction) whatToAuth, userUris);
+                isAuthorized = isAuthorizedFor((AbstractPropertyStatementAction) whatToAuth, personUris);
             }
         } else if (whatToAuth instanceof AbstractObjectPropertyStatementAction) {
             String subjectUri = ((AbstractObjectPropertyStatementAction)whatToAuth).getSubjectUri();
@@ -62,7 +62,7 @@ public class EntityUpdatePermission extends EntityPermission {
             }
 
             if (isAuthorized) {
-                isAuthorized = isAuthorizedFor((AbstractPropertyStatementAction) whatToAuth, userUris);
+                isAuthorized = isAuthorizedFor((AbstractPropertyStatementAction) whatToAuth, personUris);
             }
         } else if (whatToAuth instanceof AbstractResourceAction) {
             String subjectUri = ((AbstractObjectPropertyStatementAction)whatToAuth).getSubjectUri();

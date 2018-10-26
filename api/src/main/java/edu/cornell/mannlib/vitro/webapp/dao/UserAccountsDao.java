@@ -3,11 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.Collection;
-import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import org.apache.jena.ontology.OntModel;
 
 /**
  * Methods for dealing with UserAccount and PermissionSet objects in the User
@@ -106,5 +104,16 @@ public interface UserAccountsDao {
 	 */
 	Collection<PermissionSet> getAllPermissionSets();
 
+	/**
+	 * Set the access permissions for a given entity.
+	 *
+	 * @param entityKey The entity to set permissions for - this could be a class or a property.
+	 *                  In most cases, it will be the URI of the class or property.
+	 *                  For faux properties, it is the URI of the config object
+	 *                  Must not be null / empty.
+	 * @param displaySets The PermissionSets (roleS) that should be given display permissions. Can be null / empty.
+	 * @param editSets    The PermissionSets (roleS) that should be given edit/update permissions. Can be null / empty.
+	 * @param publishSets The PermissionSets (roleS) that should be given publish permissions. Can be null / empty.
+	 */
 	void setEntityPermissions(String entityKey, Collection<PermissionSet> displaySets, Collection<PermissionSet> editSets, Collection<PermissionSet> publishSets);
 }

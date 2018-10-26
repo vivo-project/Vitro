@@ -28,6 +28,7 @@ edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil$Setup
 
 edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup
 
+# Migrate any existing role-based permissions to the new permission sets
 edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator
 
 edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl$ReasonersSetup

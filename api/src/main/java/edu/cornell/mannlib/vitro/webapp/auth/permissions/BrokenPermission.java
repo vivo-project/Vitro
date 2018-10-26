@@ -16,7 +16,7 @@ public class BrokenPermission extends Permission {
 	}
 
 	@Override
-	public boolean isAuthorized(List<String> userUris, RequestedAction whatToAuth) {
+	public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
 		return false;
 	}
 

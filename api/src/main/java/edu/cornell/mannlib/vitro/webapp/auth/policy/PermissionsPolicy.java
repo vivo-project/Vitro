@@ -34,10 +34,10 @@ public class PermissionsPolicy implements PolicyIface {
 			return defaultDecision("whatToAuth was null");
 		}
 
-		List<String> userUris = new ArrayList<String>(HasAssociatedIndividual.getIndividualUris(whoToAuth));
+		List<String> personUris = new ArrayList<String>(HasAssociatedIndividual.getIndividualUris(whoToAuth));
 
 		for (Permission p : HasPermission.getPermissions(whoToAuth)) {
-			if (p.isAuthorized(userUris, whatToAuth)) {
+			if (p.isAuthorized(personUris, whatToAuth)) {
 				log.debug("Permission " + p + " approves request " + whatToAuth);
 				return new BasicPolicyDecision(Authorization.AUTHORIZED,
 						"PermissionsPolicy: approved by " + p);

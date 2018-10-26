@@ -20,6 +20,7 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityDisplayPermission;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityPermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityPublishPermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityUpdatePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
@@ -212,9 +213,9 @@ public class BaseEditController extends VitroHttpServlet {
     	return(request.getContextPath() + DEFAULT_LANDING_PAGE);
     }
 
-    protected static void addPermissionAttributes(HttpServletRequest req, String permissionsNamespace) {
-        // Add the permissionsNamespace (if we are creating a new property, this will be empty)
-        req.setAttribute("_permissionsNamespace", permissionsNamespace);
+    protected static void addPermissionAttributes(HttpServletRequest req, String permissionsEntityURI) {
+        // Add the permissionsEntityURI (if we are creating a new property, this will be empty)
+        req.setAttribute("_permissionsEntityURI", permissionsEntityURI);
 
         // Get the available permission sets
         List<PermissionSet> roles = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
@@ -223,7 +224,7 @@ public class BaseEditController extends VitroHttpServlet {
         req.setAttribute("roles", roles);
 
         // If the namespace is empty (e.e. we are creating a new record)
-        if (StringUtils.isEmpty(permissionsNamespace)) {
+        if (StringUtils.isEmpty(permissionsEntityURI)) {
             List<String> displayRoles = new ArrayList<>();
             List<String> updateRoles = new ArrayList<>();
             List<String> publishRoles = new ArrayList<>();
@@ -246,24 +247,26 @@ public class BaseEditController extends VitroHttpServlet {
             OntModel userAccounts = ModelAccess.on(req).getOntModelSelector().getUserAccountsModel();
 
             // Get the permission sets that are granted permission for this entity
-            req.setAttribute("displayRoles", getGrantedRolesForEntity(userAccounts, permissionsNamespace, EntityDisplayPermission.class));
-            req.setAttribute("updateRoles",  getGrantedRolesForEntity(userAccounts, permissionsNamespace, EntityUpdatePermission.class));
-            req.setAttribute("publishRoles", getGrantedRolesForEntity(userAccounts, permissionsNamespace, EntityPublishPermission.class));
+            req.setAttribute("displayRoles", getGrantedRolesForEntity(userAccounts, permissionsEntityURI, EntityDisplayPermission.class));
+            req.setAttribute("updateRoles",  getGrantedRolesForEntity(userAccounts, permissionsEntityURI, EntityUpdatePermission.class));
+            req.setAttribute("publishRoles", getGrantedRolesForEntity(userAccounts, permissionsEntityURI, EntityPublishPermission.class));
         }
     }
 
     /**
-     * Create a list of all known non-public PermissionSets.
+     * Create a list of all known PermissionSets.
      */
     protected static List<PermissionSet> buildListOfSelectableRoles(WebappDaoFactory wadf) {
         List<PermissionSet> list = new ArrayList<PermissionSet>();
 
+        // Get the non-public PermissionSets.
         for (PermissionSet ps: wadf.getUserAccountsDao().getAllPermissionSets()) {
             if (!ps.isForPublic()) {
                 list.add(ps);
             }
         }
 
+        // Sort the non-public PermissionSets
         list.sort(new Comparator<PermissionSet>() {
             @Override
             public int compare(PermissionSet ps1, PermissionSet ps2) {
@@ -271,6 +274,7 @@ public class BaseEditController extends VitroHttpServlet {
             }
         });
 
+        // Add the public PermissionSets.
         for (PermissionSet ps: wadf.getUserAccountsDao().getAllPermissionSets()) {
             if (ps.isForPublic()) {
                 list.add(ps);
@@ -280,12 +284,17 @@ public class BaseEditController extends VitroHttpServlet {
         return list;
     }
 
-    protected static List<String> getGrantedRolesForEntity(OntModel userAccounts, String key, Class permission) {
+    protected static List<String> getGrantedRolesForEntity(OntModel userAccounts, String key, Class<? extends EntityPermission> permission) {
         List<String> roles = new ArrayList<>();
 
         userAccounts.enterCriticalSection(Lock.READ);
         try {
-            Query query = QueryFactory.create("SELECT ?role WHERE { ?role <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#hasPermission> ?permission . ?permission a <java:" + permission.getName() + "#Set> .  ?permission <" + VitroVocabulary.PERMISSION_FOR_ENTITY + "> <" + key + "> . }");
+            Query query = QueryFactory.create("SELECT ?role WHERE { " +
+                    " ?role <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#hasPermission> ?permission . " +
+                    " ?permission a <java:" + permission.getName() + "#Set> . " +
+                    " ?permission <" + VitroVocabulary.PERMISSION_FOR_ENTITY + "> <" + key + "> . " +
+                    "}");
+
             QueryExecution qexec = QueryExecutionFactory.create(query, userAccounts);
             try {
                 ResultSet rs = qexec.execSelect();
@@ -295,7 +304,6 @@ public class BaseEditController extends VitroHttpServlet {
                 }
             } finally {
                 qexec.close();
-                query.clone();
             }
         } finally {
             userAccounts.leaveCriticalSection();

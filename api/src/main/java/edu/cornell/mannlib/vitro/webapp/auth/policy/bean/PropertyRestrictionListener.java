@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 
 /**
  * Add this ChangeListener to your EditProcessObject when modifying the
@@ -27,7 +26,7 @@ public class PropertyRestrictionListener implements ChangeListener {
 		if (oldObj instanceof Property) {
 			EntityPermission.updateAllPermissionsFor((Property)oldObj);
 		} else {
-			log.warn("Not an instance of RoleRestrictedProperty: " + oldObj);
+			log.warn("Not an instance of Property: " + oldObj);
 		}
 	}
 
@@ -39,7 +38,7 @@ public class PropertyRestrictionListener implements ChangeListener {
 		if (newObj instanceof Property) {
 			EntityPermission.updateAllPermissionsFor((Property)newObj);
 		} else {
-			log.warn("Not an instance of RoleRestrictedProperty: " + newObj);
+			log.warn("Not an instance of Property: " + newObj);
 		}
 	}
 
@@ -51,7 +50,7 @@ public class PropertyRestrictionListener implements ChangeListener {
 		if (newObj instanceof Property) {
 			EntityPermission.updateAllPermissionsFor((Property)oldObj);
 		} else {
-			log.warn("Not instances of RoleRestrictedProperty: " + oldObj
+			log.warn("Not instances of Property: " + oldObj
 					+ ", " + newObj);
 		}
 	}

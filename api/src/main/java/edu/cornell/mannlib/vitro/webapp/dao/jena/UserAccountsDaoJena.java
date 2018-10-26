@@ -4,16 +4,14 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityDisplayPermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityPublishPermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityUpdatePermission;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
@@ -485,9 +483,9 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			getOntModel().removeAll(null, getOntModel().getProperty(VitroVocabulary.PERMISSION_FOR_ENTITY), getOntModel().getResource(entityKey));
 
 			// Add the new set of permissions of the entity
-			addPermissions(entityKey, displaySets, EntityDisplayPermission.class);
-			addPermissions(entityKey, editSets,    EntityUpdatePermission.class);
-			addPermissions(entityKey, publishSets, EntityPublishPermission.class);
+			addPermissions(entityKey, (displaySets != null ? displaySets : new HashSet<>()), EntityDisplayPermission.class);
+			addPermissions(entityKey, (editSets    != null ? editSets    : new HashSet<>()), EntityUpdatePermission.class);
+			addPermissions(entityKey, (publishSets != null ? publishSets : new HashSet<>()), EntityPublishPermission.class);
 		} finally {
 			getOntModel().leaveCriticalSection();
 		}
@@ -526,7 +524,6 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				}
 			} finally {
 				qexec.close();
-				query.clone();
 			}
 		}
 	}

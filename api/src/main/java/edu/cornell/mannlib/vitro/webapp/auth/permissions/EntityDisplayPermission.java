@@ -7,7 +7,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayData
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.*;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,7 +22,7 @@ public class EntityDisplayPermission extends EntityPermission {
     }
 
     @Override
-    public boolean isAuthorized(List<String> userUris, RequestedAction whatToAuth) {
+    public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
         boolean result = false;
 
         if (whatToAuth instanceof DisplayDataProperty) {
@@ -31,20 +32,22 @@ public class EntityDisplayPermission extends EntityPermission {
             result = isAuthorizedFor(((DisplayObjectProperty)whatToAuth).getObjectProperty());
         } else if (whatToAuth instanceof DisplayDataPropertyStatement) {
             DataPropertyStatement stmt = ((DisplayDataPropertyStatement)whatToAuth).getDataPropertyStatement();
-            // Check subject as resource
-            // String subjectUri = stmt.getIndividualURI();
+
+            // Subject [stmt.getIndividualURI()] is a resource
+            // Previous auth code always evaluated as true when checking permissions for resources
+            // Do we need to implement a check on permissions the class for the resource?
 
             String predicateUri = stmt.getDatapropURI();
             result = isAuthorizedFor(new Property(predicateUri));
         } else if (whatToAuth instanceof DisplayObjectPropertyStatement) {
-            // Check subject as resource
-//            String subjectUri = ((DisplayObjectPropertyStatement)whatToAuth).getSubjectUri();
-            // Check object as resource
-//            String objectUri = ((DisplayObjectPropertyStatement)whatToAuth).getObjectUri();
+
+            // Subject [((DisplayObjectPropertyStatement)whatToAuth).getSubjectUri()] is a resource
+            // Object [((DisplayObjectPropertyStatement)whatToAuth).getObjectUri()] is resource
+            // Previous auth code always evaluated as true when checking permissions for resources
+            // Do we need to implement a check on permissions the class for the resource?
 
             Property op = ((DisplayObjectPropertyStatement)whatToAuth).getProperty();
             result = isAuthorizedFor(op);
-            //p.getDomainVClassURI(), p.getURI(), p.getRangeVClassURI()
         }
 
         if (result) {

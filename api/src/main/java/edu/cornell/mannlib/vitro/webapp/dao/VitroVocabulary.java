@@ -54,14 +54,6 @@ public class VitroVocabulary {
 
     public static final String MOST_SPECIFIC_TYPE = vitroURI + "mostSpecificType";
 
-    // roles
-//    public static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/role#public";
-//    public static final String SELF = "http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor";
-//    public static final String EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#editor";
-//    public static final String CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#curator";
-//    public static final String DB_ADMIN = "http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin";
-//    public static final String NOBODY = "http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody";
-    
     public static final String SEARCH_BOOST_ANNOT = vitroURI + "searchBoostAnnot";
 
     public static final String DEPENDENT_RESORUCE = "http://vivoweb.org/ontology/core#DependentResource";
