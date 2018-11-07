@@ -163,10 +163,9 @@ public class AuthenticateTest extends AbstractTestClass {
 		
 		userAccountsDao = new UserAccountsDaoStub();
 		userAccountsDao.addPermissionSet(adminPermissionSet);
-		userAccountsDao.addUser(createUserFromUserInfo(NEW_DBA));
-		userAccountsDao.addUser(createUserFromUserInfo(OLD_DBA));
-		userAccountsDao.addUser(createUserFromUserInfo(OLD_SELF));
-		userAccountsDao.addUser(createUserFromUserInfo(OLD_STRANGER));
+		for (UserAccount account : userAccounts) {
+			userAccountsDao.addUser(account);
+		}
 
 		individualDao = new IndividualDaoStub();
 
