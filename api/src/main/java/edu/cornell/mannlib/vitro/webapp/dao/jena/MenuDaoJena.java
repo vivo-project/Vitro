@@ -5,9 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -22,6 +24,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
+
+import javax.servlet.ServletRequest;
 
 public class MenuDaoJena extends JenaBaseDao implements MenuDao {
 
@@ -65,11 +69,15 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
     
     @Override
     public MainMenu getMainMenu( String url ) {
-        return getMenu( getOntModelSelector().getDisplayModel(), url );         
+        return getMenu( getOntModelSelector().getDisplayModel(), url );
     }
-            
-    
-    protected MainMenu getMenu(Model displayModel, String url){    
+
+    public MainMenu getMainMenu( ServletRequest req, String url ) {
+        OntModel displayModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(getOntModelSelector().getDisplayModel(), req );
+        return getMenu(displayModel,  url) ;
+    }
+
+    protected MainMenu getMenu(Model displayModel, String url){
         //setup query parameters
         QuerySolutionMap initialBindings = new QuerySolutionMap();        
         

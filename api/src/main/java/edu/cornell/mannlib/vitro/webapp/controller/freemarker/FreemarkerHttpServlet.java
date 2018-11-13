@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.MenuDaoJena;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -461,7 +462,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
     
     protected MainMenu getDisplayModelMenu(VitroRequest vreq){
         String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
-        return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
+        return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(vreq, url);
     }
     
     // NIHVIVO-3307: we need this here instead of FreemarkerConfiguration.java so that updates to

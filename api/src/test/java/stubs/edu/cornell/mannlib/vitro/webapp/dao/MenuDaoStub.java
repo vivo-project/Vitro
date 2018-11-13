@@ -5,6 +5,8 @@ package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 
+import javax.servlet.ServletRequest;
+
 /**
  * A minimal implementation of the MenuDao.
  * 
@@ -32,6 +34,11 @@ public class MenuDaoStub implements MenuDao {
 	 */
 	@Override
 	public MainMenu getMainMenu(String url) {
+		return this.mainMenu;
+	}
+
+	@Override
+	public MainMenu getMainMenu(ServletRequest req, String url) {
 		return this.mainMenu;
 	}
 
