@@ -52,7 +52,6 @@ public abstract class EntityPermission extends Permission {
      * Instance fields for each EntityPermission
      */
     private final Set<PropertyDao.FullPropertyKey> authorizedKeys = new HashSet<>();
-    private final Set<String> authorizedResources = new HashSet<>();
     private boolean limitToRelatedUser = false;
 
     public static List<EntityPermission> getAllInstances(ContextModelAccess models) {
@@ -72,7 +71,7 @@ public abstract class EntityPermission extends Permission {
             updateAllPermissions();
         }
 
-        return new ArrayList<EntityPermission>(allInstances.values());
+        return new ArrayList<>(allInstances.values());
     }
 
     private static void getAllInstances(Class<? extends EntityPermission> clazz) {
@@ -176,12 +175,6 @@ public abstract class EntityPermission extends Permission {
             authorizedKeys.clear();
             authorizedKeys.addAll(newKeys);
         }
-
-        // replace authorized resources
-        synchronized (authorizedResources) {
-            authorizedResources.clear();
-            authorizedResources.addAll(newResources);
-        }
     }
 
     private void updateFor(Property p) {
@@ -206,16 +199,9 @@ public abstract class EntityPermission extends Permission {
                     authorizedKeys.add(key);
                 }
 
-                synchronized (authorizedResources) {
-                    authorizedResources.add(uri);
-                }
             } else {
                 synchronized (authorizedKeys) {
                     authorizedKeys.remove(key);
-                }
-
-                synchronized (authorizedResources) {
-                    authorizedResources.remove(uri);
                 }
             }
         } finally {

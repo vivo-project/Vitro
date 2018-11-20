@@ -5,12 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasPermissionSet;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.EntityDisplayPermission;
 import edu.cornell.mannlib.vitro.webapp.beans.*;
-import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import net.sf.jga.fn.UnaryFunctor;
@@ -18,9 +15,6 @@ import net.sf.jga.fn.UnaryFunctor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasPermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;

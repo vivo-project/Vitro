@@ -66,16 +66,4 @@ public abstract class Permission implements Comparable<Permission> {
 		return this.getClass().getSimpleName() + "['" + uri + "']";
 	}
 
-	/**
-	 * A concrete Permission instance that authorizes nothing.
-	 */
-	static Permission NOT_AUTHORIZED = new Permission("java:"
-			+ Permission.class.getName() + "#NOT_AUTHORIZED") {
-
-		@Override
-		public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
-			return false;
-		}
-
-	};
 }
