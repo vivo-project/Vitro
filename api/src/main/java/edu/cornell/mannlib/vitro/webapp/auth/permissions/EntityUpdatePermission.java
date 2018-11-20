@@ -21,14 +21,14 @@ public class EntityUpdatePermission extends EntityPermission {
     private static final Log log = LogFactory.getLog(EntityUpdatePermission.class);
 
     private static final Collection<String> PROHIBITED_NAMESPACES = Arrays
-            .asList(new String[] { VitroVocabulary.vitroURI, "" });
+            .asList(VitroVocabulary.vitroURI, "" );
 
     private static final Collection<String> PERMITTED_EXCEPTIONS = Arrays
-            .asList(new String[] { VitroVocabulary.MONIKER,
+            .asList(VitroVocabulary.MONIKER,
                     VitroVocabulary.MODTIME, VitroVocabulary.IND_MAIN_IMAGE,
                     VitroVocabulary.LINK, VitroVocabulary.PRIMARY_LINK,
                     VitroVocabulary.ADDITIONAL_LINK,
-                    VitroVocabulary.LINK_ANCHOR, VitroVocabulary.LINK_URL });
+                    VitroVocabulary.LINK_ANCHOR, VitroVocabulary.LINK_URL );
 
     public EntityUpdatePermission(String uri) {
         super(uri);
@@ -65,7 +65,7 @@ public class EntityUpdatePermission extends EntityPermission {
                 isAuthorized = isAuthorizedFor((AbstractPropertyStatementAction) whatToAuth, personUris);
             }
         } else if (whatToAuth instanceof AbstractResourceAction) {
-            String subjectUri = ((AbstractObjectPropertyStatementAction)whatToAuth).getSubjectUri();
+            String subjectUri = ((AbstractResourceAction)whatToAuth).getSubjectUri();
             isAuthorized = isModifiable(subjectUri);
         }
 
