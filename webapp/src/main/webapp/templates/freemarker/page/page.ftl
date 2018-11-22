@@ -24,8 +24,7 @@
         <hr class="hidden" />
 
         <div id="contentwrap">
-            <#include "flash.html">
-
+  
             <div id="content">                      
                 ${body}
             </div> <!-- content -->
