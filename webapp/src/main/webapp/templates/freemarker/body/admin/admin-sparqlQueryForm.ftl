@@ -31,6 +31,6 @@
     </form>
 </div><!-- content -->
 
-${stylesheets.add('<link rel="stylesheet" href="//cdn.jsdelivr.net/yasqe/2.6.1/yasqe.min.css" />')}
-${scripts.add('<script type="text/javascript" src="//cdn.jsdelivr.net/yasqe/2.6.1/yasqe.bundled.min.js"></script>',
+${stylesheets.add('<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/yasgui-yasqe@2.11.22/dist/yasqe.min.css" />')}
+${scripts.add('<script type="text/javascript" src="//cdn.jsdelivr.net/npm/yasgui-yasqe@2.11.22/dist/yasqe.bundled.min.js"></script>',
 '<script type="text/javascript" src="${urls.base}/js/sparql/init-yasqe.js"></script>')}
