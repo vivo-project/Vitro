@@ -365,10 +365,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
 	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
         if( objectPropertyStatementDao == null )
-            // TODO supply a valid RDFService as the first argument if we keep this
-            // implementation
             objectPropertyStatementDao = new ObjectPropertyStatementDaoJena(
-                    null, dwf, this);
+                    rdfService, dwf, this);
         return objectPropertyStatementDao;
     }
 

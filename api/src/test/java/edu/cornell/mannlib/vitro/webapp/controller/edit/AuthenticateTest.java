@@ -10,15 +10,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -119,16 +122,33 @@ public class AuthenticateTest extends AbstractTestClass {
 	private static final String NO_USER = "";
 	private static final String NO_MSG = "";
 
+	/**
+	 * Due to increased overhead of password hashing, create a list of UserAccount objects once
+	 * when the class is cloaded.
+	 *
+	 * These prepared user accounts will then be (re)used to populate the authenticator stubs prior to each test
+	 */
+	private static List<UserAccount> userAccounts = new ArrayList<>();
+
+	@BeforeClass
+	public static void prepareUserAccounts() {
+		userAccounts.add(createUserFromUserInfo(NEW_DBA));
+		userAccounts.add(createUserFromUserInfo(OLD_DBA));
+		userAccounts.add(createUserFromUserInfo(OLD_SELF));
+		userAccounts.add(createUserFromUserInfo(OLD_STRANGER));
+	}
+
 	@Before
 	public void setup() throws Exception {
 		I18nStub.setup();
 
 		authenticatorFactory = new AuthenticatorStub.Factory();
 		authenticator = authenticatorFactory.getInstance(request);
-		authenticator.addUser(createUserFromUserInfo(NEW_DBA));
-		authenticator.addUser(createUserFromUserInfo(OLD_DBA));
-		authenticator.addUser(createUserFromUserInfo(OLD_SELF));
-		authenticator.addUser(createUserFromUserInfo(OLD_STRANGER));
+
+		for (UserAccount account : userAccounts) {
+			authenticator.addUser(account);
+		}
+
 		authenticator.setAssociatedUri(OLD_SELF.username,
 				"old_self_associated_uri");
 
@@ -143,10 +163,9 @@ public class AuthenticateTest extends AbstractTestClass {
 		
 		userAccountsDao = new UserAccountsDaoStub();
 		userAccountsDao.addPermissionSet(adminPermissionSet);
-		userAccountsDao.addUser(createUserFromUserInfo(NEW_DBA));
-		userAccountsDao.addUser(createUserFromUserInfo(OLD_DBA));
-		userAccountsDao.addUser(createUserFromUserInfo(OLD_SELF));
-		userAccountsDao.addUser(createUserFromUserInfo(OLD_STRANGER));
+		for (UserAccount account : userAccounts) {
+			userAccountsDao.addUser(account);
+		}
 
 		individualDao = new IndividualDaoStub();
 
@@ -186,7 +205,7 @@ public class AuthenticateTest extends AbstractTestClass {
 				new HasPermissionFactory(servletContext));
 	}
 
-	private UserAccount createUserFromUserInfo(UserInfo userInfo) {
+	private static UserAccount createUserFromUserInfo(UserInfo userInfo) {
 		UserAccount user = new UserAccount();
 		user.setEmailAddress(userInfo.username);
 		user.setUri(userInfo.uri);
