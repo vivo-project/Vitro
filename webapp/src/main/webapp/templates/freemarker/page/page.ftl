@@ -24,7 +24,8 @@
         <hr class="hidden" />
 
         <div id="contentwrap">
-			<#include "flash.ftl">
+            <#include "flash.ftl">
+
             <div id="content">                      
                 ${body}
             </div> <!-- content -->
