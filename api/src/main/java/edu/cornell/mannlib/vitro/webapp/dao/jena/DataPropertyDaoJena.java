@@ -197,6 +197,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             dp.setExample(getPropertyStringValue(op,EXAMPLE_ANNOT));
             dp.setDescription(getPropertyStringValue(op,DESCRIPTION_ANNOT));
             dp.setPublicDescription(getPropertyStringValue(op,PUBLIC_DESCRIPTION_ANNOT));
+            dp.setEditing(getPropertyStringValue(op,EDITING));
             dp.setDisplayTier((getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_RANK_ANNOT));
             dp.setDisplayLimit((getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_LIMIT));
             

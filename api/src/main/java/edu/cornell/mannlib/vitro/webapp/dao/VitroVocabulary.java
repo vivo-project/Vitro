@@ -46,6 +46,7 @@ public class VitroVocabulary {
     
     public static final String DESCRIPTION_ANNOT = vitroURI + "descriptionAnnot";
     public static final String PUBLIC_DESCRIPTION_ANNOT = vitroURI + "publicDescriptionAnnot";
+    public static final String EDITING = vitroURI + "editing";
     public static final String SHORTDEF = "http://purl.obolibrary.org/obo/IAO_0000115";
     public static final String EXAMPLE_ANNOT = "http://purl.obolibrary.org/obo/IAO_0000112";
 

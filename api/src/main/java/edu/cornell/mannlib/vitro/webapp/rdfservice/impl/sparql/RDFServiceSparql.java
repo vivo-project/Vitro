@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Consts;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthenticationException;
@@ -495,8 +496,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	protected void executeUpdate(String updateString) throws RDFServiceException {
 		try {
 			HttpPost meth = new HttpPost(updateEndpointURI);
-			meth.addHeader("Content-Type", "application/x-www-form-urlencoded");
-			meth.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair("update", updateString))));
+			meth.addHeader("Content-Type", "application/x-www-form-urlencoded; charset="+Consts.UTF_8);
+			meth.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair("update", updateString)),Consts.UTF_8));
 			HttpContext context = getContext(meth);
 			HttpResponse response = context != null ? httpClient.execute(meth, context) : httpClient.execute(meth);
 			try {
@@ -510,6 +511,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				EntityUtils.consume(response.getEntity());
 			}
 		} catch (Exception e) {
+			log.debug("update string: \n" + updateString);
 			throw new RDFServiceException("Unable to perform change set update", e);
 		}
 	}

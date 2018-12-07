@@ -22,6 +22,8 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     private String domainClassURI = null;
     private String rangeDatatypeURI = null;
     
+    private String editing = null;
+    
     private boolean functional = false;
 
     private String example = null;
@@ -88,6 +90,14 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
 
     public void setRangeDatatypeURI(String rangeDatatypeURI) {
         this.rangeDatatypeURI = rangeDatatypeURI;
+    }
+    
+    public void setEditing(String editing) {
+    	this.editing = editing;
+    }
+    
+    public String getEditing() {
+    	return this.editing;
     }
 
     public boolean getFunctional() {

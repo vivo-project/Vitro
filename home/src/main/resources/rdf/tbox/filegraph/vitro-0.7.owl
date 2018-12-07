@@ -36,6 +36,7 @@ xmlns:vitro="&vitro;"
 <owl:AnnotationProperty rdf:about="&vitro;modTimeAnnot"/>
 <owl:AnnotationProperty rdf:about="&vitro;shortDefAnnot"/>
 <owl:AnnotationProperty rdf:about="&vitro;oldId"/>
+<owl:AnnotationProperty rdf:about="&vitro;editing"/>
 
 <!-- VClassGroup-related constructs -->
 

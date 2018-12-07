@@ -51,6 +51,8 @@ public class JenaBaseDaoCon {
     protected AnnotationProperty DESCRIPTION_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.DESCRIPTION_ANNOT);
     protected AnnotationProperty PUBLIC_DESCRIPTION_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PUBLIC_DESCRIPTION_ANNOT);
     protected AnnotationProperty SHORTDEF = _constModel.createAnnotationProperty(VitroVocabulary.SHORTDEF);
+    
+    protected AnnotationProperty EDITING = _constModel.createAnnotationProperty(VitroVocabulary.EDITING);
 
     protected DatatypeProperty   MONIKER = _constModel.createDatatypeProperty(VitroVocabulary.MONIKER);
     protected OntClass           CLASSGROUP = _constModel.createClass(VitroVocabulary.CLASSGROUP);
