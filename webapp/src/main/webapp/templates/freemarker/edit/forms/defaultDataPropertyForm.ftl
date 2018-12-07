@@ -23,28 +23,23 @@
 </#if>
 
 <#assign literalValues = "${editConfiguration.dataLiteralValuesAsString}" />
-<#if editConfiguration.dataPredicateProperty.rangeDatatypeURI?? >
-	<#assign datatype = editConfiguration.dataPredicateProperty.rangeDatatypeURI />
-<#else>
-	<#assign datatype = "none" />
-</#if>
+<#assign datatype = editConfiguration.dataPredicateProperty.rangeDatatypeURI!"none" />
 
 <form class="editForm" action = "${submitUrl}" method="post">
     <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input" />
     <#if editConfiguration.dataPredicatePublicDescription?has_content>
        <label for="${editConfiguration.dataLiteral}"><p class="propEntryHelpText">${editConfiguration.dataPredicatePublicDescription}</p></label>
     </#if>   
-
-    <#if datatype = "http://www.w3.org/2001/XMLSchema#integer" || datatype = "http://www.w3.org/2001/XMLSchema#int">
-    	<input
-            type="text" id="literal" name="literal" value="${literalValues}"
-            placeholder="123456"
-        />
+	
+	<#if "HTML" == editConfiguration.dataPredicateProperty.editing!>
+		<textarea rows="2" id="literal" name="literal" class="useTinyMce" role="textarea">${literalValues}</textarea>
+		
+	<#elseif datatype = "http://www.w3.org/2001/XMLSchema#integer" || datatype = "http://www.w3.org/2001/XMLSchema#int">
+    	<input type="text" id="literal" name="literal" value="${literalValues}" placeholder="123456" />
+		
     <#elseif datatype = "http://www.w3.org/2001/XMLSchema#float">
-        <input
-            type="text" id="literal" name="literal" value="${literalValues}"
-            placeholder="12.345"
-        />
+        <input type="text" id="literal" name="literal" value="${literalValues}" placeholder="12.345" />
+		
     <#elseif datatype = "http://www.w3.org/2001/XMLSchema#boolean">
         <select id="literal" name="literal">
             <#if literalValues = "true">
@@ -55,11 +50,10 @@
                 <option value="false" selected="true">false</option>
             </#if>
         </select>
+		
     <#elseif datatype = "http://www.w3.org/2001/XMLSchema#anyURI">
-        <input
-            type="text" id="literal" name="literal" value="${literalValues}"
-            placeholder="http://..."
-        />
+        <input type="text" id="literal" name="literal" value="${literalValues}" placeholder="http://..." />
+		
     <#elseif datatype = "http://www.w3.org/2001/XMLSchema#dateTime" || 
         		datatype = "http://www.w3.org/2001/XMLSchema#date" ||
         		datatype = "http://www.w3.org/2001/XMLSchema#time" ||
@@ -67,8 +61,10 @@
         		datatype = "http://www.w3.org/2001/XMLSchema#gYear"	||
         		datatype = "http://www.w3.org/2001/XMLSchema#gMonth" >
         <#include "dateTimeEntryForm.ftl">
+		
     <#else>
-    	<textarea rows="2"  id="literal" name="literal" value="" class="useTinyMce" role="textarea">${literalValues}</textarea>
+        <input type="text" size="70" id="literal" name="literal" value="${literalValues}" />
+
     </#if> 
 
     <br />
