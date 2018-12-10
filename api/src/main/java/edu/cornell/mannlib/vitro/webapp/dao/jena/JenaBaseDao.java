@@ -1164,13 +1164,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	
     	String describeQueryStr =    "DESCRIBE <" + res.getURI() + ">" ;
     	
-//    	?	"PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
-//    		"DESCRIBE ?bnode \n" +
-//    	    "WHERE { \n" +
-//    		"    FILTER(afn:bnode(?bnode) = \"" + res.getId().toString() + "\")\n" +
-//    		"    ?bnode ?p ?o \n" +
-//    	    "}"
-    	 
 	    Query describeQuery = QueryFactory.create(describeQueryStr, Syntax.syntaxARQ);
 		QueryExecution qe = QueryExecutionFactory.create(describeQuery, ontModel);
 		qe.execDescribe(temp);
