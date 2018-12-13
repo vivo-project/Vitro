@@ -259,8 +259,8 @@ public class ABoxRecomputer {
 
         long start = System.currentTimeMillis();
         Model types = ModelFactory.createDefaultModel();
-        types.add(assertions.listStatements(null, RDF.type, (RDFNode) null));
-        types.add(rebuildModel.listStatements(null, RDF.type, (RDFNode) null));
+        types.add(assertions.listStatements(individual, RDF.type, (RDFNode) null));
+        types.add(rebuildModel.listStatements(individual, RDF.type, (RDFNode) null));
         Model inferredTypes = rewriteInferences(getInferredTypes(individual, types, caches), aliasURI);
         rebuildModel.add(inferredTypes);
         log.trace((System.currentTimeMillis() - start) + " to infer " + inferredTypes.size() + " types");
