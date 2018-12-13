@@ -13,11 +13,15 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -35,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSubmissionTemplateModel;
 
@@ -61,7 +66,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-    	return SimplePermission.DO_FRONT_END_EDITING.ACTION;
+    	//Check if this statement can be edited here and return unauthorized if not
+		String subjectUri = vreq.getParameter("subjectUri");
+		String predicateUri = vreq.getParameter("predicateUri");
+		Property predicateProp = new Property();
+		predicateProp.setURI(predicateUri);
+		OntModel ontModel = ModelAccess.on(vreq).getOntModel();
+    	boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, 
+    			new EditDataPropertyStatement(ontModel, subjectUri, predicateUri, null).
+    			or(new EditObjectPropertyStatement(ontModel, subjectUri, predicateProp, null)));
+    	if(isAuthorized) 
+    		return SimplePermission.DO_FRONT_END_EDITING.ACTION;
+    	else 
+    		return AuthorizationRequest.UNAUTHORIZED;
 	}
 
 	@Override
