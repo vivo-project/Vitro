@@ -91,6 +91,7 @@ public class LanguageFilteringRDFService implements RDFService {
     public void sparqlConstructQuery(String query, Model model)
             throws RDFServiceException {
         s.sparqlConstructQuery(query, model);
+        filterModel(model);
     }
 
     @Override
