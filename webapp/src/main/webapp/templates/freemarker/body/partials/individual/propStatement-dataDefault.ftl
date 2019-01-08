@@ -6,15 +6,19 @@
      is also used to generate the property statement during a deletion.  
  -->
 <#import "lib-datetime.ftl" as dt>
+<#import "lib-meta-tags.ftl" as lmt>
 <#if property.rangeDatatypeURI?? && property.rangeDatatypeURI?contains("#")>
 	<#assign datatype = property.rangeDatatypeURI?substring(property.rangeDatatypeURI?last_index_of("#")+1) />
 <#else>
 	<#assign datatype = "none" />
 </#if>
-<@showStatement statement datatype />
-
-<#macro showStatement statement datatype>
+<@showStatement statement property datatype />
+<#macro showStatement statement property datatype>
     <#assign theValue = statement.value />
+
+    <#if datatype == "anyURI" && theValue?starts_with("http")>
+	<#assign theValue = "<a href=\"" + statement.value + "\" target=\"_blank\">" + statement.value + "</a>" />
+    </#if>
 	
     <#if theValue?contains("<ul>") >
         <#assign theValue = theValue?replace("<ul>","<ul class='tinyMCEDisc'>") />
@@ -43,7 +47,8 @@
 	<#else>
     	${theValue} <#if !datatype?contains("none")> <@validateFormat theValue datatype/> </#if>
 	</#if>
-</#macro> 
+	<@lmt.addCitationMetaTag uri=(property.uri!) content=(theValue!) />
+</#macro>
 <#macro validateFormat value datatype >
 	<#if datatype?? >
 		<#switch datatype>
