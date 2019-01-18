@@ -93,7 +93,7 @@
         <td valign="top" colspan="4">
             <b>Display</b> permissions for this property<br/>
             <c:forEach var="role" items="${roles}">
-                <input id="display${role.label}" type="checkbox" name="displayRoles" value="${role.uri}" ${fn:contains(displayRoles, role.uri)?'checked':''} ${role.isForPublic()?'disabled':''} />
+                <input id="display${role.label}" type="checkbox" name="displayRoles" value="${role.uri}" ${fn:contains(displayRoles, role.uri)?'checked':''} />
                 <label class="inline" for="display${role.label}"> ${role.label}</label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </c:forEach>
@@ -104,7 +104,7 @@
         <td valign="top" colspan="4">
             <b>Update</b> permissions for this property<br/>
             <c:forEach var="role" items="${roles}">
-                <input id="update${role.label}" type="checkbox" name="updateRoles" value="${role.uri}" ${fn:contains(updateRoles, role.uri)?'checked':''} />
+                <input id="update${role.label}" type="checkbox" name="updateRoles" value="${role.uri}" ${fn:contains(updateRoles, role.uri)?'checked':''} ${role.isForPublic()?'disabled':''} />
                 <label class="inline" for="update${role.label}"> ${role.label}</label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </c:forEach>
