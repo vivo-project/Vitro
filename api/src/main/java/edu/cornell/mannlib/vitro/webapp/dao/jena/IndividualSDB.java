@@ -118,6 +118,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.dwf = datasetWrapperFactory;
 		this.webappDaoFactory = wadf;
 
+		// Check that individualURI is valid. (Prevent SPARQL injection attack.)
+		// Valid syntax is defined here: https://www.w3.org/TR/rdf-sparql-query/#rIRI_REF
+		if (!individualURI.matches("[^<>\"{}|^`\\\\\u0000-\u0020]*")) {
+			throw new IndividualNotFoundException();
+		}
+
     	if (skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
