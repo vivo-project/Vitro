@@ -9,8 +9,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.imageio.ImageIO;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageWriter;
+import javax.imageio.ImageWriteParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -147,10 +151,11 @@ public class IIOImageProcessor implements ImageProcessor {
 	}
 
 	private BufferedImage scaleImage(BufferedImage image, float scaleFactor) {
+		BufferedImage after = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		AffineTransform transform = AffineTransform.getScaleInstance(
 				scaleFactor, scaleFactor);
-		AffineTransformOp atoOp = new AffineTransformOp(transform, null);
-		return atoOp.filter(image, null);
+		AffineTransformOp atoOp = new AffineTransformOp(transform, AffineTransformOp.TYPE_BICUBIC);
+		return atoOp.filter(image, after);
 	}
 
 	private CropRectangle adjustCropRectangleToScaledImage(CropRectangle crop,
@@ -167,8 +172,14 @@ public class IIOImageProcessor implements ImageProcessor {
 	}
 
 	private byte[] encodeAsJpeg(BufferedImage image) throws IOException {
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		ImageIO.write(image, "JPG", bytes);
+		ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+		ImageWriteParam param = writer.getDefaultWriteParam();
+		param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT); 
+		param.setCompressionQuality(0.8f); 
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
+		writer.setOutput(new MemoryCacheImageOutputStream(bytes)); 
+		writer.write(null, new IIOImage(image,null,null),param);
+		writer.dispose();
 		return bytes.toByteArray();
 	}
 }
