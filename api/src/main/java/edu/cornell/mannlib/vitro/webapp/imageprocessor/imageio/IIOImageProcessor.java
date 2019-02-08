@@ -15,14 +15,14 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorConvertOp;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import com.twelvemonkeys.image.ResampleOp;
 
 /**
  * Crop the main image as specified, and scale it to the correct size for a
@@ -151,11 +151,10 @@ public class IIOImageProcessor implements ImageProcessor {
 	}
 
 	private BufferedImage scaleImage(BufferedImage image, float scaleFactor) {
-		BufferedImage after = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-		AffineTransform transform = AffineTransform.getScaleInstance(
-				scaleFactor, scaleFactor);
-		AffineTransformOp atoOp = new AffineTransformOp(transform, AffineTransformOp.TYPE_BICUBIC);
-		return atoOp.filter(image, after);
+		int newX = (int) (image.getWidth() * scaleFactor);
+		int newY = (int) (image.getHeight() * scaleFactor);
+		BufferedImageOp resampler = new ResampleOp(newX, newY, ResampleOp.FILTER_LANCZOS);
+		return resampler.filter(image, null);
 	}
 
 	private CropRectangle adjustCropRectangleToScaledImage(CropRectangle crop,
