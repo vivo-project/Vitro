@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -259,8 +260,8 @@ public class ABoxRecomputer {
 
         long start = System.currentTimeMillis();
         Model types = ModelFactory.createDefaultModel();
-        types.add(assertions.listStatements(null, RDF.type, (RDFNode) null));
-        types.add(rebuildModel.listStatements(null, RDF.type, (RDFNode) null));
+        types.add(assertions.listStatements(individual, RDF.type, (RDFNode) null));
+        types.add(rebuildModel.listStatements(individual, RDF.type, (RDFNode) null));
         Model inferredTypes = rewriteInferences(getInferredTypes(individual, types, caches), aliasURI);
         rebuildModel.add(inferredTypes);
         log.trace((System.currentTimeMillis() - start) + " to infer " + inferredTypes.size() + " types");
@@ -457,39 +458,46 @@ public class ABoxRecomputer {
         return individualURIs;
     }
 
-    protected void getIndividualURIs(String queryString, Queue<String> individuals) {
-        int batchSize = 50000;
+    protected void getIndividualURIs(String queryString, final Queue<String> individuals) {
+        final int batchSize = 50000;
         int offset = 0;
-        boolean done = false;
-        while (!done) {
+        final AtomicBoolean done = new AtomicBoolean(false);
+        while (!done.get()) {
             String queryStr = queryString + " LIMIT " + batchSize + " OFFSET " + offset;
             if(log.isDebugEnabled()) {
                 log.debug(queryStr);
             }
-            ResultSet results = null;
             try {
-                InputStream in = rdfService.sparqlSelectQuery(queryStr, RDFService.ResultFormat.JSON);
-                results = ResultSetFactory.fromJSON(in);
+                rdfService.sparqlSelectQuery(queryStr, new ResultSetConsumer() {
+                    private int count = 0;
+
+                    @Override
+                    protected void processQuerySolution(QuerySolution qs) {
+                        count++;
+                        Resource resource = qs.getResource("s");
+
+                        if ((resource != null) && !resource.isAnon()) {
+                            individuals.add(resource.getURI());
+                        }
+                    }
+
+                    @Override
+                    protected void endProcessing() {
+                        super.endProcessing();
+
+                        if (count < batchSize) {
+                            done.set(true);
+                        }
+                    }
+                });
             } catch (RDFServiceException e) {
                 throw new RuntimeException(e);
-            }
-            if (!results.hasNext()) {
-                done = true;
-            }
-            while (results.hasNext()) {
-                QuerySolution solution = results.next();
-                Resource resource = solution.getResource("s");
-
-                if ((resource != null) && !resource.isAnon()) {
-                    individuals.add(resource.getURI());
-                }					
             }
             if(log.isDebugEnabled()) {
                 log.debug(individuals.size() + " in set");
             }
             offset += batchSize;
         }
-
     }
 
     protected void addInferenceStatementsFor(String individualUri, Model addTo) throws RDFServiceException {
