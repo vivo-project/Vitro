@@ -1,8 +1,7 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.imageprocessor.imageio;
 
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
@@ -10,20 +9,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.BandSelectDescriptor;
-import javax.media.jai.operator.StreamDescriptor;
-import javax.media.jai.util.ImagingListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageWriter;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.MemoryCacheImageInputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorConvertOp;
-import java.awt.image.ColorModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import com.twelvemonkeys.image.ResampleOp;
 
 /**
  * Crop the main image as specified, and scale it to the correct size for a
@@ -55,8 +54,8 @@ public class IIOImageProcessor implements ImageProcessor {
 	 */
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
-		JAI.getDefaultInstance().setImagingListener(
-				new NonNoisyImagingListener());
+//		JAI.getDefaultInstance().setImagingListener(
+//				new NonNoisyImagingListener());
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class IIOImageProcessor implements ImageProcessor {
 
 	@Override
 	public Dimensions getDimensions(InputStream imageStream) throws ImageProcessorException, IOException {
-		MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(imageStream);
+		ImageInputStream stream = new MemoryCacheImageInputStream(imageStream);
 		BufferedImage image = ImageIO.read(stream);
 		return new Dimensions(image.getWidth(), image.getHeight());
 	}
@@ -80,7 +79,7 @@ public class IIOImageProcessor implements ImageProcessor {
 			CropRectangle crop, Dimensions limits)
 			throws ImageProcessorException, IOException {
 		try {
-			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(mainImageStream);
+			ImageInputStream stream = new MemoryCacheImageInputStream(mainImageStream);
 			BufferedImage mainImage = ImageIO.read(stream);
 
 			BufferedImage bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR); // BufferedImage.TYPE_INT_RGB
@@ -152,10 +151,10 @@ public class IIOImageProcessor implements ImageProcessor {
 	}
 
 	private BufferedImage scaleImage(BufferedImage image, float scaleFactor) {
-		AffineTransform transform = AffineTransform.getScaleInstance(
-				scaleFactor, scaleFactor);
-		AffineTransformOp atoOp = new AffineTransformOp(transform, null);
-		return atoOp.filter(image, null);
+		int newX = (int) (image.getWidth() * scaleFactor);
+		int newY = (int) (image.getHeight() * scaleFactor);
+		BufferedImageOp resampler = new ResampleOp(newX, newY, ResampleOp.FILTER_LANCZOS);
+		return resampler.filter(image, null);
 	}
 
 	private CropRectangle adjustCropRectangleToScaledImage(CropRectangle crop,
@@ -172,37 +171,14 @@ public class IIOImageProcessor implements ImageProcessor {
 	}
 
 	private byte[] encodeAsJpeg(BufferedImage image) throws IOException {
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		ImageIO.write(image, "JPG", bytes);
+		ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+		ImageWriteParam param = writer.getDefaultWriteParam();
+		param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT); 
+		param.setCompressionQuality(0.8f); 
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
+		writer.setOutput(new MemoryCacheImageOutputStream(bytes)); 
+		writer.write(null, new IIOImage(image,null,null),param);
+		writer.dispose();
 		return bytes.toByteArray();
 	}
-
-	/**
-	 * This ImagingListener means that Java Advanced Imaging won't dump an
-	 * exception log to System.out. It writes to the log, instead.
-	 * 
-	 * Further, since the lack of native accelerator classes isn't an error, it
-	 * is written as a simple log message.
-	 */
-	static class NonNoisyImagingListener implements ImagingListener {
-		@Override
-		public boolean errorOccurred(String message, Throwable thrown,
-				Object where, boolean isRetryable) throws RuntimeException {
-			if (thrown instanceof RuntimeException) {
-				throw (RuntimeException) thrown;
-			}
-			if ((thrown instanceof NoClassDefFoundError)
-					&& (thrown.getMessage()
-							.contains("com/sun/medialib/mlib/Image"))) {
-				log.info("Java Advanced Imaging: Could not find mediaLib "
-						+ "accelerator wrapper classes. "
-						+ "Continuing in pure Java mode.");
-				return false;
-			}
-			log.error(thrown, thrown);
-			return false;
-		}
-
-	}
-
 }
