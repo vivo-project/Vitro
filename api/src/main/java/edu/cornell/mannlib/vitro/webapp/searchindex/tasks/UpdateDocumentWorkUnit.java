@@ -176,8 +176,6 @@ public class UpdateDocumentWorkUnit implements Runnable {
 					classGroupUris.add(classGroupUri);
 				}
 
-				addToAlltext(doc, clz.getName());
-
 				Float boost = clz.getSearchBoost();
 				if (boost != null) {
 					doc.setDocumentBoost(doc.getDocumentBoost() + boost);
