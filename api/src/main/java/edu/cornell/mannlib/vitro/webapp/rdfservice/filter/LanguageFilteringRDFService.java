@@ -22,6 +22,7 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -90,8 +91,15 @@ public class LanguageFilteringRDFService implements RDFService {
     @Override
     public void sparqlConstructQuery(String query, Model model)
             throws RDFServiceException {
-        s.sparqlConstructQuery(query, model);
-        filterModel(model);
+        if (model.isEmpty()) {
+            s.sparqlConstructQuery(query, model);
+            filterModel(model);
+        } else {
+            Model constructedModel = ModelFactory.createDefaultModel();
+            s.sparqlConstructQuery(query, constructedModel);
+            filterModel(constructedModel);
+            model.add(constructedModel);
+        }
     }
 
     @Override
