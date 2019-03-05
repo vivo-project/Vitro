@@ -54,8 +54,6 @@ public class IIOImageProcessor implements ImageProcessor {
 	 */
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
-//		JAI.getDefaultInstance().setImagingListener(
-//				new NonNoisyImagingListener());
 	}
 
 	@Override
