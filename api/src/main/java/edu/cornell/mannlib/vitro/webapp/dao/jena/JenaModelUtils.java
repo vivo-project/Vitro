@@ -258,8 +258,7 @@ public class JenaModelUtils {
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             StringBuilder buff = new StringBuilder();
-            buff.append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
-                    .append("CONSTRUCT { \n").append("  ?res <").append(property.getURI()).append("> ?o } WHERE { \n");
+            buff.append("CONSTRUCT { \n").append("  ?res <").append(property.getURI()).append("> ?o } WHERE { \n");
             if (graphURI != null) {
                 buff.append("    GRAPH ").append(graphURI).append(" { \n");
             }
@@ -289,7 +288,6 @@ public class JenaModelUtils {
         
         StringBuilder describeQueryStrBuff = new StringBuilder()
             .append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n")
-            .append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
             .append("DESCRIBE ?res WHERE { \n");
             if (graphURI != null) {
                 describeQueryStrBuff.append("GRAPH ").append(graphURI).append("{ \n");
@@ -319,7 +317,7 @@ public class JenaModelUtils {
             // exclude resources in the Vitro internal namespace or in the 
             // OWL namespace, but allow all others
             buff
-            .append("    FILTER (afn:namespace(?res) != \"")
+            .append("    FILTER (REPLACE(STR(?res),\"^(.*)(#)(.*)$\", \"$1$2\") != \"")
             .append("http://www.w3.org/2002/07/owl#")
             .append("\") \n")
             .append("    FILTER (?res != <")

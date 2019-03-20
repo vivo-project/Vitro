@@ -55,7 +55,6 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	protected static final String FAUX_PROPERTY_FLAG = "FAUX";
 	
     private static final Map<String, String> NAMESPACES = new HashMap<String, String>() {{
-        put("afn", VitroVocabulary.AFN);
         put("owl", VitroVocabulary.OWL);
         put("rdf", VitroVocabulary.RDF);
         put("rdfs", VitroVocabulary.RDFS);
