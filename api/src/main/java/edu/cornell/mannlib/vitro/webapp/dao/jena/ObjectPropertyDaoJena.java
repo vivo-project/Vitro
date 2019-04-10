@@ -1086,8 +1086,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     // If domain or range is unspecified, OWL.Thing.getURI() is used in the key.
     Map<FullPropertyKey, String> customListViewConfigFileMap;
     
+    // must be threadsafe 
     @Override
-    public String getCustomListViewConfigFileName(ObjectProperty op) {
+    public synchronized String getCustomListViewConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
             customListViewConfigFileMap = new HashMap<>();
         }

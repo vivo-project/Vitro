@@ -7,6 +7,8 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAct
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,38 +33,76 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(PropertyGroupTemplateModel.class); 
     
     private final String name;
-    private final List<PropertyTemplateModel> properties;
+    private List<PropertyTemplateModel> properties;
 
-
+    List<Future<?>> futures = null;
+    
+    public List<Future<?>> getFutures() {
+		return futures;
+	}
 
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
             Individual subject, boolean editing, 
             List<DataProperty> populatedDataPropertyList, 
-            List<ObjectProperty> populatedObjectPropertyList) {
+            List<ObjectProperty> populatedObjectPropertyList,
+            boolean parallel,ExecutorService executor
+    		) {
 
         this.name = group.getName();
+        
+        if(parallel) {
+        	futures = new ArrayList<>();
+        }
         
         List<Property> propertyList = group.getPropertyList();
         properties = new ArrayList<PropertyTemplateModel>(propertyList.size());
         
         for (Property p : propertyList)  {
+        	
+        	
+        	
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty) p;
                 if (!allowedToDisplay(vreq, op, subject)) {
                     continue;
                 }
-                ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
+                
+                if(!parallel) {
+                
+                	ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
                         op, subject, vreq, editing, populatedObjectPropertyList);
-                if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
-                    properties.add(tm);                    
+                	if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
+                		properties.add(tm);                    
+                	}
+                
+                }else {
+                	
+                    futures.add(
+                  	      executor.submit(
+                  	    		  new ObjectPropertyTemplateModelCallable(op, subject, vreq, editing, populatedObjectPropertyList,op.getLocalName())
+                  	        ));
+    
+                	
                 }
+                
 
             } else if (p instanceof DataProperty){
-                DataProperty dp = (DataProperty) p;
-                if (!allowedToDisplay(vreq, dp, subject))  {
-                    continue;
-                }
-                properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
+            		
+            	
+            	DataProperty dp = (DataProperty) p;
+       		 	if (!allowedToDisplay(vreq, dp, subject))  {
+       		 		continue;
+       		 	}
+            	
+            	 if(!parallel) {
+            		 properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
+             	 }else {
+            		 futures.add(
+                     	      executor.submit(
+                     	    		  new DataPropertyTemplateModelCallable(dp, subject, vreq, editing, populatedDataPropertyList,dp.getLocalName())
+                     	        ));
+            	 }
+            
             } else {
                 log.debug(p.getURI() + " is neither an ObjectProperty nor a DataProperty; skipping display");
             }

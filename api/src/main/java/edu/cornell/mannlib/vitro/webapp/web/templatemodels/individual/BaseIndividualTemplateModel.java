@@ -104,10 +104,19 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         }
     }
 
+    /*
+     * https://wiki.blazegraph.com/wiki/index.php/PerformanceOptimization, Parallel is perfect
+     * // -40% to process
+     */
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
-            propertyList = new GroupedPropertyList(individual, vreq, editing);
-        }
+        	try{
+        		//propertyList = new GroupedPropertyList(individual, vreq, editing,false);	
+        		propertyList = new GroupedPropertyList(individual, vreq, editing,true);
+        	}catch(Exception e) {
+        		e.printStackTrace();
+        	}
+        	}
         return propertyList;
     }
     

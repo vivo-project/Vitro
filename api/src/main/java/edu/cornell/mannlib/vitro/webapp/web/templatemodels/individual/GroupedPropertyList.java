@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,7 +71,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private List<PropertyGroupTemplateModel> groups;
 
     GroupedPropertyList(Individual subject, VitroRequest vreq,
-            boolean editing) {
+            boolean editing,boolean parallel) {
         this.vreq = vreq;
         this.subject = subject;
         this.wdf = vreq.getWebappDaoFactory();
@@ -136,11 +140,56 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(
                 propertyGroupList.size());
+        
+        
+        if(!parallel) {
+        
         for (PropertyGroup propertyGroup : propertyGroupList) {
             groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup,
                     subject, editing, populatedDataPropertyList,
-                    populatedObjectPropertyList));
+                    populatedObjectPropertyList,parallel,null));
         }
+        
+        }else {
+
+        	//submit parallel
+        	ExecutorService executor = Executors.newCachedThreadPool();
+        	for (PropertyGroup propertyGroup : propertyGroupList) {
+            	PropertyGroupTemplateModel pgtm = 
+            		        new PropertyGroupTemplateModel(vreq, propertyGroup,
+            		                subject, editing, populatedDataPropertyList,
+            		                populatedObjectPropertyList,parallel,executor);
+            	
+               groups.add(pgtm);
+             }
+        	 //wait all
+        	for(PropertyGroupTemplateModel pgtm : groups  ) {
+            	List<Future<?>> futures = pgtm.getFutures(); 
+            	List<PropertyTemplateModel>  properties = pgtm.getProperties();
+                for (Future<?> f : futures) {
+                	Object o;
+                	try {
+        			o = f.get();
+                  	if(o instanceof ObjectPropertyTemplateModel) {
+                		 ObjectPropertyTemplateModel tm = (ObjectPropertyTemplateModel) o;
+                		 if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
+                             properties.add(tm);    
+                          }
+                	} else if           	
+                	(o instanceof DataPropertyTemplateModel) {
+                		DataPropertyTemplateModel dptm = (DataPropertyTemplateModel) o;
+                		properties.add(dptm);  
+                	}	
+                	
+        			} catch (InterruptedException | ExecutionException e) {
+        				e.printStackTrace();
+        			} 
+                }
+            }
+        	
+        	executor.shutdown();
+        }
+        
         
         if (!editing) {
             pruneEmptyProperties();
