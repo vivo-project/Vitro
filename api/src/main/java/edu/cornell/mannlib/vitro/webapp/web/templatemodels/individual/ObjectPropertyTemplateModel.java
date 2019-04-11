@@ -161,9 +161,16 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 		return FreemarkerConfiguration.getConfig(vreq).getTemplateLoader();
 	}
     
+	private List<Map<String, String>> statementData = null;;
+	
     protected List<Map<String, String>> getStatementData() {
-        ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, domainUri, rangeUri, getSelectQuery(), getConstructQueries(), sortDirection);
+        
+    	if(statementData==null) {
+    		ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
+    		statementData =  opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, domainUri, rangeUri, getSelectQuery(), getConstructQueries(), sortDirection);
+    	}
+    	return statementData;
+    
     }
     
     protected abstract boolean isEmpty();

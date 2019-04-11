@@ -106,13 +106,16 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 
     /*
      * https://wiki.blazegraph.com/wiki/index.php/PerformanceOptimization, Parallel is perfect
-     * // -40% to process
+     * -60% on sparqlContentTripleSource
+     * -50% on tdbContentTripleSource
      */
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
         	try{
-        		//propertyList = new GroupedPropertyList(individual, vreq, editing,false);	
-        		propertyList = new GroupedPropertyList(individual, vreq, editing,true);
+        		boolean parallel = true;
+        		long t1 = System.currentTimeMillis();
+        		propertyList = new GroupedPropertyList(individual, vreq, editing,parallel);
+        		log.debug(" getPropertyList parallel: "+parallel+" time :"+(System.currentTimeMillis()-t1)+" ms");
         	}catch(Exception e) {
         		e.printStackTrace();
         	}
