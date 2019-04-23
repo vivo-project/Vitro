@@ -11,7 +11,7 @@ import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistrib
 /**
  * Creates an empty RDF graph. For use as a placeholder or in tests.
  */
-public class EmptyGraphBuilder implements GraphBuilder {
+public class EmptyGraphBuilder extends AbstractGraphBuilder {
 
     @Override
     public Model buildGraph(DataDistributorContext ddContext)

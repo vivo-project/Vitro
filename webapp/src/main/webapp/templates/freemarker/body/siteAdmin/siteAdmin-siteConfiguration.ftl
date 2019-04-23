@@ -26,8 +26,12 @@
             <#if siteConfig.siteInfo?has_content>
                 <li role="listitem"><a href="${siteConfig.siteInfo}" title="${i18n().site_information}">${i18n().site_information}</a></li>
             </#if>
-            
-             <#if siteConfig.userAccounts?has_content>
+
+            <#if siteConfig.manageDataDistributors?has_content>
+                <li role="listitem"><a href="${siteConfig.manageDataDistributors}" title="${i18n().manage_datadistributors}">${i18n().manage_datadistributors}</a></li>
+            </#if>
+
+            <#if siteConfig.userAccounts?has_content>
                 <li role="listitem"><a href="${siteConfig.userAccounts}" title="${i18n().user_accounts}">${i18n().user_accounts}</a></li>
              </#if>        
         </ul>

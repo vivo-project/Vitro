@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
  * parameters into SPARQL queries.
  */
 public abstract class AbstractSparqlBindingGraphBuilder
-        implements GraphBuilder {
+        extends AbstractGraphBuilder {
     protected Set<String> uriBindingNames = new HashSet<>();
     protected Set<String> literalBindingNames = new HashSet<>();
 

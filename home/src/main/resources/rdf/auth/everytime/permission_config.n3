@@ -15,6 +15,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
    	auth:hasPermission simplePermission:EnableDeveloperPanel ;    
     auth:hasPermission simplePermission:LoginDuringMaintenance ;
+    auth:hasPermission simplePermission:ManageDataDistributors ;
     auth:hasPermission simplePermission:ManageMenus ;
     auth:hasPermission simplePermission:ManageProxies ;
     auth:hasPermission simplePermission:ManageSearchIndex ;

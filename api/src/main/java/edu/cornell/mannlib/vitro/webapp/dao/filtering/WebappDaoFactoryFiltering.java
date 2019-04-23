@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
+import edu.cornell.mannlib.vitro.webapp.dao.DataDistributorDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
@@ -271,6 +272,9 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     public DisplayModelDao getDisplayModelDao(){
         return innerWebappDaoFactory.getDisplayModelDao();
     }
+
+    @Override
+    public DataDistributorDao getDataDistributorDao() { return innerWebappDaoFactory.getDataDistributorDao(); }
     
     @Override 
     public void close() {

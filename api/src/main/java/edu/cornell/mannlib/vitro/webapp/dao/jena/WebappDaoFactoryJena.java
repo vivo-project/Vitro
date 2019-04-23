@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DataDistributorDao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.iri.IRI;
@@ -439,7 +440,10 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     public DisplayModelDao getDisplayModelDao(){
         return new DisplayModelDaoJena( this );
     }
-    
+
+    @Override
+    public DataDistributorDao getDataDistributorDao() { return new DataDistributorDaoJena(this); }
+
     @Override
     public void close() {
         if (applicationDao != null) {

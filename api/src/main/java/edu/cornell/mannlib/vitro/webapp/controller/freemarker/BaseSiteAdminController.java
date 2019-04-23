@@ -71,6 +71,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         registerSiteMaintenanceUrl("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developer_enabled: true});", null, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTION);
 
         registerSiteConfigData("userAccounts", "/accountsAdmin", null, SimplePermission.MANAGE_USER_ACCOUNTS.ACTION);
+        registerSiteConfigData("manageDataDistributors", "/admin/datadistributor", null, SimplePermission.MANAGE_DATA_DISTRIBUTORS.ACTION);
         registerSiteConfigData("manageProxies", "/manageProxies", null, SimplePermission.MANAGE_PROXIES.ACTION);
 
         registerSiteConfigData("siteInfo", "/editForm", new ParamMap(new String[] {"controller", "ApplicationBean"}), SimplePermission.EDIT_SITE_INFORMATION.ACTION);

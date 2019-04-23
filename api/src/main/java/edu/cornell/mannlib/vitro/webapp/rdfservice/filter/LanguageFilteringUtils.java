@@ -11,10 +11,13 @@ import javax.servlet.ServletRequest;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.ontology.impl.OntModelImpl;
+import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.vocabulary.RDF;
 
 /**
  * Some methods that will come in handy when dealing with Language Filtering
@@ -49,15 +52,16 @@ public class LanguageFilteringUtils {
 			ServletRequest req) {
 		/** This is some nasty layering. Could we do this more easily? */
 		List<String> languages = localesToLanguages(req.getLocales());
-		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
-				RDFServiceGraph.createRDFServiceModel(
-						new RDFServiceGraph(
-								new LanguageFilteringRDFService(
-										new RDFServiceModel(rawModel), languages))));
+
+		// Return a custom OntModel type that allows callers to find out extra information about the underlying
+		// OntModel that has been wrapped in an RDF service
+		return new LangAwareOntModel(OntModelSpec.OWL_MEM, RDFServiceGraph.createRDFServiceModel(
+				new RDFServiceGraph(
+						new LanguageFilteringRDFService(
+								new RDFServiceModel(rawModel), languages))), rawModel);
 	}
 
 	private LanguageFilteringUtils() {
 		// Nothing to instantiate
 	}
-
 }

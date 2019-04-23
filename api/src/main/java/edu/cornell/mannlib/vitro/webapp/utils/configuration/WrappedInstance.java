@@ -27,6 +27,8 @@ public class WrappedInstance<T> {
 	private final Map<String, PropertyMethod> propertyMethods;
 	private final Set<Method> validationMethods;
 
+	public Map<String, PropertyMethod> getPropertyMethods() { return propertyMethods; }
+
 	public WrappedInstance(T instance,
 			Map<String, PropertyMethod> propertyMethods,
 			Set<Method> validationMethods) {

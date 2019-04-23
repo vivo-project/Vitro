@@ -108,7 +108,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
  * Turtle format.
  */
 
-public class IteratingGraphBuilder implements GraphBuilder {
+public class IteratingGraphBuilder extends AbstractGraphBuilder {
     private String parameterName;
     private final List<String> parameterValues = new ArrayList<>();
     private final List<GraphBuilder> childGraphBuilders = new ArrayList<>();

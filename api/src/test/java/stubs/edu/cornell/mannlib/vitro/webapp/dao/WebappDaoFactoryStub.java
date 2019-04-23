@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
+import edu.cornell.mannlib.vitro.webapp.dao.DataDistributorDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
@@ -260,6 +261,12 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public PageDao getPageDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getPageDao() not implemented.");
+	}
+
+	@Override
+	public DataDistributorDao getDataDistributorDao() {
+		throw new RuntimeException(
+				"WebappDaoFactory.getDataDistributorDao() not implemented.");
 	}
 
 	@Override

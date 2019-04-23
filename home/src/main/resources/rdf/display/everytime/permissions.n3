@@ -63,6 +63,11 @@ action:ManageSearchIndex
     rdfs:label "MANAGE_SEARCH_INDEX" .
 
 
+action:ManageDataDistributors
+    a display:RequiredAction ;
+    rdfs:label "MANAGE_DATADISTRIBUTORS" .
+
+
 action:ManageUserAccounts
     a display:RequiredAction ;
     rdfs:label "MANAGE_USER_ACCOUNTS" .

@@ -23,7 +23,7 @@ public abstract class AbstractDataDistributor implements DataDistributor {
         this.parameters = ddc.getRequestParameters();
     }
 
-    @Property(uri = ACTION_NAME_PROPERTY)
+    @Property(uri = ACTION_NAME_PROPERTY, minOccurs = 1, maxOccurs = 1)
     public void setActionName(String aName) {
         this.actionName = aName;
     }

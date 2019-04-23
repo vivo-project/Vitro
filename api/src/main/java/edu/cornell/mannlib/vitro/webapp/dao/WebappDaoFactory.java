@@ -130,6 +130,7 @@ public interface WebappDaoFactory {
 
     public PageDao getPageDao();    
     
-    public MenuDao getMenuDao();    
-    
+    public MenuDao getMenuDao();
+
+    public DataDistributorDao getDataDistributorDao();
 }

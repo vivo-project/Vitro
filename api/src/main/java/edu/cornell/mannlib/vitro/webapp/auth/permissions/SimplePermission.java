@@ -41,6 +41,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "EnableDeveloperPanel");
 	public static final SimplePermission LOGIN_DURING_MAINTENANCE = new SimplePermission(
 		NAMESPACE + "LoginDuringMaintenance");
+	public static final SimplePermission MANAGE_DATA_DISTRIBUTORS = new SimplePermission(
+		NAMESPACE + "ManageDataDistributors");
 	public static final SimplePermission MANAGE_MENUS = new SimplePermission(
 		NAMESPACE + "ManageMenus");
 	public static final SimplePermission MANAGE_OWN_PROXIES = new SimplePermission(

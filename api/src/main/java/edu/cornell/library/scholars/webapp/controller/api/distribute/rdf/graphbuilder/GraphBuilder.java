@@ -18,4 +18,8 @@ public interface GraphBuilder {
      */
     Model buildGraph(DataDistributorContext ddContext)
             throws DataDistributorException;
+
+    String getBuilderName();
+
+    void setBuilderName(String name);
 }
