@@ -18,37 +18,37 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
  * To change this template use File | Settings | File Templates.
  */
 public interface ObjectPropertyStatementDao {
-	
+
     void deleteObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt);
-    
+
     List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty);
-    
+
     List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty, int startIndex, int endIndex);
 
     List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectPropertyStatement objPropertyStmt);
-    
+
     Individual fillExistingObjectPropertyStatements( Individual entity );
 
-    int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );        
+    int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );
 
 //    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-//			String subjectUri, 
-//			String propertyUri, 
-//			String objectKey, 
+//			String subjectUri,
+//			String propertyUri,
+//			String objectKey,
 //			String queryString,
 //			Set<String> constructQueryStrings);
-    
+
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri);
 
 	List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-			String subjectUri, String propertyUri, String objectKey, String domainUri, 
+			String subjectUri, String propertyUri, String objectKey, String domainUri,
 			String rangeUri, String queryString, Set<String> constructQueryStrings,
 			String sortDirection);
 
 	/**
 	 * Inspect the elements of the statement to see whether it qualifies as a
 	 * faux property.
-	 * 
+	 *
 	 * That is, is there a faux property definition, such that
 	 * <ul>
 	 * <li>The property URI of this statement is the base URI of the faux
@@ -58,10 +58,10 @@ public interface ObjectPropertyStatementDao {
 	 * <li>One of the VClasses of the object of this statement is the range of
 	 * the faux property</li>
 	 * </ul>
-	 * 
+	 *
 	 * If that is so, then set the domain and range (and the domainURI and
 	 * rangeURI) of the property of this statement to match the faux property.
 	 */
 	void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list);
-  
+
 }

@@ -15,7 +15,7 @@
         </p>
 
         <p>
-            You recently changed the email address associated with 
+            You recently changed the email address associated with
             ${userAccount.firstName} ${userAccount.lastName}
         </p>
 
@@ -29,7 +29,7 @@
 <#assign text>
 Hi, ${userAccount.firstName} ${userAccount.lastName}
 
-You recently changed the email address associated with 
+You recently changed the email address associated with
 ${userAccount.firstName} ${userAccount.lastName}
 
 Thank you.

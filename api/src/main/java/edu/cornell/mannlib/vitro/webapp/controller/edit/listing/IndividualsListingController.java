@@ -39,22 +39,22 @@ public class IndividualsListingController extends BaseEditController {
         //need to figure out how to structure the results object to put the classes underneath
 
         String assertedOnlyStr = request.getParameter("assertedOnly");
-        
+
         WebappDaoFactory wadf = null;
-        
+
         if (assertedOnlyStr != null && assertedOnlyStr.equalsIgnoreCase("true")) {
         	wadf = vrequest.getUnfilteredAssertionsWebappDaoFactory();
         }
         if (wadf == null) {
         	wadf = vrequest.getUnfilteredWebappDaoFactory();
         }
-        
+
         IndividualDao dao = wadf.getIndividualDao();
         VClassDao vcDao = wadf.getVClassDao();
 
         String vclassURI = request.getParameter("VClassURI");
         VClass vc = vcDao.getVClassByURI(vclassURI);
-        
+
         List<Individual> inds = dao.getIndividualsByVClassURI(vclassURI);
         //List inds = dao.getIndividualsByVClassURI(vclassURI,1,MAX_INDIVIDUALS);
 
@@ -105,12 +105,12 @@ public class IndividualsListingController extends BaseEditController {
         // new individual button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newIndividualParams=new HashMap<String,String>();
-        newIndividualParams.put("VClassURI",vclassURI);    
+        newIndividualParams.put("VClassURI",vclassURI);
         newIndividualParams.put("controller","Entity");
         ButtonForm newIndividualButton = new ButtonForm(Controllers.RETRY_URL,"buttonForm","Add instance",newIndividualParams);
         buttons.add(newIndividualButton);
         request.setAttribute("topButtons", buttons);
-          
+
         try {
             JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {

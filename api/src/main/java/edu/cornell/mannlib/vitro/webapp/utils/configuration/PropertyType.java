@@ -17,7 +17,7 @@ import org.apache.jena.rdf.model.Statement;
 /**
  * An enumeration of the types of properties that the ConfigurationBeanLoader
  * will support.
- * 
+ *
  * Also, classes that represent the Java methods and RDF statements associated
  * with those types.
  */

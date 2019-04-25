@@ -48,23 +48,23 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 /**
  * Write a smaller set of Linked Data. It consists of:
- * 
+ *
  * 1) The data properties of the entity
- * 
+ *
  * 2) The object properties in which the entity is either subject or object
- * 
+ *
  * 3) The labels and types of the objects that are linked by those properties.
- * 
+ *
  * If the request comes with an Accept-language header, use an appropriately
  * language-aware data source to filter the data properties and labels.
  * Otherwise, show all triples, regardless of language.
- * 
+ *
  * Filter the result based on the policy, removing any triples that should not
  * be published to the public (or to the user, if logged in). Also remove any
  * objects which can only be reached by excluded triples.
- * 
+ *
  * ----------------
- * 
+ *
  * This still permits the use of rich export, by "include" options on the
  * request. The only difference from earlier implementations is that the result
  * may be made language-aware.
@@ -300,9 +300,9 @@ public class IndividualRdfAssembler {
 
 	/**
 	 * Add info about the RDF itself.
-	 * 
+	 *
 	 * It will look something like this:
-	 * 
+	 *
 	 * <pre>
 	 * <http://vivo.cornell.edu/individual/n6628/n6628.rdf>
 	 *     rdfs:label "RDF description of Baker, Able - http://vivo.cornell.edu/individual/n6628" ;

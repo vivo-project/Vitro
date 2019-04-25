@@ -18,9 +18,9 @@
 
 <#--HTML Portion-->
  <section id="browseClassGroup" class="contentSectionContainer">
-                       
-                <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
-                    
+
+                <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">
+
                     <label for="selectClassGroup">${i18n().class_group_all_caps}<span class="requiredHint"> *</span></label>
                     <select name="selectClassGroup" id="selectClassGroup" role="combobox">
                         <option value="-1" role="option">${i18n().select_one}</option>
@@ -29,10 +29,10 @@
                         </#list>
                     </select>
                 </section>
-                
-                
+
+
                 <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
-                    <#-- Select classes in a class group -->    
+                    <#-- Select classes in a class group -->
                     <p id="selectClassesMessage" name="selectClassesMessage">${i18n().select_content_display}<span class="requiredHint"> *</span></p>
 
                     <#include "pageManagement--classIntersections.ftl">
@@ -47,7 +47,7 @@
                         <li class="ui-state-default" role="menuitem">
                             <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" checked="checked" />
                             <label class="inline" for="${classInClassGroup.name}"> ${classInClassGroup.name}</label>
-                            <span class="ui-icon-sortable"></span> 
+                            <span class="ui-icon-sortable"></span>
                         </li>
                         </#list>
                     </ul><br />
@@ -65,5 +65,5 @@
         selectClasses: '${i18n().select_classes_to_display}'
     };
 </script>
- <#--Include JavaScript specific to the types of data getters related to this content-->           
+ <#--Include JavaScript specific to the types of data getters related to this content-->
  <#include "pageManagement--browseClassGroupsScripts.ftl">

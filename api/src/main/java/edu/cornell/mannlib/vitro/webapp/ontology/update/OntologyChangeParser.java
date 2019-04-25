@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.Ato
 
 /**
  * Performs parsing on Prompt output and provides change object list.
- * 
+ *
  * @author ass92
  *
  */
@@ -27,20 +27,20 @@ import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.Ato
 public class OntologyChangeParser {
 
     private final Log log = LogFactory.getLog(OntologyChangeParser.class);
-    
+
 	private ChangeLogger logger;
-	
+
 	public OntologyChangeParser(ChangeLogger logger) {
 		this.logger = logger;
 	}
-		
+
 	/**
 	 * @param diffPath Diff path
 	 */
-	
+
 	@SuppressWarnings({ "unchecked", "null", "static-access" })
 	public ArrayList<AtomicOntologyChange> parseFile(String diffPath) throws IOException{
-		
+
 		AtomicOntologyChange changeObj;
 		ArrayList<AtomicOntologyChange> changeObjects = new ArrayList<AtomicOntologyChange>();
 		int countColumns = 0;
@@ -48,7 +48,7 @@ public class OntologyChangeParser {
 		String rename = null;
 		String sourceURI = null;
 		String destinationURI = null;
-		StringTokenizer stArr = null; 
+		StringTokenizer stArr = null;
 		FileInputStream in = new FileInputStream(new File(diffPath));
 
 		CSVParser readFile = new CSVParser(new InputStreamReader(in),
@@ -82,7 +82,7 @@ public class OntologyChangeParser {
 				if ("Yes".equals(record.get(2))) {
 					changeObj.setAtomicChangeType(AtomicChangeType.RENAME);
 				} else if ("Delete".equals(record.get(3))) {
-					changeObj.setAtomicChangeType(AtomicChangeType.DELETE); 
+					changeObj.setAtomicChangeType(AtomicChangeType.DELETE);
 				} else if ("Add".equals(record.get(3))) {
 					changeObj.setAtomicChangeType(AtomicChangeType.ADD);
 				} else {
@@ -91,13 +91,13 @@ public class OntologyChangeParser {
 				}
 
 			    log.debug(changeObj);
-				
+
 				changeObjects.add(changeObj);
 			}
 		}
 
 		readFile.close();
-		
+
 		if (changeObjects.size() == 0) {
 			logger.log("No ABox updates are required.");
 		}

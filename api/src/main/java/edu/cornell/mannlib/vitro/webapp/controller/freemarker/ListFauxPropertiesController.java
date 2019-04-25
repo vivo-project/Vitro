@@ -29,19 +29,19 @@ import javax.servlet.annotation.WebServlet;
 public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 
 	private static final Log log = LogFactory.getLog(ListFauxPropertiesController.class.getName());
-	
+
     private static final String TEMPLATE_NAME = "siteAdmin-fauxPropertiesList.ftl";
 
     private ObjectPropertyDao opDao = null;
     private PropertyGroupDao pgDao = null;
     private FauxPropertyDao fpDao = null;
 	private String notFoundMessage = "";
-	
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
@@ -49,7 +49,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
         try {
 
             String displayOption = "";
-            
+
             if ( vreq.getParameter("displayOption") != null ) {
                 displayOption = vreq.getParameter("displayOption");
             }
@@ -57,14 +57,14 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
                 displayOption = "listing";
             }
             body.put("displayOption", displayOption);
-            
+
             if ( displayOption.equals("listing") ) {
                 body.put("pageTitle", "Faux Property Listing");
             }
             else {
                 body.put("pageTitle", "Faux Properties by Base Property");
             }
-                        
+
             opDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
 			fpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getFauxPropertyDao();
 			pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
@@ -73,14 +73,14 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
             objectProps = opDao.getRootObjectProperties();
 
 			Map<String, Object> allFauxProps = new TreeMap<String, Object>();
-			// get the faux depending on the display option 
+			// get the faux depending on the display option
 			if ( displayOption.equals("listing") ) {
                 allFauxProps = getFauxPropertyList(objectProps);
             }
 			else {
 				allFauxProps = getFauxByBaseList(objectProps);
 			}
-			
+
 			log.debug(allFauxProps.toString());
 
 			if ( notFoundMessage.length() == 0 ) {
@@ -89,7 +89,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 			else {
             	body.put("fauxProps", allFauxProps);
 			}
-                    
+
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -100,21 +100,21 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 	private TreeMap<String, Object> getFauxPropertyList(List<ObjectProperty> objectProps) {
 		List<FauxProperty> fauxProps = null;
 		TreeMap<String, Object> theFauxProps = new TreeMap<String, Object>();
-        if ( objectProps != null ) {	
+        if ( objectProps != null ) {
             Iterator<ObjectProperty> opIt = objectProps.iterator();
             if ( !opIt.hasNext()) {
-                notFoundMessage = "No object properties found."; 
-            } 
+                notFoundMessage = "No object properties found.";
+            }
 			else {
                 while (opIt.hasNext()) {
-					
+
                     ObjectProperty op = opIt.next();
 					String baseURI = op.getURI();
                     fauxProps = fpDao.getFauxPropertiesForBaseUri(baseURI);
 					if ( fauxProps != null ) {
 						Iterator<FauxProperty> fpIt = fauxProps.iterator();
 						if ( !fpIt.hasNext()) {
-							notFoundMessage = "No faux properties found."; 
+							notFoundMessage = "No faux properties found.";
 						}
 						else {
 							while (fpIt.hasNext()) {
@@ -143,12 +143,12 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								tmpHash.put("rangeURI", rangeURI);
 								tmpHash.put("domain", domainLabel);
 								tmpHash.put("domainURI", domainURI);
-								// add the faux and its details to the treemap	
+								// add the faux and its details to the treemap
 								theFauxProps.put(fauxLabel + "@@" + domainLabel, tmpHash);
-							} 
-						} 
+							}
+						}
 					}
-            	}	
+            	}
             }
         }
         return theFauxProps;
@@ -157,11 +157,11 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 	private TreeMap<String, Object> getFauxByBaseList(List<ObjectProperty> objectProps) {
 		List<FauxProperty> fauxProps = null;
 		TreeMap<String, Object> fauxByBaseProps = new TreeMap<String, Object>();
-        if ( objectProps != null ) {	
+        if ( objectProps != null ) {
             Iterator<ObjectProperty> opIt = objectProps.iterator();
             if ( !opIt.hasNext()) {
-                notFoundMessage = "No object properties found."; 
-            } 
+                notFoundMessage = "No object properties found.";
+            }
 			else {
                 while (opIt.hasNext()) {
 					TreeMap<String, Object> fauxForGivenBase = new TreeMap<String, Object>();
@@ -172,7 +172,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 					if ( fauxProps != null ) {
 						Iterator<FauxProperty> fpIt = fauxProps.iterator();
 						if ( !fpIt.hasNext()) {
-							notFoundMessage = "No faux properties found."; 
+							notFoundMessage = "No faux properties found.";
 						}
 						else {
 							String baseLabel = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
@@ -199,13 +199,13 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								tmpHash.put("rangeURI", rangeURI);
 								tmpHash.put("domain", domainLabel);
 								tmpHash.put("domainURI", domainURI);
-								// add the faux and its details to the treemap	
+								// add the faux and its details to the treemap
 								fauxForGivenBase.put(fauxLabel + "@@" + domainLabel, tmpHash);
 							}
 							 fauxByBaseProps.put(baseLabel, fauxForGivenBase);
-						} 
+						}
 					}
-            	}	
+            	}
             }
         }
         return fauxByBaseProps;
@@ -216,8 +216,8 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
      */
     public static String getDisplayLabel(ObjectProperty op) {
         String displayLabel = op.getPickListName();
-    	displayLabel = (displayLabel != null && displayLabel.length() > 0)  
-			? displayLabel 
+    	displayLabel = (displayLabel != null && displayLabel.length() > 0)
+			? displayLabel
 			: op.getLocalName();
 		return (displayLabel != null) ? displayLabel : "[object property]" ;
     }

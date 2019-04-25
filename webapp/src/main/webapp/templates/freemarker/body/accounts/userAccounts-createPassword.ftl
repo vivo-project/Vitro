@@ -27,10 +27,10 @@
     <form method="POST" action="${formUrls.createPassword}" class="customForm" role="create password">
         <input type="hidden" name="user" value="${userAccount.emailAddress}" role="input" />
         <input type="hidden" name="key"  value="${userAccount.passwordLinkExpiresHash}" role="input" />
-    
+
         <label for="new-password">${strings.new_password}<span class="requiredHint"> *</span></label>
         <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
-        
+
         <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}</p>
 
         <label for="confirm-password">${strings.confirm_password}<span class="requiredHint"> *</span></label>

@@ -15,13 +15,13 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 /**
  * Where are we in the process of logging on? What message should we show to the
  * user?
- * 
+ *
  * TODO: the contents loginPageUrl is not explicitly defined, but it is assumed
  * to be either null, absolute, or relative to the host. It would be better if
  * it were explicitly defined, and either null, absolute or relative to the
  * context path. Then, the context path could be applied when the URL is used.
  * Later for that.
- * 
+ *
  * TODO: similar for afterLoginUrl, I presume.
  */
 public class LoginProcessBean {
@@ -120,12 +120,12 @@ public class LoginProcessBean {
 			this.messageLevel = MLevel.NONE;
 			this.text = "";
 		}
-		
+
 		public Message(HttpServletRequest req, MLevel messageLevel, String textKey, Object... parameters) {
 			this.messageLevel = messageLevel;
 			this.text = I18n.bundle(req).text(textKey, parameters);
 		}
-		
+
 		public MLevel getMessageLevel() {
 			return this.messageLevel;
 		}
@@ -188,7 +188,7 @@ public class LoginProcessBean {
 			this.message = message;
 		}
 	}
-	
+
 	public void setMessage(HttpServletRequest req, MLevel level, String textKey, Object... parameters) {
 		synchronized (messageSynchronizer) {
 			this.message = new Message(req, level, textKey, parameters);

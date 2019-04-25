@@ -12,13 +12,13 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
 public class FieldUtils {
-    
+
     private static final Log log = LogFactory.getLog(FieldUtils.class);
-    
+
 
     // copied from OptionsForPropertyTag.java in the thought that class may be deprecated
     public static List<Individual> removeIndividualsAlreadyInRange(List<Individual> individuals,
-            List<ObjectPropertyStatement> stmts, String predicateUri, String objectUriBeingEdited){        
+            List<ObjectPropertyStatement> stmts, String predicateUri, String objectUriBeingEdited){
         HashSet<String>  range = new HashSet<String>();
 
         for(ObjectPropertyStatement ops : stmts){
@@ -35,10 +35,10 @@ public class FieldUtils {
                 ++removeCount;
             }
         }
-        
+
         return individuals;
     }
-    
- 
-    
+
+
+
 }

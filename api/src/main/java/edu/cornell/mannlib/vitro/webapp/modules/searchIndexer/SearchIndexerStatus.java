@@ -8,11 +8,11 @@ import java.util.Date;
 /**
  * An immutable summary of the status of the SearchIndexer, at a fixed point in
  * time. Contains the current state, the time, and some counts.
- * 
+ *
  * If the indexer is processing URIs, processing statements, or preparing a
  * rebuild, the counts are URI_COUNTS, STATEMENT_COUNTS, or REBUILD_COUNTS,
  * respectively.
- * 
+ *
  * When the indexer starts up, becomes idle, or shuts down, the counts are
  * NO_COUNTS.
  */
@@ -120,7 +120,7 @@ public class SearchIndexerStatus {
 		public int getExcluded() {
 			return excluded;
 		}
-		
+
 		public int getDeleted() {
 			return deleted;
 		}

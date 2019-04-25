@@ -22,8 +22,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 
 
 public class DataPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
-    private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
-    
+    private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class);
+
     private final Literal literalValue;
     private final String deleteUrl;
     private final String editUrl;
@@ -32,17 +32,17 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     //Extended to include vitro request to check for special parameters
     public DataPropertyStatementTemplateModel(String subjectUri, Property property, Literal literal,
             String templateName, VitroRequest vreq) {
-        
+
         super(subjectUri, property, vreq);
-        
+
         this.literalValue = literal;
         this.templateName = templateName;
 
         // Do delete url first, since used in building edit url
-        this.deleteUrl = makeDeleteUrl();            
-        this.editUrl = makeEditUrl();       
+        this.deleteUrl = makeDeleteUrl();
+        this.editUrl = makeEditUrl();
     }
-    
+
 	private String makeDeleteUrl() {
         // Determine whether the statement can be deleted
 		DataPropertyStatement dps = makeStatement();
@@ -50,47 +50,47 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }
-        
+
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
                 "predicateUri", property.getURI(),
                 "datapropKey", makeHash(dps),
                 "cmd", "delete");
-        
+
         params.put("templateName", templateName);
         params.putAll(UrlBuilder.getModelParams(vreq));
-        
+
         return UrlBuilder.getUrl(EDIT_PATH, params);
 	}
 
 	private String makeEditUrl() {
-        // vitro:moniker is deprecated. We display existing data values so editors can 
+        // vitro:moniker is deprecated. We display existing data values so editors can
         // move them to other properties and delete, but don't allow editing.
         if ( VitroVocabulary.MONIKER.equals(property.getURI()) ) {
-            return "";           
+            return "";
         }
-        
+
         // Determine whether the statement can be edited
 		DataPropertyStatement dps = makeStatement();
         RequestedAction action = new EditDataPropertyStatement(vreq.getJenaOntModel(), dps);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }
-        
+
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
                 "predicateUri", property.getURI(),
                 "datapropKey", makeHash(dps));
-        
+
         if ( deleteUrl.isEmpty() ) {
             params.put("deleteProhibited", "prohibited");
         }
-        
+
         params.putAll(UrlBuilder.getModelParams(vreq));
-        
-        return UrlBuilder.getUrl(EDIT_PATH, params);             
+
+        return UrlBuilder.getUrl(EDIT_PATH, params);
 	}
-        
+
 	private DataPropertyStatement makeStatement() {
 		DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, property.getURI(), literalValue.getLexicalForm());
 		// Language and datatype are needed to get the correct hash value
@@ -105,7 +105,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 	}
 
     /* Template properties */
-    
+
     public String getValue() {
         //attempt to strip any odd HTML
         return cleanTextForDisplay( literalValue.getLexicalForm() );
@@ -115,7 +115,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 	public String getDeleteUrl() {
 		return deleteUrl;
 	}
-    
+
     @Override
 	public String getEditUrl() {
 		return editUrl;

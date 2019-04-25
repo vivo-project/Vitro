@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 
 /**
  * A mock instance of ModelAccessFactory for use in unit tests.
- * 
+ *
  * I have only implemented the methods that I needed for my tests. Feel free to
  * implement the rest, as needed.
  */
@@ -50,7 +50,7 @@ public class ModelAccessFactoryStub extends ModelAccessFactory {
 	public ContextModelAccessStub get(ServletContext ctx) {
 		return contextMA;
 	}
-	
+
 	public RequestModelAccessStub get(HttpServletRequest req) {
 		return requestMA;
 	}

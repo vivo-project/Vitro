@@ -18,13 +18,13 @@
 		<input type="hidden" name="EmailFields" value="webuseremail"/>
 		<input type="hidden" name="EmailFieldsNames" value="emailaddress"/>
 		<input type="hidden" name="DeliveryType" value="comment"/>
-		
+
 		<p class="normal">My email address is (e.g., userid<b>@institution.edu</b>):</p>
 		<input style="width:25%;" type="text" name="webuseremail" maxlength="255"/><br/><br/>
 		<p class="normal">My full name is:</p>
 		<input style="width:33%;" type="text" name="webusername" maxlength="255"/><br/><br/>
 
-		
+
 		<h3>Enter your message below. This message will be emailed to all email addresses associated with user accounts. </h3>
 
 		<textarea name="s34gfd88p9x1" rows="10" cols="90"></textarea>

@@ -12,7 +12,7 @@
 <#--Number of distinct languages represented, with no language tag counting as a language, across labels-->
 <#if !languageCount??>
 	<#assign languageCount = 1>
-</#if>	
+</#if>
 
 <#-- Default individual profile page template -->
 <#--@dumpAll /-->
@@ -44,8 +44,8 @@
         <header>
             <#if relatedSubject??>
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
-                <p><a href="${relatedSubject.url}" title="${i18n().return_to(relatedSubject.name)}">&larr; ${i18n().return_to(relatedSubject.name)}</a></p>                
-            <#else>                
+                <p><a href="${relatedSubject.url}" title="${i18n().return_to(relatedSubject.name)}">&larr; ${i18n().return_to(relatedSubject.name)}</a></p>
+            <#else>
                 <h1 class="fn" itemprop="name">
                     <#-- Label -->
                     <@p.label individual editable labelCount localesCount languageCount/>
@@ -56,7 +56,7 @@
                 </h1>
             </#if>
         </header>
-                
+
     <#if individualProductExtension??>
         ${individualProductExtension}
     <#else>
@@ -64,15 +64,15 @@
         </section> <!-- individual-intro -->
     </#if>
 
-<#assign nameForOtherGroup = "${i18n().other}"> 
+<#assign nameForOtherGroup = "${i18n().other}">
 
 <!-- Property group menu or tabs -->
-<#-- 
+<#--
     With release 1.6 there are now two types of property group displays: the original property group
      menu and the horizontal tab display, which is the default. If you prefer to use the property
      group menu, simply substitute the include statement below with the one that appears after this
      comment section.
-     
+
      <#include "individual-property-group-menus.ftl">
 -->
 

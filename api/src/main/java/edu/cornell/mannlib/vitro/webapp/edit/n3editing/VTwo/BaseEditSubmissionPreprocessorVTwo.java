@@ -6,10 +6,10 @@ public abstract class BaseEditSubmissionPreprocessorVTwo implements
         EditSubmissionVTwoPreprocessor {
 
     protected EditConfigurationVTwo editConfiguration;
-    
+
     public BaseEditSubmissionPreprocessorVTwo(EditConfigurationVTwo editConfig) {
         editConfiguration = editConfig;
     }
-    
+
 
 }

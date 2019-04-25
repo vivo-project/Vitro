@@ -3,7 +3,7 @@
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <!--
-	Template file does not exist. Should throw an exception.  
+	Template file does not exist. Should throw an exception.
 -->
 
 <list-view-config>
@@ -15,16 +15,16 @@
             <collated>
             ?object a ?subclass.
             </collated>
-        }  
+        }
     </query-select>
 
     <query-construct>
         CONSTRUCT {
             ?subject ?property ?object .
         } WHERE {
-            ?subject ?property ?object 
+            ?subject ?property ?object
         }
     </query-construct>
-    
+
     <template>propStatement-doesNotExist.ftl</template>
 </list-view-config>

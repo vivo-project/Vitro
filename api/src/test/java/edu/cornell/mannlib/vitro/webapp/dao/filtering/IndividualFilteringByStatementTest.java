@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
  * Test that the IndividualFiltering class filters by statements as much as
  * possible. That way the filter can consider the subject of the statement as
  * well as the predicate, when deciding whether to authorize the request.
- * 
+ *
  * <pre>
  * Start with six properties and a filter that recognizes them.
  *    DATA_HIDDEN -- never approved
@@ -44,13 +44,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
  *    DATA_MAYBE -- only approved in statements with subject of SPECIAL URI.
  *    OBJECT_HIDDEN -- never approved
  *    OBJECT_VISIBLE -- always approved
- *    OBJECT_MAYBE -- only approved in statements with subject or object of SPECIAL URI. 
- * 
- * Test all of the filtering methods on two filtered individuals. 
+ *    OBJECT_MAYBE -- only approved in statements with subject or object of SPECIAL URI.
+ *
+ * Test all of the filtering methods on two filtered individuals.
  *    One is SPECIAL_URI, and should see the MAYBE properties.
  *    One is ordinary, and should not see the MAYBE properties.
  * </pre>
- * 
+ *
  * This is a simplification of a "self-editing" filter, which shows some
  * properties, hides others, and allows some of the hidden ones in statements,
  * depending on the subject and/or object of the statement.

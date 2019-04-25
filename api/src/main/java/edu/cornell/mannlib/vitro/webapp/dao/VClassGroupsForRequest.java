@@ -36,7 +36,7 @@ public class VClassGroupsForRequest {
 		for (VClassGroup vcGroup : cache.getGroups()) {
 			loadGroup(vcGroup);
 		}
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug("groups: " + groupMap.values());
 			log.debug("classes: " + classMap.values());

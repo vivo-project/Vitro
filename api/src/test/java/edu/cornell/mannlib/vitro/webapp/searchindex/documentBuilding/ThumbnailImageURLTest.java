@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 public class ThumbnailImageURLTest extends AbstractTestClass{
 	ContextModelAccessStub contextModels;
     String personsURI = "http://vivo.cornell.edu/individual/individual8803";
-        
+
     /**
      * @throws java.lang.Exception
      */
@@ -41,9 +41,9 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
         setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
         ApplicationStub.setup(new ServletContextStub(), new SearchEngineStub());
 
-        Model model = ModelFactory.createDefaultModel();        
+        Model model = ModelFactory.createDefaultModel();
         InputStream in = ThumbnailImageURLTest.class.getResourceAsStream("testPerson.n3");
-        model.read(in,"","N3");        
+        model.read(in,"","N3");
         contextModels = new ContextModelAccessStub();
         contextModels.setRDFService(CONTENT, new RDFServiceModel( model ));
     }
@@ -59,18 +59,18 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
         testMe.setContextModels(contextModels);
         Individual ind = new IndividualImpl();
         ind.setURI(personsURI);
-        
+
         //make sure that the person is in the RDF
         testMe.modifyDocument(ind, doc);
 
         //make sure that a search document field got created for the thumbnail image
-        
+
         SearchInputField thumbnailField = doc.getField( VitroSearchTermNames.THUMBNAIL_URL );
         Assert.assertNotNull(thumbnailField);
 
         Assert.assertNotNull( thumbnailField.getValues() );
         Assert.assertEquals(1, thumbnailField.getValues().size());
-        
+
         Assert.assertEquals("http://vivo.cornell.edu/individual/n54945", thumbnailField.getFirstValue());
     }
 

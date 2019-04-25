@@ -22,8 +22,8 @@ public class UrlBuilder {
 
     private static final Log log = LogFactory.getLog(UrlBuilder.class.getName());
 
-    protected static String contextPath = null;   
-        
+    protected static String contextPath = null;
+
     public enum Route {
         ABOUT("/about"),
         AUTHENTICATE("/authenticate"),
@@ -34,7 +34,7 @@ public class UrlBuilder {
         INDIVIDUAL("/individual"),
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
-        LOGIN("/login"), 
+        LOGIN("/login"),
         LOGOUT("/logout"),
         OBJECT_PROPERTY_EDIT("/propertyEdit"),
         SEARCH("/search"),
@@ -47,11 +47,11 @@ public class UrlBuilder {
         EDIT_REQUEST_DISPATCH("/editRequestDispatch");
 
         private final String path;
-        
+
         Route(String path) {
             this.path = path;
         }
-        
+
         public String path() {
             return path;
         }
@@ -59,81 +59,81 @@ public class UrlBuilder {
         public String url() {
             return getUrl(path);
         }
-        
+
         public String url(ParamMap params) {
             return getUrl(path, params);
         }
-        
+
         public String toString() {
             return path();
-        }        
+        }
     }
-    
+
     public enum Css {
         CUSTOM_FORM("/edit/forms/css/customForm.css"),
         JQUERY_UI("/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css");
 
         private final String path;
-        
+
         Css(String path) {
-            this.path = path;           
+            this.path = path;
         }
-        
+
         public String path() {
             return path;
         }
-        
+
         public String toString() {
             return path;
         }
     }
-    
+
     public enum JavaScript {
         CUSTOM_FORM_UTILS("/js/customFormUtils.js"),
         JQUERY("/js/jquery-1.12.4.min.js"),
         JQUERY_MIGRATE("/js/jquery-migrate-1.4.1.js"),
         JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.12.1.min.js"),
         UTILS("/js/utils.js");
-        
+
         private final String path;
-        
+
         JavaScript(String path) {
-            this.path = path;           
+            this.path = path;
         }
-        
+
         public String path() {
             return path;
         }
-        
+
         public String toString() {
             return path;
         }
     }
-    
+
     private UrlBuilder() { }
-  
+
     public static String getHomeUrl() {
     	return getUrl("");
     }
-    
+
     // Used by templates to build urls.
     public static String getBaseUrl() {
         return contextPath;
     }
-    
+
 	public static String getLoginUrl() {
 		return getUrl(Route.AUTHENTICATE, "return", "true");
 	}
-    
+
     public static String getLogoutUrl() {
         return getUrl(Route.LOGOUT);
     }
-    
-    public static class ParamMap extends LinkedHashMap<String, String> { 
+
+    public static class ParamMap extends LinkedHashMap<String, String> {
         private static final long serialVersionUID = 1L;
-        
+
         public ParamMap() { }
-        
+
         public ParamMap(String...strings) {
             int stringCount = strings.length;
             for (int i = 0; i < stringCount; i=i+2) {
@@ -143,70 +143,70 @@ public class UrlBuilder {
                 if (strings[i+1] == null) { continue; }
                 this.put(strings[i], strings[i+1]);
             }
-        } 
-        
+        }
+
         public ParamMap(List<String> strings) {
             this((String[]) strings.toArray());
         }
-        
+
         public ParamMap(Map<String, String> map) {
             putAll(map);
         }
-        
+
         public void put(String key, int value) {
             put(key, String.valueOf(value));
         }
-        
+
         public void put(String key, boolean value) {
             put(key, String.valueOf(value));
         }
-        
+
         public void put(ParamMap params) {
             for (String key: params.keySet()) {
                 put(key, params.get(key));
             }
         }
-        
+
     }
-    
+
     public static String getUrl(String path) {
-    	
+
         if ( !path.isEmpty() && !path.startsWith("/") ) {
             path = "/" + path;
         }
         path = contextPath + path;
         return path.isEmpty() ? "/" : path;
     }
-    
+
     public static String getUrl(Route route) {
         return getUrl(route.path());
     }
-    
+
     public static String getUrl(String path, String...params) {
         ParamMap urlParams = new ParamMap(params);
         return getUrl(path, urlParams);
     }
-    
+
     public static String getUrl(Route route, String...params) {
         return getUrl(route.path(), params);
     }
-    
+
     public static String getUrl(String path, ParamMap params) {
         path = getPath(path, params);
-        return getUrl(path);       
+        return getUrl(path);
     }
 
     //TODO: document this as it is used all over the app
-    //does this append the context?  What if params is null? 
+    //does this append the context?  What if params is null?
     //What if you want a route that isn't in Route?
     public static String getUrl(Route route, ParamMap params) {
         return getUrl(route.path(), params);
     }
-    
+
     public static String getPath(String path, ParamMap params) {
-        return addParams(path, params, "?");      
+        return addParams(path, params, "?");
     }
-    
+
     private static String addParams(String url, ParamMap params, String glue) {
         if (params.size() > 0) {
             StringBuilder sb = new StringBuilder(url);
@@ -227,32 +227,32 @@ public class UrlBuilder {
 
         return url;
     }
-    
+
     public static String addParams(String url, ParamMap params) {
         String glue = url.contains("?") ? "&" : "?";
         return addParams(url, params, glue);
     }
-    
+
     public static String addParams(String url, String...params) {
         return addParams(url, new ParamMap(params));
     }
-    
+
     public static String addParams(String url, List<String> params) {
         return addParams(url, new ParamMap(params));
     }
-    
+
     public static String getPath(Route route, ParamMap params) {
         return getPath(route.path(), params);
     }
-    
+
     public static String getIndividualProfileUrl(Individual individual, VitroRequest vreq) {
         WebappDaoFactory wadf = vreq.getWebappDaoFactory();
         String profileUrl = null;
         try {
             String localName = individual.getLocalName();
             String namespace = individual.getNamespace();
-            String defaultNamespace = wadf.getDefaultNamespace();                
-                    
+            String defaultNamespace = wadf.getDefaultNamespace();
+
             if (defaultNamespace.equals(namespace)) {
                 profileUrl = getUrl(Route.DISPLAY.path() + "/" + localName);
             } else {
@@ -267,7 +267,7 @@ public class UrlBuilder {
         } catch (Exception e) {
             log.warn(e);
             return null;
-        }        
+        }
 
         if (profileUrl != null) {
             LinkedHashMap<String, String> specialParams = getModelParams(vreq);
@@ -275,38 +275,38 @@ public class UrlBuilder {
                 profileUrl = addParams(profileUrl, new ParamMap(specialParams));
             }
         }
-        
+
         return profileUrl;
     }
 
     /**
-     * If you already have an Individual object around, 
-     * call getIndividualProfileUrl(Individual, VitroRequest) 
-     * instead of this method. 
+     * If you already have an Individual object around,
+     * call getIndividualProfileUrl(Individual, VitroRequest)
+     * instead of this method.
      */
-    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {        
+    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {
         return getIndividualProfileUrl(new IndividualImpl(individualUri),  vreq);
-    }    
-    
+    }
+
     public static boolean isUriInDefaultNamespace(String individualUri, VitroRequest vreq) {
         return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());
     }
-    
+
     public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {
         return isUriInDefaultNamespace( individualUri, wadf.getDefaultNamespace());
     }
-    
+
     public static boolean isUriInDefaultNamespace(String individualUri, String defaultNamespace){
         try {
-            Individual ind = new IndividualImpl(individualUri); 
-            String namespace = ind.getNamespace();          
+            Individual ind = new IndividualImpl(individualUri);
+            String namespace = ind.getNamespace();
             return defaultNamespace.equals(namespace);
         } catch (Exception e) {
             log.warn(e);
             return false;
         }
     }
-    
+
     public static String urlEncode(String str) {
         String encoding = "UTF-8";
         String encodedUrl = null;
@@ -328,11 +328,11 @@ public class UrlBuilder {
         }
         return decodedUrl;
     }
-    
+
     //To be used in different property templates so placing method for reuse here
     //Check if special params included, specifically for menu management and other models
     public static LinkedHashMap<String,String> getModelParams(VitroRequest vreq) {
-    	
+
     	LinkedHashMap<String,String> specialParams = new LinkedHashMap<String, String>();
     	if(vreq != null) {
     		//this parameter is sufficient to switch to menu model
@@ -346,7 +346,7 @@ public class UrlBuilder {
 	    	}
 	    	else if(useMainModelUri != null && !useMainModelUri.isEmpty()) {
 	    		specialParams.put(DisplayVocabulary.USE_MODEL_PARAM, useMainModelUri);
-	    		if(useTboxModelUri != null && !useTboxModelUri.isEmpty()){ 
+	    		if(useTboxModelUri != null && !useTboxModelUri.isEmpty()){
 	    			specialParams.put(DisplayVocabulary.USE_TBOX_MODEL_PARAM, useTboxModelUri);
 	    		}
 	    		if(useDisplayModelUri != null && !useDisplayModelUri.isEmpty()) {

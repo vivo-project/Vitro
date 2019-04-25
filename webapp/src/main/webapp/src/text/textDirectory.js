@@ -29,7 +29,7 @@ dojo.textDirectoryTokeniser.Property = function (line) {
 	var left = dojo.string.trim(line.substring(0, line.indexOf(':')));
 	var right = dojo.string.trim(line.substr(line.indexOf(':') + 1));
 
-	// seperate name and paramters	
+	// seperate name and paramters
 	var parameters = dojo.string.splitEscaped(left,';');
 	this.name = parameters[0]
 	parameters.splice(0, 1);
@@ -39,9 +39,9 @@ dojo.textDirectoryTokeniser.Property = function (line) {
 	for (var i = 0; i < parameters.length; i++) {
 		var arr = parameters[i].split("=");
 		var key = dojo.string.trim(arr[0].toUpperCase());
-		
+
 		if (arr.length == 1) { this.params.push([key]); continue; }
-		
+
 		var values = dojo.string.splitEscaped(arr[1],',');
 		for (var j = 0; j < values.length; j++) {
 			if (dojo.string.trim(values[j]) != '') {
@@ -56,7 +56,7 @@ dojo.textDirectoryTokeniser.Property = function (line) {
 		this.group = arr[0];
 		this.name = arr[1];
 	}
-	
+
 	// don't do any parsing, leave to implementation
 	this.value = right;
 }
@@ -68,7 +68,7 @@ dojo.textDirectoryTokeniser.tokenise = function (text) {
 	var nText = dojo.string.normalizeNewlines(text,"\n");
 	nText = nText.replace(/\n[ \t]/g, '');
 	nText = nText.replace(/\x00/g, '');
-		
+
 	var lines = nText.split("\n");
 	var properties = []
 

@@ -64,7 +64,7 @@ public class ConfigReader {
     /**
      * Gets the data source types.
      *
-     * @return a mapping of names of data source types to these types  
+     * @return a mapping of names of data source types to these types
      */
     public Map<String, IDataSourceType> getDataSourceTypes() {
         return dataSourceTypes;
@@ -90,7 +90,7 @@ public class ConfigReader {
 
     /**
      * Gets the base URL
-     * 
+     *
      * @return the base URL
      */
     public String getBaseURL() {
@@ -99,7 +99,7 @@ public class ConfigReader {
 
     /**
      * Loads a certain {@link IDataSourceType} class at runtime
-     * 
+     *
      * @param className IDataSourceType class
      * @return the created IDataSourceType object
      */
@@ -107,7 +107,7 @@ public class ConfigReader {
     {
         final Class<?> c;
         try {
-            c = Class.forName( className ); 
+            c = Class.forName( className );
         }
         catch ( ClassNotFoundException e ) {
             throw new IllegalArgumentException( "Class not found: " + className,

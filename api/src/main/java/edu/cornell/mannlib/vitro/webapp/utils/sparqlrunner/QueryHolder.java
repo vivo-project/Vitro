@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 /**
  * Holds the text of a SPARQL query, and allows you to perform some lexical
  * operations on it.
- * 
+ *
  * This is immutable, so don't forget to get the result of the operations.
  */
 public class QueryHolder {

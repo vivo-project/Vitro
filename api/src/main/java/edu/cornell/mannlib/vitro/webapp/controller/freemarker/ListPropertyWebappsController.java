@@ -40,12 +40,12 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
     private static Log log = LogFactory.getLog( ListPropertyWebappsController.class );
 
     private static final String TEMPLATE_NAME = "siteAdmin-objectPropHierarchy.ftl";
-        
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
@@ -68,16 +68,16 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
             PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
             String vclassURI = vreq.getParameter("vclassUri");
-        
+
             List<ObjectProperty> props = new ArrayList<ObjectProperty>();
             if (vreq.getParameter("propsForClass") != null) {
                 noResultsMsgStr = "There are no object properties that apply to this class.";
-            
+
                 // incomplete list of classes to check, but better than before
                 List<String> superclassURIs = vcDao.getAllSuperClassURIs(vclassURI);
                 superclassURIs.add(vclassURI);
                 superclassURIs.addAll(vcDao.getEquivalentClassURIs(vclassURI));
-            
+
                 Map<String, PropertyInstance> propInstMap = new HashMap<String, PropertyInstance>();
                 for (String classURI : superclassURIs) {
             	    Collection<PropertyInstance> propInsts = piDao.getAllPropInstByVClass(classURI);
@@ -88,7 +88,7 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                 List<PropertyInstance> propInsts = new ArrayList<PropertyInstance>();
                 propInsts.addAll(propInstMap.values());
                 Collections.sort(propInsts);
-            
+
                 Iterator<PropertyInstance> propInstIt = propInsts.iterator();
                 HashSet<String> propURIs = new HashSet<String>();
                 while (propInstIt.hasNext()) {
@@ -106,7 +106,7 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                     ? dao.getRootObjectProperties()
                     : dao.getAllObjectProperties();
             }
-        
+
             OntologyDao oDao = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
             HashMap<String,String> ontologyHash = new HashMap<String,String>();
 
@@ -191,14 +191,14 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
 
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
-    
+
     private String getVClassNameFromURI(String vclassURI, VClassDao vcDao, VClassDao vcDaoLangNeut) {
         if(vclassURI == null) {
             return "";
         }
         VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
         if(vclass == null) {
-            return ""; 
+            return "";
         }
         if(vclass.isAnonymous()) {
             return vclass.getPickListName();

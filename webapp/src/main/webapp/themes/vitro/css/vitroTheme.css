@@ -20,14 +20,14 @@ html,
 body {
     padding: 0;
     height: 100%; /* needed for container min-height */
-    font-family: "Lucida Sans Unicode","Lucida Grande", Geneva, helvetica, sans-serif; 
+    font-family: "Lucida Sans Unicode","Lucida Grande", Geneva, helvetica, sans-serif;
     height: auto !important; /* real browsers */
     height: 100%; /* IE6: treaded as min-height*/;
     min-height: 100%; /* real browsers */
     margin: 0 auto;
 }
 body {
-   background: #fff url(../images/header-background.gif) center 0 repeat-x; 
+   background: #fff url(../images/header-background.gif) center 0 repeat-x;
 }
 a {
     color: #47B6D0;
@@ -54,9 +54,9 @@ h2 {
 h2 a {
     color: #006279;
 }
-h2 a:link, 
+h2 a:link,
 h2 a:visited {
-    text-decoration: underline; 
+    text-decoration: underline;
 }
 h3 {
     padding: 10px 0 12px 0;
@@ -79,7 +79,7 @@ h5 {
 /* ------------------------------------------------->  */
 /* EDITING STYLES ---------------------------------->  */
 /* ------------------------------------------------->  */
-input[type="text"], 
+input[type="text"],
 input[type="password"] {
     border: 0;
     font-size: 14px;
@@ -101,12 +101,12 @@ label {
 .verbose-toggle:visited,
 #showAddFormButton,
 #showAddFormButton:visited,
-input.submit, 
+input.submit,
 input.submit:visited,
-/* the id selectors are used temporarily due to the custom jsp tags (<v:input>) 
-for editing forms which require an id and do not allow a class. This will be 
+/* the id selectors are used temporarily due to the custom jsp tags (<v:input>)
+for editing forms which require an id and do not allow a class. This will be
 removed once we refactor the editing forms to Freemarker */
-input#submit, 
+input#submit,
 input#submit:visited,
 input.form-button,
 input.form-button:visited {
@@ -116,7 +116,7 @@ input.form-button:visited {
     padding: 5px 18px 7px;
     color: #fff;
     text-decoration: none;
-    border-radius: 4px; 
+    border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     position: relative;
@@ -130,7 +130,7 @@ input.form-button:visited {
     margin-right: .6em;
     margin-top: .5em;
     margin-bottom: .5em;
-    
+
 }
 #verbose-mode .small {
     font-size: 12px;
@@ -151,7 +151,7 @@ input#delete:visited {
     padding: 5px 18px 7px;
     color: #fff;
     text-decoration: none;
-    border-radius: 4px; 
+    border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     position: relative;
@@ -190,8 +190,8 @@ input.form-button:active,
     top: 1px;
 }
 form textarea {
-    border: 1px solid #e0dfdf; 
-    border-radius: 4px; 
+    border: 1px solid #e0dfdf;
+    border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     font-style: normal;
@@ -203,7 +203,7 @@ form textarea {
 #authorships a.remove:link,
 #webpageList a.remove:link,
 #showAddForm a.cancel:link,
-form a:link.cancel, 
+form a:link.cancel,
 form a:visited.cancel {
     text-decoration: underline;
     color: #f70;
@@ -216,7 +216,7 @@ form a:visited.cancel {
 #webpageList a.remove:active,
 #showAddForm a.cancel:hover,
 #showAddForm a.cancel:active,
-form a:hover.cancel, 
+form a:hover.cancel,
 form a:active.cancel {
     text-decoration: none;
     color: #f70;
@@ -356,11 +356,11 @@ form select {
    margin-top: .7em;
    margin-right: .5em;
 }
-.notice { 
-    margin-top: 1em; 
+.notice {
+    margin-top: 1em;
     border: 1px dotted #FFD324;
 }
-a.ingestMenu:link, 
+a.ingestMenu:link,
 a.ingestMenu:visited,
 ul#alpha-browse-individuals a,
 ul#browse-classes a,
@@ -369,7 +369,7 @@ ul#vgraph-classes a {
     text-decoration: none;
     color: #5E6363;
 }
-a.ingestMenu:hover, 
+a.ingestMenu:hover,
 a.ingestMenu:active {
     text-decoration: none;
     color: #47B6D0;
@@ -400,7 +400,7 @@ tr.editformcell td textarea.matchingInput {
     width: 95%;
     height:10ex;
     margin-top:0.7em;
-    font-family: "Lucida Sans Unicode","Lucida Grande", Geneva, helvetica, sans-serif; 
+    font-family: "Lucida Sans Unicode","Lucida Grande", Geneva, helvetica, sans-serif;
     font-size:0.95em;
 }
 hr.formDivider {
@@ -409,7 +409,7 @@ hr.formDivider {
     height: 1px;
     margin-bottom: 20px;
     margin-top: 15px;
-    opacity: 0.3;   
+    opacity: 0.3;
 }
 .editingForm table {
     width: 100%;
@@ -580,7 +580,7 @@ p.forgot-password a,
 h3.internal-auth:hover {
     color: #47B6D0
 }
-/* LOG IN------>  */          
+/* LOG IN------>  */
 #login {
     float: right;
     width: 314px;
@@ -639,11 +639,11 @@ body.login #login {
     border: 1px solid #e0dfdf;
     border-radius: 5px;
     -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;     
+    -webkit-border-radius: 5px;
 }
 #login-form input.text-field:focus {
-    border: 1px solid rgba(57, 138, 172, .5);  
-    background-color: rgba(0, 168, 196, .1);   
+    border: 1px solid rgba(57, 138, 172, .5);
+    background-color: rgba(0, 168, 196, .1);
 }
 #login-form p.submit {
     width: 100px;
@@ -695,12 +695,12 @@ p.request-account {
 p.password-note {
     font-size: 12px;
     color: #949696;
-    padding-left: 38px;   
+    padding-left: 38px;
 }
 #flash-message {
     border: 1px dotted #E2C822;
     background-color: #FFF9D7;
-    padding: .5em;  
+    padding: .5em;
     margin-bottom: 10px;
 }
 #welcome-message {
@@ -717,7 +717,7 @@ p.password-note {
     height:34px;
 }
 
-/* SEARCH HOME------>  */ 
+/* SEARCH HOME------>  */
 
 #search-home-field {
 		background: url(../images/search-field-and-button.gif) 0 0 no-repeat;
@@ -759,7 +759,7 @@ p.request-account a,
 ul#header-nav a,
 ul#browse-classgroups a.selected span.count-classes,
 ul#browse-classgroups a:hover span.count-classes {
-   color: #fff; 
+   color: #fff;
 }
 #filter-search-nav a {
 		border-bottom: 1px dotted #4f5656;
@@ -786,7 +786,7 @@ ul#browse-classgroups {
 ul#browse-classgroups li {
     border-bottom: 1px solid #bbbbb9;
 }
-ul#browse-classgroups a:hover, 
+ul#browse-classgroups a:hover,
 ul#browse-classgroups a.selected,
 ul#classes-in-classgroup a:hover {
     background-image: none;
@@ -923,7 +923,7 @@ p {
 .button:visited {
     font-size: 16px;
     font-weight: normal;
-    line-height: 1; 
+    line-height: 1;
 }
 .green.button,
 .green.button:visited {
@@ -954,15 +954,15 @@ p {
 .individualList ul.individualData li {
     border-right: solid 1px #a0a0a0;
 }
-.individualList ul { 
-    margin-left: 0; 
+.individualList ul {
+    margin-left: 0;
 }
 .individualList li,
-.individualList li span { 
+.individualList li span {
   color: #9c9c9c;
  }
-.individualList li a { 
-    font-weight: normal; 
+.individualList li a {
+    font-weight: normal;
     color: #47B6D0;
 }
 
@@ -1051,7 +1051,7 @@ ul#find-filters a.selected {
 #profile-photo-display {
     width: 600px;
 }
-#profile-photo-display img {    
+#profile-photo-display img {
     border: 1px solid #dde4e3;
 }
 #nav-display p {
@@ -1086,8 +1086,8 @@ ul#browse-classes a.selected {
     background: url(../images/arrow.gif) 4px 5px no-repeat;
     color: #2ea0cf;
 }
-ul#browse-classes .count-classes {    
-    font-size: 12px; 
+ul#browse-classes .count-classes {
+    font-size: 12px;
 }
 /* ALPHA BROWSE------>  */
 ul#alpha-browse-individuals a:hover {
@@ -1107,7 +1107,7 @@ ul#vgraph-classes .count-classes {
 .alphaIndex,
 .pagination.menupage,
 tr.editformcell td select,
-ul#alpha-browse-individuals li {    
+ul#alpha-browse-individuals li {
     font-size: .8em;
 }
 ul#alpha-browse-individuals,
@@ -1195,8 +1195,8 @@ article.property ul.property-list {
     padding-top: .2em;
 }
 #individual-intro h1 {
-    font-size: 1.375em; 
-    color: #47B6D0; 
+    font-size: 1.375em;
+    color: #47B6D0;
 }
 #individual-intro span.display-title,
 h1.fn .display-title {
@@ -1232,11 +1232,11 @@ ul#individual-tools {
 ul.individual-urls {
     list-style: url(../images/bullet.gif);
 }
-ul#individual-email, 
+ul#individual-email,
 ul#individual-phone {
     list-style-type: none;
 }
-ul#individual-email li, 
+ul#individual-email li,
 ul#individual-phone li {
     line-height: 1.6em;
 }
@@ -1255,7 +1255,7 @@ ul.individual-urls-people {
 #property-group-menu a,
 .grey,
 .pagination.menupage li.selected,
-h2#mainImage, 
+h2#mainImage,
 #share-contact h2,
 h3.internal-auth {
     color: #5e6363;

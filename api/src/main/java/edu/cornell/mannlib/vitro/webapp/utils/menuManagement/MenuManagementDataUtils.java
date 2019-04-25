@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /*
- * This class includes methods that help in selecting a data getter based on 
+ * This class includes methods that help in selecting a data getter based on
  * parameters, and VIVO will have its own version or extend this
  */
 public class MenuManagementDataUtils {
@@ -29,10 +29,10 @@ public class MenuManagementDataUtils {
     public static void setImplementation(IMenuManagementDataUtils impl) {
         MenuManagementDataUtils.impl = impl;
     }
-    
+
 
     public interface IMenuManagementDataUtils {
         public void includeRequiredSystemData(ServletContext context, Map<String, Object> templateData);
     }
-    
+
 }

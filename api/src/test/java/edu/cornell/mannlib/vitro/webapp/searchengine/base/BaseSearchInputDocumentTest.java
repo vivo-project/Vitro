@@ -32,7 +32,7 @@ public class BaseSearchInputDocumentTest {
 		SearchInputField field2 = new BaseSearchInputField("anotherField");
 		field2.setBoost(-16F);
 		doc.addField(field2);
-		
+
 		BaseSearchInputDocument other = new BaseSearchInputDocument(doc);
 		assertEquals(doc, other);
 		assertEquals(doc.getDocumentBoost(), other.getDocumentBoost(), 0.01F);

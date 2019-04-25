@@ -99,7 +99,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 		}
 	},
 
-	
+
 	setUrl: function(/*String*/ url) {
 		// summary:
 		// 	Reset the (external defined) content of this pane and replace with new url
@@ -122,7 +122,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 				if(type == "load") {
 					self.onDownloadEnd.call(self, url, data);
 				} else {
-					// works best when from a live server instead of from file system 
+					// works best when from a live server instead of from file system
 					self._handleDefaults.call(self, "Error loading '" + url + "' (" + e.status + " "+  e.statusText + ")", "onDownloadError");
 					self.onLoad();
 				}
@@ -146,7 +146,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 		for(var i = 0;i < st.length; i++){
 			try{
 				st[i].call(this.scriptScope);
-			}catch(e){ 
+			}catch(e){
 				err += "\n"+st[i]+" failed: "+e.description;
 			}
 		}
@@ -212,7 +212,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 			}
 		}
 		if(typeof e.returnValue != "boolean"){
-			e.returnValue = true; 
+			e.returnValue = true;
 		}
 		if(typeof e.preventDefault != "function"){
 			e.preventDefault = function(){
@@ -235,7 +235,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 		}
 	},
 
-	
+
 	splitAndFixPaths: function(/*String*/s, /*dojo.uri.Uri?*/url){
 		// summary:
 		// 	fixes all remote paths in (hopefully) all cases for example images, remote scripts, links etc.
@@ -253,7 +253,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 		// cut out title tags
 		var match = [];
 		while(match){
-			match = s.match(/<title[^>]*>([\s\S]*?)<\/title>/i); // can't match with dot as that 
+			match = s.match(/<title[^>]*>([\s\S]*?)<\/title>/i); // can't match with dot as that
 			if(!match){ break;}					//doesnt match newline in js
 			titles.push(match[1]);
 			s = s.replace(/<title[^>]*>[\s\S]*?<\/title>/i, "");
@@ -273,7 +273,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 		// strip out the tag and run fix on that.
 		// this guarantees that we won't run replace another tag's attribute + it was easier do
 		var pos = 0; var pos2 = 0; var stop = 0 ;var str = ""; var fixedPath = "";
-		var attr = []; var fix = ""; var tagFix = ""; var tag = ""; var regex = ""; 
+		var attr = []; var fix = ""; var tagFix = ""; var tag = ""; var regex = "";
 		while(pos>-1){
 			pos = s.search(/<[a-z][a-z0-9]*[^>]*\s(?:(?:src|href|style)=[^>])+[^>]*>/i);
 			if(pos==-1){ break; }
@@ -348,7 +348,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 				var sc = match[2].replace(/(?:var )?\bdjConfig\b(?:[\s]*=[\s]*\{[^}]+\}|\.[\w]*[\s]*=[\s]*[^;\n]*)?;?|dojo\.hostenv\.writeIncludes\(\s*\);?/g, "");
 				if(!sc){ continue; }
 
-				// cut out all dojo.require (...) calls, if we have execute 
+				// cut out all dojo.require (...) calls, if we have execute
 				// scripts false widgets dont get there require calls
 				// does suck out possible widgetpackage registration as well
 				tmp = [];
@@ -400,9 +400,9 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 			"url": url};
 	},
 
-	
+
 	_setContent: function(/*String*/ xml){
-		// summary: 
+		// summary:
 		//		private internal function without path regExpCheck and no onLoad calls aftervards
 
 		// remove old children from current content
@@ -457,15 +457,15 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 			}
 			// insert styleNodes, from <style>....
 			for(var i = 0; i < data.styles.length; i++){
-				if(i==0){ 
-					this._remoteStyles = []; 
+				if(i==0){
+					this._remoteStyles = [];
 				}
 				this._remoteStyles.push(dojo.style.insertCssText(data.styles[i]));
 			}
 			// insert styleNodes, from <link href="...">
 			for(var i = 0; i < data.linkStyles.length; i++){
-				if(i==0){ 
-					this._remoteStyles = []; 
+				if(i==0){
+					this._remoteStyles = [];
 				}
 				this._remoteStyles.push(dojo.style.insertCssFile(data.linkStyles[i]));
 			}
@@ -473,7 +473,7 @@ dojo.lang.extend(dojo.widget.html.ContentPane, {
 
 			if(this.parseContent){
 				for(var i = 0; i < data.requires.length; i++){
-					try{ 
+					try{
 						eval(data.requires[i]);
 					} catch(e){
 						this._handleDefaults(e, "onContentError", true);

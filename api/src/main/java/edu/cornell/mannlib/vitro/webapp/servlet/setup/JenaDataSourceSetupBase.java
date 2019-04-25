@@ -13,20 +13,20 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 	private static final Log log = LogFactory.getLog(
 			JenaDataSourceSetupBase.class);
-	
+
     private static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 
-    
+
     private static boolean firstStartup = false;
 
    public static boolean isFirstStartup() {
        return firstStartup;
    }
-   
+
    public static void thisIsFirstStartup(){
        firstStartup = true;
    }
-   
+
     protected String getDefaultNamespace(ServletContext ctx) {
         String dns = ConfigurationProperties.getBean(ctx).getProperty(
                 VITRO_DEFAULT_NAMESPACE);
@@ -37,5 +37,5 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                     + "contain a value for '" + VITRO_DEFAULT_NAMESPACE + "'");
         }
     }
-    
+
 }

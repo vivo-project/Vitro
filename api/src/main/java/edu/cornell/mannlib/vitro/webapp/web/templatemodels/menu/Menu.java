@@ -16,19 +16,19 @@ public class Menu extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(Menu.class.getName());
 
     protected List<MenuItem> items;
-    
-    public Menu() {  
+
+    public Menu() {
         items = new ArrayList<MenuItem>();
     }
-    
+
     public void addItem(String text, String path) {
         items.add(new MenuItem(text, path));
     }
-    
+
     /* Template properties */
-    
+
     public List<MenuItem> getItems() {
         return items;
-    }  
-    
+    }
+
 }

@@ -25,7 +25,7 @@ public class IndividualLocalNameMethod extends BaseTemplateMethodModel {
             throw new TemplateModelException("Wrong number of arguments");
         }
 
-        String uri = (String) args.get(0);        
+        String uri = (String) args.get(0);
         Environment env = Environment.getCurrentEnvironment();
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         VitroRequest vreq = new VitroRequest(request);
@@ -44,12 +44,12 @@ public class IndividualLocalNameMethod extends BaseTemplateMethodModel {
         List<String>params = new ArrayList<String>();
         params.add("Uri of individual");
         map.put("parameters", params);
-        
+
         List<String> examples = new ArrayList<String>();
         examples.add(name + "(individual.uri)");
         map.put("examples", examples);
-        
+
         return map;
     }
-    
+
 }

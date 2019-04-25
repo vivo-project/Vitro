@@ -99,10 +99,10 @@ public class BaseSearchInputField implements SearchInputField {
 	/**
 	 * Can't just compare the value lists, because they are considered to be
 	 * equivalent even if the order is differemt.
-	 * 
+	 *
 	 * Can't just convert them to Sets, because either list may contain the same
 	 * object multiple times.
-	 * 
+	 *
 	 * Remove the members of list1 from list2, one at a time. If any member is
 	 * not found, the lists are not equivalent.
 	 */

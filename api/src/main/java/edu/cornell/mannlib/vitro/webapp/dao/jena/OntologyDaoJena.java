@@ -22,34 +22,34 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     public OntologyDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
-    
+
     // TODO: add model-per-ontology support
     @Override
     protected OntModel getOntModel() {
     	return getOntModelSelector().getTBoxModel();
     }
-    
-    public static synchronized String adjustOntologyURI(String ontologyURI) { 
+
+    public static synchronized String adjustOntologyURI(String ontologyURI) {
     	String uri = ontologyURI.trim();
     	int length = uri.length();
-		if ( (length>1) && (uri.charAt(length-1)=='#') ) { 
+		if ( (length>1) && (uri.charAt(length-1)=='#') ) {
     		return uri.substring(0,length-1);
     	} else {
     		return uri;
     	}
     }
-    
+
     private org.apache.jena.ontology.Ontology getOntology(String ontologyURI,
                                                           OntModel ontModel) {
-    	
+
     	// Something non-ideal happens here.  There are places in the code that
-    	// call getOntology() but don't pass the URI of the ontology resource 
+    	// call getOntology() but don't pass the URI of the ontology resource
     	// itself.  Instead, they pass the namespace that would appear
     	// in a PREFIX declaration.  For example, we might have an ontology with
     	// the namespace http://example.org/ontology# .
-    	// A class in this namespace might have the URI 
-    	// http://example.org/ontology#SomeClass .  The ontology resource 
-    	// itself, however, may have the URI http://example.org/ontology 
+    	// A class in this namespace might have the URI
+    	// http://example.org/ontology#SomeClass .  The ontology resource
+    	// itself, however, may have the URI http://example.org/ontology
     	// (no final hash mark).  To support assumptions in the code,
     	// this method calls adjustOntologyURI to remove a trailing hash
     	// mark if an ontology resource is not found at the specified URI.
@@ -109,11 +109,11 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
         Collections.sort(ontologies);
         return (ontologies.size()>0) ? ontologies : null;
     }
-    
+
     public Ontology getOntologyByURI(String ontologyURI) {
     	Ontology o = null;
     	try {
-    		o = ontologyFromOntologyResource(getOntology(ontologyURI,getOntModel()));	
+    		o = ontologyFromOntologyResource(getOntology(ontologyURI,getOntModel()));
     	} catch (Exception e) {}
     	if (o == null) {
 	        try {
@@ -130,7 +130,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     public String insertNewOntology(Ontology ontology, OntModel ontModel) {
     	if (ontology == null) {
     		return null;
-    	} 
+    	}
     	try {
     		String ontologyURI = adjustAndValidateOntologyURI(ontology.getURI());
             ontModel.enterCriticalSection(Lock.WRITE);
@@ -163,7 +163,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
 	public void updateOntology(Ontology ontology) {
     	updateOntology(ontology,getOntModel());
     }
-    
+
     public void updateOntology(Ontology ontology, OntModel ontModel) {
         ontModel.enterCriticalSection(Lock.WRITE);
         if (ontology != null && ontology.getURI() != null && ontology.getURI().length()>0) {
@@ -173,7 +173,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
                     log.error("OntologyDaoJena.updateOntology() could not find ontology "+ontology.getURI()+" in Jena model");
                 } else {
                     updateRDFSLabel(o, ontology.getName());
-                    updatePropertyStringValue(o, ONTOLOGY_PREFIX_ANNOT, 
+                    updatePropertyStringValue(o, ONTOLOGY_PREFIX_ANNOT,
                             ontology.getPrefix(), ontModel);
                 }
             } finally {
@@ -189,7 +189,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
         ontology.setName(getLabelOrId(ontRes));
         ontology.setURI(ontRes.getURI());
         ontology.setPrefix(getPropertyStringValue(ontRes,ONTOLOGY_PREFIX_ANNOT));
-        
+
         // we need this for the time being because other things are expecting getAllOntologies() to return objects with trailing fragment separators
         // TODO: improve this so '#' is only appended if the last character is not an XML name character
         if (!(ontology.getURI().substring(ontology.getURI().length()-1,ontology.getURI().length()).equals("#") ||
@@ -197,7 +197,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
             )) {
             ontology.setURI(ontology.getURI()+"#");
         }
-        
+
         return ontology;
     }
 

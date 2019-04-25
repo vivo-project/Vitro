@@ -23,7 +23,7 @@
     <li><a href="ingest?action=renameBNodes" title="Convert blank nodes to named resources">Name Blank Nodes</a></li>
     <li><a href="ingest?action=smushSingleModel" title="Convert all existing URIs for a resource to a single URI">Smush Resources</a></li>
     <li><a href="ingest?action=mergeResources" title="Merge two resources into one">Merge Resources</a></li>
-    <li><a href="ingest?action=renameResource" title="Change the namespace of resources currently in a specified namespace">Change Namespace of Resources</a></li> 
+    <li><a href="ingest?action=renameResource" title="Change the namespace of resources currently in a specified namespace">Change Namespace of Resources</a></li>
     <li><a href="ingest?action=processStrings" title="Process property value strings">Process Property Value Strings</a></li>
     <li><a href="ingest?action=splitPropertyValues" title="Split property value strings into multiple property values using a regular expression pattern">Split Property Value Strings into Multiple Property Values</a></li>
 </ul>

@@ -15,9 +15,9 @@ import org.directwebremoting.WebContextFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-public class VClassDWR {    
+public class VClassDWR {
 
-    public VClassDWR(){        
+    public VClassDWR(){
     }
 
     /**
@@ -36,17 +36,17 @@ public class VClassDWR {
      */
     public Collection <VClass> getVClasses(String vclassURI, String propertyURI, boolean filterOutUninstanciated){
         List <VClass> vclasses = new ArrayList <VClass>();
-        
+
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
-        
+
         vclasses = vreq.getWebappDaoFactory().getVClassDao().getVClassesForProperty(vclassURI, propertyURI);
-        
+
         //it seems that filterOutUninstanciated was removed in the RDFService conversion.
-                
-        Collections.sort(vclasses); //sort vClasses NIHVIVO-3963        
+
+        Collections.sort(vclasses); //sort vClasses NIHVIVO-3963
         return vclasses;
     }
-    
+
 }

@@ -19,9 +19,9 @@ import freemarker.template.TemplateModelException;
 public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateDirectiveModel.class);
-    
+
     public abstract Map<String, Object> help(String name);
-    
+
     public static String processTemplateToString(String templateName, Map<String, Object> map, Environment env) {
         Template template = getTemplate(templateName, env);
         StringWriter sw = new StringWriter();
@@ -32,9 +32,9 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
         } catch (IOException e) {
             log.error("IOException creating processing environment", e);
         }
-        return sw.toString();        
+        return sw.toString();
     }
-    
+
     private static Template getTemplate(String templateName, Environment env) {
         Template template = null;
         try {
@@ -42,10 +42,10 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
         } catch (IOException e) {
             // RY Should probably throw this error instead.
             log.error("Cannot get template " + templateName, e);
-        }  
-        return template;        
+        }
+        return template;
     }
-    
+
     // ----------------------------------------------------------------------
 	// Convenience methods for parsing the parameter map
 	// ----------------------------------------------------------------------
@@ -82,5 +82,5 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
 
 		return o.toString();
 	}
-	
+
 }

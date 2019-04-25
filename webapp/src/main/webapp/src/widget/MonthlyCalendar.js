@@ -33,7 +33,7 @@ dojo.requireAfterIf("html", "dojo.widget.html.MonthlyCalendar");
 dojo.widget.MonthlyCalendar.util= new function() {
 	this.months = dojo.date.months;
 	this.weekdays = dojo.date.days;
-	
+
 	this.toRfcDate = function(jsDate) {
 		if(!jsDate) {
 			jsDate = this.today;
@@ -47,11 +47,11 @@ dojo.widget.MonthlyCalendar.util= new function() {
 		if (date < 10) {
 			date = "0" + date.toString();
 		}
-		// because this is a date picker and not a time picker, we treat time 
+		// because this is a date picker and not a time picker, we treat time
 		// as zero
 		return year + "-" + month + "-" + date + "T00:00:00+00:00";
 	}
-	
+
 	this.fromRfcDate = function(rfcDate) {
 		var tempDate = rfcDate.split("-");
 		if(tempDate.length < 3) {
@@ -60,7 +60,7 @@ dojo.widget.MonthlyCalendar.util= new function() {
 		// fullYear, month, date
 		return new Date(parseInt(tempDate[0]), (parseInt(tempDate[1], 10) - 1), parseInt(tempDate[2].substr(0,2), 10));
 	}
-	
+
 	this.initFirstSaturday = function(month, year) {
 		if(!month) {
 			month = this.date.getMonth();

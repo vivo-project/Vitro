@@ -30,7 +30,7 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 	public void addUser(UserAccount user) {
 		userAccountsByUri.put(user.getUri(), user);
 	}
-	
+
 	public void addPermissionSet(PermissionSet ps) {
 		permissionSetsByUri.put(ps.getUri(), ps);
 	}

@@ -30,15 +30,15 @@ public class GetSearchIndividualsByVClasses extends JsonObjectProducer {
         VClass vclass=null;
         log.debug("Retrieving search individuals by vclasses");
         // Could have multiple vclass ids sent in
-        String[] vitroClassIdStr = vreq.getParameterValues("vclassId");  
-        if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    
+        String[] vitroClassIdStr = vreq.getParameterValues("vclassId");
+        if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){
         	for(String vclassId: vitroClassIdStr) {
         		log.debug("Iterating throug vclasses, using VClass " + vclassId);
                 vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
                 if (vclass == null) {
-                    log.error("Couldn't retrieve vclass ");   
+                    log.error("Couldn't retrieve vclass ");
                     throw new Exception ("Class " + vclassId + " not found");
-                }   
+                }
         	}
         }else{
             log.error("parameter vclassId URI parameter expected but not found");

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
-<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" 
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN"
   "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
 <taglib>
 	<tlibversion>1.0</tlibversion>
@@ -13,7 +13,7 @@
 		how dynamic content should be retrieved from persistent
 		storage.
 	</info>
-	
+
 	<tag>
 		<name>option</name>
 		<tagclass>edu.cornell.mannlib.vedit.tags.OptionTag</tagclass>
@@ -22,7 +22,7 @@
 			<name>name</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>		
+		</attribute>
 	</tag>
 
 	<tag>
@@ -33,9 +33,9 @@
 			<name>name</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>		
+		</attribute>
 	</tag>
-	
+
 	<tag>
 		<name>dynamicFields</name>
 		<tagclass>edu.cornell.mannlib.vedit.tags.DynamicFieldsTag</tagclass>
@@ -51,7 +51,7 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<name>error</name>
 		<tagclass>edu.cornell.mannlib.vedit.tags.ErrorTag</tagclass>
@@ -60,7 +60,7 @@
 			<name>name</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-		</attribute>		
+		</attribute>
 	</tag>
-	
+
 </taglib>

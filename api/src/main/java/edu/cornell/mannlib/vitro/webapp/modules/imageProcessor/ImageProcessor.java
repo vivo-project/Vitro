@@ -19,7 +19,7 @@ public interface ImageProcessor extends Application.Module {
 
 	/**
 	 * How big is the image contained in this stream?
-	 * 
+	 *
 	 * @param image
 	 *            The image stream. This method will not close it.
 	 * @return The dimensions of the image. Never returns null.
@@ -34,11 +34,11 @@ public interface ImageProcessor extends Application.Module {
 	/**
 	 * Create a new image from a portion of the supplied image, and reduce to
 	 * fit a limiting size.
-	 * 
+	 *
 	 * If the crop rectangle extends beyond the image boundaries, it is limited
 	 * to fit, or relocated if limiting would make it smaller than the
 	 * MINIMUM_CROP_SIZE.
-	 * 
+	 *
 	 * @param image
 	 *            The image stream. This method will not close it.
 	 * @param crop

@@ -27,7 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 /**
  * Handle an AJAX request for a SPARQL query. On entry, the "query" parameter
  * contains the query string.
- * 
+ *
  * The result is delivered in JSON format.
  */
 @WebServlet(name = "ajaxSparqlQuery", urlPatterns = {"/ajax/sparqlQuery"} )
@@ -97,5 +97,5 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 					+ PARAMETER_QUERY + "' parameter is required");
 		}
 	}
-	
+
 }

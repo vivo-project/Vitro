@@ -269,7 +269,7 @@ public class ConfigurationBeanLoader_PropertyTest extends
 						"Value"),
 				dataProperty(GENERIC_INSTANCE_URI, OTHER_PROPERTY_URI,
 						100.0F) });
-		
+
 		expectSimpleFailure(
 				DistinctPropertyMethodSubclass.class,
 				throwable(ConfigurationBeanLoaderException.class,

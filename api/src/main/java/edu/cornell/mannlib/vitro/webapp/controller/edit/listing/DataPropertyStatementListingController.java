@@ -45,7 +45,7 @@ public class DataPropertyStatementListingController extends BaseEditController {
                 throw new Error("Cannot interpret "+startAtParam+" as a number");
             }
         }
-        
+
         int endAt=50;
         String endAtParam = request.getParameter("endAt");
         if (endAtParam!=null && endAtParam.trim().length()>0) {
@@ -63,24 +63,24 @@ public class DataPropertyStatementListingController extends BaseEditController {
                 throw new Error("Cannot interpret "+endAtParam+" as a number");
             }
         }
-        
+
         ArrayList results = new ArrayList();
-        
+
         request.setAttribute("results",results);
-        
+
         results.add("XX");
         results.add("subject");
         results.add("property");
         results.add("object");
-        
+
         DataPropertyStatementDao dpsDao = vrequest.getUnfilteredWebappDaoFactory().getDataPropertyStatementDao();
         DataPropertyDao dpDao = vrequest.getUnfilteredWebappDaoFactory().getDataPropertyDao();
         IndividualDao iDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
-        
+
         String propURIStr = request.getParameter("propertyURI");
-        
-        DataProperty dp = dpDao.getDataPropertyByURI(propURIStr);        
-        
+
+        DataProperty dp = dpDao.getDataPropertyByURI(propURIStr);
+
         int count = 0;
 
        for (DataPropertyStatement dataPropertyStatement : dpsDao.getDataPropertyStatements(dp, startAt, endAt)) {
@@ -92,14 +92,14 @@ public class DataPropertyStatementListingController extends BaseEditController {
            results.add(dp.getPublicName());
            results.add(dps.getData());
        }
-        
+
         if (count == 0) {
         	results.add("XX");
         	results.add("No statements found for property \""+dp.getPublicName()+"\"");
         	results.add("");
         	results.add("");
         }
-        
+
         request.setAttribute("columncount",new Integer(4));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Data Property Statements");
@@ -108,11 +108,11 @@ public class DataPropertyStatementListingController extends BaseEditController {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        
+
    }
-   
+
    public void doPost(HttpServletRequest request, HttpServletResponse response) {
 	   // don't post to this controller
    }
-   
+
 }

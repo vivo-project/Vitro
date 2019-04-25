@@ -16,11 +16,11 @@ dojo.require("dojo.flash");
 dojo.require("dojo.json");
 dojo.require("dojo.uri.*");
 
-/** 
+/**
 		Storage provider that uses features in Flash to achieve permanent storage.
-		
+
 		@author Alex Russel, alex@dojotoolkit.org
-		@author Brad Neuberg, bkn3@columbia.edu 
+		@author Brad Neuberg, bkn3@columbia.edu
 */
 dojo.storage.browser.FlashStorageProvider = function(){
 }
@@ -33,12 +33,12 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 	initialized: false,
 	_available: null,
 	_statusHandler: null,
-	
+
 	initialize: function(){
 		if(djConfig["disableFlashStorage"] == true){
 			return;
 		}
-		
+
 		// initialize our Flash
 		var loadedListener = function(){
 			dojo.storage._flashLoaded();
@@ -48,15 +48,15 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 		var swfloc8 = dojo.uri.dojoUri("Storage_version8.swf").toString();
 		dojo.flash.setSwf({flash6: swfloc6, flash8: swfloc8, visible: false});
 	},
-	
+
 	isAvailable: function(){
 		if(djConfig["disableFlashStorage"] == true){
 			this._available = false;
 		}
-		
+
 		return this._available;
 	},
-	
+
 	setNamespace: function(namespace){
 		this.namespace = namespace;
 	},
@@ -65,9 +65,9 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 		if(this.isValidKey(key) == false){
 			dojo.raise("Invalid key given: " + key);
 		}
-			
+
 		this._statusHandler = resultsHandler;
-		
+
 		// serialize the value
 		// Handle strings differently so they have better performance
 		if(dojo.lang.isString(value)){
@@ -75,7 +75,7 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 		}else{
 			value = dojo.json.serialize(value);
 		}
-		
+
 		dojo.flash.comm.put(key, value, this.namespace);
 	},
 
@@ -83,46 +83,46 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 		if(this.isValidKey(key) == false){
 			dojo.raise("Invalid key given: " + key);
 		}
-		
+
 		var results = dojo.flash.comm.get(key, this.namespace);
 
 		if(results == ""){
 			return null;
 		}
-    
-		// destringify the content back into a 
+
+		// destringify the content back into a
 		// real JavaScript object
 		// Handle strings differently so they have better performance
-		if(!dojo.lang.isUndefined(results) && results != null 
+		if(!dojo.lang.isUndefined(results) && results != null
 			 && /^string:/.test(results)){
 			results = results.substring("string:".length);
 		}else{
 			results = dojo.json.evalJson(results);
 		}
-    
+
 		return results;
 	},
 
 	getKeys: function(){
 		var results = dojo.flash.comm.getKeys(this.namespace);
-		
+
 		if(results == ""){
 			return new Array();
 		}
 
 		// the results are returned comma seperated; split them
 		results = results.split(",");
-		
+
 		return results;
 	},
 
 	clear: function(){
 		dojo.flash.comm.clear(this.namespace);
 	},
-	
+
 	remove: function(key){
 	},
-	
+
 	isPermanent: function(){
 		return true;
 	},
@@ -144,23 +144,23 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 	hideSettingsUI: function(){
 		// hide the dialog
 		dojo.flash.obj.setVisible(false);
-		
+
 		// call anyone who wants to know the dialog is
 		// now hidden
 		if(dojo.storage.onHideSettingsUI != null &&
 			!dojo.lang.isUndefined(dojo.storage.onHideSettingsUI)){
-			dojo.storage.onHideSettingsUI.call(null);	
+			dojo.storage.onHideSettingsUI.call(null);
 		}
 	},
-	
-	/** 
-			The provider name as a string, such as 
-			"dojo.storage.FlashStorageProvider". 
+
+	/**
+			The provider name as a string, such as
+			"dojo.storage.FlashStorageProvider".
 	*/
 	getType: function(){
 		return "dojo.storage.FlashStorageProvider";
 	},
-	
+
 	/** Called when the Flash is finished loading. */
 	_flashLoaded: function(){
 		this.initialized = true;
@@ -168,10 +168,10 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 		// indicate that this storage provider is now loaded
 		dojo.storage.manager.loaded();
 	},
-	
-	/** 
+
+	/**
 			Called if the storage system needs to tell us about the status
-			of a put() request. 
+			of a put() request.
 	*/
 	_onStatus: function(statusResult, key){
 		//dojo.debug("_onStatus, statusResult="+statusResult+", key="+key);
@@ -181,10 +181,10 @@ dojo.lang.extend(dojo.storage.browser.FlashStorageProvider, {
 		}else{
 			dojo.flash.obj.setVisible(false);
 		}
-		
-		if(!dojo.lang.isUndefined(dojo.storage._statusHandler) 
+
+		if(!dojo.lang.isUndefined(dojo.storage._statusHandler)
 				&& dojo.storage._statusHandler != null){
-			dojo.storage._statusHandler.call(null, statusResult, key);		
+			dojo.storage._statusHandler.call(null, statusResult, key);
 		}
 	}
 });
@@ -196,4 +196,4 @@ dojo.storage.manager.register("dojo.storage.browser.FlashStorageProvider",
 // now that we are loaded and registered tell the storage manager to initialize
 // itself
 dojo.storage.manager.initialize();
-															
+

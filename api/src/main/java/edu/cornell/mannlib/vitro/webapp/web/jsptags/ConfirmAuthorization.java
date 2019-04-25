@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
 /**
  * Confirm that the user is authorized to perform each of the RequestedActions.
- * 
+ *
  * The user specifies the actions as the "requestedActions" attribute of the
  * HTTP request. The attribute must contain either a RequestedAction or an array
  * of RequestedActions.
@@ -54,7 +54,7 @@ public class ConfirmAuthorization extends BodyTagSupport {
 
 	/**
 	 * The attribute may be either a single RequestedAction or an array of
-	 * RequestedActions. 
+	 * RequestedActions.
 	 *
 	 * When we are done, clear the attribute, so any included or forwarded page
 	 * will not see it.

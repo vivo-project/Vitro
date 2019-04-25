@@ -26,7 +26,7 @@ import org.apache.jena.rdf.model.Model;
 /**
  * Handle an AJAX request for a SPARQL query. On entry, the "query" parameter
  * contains the query string.
- * 
+ *
  * The result is delivered in JSON format.
  */
 public class SparqlUtils {

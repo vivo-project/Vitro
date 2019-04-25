@@ -20,7 +20,7 @@ dojo.widget.ContextMenu = function(){
 	this.widgetType = "ContextMenu";
 	this.isContainer = true;
 	this.isOpened = false;
-	
+
 	// copy children widgets output directly to parent (this node), to avoid
 	// errors trying to insert an <li> under a <div>
 	this.snarfChildDomOutput = true;

@@ -16,14 +16,14 @@ public class IndividualEditEvent extends EditEvent {
 
 	private static final String INDIVIDUAL_EDIT_EVENT = VitroVocabulary.INDIVIDUAL_EDIT_EVENT;
 	private static final String EDITED_INDIVIDUAL = VitroVocabulary.EDITED_INDIVIDUAL;
-	
+
 	private String individualURI;
-	
+
 	public IndividualEditEvent(String userURI, boolean begin, String individualURI) {
 		super(userURI, begin);
 		this.individualURI = individualURI;
 	}
-	
+
 	public String getIndividualURI() {
 		return individualURI;
 	}
@@ -39,7 +39,7 @@ public class IndividualEditEvent extends EditEvent {
 		}
 		typeValueList.add(ResourceFactory.createResource(INDIVIDUAL_EDIT_EVENT));
 		map.put(RDF.type.getURI(),typeValueList);
-		return map;	
+		return map;
 	}
-	
+
 }

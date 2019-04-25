@@ -18,28 +18,28 @@ public class BasicValidationVTwoTest {
         String res;
         res = bv.validate("httpUrl", "http://example.com/index");
         Assert.assertEquals(res, BasicValidationVTwo.SUCCESS);
-        
+
         res = bv.validate("httpUrl", "http://example.com/index?bogus=skjd%20skljd&something=sdkf");
         Assert.assertEquals(res, BasicValidationVTwo.SUCCESS);
-        
+
         res = bv.validate("httpUrl", "http://example.com/index#2.23?bogus=skjd%20skljd&something=sdkf");
-        Assert.assertEquals(res, BasicValidationVTwo.SUCCESS);               
+        Assert.assertEquals(res, BasicValidationVTwo.SUCCESS);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void testEmptyValidate(){
-       BasicValidationVTwo bv = new BasicValidationVTwo(Collections.EMPTY_MAP);              
-       
+       BasicValidationVTwo bv = new BasicValidationVTwo(Collections.EMPTY_MAP);
+
        Assert.assertEquals(
                bv.validate("nonempty", null)
                , BasicValidationVTwo.REQUIRED_FIELD_EMPTY_MSG);
-        
+
 
        Assert.assertEquals(
                bv.validate("nonempty", "")
                , BasicValidationVTwo.REQUIRED_FIELD_EMPTY_MSG);
-       
+
        Assert.assertEquals(
                bv.validate("nonempty", "some value")
                , BasicValidationVTwo.SUCCESS);

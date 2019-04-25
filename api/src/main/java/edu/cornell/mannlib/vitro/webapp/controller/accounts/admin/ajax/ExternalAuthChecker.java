@@ -22,14 +22,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 
 /**
  * What is our reaction to this possible External Auth ID?
- * 
+ *
  * Is somebody already using it (other than ourselves)? Does it match an
  * existing Profile? Neither?
- * 
+ *
  * If we are creating a new account, the userAccountUri will be empty, so if
  * someone is using the externalAuthID, their URI won't match ours, which is
  * what we want.
- * 
+ *
  * If the externalAuthId is empty, or if there is any error, say "neither".
  */
 class ExternalAuthChecker extends AbstractAjaxResponder {

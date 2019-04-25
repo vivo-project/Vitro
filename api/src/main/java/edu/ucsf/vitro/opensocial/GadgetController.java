@@ -20,10 +20,10 @@ import javax.servlet.annotation.WebServlet;
 
 @WebServlet(name = "GadgetController", urlPatterns = {"/orng/*"})
 public class GadgetController extends FreemarkerHttpServlet {
-	
+
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(GadgetController.class);
-	
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
     	if ("/clearcache".equalsIgnoreCase(vreq.getPathInfo())) {
@@ -41,13 +41,13 @@ public class GadgetController extends FreemarkerHttpServlet {
     	else {
     		return processGadgetDetails(vreq);
     	}
-    }    	
+    }
 
     protected ResponseValues processGadgetDetails(VitroRequest vreq) {
     	try {
 	        Map<String, Object> body = new HashMap<String, Object>();
 
-            body.put("title", "Gadget Details");            
+            body.put("title", "Gadget Details");
 	        // VIVO OpenSocial Extension by UCSF
 	        try {
 		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "gadgetDetails");
@@ -59,20 +59,20 @@ public class GadgetController extends FreemarkerHttpServlet {
 	            log.error("IOException in doTemplate()", e);
 	        } catch (SQLException e) {
 	            log.error("SQLException in doTemplate()", e);
-	        }	               
-	        
+	        }
+
 	        return new TemplateResponseValues("gadgetDetails.ftl", body);
-        
+
 	    } catch (Throwable e) {
 	        log.error(e, e);
 	        return new ExceptionResponseValues(e);
 	    }
     }
-    
+
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
     	return "Gadget Details";
-    }    
+    }
 
     protected ResponseValues processGadgetSandbox(VitroRequest vreq) {
     	if ("POST".equalsIgnoreCase(vreq.getMethod())) {
@@ -81,10 +81,10 @@ public class GadgetController extends FreemarkerHttpServlet {
 			vreq.getSession().setAttribute(OpenSocialManager.OPENSOCIAL_NOCACHE, vreq.getParameter("useCache") == null);
 			return new RedirectResponseValues("/");
     	}
-    	
+
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("title", "Gadget Sandbox");            
-        
+        body.put("title", "Gadget Sandbox");
+
         try {
 	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "gadgetSandbox");
 	        StringBuilder gadgetURLS = new StringBuilder();
@@ -98,9 +98,9 @@ public class GadgetController extends FreemarkerHttpServlet {
             log.error("IOException in doTemplate()", e);
         } catch (SQLException e) {
             log.error("SQLException in doTemplate()", e);
-        }	               
-	        
-        
+        }
+
+
         return new TemplateResponseValues("gadgetLogin.ftl", body);
     }
 

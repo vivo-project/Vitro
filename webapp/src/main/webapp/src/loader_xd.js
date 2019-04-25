@@ -63,7 +63,7 @@ dojo.hostenv.createXdPackage = function(contents){
 	output.push("\ndefinePackage: function(dojo){");
 	output.push(contents);
 	output.push("\n}});");
-	
+
 	return output.join("");
 }
 
@@ -127,7 +127,7 @@ dojo.hostenv.loadUri = function(uri, cb, currentIsXDomain, module){
 		//Increment inFlightCount
 		//This will stop the modulesLoaded from firing all the way.
 		this.inFlightCount++;
-				
+
 		//Start timer
 		if(!this.xdTimer){
 			this.xdTimer = setInterval("dojo.hostenv.watchInFlightXDomain();", 100);
@@ -158,7 +158,7 @@ dojo.hostenv.loadUri = function(uri, cb, currentIsXDomain, module){
 	}else{
 		var contents = this.getText(uri, null, true);
 		if(contents == null){ return 0; }
-		
+
 		if(this.isXDomain){
 			var pkg = this.createXdPackage(contents);
 			dj_eval(pkg);
@@ -229,7 +229,7 @@ dojo.hostenv.packageLoaded = function(pkg){
 		}
 
 		//Now update the inflight status for any provided packages in this loaded package.
-		//Do this at the very end (in a *separate* for loop) to avoid shutting down the 
+		//Do this at the very end (in a *separate* for loop) to avoid shutting down the
 		//inflight timer check too soon.
 		for(var i = 0; i < provideList.length; i++){
 			this.xdInFlight[provideList[i]] = false;
@@ -265,7 +265,7 @@ dojo.hostenv.unpackXdDependency = function(dep){
 		case "hostenv.conditionalLoadModule":
 			var modMap = dep[1];
 			var common = modMap["common"]||[];
-			var newDeps = (modMap[dojo.hostenv.name_]) ? common.concat(modMap[dojo.hostenv.name_]||[]) : common.concat(modMap["default"]||[]);	
+			var newDeps = (modMap[dojo.hostenv.name_]) ? common.concat(modMap[dojo.hostenv.name_]||[]) : common.concat(modMap["default"]||[]);
 			dojo.hostenv.flattenRequireArray(newDeps);
 			break;
 		case "require":
@@ -366,7 +366,7 @@ dojo.hostenv.watchInFlightXDomain = function(){
 	}
 
 	//If any are true, then still waiting.
-	//Come back later.	
+	//Come back later.
 	for(var param in this.xdInFlight){
 		if(this.xdInFlight[param]){
 			return;
@@ -395,7 +395,7 @@ dojo.hostenv.watchInFlightXDomain = function(){
 	this.resetXd();
 
 	//Clear inflight count so we will finally do finish work.
-	this.inFlightCount = 0; 
+	this.inFlightCount = 0;
 	this.callLoaded();
 }
 

@@ -27,10 +27,10 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * If the user has an IsRootUser identifier, they can do anything!
- * 
+ *
  * On setup, check to see that the specified root user exists. If not, create
  * it. If we can't create it, abort.
- * 
+ *
  * If any other root users exist, warn about them.
  */
 public class RootUserPolicy implements PolicyIface {

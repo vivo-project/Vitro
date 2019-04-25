@@ -38,10 +38,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * A simple implementation of CombinedTripleSource.
- * 
+ *
  * Note that we don't bother to cache the RDFServices, RDFServiceFactories, and
  * ModelMakers, since the sources can be expected to cache them.
- * 
+ *
  * We must cache the OntModelCache because it was created here. If we were to
  * recreate it, we would lose any sub-models that had been attached in the
  * meantime.

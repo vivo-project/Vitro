@@ -8,16 +8,16 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 
 /**
- * Policy decision that is made from some analysis of a set of decisions. 
+ * Policy decision that is made from some analysis of a set of decisions.
  * @author bdc34
  *
  */
 public class CompositPolicyDecision extends BasicPolicyDecision implements PolicyDecision {
     List<PolicyDecision> subDecisions;
-    
+
     public CompositPolicyDecision(Authorization auth, String message, List<PolicyDecision> subDecisions){
         super( auth, message);
-        this.subDecisions = subDecisions;    
+        this.subDecisions = subDecisions;
     }
 
 }

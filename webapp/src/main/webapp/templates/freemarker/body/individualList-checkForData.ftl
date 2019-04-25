@@ -6,7 +6,7 @@
     <#assign noData = true />
 </#if>
 
-<#assign noDataNotification>    
+<#assign noDataNotification>
     <#if user.loggedIn>
         <#if user.authorizedToRebuildSearchIndex>
             <span class="contentNote">
@@ -19,9 +19,9 @@
             <p>${i18n().please} <a href="${urls.login}" title="${i18n().login_to_manage_site}">${i18n().log_in}</a> ${i18n().to_manage_content}</p>
         </span>
     </#if>
-    
+
     <h3>${i18n().no_content_in_system(title)}</h3>
-    
+
     <#if user.loggedIn && user.hasSiteAdminAccess>
         <p>${i18n().you_can} <a href="${urls.siteAdmin}" title="${i18n().add_content_manage_site}">${i18n().add_content_manage_site}</a> ${i18n().from_site_admin_page}</p>
     </#if>

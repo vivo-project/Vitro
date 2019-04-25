@@ -47,62 +47,62 @@ import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
 /**
  * Generates the edit configuration for a default property form.
  * This handles the default object property auto complete.
- * 
+ *
  * If a default property form is request and the number of indivdiuals
  * found in the range is too large, the the auto complete setup and
  * template will be used instead.
  */
 public class DefaultObjectPropertyFormGenerator implements EditConfigurationGenerator {
 
-	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);	
+	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
 	private String subjectUri = null;
 	private String predicateUri = null;
-	private String objectUri = null;	
-		
+	private String objectUri = null;
+
 	private String objectPropertyTemplate = "defaultPropertyForm.ftl";
-	private String acObjectPropertyTemplate = "autoCompleteObjectPropForm.ftl";		
-	
+	private String acObjectPropertyTemplate = "autoCompleteObjectPropForm.ftl";
+
 	protected boolean doAutoComplete = false;
 	protected boolean tooManyRangeIndividuals = false;
-	
+
 	protected long maxNonACRangeIndividualCount = 300;
 	protected String customErrorMessages = null;
-	
+
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
             HttpSession session) throws Exception {
 
-    	if(!EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {    	    	
+    	if(!EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
     	    throw new Exception("DefaultObjectPropertyFormGenerator does not handle data properties.");
     	}
-    	
+
     	//Custom error can also be represented as an exception above, but in this case
     	//we would like the page to enable the user to go back to the profile page
-    	
+
     	customErrorMessages = getCustomErrorMessages(vreq);
     	if(customErrorMessages != null) {
     		return this.getCustomErrorEditConfiguration(vreq, session);
     	}
-    	
+
      	if( tooManyRangeOptions( vreq, session ) ){
     		tooManyRangeIndividuals = true;
     		doAutoComplete = true;
     	}
-     	
+
     	//Check if create new and return specific edit configuration from that generator.
     	if(DefaultAddMissingIndividualFormGenerator.isCreateNewIndividual(vreq, session)) {
 			EditConfigurationGenerator generator = JspToGeneratorMapping.createFor("defaultAddMissingIndividualForm.jsp", DefaultAddMissingIndividualFormGenerator.class);
     		return generator.getEditConfiguration(vreq, session);
     	}
-    	    
+
     	//TODO: Add a generator for delete: based on command being delete - propDelete.jsp
         //Generate a edit configuration for the default object property form and return it.
     	//if(DefaultDeleteGenerator.isDelete( vreq,session)){
     	//  return (new DefaultDeleteGenerator()).getEditConfiguration(vreq,session);
-    	
+
     	return getDefaultObjectEditConfiguration(vreq, session);
     }
-	
+
     private String getCustomErrorMessages(VitroRequest vreq) {
 		String errorMessages = null;
     	String rangeUri = vreq.getParameter("rangeUri");
@@ -114,7 +114,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
    		    	errorMessages = I18n.text(vreq,"the_range_class_does_not_exist");
    		    }
 		}
-		
+
 		return errorMessages;
 	}
 
@@ -135,7 +135,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
    		    VClass rangeVClass = ctxDaoFact.getVClassDao().getVClassByURI(rangeUri);
    		    if(rangeVClass != null) {
 	   		    if (!rangeVClass.isUnion()) {
-	   		        types.add(rangeVClass);    
+	   		        types.add(rangeVClass);
 	   		    } else {
 					types.addAll(rangeVClass.getUnionComponents());
 	   		    }
@@ -163,34 +163,34 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
    			log.error("Subject individual was null for");
    		}
         return types;
-	}	
-	
+	}
+
     private boolean tooManyRangeOptions(VitroRequest vreq, HttpSession session ) throws SearchEngineException {
     	List<VClass> rangeTypes = getRangeTypes(vreq);
 		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
-    	
+
     	List<String> types = new ArrayList<String>();
     	for (VClass vclass : rangeTypes) {
     	    if (vclass.getURI() != null) {
     	        types.add(vclass.getURI());
     	    }
     	}
-    	
+
     	//empty list means the range is not set to anything, force Thing
     	if(types.size() == 0 ){
     		types.add(VitroVocabulary.OWL_THING);
-    	} 
-    	
-    	long count = 0;    		   
+    	}
+
+    	long count = 0;
     	for( String type:types){
-    		//search query for type count.    		
+    		//search query for type count.
     		SearchQuery query = searchEngine.createQuery();
     		if( VitroVocabulary.OWL_THING.equals( type )){
-    			query.setQuery( "*:*" );    			
+    			query.setQuery( "*:*" );
     		}else{
     			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		}
-    		query.setRows(0);	
+    		query.setRows(0);
     		SearchResponse rsp = searchEngine.query(query);
     		SearchResultDocumentList docs = rsp.getResults();
     		long found = docs.getNumFound();
@@ -198,87 +198,87 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		if( count > maxNonACRangeIndividualCount )
     			break;
     	}
-    	    	
-    	return  count > maxNonACRangeIndividualCount ;    	    	   
+
+    	return  count > maxNonACRangeIndividualCount ;
 	}
 
-    
+
 	private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) throws Exception {
-    	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();    	
-    	
+    	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
+
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
-    	
+
       	//Assumes this is a simple case of subject predicate var
     	editConfiguration.setN3Required(this.generateN3Required(vreq));
-    	    	
+
     	//n3 optional
     	editConfiguration.setN3Optional(this.generateN3Optional());
-    	
+
     	//Todo: what do new resources depend on here?
     	//In original form, these variables start off empty
     	editConfiguration.setNewResources(new HashMap<String, String>());
     	//In scope
     	this.setUrisAndLiteralsInScope(editConfiguration);
-    	
+
     	//on Form
     	this.setUrisAndLiteralsOnForm(editConfiguration, vreq);
-    	
+
     	editConfiguration.setFilesOnForm(new ArrayList<String>());
-    	
+
     	//Sparql queries
     	this.setSparqlQueries(editConfiguration);
-    	
+
     	//set fields
     	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq), getRangeTypes(vreq));
-    	
+
     //	No need to put in session here b/c put in session within edit request dispatch controller instead
     	//placing in session depends on having edit key which is handled in edit request dispatch controller
     //	editConfiguration.putConfigInSession(editConfiguration, session);
 
     	prepareForUpdate(vreq, session, editConfiguration);
-    	
+
     	//After the main processing is done, check if select from existing process
     	processProhibitedFromSearch(vreq, session, editConfiguration);
-    	
+
     	//Form title and submit label moved to template
     	setTemplate(editConfiguration, vreq);
-    	
+
     	editConfiguration.addValidator(new AntiXssValidation());
-    	
+
     	//Set edit key
     	setEditKey(editConfiguration, vreq);
-    	    	       	    	
+
     	//Adding additional data, specifically edit mode
     	if( doAutoComplete ){
     		addFormSpecificDataForAC(editConfiguration, vreq, session);
-    	}else{	    
+    	}else{
 	        addFormSpecificData(editConfiguration, vreq);
-    	}      
-    	
+    	}
+
     	return editConfiguration;
     }
-	
+
 	//We only need enough for the error message to show up
 	private EditConfigurationVTwo getCustomErrorEditConfiguration(VitroRequest vreq, HttpSession session) {
-		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();    	
-    	
+		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
+
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
-    	
+
     	this.setUrisAndLiteralsInScope(editConfiguration);
-    	
+
     	//Sparql queries
     	this.setSparqlQueries(editConfiguration);
-    	
-    
+
+
     	prepareForUpdate(vreq, session, editConfiguration);
-    	
+
     	editConfiguration.setTemplate("customErrorMessages.ftl");
-    	
+
     	//Set edit key
     	setEditKey(editConfiguration, vreq);
-    	
+
     	//if custom error messages is not null, then add to form specific data
     	if(customErrorMessages != null) {
     		//at this point, it shouldn't be null
@@ -288,19 +288,19 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	}
     	return editConfiguration;
 	}
-    
+
     private void setEditKey(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-    	String editKey = EditConfigurationUtils.getEditKey(vreq);	
+    	String editKey = EditConfigurationUtils.getEditKey(vreq);
     	editConfiguration.setEditKey(editKey);
     }
-    
+
 	private void setTemplate(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq) {
 		if( doAutoComplete )
 			editConfiguration.setTemplate(acObjectPropertyTemplate);
 		else
 			editConfiguration.setTemplate(objectPropertyTemplate);
-		
+
 	}
 
 	//Initialize setup: process parameters
@@ -309,18 +309,18 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 
     	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-    
+
     	editConfiguration.setFormUrl(formUrl);
-    	
+
     	editConfiguration.setUrlPatternToReturnTo("/individual");
-    	
+
     	editConfiguration.setVarNameForSubject("subject");
     	editConfiguration.setSubjectUri(subjectUri);
     	editConfiguration.setEntityToReturnTo(subjectUri);
     	editConfiguration.setVarNameForPredicate("predicate");
     	editConfiguration.setPredicateUri(predicateUri);
-    	
-    	
+
+
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
     	//"object"       : [ "objectVar" ,  "${objectUriJson}" , "URI"],
@@ -331,40 +331,40 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	} else {
     		log.debug("This is a data property: " + predicateUri);
         }
-    }    
+    }
 
-    
+
 	private void initObjectParameters(VitroRequest vreq) {
 		//in case of object property
     	objectUri = EditConfigurationUtils.getObjectUri(vreq);
 	}
 
 	private void processObjectPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	editConfiguration.setVarNameForObject("objectVar");    	
+    	editConfiguration.setVarNameForObject("objectVar");
     	editConfiguration.setObject(objectUri);
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
     	//TODO: Check if null in case no object uri exists but this is still an object property
     }
-       
-    //Get N3 required 
-    //Handles both object and data property    
+
+    //Get N3 required
+    //Handles both object and data property
     private List<String> generateN3Required(VitroRequest vreq) {
     	List<String> n3ForEdit = new ArrayList<String>();
-    	String editString = "?subject ?predicate ";    	
-    	editString += "?objectVar";    	
+    	String editString = "?subject ?predicate ";
+    	editString += "?objectVar";
     	editString += " .";
     	n3ForEdit.add(editString);
     	return n3ForEdit;
     }
-    
+
     private List<String> generateN3Optional() {
-    	List<String> n3Inverse = new ArrayList<String>();    	
-    	n3Inverse.add("?objectVar ?inverseProp ?subject .");    	
+    	List<String> n3Inverse = new ArrayList<String>();
+    	n3Inverse.add("?objectVar ?inverseProp ?subject .");
     	return n3Inverse;
-    	
+
     }
-    
+
     //Set queries
     private String retrieveQueryForInverse () {
     	String queryForInverse =  "PREFIX owl:  <http://www.w3.org/2002/07/owl#>"
@@ -372,78 +372,78 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 			+ "    WHERE { ?inverse_property owl:inverseOf ?predicate } ";
     	return queryForInverse;
     }
-    
+
     private void setUrisAndLiteralsInScope(EditConfigurationVTwo editConfiguration) {
     	HashMap<String, List<String>> urisInScope = new HashMap<String, List<String>>();
     	//note that at this point the subject, predicate, and object var parameters have already been processed
-    	urisInScope.put(editConfiguration.getVarNameForSubject(), 
+    	urisInScope.put(editConfiguration.getVarNameForSubject(),
     			Arrays.asList(new String[]{editConfiguration.getSubjectUri()}));
-    	urisInScope.put(editConfiguration.getVarNameForPredicate(), 
+    	urisInScope.put(editConfiguration.getVarNameForPredicate(),
     			Arrays.asList(new String[]{editConfiguration.getPredicateUri()}));
     	//this shoudl happen in edit configuration prepare for object prop update
-    	//urisInScope.put(editConfiguration.getVarNameForObject(), 
+    	//urisInScope.put(editConfiguration.getVarNameForObject(),
     	//		Arrays.asList(new String[]{editConfiguration.getObject()}));
     	//inverse property uris should be included in sparql for additional uris in edit configuration
     	editConfiguration.setUrisInScope(urisInScope);
     	//Uris in scope include subject, predicate, and object var
-    	
+
     	editConfiguration.setLiteralsInScope(new HashMap<String, List<Literal>>());
     }
-    
+
     //n3 should look as follows
-    //?subject ?predicate ?objectVar 
-    
+    //?subject ?predicate ?objectVar
+
     private void setUrisAndLiteralsOnForm(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	List<String> urisOnForm = new ArrayList<String>();
     	List<String> literalsOnForm = new ArrayList<String>();
-    	
+
     	//uris on form should be empty if data property
     	urisOnForm.add("objectVar");
-    	
+
     	editConfiguration.setUrisOnform(urisOnForm);
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
     }
-        
+
     //This is for various items
     private void setSparqlQueries(EditConfigurationVTwo editConfiguration) {
     	//Sparql queries defining retrieval of literals etc.
     	editConfiguration.setSparqlForAdditionalLiteralsInScope(new HashMap<String, String>());
-    	
+
     	Map<String, String> urisInScope = new HashMap<String, String>();
     	urisInScope.put("inverseProp", this.retrieveQueryForInverse());
     	editConfiguration.setSparqlForAdditionalUrisInScope(urisInScope);
-    	
+
     	editConfiguration.setSparqlForExistingLiterals(generateSparqlForExistingLiterals());
     	editConfiguration.setSparqlForExistingUris(generateSparqlForExistingUris());
     }
-    
-    
+
+
     //Get page uri for object
     private HashMap<String, String> generateSparqlForExistingUris() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	return map;
     }
-    
+
     private HashMap<String, String> generateSparqlForExistingLiterals() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	return map;
     }
-    
+
     protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {
         setFields(editConfiguration, vreq, predicateUri, null);
     }
-    
+
     protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri, List<VClass> rangeTypes) throws Exception {
 		FieldVTwo field = new FieldVTwo();
-    	field.setName("objectVar");    	
-    	
+    	field.setName("objectVar");
+
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
     	field.setValidators(validators);
-    	    	
+
     	if( ! doAutoComplete ){
     		field.setOptions( new IndividualsViaObjectPropetyOptions(
-    	        subjectUri, 
+    	        subjectUri,
     	        predicateUri,
     	        rangeTypes,
     	        objectUri,
@@ -451,15 +451,15 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	}else{
     		field.setOptions(null);
     	}
-    	
+
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
-    	fields.put(field.getName(), field);    	
-    	    	    	
+    	fields.put(field.getName(), field);
+
     	editConfiguration.setFields(fields);
-    }       
+    }
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
-    	//Here, retrieve model from 
+    	//Here, retrieve model from
 		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
@@ -475,7 +475,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	    throw new Error("DefaultObjectPropertyForm does not handle data properties.");
     	}
     }
-      
+
     private boolean isSelectFromExisting(VitroRequest vreq) {
     	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
     	if(EditConfigurationUtils.isDataProperty(predicateUri, vreq)) {
@@ -484,7 +484,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	ObjectProperty objProp = EditConfigurationUtils.getObjectPropertyForPredicate(vreq, EditConfigurationUtils.getPredicateUri(vreq));
     	return objProp.getSelectFromExisting();
     }
-    
+
     //Additional processing, eg. select from existing
     //This is really process prohibited from search
     private void processProhibitedFromSearch(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfig) {
@@ -498,11 +498,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
                 editConfig.setProhibitedFromSearch(pfs);
     	}
     }
-    
+
   //Form specific data
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
-		//range options need to be stored for object property 
+		//range options need to be stored for object property
 		//Store field names
 		List<String> objectSelect = new ArrayList<String>();
 		objectSelect.add(editConfiguration.getVarNameForObject());
@@ -513,12 +513,12 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		}
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
-        			
+
 	public void addFormSpecificDataForAC(EditConfigurationVTwo editConfiguration, VitroRequest vreq, HttpSession session) throws SearchEngineException {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
 		//Get the edit mode
 		formSpecificData.put("editMode", getEditMode(vreq).toString().toLowerCase());
-		
+
 		//We also need the type of the object itself
 		List<VClass> types = getRangeTypes(vreq);
         //if types array contains only owl:Thing, the search will not return any results
@@ -526,26 +526,26 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         if(types.size() == 1 && types.get(0).getURI().equals(VitroVocabulary.OWL_THING) ){
         	types = new ArrayList<VClass>();
         }
-		
+
         StringBuilder typesBuff = new StringBuilder();
         for (VClass type : types) {
             if (type.getURI() != null) {
                 typesBuff.append(type.getURI()).append(",");
             }
         }
-        
+
 		formSpecificData.put("objectTypes", typesBuff.toString());
 		log.debug("autocomplete object types : "  + formSpecificData.get("objectTypes"));
-		
+
 		//Get label for individual if it exists
 		if(EditConfigurationUtils.getObjectIndividual(vreq) != null) {
 			String objectLabel = EditConfigurationUtils.getObjectIndividual(vreq).getName();
 			formSpecificData.put("objectLabel", objectLabel);
 		}
-		
+
 		//TODO: find out if there are any individuals in the classes of objectTypes
 		formSpecificData.put("rangeIndividualsExist", rangeIndividualsExist(types) );
-		
+
 		formSpecificData.put("sparqlForAcFilter", getSparqlForAcFilter(vreq));
 		if(customErrorMessages != null && !customErrorMessages.isEmpty()) {
 			formSpecificData.put("customErrorMessages", customErrorMessages);
@@ -553,40 +553,40 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		editConfiguration.setTemplate(acObjectPropertyTemplate);
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
-	
-	private Object rangeIndividualsExist(List<VClass> types) throws SearchEngineException {		
+
+	private Object rangeIndividualsExist(List<VClass> types) throws SearchEngineException {
 		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
-    	
+
     	boolean rangeIndividualsFound = false;
     	for( VClass type:types){
     		//search  for type count.
-    		SearchQuery query = searchEngine.createQuery();   
+    		SearchQuery query = searchEngine.createQuery();
     		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type.getURI());
     		query.setRows(0);
-    		
+
     		SearchResponse rsp = searchEngine.query(query);
     		SearchResultDocumentList docs = rsp.getResults();
     		if( docs.getNumFound() > 0 ){
     			rangeIndividualsFound = true;
     			break;
-    		}    		
+    		}
     	}
-    	
-    	return  rangeIndividualsFound;		
+
+    	return  rangeIndividualsFound;
 	}
 
 	public String getSubjectUri() {
 		return subjectUri;
 	}
-	
+
 	public String getPredicateUri() {
 		return predicateUri;
 	}
-	
+
 	public String getObjectUri() {
 		return objectUri;
 	}
-	
+
 
 	/** get the auto complete edit mode */
 	public EditMode getEditMode(VitroRequest vreq) {
@@ -596,19 +596,19 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		EditMode editMode = FrontEndEditingUtils.EditMode.ADD;
 		if(objectUri != null && !objectUri.isEmpty()) {
 			editMode = FrontEndEditingUtils.EditMode.EDIT;
-			
+
 		}
 		return editMode;
 	}
-    
+
 	public String getSparqlForAcFilter(VitroRequest vreq) {
-		String subject = EditConfigurationUtils.getSubjectUri(vreq);			
+		String subject = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicate = EditConfigurationUtils.getPredicateUri(vreq);
 		//Get all objects for existing predicate, filters out results from addition and edit
-		String query =  "SELECT ?objectVar WHERE { " + 
+		String query =  "SELECT ?objectVar WHERE { " +
 			"<" + subject + "> <" + predicate + "> ?objectVar .} ";
 		return query;
 	}
-		
+
 
 }

@@ -3,7 +3,7 @@
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <!--
-	More than one construct query.  
+	More than one construct query.
 -->
 
 <list-view-config>
@@ -15,12 +15,12 @@
             <collated>
             ?object a ?subclass.
             </collated>
-        }  
+        }
     </query-select>
 
     <query-construct>ONE</query-construct>
     <query-construct>TWO</query-construct>
     <query-construct>THREE</query-construct>
-    
+
     <template>propStatement-default.ftl</template>
 </list-view-config>

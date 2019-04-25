@@ -158,7 +158,7 @@ public class CollatedObjectPropertyTemplateModel extends
 					dataForThisObject.add(innerMap);
 				}
 			}
-			
+
 			if(log.isDebugEnabled()) {
 				log.debug("Object URI " + objectUri + " has number of statements = " + dataForThisObject.size());
 			}
@@ -198,7 +198,7 @@ public class CollatedObjectPropertyTemplateModel extends
 		}
 	}
 
-	
+
 
 	// Collate the statements by subclass.
 	private List<SubclassTemplateModel> collate(String subjectUri,

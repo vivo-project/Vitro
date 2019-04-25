@@ -9,8 +9,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.vocabulary.XSD;
 
-/* This class is used to order authorships on the add author form. It should be removed in favor of using whatever 
- * method is used to order authorships on the publication profile page instead. I've implemented this due to 
+/* This class is used to order authorships on the add author form. It should be removed in favor of using whatever
+ * method is used to order authorships on the publication profile page instead. I've implemented this due to
  * time constraints.
  */
 public class DataPropertyComparator implements Comparator<Individual> {
@@ -18,7 +18,7 @@ public class DataPropertyComparator implements Comparator<Individual> {
     private static final Log log = LogFactory.getLog(DataPropertyComparator.class);
 
     private String dataPropertyUri = null;
-    
+
     public DataPropertyComparator(String dataPropertyUri) {
         this.dataPropertyUri = dataPropertyUri;
     }
@@ -28,16 +28,16 @@ public class DataPropertyComparator implements Comparator<Individual> {
         DataPropertyStatement dps2 = ind2.getDataPropertyStatement(dataPropertyUri);
 
         int result;
-        
+
         // Push null values to the end of the list.
-        // Is this generally what's wanted? Or should this class be 
+        // Is this generally what's wanted? Or should this class be
         // NullLastDataPropertyComparator?
         if (dps1 == null) {
             result = (dps2 == null) ? 0 : 1;
         } else if (dps2 == null) {
             result = -1;
         } else {
-        
+
             String datatype = dps1.getDatatypeURI();
             if (datatype == null) {
                 datatype = dps2.getDatatypeURI();
@@ -47,14 +47,14 @@ public class DataPropertyComparator implements Comparator<Individual> {
                 // Perhaps we should throw an error here, but for now we need it to set the datatype
                 datatype = XSD.xint.toString();
             }
-            
+
             if (XSD.xint.toString().equals(datatype)) {
                 int i1 = Integer.valueOf(dps1.getData());
                 int i2 = Integer.valueOf(dps2.getData());
                 result = Integer.compare(i1, i2);
             }
             else if (XSD.xstring.toString().equals(datatype)) {
-                result = dps1.getData().compareTo(dps2.getData());            
+                result = dps1.getData().compareTo(dps2.getData());
             }
             // Fill in other types here
             else {
@@ -65,7 +65,7 @@ public class DataPropertyComparator implements Comparator<Individual> {
         }
         return result;
     }
-    
-    
+
+
 
 }

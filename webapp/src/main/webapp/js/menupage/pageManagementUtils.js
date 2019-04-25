@@ -1,5 +1,5 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
-  
+
 var pageManagementUtils = {
 	dataGetterLabelToURI:null,//initialized by custom data
 	dataGetterURIToLabel:null, //initialized from custom data
@@ -10,7 +10,7 @@ var pageManagementUtils = {
 	onLoad:function(){
 		if (this.disableFormInUnsupportedBrowsers()) {
             return;
-        }   
+        }
 		this.mixIn();
 		this.initReverseURIToLabel();
 		this.initDataGetterProcessors();
@@ -21,7 +21,7 @@ var pageManagementUtils = {
 	    if(this.isEdit()) {
 	    	this.initExistingContent();
 	    }
-	}, 
+	},
 	isEdit:function() {
 		if(pageManagementUtils.menuAction != null && pageManagementUtils.menuAction == "Edit") {
 			return true;
@@ -38,11 +38,11 @@ var pageManagementUtils = {
 		if(pageManagementUtils.addMenuItem != null && pageManagementUtils.addMenuItem == "true") {
 			return true;
 		}
-		return false;	
+		return false;
 	},
 	initExistingContent:function() {
 		this.generateExistingContentSections();
-		//display more content button - will need to review how to hit save etc. 
+		//display more content button - will need to review how to hit save etc.
         //Don't need to display this b/c already in appended section
 		//pageManagementUtils.moreContentButton.show();
 		//Need to have additional save button
@@ -57,13 +57,13 @@ var pageManagementUtils = {
 				}
 			}
 		} else {
-			//Error condition.  
+			//Error condition.
 		}
 	},
 	initDataGetterProcessors:function() {
 		//data getter processor map should come in from custom data
 		//Go through each and initialize with their class
-		
+
 		if(pageManagementUtils.processDataGetterUtils != null) {
 			var dataGetterProcessorMap = pageManagementUtils.dataGetterProcessorMap = pageManagementUtils.processDataGetterUtils.dataGetterProcessorMap;
 			$.each(dataGetterProcessorMap, function(key, dataGetterProcessorObject) {
@@ -71,11 +71,11 @@ var pageManagementUtils = {
 				dataGetterProcessorObject.initProcessor(pageManagementUtils.dataGetterLabelToURI[key]);
 			})
 		}
-	
+
 	},
-    disableFormInUnsupportedBrowsers: function() {       
+    disableFormInUnsupportedBrowsers: function() {
         var disableWrapper = $('#ie67DisableWrapper');
-        
+
         // Check for unsupported browsers only if the element exists on the page
         if (disableWrapper.length) {
             if (vitro.browserUtils.isIELessThan8()) {
@@ -83,8 +83,8 @@ var pageManagementUtils = {
                 $('.noIE67').hide();
                 return true;
             }
-        }            
-        return false;      
+        }
+        return false;
     },
 
     mixIn: function() {
@@ -94,7 +94,7 @@ var pageManagementUtils = {
         // Get the custom form data from the page
         $.extend(this, customFormData);
         $.extend(this, i18nStrings);
-        
+
     },
 	initObjects:function(){
 		this.counter = 0;
@@ -118,7 +118,7 @@ var pageManagementUtils = {
         this.classesForClassGroup = $('section#classesInSelectedGroup');
         this.selectedGroupForPage = $('#selectedContentTypeValue');
         this.allClassesSelectedCheckbox = $('#allSelected');
-        
+
         this.displayInternalMessage = $('#internal-class label em');
         this.pageContentSubmissionInputs = $("#pageContentSubmissionInputs");
         this.headerBar = $("section#headerBar");
@@ -140,7 +140,7 @@ var pageManagementUtils = {
 		//right side components
 	    this.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
 	    $('select#selectClassGroup option').eq(0).prop('selected', 'selected');
-	    
+
 	    //Why would you want to hide this? This hides everything
 	   // $("section#pageDetails").hide();
 	    this.headerBar.hide();
@@ -168,10 +168,10 @@ var pageManagementUtils = {
 	/*
 	//for search individuals - remember this populates the template class dropdown
 	populateClassForSearchDropdown:function() {
-	
+
         //Run ajax query
         var url = "dataservice?getAllVClasses=1";
-       
+
         //Make ajax call to retrieve vclasses
         $.getJSON(url, function(results) {
         	//Moved the function to processClassGroupDataGetterContent
@@ -181,7 +181,7 @@ var pageManagementUtils = {
 	},
 	displayAllClassesForSearchDropdown:function(results) {
 		 if ( results.classes.length == 0 ) {
-	            
+
         } else {
         	var appendHtml = "";
             $.each(results.classes, function(i, item) {
@@ -190,36 +190,36 @@ var pageManagementUtils = {
                 //Create options for the dropdown
                 appendHtml += "<option value='" + thisClass.URI + "'>" + thisClassName + "</option>";
             });
-        
+
             //if there are options to add
             if(appendHtml != "") {
             	pageManagementUtils.searchAllClassesDropdown.html(appendHtml);
             }
-         
+
         }
 	},*/
 	bindEventListeners:function(){
-		
+
 	    this.defaultTemplateRadio.click( function() {
 	            pageManagementUtils.customTemplate.addClass('hidden');
 	            //Also clear custom template value so as not to submit it
 	            pageManagementUtils.clearInputs(pageManagementUtils.customTemplate);
-	            pageManagementUtils.rightSideDiv.show(); 
+	            pageManagementUtils.rightSideDiv.show();
 	            //Check to see if there is already content on page, in which case save should be enabled
 	        	var pageContentSections = $("section[class='pageContent']");
 	        	if(pageContentSections.length == 0) {
 	        		pageManagementUtils.disablePageSave();
-	        	} 
+	        	}
 	    });
 
 	    this.customTemplateRadio.click( function() {
-	            pageManagementUtils.handleSelectCustomTemplate();  
+	            pageManagementUtils.handleSelectCustomTemplate();
 	    });
-	
+
 	    this.selfContainedTemplateRadio.click( function() {
 	            pageManagementUtils.customTemplate.removeClass('hidden');
-	            pageManagementUtils.rightSideDiv.hide(); 
-	            pageManagementUtils.enablePageSave();           
+	            pageManagementUtils.rightSideDiv.hide();
+	            pageManagementUtils.enablePageSave();
 	    });
 
 	    this.isMenuCheckbox.click( function() {
@@ -228,15 +228,15 @@ var pageManagementUtils = {
 	        }
 	        else {
 	            pageManagementUtils.menuSection.hide();
-	        }            
+	        }
 	    });
-	
+
 	    //Collapses the current content and creates a new section of content
 	    //Resets the content to be cloned to default settings
 	    this.doneButton.click( function() {
 	       pageManagementUtils.handleClickDone();
 	    });
-	
+
 	    this.cancelLink.click( function() {
 	        pageManagementUtils.clearSourceTemplateValues();
 	        pageManagementUtils.headerBar.hide();
@@ -253,34 +253,34 @@ var pageManagementUtils = {
 	    this.selectClassGroupDropdown.change(function() {
             pageManagementUtils.chooseClassGroup();
         });
-	    
-	    
-	    
+
+
+
 	    this.contentTypeSelect.change( function() {
 	    	pageManagementUtils.handleContentTypeSelect();
 	    });
-	    
-	    
+
+
 	    //Submission: validate as well as create appropriate hidden json inputs
-	    $("form").submit(function (event) { 
+	    $("form").submit(function (event) {
            pageManagementUtils.handleFormSubmission(event);
          });
-    
+
 	},
 	handleSelectCustomTemplate: function() {
-		pageManagementUtils.customTemplate.removeClass('hidden');            
+		pageManagementUtils.customTemplate.removeClass('hidden');
         pageManagementUtils.rightSideDiv.show();
         //Check to see if there is already content on page, in which case save should be enabled
         var pageContentSections = $("section[class='pageContent']");
     	if(pageContentSections.length == 0) {
     		pageManagementUtils.disablePageSave();
-    	}          
+    	}
 	},
-	
+
 	handleClickDone:function() {
 		var selectedType = pageManagementUtils.contentTypeSelect.val();
 		var selectedTypeText = $("#typeSelect option:selected").text();
-		
+
 		//Hide all sections
 		pageManagementUtils.classGroupSection.hide();
 		pageManagementUtils.fixedHTMLSection.hide();
@@ -308,7 +308,7 @@ var pageManagementUtils = {
 	   //Enable save button now that some content has been selected
 	   pageManagementUtils.enablePageSave();
 	   pageManagementUtils.contentTypeSelect.focus();
-	
+
 	},
 	//Form submission
 	handleFormSubmission:function(event) {
@@ -331,7 +331,7 @@ var pageManagementUtils = {
             $('#error-alert p').html(validationError);
             event.preventDefault();
             return false;
-        } 	
+        }
 	},
 	checkMenuTitleSubmission:function() {
 		var isMenu = pageManagementUtils.isMenuCheckbox.is(":checked");
@@ -347,7 +347,7 @@ var pageManagementUtils = {
 			pageManagementUtils.menuLinkText.val("");
 		}
 	},
-	
+
 	//Select content type - this is content type specific
 	//TODO: Find better way to refactor this and/or see if any of this display functionality can be moved into content type processing
 	handleContentTypeSelect:function() {
@@ -383,7 +383,7 @@ var pageManagementUtils = {
             	pageManagementUtils.fixedHTMLSection.hide();
             	pageManagementUtils.searchIndividualsSection.show();
             }
-           
+
             pageManagementUtils.headerBar.show();
             pageManagementUtils.classesForClassGroup.addClass('hidden');
             $('div#selfContainedDiv').hide();
@@ -405,7 +405,7 @@ var pageManagementUtils = {
         //Disable save button until the user has clicked done or cancel from the addition
         pageManagementUtils.disablePageSave();
         //If the default template is selected, there is already content on the page, and the user is selecting new content
-        //display alert message that they must select a custom template and select 
+        //display alert message that they must select a custom template and select
         pageManagementUtils.checkTemplateForMultipleContent(_this.contentTypeSelect.val());
 	},
 	disablePageSave:function() {
@@ -443,7 +443,7 @@ var pageManagementUtils = {
 		$el.find("textarea").val("");
 		//resetting class group section as well so selection is reset if type changes
 		$el.find("select option:eq(0)").prop("selected", "selected");
-		
+
 	},
 	checkTemplateForMultipleContent:function(contentTypeSelected) {
 		if(contentTypeSelected != "") {
@@ -455,7 +455,7 @@ var pageManagementUtils = {
 	    		alert(pageManagementUtils.multipleContentWithDefaultTemplateError);
 	    		//pick custom template
 	    		 $('input:radio[name=selectedTemplate][value="custom"]').prop("checked", true);
-	    		 pageManagementUtils.handleSelectCustomTemplate();  
+	    		 pageManagementUtils.handleSelectCustomTemplate();
 
 	    	}
 		}
@@ -467,16 +467,16 @@ var pageManagementUtils = {
         var ctr = pageManagementUtils.counter;
         var counter = pageManagementUtils.counter;
         var varOrClass;
-        
+
         //Clone the object, renaming ids and copying text area values as well
         $newContentObj = pageManagementUtils.createCloneObject(contentType, counter);
 
         // Get rid of the cancel link; it'll be replaced by a delete link
         $newContentObj.find('span#cancelContent' + counter).html('');
-        
+
         if ( contentType == "sparqlQuery" || contentType == "fixedHtml" || contentType == "searchIndividuals") {
         	varOrClass = $newContentObj.find('input[name="saveToVar"]').val();
-        } 
+        }
         else if ( contentType == "browseClassGroup" ) {
         	$newContentObj.find('section#classesInSelectedGroup' + counter).removeClass('hidden');
         	varOrClass = $newContentObj.find('select#selectClassGroup' + counter + ' option:selected').text();
@@ -489,9 +489,9 @@ var pageManagementUtils = {
         pageManagementUtils.bindClonedContentEventHandlers($newContentObj);
         pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, varOrClass);
         //previously increased by 10, just increasing by 1 here
-        pageManagementUtils.counter++;  
+        pageManagementUtils.counter++;
     },
-    
+
     //For binding content type specific event handlers should they exist
     bindClonedContentEventHandlers:function($newContentObj) {
     	var dataGetterProcessorObj = pageManagementUtils.getDataGetterProcessorObject($newContentObj);
@@ -506,9 +506,9 @@ var pageManagementUtils = {
         $newDivContainer = $("<div></div>", {
             id: "divContainer" + counter,
             "class": "pageContentContainer",
-            html: "<span class='pageContentTypeLabel'>" + contentTypeLabel + " - " + varOrClass 
-                        + "</span><span id='clickable" + counter 
-                        + "' class='pageContentExpand'><div id='woof' class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
+            html: "<span class='pageContentTypeLabel'>" + contentTypeLabel + " - " + varOrClass
+                        + "</span><span id='clickable" + counter
+                        + "' class='pageContentExpand'><div id='woof' class='arrow expandArrow'></div></span><div id='innerContainer" + counter
                         + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;" + pageManagementUtils.orString + "&nbsp;<a id='remove" + counter   // changed button to a link
                         + "' href='' >" + pageManagementUtils.deleteString + "</a></span></div>"
         });
@@ -519,7 +519,7 @@ var pageManagementUtils = {
         pageManagementUtils.bindClonedContentContainerEvents($newDivContainer, counter);
         //Append the new container to the section storing these containers
         $newDivContainer.appendTo($('section#contentDivs'));
-        //place new content object        
+        //place new content object
         $newContentObj.prependTo($innerDiv);
     },
     bindClonedContentDoneEvent:function($newContentObj) {
@@ -532,8 +532,8 @@ var pageManagementUtils = {
                 thisArrowDiv.removeClass("collapseArrow");
                 thisArrowDiv.addClass("expandArrow");
                 window.setTimeout('pageManagementUtils.adjustSaveButtonHeight()', 223);
-         
-        });	
+
+        });
     },
     bindClonedContentContainerEvents:function($newDivContainer, counter) {
     	 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
@@ -554,11 +554,11 @@ var pageManagementUtils = {
                 arrowDiv.removeClass("expandArrow");
                 arrowDiv.addClass("collapseArrow");
             }
-            window.setTimeout('pageManagementUtils.adjustSaveButtonHeight()', 223);             
+            window.setTimeout('pageManagementUtils.adjustSaveButtonHeight()', 223);
         });
-        
+
         //remove button
-        $newRemoveLink = $innerDiv.find('a#remove' + counter); 
+        $newRemoveLink = $innerDiv.find('a#remove' + counter);
         //remove the content entirely
         $newRemoveLink.click(function(event) {
         	//if content type of what is being deleted is browse class group, then
@@ -579,8 +579,8 @@ var pageManagementUtils = {
     createCloneObject:function(contentType, counter) {
     	var originalObjectPath = 'section#' + contentType;
     	var $newContentObj = $(originalObjectPath).clone();
- 	    $newContentObj.removeClass("contentSectionContainer"); 
- 	    $newContentObj.addClass("pageContent"); 
+ 	    $newContentObj.removeClass("contentSectionContainer");
+ 	    $newContentObj.addClass("pageContent");
  	    $newContentObj.attr("contentNumber", counter);
  	    //Save content type
 	    $newContentObj.attr("contentType", contentType);
@@ -600,10 +600,10 @@ var pageManagementUtils = {
     		var originalTextAreaName = $(this).attr("name");
     		$newAncestorObject.find("textarea[name='" + originalTextAreaName + "']").val(originalTextAreaValue);
     	});
-    }, 
+    },
     //given an object and a counter, rename all the ids
     renameIdsInClone:function($newContentObj, counter) {
-    	$newContentObj.find("[id]").each(function(index, el) { 
+    	$newContentObj.find("[id]").each(function(index, el) {
     		var originalId = $(this).attr("id");
     		var newId = originalId + counter;
     		$(this).attr("id", newId);
@@ -613,7 +613,7 @@ var pageManagementUtils = {
   //For edit, need to have text passed in
     //Returns new content object itself
     cloneContentAreaForEdit: function(contentType, contentTypeLabel, labelText) {
-           var counter = pageManagementUtils.counter;           
+           var counter = pageManagementUtils.counter;
            //Clone the object, renaming ids and copying text area values as well
            $newContentObj = pageManagementUtils.createCloneObject(contentType, counter);
            //Attach done event
@@ -622,9 +622,9 @@ var pageManagementUtils = {
        		//create cloned content container
            pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, labelText);
            //previously increased by 10, just increasing by 1 here
-           pageManagementUtils.counter++;  
+           pageManagementUtils.counter++;
            return $newContentObj;
-    }, 
+    },
     //To actually generate the content for existing values
     generateExistingContentSections:function() {
     	if(pageManagementUtils.menuAction == "Edit") {
@@ -644,7 +644,7 @@ var pageManagementUtils = {
 	    				//Get the Label for the URI
 	    				var contentType = pageManagementUtils.dataGetterURIToLabel[dataGetterClass];
 	    				var contentTypeForCloning = pageManagementUtils.processDataGetterUtils.getContentTypeForCloning(contentType);
-	    				//Get the processor class for this type 
+	    				//Get the processor class for this type
 	    				var dataGetterProcessorObject = pageManagementUtils.processDataGetterUtils.dataGetterProcessorMap[contentType];
 	    				var contentTypeLabel = dataGetterProcessorObject.retrieveContentLabel();
 	    				var additionalLabelText = dataGetterProcessorObject.retrieveAdditionalLabelText(JSONContentObject);
@@ -662,9 +662,9 @@ var pageManagementUtils = {
 	    				//error condition
 	    			}
     			}
-    			
+
     		}
-    		
+
     	}
     },
     //What's the label of the content type from the drop down
@@ -681,7 +681,7 @@ var pageManagementUtils = {
     		$("<input type='hidden' name='URI' value='" + uri + "'>").appendTo($newContentObj);
     	}
     },
-    
+
     //Adjust save button height
     adjustSaveButtonHeight:function() {
         if ( $("div#leftSide").css("height") != undefined ) {
@@ -693,7 +693,7 @@ var pageManagementUtils = {
     },
     /***Class group selection***/
     //Copied from menu management edit javascript
-  //Class group 
+  //Class group
     resetClassGroupSection:function() {
     	//doing this in clear inputs instead which will be triggered
     	//every time content type is changed AS well as on  more content button after
@@ -701,7 +701,7 @@ var pageManagementUtils = {
     	//$('select#selectClassGroup option').eq(0).prop('selected', 'selected');
     	 pageManagementUtils.classesForClassGroup.addClass('hidden');
     },
-    chooseClassGroup: function() {        
+    chooseClassGroup: function() {
         var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
         var vclassUri = this.selectClassGroupDropdown.val();
         url += encodeURIComponent(vclassUri);
@@ -714,45 +714,45 @@ var pageManagementUtils = {
     },
     displayClassesForClassGroup:function(results) {
         if ( results.classes.length == 0 ) {
-            
+
         } else {
             //update existing content type with correct class group name and hide class group select again
         //   pageManagementUtils.hideClassGroups();
-    
+
             pageManagementUtils.selectedGroupForPage.html(results.classGroupName);
             //update content type in message to "display x within my institution"
             //SPECIFIC TO VIVO: So include in internal CLASS section instead
             pageManagementUtils.updateInternalClassMessage(results.classGroupName);
             //retrieve classes for class group and display with all selected
             var selectedClassesList =  pageManagementUtils.classesForClassGroup.children('ul#selectedClasses');
-            
+
             selectedClassesList.empty();
             selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> ' + pageManagementUtils.allCapitalized + '</label> </li>');
-            
+
             $.each(results.classes, function(i, item) {
                 var thisClass = results.classes[i];
                 var thisClassName = thisClass.name;
                 //For the class group, ALL classes should be selected
-                appendHtml = ' <li class="ui-state-default">' + 
-                        '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
-                       '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
+                appendHtml = ' <li class="ui-state-default">' +
+                        '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +
+                       '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' +
                         '</li>';
                 selectedClassesList.append(appendHtml);
             });
             pageManagementUtils.toggleClassSelection();
-            
-            
+
+
             //From NEW code
             if (pageManagementUtils.selectClassGroupDropdown.val() == "" ) {
           	  pageManagementUtils.classesForClassGroup.addClass('hidden');
 	            $("div#leftSide").css("height","");
-	            
+
 	  	        }
 	  	     else {
 	  	    	 	pageManagementUtils.classesForClassGroup.removeClass('hidden');
 	  	            if ( $("div#leftSide").height() < $("div#rightSide").height() ) {
 	  	                $("div#leftSide").css("height",$("div#rightSide").height() + "px");
-	  	            }          
+	  	            }
 	  	     }
         }
     },
@@ -776,11 +776,11 @@ var pageManagementUtils = {
             $(this).closest("ul").find('input:checkbox[name=allSelected]').prop('checked', null);
         });
     }, //This is SPECIFIC to VIVO so should be moved there
-    updateInternalClassMessage:function(classGroupName) { //User has changed content type 
+    updateInternalClassMessage:function(classGroupName) { //User has changed content type
         //Set content type within internal class message
         this.displayInternalMessage.filter(":first").html(classGroupName);
     },
-    
+
     /**On submission**/
     //On submission, generates the content for the input that will return the serialized JSON objects representing
     //each of the content types
@@ -831,13 +831,13 @@ var pageManagementUtils = {
 				//ERROR handling
 		    	alert(pageManagementUtils.mapProcessorError);
 				return null;
-			} 
+			}
 		}
     	alert(pageManagementUtils.codeProcessingError);
     	//Error handling here
     	return null;
     },
-  
+
     //Get the data getter processor
     getDataGetterProcessorObject:function(pageContentSection) {
     	var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType(pageContentSection);
@@ -856,7 +856,7 @@ var pageManagementUtils = {
     handleRemoveBrowseClassGroupPageContent:function() {
     	if(pageManagementUtils.contentTypeSelect.find("option[value='browseClassGroup']").length == 0) {
 	    	//if removed, add browse class group back
-	    	var classGroupOption = '<option value="browseClassGroup">Browse Class Group</option>';           
+	    	var classGroupOption = '<option value="browseClassGroup">Browse Class Group</option>';
 	    	pageManagementUtils.contentTypeSelect.find('option:eq(0)').after(classGroupOption);
     	}
     },
@@ -871,28 +871,28 @@ var pageManagementUtils = {
     /***Validation***/
     validateMenuItemForm: function() {
         var validationError = "";
-        
+
         // Check menu name
         if ($('input[type=text][name=pageName]').val() == "") {
             validationError += pageManagementUtils.supplyName + "<br />";
             }
-        // Check pretty url     
+        // Check pretty url
         if ($('input[type=text][name=prettyUrl]').val() == "") {
             validationError += pageManagementUtils.supplyPrettyUrl + "<br />";
         }
         if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
             validationError += pageManagementUtils.startUrlWithSlash + "<br />";
         }
-        
+
         // Check custom template and self contained template
         var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
         if (selectedTemplateValue == "custom" || selectedTemplateValue == "selfContained") {
             if ($('input[name=customTemplate]').val() == "") {
-                validationError += pageManagementUtils.supplyTemplate + "<br />"; 
+                validationError += pageManagementUtils.supplyTemplate + "<br />";
             }
         }
-        
-       
+
+
         return validationError;
     },
     //Validation across different content types
@@ -937,27 +937,27 @@ var pageManagementUtils = {
             $("input[name='selfContainedTemplate']").val($("input[name='customTemplate']").val());
         }
     },
-    
+
     setUsesSelfContainedTemplateInput:function() {
     	//On form submission attach hidden input to form if the custom template selection is picked
         if ( pageManagementUtils.isSelfContainedTemplateChecked() ) {
         	$("<input name='isSelfContainedTemplate' value='true'>").appendTo($("form"));
         }
     },
-    
+
     //If any content is defined, keep the selContained radio button hidden
     checkSelfContainedRadio:function() {
         if ( pageManagementUtils.savedContentDivs.html().length == 0 ) {
             $('div#selfContainedDiv').show();
         }
-        
+
     },
     isSelfContainedTemplateChecked:function() {
     	return pageManagementUtils.selfContainedTemplateRadio.is(':checked');
     }
 
 }
-    
+
 $(document).ready(function() {
    pageManagementUtils.onLoad();
 });

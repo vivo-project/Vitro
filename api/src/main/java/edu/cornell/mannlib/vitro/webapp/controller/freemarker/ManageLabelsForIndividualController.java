@@ -25,7 +25,7 @@ public class ManageLabelsForIndividualController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ManageLabelsForIndividualController.class.getName());
     private static final String TEMPLATE_NAME = "manageLabelsForIndividual.ftl";
-    
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.DO_FRONT_END_EDITING.ACTION;
@@ -37,14 +37,14 @@ public class ManageLabelsForIndividualController extends FreemarkerHttpServlet {
         Map<String, Object> body = new HashMap<String, Object>();
 
         String subjectUri = vreq.getParameter("subjectUri");
-        
+
         body.put("subjectUri", subjectUri);
 
 
         ArrayList<Literal> labels = getLabels(subjectUri, vreq);
         log.debug("labels = " + labels) ;
         body.put("labels", labels);
-        
+
         Individual subject = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(subjectUri);
         if( subject != null && subject.getName() != null ){
              body.put("subjectName", subject.getName());
@@ -54,17 +54,17 @@ public class ManageLabelsForIndividualController extends FreemarkerHttpServlet {
 
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
-  
-    
+
+
     private static String LABEL_QUERY = ""
         + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
         + "SELECT DISTINCT ?label WHERE { \n"
         + "    ?subject rdfs:label ?label \n"
         + "} ORDER BY ?label";
-    
-       
+
+
     ArrayList<Literal>  getLabels(String subjectUri, VitroRequest vreq) {
-          
+
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
 
@@ -74,14 +74,14 @@ public class ManageLabelsForIndividualController extends FreemarkerHttpServlet {
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 Literal nodeLiteral = soln.get("label").asLiteral();
-                labels.add(nodeLiteral); 
+                labels.add(nodeLiteral);
 
 
             }
         } catch (Exception e) {
             log.error(e, e);
-        }    
-       
+        }
+
         return labels;
     }
 }

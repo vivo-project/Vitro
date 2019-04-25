@@ -33,9 +33,9 @@ dojo.graphics.color.rgb2hsv = function(r, g, b){
 	// v = 0.0 (black) to 1.0 {white)
 	//
 	// Based on C Code in "Computer Graphics -- Principles and Practice,"
-	// Foley et al, 1996, p. 592. 
+	// Foley et al, 1996, p. 592.
 	//
-	// our calculatuions are based on 'regular' values (0-360, 0-1, 0-1) 
+	// our calculatuions are based on 'regular' values (0-360, 0-1, 0-1)
 	// but we return bytes values (0-255, 0-255, 0-255)
 
 	var h = null;
@@ -83,7 +83,7 @@ dojo.graphics.color.rgb2hsv = function(r, g, b){
 }
 
 dojo.graphics.color.hsv2rgb = function(h, s, v){
- 
+
 	if (dojo.lang.isArray(h)) {
 		v = h[2] || 0;
 		s = h[1] || 0;

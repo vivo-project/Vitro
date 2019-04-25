@@ -13,7 +13,7 @@ import stubs.javax.naming.InitialContextStub;
 /**
  * In order to use this and the other naming stubs.javax.naming classes, do
  * this:
- * 
+ *
  * <pre>
  * System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
  * 		InitialContextFactoryStub.class.getName());

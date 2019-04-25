@@ -11,12 +11,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMa
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 
 public class VClassTemplateModel extends BaseTemplateModel {
-    
+
     private static final Log log = LogFactory.getLog(VClassTemplateModel.class);
     private static final String PATH = Route.INDIVIDUAL_LIST.path();
-    
+
     private final VClass vclass;
-    
+
     public VClassTemplateModel(VClass vclass) {
         this.vclass = vclass;
     }
@@ -24,15 +24,15 @@ public class VClassTemplateModel extends BaseTemplateModel {
     public String getUri(){
         return vclass.getURI();
     }
-    
+
     public String getName() {
         return vclass.getName();
     }
-    
+
     public String getUrl() {
         return getUrl(PATH, new ParamMap("vclassId", vclass.getURI()));
     }
-    
+
     public int getIndividualCount() {
         return vclass.getEntityCount();
     }

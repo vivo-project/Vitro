@@ -8,31 +8,31 @@ var processSearchDataGetterContent = {
 	//can use this if expect to initialize from elsewhere
 	initProcessor:function(dataGetterClass) {
 		this.dataGetterClass =dataGetterClass;
-		
+
 	},
-	
+
 	processPageContentSection:function(pageContentSection) {
-		
+
 		var variableValue = pageContentSection.find("input[name='saveToVar']").val();
 		var vclassUriValue = pageContentSection.find("select[name='vclassUri']").val();
-		
+
 
 		//query model should also be an input
 		//set query model to query model here - vitro:contentDisplayModel
 		var returnObject = {saveToVar:variableValue, vclassUri:vclassUriValue, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	},
-	//For an existing set of content where form is already set, fill in the values 
+	//For an existing set of content where form is already set, fill in the values
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		var vclassUriValue = existingContentObject["vclassUri"];
-		
-		
+
+
 		//Now find and set value
 		pageContentSection.find("input[name='saveToVar']").val(saveToVarValue);
 		//set value of query
 		pageContentSection.find("select[name='vclassUri']").val(vclassUriValue);
-		
+
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveContentLabel:function() {
@@ -43,7 +43,7 @@ var processSearchDataGetterContent = {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		return saveToVarValue;
 	},
-    //Validation on form submit: Check to see that class group has been selected 
+    //Validation on form submit: Check to see that class group has been selected
     validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
     	var validationError = "";
     	//Check that vclassuri and saveToVar have been input
@@ -57,9 +57,9 @@ var processSearchDataGetterContent = {
     	if(processSearchDataGetterContent.stringHasDoubleQuote(variableValue)) {
     		validationError += pageContentSectionLabel + ": " + i18nStringsSearchIndividuals.noDoubleQuotes + " <br />";
     	}
-    	
+
     	//validation for search individuals
-    	
+
 		var vclassUriValue = pageContentSection.find("select[name='vclassUri']").val();
 		if(vclassUriValue == "") {
 			validationError += pageContentSectionLabel + ": " + i18nStringsSearchIndividuals.selectClass + " <br />";
@@ -81,6 +81,6 @@ var processSearchDataGetterContent = {
 
     	return inputStr.replace(/&#39;/g, "\'").replace(/&quot;/g, "\"");
     }
-		
-		
+
+
 };

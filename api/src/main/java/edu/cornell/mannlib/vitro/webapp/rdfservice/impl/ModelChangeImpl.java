@@ -19,12 +19,12 @@ public class ModelChangeImpl implements ModelChange {
 	private String graphURI;
 
 	public ModelChangeImpl() {}
-	
+
 	public ModelChangeImpl(InputStream serializedModel,
                            RDFService.ModelSerializationFormat serializationFormat,
                            Operation operation,
                            String graphURI) {
-		
+
 		this.serializedModel = serializedModel;
 		this.serializationFormat = serializationFormat;
 		this.operation = operation;
@@ -35,27 +35,27 @@ public class ModelChangeImpl implements ModelChange {
 	public InputStream getSerializedModel() {
 		return serializedModel;
 	}
-	
+
 	@Override
 	public void setSerializedModel(InputStream serializedModel) {
 		this.serializedModel = serializedModel;
 	}
-	
+
 	@Override
 	public RDFService.ModelSerializationFormat getSerializationFormat() {
 		return serializationFormat;
 	}
-	
+
 	@Override
 	public void setSerializationFormat(RDFService.ModelSerializationFormat serializationFormat) {
 		this.serializationFormat = serializationFormat;
 	}
-	
+
 	@Override
 	public Operation getOperation() {
 		return operation;
 	}
-	
+
 	@Override
 	public void setOperation(Operation operation) {
 		this.operation = operation;

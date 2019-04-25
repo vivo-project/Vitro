@@ -20,7 +20,7 @@ public class Concept {
    private List<String> exactMatchURIList;
    private List<String> closeMatchURIList;
    private List<String> altLabelList;
-   
+
    /**
     * default constructor
     */
@@ -30,7 +30,7 @@ public class Concept {
       this.exactMatchURIList = new ArrayList<String>();
       this.closeMatchURIList = new ArrayList<String>();
    }
-   
+
    /**
     * @return the conceptId
     */

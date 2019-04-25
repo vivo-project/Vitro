@@ -9,16 +9,16 @@ var processClassGroupDataGetterContent = {
 	initProcessor:function(dataGetterClassInput) {
 		this.dataGetterClass = dataGetterClassInput;
 	},
-	
+
 	//Do we need a separate content type for each of the others?
 	processPageContentSection:function(pageContentSection) {
-		//Will look at classes etc. 
+		//Will look at classes etc.
 		var classGroup = pageContentSection.find("select[name='selectClassGroup']").val();
 		//query model should also be an input, ensure class group URI is saved as URI and not string
 		var returnObject = {classGroup:classGroup, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	},
-	//For an existing set of content where form is already set, fill in the values 
+	//For an existing set of content where form is already set, fill in the values
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		var classGroupValue = existingContentObject["classGroup"];
 		pageContentSection.find("select[name='selectClassGroup']").val(classGroupValue);
@@ -52,29 +52,29 @@ var processClassGroupDataGetterContent = {
 	//Page content section specific methods
 	displayClassesForClassGroup:function(results, pageContentSection) {
         if ( results.classes.length == 0 ) {
-            
+
         } else {
            var contentNumber = pageContentSection.attr("contentNumber");
         	var classesForClassGroup = pageContentSection.find('section[name="classesInSelectedGroup"]');
-        	
+
             //retrieve classes for class group and display with all selected
             var selectedClassesList = classesForClassGroup.children('ul[name="selectedClasses"]');
-            
+
             selectedClassesList.empty();
             var newId = "allSelected" + contentNumber;
             selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="' + contentNumber + '" value="all" checked="checked" /> <label class="inline" for="All"> ' + i18nStringsBrowseGroups.allCapitalized + '</label> </li>');
-            
+
             $.each(results.classes, function(i, item) {
                 var thisClass = results.classes[i];
                 var thisClassName = thisClass.name;
                 //For the class group, ALL classes should be selected
-                appendHtml = ' <li class="ui-state-default">' + 
-                        '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
-                       '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
+                appendHtml = ' <li class="ui-state-default">' +
+                        '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +
+                       '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' +
                         '</li>';
                 selectedClassesList.append(appendHtml);
             });
-            
+
             //Need a way of handling this without it being in the internal class data getter
             var displayInternalMessage = pageContentSection.find('label[for="display-internalClass"] em');
             if(displayInternalMessage != null) {
@@ -84,8 +84,8 @@ var processClassGroupDataGetterContent = {
     	 	classesForClassGroup.removeClass('hidden');
             if ( $("div#leftSide").height() < $("div#rightSide").height() ) {
                 $("div#leftSide").css("height",$("div#rightSide").height() + "px");
-            }          
-	  	     
+            }
+
         }
     },
 	//Toggle class selection already deals with names but want to attach that event
@@ -118,7 +118,7 @@ var processClassGroupDataGetterContent = {
              processClassGroupDataGetterContent.chooseClassGroup(pageContentSection);
          });
     },
-    chooseClassGroup: function(pageContentSection) {        
+    chooseClassGroup: function(pageContentSection) {
     	var selectClassGroupDropdown =  pageContentSection.find("select[name='selectClassGroup']");
         var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
         var vclassUri = selectClassGroupDropdown.val();
@@ -131,11 +131,11 @@ var processClassGroupDataGetterContent = {
         	processClassGroupDataGetterContent.displayClassesForClassGroup(results, pageContentSection);
         });
     },
-    //Validation on form submit: Check to see that class group has been selected 
+    //Validation on form submit: Check to see that class group has been selected
     validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
     	var validationError = "";
     	 if (pageContentSection.find('select[name="selectClassGroup"]').val() =='-1') {
-             validationError += pageContentSectionLabel + ": " + i18nStringsBrowseGroups.supplyClassGroup + " <br />"; 
+             validationError += pageContentSectionLabel + ": " + i18nStringsBrowseGroups.supplyClassGroup + " <br />";
          } else {
              //class group has been selected, make sure there is at least one class selected
              var allSelected = pageContentSection.find('input[name="allSelected"]:checked').length;
@@ -147,7 +147,7 @@ var processClassGroupDataGetterContent = {
          }
     	 return validationError;
     }
-	   
-		
-		
-} 
+
+
+
+}

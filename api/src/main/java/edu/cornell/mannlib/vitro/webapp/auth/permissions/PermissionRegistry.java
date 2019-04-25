@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * A collection of Permission objects, keyed by URI. Resides in the
  * ServletContext.
- * 
+ *
  * This is not thread-safe, so Permissions should be added only during context
  * initialization.
  */
@@ -123,7 +123,7 @@ public class PermissionRegistry {
 	/**
 	 * Get the permission that is registered with this URI. If there is no such
 	 * Permission, return a BrokenPermission that always denies authorization.
-	 * 
+	 *
 	 * If you want to know whether an actual Permission has been registered at
 	 * this URI, call isPermission() instead.
 	 */
@@ -183,7 +183,7 @@ public class PermissionRegistry {
 		 * property may be given an edit-level of "PUBLIC", but that may also
 		 * simply be the default assigned to it when editing, and we don't want
 		 * to recognize that.
-		 * 
+		 *
 		 * Other permissions give self-editors their editing privileges.
 		 */
 		private Collection<Permission> createEditByRolePermissions() {

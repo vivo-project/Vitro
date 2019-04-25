@@ -8,7 +8,7 @@ var processIndividualsForClassesDataGetterContent = {
 	},
 	//Do we need a separate content type for each of the others?
 	processPageContentSection:function(pageContentSection) {
-		//Will look at classes etc. 
+		//Will look at classes etc.
 		var classGroup = pageContentSection.find("select[name='selectClassGroup']").val();
 		//query model should also be an input
 		//Get classes selected
@@ -24,7 +24,7 @@ var processIndividualsForClassesDataGetterContent = {
 	retrieveContentLabel:function() {
 		return processClassGroupDataGetterContent.retrieveContentLabel();
 	},
-	//For an existing set of content where form is already set, fill in the values 
+	//For an existing set of content where form is already set, fill in the values
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		//select class group in dropdown and append the classes within that class group
 		processClassGroupDataGetterContent.populatePageContentSection(existingContentObject, pageContentSection);
@@ -38,7 +38,7 @@ var processIndividualsForClassesDataGetterContent = {
 			pageContentSection.find("input[name='classInClassGroup'][value='" + classSelected + "']").prop("checked", "checked");
 		}
 		//If number of classes selected is not equal to total number of classes, uncheck all
-		
+
 		var results =existingContentObject["results"];
 		if(results != null && results.classGroupName != null) {
 	    	var resultsClasses = results["classes"];
@@ -54,9 +54,9 @@ var processIndividualsForClassesDataGetterContent = {
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		return processClassGroupDataGetterContent.retrieveAdditionalLabelText(existingContentObject);
 	},
-	 //Validation on form submit: Check to see that class group has been selected 
+	 //Validation on form submit: Check to see that class group has been selected
     validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
     	return processClassGroupDataGetterContent.validateFormSubmission(pageContentSection, pageContentSectionLabel);
     }
-		
+
 }

@@ -23,22 +23,22 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
-	 
+
     private SDBDatasetMode datasetMode = SDBDatasetMode.ASSERTIONS_AND_INFERENCES;
-    
+
 	public WebappDaoFactorySDB(RDFService rdfService,
-	                          OntModelSelector ontModelSelector) { 
+	                          OntModelSelector ontModelSelector) {
 		this(rdfService, ontModelSelector, new WebappDaoFactoryConfig());
 	}
-	
+
     public WebappDaoFactorySDB(RDFService rdfService,
                                OntModelSelector ontModelSelector,
                                WebappDaoFactoryConfig config) {
         this(rdfService, ontModelSelector, config, null);
     }
-    
+
     public WebappDaoFactorySDB(RDFService rdfService,
-                               OntModelSelector ontModelSelector, 
+                               OntModelSelector ontModelSelector,
                                WebappDaoFactoryConfig config,
                                SDBDatasetMode datasetMode) {
         super(ontModelSelector, config);
@@ -48,7 +48,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
             this.datasetMode = datasetMode;
         }
     }
-    
+
 	@Override
 	public String toString() {
 		return "WebappDaoFactorySDB[" + Integer.toString(hashCode(), 16) + ", "
@@ -63,7 +63,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
         this.dwf = base.dwf;
         this.rdfService = base.rdfService;
     }
-	
+
 	@Override
     public IndividualDao getIndividualDao() {
         if (entityWebappDao != null)
@@ -72,47 +72,47 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
             return entityWebappDao = new IndividualDaoSDB(
                     dwf, datasetMode, this);
     }
-	
+
 	@Override
 	public DataPropertyStatementDao getDataPropertyStatementDao() {
-		if (dataPropertyStatementDao != null) 
+		if (dataPropertyStatementDao != null)
 			return dataPropertyStatementDao;
 		else
 			return dataPropertyStatementDao = new DataPropertyStatementDaoSDB(
 			        dwf, datasetMode, this);
 	}
-	
+
 	@Override
 	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
-		if (objectPropertyStatementDao != null) 
+		if (objectPropertyStatementDao != null)
 			return objectPropertyStatementDao;
 		else
-			return objectPropertyStatementDao = 
+			return objectPropertyStatementDao =
 			    new ObjectPropertyStatementDaoSDB(rdfService, dwf, datasetMode, this);
 	}
-	
+
 	@Override
 	public VClassDao getVClassDao() {
-		if (vClassDao != null) 
+		if (vClassDao != null)
 			return vClassDao;
 		else
 			return vClassDao = new VClassDaoSDB(dwf, datasetMode, this, config.isUnderlyingStoreReasoned());
 	}
-	
+
 	@Override
 	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         return new WebappDaoFactorySDB(this, userURI);
     }
-	
+
 	public RDFService getRDFService() {
 	    return this.rdfService;
 	}
-	
+
 	public enum SDBDatasetMode {
 	    ASSERTIONS_ONLY, INFERENCES_ONLY, ASSERTIONS_AND_INFERENCES
 	}
-	
-	public static String getFilterBlock(String[] graphVars, 
+
+	public static String getFilterBlock(String[] graphVars,
 	                                    SDBDatasetMode datasetMode) {
 	    StringBuilder filterBlock = new StringBuilder();
 		for (String graphVar : graphVars) {
@@ -148,7 +148,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 		}
 	    return filterBlock.toString();
 	}
-	
+
 	@Override
 	public void close() {
 	    super.close();
@@ -156,18 +156,18 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	        this.rdfService.close();
 	    }
 	}
-	
+
 	private class ReconnectingDatasetFactory implements DatasetWrapperFactory {
-	    
+
 	    private BasicDataSource _bds;
 	    private StoreDesc _storeDesc;
-	    
-	    public ReconnectingDatasetFactory(BasicDataSource bds, 
+
+	    public ReconnectingDatasetFactory(BasicDataSource bds,
                                           StoreDesc storeDesc) {
 	        _bds = bds;
 	        _storeDesc = storeDesc;
 	    }
-	    
+
 	    public DatasetWrapper getDatasetWrapper() {
 	        try {
                 Connection sqlConn = _bds.getConnection();
@@ -180,7 +180,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
                 		"Unable to connect to database", sqe);
             }
 	    }
-	    
-	}    
-	
+
+	}
+
 }

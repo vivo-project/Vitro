@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * This allows J. Random User to pretend that he's passed external
  * authentication.
- * 
+ *
  * This should not be included in web.xml in a production deployment!!!
  */
 public class FakeExternalAuthController extends FreemarkerHttpServlet {
@@ -43,10 +43,10 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 	@Override
 	public void init() throws ServletException {
 		log.debug("storing the bean.");
-		
+
 		ExternalAuthHelper.setBean(getServletContext(),
 				new FakeExternalAuthHelper(null));
-		
+
 		new SecurityWarning().warn(getServletContext(),
 				"The FakeExternalAuthController is enabled. "
 						+ "If that's not what you wanted, "

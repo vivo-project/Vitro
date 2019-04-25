@@ -19,7 +19,7 @@ import org.apache.jena.rdf.model.RDFNode;
 /**
  * This RDFService wrapper adds instrumentation to the time-consuming methods of
  * the inner RDFService.
- * 
+ *
  * For the other methods, it just delegates to the inner RDFService.
  */
 public class LoggingRDFService implements RDFService {

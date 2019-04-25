@@ -31,7 +31,7 @@ public class IndividualTypeOperationController extends BaseEditController {
 
     	VitroRequest request = new VitroRequest(req);
     	String defaultLandingPage = getDefaultLandingPage(request);
-    	
+
         HashMap epoHash = null;
         EditProcessObject epo = null;
         try {
@@ -60,7 +60,7 @@ public class IndividualTypeOperationController extends BaseEditController {
         }
 
         IndividualDao dao = request.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao();
-        
+
         if (request.getParameter("_cancel") == null) {
 	        try {
 	            if (request.getParameter("operation").equals("remove")) {
@@ -81,7 +81,7 @@ public class IndividualTypeOperationController extends BaseEditController {
 
         //if no page forwarder was set, just go back to referring page:
         //the referer stuff all will be changed so as not to rely on the HTTP header
-        
+
         String referer = epo.getReferer();
         if (referer == null) {
             try {
@@ -104,5 +104,5 @@ public class IndividualTypeOperationController extends BaseEditController {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         doGet(request, response);
     }
-	
+
 }

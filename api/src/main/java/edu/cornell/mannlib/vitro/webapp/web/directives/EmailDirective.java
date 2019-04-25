@@ -21,7 +21,7 @@ import freemarker.template.TemplateModelException;
 
 /**
  * Process the inputs for a FreemarkerEmailMessage.
- * 
+ *
  * @see FreemarkerEmailMessage
  */
 public class EmailDirective extends BaseTemplateDirectiveModel {

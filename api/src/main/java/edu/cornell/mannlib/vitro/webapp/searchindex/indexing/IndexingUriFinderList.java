@@ -8,15 +8,15 @@ import org.apache.jena.rdf.model.Statement;
 
 /**
  * An ordered list of IndexingUriFinder objects, in a handy package.
- * 
+ *
  * Implementations should make a protective copy of the list of
  * IndexingUriFinders. Implementations must be thread-safe.
- * 
+ *
  * The life-cycle is:
- * 
+ *
  * <pre>
- * startIndexing(), 
- * 0 or more findAdditionalUris() by multiple threads, 
+ * startIndexing(),
+ * 0 or more findAdditionalUris() by multiple threads,
  * stopIndexing().
  * </pre>
  */

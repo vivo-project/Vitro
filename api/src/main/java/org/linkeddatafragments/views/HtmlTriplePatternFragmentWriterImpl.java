@@ -31,14 +31,14 @@ import java.util.Map;
  */
 public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWriterBase implements ILinkedDataFragmentWriter {
     private final Configuration cfg;
-    
+
     private final Template indexTemplate;
     private final Template datasourceTemplate;
     private final Template notfoundTemplate;
     private final Template errorTemplate;
-    
-    private final String HYDRA = "http://www.w3.org/ns/hydra/core#"; 
-    
+
+    private final String HYDRA = "http://www.w3.org/ns/hydra/core#";
+
     /**
      *
      * @param prefixes
@@ -47,18 +47,18 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
      */
     public HtmlTriplePatternFragmentWriterImpl(Map<String, String> prefixes, HashMap<String, IDataSource> datasources) throws IOException {
         super(prefixes, datasources);
-        
+
         cfg = new Configuration(Configuration.VERSION_2_3_22);
         cfg.setClassForTemplateLoading(getClass(), "/views");
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        
+
         indexTemplate = cfg.getTemplate("index.ftl.html");
         datasourceTemplate = cfg.getTemplate("datasource.ftl.html");
         notfoundTemplate = cfg.getTemplate("notfound.ftl.html");
         errorTemplate = cfg.getTemplate("error.ftl.html");
     }
-    
+
     /**
      *
      * @param outputStream
@@ -71,21 +71,21 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
     @Override
     public void writeFragment(ServletOutputStream outputStream, IDataSource datasource, ITriplePatternFragment fragment, ITriplePatternFragmentRequest tpfRequest) throws IOException, TemplateException{
         Map data = new HashMap();
-        
+
         // base.ftl.html
         data.put("assetsPath", "assets/");
         data.put("header", datasource.getTitle());
         data.put("date", new Date());
-        
+
         // fragment.ftl.html
         data.put("datasourceUrl", tpfRequest.getDatasetURL());
         data.put("datasource", datasource);
-        
+
         // Parse controls to template variables
         StmtIterator controls = fragment.getControls();
         while (controls.hasNext()) {
             Statement control = controls.next();
-            
+
             String predicate = control.getPredicate().getURI();
             RDFNode object = control.getObject();
             if (!object.isAnon()) {
@@ -93,28 +93,28 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
                 data.put(predicate.replaceFirst(HYDRA, ""), value);
             }
         }
-        
+
         // Add metadata
         data.put("totalEstimate", fragment.getTotalSize());
         data.put("itemsPerPage", fragment.getMaxPageSize());
-        
+
         // Add triples and datasources
         List<Statement> triples = fragment.getTriples().toList();
         data.put("triples", triples);
         data.put("datasources", getDatasources());
-        
+
         // Calculate start and end triple number
         Long start = ((tpfRequest.getPageNumber() - 1) * fragment.getMaxPageSize()) + 1;
         data.put("start", start);
         data.put("end", (start - 1) + (triples.size() < fragment.getMaxPageSize() ? triples.size() : fragment.getMaxPageSize()));
-        
+
         // Compose query object
         Map query = new HashMap();
         query.put("subject", !tpfRequest.getSubject().isVariable() ? tpfRequest.getSubject().asConstantTerm() : "");
         query.put("predicate", !tpfRequest.getPredicate().isVariable() ? tpfRequest.getPredicate().asConstantTerm() : "");
         query.put("object", !tpfRequest.getObject().isVariable() ? tpfRequest.getObject().asConstantTerm() : "");
         data.put("query", query);
-       
+
         // Get the template (uses cache internally)
         Template temp = datasource instanceof IndexDataSource ? indexTemplate : datasourceTemplate;
 
@@ -129,7 +129,7 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
         data.put("datasources", getDatasources());
         data.put("date", new Date());
         data.put("url", request.getRequestURL().toString());
-        
+
         notfoundTemplate.process(data, new OutputStreamWriter(outputStream));
     }
 

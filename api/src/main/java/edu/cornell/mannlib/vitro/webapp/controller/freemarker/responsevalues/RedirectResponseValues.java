@@ -13,13 +13,13 @@ public class RedirectResponseValues extends BaseResponseValues {
 
     private final String redirectUrl;
 
-    /** 
-     * The string redirectUrl will get the context added.    
-       If you want a redirect for a URL that has the context already added, 
-       as is the case if a UrlBuilder was used. use the class DirectRedirectResponseValues. 
-       
+    /**
+     * The string redirectUrl will get the context added.
+       If you want a redirect for a URL that has the context already added,
+       as is the case if a UrlBuilder was used. use the class DirectRedirectResponseValues.
+
        This will attempt to handle an off site redirect by checking for
-        "://" in the URL. 
+        "://" in the URL.
      */
     public RedirectResponseValues(String redirectUrl) {
         this.redirectUrl = getRedirectUrl(redirectUrl);
@@ -29,16 +29,16 @@ public class RedirectResponseValues extends BaseResponseValues {
         super(statusCode);
         this.redirectUrl = getRedirectUrl(redirectUrl);
     }
-    
+
     public RedirectResponseValues(Route redirectUrl) {
         this.redirectUrl = UrlBuilder.getUrl(redirectUrl);
     }
-    
+
     @Override
     public String getRedirectUrl() {
         return this.redirectUrl;
     }
-    
+
     protected String getRedirectUrl(String redirectUrl) {
         return redirectUrl.contains("://") ? redirectUrl : UrlBuilder.getUrl(redirectUrl);
     }

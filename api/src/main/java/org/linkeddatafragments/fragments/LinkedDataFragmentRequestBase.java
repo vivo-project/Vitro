@@ -28,7 +28,7 @@ public abstract class LinkedDataFragmentRequestBase
      *
      */
     public final long pageNumber;
-    
+
     /**
      *
      * @param fragmentURL

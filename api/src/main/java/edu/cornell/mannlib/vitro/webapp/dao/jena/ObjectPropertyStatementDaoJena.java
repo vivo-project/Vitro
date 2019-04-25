@@ -54,10 +54,10 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
 
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
-    
+
     protected DatasetWrapperFactory dwf;
     protected RDFService rdfService;
-    
+
     public ObjectPropertyStatementDaoJena(RDFService rdfService,
                                           DatasetWrapperFactory dwf,
                                           WebappDaoFactoryJena wadf) {
@@ -95,10 +95,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return entity;
         else {
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
-        	
+
         	ObjectPropertyDaoJena opDaoJena = (ObjectPropertyDaoJena) getWebappDaoFactory().getObjectPropertyDao();
         	//new ObjectPropertyDaoJena(rdfService, dwf, getWebappDaoFactory());
-        	
+
         	OntModel ontModel = getOntModelSelector().getABoxModel();
         	ontModel.enterCriticalSection(Lock.READ);
         	try {
@@ -108,7 +108,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	            try {
 	                while (propIt.hasNext()) {
 	                    Statement st = propIt.next();
-	                    
+
 	                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
 	                        try {
 	                            ObjectPropertyStatement objPropertyStmt = new ObjectPropertyStatementImpl();
@@ -133,21 +133,21 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	                                		//if ObjectProperty not found in ontology, skip it
 	                                		continue;
 	                                	}
-	                                }                                
+	                                }
 	                            } catch (Throwable g) {
 	                                //do not add statement to list
 	                            	log.debug("exception while trying to get object property for statement list, statement skipped.", g);
-	                            	continue;                                                                
+	                            	continue;
 	                            }
 	                            if (objPropertyStmt.getObjectURI() != null) {
 	                                Individual objInd = getWebappDaoFactory().getIndividualDao().getIndividualByURI(objPropertyStmt.getObjectURI());
 	                                objPropertyStmt.setObject(objInd);
 	                            }
-	
+
 	                            //add object property statement to list for Individual
 	                            if ((objPropertyStmt.getSubjectURI() != null) && (objPropertyStmt.getPropertyURI() != null) && (objPropertyStmt.getObject() != null)){
-	                                objPropertyStmtList.add(objPropertyStmt);                           
-	                            } 
+	                                objPropertyStmtList.add(objPropertyStmt);
+	                            }
 	                        } catch (Throwable t) {
 	                            log.error(t, t);
 	                        }
@@ -163,14 +163,14 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return entity;
         }
     }
-    
+
     private int NO_LIMIT = -1;
-    
+
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements (ObjectProperty objectProperty) {
     	return getObjectPropertyStatements(objectProperty, NO_LIMIT, NO_LIMIT);
     }
-    
+
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements (ObjectProperty objectProperty, int startIndex, int endIndex) {
     	getOntModel().enterCriticalSection(Lock.READ);
@@ -189,7 +189,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	    					if (!objRes.isAnon()) {
 			    				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
 			    				ops.setSubjectURI(stmt.getSubject().getURI());
-			    				ops.setPropertyURI(objectProperty.getURI());		
+			    				ops.setPropertyURI(objectProperty.getURI());
 			    				ops.setObjectURI(objRes.getURI());
 			    				opss.add(ops);
 	    					}
@@ -272,19 +272,19 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * DataPropertyStatementDaoJena returns a List<DataPropertyStatement>. We need to accomodate
      * custom queries that could request any data in addition to just the object of the statement.
      * However, we do need to get the object of the statement so that we have it to create editing links.
-     */             
-    
+     */
+
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, 
-            String propertyUri,             
+            String subjectUri,
+            String propertyUri,
             final String objectKey, String domainUri, String rangeUri,
-            String queryString, 
+            String queryString,
             Set<String> constructQueryStrings,
-            String sortDirection) {    	        
-    	
+            String sortDirection) {
+
         final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        
+
         long start = System.currentTimeMillis();
 
         Model constructedModel = null;
@@ -396,10 +396,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     }
 
     private Model constructModelForSelectQueries(String subjectUri,
-                                                 String propertyUri,    
+                                                 String propertyUri,
                                                  String rangeUri,
                                                  Set<String> constructQueries) {
-        
+
         if (constructQueries.size() == 0 || constructQueries == null) {
             return null;
         }
@@ -407,23 +407,23 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         Model constructedModel = ModelFactory.createDefaultModel();
 
         for (String queryString : constructQueries) {
-                     
+
             queryString = queryString.replace("?subject", "<" + subjectUri + ">");
             queryString = queryString.replace("?property", "<" + propertyUri + ">");
             if (rangeUri != null) {
                 queryString = queryString.replace("?objectType", "<" + rangeUri + ">");
             }
-         
+
             if (log.isDebugEnabled()) {
-                log.debug("CONSTRUCT query string for object property " + 
+                log.debug("CONSTRUCT query string for object property " +
                         propertyUri + ": " + queryString);
             }
-            
+
             try {
-            	//If RDFService is null, will do what code used to do before, 
+            	//If RDFService is null, will do what code used to do before,
                 //otherwise employ rdfservice
             	if(rdfService == null) {
-                    log.debug("RDF Service null, Using CONSTRUCT query string for object property " + 
+                    log.debug("RDF Service null, Using CONSTRUCT query string for object property " +
                             propertyUri + ": " + queryString);
                     Query query = null;
                     try {
@@ -433,18 +433,18 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                                   "string. " + th.getMessage());
                         log.error(queryString);
                         return constructedModel;
-                    } 
-                
+                    }
+
                     DatasetWrapper w = dwf.getDatasetWrapper();
                     Dataset dataset = w.getDataset();
                     dataset.getLock().enterCriticalSection(Lock.READ);
                     QueryExecution qe = null;
-                    try {                           
+                    try {
                         qe = QueryExecutionFactory.create(
                                 query, dataset);
                         qe.execConstruct(constructedModel);
                     } catch (Exception e) {
-                        log.error("Error getting constructed model for subject " 
+                        log.error("Error getting constructed model for subject "
                             + subjectUri + " and property " + propertyUri);
                     } finally {
                         if (qe != null) {
@@ -452,18 +452,18 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                         }
                         dataset.getLock().leaveCriticalSection();
                         w.close();
-                    }	
+                    }
             	} else {
             	    rdfService.sparqlConstructQuery(queryString, constructedModel);
             	}
-            } catch (Exception e) {                
-                log.error("Error getting constructed model for subject " 
+            } catch (Exception e) {
+                log.error("Error getting constructed model for subject "
                     + subjectUri + " and property " + propertyUri, e);
-            } 
+            }
         }
-        return constructedModel;        
+        return constructedModel;
     }
-    
+
     protected static final String MOST_SPECIFIC_TYPE_QUERY = ""
         + "PREFIX rdfs: <" + VitroVocabulary.RDFS + "> \n"
         + "PREFIX vitro: <" + VitroVocabulary.vitroURI + "> \n"
@@ -475,27 +475,27 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         + "} ORDER BY ?label ";
 
     @Override
-    /** 
+    /**
      * Finds all mostSpecificTypes of an individual that are members of a classgroup.
-     * Returns a list of type labels. 
-     * 
-     * Note that the Map returned is a LinkedHashMap, which means that an iterator 
+     * Returns a list of type labels.
+     *
+     * Note that the Map returned is a LinkedHashMap, which means that an iterator
      * will return the entries in the order in which the keys were inserted in the map.
-     * Since the SPARQL query included an "ORDER BY ?label" clause, and since an 
+     * Since the SPARQL query included an "ORDER BY ?label" clause, and since an
      * iterator through that ResultSet was used to add entries to the map, an iterator
      * on the map will return entries that are sorted by label (value, not key).
-     * 
+     *
      * While this sorting order is not specified as a requirement (maybe it should be?),
      * it is certainly useful that the types are returned in some order that is
      * replicable, so an individual with multiple mostSpecificTypes, will always see
      * the same list in the same order. (See https://issues.library.cornell.edu/browse/NIHVIVO-568)
      * **/
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
-        
+
         String queryString = QueryUtils.subUriForQueryVar(MOST_SPECIFIC_TYPE_QUERY, "subject", subjectUri);
-        
+
         log.debug("Query string for vitro:mostSpecificType : " + queryString);
-        
+
         Query query = null;
         try {
             query = QueryFactory.create(queryString, Syntax.syntaxARQ);
@@ -503,8 +503,8 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             log.error("Could not create SPARQL query for query string. " + th.getMessage());
             log.error(queryString);
             return Collections.emptyMap();
-        }        
-        
+        }
+
         Map<String, String> result = new LinkedHashMap<String, String>();
         Map<String, List<Literal>> types = new LinkedHashMap<String, List<Literal>>();
         DatasetWrapper w = dwf.getDatasetWrapper();
@@ -515,38 +515,38 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             qexec = QueryExecutionFactory.create(query, dataset);
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();       
+                QuerySolution soln = results.nextSolution();
 
                 RDFNode typeNode = soln.get("type");
                 String type = null;
                 if (typeNode.isURIResource()) {
                      type = typeNode.asResource().getURI();
                 }
-                
+
                 RDFNode labelNode = soln.get("label");
                 if (StringUtils.isNotBlank(type) && labelNode.isLiteral()) {
-                	
+
                 	List<Literal> langLabels = types.get(type);
                 	if (null == langLabels) {
                 		types.put(type, langLabels = new ArrayList<Literal>());
                 	}
                 	langLabels.add(labelNode.asLiteral());
-                    
+
                 }
             }
-            
+
             // choose labels corresponding to preferred languages
             Set<Entry<String, List<Literal>>> typeEntries = types.entrySet();
             for (Entry<String, List<Literal>> current : typeEntries) {
             	result.put(current.getKey(), tryLiteralForPreferredLanguages(current.getValue()).getLexicalForm());
             }
-            
+
             return result;
-            
+
         } catch (Exception e) {
             log.error("Error getting most specific types for subject " + subjectUri);
             return Collections.emptyMap();
-            
+
         } finally {
             dataset.getLock().leaveCriticalSection();
             if (qexec != null) {
@@ -554,9 +554,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             }
             w.close();
         }
-           
+
     }
-    
+
 	/**
 	 * If this statement qualifies as a faux property, set the range and domain
 	 * accordingly.

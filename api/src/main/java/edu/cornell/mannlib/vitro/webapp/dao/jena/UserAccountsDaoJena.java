@@ -486,7 +486,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	/**
 	 * Since there is no reasoner on the UserAccountModel, this will return a
 	 * false negative for a subtype of the specified type.
-	 * 
+	 *
 	 * There should already be a lock on the model when this is called.
 	 */
 	private boolean isResourceOfType(OntResource r, OntClass type) {

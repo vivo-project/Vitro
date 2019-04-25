@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 /**
  * A minimal implementation of the OntologyDao.
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */
@@ -22,7 +22,7 @@ public class OntologyDaoStub implements OntologyDao {
 	// ----------------------------------------------------------------------
 
 	private final Map<String, Ontology> ontologies = new HashMap<String, Ontology>();
-	
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------

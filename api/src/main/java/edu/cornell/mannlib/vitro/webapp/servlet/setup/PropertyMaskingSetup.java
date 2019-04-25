@@ -24,11 +24,11 @@ public class PropertyMaskingSetup implements ServletContextListener {
 		OntModel jenaOntModel = ModelAccess.on(sce.getServletContext()).getOntModel();
         sce.getServletContext().setAttribute(ENTITY_PROPERTY_LIST_FILTER_ATTR_NAME, new EntityPropertyListFilter(jenaOntModel));
 	}
-	
+
 	public static UnaryFunctor<List<Property>,List<Property>> getEntityPropertyListFilter(ServletContext ctx) {
 		return (UnaryFunctor<List<Property>,List<Property>>) ctx.getAttribute(ENTITY_PROPERTY_LIST_FILTER_ATTR_NAME);
 	}
-	
+
 	public void contextDestroyed(ServletContextEvent sce) {
 		// nothing to worry about
 	}

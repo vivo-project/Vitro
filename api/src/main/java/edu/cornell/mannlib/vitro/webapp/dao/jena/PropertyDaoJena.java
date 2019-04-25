@@ -50,10 +50,10 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
-	
+
 	protected static final Log log = LogFactory.getLog(PropertyDaoJena.class.getName());
 	protected static final String FAUX_PROPERTY_FLAG = "FAUX";
-	
+
     private static final Map<String, String> NAMESPACES = new HashMap<String, String>() {{
         put("owl", VitroVocabulary.OWL);
         put("rdf", VitroVocabulary.RDF);
@@ -61,7 +61,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         put("vitro", VitroVocabulary.vitroURI);
         put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
     }};
-    
+
     protected static final String PREFIXES;
     static {
         StringBuilder prefixes = new StringBuilder();
@@ -71,23 +71,23 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         PREFIXES = prefixes.toString();
         log.debug("Query prefixes: " + PREFIXES);
     }
-    
+
     protected RDFService rdfService;
     protected DatasetWrapperFactory dwf;
-    
+
     public PropertyDaoJena(RDFService rdfService,
-                           DatasetWrapperFactory dwf, 
+                           DatasetWrapperFactory dwf,
                            WebappDaoFactoryJena wadf) {
         super(wadf);
         this.rdfService = rdfService;
         this.dwf = dwf;
     }
-    
+
     @Override
     protected OntModel getOntModel() {
     	return getOntModelSelector().getTBoxModel();
     }
-    
+
     protected RDFService getRDFService() {
         return this.rdfService;
     }
@@ -95,7 +95,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	public void addSuperproperty(ObjectProperty property, ObjectProperty superproperty) {
     	addSuperproperty(property.getURI(),superproperty.getURI());
     }
-    
+
     @Override
 	public void addSuperproperty(String propertyURI, String superpropertyURI) {
 		getOntModel().enterCriticalSection(Lock.WRITE);
@@ -105,11 +105,11 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 			getOntModel().leaveCriticalSection();
 		}
 	}
-    
+
     public void removeSuperproperty(ObjectProperty property, ObjectProperty superproperty) {
     	removeSuperproperty(property.getURI(),superproperty.getURI());
     }
-    
+
     @Override
     public void removeSuperproperty(String propertyURI, String superpropertyURI) {
     	getOntModel().enterCriticalSection(Lock.WRITE);
@@ -121,25 +121,25 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     		getOntModel().leaveCriticalSection();
     	}
     }
-    
+
     public void addSubproperty(ObjectProperty property, ObjectProperty subproperty) {
     	addSuperproperty(subproperty, property);
     }
-    
+
     @Override
     public void addSubproperty(String propertyURI, String subpropertyURI) {
     	addSuperproperty(subpropertyURI, propertyURI);
     }
-    
+
     public void removeSubproperty(ObjectProperty property, ObjectProperty subproperty) {
     	removeSuperproperty(subproperty, property);
     }
-    
+
     @Override
     public void removeSubproperty(String propertyURI, String subpropertyURI) {
     	removeSuperproperty(subpropertyURI,propertyURI);
     }
-    
+
     @Override
     public List <String> getSubPropertyURIs(String propertyURI) {
     	List<String> subURIs = new LinkedList<String>();
@@ -153,7 +153,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 } catch (Exception cce) {}
             }
 	    } catch (Exception e) {
-	    	log.error(e, e); 
+	    	log.error(e, e);
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}
@@ -180,7 +180,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     	outputList.addAll(nodeSet);
     	return outputList;
     }
-    
+
     @Override
     public List <String> getSuperPropertyURIs(String propertyURI, boolean direct) {
        	List<String> supURIs = new LinkedList<String>();
@@ -194,7 +194,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 } catch (Exception cce) {}
             }
 	    } catch (Exception e) {
-	    	log.error("Failed to get super-properties for " + propertyURI, e); 
+	    	log.error("Failed to get super-properties for " + propertyURI, e);
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}
@@ -234,7 +234,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 
     @Override
 	public void removeSubproperty(Property property, Property subproperty) {
-		removeSubproperty(property.getURI(), subproperty.getURI());	
+		removeSubproperty(property.getURI(), subproperty.getURI());
 	}
 
     @Override
@@ -248,7 +248,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 		if (propertyURI == null || equivalentPropertyURI == null) {
 			throw new RuntimeException("cannot assert equivalence of anonymous properties");
 		}
-		OntModel ontModel = getOntModel();	
+		OntModel ontModel = getOntModel();
 		ontModel.enterCriticalSection(Lock.WRITE);
 		try {
 			Resource property = ontModel.getResource(propertyURI);
@@ -280,7 +280,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 }
             }
 	    } catch (Exception e) {
-	    	log.error(e, e); 
+	    	log.error(e, e);
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}
@@ -292,7 +292,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 		if (propertyURI == null || equivalentPropertyURI == null) {
 			throw new RuntimeException("cannot remove equivalence axiom about anonymous properties");
 		}
-		OntModel ontModel = getOntModel();	
+		OntModel ontModel = getOntModel();
 		ontModel.enterCriticalSection(Lock.WRITE);
 		try {
 			Resource property = ontModel.getResource(propertyURI);
@@ -308,7 +308,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	public void removeEquivalentProperty(Property property, Property equivalentProperty) {
 		removeEquivalentProperty(property.getURI(), equivalentProperty.getURI());
 	}
-	
+
 	protected void removeABoxStatementsWithPredicate(Property predicate) {
 		// DO NOT issue a removeAll() with a null (wildcard) in predicate position!
 		if (predicate == null) {
@@ -317,7 +317,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 			removeABoxStatementsWithPredicate(predicate.getURI());
 		}
 	}
-	
+
 	protected void removeABoxStatementsWithPredicate(String predicateURI) {
 		if (predicateURI == null) {
 			log.debug("Cannot remove ABox statements with null predicate URI.");
@@ -332,12 +332,12 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         	aboxModel.getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
         	aboxModel.leaveCriticalSection();
         }
-    		
+
 	}
-	
+
 	/**
 	 * Finds the classes that have a definition involving a restriction
-	 * on the given property. 
+	 * on the given property.
 	 *
 	 * @param   propertyURI  identifier of a property
 	 * @return  a list of VClass objects representing the classes that have
@@ -346,27 +346,27 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 
     @Override
     public List<VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
-    	
+
     	if (propertyURI == null) {
     		log.warn("getClassesWithRestrictionOnProperty: called with null propertyURI");
     		return null;
     	}
-    	    	
-		OntModel ontModel = getOntModel();	
+
+		OntModel ontModel = getOntModel();
 		ontModel.enterCriticalSection(Lock.READ);
-		
+
 		HashSet<String> classURISet = new HashSet<String>();
-		
+
 		try {
 			Resource targetProp = ontModel.getResource(propertyURI);
-			   
+
 			if (targetProp != null) {
-			
+
 			    StmtIterator stmtIter = ontModel.listStatements((Resource) null, OWL.onProperty, targetProp);
-	
+
 			    while (stmtIter.hasNext()) {
 				   Statement statement = stmtIter.next();
-				   
+
 				   if ( statement.getSubject().canAs(OntClass.class) ) {
 					   classURISet.addAll(getRestrictedClasses(statement.getSubject().as(OntClass.class)));
 				   } else {
@@ -374,7 +374,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 				   }
 			    }
 			} else {
-	    		log.error("getClassesWithRestrictionOnProperty: Error: didn't find a Property in the ontology model for the URI: " +  propertyURI);				
+	    		log.error("getClassesWithRestrictionOnProperty: Error: didn't find a Property in the ontology model for the URI: " +  propertyURI);
 			}
 		} finally {
 			ontModel.leaveCriticalSection();
@@ -382,21 +382,21 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 
 		List<VClass> classes = new ArrayList<VClass>();
 		Iterator<String> iter = classURISet.iterator();
-		
+
 		VClassDao vcd = getWebappDaoFactory().getVClassDao();
-		
+
 		while (iter.hasNext()) {
-		
+
 		   String curi = iter.next();
 		   VClass vc = vcd.getVClassByURI(curi);
-		  
+
 		   if (vc != null) {
-		       classes.add(vc);	  
+		       classes.add(vc);
 		   } else {
 			   log.error("getClassesWithRestrictionOnProperty: Error: no VClass found for URI: " + curi);
-		   }	
+		   }
 		}
-       
+
         return (classes.size()>0) ? classes : null;
     }
 
@@ -404,15 +404,15 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	 * Find named classes to which a restriction "applies"
 	 * @param   ontClass Ontology class
 	 * @return  set of class URIs
-	 * 
+	 *
 	 * Note: this method assumes that the caller holds a read lock on
 	 * the ontology model.
 	 */
 
     public HashSet<String> getRestrictedClasses(OntClass ontClass) {
-    	
+
         HashSet<String> classSet = new HashSet<String>();
-  
+
         List<OntClass> classList = ontClass.listEquivalentClasses().toList();
         classList.addAll(ontClass.listSubClasses().toList());
 
@@ -423,10 +423,10 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 				classSet.addAll(getRestrictedClasses(oc));
 			}
 		}
-        		
+
         return classSet;
     }
-     
+
 	protected void getPropertyQueryResults(String queryString, ResultSetConsumer consumer) {
 		log.debug("SPARQL query:\n" + queryString);
 
@@ -452,7 +452,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
      */
     protected List<Resource> getPropertiesWithAppropriateDomainFor(String vclassURI) {
         List<Resource> propertyResList = new ArrayList<Resource>();
-    	String queryStr = 
+    	String queryStr =
     		      "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
                   "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
                   "PREFIX owl:   <http://www.w3.org/2002/07/owl#> \n\n " +
@@ -461,7 +461,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                   "    ?p rdfs:domain <" + vclassURI + "> . \n" +
                   "  } UNION { \n" +
                   "    ?parent rdfs:domain <" + vclassURI + "> . \n" +
-                  "    ?p rdfs:subPropertyOf* ?parent. \n" + 
+                  "    ?p rdfs:subPropertyOf* ?parent. \n" +
                   "    OPTIONAL { \n" +
                   "      ?p rdfs:domain ?childDomain \n" +
                   "    } \n" +
@@ -476,7 +476,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                   "    ?u rdf:rest* ?f . \n" +
                   "    ?d owl:unionOf ?u . \n" +
                   "    ?parent rdfs:domain ?d . \n" +
-                  "    ?p rdfs:subPropertyOf* ?parent. \n" + 
+                  "    ?p rdfs:subPropertyOf* ?parent. \n" +
                   "    OPTIONAL { \n" +
                   "      ?p rdfs:domain ?childDomain \n" +
                   "    } \n" +
@@ -499,15 +499,15 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     	}
     	return propertyResList;
     }
-    
+
     public List<PropertyInstance> getAllPossiblePropInstForIndividual(String individualURI) {
     	Individual ind = getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
     	VClassDao vcDao = getWebappDaoFactory().getVClassDao();
-    	
+
     	List<VClass> allTypes = ind.getVClasses(false); // include indirect types
-        
+
         Set<String> allSuperclassURIs = new HashSet<String>();
-        
+
         for (VClass type : allTypes) {
             String classURI = type.getURI();
             if (classURI != null) {
@@ -519,7 +519,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             }
             allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(classURI));
         }
-        
+
         List<VClass> vclasses = new ArrayList<VClass>();
         for(String vclassURI : allSuperclassURIs) {
             VClass vclass = vcDao.getVClassByURI(vclassURI);
@@ -528,20 +528,20 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             }
         }
     	return getAllPropInstByVClasses(vclasses);
-    	
+
     }
-    
+
     /* Removed: see VIVO-766.
      * sorts VClasses so that subclasses come before superclasses
-     * 
-     * Because subclass/superclass is only a partial ordering, this breaks the 
+     *
+     * Because subclass/superclass is only a partial ordering, this breaks the
      * contract for Comparator, and throws an IllegalArgumentException under Java 8.
-     * In particular, for classes sub, super and other, we have sub=other, sub<super, 
+     * In particular, for classes sub, super and other, we have sub=other, sub<super,
      * which should imply other<super, but that is not true.
-     * 
-     * As far as I can determine, this sort is never relied on anyway, so there 
+     *
+     * As far as I can determine, this sort is never relied on anyway, so there
      * should be no impact in removing it. Note that PropertyInstanceDaoJena re-sorts
-     * thes results before using them, so this sort was irrelevant for any calls 
+     * thes results before using them, so this sort was irrelevant for any calls
      * through that path.
      */
 //    private class VClassHierarchyRanker implements Comparator<VClass> {
@@ -560,24 +560,24 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 //    		}
 //    	}
 //    }
-//    
-    
+//
+
     public List<PropertyInstance> getAllPropInstByVClass(String classURI) {
         if (classURI==null || classURI.length()<1) {
             return null;
         }
-        
+
         VClassDao vcDao = getWebappDaoFactory().getVClassDao();
-        
+
         Set<String> allSuperclassURIs = new HashSet<String>();
-       
+
         allSuperclassURIs.add(classURI);
         for (String equivURI : vcDao.getEquivalentClassURIs(classURI)) {
             allSuperclassURIs.add(equivURI);
             allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
         }
         allSuperclassURIs.addAll(vcDao.getAllSuperClassURIs(classURI));
-        
+
         List<VClass> vclasses = new ArrayList<VClass>();
         for(String vclassURI : allSuperclassURIs) {
             VClass vclass = vcDao.getVClassByURI(vclassURI);
@@ -587,10 +587,10 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         }
         return getAllPropInstByVClasses(vclasses);
     }
-    
-    private void updatePropertyRangeMap(Map<String, Resource[]> map, 
-                                        String propURI, 
-                                        Resource[] ranges, 
+
+    private void updatePropertyRangeMap(Map<String, Resource[]> map,
+                                        String propURI,
+                                        Resource[] ranges,
                                         boolean replaceIfMoreSpecific) {
         Resource[] existingRanges = map.get(propURI);
         if (existingRanges == null) {
@@ -605,10 +605,10 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             if (ranges[0] != null && moreSpecificThan(ranges[0], existingRanges[0])) {
                 existingRanges[0] = ranges[0];
             }
-            map.put(propURI, existingRanges);            
-        } 
+            map.put(propURI, existingRanges);
+        }
     }
-    
+
     private boolean moreSpecificThan(Resource r1, Resource r2) {
         if(r1.getURI() == null) {
             return false;
@@ -617,15 +617,15 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         }
         return getWebappDaoFactory().getVClassDao().isSubClassOf(r1.getURI(), r2.getURI());
     }
-    
+
     private List<OntClass> listSuperClasses(OntClass ontClass) {
         return relatedClasses(ontClass, RDFS.subClassOf);
     }
-    
+
     private List<OntClass> listEquivalentClasses(OntClass ontClass) {
         return relatedClasses(ontClass, OWL.equivalentClass);
     }
-     
+
     private List<OntClass> relatedClasses(OntClass ontClass,
             org.apache.jena.rdf.model.Property property) {
         List<OntClass> classes = new ArrayList<OntClass>();
@@ -642,16 +642,16 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         }
         return classes;
     }
-    
+
     private static final int DEPTH_LIMIT = 20;
-    
+
     private List<Restriction> getRelatedRestrictions(OntClass ontClass) {
         List<Restriction> restList = new ArrayList<Restriction>();
         addRelatedRestrictions(ontClass, restList, DEPTH_LIMIT);
         return restList;
     }
-    
-    private void addRelatedRestrictions(OntClass ontClass, 
+
+    private void addRelatedRestrictions(OntClass ontClass,
             List<Restriction> relatedRestrictions, int limit) {
         limit--;
         if (ontClass.isRestriction()) {
@@ -664,52 +664,52 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 if (!relatedRestrictions.contains(operand) && limit > 0) {
                     addRelatedRestrictions(operand, relatedRestrictions, limit);
                 }
-            }   
+            }
         } else {
             List<OntClass> superClasses = listSuperClasses(ontClass);
             superClasses.addAll(listEquivalentClasses(ontClass));
             for (OntClass sup : superClasses) {
-                if (sup.isAnon() && !sup.equals(ontClass) 
+                if (sup.isAnon() && !sup.equals(ontClass)
                         && !relatedRestrictions.contains(ontClass) && limit > 0) {
                     addRelatedRestrictions(sup, relatedRestrictions, limit);
                 }
             }
         }
     }
-    
+
     public List<PropertyInstance> getAllPropInstByVClasses(List<VClass> vclasses) {
-        
+
         List<PropertyInstance> propInsts = new ArrayList<PropertyInstance>();
-        
+
         if(vclasses == null || vclasses.isEmpty()) {
             return propInsts;
         }
-        
+
         // Removed: see VIVO-766.
         // Collections.sort(vclasses, new VClassHierarchyRanker(this.getWebappDaoFactory().getVClassDao()));
-        
+
         OntModel ontModel = getOntModelSelector().getTBoxModel();
-        
+
         try {
-        
+
         	ontModel.enterCriticalSection(Lock.READ);
-        	
+
         	// map object property URI to an array of two resources:
         	// the first is the "allValuesFrom" resource and the second is
         	// "someValuesFrom"
-        	Map<String, Resource[]> applicableProperties = 
+        	Map<String, Resource[]> applicableProperties =
         	        new HashMap<String, Resource[]>();
-        	
+
         	try {
 		        for (VClass vclass : vclasses) {
 		            if (vclass.isAnonymous()) {
-		                continue; 
+		                continue;
 		            }
 		            String VClassURI = vclass.getURI();
-		            
+
 		        	OntClass ontClass = getOntClass(ontModel,VClassURI);
 		        	if (ontClass == null) {
-		        	    continue;  
+		        	    continue;
 		        	}
 	        	    List<Restriction> relatedRestrictions = getRelatedRestrictions(ontClass);
 	        	    for (Restriction rest : relatedRestrictions) {
@@ -729,17 +729,17 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                             }
 		        		}
 	        	    }
-	        		
-	        	    List<Resource> propertyList = 
+
+	        	    List<Resource> propertyList =
 	        	    	    getPropertiesWithAppropriateDomainFor(VClassURI);
 	        		for (Resource prop : propertyList) {
-	        		    if (prop.getNameSpace() != null 
+	        		    if (prop.getNameSpace() != null
 	        		            && !NONUSER_NAMESPACES.contains(
 	        		                    prop.getNameSpace()) ) {
 	        		        StmtIterator rangeSit = prop.listProperties(
 	        		                RDFS.range);
 	        		        Resource rangeRes = null;
-	        		        while (rangeSit.hasNext()) {    
+	        		        while (rangeSit.hasNext()) {
 	        		            Statement s = rangeSit.nextStatement();
 	        		            if (s.getObject().isURIResource()) {
 	        		                rangeRes = (Resource) s.getObject();
@@ -749,39 +749,39 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	        		        ranges[0] = rangeRes;
 	        		        updatePropertyRangeMap(
 	        		                applicableProperties, prop.getURI(), ranges, false);
-	        		        
+
 	        		    }
 	        		}
-	        		
+
 	        	}
-		             
+
         	} catch (Exception e) {
         		log.error("Unable to get applicable properties " +
         		          "by examining property restrictions and domains", e);
         	}
-        	
+
         	// make the PropertyInstance objects
 	        for (String propertyURI : applicableProperties.keySet()) {
 	            OntProperty op = ontModel
 	                    .getOntProperty(propertyURI);
 	            if (op == null) {
 	                continue;
-	            } 
+	            }
 	            Resource[] foundRanges = applicableProperties.get(propertyURI);
-	            Resource rangeRes = (foundRanges[0] != null) 
+	            Resource rangeRes = (foundRanges[0] != null)
 	                    ? foundRanges[0]
 	                            : (op.getRange() == null && foundRanges[1] != null)
 	                            ? foundRanges[1]
 	                                    : op.getRange();
 	            Resource domainRes = op.getDomain();
 	                            propInsts.add(getPropInst(op, domainRes, rangeRes));
-	            List<FullPropertyKey> additionalFauxSubpropertyKeys = 
+	            List<FullPropertyKey> additionalFauxSubpropertyKeys =
 	            		getAdditionalFauxSubpropertyKeysForPropertyURI(propertyURI);
 	            for (FullPropertyKey fauxSubpropertyKey : additionalFauxSubpropertyKeys) {
 	                boolean applicablePropInst = false;
-	                if (rangeRes == null ||  
+	                if (rangeRes == null ||
 	                        !getWebappDaoFactory().getVClassDao().isSubClassOf(
-	                            rangeRes.getURI(), fauxSubpropertyKey.getRangeUri())) { 
+	                            rangeRes.getURI(), fauxSubpropertyKey.getRangeUri())) {
 	                    if (fauxSubpropertyKey.getDomainUri() == null) {
 	                        applicablePropInst = true;
 	                    } else {
@@ -797,17 +797,17 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     	                    propInsts.add(getPropInst(
                                     op,
                                     ResourceFactory.createResource(fauxSubpropertyKey.getDomainUri()),
-                                    ResourceFactory.createResource(fauxSubpropertyKey.getRangeUri()) 
+                                    ResourceFactory.createResource(fauxSubpropertyKey.getRangeUri())
                                     ));
 	                    }
 	                }
 	            }
 	        }
-	        
+
         } finally {
         	ontModel.leaveCriticalSection();
         }
-        
+
         // add any faux properties with applicable domain where the predicate URI
         // is not already on the list
         List<ObjectProperty> stragglers = getAdditionalFauxSubpropertiesForVClasses(
@@ -815,11 +815,11 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         for (ObjectProperty op : stragglers) {
             propInsts.add(makePropInst(op));
         }
-        
+
         return propInsts;
-        
+
     }
-    
+
     private PropertyInstance makePropInst(ObjectProperty op) {
         PropertyInstance pi = new PropertyInstance();
         pi.setDomainClassURI(op.getDomainVClassURI());
@@ -830,15 +830,15 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         pi.setDomainPublic(op.getDomainPublic());
         return pi;
     }
-    
-    private PropertyInstance getPropInst(OntProperty op, Resource domainRes, 
-            Resource rangeRes) {  
+
+    private PropertyInstance getPropInst(OntProperty op, Resource domainRes,
+            Resource rangeRes) {
         if (log.isDebugEnabled() && domainRes != null && rangeRes != null) {
-            log.debug("getPropInst() op: " + op.getURI() + " domain: " + 
+            log.debug("getPropInst() op: " + op.getURI() + " domain: " +
                 domainRes.getURI() + " range: " + rangeRes.getURI());
         }
         PropertyInstance pi = new PropertyInstance();
-        String domainURIStr = (domainRes != null && !domainRes.isAnon()) ? 
+        String domainURIStr = (domainRes != null && !domainRes.isAnon()) ?
                 domainURIStr = domainRes.getURI()
                 : null;
 //        if (rangeRes == null) {
@@ -879,10 +879,10 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         pi.setDomainPublic(getLabelOrId(op));
         return pi;
     }
-    
+
     private List<ObjectProperty> getAdditionalFauxSubpropertiesForVClasses(
             List<VClass> vclasses, List<PropertyInstance> propInsts) {
-        
+
         List<ObjectProperty> opList = new ArrayList<ObjectProperty>();
         if (vclasses.size() == 0) {
             return opList;
@@ -925,13 +925,13 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 String rangeURI = qsoln.getResource("range").getURI();
                 opList.add(opDao.getObjectPropertyByURIs(
                         propertyURI, domainURI, rangeURI, null));
-            }  
+            }
         } finally {
             qe.close();
-        } 
+        }
         return opList;
     }
-    
+
     private List<FullPropertyKey> getAdditionalFauxSubpropertyKeysForPropertyURI(String propertyURI) {
         List<FullPropertyKey> keys = new ArrayList<>();
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
@@ -941,7 +941,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 "    ?context config:configContextFor <" + propertyURI + "> . \n" +
                 "    ?context config:qualifiedBy ?range . \n" +
                 "    OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
-                "}"; 
+                "}";
 
         Query q = QueryFactory.create(propQuery);
         QueryExecution qe = QueryExecutionFactory.create(q, getOntModelSelector().getDisplayModel());
@@ -955,14 +955,14 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 String domainURI = null;
                 if (domainRes != null && !domainRes.isAnon()) {
                     domainURI = domainRes.getURI();
-                } 
+                }
                 keys.add(new FullPropertyKey(domainURI, propertyURI, rangeURI));
-            }  
+            }
         } finally {
             qe.close();
         }
         return keys;
     }
-    
-    
+
+
 }

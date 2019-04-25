@@ -17,15 +17,15 @@ import edu.cornell.mannlib.vitro.utilities.revisioninfo.ProcessRunner.ProcessExc
 /**
  * Get release and revision information to display on screen. Put this
  * information into a single line and append it to the specified file.
- * 
+ *
  * Ask Git for the information. If Git is available, and if this is a working
  * directory, then we can build the info from the responses we get from
  * "git describe", "git symbolic-ref" and "git log".
- * 
+ *
  * If that doesn't work, read the information from the "revisionInfo" file in
  * the product directory. Presumably, that file was created when the source was
  * exported from Git.
- * 
+ *
  * If that doesn't work either, return something like this:
  * "productName ~ unknown ~ unknown"
  */
@@ -123,7 +123,7 @@ public class RevisionInfoBuilder {
 		if (revision == null) {
 			System.out.println("Couldn't get commit ID from Git");
 		}
-		
+
 		if ((revision == null) && (release == null)) {
 			return null;
 		}

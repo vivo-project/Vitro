@@ -5,7 +5,7 @@ import org.linkeddatafragments.fragments.tpf.TriplePatternElementFactory;
 
 /**
  * Parses strings (as obtained from HTTP request parameters) into
- * {@link ITriplePatternElement}s. 
+ * {@link ITriplePatternElement}s.
  *
  * @param <ConstantTermType> type for representing constants in triple patterns
  *                           (i.e., URIs and literals)

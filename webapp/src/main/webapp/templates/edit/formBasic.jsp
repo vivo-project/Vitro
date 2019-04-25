@@ -34,32 +34,32 @@
 	 <span class="note">(<sup>*</sup> Required Fields)</span></h3>
 	</div><!--entryFormHead-->
 	</th></tr>
-	
+
 	<c:if test="${!empty globalErrorMsg}">
 	    <tr><td><span class="notice">${globalErrorMsg}</span></td></tr>
 	</c:if>
-	
+
 	<jsp:include page="${formJsp}"/>
-	
+
 	<tr class="editformcell">
 		<td colspan="${colspan}">
 			<c:choose>
 				<c:when test='${_action == "insert"}'>
 					<input id="primaryAction" type="submit" class="submit" name="_insert" value="Create New Record"/>
 				</c:when>
-				<c:otherwise>		
+				<c:otherwise>
     				<input id="primaryAction" type="submit" class="submit" name="_update" value="Submit Changes"/>
-                    <c:if test="${ ! (_cancelButtonDisabled == 'disabled') }">	
+                    <c:if test="${ ! (_cancelButtonDisabled == 'disabled') }">
 				        <input type="submit" class="delete" name="_delete" onclick="return confirmDelete();" value="Delete"/>
                     </c:if>
 				</c:otherwise>
 			</c:choose>
-			
+
 			<input type="reset"  class="delete" value="Reset"/>
-			
+
             <c:choose>
                 <c:when test="${!empty formOnCancel}">
-                    <input type="submit" class="delete" name="_cancel" onclick="${formOnCancel}" value="Cancel"/> 
+                    <input type="submit" class="delete" name="_cancel" onclick="${formOnCancel}" value="Cancel"/>
                 </c:when>
                 <c:otherwise>
 		            <input type="submit" class="delete" name="_cancel" value="Cancel"/>

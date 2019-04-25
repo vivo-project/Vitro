@@ -7,9 +7,9 @@
   <shortname>string</shortname>
   <uri>http://jakarta.apache.org/taglibs/string-1.1</uri>
   <info>
-    The String taglibrary provides a host of tags for manipulating 
-    java.lang.Strings. The style is that the String to act upon is the 
-    body of the tag, and attributes are used as parameters for the 
+    The String taglibrary provides a host of tags for manipulating
+    java.lang.Strings. The style is that the String to act upon is the
+    body of the tag, and attributes are used as parameters for the
     manipulation.
   </info>
   <tag>

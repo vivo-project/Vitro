@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 
 /**
  * A minimal implementation of the ObjectPropertyStatementDao
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */

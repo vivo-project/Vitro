@@ -7,7 +7,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 
 /**
  * The threshold levels for operations on a given property.
- * 
+ *
  * This is based on the assumption that the FullPropertyKey is sufficient to
  * distinguish all properties. An object property and a data property may not
  * share the same key. A faux property must have a different key from any object

@@ -48,7 +48,7 @@ public class ApplicationStub implements Application {
 	public ApplicationStub(ServletContext ctx, SearchEngine searchEngine) {
 		this.ctx = ctx;
 		this.searchEngine = searchEngine;
-		
+
 		this.searchIndexer = new SearchIndexerStub();
 		this.searchIndexer.unpause();
 	}

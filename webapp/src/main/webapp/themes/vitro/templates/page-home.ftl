@@ -8,7 +8,7 @@
     <head>
         <#include "head.ftl">
     </head>
-    
+
     <body class="${bodyClasses!}">
         <header id="branding" role="banner">
             <#include "identity.ftl">
@@ -58,14 +58,14 @@
             <!-- Statistical information relating to property groups and their classes; displayed horizontally, not vertically-->
             <@lh.allClassGroups vClassGroups! />
         </div>
-        
+
         <#include "footer.ftl">
         <script>
             // this will ensure that the hidden classgroup input is cleared if the back button is used
             // to return to the home page from the search results. Not in vitroUtils.js because that
             // gets loaded on every page.
             $(document).ready(function(){
-                $('input[name="classgroup"]').val("");    
+                $('input[name="classgroup"]').val("");
             });
         </script>
     </body>

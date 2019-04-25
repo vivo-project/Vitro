@@ -23,26 +23,26 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Works like a PropertyResourceBundle with two exceptions:
- * 
+ *
  * It looks for the file in both the i18n directory of the theme and in the i18n
  * directory of the application. Properties found in the theme override those
  * found in the application.
- * 
+ *
  * It allows a property to take its contents from a file. File paths are
  * relative to the i18n directory. Again, a file in the theme will override one
  * in the application.
- * 
+ *
  * If a property has a value (after overriding) of "@@file &lt;filepath&gt;", the
  * bundle looks for the file relative to the i18n directory of the theme, then
  * relative to the i18n directory of the application. If the file is not found
  * in either location, a warning is written to the log and the property will
  * contain an error message for displayed.
- * 
+ *
  * Note that the filename is not manipulated for Locale, so the author of the
  * properties files must do it explicitly. For example:
- * 
+ *
  * In all.properties: account_email_html = @@file accountEmail.html
- * 
+ *
  * In all_es.properties: account_email_html = @@file accountEmail_es.html
  */
 public class VitroResourceBundle extends ResourceBundle {
@@ -75,17 +75,17 @@ public class VitroResourceBundle extends ResourceBundle {
 	 * Returns the bundle for the for foo_ba_RR, providing that
 	 * foo_ba_RR.properties exists in the I18n area of either the theme or the
 	 * application.
-	 * 
+	 *
 	 * If the desired file doesn't exist in either location, return null.
 	 * Usually, this does not indicate a problem but only that we were looking
 	 * for too specific a bundle. For example, if the base name of the bundle is
 	 * "all" and the locale is "en_US", we will likely return null on the search
 	 * for all_en_US.properties, and all_en.properties, but will return a full
 	 * bundle for all.properties.
-	 * 
+	 *
 	 * Of course, if all.properties doesn't exist either, then we have a
 	 * problem, but that will be reported elsewhere.
-	 * 
+	 *
 	 * @return the populated bundle or null.
 	 */
 	public static VitroResourceBundle getBundle(String bundleName,

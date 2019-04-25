@@ -1,11 +1,11 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-@import url("autocomplete.css"); 
+@import url("autocomplete.css");
 
 /* Although Javascript hides these on page load, hide here as well to avoid the flash on page load.
    This needs to be removed to support a non-JS version of the form. */
-.fullViewOnly, 
-#submit, 
+.fullViewOnly,
+#submit,
 .or,
 #requiredLegend {
     display: none;
@@ -31,7 +31,7 @@ form.customForm h4 {
 span.readOnly {
     color: #000;
 }
-/* special styles for addPublicationToPerson.ftl 
+/* special styles for addPublicationToPerson.ftl
    volume, number, issue fields and start/end page fields */
 label.vniLabels {
     padding-left: 50px;

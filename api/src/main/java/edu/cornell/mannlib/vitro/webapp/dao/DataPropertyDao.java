@@ -17,11 +17,11 @@ public interface DataPropertyDao extends PropertyDao {
     void fillDataPropertiesForIndividual(Individual individual);
 
     List<DataProperty> getDataPropertiesForVClass(String vClassURI);
-    
+
     Collection<DataProperty> getAllPossibleDatapropsForIndividual(String individualURI);
 
     String getRequiredDatatypeURI(Individual individual, DataProperty dataProperty);
-    
+
     DataProperty getDataPropertyByURI(String dataPropertyURI);
 
     String insertDataProperty(DataProperty dataProperty) throws InsertException;
@@ -33,12 +33,12 @@ public interface DataPropertyDao extends PropertyDao {
     void deleteDataProperty(String dataPropertyURI);
 
     List<DataProperty> getRootDataProperties();
-    
+
     boolean annotateDataPropertyAsExternalIdentifier(String dataPropertyURI);
-    
+
     public List<DataProperty> getDataPropertyList(Individual subject);
-    
+
     public List<DataProperty> getDataPropertyList(String subjectUri);
-    
+
     public String getCustomListViewConfigFileName(DataProperty dataProperty);
 }

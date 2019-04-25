@@ -18,7 +18,7 @@ import freemarker.template.TemplateModelException;
 /**
  * This Freemarker method will produce a bundle of text strings. It is simply a
  * wrapper around I18n that produces a wrapped I18nBundle.
- * 
+ *
  * If the bundle name is not provided, the default bundle is assumed.
  */
 public class I18nMethodModel implements TemplateMethodModel {

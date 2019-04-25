@@ -1,8 +1,8 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<#-- 
+<#--
         Used to display both the object and data property hierarchies, though there are
-        separate controllers for those. Also used to display lists of "all" object and 
+        separate controllers for those. Also used to display lists of "all" object and
         data properties, though there are separate controllers for those, too.
  -->
  <#if propertyType??>
@@ -13,13 +13,13 @@
 
 
 <section role="region">
-    
+
     <h2>${pageTitle!}</h2>
 
     <#if !displayOption?has_content>
         <#assign displayOption = "hierarchy">
     </#if>
-   
+
     <#if propType == "group">
         <form action="editForm" method="get">
             <input type="submit" class="form-button" id="addProperty" value="${i18n().add_property_group}"/>
@@ -67,7 +67,7 @@
 <script language="javascript" type="text/javascript" >
 $(document).ready(function() {
     objectPropHierarchyUtils.onLoad("${urls.base!}","${displayOption!}","${propType}");
-});    
+});
 </script>
 
 
@@ -75,4 +75,4 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/classHierarchy.
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/siteAdmin/objectPropertyHierarchyUtils.js"></script>')}
-              
+

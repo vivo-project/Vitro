@@ -29,27 +29,27 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * When a change is heard, wait for an interval to see if more changes come in.
  * When changes stop coming in for a specified interval, send what has
  * accumulated.
- * 
+ *
  * When the SearchIndexer pauses, stop sending changes until the SearchIndexer
  * unpauses.
- * 
+ *
  * If the SearchIndexer begins a rebuild, discard any changes that we had
  * accumulated. They will be accomplished by the rebuild.
- * 
+ *
  * -----------------------
- * 
+ *
  * When a changed statement is received, it should not be added to the list of
  * pending changes. The elements of the statement hold references to the model
  * in which they were created, as well as to other structures.
- * 
+ *
  * Thus, an action that produces many changes to the models could become
  * unscalable.
- * 
+ *
  * To avoid this, we use the ResourceFactory to create a "sanitized" statement
  * which is semantically equivalent to the original, and add that to the list
  * instead. The original statement is released.
  */
-public class IndexingChangeListener extends StatementListener 
+public class IndexingChangeListener extends StatementListener
         implements ModelChangedListener, SearchIndexer.Listener {
 	private static final Log log = LogFactory
 			.getLog(IndexingChangeListener.class);
@@ -72,7 +72,7 @@ public class IndexingChangeListener extends StatementListener
 	}
 
 	private synchronized void noteChange(Statement stmt) {
-        changes.add(stmt); 
+        changes.add(stmt);
 		ticker.start();
 	}
 
@@ -167,17 +167,17 @@ public class IndexingChangeListener extends StatementListener
 	/**
 	 * The ticker will ask for a response after two ticks, unless it is started
 	 * again before the second one.
-	 * 
+	 *
 	 * <pre>
 	 * On a call to start():
 	 *    Start the timer unless it is already running.
 	 *    Reset the hasOneTick flag.
-	 *    
+	 *
 	 * When the timer expires:
 	 *    If the timer hasOneTick, we're done: call for a response.
 	 *    Otherwise, record that it hasOneTick, and keep the timer running.
 	 * </pre>
-	 * 
+	 *
 	 * All methods are synchronized on the enclosing IndexingChangeListener.
 	 */
 	private class Ticker {

@@ -26,10 +26,10 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
 /**
  * This will pass these variables to the template:
  * classGroupUri: uri of the classgroup associated with this page.
- * vClassGroup: a data structure that is the classgroup associated with this page.     
+ * vClassGroup: a data structure that is the classgroup associated with this page.
  */
 public class ClassGroupPageData extends DataGetterBase implements DataGetter{
-	
+
     private static final Log log = LogFactory.getLog(ClassGroupPageData.class);
     String dataGetterURI;
     String classGroupUri;
@@ -41,28 +41,28 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
      */
     public ClassGroupPageData(VitroRequest vreq, Model displayModel, String dataGetterURI){
         this.configure(vreq, displayModel,dataGetterURI);
-    }        
-    
+    }
+
     /**
      * Configure this instance based on the URI and display model.
      */
     protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
-    	if( vreq == null ) 
+    	if( vreq == null )
     		throw new IllegalArgumentException("VitroRequest  may not be null.");
-        if( displayModel == null ) 
+        if( displayModel == null )
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
-                
+
         this.vreq = vreq;
         this.context = vreq.getSession().getServletContext();
-        this.dataGetterURI = dataGetterURI;        
+        this.dataGetterURI = dataGetterURI;
         this.classGroupUri = 	DataGetterUtils.getClassGroupForDataGetter(displayModel, dataGetterURI);
     }
-    
-    
+
+
     @Override
-    public Map<String, Object> getData(Map<String, Object> pageData) { 
+    public Map<String, Object> getData(Map<String, Object> pageData) {
     	  HashMap<String, Object> data = new HashMap<String,Object>();
           data.put("classGroupUri", this.classGroupUri);
 
@@ -75,7 +75,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                   break;
               }
           }
-          if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){ 
+          if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){
               /*This could be for two reasons: one is that the classgroup doesn't exist
                * The other is that there are no individuals in any of the classgroup's classes */
               group = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(classGroupUri);
@@ -86,9 +86,9 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                       if( classGroupUri.equals(vcg.getURI()) ){
                           group = vcg;
                           break;
-                      }                                
+                      }
                   }
-                  
+
                   setAllClassCountsToZero(group);
 
                   log.debug("Retrieved class group " + group.getURI()
@@ -99,27 +99,27 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                         log.debug("Class " + v.getName() + " - " + v.getURI()
                                 + " has " + v.getEntityCount() + " entities");
                       }
-                  }               
+                  }
               }else{
                   throw new RuntimeException("classgroup " + classGroupUri + " does not exist in the system");
-              }              
-          }          
-         
+              }
+          }
+
           data.put("vClassGroup", group);  //may put null
-          
+
           //This page level data getters tries to set its own template,
           // not all of the data getters need to do this.
           data.put("bodyTemplate", "page-classgroup.ftl");
-          
+
           //Also add data service url
           //Hardcoding for now, need a more dynamic way of doing this
           data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
           return data;
     }
-     
-    
+
+
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
-        
+
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
@@ -129,8 +129,8 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                 break;
             }
         }
-        
-        if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){ 
+
+        if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){
             /*This could be for two reasons: one is that the classgroup doesn't exist
              * The other is that there are no individuals in any of the classgroup's classes */
             group = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(classGroupUri);
@@ -141,7 +141,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                     if( classGroupUri.equals(vcg.getURI()) ){
                         group = vcg;
                         break;
-                    }                                
+                    }
                 }
                 if( group == null ){
                     log.error("Cannot get classgroup '" + classGroupUri + "'");
@@ -152,17 +152,17 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
             }else{
                 log.error("classgroup " + classGroupUri + " does not exist in the system");
                 return null;
-            }            
+            }
         }
-        
+
         return new VClassGroupTemplateModel(group);
     }
-    
+
   //Get data servuice
     public String getDataServiceUrl() {
     	return UrlBuilder.getUrl("/dataservice?getRenderedSearchIndividualsByVClass=1&vclassId=");
     }
-    
+
     /**
      * Query to get the definition of the ClassGroupDataGetter for a given data getter URI - specifically
      * the class group uri
@@ -172,10 +172,10 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
         "SELECT ?classGroupUri WHERE { \n" +
         "  ?dataGetterUri "+forClassGroupURI+" ?classGroupUri . \n" +
-        "}";      
+        "}";
 
-    
-    
+
+
     /**
      * For processing of JSONObject
      */

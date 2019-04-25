@@ -14,10 +14,10 @@
 <%
     String resourceURIStr = request.getParameter("resourceURI");
     if (resourceURIStr != null) {
-        
-        String describeQueryStr = 
+
+        String describeQueryStr =
             "DESCRIBE <" + resourceURIStr + ">";
-            
+
     	OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.FULL_ASSERTIONS);
         Model resourceDescription = ModelFactory.createDefaultModel();
         try {
@@ -25,15 +25,15 @@
             Query describeQuery = QueryFactory.create(describeQueryStr, Syntax.syntaxARQ);
             QueryExecution qe = QueryExecutionFactory.create(describeQuery, ontModel);
             qe.execDescribe(resourceDescription);
-            
+
             resourceDescription.add(ontModel.listStatements((Resource) null, (Property) null, ontModel.getResource(resourceURIStr)));
-            
+
         } finally {
             ontModel.leaveCriticalSection();
         }
-        
-        
-        
+
+
+
         List<String> actionStrList = (request.getParameterValues("action") != null)
            ? Arrays.asList(request.getParameterValues("action"))
            : new ArrayList<String>();
@@ -49,7 +49,7 @@
             resourceDescription.write(response.getOutputStream(), "TTL");
             return;
         }
-        
+
     }
 
 %>
@@ -78,8 +78,8 @@
     <form action="" method="post">
         <p>Resource URI: <input name="resourceURI"/></p>
         <p><input type="checkbox" name="action" value="describe"/> describe resource</p>
-        <p><input type="checkbox" name="action" value="remove"/> remove resource</p> 
+        <p><input type="checkbox" name="action" value="remove"/> remove resource</p>
         <p><input type="submit" value="Perform action"/></p>
     </form>
-</body></html>    
-    
+</body></html>
+

@@ -4,18 +4,18 @@
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
 
-rdf:type 
+rdf:type
       a owl:ObjectProperty ;
       rdfs:label "RDF Type"@en-US ;
-      rdfs:range owl:Class;                   
+      rdfs:range owl:Class;
       <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customEntryFormAnnot>
-         "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfTypeGenerator"^^xsd:string ;                             
+         "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfTypeGenerator"^^xsd:string ;
       <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#offerCreateNewOptionAnnot>
               "true"^^xsd:boolean ;
       <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot>
-              "true"^^xsd:boolean .  
-              
-              
+              "true"^^xsd:boolean .
+
+
 display:requiresAction
       a owl:ObjectProperty ;
       rdfs:label "Required Action"@en-US ;
@@ -25,4 +25,4 @@ display:requiresAction
               "true"^^xsd:boolean ;
       <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot>
               "true"^^xsd:boolean .
-      
+

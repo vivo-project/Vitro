@@ -91,14 +91,14 @@ dojo.widget.defineWidget(
 			if(this.fadeAnim) {
 				this.fadeAnim.stop();
 			}
-			this.fadeAnim = dojo.lfx.fadeOut(this[this.foreground], 
+			this.fadeAnim = dojo.lfx.fadeOut(this[this.foreground],
 				this.transitionInterval, null);
 			dojo.event.connect(this.fadeAnim,"onEnd",this,"endTransition");
 			this.fadeAnim.play();
 		},
 
 		endTransition: function(){
-			// move the foreground image to the background 
+			// move the foreground image to the background
 			with(this[this.background].style){ zIndex = parseInt(zIndex)+1; }
 			with(this[this.foreground].style){ zIndex = parseInt(zIndex)-1; }
 

@@ -16,14 +16,14 @@ import freemarker.ext.beans.BeansWrapper.MethodAppearanceDecision;
  * purpose as a method that returns void, or whose name
  * starts with "set". It also hides built-in methods of Java
  * utility classes like Map.put(), etc.
- * 
+ *
  * @author rjy7
  *
  */
 public class ReadOnlyBeansWrapper extends BeansWrapper {
 
     private static final Log log = LogFactory.getLog(ReadOnlyBeansWrapper.class);
-    
+
     public ReadOnlyBeansWrapper() {
         // Start by exposing all safe methods.
         setExposureLevel(EXPOSE_SAFE);
@@ -67,5 +67,5 @@ public class ReadOnlyBeansWrapper extends BeansWrapper {
 //            log.error(e, e);
 //        }
 //    }
-    
+
 }

@@ -40,7 +40,7 @@ public class SelfEditingConfiguration {
 	/**
 	 * Get the bean from the context. If there no bean, create one on the fly
 	 * and store it in the context.
-	 * 
+	 *
 	 * Never returns null.
 	 */
 	public static SelfEditingConfiguration getBean(ServletRequest request) {
@@ -61,7 +61,7 @@ public class SelfEditingConfiguration {
 	/**
 	 * Get the bean from the context. If there no bean, create one on the fly
 	 * and store it in the context.
-	 * 
+	 *
 	 * Never returns null.
 	 */
 	public static SelfEditingConfiguration getBean(ServletContext ctx) {
@@ -111,7 +111,7 @@ public class SelfEditingConfiguration {
 
 	/**
 	 * What is the matching property? (might be null).
-	 * 
+	 *
 	 * TODO This seems to expose the property unnecessarily, but how else can I
 	 * do a SPARQL query for the Individual profiles that don't have matching
 	 * property values?
@@ -164,7 +164,7 @@ public class SelfEditingConfiguration {
 	/**
 	 * This Individual, if it exists, should be associated with this
 	 * UserAccount.
-	 * 
+	 *
 	 * No other Individual should be associated with this UserAccount.
 	 */
 	public void associateIndividualWithUserAccount(IndividualDao indDao,

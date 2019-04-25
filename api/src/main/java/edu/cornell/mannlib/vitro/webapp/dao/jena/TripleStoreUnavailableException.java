@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 public class TripleStoreUnavailableException extends Exception {
-	
+
 	// nothing special (yet)
-	
+
 }

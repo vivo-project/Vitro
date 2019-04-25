@@ -31,7 +31,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
 
     	VitroRequest request = new VitroRequest(req);
         String defaultLandingPage = getDefaultLandingPage(request);
-        
+
         HashMap epoHash = null;
         EditProcessObject epo = null;
         try {
@@ -60,12 +60,12 @@ public class Classes2ClassesOperationController extends BaseEditController {
         }
 
         VClassDao vcDao = request.getLanguageNeutralWebappDaoFactory().getVClassDao();
-        
+
         String modeStr = request.getParameter("opMode");
         modeStr = (modeStr == null) ? "" : modeStr;
-        
+
         if (request.getParameter("_cancel") == null) {
-        
+
 	        try {
 	            if (request.getParameter("operation").equals("remove")) {
 	                String[] subclassURIstrs = request.getParameterValues("SubclassURI");
@@ -131,10 +131,10 @@ public class Classes2ClassesOperationController extends BaseEditController {
 	            log.error(e, e);
 	        }
         }
-	        
+
         //if no page forwarder was set, just go back to referring page:
         //the referer stuff all will be changed so as not to rely on the HTTP header
-        
+
         String referer = epo.getReferer();
         if (referer == null) {
             try {

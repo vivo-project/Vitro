@@ -21,12 +21,12 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * Assists the role-based policies in determining whether a property or resource
  * may be displayed, modified, or published in linked open data.
- * 
+ *
  * There is a singleton bean that holds the current threshold role levels for
  * displaying, modifying, or publishing restricted properties.
- * 
+ *
  * Create this bean after the context models are in place.
- * 
+ *
  * Add PropertyRestrictionListener to your EditProcessObject if you are editing
  * a property, to ensure that the bean stays current.
  */
@@ -62,7 +62,7 @@ public abstract class PropertyRestrictionBean {
 
 	/**
 	 * Any resource can be displayed.
-	 * 
+	 *
 	 * (Someday we may want to implement display restrictions based on VClass.)
 	 */
 	public abstract boolean canDisplayResource(String resourceUri,
@@ -71,7 +71,7 @@ public abstract class PropertyRestrictionBean {
 	/**
 	 * A resource cannot be modified if its namespace is in the prohibited list
 	 * (but some exceptions are allowed).
-	 * 
+	 *
 	 * (Someday we may want to implement modify restrictions based on VClass.)
 	 */
 	public abstract boolean canModifyResource(String resourceUri,
@@ -79,7 +79,7 @@ public abstract class PropertyRestrictionBean {
 
 	/**
 	 * Any resource can be published.
-	 * 
+	 *
 	 * (Someday we may want to implement publish restrictions based on VClass.)
 	 */
 	public abstract boolean canPublishResource(String resourceUri,
@@ -95,7 +95,7 @@ public abstract class PropertyRestrictionBean {
 	/**
 	 * A predicate cannot be modified if its namespace is in the prohibited list
 	 * (some exceptions are allowed).
-	 * 
+	 *
 	 * If modification of a predicate is restricted, the user's role must be at
 	 * least as high as the restriction level.
 	 */

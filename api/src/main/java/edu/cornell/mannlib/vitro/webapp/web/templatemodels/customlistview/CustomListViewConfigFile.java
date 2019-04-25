@@ -34,18 +34,18 @@ import org.xml.sax.SAXException;
 /**
  * Parses a configuration file for a custom list view, and makes the information
  * readily accessible.
- * 
+ *
  * If not editing the page, include clauses that will filter out statements with
  * missing linked individual or other critical information missing (e.g., anchor
  * and url on a link). If editing, omit those clauses so the incomplete
  * statements will show, and can be edited or removed.
- * 
+ *
  * We might want to refine this based on whether the user can edit the statement
  * in question, but that would require a completely different approach: include
  * the statement in the query results, and then during the postprocessing phase,
  * check the editing policy, and remove the statement if it's not editable. We
  * would not preprocess the query, as here.
- * 
+ *
  * If not collating by subgroup, omit clauses that only involve subgroups.
  */
 public class CustomListViewConfigFile {

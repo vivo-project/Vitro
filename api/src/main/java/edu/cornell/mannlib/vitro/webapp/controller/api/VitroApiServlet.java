@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
 
 /**
  * The base class for Vitro servlets that implement the API.
- * 
+ *
  * We don't want the API servlets to extend VitroHttpServlet, because we want
  * the following behavior:
  * <ul>

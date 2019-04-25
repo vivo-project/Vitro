@@ -41,7 +41,7 @@ public class DisplayMessage {
 	/**
 	 * Get the current message from the session, and remove it from the session
 	 * so it won't be displayed again.
-	 * 
+	 *
 	 * If there is no message, return the empty string.
 	 */
 	public static String getMessageAndClear(HttpServletRequest request) {
@@ -55,7 +55,7 @@ public class DisplayMessage {
 	/**
 	 * Get the current message from the session, and remove it from the session
 	 * so it won't be displayed again.
-	 * 
+	 *
 	 * If there is no message, return the empty string.
 	 */
 	public static String getMessageAndClear(HttpSession session) {
@@ -64,14 +64,14 @@ public class DisplayMessage {
 			Object sessionMessage = session.getAttribute(ATTRIBUTE_NAME);
 			if (sessionMessage != null) {
     			if (sessionMessage instanceof String) {
-    				log.debug("Get message: '" + sessionMessage + "'");    				
+    				log.debug("Get message: '" + sessionMessage + "'");
     				message = (String) sessionMessage;
-    			} 
-    			session.removeAttribute(ATTRIBUTE_NAME);	
+    			}
+    			session.removeAttribute(ATTRIBUTE_NAME);
 			} else {
 			    log.debug("Get no message.");
 			}
-		}				
+		}
 		return message;
 	}
 }

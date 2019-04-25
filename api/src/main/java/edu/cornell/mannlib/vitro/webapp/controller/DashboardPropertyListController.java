@@ -51,10 +51,10 @@ public class DashboardPropertyListController extends VitroHttpServlet {
      * Expected Attributes:
      * entity - set to entity to display properties for.
      */
-    
+
     private static final Log log = LogFactory.getLog(DashboardPropertyListController.class.getName());
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
-    
+
     public void doGet( HttpServletRequest req, HttpServletResponse res )
     throws IOException, ServletException {
         try {
@@ -64,7 +64,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                 throw new HelpException("EntityMergedPropertyListController requires request.attribute 'entity' to be of"
                         +" type " + Individual.class.getName() );
             Individual subject =(Individual)obj;
-            
+
             String groupForUngroupedProperties = null;
             String unassignedStr = req.getParameter("unassignedPropsGroupName");
             if (unassignedStr != null && unassignedStr.length()>0) {
@@ -73,13 +73,13 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                 req.setAttribute("unassignedPropsGroupName", unassignedStr);
                 log.debug("found temp group parameter \""+unassignedStr+"\" for unassigned properties");
             }
-            
+
             boolean groupedMode = false;
             String groupedStr = req.getParameter("grouped");
             if (groupedStr != null && groupedStr.equalsIgnoreCase("true")) {
                 groupedMode = true;
             }
-            
+
             boolean onlyPopulatedProps = true;
             String allPossiblePropsStr = req.getParameter("allProps");
             if (allPossiblePropsStr != null && allPossiblePropsStr.length()>0) {
@@ -91,22 +91,22 @@ public class DashboardPropertyListController extends VitroHttpServlet {
 
             VitroRequest vreq = new VitroRequest(req);
             WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-            
+
             PropertyGroupDao pgDao = null;
             List <PropertyGroup> groupsList = null;
             if (groupedMode) {
                 pgDao = wdf.getPropertyGroupDao();
                 groupsList = pgDao.getPublicGroups(false); // may be returned empty but not null
             }
-           
+
             PropertyInstanceDao piDao = wdf.getPropertyInstanceDao();
             ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-            
+
             // set up a new list for the combined object and data properties
             List<Property> mergedPropertyList = new ArrayList<Property>();
-            
+
             if (onlyPopulatedProps) {
-                // now first get the properties this entity actually has, presumably populated with statements 
+                // now first get the properties this entity actually has, presumably populated with statements
                 List<ObjectProperty> objectPropertyList = subject.getObjectPropertyList();
                 for (ObjectProperty op : objectPropertyList) {
                     op.setLabel(op.getDomainPublic());
@@ -129,7 +129,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                     log.error("a null Collection is returned from PropertyInstanceDao.getAllPossiblePropInstForIndividual()");
                 }
             }
-            
+
             DataPropertyDao dpDao = wdf.getDataPropertyDao();
             if (onlyPopulatedProps) {
                 // now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones
@@ -137,7 +137,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                 for (DataProperty dp : dataPropertyList) {
                     dp.setLabel(dp.getPublicName());
                     mergedPropertyList.add(dp);
-                }                
+                }
             } else {
                 log.debug("getting all possible data property choices");
                 Collection <DataProperty> allDatapropColl = dpDao.getAllPossibleDatapropsForIndividual(subject.getURI());
@@ -154,7 +154,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                     log.error("a null Collection is returned from DataPropertyDao.getAllPossibleDatapropsForIndividual())");
                 }
             }
-            
+
             if (mergedPropertyList!=null) {
                 try {
                     mergedPropertyList.sort(new PropertyRanker(vreq));
@@ -220,7 +220,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
     throws ServletException,IOException {
         doGet(request, response);
     }
-    
+
     private boolean alreadyOnPropertyList(List<Property> propsList, Property p) {
         if (p.getURI() == null) {
             log.error("Property p has no propertyURI in alreadyOnPropertyList()");
@@ -305,7 +305,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             super(string);
         }
     }
-    
+
     private class PropertyRanker implements Comparator {
         VitroRequest vreq;
         WebappDaoFactory wdf;
@@ -316,14 +316,14 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             this.wdf = vreq.getWebappDaoFactory();
             this.pgDao = wdf.getPropertyGroupDao();
         }
-        
+
         public int compare (Object o1, Object o2) {
             Property p1 = (Property) o1;
             Property p2 = (Property) o2;
-            
+
             // sort first by property group rank; if the same, then sort by property rank
             final int MAX_GROUP_RANK=99;
-            
+
             int p1GroupRank=MAX_GROUP_RANK;
             if (p1.getGroupURI()!=null) {
                 PropertyGroup pg1 = pgDao.getGroupByURI(p1.getGroupURI());
@@ -331,7 +331,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                     p1GroupRank=pg1.getDisplayRank();
                 }
             }
-            
+
             int p2GroupRank=MAX_GROUP_RANK;
             if (p2.getGroupURI()!=null) {
                 PropertyGroup pg2 = pgDao.getGroupByURI(p2.getGroupURI());
@@ -339,7 +339,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                     p2GroupRank=pg2.getDisplayRank();
                 }
             }
-            
+
             // int diff = pgDao.getGroupByURI(p1.getGroupURI()).getDisplayRank() - pgDao.getGroupByURI(p2.getGroupURI()).getDisplayRank();
             int diff=p1GroupRank - p2GroupRank;
             if (diff==0) {
@@ -352,7 +352,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             }
             return diff;
         }
-        
+
         private int determineDisplayRank(Property p) {
             if (p instanceof DataProperty) {
                 DataProperty dp = (DataProperty)p;
@@ -361,7 +361,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                 ObjectProperty op = (ObjectProperty)p;
                 return op.getDomainDisplayTier();
             } else {
-                log.error("Property is of unknown class in PropertyRanker()");  
+                log.error("Property is of unknown class in PropertyRanker()");
             }
             return 0;
         }

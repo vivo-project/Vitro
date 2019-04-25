@@ -6,7 +6,7 @@
 		<#assign labelList = labelsSorted[lang] />
 		<#--Reset for every language-->
 		<#assign labelSeq = []/>
-		
+
 		<#list labelList as labelObject>
 			<#assign labelLiteral = labelObject.labelLiteral />
 			<#assign labelStringValue = labelObject.labelStringValue />
@@ -18,7 +18,7 @@
 			<#if labelObject.editLinkURL?has_content>
 				<#assign labelEditLink = labelObject.editLinkURL/>
 			</#if>
-		
+
 			<#if label?? && ( label?index_of("@") > -1 ) >
 		    	<#assign labelStr = label?substring(0, label?index_of("@")) >
 		    	<#assign tagOrTypeStr = label?substring(label?index_of("@")) >
@@ -32,7 +32,7 @@
 		        <#assign tagOrTypeStr = "" >
 		    </#if>
 		    <@displayLabel labelSeq labelStr languageCode labelEditLink tagOrTypeStr editGenerator editable displayRemoveLink/>
-		    
+
 		    <#assign labelSeq = labelSeq + [labelStr]>
 		</#list>
 	</#if>
@@ -40,8 +40,8 @@
 
 <#--ignore 'untyped' and display everything-->
 <#macro displayExistingTypedLabels langList labelsSorted editable editGenerator="" displayRemoveLink=true>
-	
-	
+
+
 	<#list langList as lang>
 		<#if lang != "untyped">
 			<h3 languageName="${lang}">${lang}</h3>
@@ -80,13 +80,13 @@
 </#macro>
 
 <#macro displayLabel labelSeq labelStr languageCode labelEditLink tagOrTypeStr editGenerator editable displayRemoveLink>
-    <li>${labelStr} <#if labelSeq?seq_contains(labelStr)> (duplicate value) </#if> 
+    <li>${labelStr} <#if labelSeq?seq_contains(labelStr)> (duplicate value) </#if>
     <#if editable> <#if labelEditLink?has_content> <a href="${labelEditLink}&${editGenerator}">Edit</a></#if>
     <#if displayRemoveLink>
 	<a href="${urls.base}/edit/primitiveRdfEdit" languageName="${labelLang}" languageCode="${languageCode}"
 	labelValue="${labelStr}" tagOrType="${tagOrTypeStr!}" class="remove" title="${i18n().remove_capitalized}">${i18n().remove_capitalized}</a>
 	</#if>
 	</#if>
-    
+
     </li>
 </#macro>

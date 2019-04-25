@@ -29,7 +29,7 @@ public class UserAccountsProfileCreator {
 
 		String label = account.getLastName() + ", " + account.getFirstName();
 		addProp(dpsDao, indUri, VitroVocabulary.LABEL, label);
-		
+
 		return indUri;
 	}
 

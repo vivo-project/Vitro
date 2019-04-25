@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
 public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable, RoleRestrictedProperty
 {
 	private static final Log log = LogFactory.getLog(ObjectProperty.class.getName());
-	
+
     private String parentURI = null;
 
     private String domainVClassURI = null;
@@ -43,7 +43,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     private boolean symmetric = false;
     private boolean functional = false;
     private boolean inverseFunctional = false;
-    
+
     private List<ObjectPropertyStatement> objectPropertyStatements = null;
     private String example = null;
     private String description = null;
@@ -58,17 +58,17 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     private Integer domainDisplayLimit = null;
 
     private String objectIndividualSortPropertyURI = null;
-    
+
     private String rangeEntitySortDirection = null;
     private Integer rangeDisplayTier = null;
     private Integer rangeDisplayLimit = null;
-    
+
     private boolean selectFromExisting = true;
     private boolean offerCreateNewOption = false;
     private boolean stubObjectRelation = false;
-    
+
     private boolean collateBySubclass = false;
-    
+
     public ObjectProperty() {
         super();
     }
@@ -83,7 +83,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public String getDomainVClassURI() {
         return domainVClassURI;
     }
-    
+
     @Override
     public void setDomainVClassURI(String domainClassURI) {
         this.domainVClassURI = domainClassURI;
@@ -99,7 +99,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public String getLabel() {
         return getDomainPublic();
     }
-    
+
     public String getDomainPublic() {
         return domainPublic;
     }
@@ -118,12 +118,12 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setParentURI(String parentURI) {
         this.parentURI = parentURI;
     }
-    
+
     @Override
     public String getRangeVClassURI() {
         return rangeVClassURI;
     }
-    
+
     @Override
     public void setRangeVClassURI(String rangeClassURI) {
         this.rangeVClassURI = rangeClassURI;
@@ -210,35 +210,35 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
             this.URIInverse = namespaceInverse + localNameInverse;
         }
     }
-    
+
     public boolean getTransitive() {
     	return transitive;
     }
-    
+
     public void setTransitive(boolean transitive) {
     	this.transitive = transitive;
     }
-    
+
     public boolean getSymmetric() {
     	return symmetric;
     }
-    
+
     public void setSymmetric(boolean symmetric) {
     	this.symmetric = symmetric;
     }
-    
+
     public boolean getFunctional() {
     	return functional;
     }
-    
+
     public void setFunctional(boolean functional) {
     	this.functional = functional;
     }
-    
+
     public boolean getInverseFunctional() {
     	return inverseFunctional;
     }
-    
+
     public void setInverseFunctional(boolean inverseFunctional) {
     	this.inverseFunctional = inverseFunctional;
     }
@@ -246,11 +246,11 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
 	public void setCollateBySubclass(boolean collate) {
 		collateBySubclass = collate;
 	}
-	
+
 	public boolean getCollateBySubclass() {
 		return collateBySubclass;
 	}
-    
+
     /**
      * adds a single ObjectPropertyStatement object to Property's object property statements List.
      */
@@ -284,7 +284,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     }
     /**
      * @return display tier, or null for an unset value
-     */    
+     */
     public Integer getDomainDisplayTierInteger() {
         return domainDisplayTier;
     }
@@ -342,27 +342,27 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public boolean getSelectFromExisting() {
         return selectFromExisting;
     }
-    
+
     public void setSelectFromExisting(boolean b) {
         this.selectFromExisting = b;
     }
-    
+
     public boolean getOfferCreateNewOption() {
         return offerCreateNewOption;
     }
-    
+
     public void setOfferCreateNewOption(boolean b) {
         this.offerCreateNewOption = b;
     }
-    
+
     public boolean getStubObjectRelation() {
         return stubObjectRelation;
     }
-    
+
     public void setStubObjectRelation(boolean b) {
         this.stubObjectRelation = b;
-    }    
-    
+    }
+
     /**
      * Sorts alphabetically by public name
      */
@@ -385,14 +385,14 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
             tier2 = (tier2 == null) ? 0 : tier2;
             return tier1 - tier2;
         }
-    }  
-    
+    }
+
     /**
      * Sorts the object property statements taking into account the sort order.
      */
     public static List<ObjectPropertyStatement> sortObjectPropertyStatementsForDisplay(
     		ObjectProperty prop, List objPropStmtsList) {
-    	
+
         if (objPropStmtsList == null) {
             log.error("incoming object property statement list is null; " +
             		  "returning null");
@@ -401,27 +401,27 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         if (objPropStmtsList.size() < 2) { // no need to sort
             return objPropStmtsList;
         }
-        
-        String tmpDirection = prop.getDomainEntitySortDirection(); 
+
+        String tmpDirection = prop.getDomainEntitySortDirection();
         // Valid values are "desc" and "asc";
         // anything else will default to ascending.
         final boolean ascending = !"desc".equalsIgnoreCase(tmpDirection);
 
         String objIndivSortPropURI = prop.getObjectIndividualSortPropertyURI();
-        if (prop.getObjectIndividualSortPropertyURI() == null 
+        if (prop.getObjectIndividualSortPropertyURI() == null
         		|| prop.getObjectIndividualSortPropertyURI().length() == 0) {
             log.debug("objectIndividualSortPropertyURI is null or blank " +
                       "so sorting by name ");
-            
+
             Comparator fieldComp = new Comparator() {
-                
+
                 public final int compare(Object o1, Object o2) {
-                    ObjectPropertyStatement e2e1 = (ObjectPropertyStatement) o1, 
+                    ObjectPropertyStatement e2e1 = (ObjectPropertyStatement) o1,
                                             e2e2 = (ObjectPropertyStatement) o2;
                     Individual e1 , e2;
                     e1 = e2e1 != null ? e2e1.getObject():null;
                     e2 = e2e2 != null ? e2e2.getObject():null;
-    
+
                     Object val1 = null, val2 = null;
                     if( e1 != null ) {
                         val1 = e1.getName();
@@ -442,7 +442,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                         		rv = -1;
                         	} else {
                                 Collator collator = Collator.getInstance();
-                            	rv = collator.compare( ((String)val1) , ((String)val2) );                		
+                            	rv = collator.compare( ((String)val1) , ((String)val2) );
                         	}
                         } else if( val1 instanceof Date ) {
                             DateTime dt1 = new DateTime((Date)val1);
@@ -454,7 +454,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                     } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
-    
+
                     if( ascending ) {
                         return rv;
                     } else {
@@ -472,13 +472,13 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
             final String objIndSortPropURI = prop.getObjectIndividualSortPropertyURI();
             Comparator dpComp = new Comparator() {
                 final String cDatapropURI = objIndSortPropURI;
-    
+
                 public final int compare(Object o1, Object o2){
                     ObjectPropertyStatement e2e1= (ObjectPropertyStatement)o1, e2e2=(ObjectPropertyStatement)o2;
                     Individual e1 , e2;
                     e1 = e2e1 != null ? e2e1.getObject():null;
                     e2 = e2e2 != null ? e2e2.getObject():null;
-    
+
                     Object val1 = null, val2 = null;
                     if( e1 != null ){
                         try {
@@ -499,7 +499,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                         }
                     } else
                         log.debug( "PropertyWebapp.sortObjectPropertiesForDisplay passed object property statement with no range entity.");
-    
+
                     if( e2 != null ){
                         try {
                             List<DataPropertyStatement> dataPropertyStatements = e2.getDataPropertyStatements();
@@ -521,14 +521,14 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                         log.debug( "PropertyWebapp.sortObjectPropertyStatementsForDisplay passed object property statement with no range entity.");
                     }
                     int rv = 0;
-                    try {	
+                    try {
                     	if (val1 == null && val2 == null) {
                     		 rv = 0;
                     	} else if (val1==null) {
                              rv = 1;
                         } else if (val2==null) {
                              rv = -1;
-                        }  else {                        
+                        }  else {
 	                           if( val1 instanceof String ) {
 	                              Collator collator = Collator.getInstance();
 	                              rv = collator.compare( ((String)val1) , ((String)val2) ); //was rv = ((String)val1).compareTo((String)val2);
@@ -545,19 +545,19 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                     } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
- 
-                    
+
+
                     if ( !ascending ) {
                     	rv = rv * -1;
                     }
-                    
+
                     // sort alphabetically by name if have same dataproperty value
                     if ( rv == 0 ) {
                     	String nameValue1 = ( e1.getName() != null ) ? e1.getName() : "";
                     	String nameValue2 = ( e2.getName() != null ) ? e2.getName() : "";
                     	rv = Collator.getInstance().compare( nameValue1, nameValue2 );
                     }
-                    
+
                     return rv;
                 }
             };
@@ -611,7 +611,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         "offerCreateNewOption" + getOfferCreateNewOption() + "\n\t" +
         "** object property statements: " + list + "\n";
     }
-    
+
     @Override
     public ObjectProperty clone()
     {
@@ -660,6 +660,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         clone.setTransitive(this.getTransitive());
         clone.setURI(this.getURI());
         clone.setURIInverse(this.getURIInverse());
-        return clone;     
+        return clone;
     }
 }

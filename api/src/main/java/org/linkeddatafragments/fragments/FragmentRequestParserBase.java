@@ -56,7 +56,7 @@ abstract public class FragmentRequestParserBase implements IFragmentRequestParse
          *
          */
         public final long pageNumber;
-        
+
         /**
          *
          * @param request
@@ -67,7 +67,7 @@ abstract public class FragmentRequestParserBase implements IFragmentRequestParse
         {
             this.request = request;
             this.config = config;
-            
+
             final String givenPageNumber = request.getParameter(
                               ILinkedDataFragmentRequest.PARAMETERNAME_PAGE );
             if ( givenPageNumber != null ) {
@@ -123,7 +123,7 @@ abstract public class FragmentRequestParserBase implements IFragmentRequestParse
      * @param config
      * @return
      */
-    
+
     public static String extractBaseURL( final HttpServletRequest request,
                                          final ConfigReader config ) {
         if (config.getBaseURL() != null) {

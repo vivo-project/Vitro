@@ -27,56 +27,56 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 /**
  * handles rules of the form
  * assertedProp1(?x, ?y) ^ assertedProp2(?y, ?z) -&gt; inferredProp(?x, ?z)
- * 
+ *
  */
 public abstract class SimpleBridgingRule implements ReasonerPlugin {
-	
+
     private static final Log log = LogFactory.getLog(SimpleBridgingRule.class);
-    
+
 	private Property assertedProp1;
 	private Property assertedProp2;
 	private Property inferredProp;
-	
+
 	private String   queryStr;
 	private String   retractionTestString;
-	
+
 	private SimpleReasoner simpleReasoner;
-	
+
 	protected SimpleBridgingRule(String assertedProp1, String assertedProp2, String inferredProp) {
 		this.assertedProp1 = ResourceFactory.createProperty(assertedProp1);
         this.assertedProp2 = ResourceFactory.createProperty(assertedProp2);
         this.inferredProp = ResourceFactory.createProperty(inferredProp);
-        
+
         this.queryStr = "CONSTRUCT { \n" +
                         "  ?x <" + inferredProp + "> ?z \n" +
                         "} WHERE { \n" +
                         "  ?x <" + assertedProp1 + "> ?y . \n" +
                         "  ?y <" + assertedProp2 + "> ?z \n" +
                         "}";
-        
-        this.retractionTestString = 
+
+        this.retractionTestString =
                 "  ASK { \n" +
                 "  ?x <" + assertedProp1 + "> ?y . \n" +
-                "  ?y <" + assertedProp2 + "> ?z \n" +                                 
+                "  ?y <" + assertedProp2 + "> ?z \n" +
                 "  } ";
-        
+
 	}
-	
+
 	public boolean isConfigurationOnlyPlugin() {
 	    return false;
 	}
-	
+
 	public boolean isInterestedInAddedStatement(Statement stmt) {
 		return isRelevantPredicate(stmt);
 	}
-	
+
 	public boolean isInterestedInRemovedStatement(Statement stmt) {
 		return isRelevantPredicate(stmt);
 	}
-	
-	public void addedABoxStatement(Statement stmt, 
-            Model aboxAssertionsModel, 
-            Model aboxInferencesModel, 
+
+	public void addedABoxStatement(Statement stmt,
+            Model aboxAssertionsModel,
+            Model aboxInferencesModel,
             OntModel TBoxInferencesModel) {
 		if (!isInterestedInAddedStatement(stmt) || ignore(stmt)) {
 			return;
@@ -86,15 +86,15 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
         while(sit.hasNext()) {
         	Statement s = sit.nextStatement();
         	if (simpleReasoner != null) simpleReasoner.addInference(s,aboxInferencesModel);
-        }     
+        }
 	}
-	
+
 	private boolean ignore(Statement stmt) {
 		return (
 				(stmt.getSubject().isAnon() || stmt.getObject().isAnon())
 			    // can't deal with blank nodes
 		||
-		        (!stmt.getObject().isResource()) 
+		        (!stmt.getObject().isResource())
 			    // don't deal with literal values
 	    );
 	}
@@ -110,7 +110,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
             queryStr = queryStr.replace(
                     "?y", "<" + stmt.getSubject().getURI() + ">");
             queryStr = queryStr.replace(
-                    "?z", "<" + ((Resource) stmt.getObject()).getURI() + ">");          
+                    "?z", "<" + ((Resource) stmt.getObject()).getURI() + ">");
         } else {
             // should never be here
             return null;
@@ -119,9 +119,9 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
             queryStr = queryStr.replace(
                     "?x", "<" + stmt.getSubject().getURI() + ">");
             queryStr = queryStr.replace(
-                    "?z", "<" + ((Resource) stmt.getObject()).getURI() + ">");  
+                    "?z", "<" + ((Resource) stmt.getObject()).getURI() + ">");
         }
-        
+
         if (log.isDebugEnabled()) {
             log.debug(queryStr);
         }
@@ -138,7 +138,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
         }
         return query;
 	}
-	
+
 	private Model constructInferences(String queryString, Statement stmt, Model aboxAssertionsModel) {
 	    Query query = createQuery(queryString, stmt, null);
 		QueryExecution qe = QueryExecutionFactory.create(query, aboxAssertionsModel);
@@ -147,26 +147,26 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 		} finally {
 			qe.close();
 		}
-		
+
 	}
-	
-    public void removedABoxStatement(Statement stmt, 
-            Model aboxAssertionsModel, 
-            Model aboxInferencesModel, 
+
+    public void removedABoxStatement(Statement stmt,
+            Model aboxAssertionsModel,
+            Model aboxInferencesModel,
             OntModel TBoxInferencesModel) {
 
 		if (!isInterestedInRemovedStatement(stmt) || ignore(stmt)) {
 			return;
 		}
-        
+
         // I initially tried constructing the statements to remove with a single
         // SPARQL CONSTRUCT statement, but that didn't seem to perform very well.
         // So this first retrieves a list of candidate ?x <inferredProp> ?z
         // statements, and then runs an ASK query to determine if there are still
         // statements ?x <assertedProp1> ?y and ?y <assertedProp2> ?z that entail
         // the statement in question.  If not, the statement is removed.
-        
-        // find-based candidate identification        
+
+        // find-based candidate identification
         Resource x = null;
         RDFNode z = null;
         if (stmt.getPredicate().equals(assertedProp1)) {
@@ -190,12 +190,12 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 			}
 		}
     }
-	
+
     private boolean isRelevantPredicate(Statement stmt) {
 		return (assertedProp1.equals(stmt.getPredicate())
 				|| assertedProp2.equals(stmt.getPredicate()));
     }
-    
+
     public void setSimpleReasoner(SimpleReasoner simpleReasoner) {
     	this.simpleReasoner = simpleReasoner;
     }

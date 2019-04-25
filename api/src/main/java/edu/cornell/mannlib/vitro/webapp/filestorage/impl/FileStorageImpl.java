@@ -45,7 +45,7 @@ public class FileStorageImpl {
 	 * How often to we insert path separator characters?
 	 */
 	public static final int SHORTY_LENGTH = 3;
-	
+
 
 	private static final Log log = LogFactory.getLog(FileStorageImpl.class);
 
@@ -62,7 +62,7 @@ public class FileStorageImpl {
 	 * Use the arguments to create an instance. If the base directory is empty,
 	 * initialize it. Otherwise, check that it was initialized to the same
 	 * namespaces.
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if the configuration property doesn't point to an existing,
 	 *             writeable directory.

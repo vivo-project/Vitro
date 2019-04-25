@@ -19,24 +19,24 @@ public class NewURIMakerVitro implements NewURIMaker {
     WebappDaoFactory wdf;
     Set<String> madeURIs = new HashSet<String>();
     static Random random = new Random();
-    
+
     public NewURIMakerVitro( WebappDaoFactory wdf){
         this.wdf = wdf;
     }
-    
+
     @Override
-    public String getUnusedNewURI(String prefixURI) throws InsertException {        
-        
+    public String getUnusedNewURI(String prefixURI) throws InsertException {
+
         Individual ind = new IndividualImpl();
         String newURI = null;
         int attempts = 0;
         boolean goodNewURI = false;
         log.debug("Before starting : Made URIs contains " + madeURIs.toString());
-       
+
         while( ! goodNewURI && attempts < MAX_ATTEMPTS ){
             attempts++;
-            
-            if( attempts > 2 && prefixURI != null && !prefixURI.isEmpty() ) 
+
+            if( attempts > 2 && prefixURI != null && !prefixURI.isEmpty() )
             {
             	log.debug("Attempts: " + attempts  + " and prefix not null and prefix not empty " + prefixURI);
                 ind.setURI(prefixURI + random.nextInt() );
@@ -49,14 +49,14 @@ public class NewURIMakerVitro implements NewURIMaker {
             log.debug("Created new uri " + newURI + " and does madeURIs contain it?" + madeURIs.contains(newURI));
             if( newURI != null && ! newURI.isEmpty() && ! madeURIs.contains( newURI) ){
             	log.debug("new URI is not null and new URI is empty and madeURIs does not containt new URI");
-                goodNewURI = true;                
-                madeURIs.add( newURI );                
-            } 
+                goodNewURI = true;
+                madeURIs.add( newURI );
+            }
             log.debug("Made URIs contains " + madeURIs.toString());
         }
         if(goodNewURI && newURI != null && !newURI.isEmpty()) {
         	log.debug("Decided on this URI " + newURI);
-        
+
             return newURI;
         }
         else {

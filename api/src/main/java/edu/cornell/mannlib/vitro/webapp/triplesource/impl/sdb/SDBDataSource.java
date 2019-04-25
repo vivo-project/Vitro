@@ -38,9 +38,9 @@ import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTrip
  */
 public class SDBDataSource {
 	private static final Log log = LogFactory.getLog(SDBDataSource.class);
-	
+
 	private final ConfigurationProperties configProps;
-	
+
 
 	public SDBDataSource(ServletContext ctx) {
 		this.configProps = ConfigurationProperties.getBean(ctx);
@@ -130,10 +130,10 @@ public class SDBDataSource {
 			return defaultValue;
 		}
 	}
-	
+
 	/**
 	 * Get the JDBC URL, perhaps with special MySQL options.
-	 * 
+	 *
 	 * This must be static and package-accessible so SDBConnectionSmokeTests can
 	 * use the same options.
 	 */
@@ -173,6 +173,6 @@ public class SDBDataSource {
 	private static String getDbType(ConfigurationProperties props) {
 		return props.getProperty(PROPERTY_DB_TYPE, DEFAULT_TYPE);
 	}
-	
+
 
 }

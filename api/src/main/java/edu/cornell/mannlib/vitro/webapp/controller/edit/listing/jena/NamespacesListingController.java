@@ -29,34 +29,34 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 @WebServlet(name = "NamespacesListingController", urlPatterns = {"/listNamespaces"} )
 public class NamespacesListingController extends BaseEditController {
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {    	
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
         	return;
         }
 
         VitroRequest vrequest = new VitroRequest(request);
-               
+
 		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
-               
+
         ArrayList results = new ArrayList();
         request.setAttribute("results",results);
         results.add("XX");
         results.add("namespace");
         results.add("prefix");
-        
+
         Property namespaceURIProp = ontModel.getProperty(VitroVocabulary.NAMESPACE_NAMESPACEURI);
-        
+
         ontModel.enterCriticalSection(Lock.READ);
         try {
         	ClosableIterator closeIt = ontModel.listIndividuals(ontModel.getResource(VitroVocabulary.NAMESPACE));
         	try {
         		for (Iterator namespaceIt=closeIt; namespaceIt.hasNext();) {
         			Individual namespaceInd = (Individual) namespaceIt.next();
-        			
+
         			String namespaceURI = "";
         			try {
-        				namespaceURI = ((Literal)namespaceInd.getPropertyValue(namespaceURIProp)).getLexicalForm(); 
+        				namespaceURI = ((Literal)namespaceInd.getPropertyValue(namespaceURIProp)).getLexicalForm();
         			} catch (Exception e) { /* ignore it for now */ }
         			results.add("XX");
         			results.add(namespaceURI);
@@ -99,5 +99,5 @@ public class NamespacesListingController extends BaseEditController {
         }
 
     }
-    
+
 }

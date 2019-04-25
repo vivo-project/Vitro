@@ -15,28 +15,28 @@
         <p>
             ${i18n().error_occurred_at(siteName!,datetime!)}
         </p>
-        
+
         <p>
             <strong>${i18n().requested_url}:</strong> ${requestedUrl!}
         </p>
-        
+
         <p>
         <#if errorMessage?has_content>
             <strong>${i18n().error_message}:</strong> ${errorMessage!}
         </#if>
         </p>
-        
+
         <p>
-            <strong>${i18n().stack_trace}</strong> (${i18n().trace_available(siteName!)}): 
+            <strong>${i18n().stack_trace}</strong> (${i18n().trace_available(siteName!)}):
             <pre>${stackTrace!}</pre>
         </p>
-        
+
         <#if cause?has_content>
-            <p><strong>${i18n().caused_by}:</strong> 
+            <p><strong>${i18n().caused_by}:</strong>
                 <pre>${cause!}</pre>
             </p>
         </#if>
-        
+
     </body>
 </html>
 </#assign>
@@ -50,13 +50,13 @@ ${i18n().requested_url}: ${requestedUrl!}
     ${i18n().error_message}: ${errorMessage!}
 </#if>
 
-${i18n().stack_trace} (${i18n().trace_available(siteName!)}): 
+${i18n().stack_trace} (${i18n().trace_available(siteName!)}):
 ${stackTrace!}
 
 <#if cause?has_content>
-${i18n().caused_by}: 
+${i18n().caused_by}:
 ${cause!}
-</#if>       
+</#if>
 </#assign>
 
 <@email subject=subject html=html text=text />

@@ -21,25 +21,25 @@
 	//Additional properties for dojo.hostenv
 	var _addHostEnv = {
 		pkgFileName: "__package__",
-	
+
 		// for recursion protection
 		loading_modules_: {},
 		loaded_modules_: {},
 		addedToLoadingCount: [],
 		removedFromLoadingCount: [],
-	
+
 		inFlightCount: 0,
-	
+
 		// FIXME: it should be possible to pull module prefixes in from djConfig
 		modulePrefixes_: {
 			dojo: {name: "dojo", value: "src"}
 		},
-	
-	
+
+
 		setModulePrefix: function(module, prefix){
 			this.modulePrefixes_[module] = {name: module, value: prefix};
 		},
-	
+
 		getModulePrefix: function(module){
 			var mp = this.modulePrefixes_;
 			if((mp[module])&&(mp[module]["name"])){
@@ -51,16 +51,16 @@
 		getTextStack: [],
 		loadUriStack: [],
 		loadedUris: [],
-	
+
 		//WARNING: This variable is referenced by packages outside of bootstrap: FloatingPane.js and undo/browser.js
 		post_load_: false,
-		
+
 		//Egad! Lots of test files push on this directly instead of using dojo.addOnLoad.
 		modulesLoadedListeners: [],
 		unloadListeners: [],
 		loadNotifying: false
 	};
-	
+
 	//Add all of these properties to dojo.hostenv
 	for(var param in _addHostEnv){
 		dojo.hostenv[param] = _addHostEnv[param];
@@ -201,7 +201,7 @@ dojo.addOnUnload = function(obj, fcnName){
 dojo.hostenv.modulesLoaded = function(){
 	if(this.post_load_){ return; }
 	if((this.loadUriStack.length==0)&&(this.getTextStack.length==0)){
-		if(this.inFlightCount > 0){ 
+		if(this.inFlightCount > 0){
 			dojo.debug("files still in flight!");
 			return;
 		}
@@ -231,7 +231,7 @@ dojo.hostenv.getModuleSymbols = function(modulename) {
 }
 
 /**
-* loadModule("A.B") first checks to see if symbol A.B is defined. 
+* loadModule("A.B") first checks to see if symbol A.B is defined.
 * If it is, it is simply returned (nothing to do).
 *
 * If it is not defined, it will look for "A/B.js" in the script root directory,
@@ -326,7 +326,7 @@ dojo.hostenv.loadModule = function(modulename, exact_only, omit_module_check){
 		// pass in false so we can give better error
 		module = this.findModule(modulename, false);
 		if(!module){
-			dojo.raise("symbol '" + modulename + "' is not defined after loading '" + relpath + "'"); 
+			dojo.raise("symbol '" + modulename + "' is not defined after loading '" + relpath + "'");
 		}
 	}
 

@@ -17,24 +17,24 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.loggers.StackTraceUtilit
 
 /**
  * Writes the log message for the LoggingRDFService.
- * 
+ *
  * If not enabled, or if the logging level is insufficient, this does nothing.
- * 
+ *
  * If enabled, it checks for restrictions. If there is a restriction on the call
  * stack (regular expression), then a log message will only be printed if the
  * pattern is found in the concatenated call stack (fully-qualified class names
  * and method names). If there is a restriction on the query string (regular
  * expression) then a log message will only be printed if the pattern is found
  * in the query string.
- * 
+ *
  * If everything passes muster, the constructor will record the time that the
  * instance was created.
- * 
+ *
  * When close() is called, if a start time was recorded, then a log record is
  * produced. This contains the elapsed time, the name of the method, and any
  * arguments passed to the constructor. It may also include a stack trace, if
  * requested.
- * 
+ *
  * The stack trace is abbreviated. It will reach into this class, and will not
  * extend past the first reference to the ApplicationFilterChain. It also omits
  * any Jena classes. Perhaps it should be abbreviated further?

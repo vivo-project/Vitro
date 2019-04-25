@@ -20,14 +20,14 @@ public interface UserAccountsDao {
 
 	/**
 	 * Get the UserAccount for this URI.
-	 * 
+	 *
 	 * @return null if the URI is null, or if there is no such UserAccount
 	 */
 	UserAccount getUserAccountByUri(String uri);
 
 	/**
 	 * Get the UserAccount for this Email address.
-	 * 
+	 *
 	 * @return null if the Email address is null, or if there is no such
 	 *         UserAccount
 	 */
@@ -35,11 +35,11 @@ public interface UserAccountsDao {
 
 	/**
 	 * Get the UserAccount for this External Authentication ID
-	 * 
+	 *
 	 * @return null if the ID is null, or if there is no such UserAccount
 	 */
 	UserAccount getUserAccountByExternalAuthId(String externalAuthId);
-	
+
 	/**
 	 * Get any UserAccounts who act as proxy editors for this profile page.
 	 */
@@ -47,14 +47,14 @@ public interface UserAccountsDao {
 
 	/**
 	 * Create a new UserAccount in the model.
-	 * 
+	 *
 	 * On entry, the URI of the UserAccount should be empty. On exit, the URI
 	 * which was created for this UserAccount will be stored in the UserAccount,
 	 * as well as being returned by the method.
-	 * 
+	 *
 	 * Does not confirm that PermissionSet objects already exist for the
 	 * PermissionSet URIs referenced by the UserAcocunt.
-	 * 
+	 *
 	 * @throws NullPointerException
 	 *             if the UserAccount is null.
 	 * @throws IllegalArgumentException
@@ -64,10 +64,10 @@ public interface UserAccountsDao {
 
 	/**
 	 * Update the values on a UserAccount that already exists in the model.
-	 * 
+	 *
 	 * Does not confirm that PermissionSet objects already exist for the
 	 * PermissionSet URIs referenced by the UserAcocunt.
-	 * 
+	 *
 	 * @throws NullPointerException
 	 *             if the UserAccount is null.
 	 * @throws IllegalArgumentException
@@ -78,7 +78,7 @@ public interface UserAccountsDao {
 
 	/**
 	 * Remove the UserAccount with this URI from the model.
-	 * 
+	 *
 	 * If the URI is null, or if no UserAccount with this URI is found in the
 	 * model, no action is taken.
 	 */
@@ -89,17 +89,17 @@ public interface UserAccountsDao {
 	 * profile page.
 	 */
 	void setProxyAccountsOnProfile(String profilePageUri, Collection<String> userAccountUris);
-	
+
 	/**
 	 * Get the PermissionSet for this URI.
-	 * 
+	 *
 	 * @return null if the URI is null, or if there is no such PermissionSet.
 	 */
 	PermissionSet getPermissionSetByUri(String uri);
 
 	/**
 	 * Get all of the PermissionSets in the model, sorted by URI.
-	 * 
+	 *
 	 * @return a collection which might be empty, but is never null.
 	 */
 	Collection<PermissionSet> getAllPermissionSets();

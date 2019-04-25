@@ -22,36 +22,36 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
     private final UnaryFunctor<PropertyInstance,Boolean> propertyInstanceFilter;
     private final IndividualDao individualDao;
     private final ObjectPropertyDao objectPropDao;
-    
-    
+
+
     public FilteringPropertyInstanceDao(
-            final PropertyInstanceDao propertyInstanceDao, 
+            final PropertyInstanceDao propertyInstanceDao,
             final ObjectPropertyDao objectPropDao,
             final IndividualDao individualDao,
             final VitroFilters filters) {
-        if( propertyInstanceDao == null ) 
+        if( propertyInstanceDao == null )
             throw new IllegalArgumentException("Must pass a non null PropertyInstanceDao to constructor");
         if( filters == null )
             throw new IllegalArgumentException("Must pass a non-null VitroFilters to constructor");
-        
+
         this.innerPropertyInstanceDao = propertyInstanceDao;
         this.filters = filters;
         this.individualDao = individualDao;
         this.objectPropDao = objectPropDao;
-        
+
         this.propertyInstanceFilter = new UnaryFunctor<PropertyInstance,Boolean>(){
             @Override
             public Boolean fn(PropertyInstance inst) {
                 if( inst == null ) return false;
-                
+
                 //this shouldn't happen
                 if( inst.getSubjectEntURI()== null && inst.getPropertyURI() == null &&
                         inst.getRangeClassURI() == null )
                     return false;
-                
+
                 //in some classes, like PropertyDWR.java, a PropertyInstance with nulls
                 //in the subjectUri and objectUri represent an ObjectProperty, not
-                //an ObjectPropertyStatement.                
+                //an ObjectPropertyStatement.
                 if( inst.getSubjectEntURI() == null && inst.getObjectEntURI() == null
                         && inst.getPropertyURI() != null ){
                     //is it a property we can show?
@@ -59,10 +59,10 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
                     if( op == null )
                         return false;
                     else
-                        return filters.getObjectPropertyFilter().fn(op);                    
+                        return filters.getObjectPropertyFilter().fn(op);
                 }
-                
-                
+
+
                 //Filter based on subject, property and object.  This could be changed
                 //to filter on the subject's and object's class.
                 Individual sub = individualDao.getIndividualByURI(inst.getSubjectEntURI());
@@ -73,23 +73,23 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
                     return false;
                 ObjectProperty prop = objectPropDao.getObjectPropertyByURI(inst.getPropertyURI());
                 return filters.getObjectPropertyFilter().fn(prop);
-            }            
+            }
         };
     }
-     
-    /* ******************** filtered methods ********************* */    
+
+    /* ******************** filtered methods ********************* */
     public Collection<PropertyInstance> getAllPossiblePropInstForIndividual(
             String individualURI) {
         Collection<PropertyInstance> innerInst = innerPropertyInstanceDao.getAllPossiblePropInstForIndividual(individualURI);
         Collection<PropertyInstance> out = new LinkedList<PropertyInstance>();
-        Filter.filter(innerInst, propertyInstanceFilter , out);                
-        return out;        
+        Filter.filter(innerInst, propertyInstanceFilter , out);
+        return out;
     }
 
     public Collection<PropertyInstance> getAllPropInstByVClass(String classURI) {
         Collection<PropertyInstance> innerInst = innerPropertyInstanceDao.getAllPropInstByVClass(classURI);
         Collection<PropertyInstance> out = new LinkedList<PropertyInstance>();
-        Filter.filter(innerInst, propertyInstanceFilter , out);                
+        Filter.filter(innerInst, propertyInstanceFilter , out);
         return out;
     }
 
@@ -97,7 +97,7 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
             String propertyURI) {
         Collection<PropertyInstance> innerInst = innerPropertyInstanceDao.getExistingProperties(entityURI, propertyURI);
         Collection<PropertyInstance> out = new LinkedList<PropertyInstance>();
-        Filter.filter(innerInst, propertyInstanceFilter , out);                
+        Filter.filter(innerInst, propertyInstanceFilter , out);
         return out;
     }
 
@@ -110,7 +110,7 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
             return null;
     }
 
-    /* **************** unfiltered methods ***************** */    
+    /* **************** unfiltered methods ***************** */
     public void deleteObjectPropertyStatement(String subjectURI,
             String propertyURI, String objectURI) {
         innerPropertyInstanceDao.deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI);
@@ -129,5 +129,5 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
 
     }
 
-    
+
 }

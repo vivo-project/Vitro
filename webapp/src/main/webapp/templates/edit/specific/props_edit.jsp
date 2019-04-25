@@ -37,7 +37,7 @@
         <form action="showObjectPropertyHierarchy" method="get">
 	    	<input type="hidden" name="propertyUri" value="${property.URI}"/>
             <input type="submit" class="form-button" value="Show Hierarchy below This Property"/>
-        </form>      
+        </form>
         <form action="listVClassWebapps" method="get">
 			<input type="hidden" name="showPropertyRestrictions" value="true"/>
 			<input type="hidden" name="propertyURI" value="${property.URI}"/>
@@ -121,7 +121,7 @@
 			      <a href="${fauxpropertyURL}">${fauxproperty.pickListName}</a>
 			      domain: ${fauxproperty.domainLabel},
 			    </c:otherwise>
-			  </c:choose> 
+			  </c:choose>
 			  range: ${fauxproperty.rangeLabel}
 			</li>
 		  </ul>
@@ -158,7 +158,7 @@
 			</ul>
 			<input type="hidden" name="SubpropertyURI" value="${property.URI}"/>
 			<input type="hidden" name="operation" value="remove"/>
-		    <input type="hidden" name="_epoKey" value="${epoKey}"/>	
+		    <input type="hidden" name="_epoKey" value="${epoKey}"/>
 			<input type="submit" class="form-button" value="Remove Checked Superproperty Links"/>
 		</form>
 	    </c:if>
@@ -172,7 +172,7 @@
 		</form>
 	</td>
 </tr>
-<tr><td colspan="3"><hr/></td></tr>			
+<tr><td colspan="3"><hr/></td></tr>
 <!-- _______________________________________________ subproperties _____________________________________________ -->
 <tr valign="bottom" align="center">
 	<td colspan="2" valign="bottom" align="left">
@@ -185,8 +185,8 @@
 				</c:url>
 				<li><input type="checkbox" name="SubpropertyURI" value="${subproperty.URI}" class="form-item"/>
 					 <a href="${subpropertyURL}"> ${subproperty.pickListName} </a>
-				</li>						
-			</c:forEach>	
+				</li>
+			</c:forEach>
 			</ul>
 			<input type="hidden" name="SuperpropertyURI" value="${property.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Subproperty Links"/>
@@ -203,7 +203,7 @@
 			<input type="submit" class="form-button" value="New Link to Subproperty"/>
 		</form>
 		<form action="editForm" method="get">
-			<input type="hidden" name="controller" value="Property"/> 
+			<input type="hidden" name="controller" value="Property"/>
 			<input type="hidden" name="parentId" value="${property.URI}" />
 			<input type="submit" class="form-button" value="Add New Subproperty of This Property"/>
 		</form>
@@ -222,8 +222,8 @@
                 </c:url>
                 <li><input type="checkbox" name="SubpropertyURI" value="${eqproperty.URI}" class="form-item"/>
                      <a href="${eqpropertyURL}"> ${eqproperty.pickListName} </a>
-                </li>                       
-            </c:forEach>    
+                </li>
+            </c:forEach>
             </ul>
             <input type="hidden" name="SuperpropertyURI" value="${property.URI}"/>
             <input type="submit" class="form-button" value="Remove Checked Equivalent Property Links"/>

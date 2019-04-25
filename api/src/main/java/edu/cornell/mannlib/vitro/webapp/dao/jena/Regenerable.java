@@ -5,5 +5,5 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 public interface Regenerable {
 
 	public void regenerate();
-	
+
 }

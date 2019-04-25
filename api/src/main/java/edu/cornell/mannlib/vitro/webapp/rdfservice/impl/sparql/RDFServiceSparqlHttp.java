@@ -20,11 +20,11 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 /**
  * This is a RDFService that passes SPARQL queries to
  * the SPARQL endpoint unaltered and without parsing them.
- * 
+ *
  *  This is useful if the endpoint accepts syntax that does
  *  not pass the ARQ SPARQL 1.1 parser.  The disadvantage
  *  of this is that it currently returns no useful debugging
- *  messages when there is a syntax error. 
+ *  messages when there is a syntax error.
  */
 public class RDFServiceSparqlHttp extends RDFServiceSparql {
 
@@ -41,22 +41,22 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 		super(readEndpointURI, updateEndpointURI, defaultWriteGraphURI);
 	}
 
-	
+
 	/**
 	 * Performs a SPARQL construct query against the knowledge base. The query may have
 	 * an embedded graph identifier.
-	 * 
+	 *
 	 * @param queryStr - the SPARQL query to be executed against the RDF store
 	 * @param resultFormat - type of serialization for RDF result of the SPARQL query
 	 */
 	@Override
 	public InputStream sparqlConstructQuery(String queryStr,
 			                                RDFServiceImpl.ModelSerializationFormat resultFormat) throws RDFServiceException {
-		
+
 		Model model = ModelFactory.createDefaultModel();
 		//Query query = QueryFactory.create(queryStr);
 		//QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, queryStr);
-		
+
 		QueryEngineHTTP qeh = new QueryEngineHTTP( readEndpointURI, queryStr);
 		try {
 			qeh.execConstruct(model);
@@ -64,7 +64,7 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 			qeh.close();
 		}
 
-		ByteArrayOutputStream serializedModel = new ByteArrayOutputStream(); 
+		ByteArrayOutputStream serializedModel = new ByteArrayOutputStream();
 		model.write(serializedModel,getSerializationFormatString(resultFormat));
 		InputStream result = new ByteArrayInputStream(serializedModel.toByteArray());
 		return result;
@@ -84,27 +84,27 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 	/**
 	 * Performs a SPARQL describe query against the knowledge base. The query may have
 	 * an embedded graph identifier.
-	 * 
+	 *
 	 * @param queryStr - the SPARQL query to be executed against the RDF store
 	 * @param resultFormat - type of serialization for RDF result of the SPARQL query
-	 * 
+	 *
 	 * @return InputStream - the result of the query
-	 * 
+	 *
 	 */
 	@Override
 	public InputStream sparqlDescribeQuery(String queryStr,
 			                               RDFServiceImpl.ModelSerializationFormat resultFormat) throws RDFServiceException {
-		
-		Model model = ModelFactory.createDefaultModel();				
+
+		Model model = ModelFactory.createDefaultModel();
 		QueryEngineHTTP qeh = new QueryEngineHTTP( readEndpointURI, queryStr);
-		
+
 		try {
 			qeh.execDescribe(model);
 		} finally {
 			qeh.close();
 		}
 
-		ByteArrayOutputStream serializedModel = new ByteArrayOutputStream(); 
+		ByteArrayOutputStream serializedModel = new ByteArrayOutputStream();
 		model.write(serializedModel,getSerializationFormatString(resultFormat));
 		InputStream result = new ByteArrayInputStream(serializedModel.toByteArray());
 		return result;
@@ -113,22 +113,22 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 	/**
 	 * Performs a SPARQL select query against the knowledge base. The query may have
 	 * an embedded graph identifier.
-	 * 
+	 *
 	 * @param queryStr - the SPARQL query to be executed against the RDF store
 	 * @param resultFormat - format for the result of the Select query
-	 * 
+	 *
 	 * @return InputStream - the result of the query
-	 * 
+	 *
 	 */
 	@Override
-	public InputStream sparqlSelectQuery(String queryStr, RDFService.ResultFormat resultFormat) throws RDFServiceException {		                
+	public InputStream sparqlSelectQuery(String queryStr, RDFService.ResultFormat resultFormat) throws RDFServiceException {
 
 		QueryEngineHTTP qeh = new QueryEngineHTTP( readEndpointURI, queryStr);
-        
+
         try {
-        	ResultSet resultSet = qeh.execSelect();        	        	
-        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
-        	
+        	ResultSet resultSet = qeh.execSelect();
+        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         	switch (resultFormat) {
         	   case CSV:
         		  ResultSetFormatter.outputAsCSV(outputStream,resultSet);
@@ -142,13 +142,13 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
         	   case XML:
         		  ResultSetFormatter.outputAsXML(outputStream, resultSet);
         		  break;
-        	   default: 
+        	   default:
         		  throw new RDFServiceException("unrecognized result format");
         	}
-        	
+
         	InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
         	return result;
-        	
+
         } finally {
             qeh.close();
         }
@@ -169,21 +169,21 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 	/**
 	 * Performs a SPARQL ASK query against the knowledge base. The query may have
 	 * an embedded graph identifier.
-	 * 
+	 *
 	 * @param queryStr - the SPARQL query to be executed against the RDF store
-	 * 
-	 * @return  boolean - the result of the SPARQL query 
+	 *
+	 * @return  boolean - the result of the SPARQL query
 	 */
 	@Override
 	public boolean sparqlAskQuery(String queryStr) throws RDFServiceException {
-			    	    
+
 	    QueryEngineHTTP qeh = new QueryEngineHTTP( readEndpointURI, queryStr);
-	    
+
 	    try {
 	         return qeh.execAsk();
 	    } finally {
 	         qeh.close();
 	    }
 	}
-	
+
 }

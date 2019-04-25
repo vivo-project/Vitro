@@ -10,7 +10,7 @@
 
 /**
  * Slider Widget.
- * 
+ *
  * The slider widget comes in three forms:
  *  1. Base Slider widget which supports movement in x and y dimensions
  *  2. Vertical Slider (SliderVertical) widget which supports movement
@@ -22,10 +22,10 @@
  *  - a container div which displays a bar in the background (Slider object)
  *  - a handle inside the container div, which represents the value
  *    (sliderHandle DOM node)
- *  - the object which moves the handle (handleMove is of type 
+ *  - the object which moves the handle (handleMove is of type
  *    SliderDragMoveSource)
  *
- * The values for the slider are calculated by grouping pixels together, 
+ * The values for the slider are calculated by grouping pixels together,
  * based on the number of values to be represented by the slider.
  * The number of pixels in a group is called the valueSize
  *  e.g. if slider is 150 pixels long, and is representing the values
@@ -47,12 +47,12 @@
  *    are required to set the valueSize is not set before fillInTemplate
  *    is called.
  *  - Issues with dragging handle when page has been scrolled
- *  - 
+ *  -
  *
  * References (aka sources of inspiration):
  *  - http://dojotoolkit.org/docs/fast_widget_authoring.html
  *  - http://dojotoolkit.org/docs/dojo_event_system.html
- * 
+ *
  * @author Marcel Linnenfelser (m.linnen@synflag.de)
  * @author Mathew Pole (mathew.pole@ebor.com)
  *
@@ -123,7 +123,7 @@ dojo.widget.defineWidget (
 
 
 		// This function is called when the template is loaded
-		fillInTemplate: function () 
+		fillInTemplate: function ()
 		{
 			// dojo.debug ("fillInTemplate - className = " + this.domNode.className);
 
@@ -136,10 +136,10 @@ dojo.widget.defineWidget (
 
 			// keep the slider handle inside it's parent container
 			this.handleMove.constrainToContainer = true;
-		
+
 			if (this.clickSelect) {
 				dojo.event.connect (this.domNode, "onclick", this, "setPosition");
-			} 
+			}
 
 			if (this.isEnableX && this.initialValueX > 0) {
 				alert("setting x to " + this.initialValueX);
@@ -211,7 +211,7 @@ dojo.widget.defineWidget (
 
 			var offset = dojo.html.getScrollOffset();
 			var parent = dojo.style.getAbsolutePosition(this.domNode, true);
-			
+
 			if (this.isEnableX) {
 				var x = offset.x + e.clientX - parent.x;
 				if (x > this.domNode.offsetWidth) {
@@ -243,11 +243,11 @@ dojo.widget.defineWidget (
 		onDragMove: function(){
 			this.onValueChanged(this.getValueX(), this.getValueY());
 		},
-	
+
 		onClick: function(){
 			this.onValueChanged(this.getValueX(), this.getValueY());
 		},
-		
+
 		onValueChanged: function(x, y){
 		}
 	}
@@ -291,17 +291,17 @@ dojo.widget.defineWidget (
 				this.onValueChanged(this.getValue());
 			}
 		},
-	
+
 		onDragEnd: function(){
 			if(!this.activeDrag){
 				this.onValueChanged(this.getValue());
 			}
 		},
-	
+
 		onClick: function(){
 			this.onValueChanged(this.getValue());
 		},
-		
+
 		onValueChanged: function(value){
 			this.value=value;
 		}
@@ -345,17 +345,17 @@ dojo.widget.defineWidget (
 				this.onValueChanged(this.getValue());
 			}
 		},
-	
+
 		onDragEnd: function(){
 			if(!this.activeDrag){
 				this.onValueChanged(this.getValue());
 			}
 		},
-	
+
 		onClick: function(){
 			this.onValueChanged(this.getValue());
 		},
-		
+
 		onValueChanged: function(value){
 			this.value=value;
 		}
@@ -405,8 +405,8 @@ dojo.declare (
 		dragObj.slider = this.slider;
 
 		// this code copied from dojo.dnd.HtmlDragSource#onDragStart
-		if (this.dragClass) { 
-			dragObj.dragClass = this.dragClass; 
+		if (this.dragClass) {
+			dragObj.dragClass = this.dragClass;
 		}
 		if (this.constrainToContainer) {
 			dragObj.constrainTo(this.constrainingContainer || this.domNode.parentNode);
@@ -419,20 +419,20 @@ dojo.declare (
 		this.slider = slider;
 	},
 
-	
+
 	calcValueSizeX: function () {
 		var dragObj = this.createDragMoveObject ();
-		dragObj.containingBlockPosition = dragObj.domNode.offsetParent ? 
+		dragObj.containingBlockPosition = dragObj.domNode.offsetParent ?
 		dojo.style.getAbsolutePosition(dragObj.domNode.offsetParent) : {x:0, y:0};
-		
+
 		var constraints = dragObj.getConstraints ();
 		return (constraints.maxX - constraints.minX) / this.slider.valuesX;
 	},
 
-	
+
 	calcValueSizeY: function () {
 		var dragObj = this.createDragMoveObject ();
-		dragObj.containingBlockPosition = dragObj.domNode.offsetParent ? 
+		dragObj.containingBlockPosition = dragObj.domNode.offsetParent ?
 		dojo.style.getAbsolutePosition(dragObj.domNode.offsetParent) : {x:0, y:0};
 		var constraints = dragObj.getConstraints ();
 		return (constraints.maxY - constraints.minY) / this.slider.valuesY;
@@ -482,7 +482,7 @@ dojo.declare (
 			if (x > 0) {
 				selectedValue = Math.round (x / this.slider.valueSizeX);
 			}
-			// dojo.debug ("x = " + x + ", valueSize = " + valueSize 
+			// dojo.debug ("x = " + x + ", valueSize = " + valueSize
 			//             + ", selectedValue = " + selectedValue);
 			x = (selectedValue * this.slider.valueSizeX);
 		}

@@ -9,7 +9,7 @@ import javax.servlet.ServletRequest;
 
 /**
  * A minimal implementation of the MenuDao.
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */

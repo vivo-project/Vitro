@@ -133,13 +133,13 @@ public class GadgetSpec {
 	public boolean isEnabled() {
 		return enabled;
 	}
-	
+
 	// who sees it? Return the viewerReq for the ProfileDetails page
 	public char getVisibleScope() {
 		GadgetViewRequirements req = getGadgetViewRequirements("/display");
 		return req != null ? req.getViewerReq() : ' ';
 	}
-	
+
 	public String toString() {
 		return "" + this.appId + ":" + this.name + ":" + this.openSocialGadgetURL;
 	}

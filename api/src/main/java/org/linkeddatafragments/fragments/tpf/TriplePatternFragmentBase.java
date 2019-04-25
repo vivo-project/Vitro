@@ -125,7 +125,7 @@ abstract public class TriplePatternFragmentBase extends LinkedDataFragmentBase
 
         predicateMapping.addProperty( CommonResources.HYDRA_VARIABLE, ITriplePatternFragmentRequest.PARAMETERNAME_PRED );
         predicateMapping.addProperty( CommonResources.HYDRA_PROPERTY, CommonResources.RDF_PREDICATE );
-        
+
         objectMapping.addProperty( CommonResources.HYDRA_VARIABLE, ITriplePatternFragmentRequest.PARAMETERNAME_OBJ );
         objectMapping.addProperty( CommonResources.HYDRA_PROPERTY, CommonResources.RDF_OBJECT );
     }

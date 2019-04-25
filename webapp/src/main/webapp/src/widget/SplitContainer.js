@@ -395,7 +395,7 @@ dojo.lang.extend(dojo.widget.html.SplitContainer, {
 
 		dojo.event.disconnect(document.documentElement, "onmousemove", this, "changeSizing");
 		dojo.event.disconnect(document.documentElement, "onmouseup", this, "endSizing");
-		
+
 		if(this.persist){
 			this.saveState(this);
 		}
@@ -533,7 +533,7 @@ dojo.lang.extend(dojo.widget.html.SplitContainer, {
 		this.virtualSizer.style.left = origin.x + 'px';
 		this.virtualSizer.style.top = origin.y + 'px';
 	},
-	
+
 	_getCookieName: function(i) {
 		return this.widgetId + "_" + i;
 	},

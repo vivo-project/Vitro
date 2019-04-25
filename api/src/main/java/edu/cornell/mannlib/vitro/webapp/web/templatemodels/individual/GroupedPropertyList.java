@@ -83,48 +83,48 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // so we cannot just rely on getting that list.
         List<ObjectProperty> populatedObjectPropertyList = subject
                 .getPopulatedObjectPropertyList();
-         
+
         Map<String, List<String>> populatedObjTypes = makePopulatedObjTypeMap(
                 populatedObjectPropertyList);
-        
-        // save applicable ranges before deduping to filter later 
+
+        // save applicable ranges before deduping to filter later
         populatedObjectPropertyList = dedupe(populatedObjectPropertyList);
-                
+
         Collection<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
                 .getAdditionalFauxSubpropertiesForList(
                         populatedObjectPropertyList, subject, vreq);
-        
+
         additions = filterAdditions(additions, populatedObjTypes);
-         
+
         if (log.isDebugEnabled()) {
             for (ObjectProperty t : additions) {
                 log.debug("addition: " + t);
             }
-            log.debug("Added " + additions.size() + 
+            log.debug("Added " + additions.size() +
                     " properties due to application configuration ontology");
         }
-        
+
         populatedObjectPropertyList.addAll(additions);
-        
+
         propertyList.addAll(populatedObjectPropertyList);
-        
+
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
             propertyList = mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
-        
-        // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones 
+
+        // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones
         // rjy7 Currently we are getting the list of properties in one sparql query, then doing a separate query
-        // to get values for each property. This could be optimized by doing a single query to get a map of properties to 
+        // to get values for each property. This could be optimized by doing a single query to get a map of properties to
         // DataPropertyStatements. Note that this does not apply to object properties, because the queries
         // can be customized and thus differ from property to property. So it's easier for now to keep the
         // two working in parallel.
         List<DataProperty> populatedDataPropertyList = subject
                 .getPopulatedDataPropertyList();
         propertyList.addAll(populatedDataPropertyList);
-        
+
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
         }
@@ -132,7 +132,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
 
         // Put the list into groups
         List<PropertyGroup> propertyGroupList = addPropertiesToGroups(propertyList);
-        
+
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(
                 propertyGroupList.size());
@@ -141,13 +141,13 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     subject, editing, populatedDataPropertyList,
                     populatedObjectPropertyList));
         }
-        
+
         if (!editing) {
             pruneEmptyProperties();
         }
 
     }
-    
+
     private Map<String, List<String>> makePopulatedObjTypeMap(List<ObjectProperty> props) {
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         for (ObjectProperty prop : props) {
@@ -156,30 +156,30 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 if(typeList == null) {
                     typeList = new ArrayList<String>();
                     map.put(prop.getURI(), typeList);
-                } 
-                typeList.add(prop.getRangeVClassURI());                
+                }
+                typeList.add(prop.getRangeVClassURI());
             }
         }
         return map;
     }
-    
-    private List<ObjectProperty> filterAdditions(Collection<ObjectProperty> additions, 
+
+    private List<ObjectProperty> filterAdditions(Collection<ObjectProperty> additions,
             Map<String, List<String>> populatedObjTypes) {
         List<ObjectProperty> filteredAdditions = new ArrayList<ObjectProperty>();
         for (ObjectProperty prop : additions) {
             List<String> allowedTypes = populatedObjTypes.get(prop.getURI());
-            if(allowedTypes != null && (allowedTypes.contains(prop.getRangeVClassURI()) 
+            if(allowedTypes != null && (allowedTypes.contains(prop.getRangeVClassURI())
                     || allowedTypes.contains(prop.getRangeEntityURI()) ) ) {
                 filteredAdditions.add(prop);
             }
         }
         return filteredAdditions;
     }
-    
+
     // It's possible that an object property retrieved in the call to getPopulatedObjectPropertyList()
     // is now empty of statements, because if not editing, some statements without a linked individual
     // are not retrieved by the query. (See <linked-individual-required> elements in queries.)
-    // Remove these properties, and also remove any groups with no remaining properties. 
+    // Remove these properties, and also remove any groups with no remaining properties.
     private void pruneEmptyProperties() {
         Iterator<PropertyGroupTemplateModel> iGroups = groups.iterator();
         while (iGroups.hasNext()) {
@@ -203,8 +203,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
             }
         }
     }
-    
-    //assumes sorted list 
+
+    //assumes sorted list
     protected List<ObjectProperty> dedupe(List<ObjectProperty> propList) {
         List<ObjectProperty> dedupedList = new ArrayList<ObjectProperty>();
         String uriRegister = "";
@@ -230,15 +230,15 @@ public class GroupedPropertyList extends BaseTemplateModel {
             List<ObjectProperty> populatedObjectPropertyList,
             List<Property> propertyList) {
 
-        // There is no ObjectPropertyDao.getAllPossibleObjectPropertiesForIndividual() parallel to 
+        // There is no ObjectPropertyDao.getAllPossibleObjectPropertiesForIndividual() parallel to
         // DataPropertyDao.getAllPossibleDatapropsForIndividual(). The comparable method for object properties
         // is defined using PropertyInstance rather than ObjectProperty.
-        
-        // Getting Language-neutral WebappDaoFactory because the language-filtering 
+
+        // Getting Language-neutral WebappDaoFactory because the language-filtering
     	// breaks blank node structures in the restrictions that determine applicable properties.
         WebappDaoFactory wadf = vreq.getLanguageNeutralWebappDaoFactory();
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
-        
+
         Collection<PropertyInstance> allPossiblePI = piDao
                 .getAllPossiblePropInstForIndividual(subject.getURI());
         if (allPossiblePI != null) {
@@ -257,7 +257,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     	}
                     }
                     if(addToList) {
-                        propertyList.add(possibleOP);         
+                        propertyList.add(possibleOP);
                     }
                 } else {
                     log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
@@ -275,7 +275,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 addObjectPropertyToPropertyList(propertyUri, null, null, propertyList);
             }
         }
-        
+
         return propertyList;
     }
 
@@ -284,7 +284,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
 				LANGUAGE_NEUTRAL, POLICY_NEUTRAL);
 		ObjectPropertyDao opDao = rawWadf.getObjectPropertyDao();
 		FauxPropertyDao fpDao = rawWadf.getFauxPropertyDao();
-		
+
 		String base = pi.getPropertyURI();
 		String domain = pi.getDomainClassURI();
 		String range = pi.getRangeClassURI();
@@ -300,17 +300,17 @@ public class GroupedPropertyList extends BaseTemplateModel {
 		}
 		return op;
 	}
-    
+
 	/**
-	* Don't know what the real problem is with VIVO-976, but somehow we have the same property 
+	* Don't know what the real problem is with VIVO-976, but somehow we have the same property
 	* showing up once with a blank node as a domain, and once with null or OWL:Thing as a domain.
-	* 
+	*
 	* Similarly, don't know the real problem with VIVO-989, except that the ranges are both
 	* blank nodes - probably the same blank node but on two different reads.
-	* 
-	* For VIVO-1015, if op2 (the unpopulated property) is a Faux property, it will appear to 
+	*
+	* For VIVO-1015, if op2 (the unpopulated property) is a Faux property, it will appear to
 	* be not redundant because of the range difference, and that's what we want. But if op2
-	* (the unpopulated property) has a different range than op1 because of a restriction, 
+	* (the unpopulated property) has a different range than op1 because of a restriction,
 	* then we want to ignore that difference, so it appears to be redundant.
 	*/
 	private boolean redundant(ObjectProperty populatedOP, ObjectProperty possibleOP) {
@@ -318,18 +318,18 @@ public class GroupedPropertyList extends BaseTemplateModel {
 			new FullPropertyKey((Property)possibleOP))) {
 			return true;
 		} else if (
-			new FullPropertyKey(fudgeBlankNodeInDomain(populatedOP.getDomainVClassURI()), 
+			new FullPropertyKey(fudgeBlankNodeInDomain(populatedOP.getDomainVClassURI()),
 								populatedOP.getURI(),
 								populatedOP.getRangeVClassURI()).equals(
-			new FullPropertyKey(fudgeBlankNodeInDomain(possibleOP.getDomainVClassURI()), 
+			new FullPropertyKey(fudgeBlankNodeInDomain(possibleOP.getDomainVClassURI()),
 								possibleOP.getURI(),
 								possibleOP.getRangeVClassURI()))) {
 			return true;
 		} else if (
-			new FullPropertyKey(populatedOP.getDomainVClassURI(), 
+			new FullPropertyKey(populatedOP.getDomainVClassURI(),
 								populatedOP.getURI(),
 								fudgeBlankNodeInRange(populatedOP.getRangeVClassURI())).equals(
-			new FullPropertyKey(possibleOP.getDomainVClassURI(), 
+			new FullPropertyKey(possibleOP.getDomainVClassURI(),
 								possibleOP.getURI(),
 								fudgeBlankNodeInRange(possibleOP.getRangeVClassURI())))) {
 			return true;
@@ -337,7 +337,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             return !(possibleOP instanceof FauxObjectPropertyWrapper) &&
                     populatedOP.getURI().equals(possibleOP.getURI());
     }
-	
+
 	private String fudgeBlankNodeInDomain(String rawDomainUri) {
 		if (rawDomainUri == null) {
 			return null;
@@ -357,7 +357,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
 			return rawRangeUri;
 		}
 	}
-	
+
     private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,
             List<Property> propertyList) {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
@@ -449,7 +449,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
          */
         PropertyGroup groupForUnassignedProperties = pgDao
                 .createDummyPropertyGroup("", MAX_GROUP_DISPLAY_RANK);
-                
+
         if (groupCount > 1) {
             try {
                 Collections.sort(groupList);
@@ -479,7 +479,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // group list.
         if (groupForUnassignedProperties.getPropertyList().size() > 0) {
             groupList.add(groupForUnassignedProperties);
-            // If no real property groups are populated, the groupForUnassignedProperties 
+            // If no real property groups are populated, the groupForUnassignedProperties
             // moves from case 2 to case 1 above, so change the name to null
             // to signal to the templates that there are no real groups.
             if (groupCount == 0) {
@@ -519,7 +519,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                             pg.getPropertyList().add(p);
                             assignedToGroup = true;
                             break;
-                        }     
+                        }
                     }
                 }
 
@@ -570,7 +570,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
 
-    // Since we're now including some vitro properties in the property list, 
+    // Since we're now including some vitro properties in the property list,
     // which don't have labels, use their local name instead.
     private String getLabel(Property property) {
         String label = property.getLabel();
@@ -585,8 +585,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
     public List<PropertyGroupTemplateModel> getAll() {
         return groups;
     }
-    
-    
+
+
     /* Template methods */
 
     public PropertyTemplateModel getProperty(String propertyUri) {
@@ -618,13 +618,13 @@ public class GroupedPropertyList extends BaseTemplateModel {
     public PropertyTemplateModel pullProperty(String propertyUri) {
         return pullProperty(propertyUri, null);
     }
-    
+
     public PropertyTemplateModel pullProperty(String propertyUri, String rangeUri) {
 
         for (PropertyGroupTemplateModel pgtm : groups) {
             List<PropertyTemplateModel> properties = pgtm.getProperties();
             for (PropertyTemplateModel ptm : properties) {
-                if (propertyUri.equals(ptm.getUri()) && 
+                if (propertyUri.equals(ptm.getUri()) &&
                         (rangeUri == null || rangeUri.equals(ptm.getRangeUri()))) {
                     // Remove the property from the group.
                     // NB Works with a for-each loop instead of an iterator,
@@ -642,7 +642,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
         return null;
     }
-    
+
     public PropertyGroupTemplateModel pullPropertyGroup(String groupName) {
         for (PropertyGroupTemplateModel group : groups) {
             if (groupName.equals(group.getName())) {

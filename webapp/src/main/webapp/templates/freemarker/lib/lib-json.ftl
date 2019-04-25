@@ -3,9 +3,9 @@
 <#-- Macros for json output -->
 
 <#macro array data>
-[ 
+[
 <#if data??>
-    <#list data as obj>   
+    <#list data as obj>
         ${obj.json}<#if obj_has_next>,</#if>
     </#list>
 </#if>

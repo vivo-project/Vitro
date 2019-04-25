@@ -17,13 +17,13 @@ import freemarker.template.TemplateMethodModel;
 public abstract class BaseTemplateMethodModel implements TemplateMethodModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateMethodModel.class);
-    
+
     public abstract Map<String, Object> help(String name);
-    
+
     protected String mergeToHelpTemplate(Map<String, Object> map, Environment env) {
-        return processTemplateToString("help-method.ftl", map, env);        
+        return processTemplateToString("help-method.ftl", map, env);
     }
-    
+
     public static String processTemplateToString(String templateName, Map<String, Object> map, Environment env) {
         Template template = getTemplate(templateName, env);
         StringWriter sw = new StringWriter();
@@ -34,9 +34,9 @@ public abstract class BaseTemplateMethodModel implements TemplateMethodModel {
         } catch (IOException e) {
             log.error("IOException creating processing environment", e);
         }
-        return sw.toString();        
+        return sw.toString();
     }
-    
+
     private static Template getTemplate(String templateName, Environment env) {
         Template template = null;
         try {
@@ -44,8 +44,8 @@ public abstract class BaseTemplateMethodModel implements TemplateMethodModel {
         } catch (IOException e) {
             // RY Should probably throw this error instead.
             log.error("Cannot get template " + templateName, e);
-        }  
-        return template;        
+        }
+        return template;
     }
 
 }

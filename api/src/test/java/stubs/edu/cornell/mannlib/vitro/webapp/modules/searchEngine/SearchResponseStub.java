@@ -19,7 +19,7 @@ public class SearchResponseStub implements SearchResponse {
 	// ----------------------------------------------------------------------
 
 	public static final SearchResponseStub EMPTY_RESPONSE = null;
-	
+
 
 	// ----------------------------------------------------------------------
 	// Stub methods

@@ -26,16 +26,16 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 
 public class ApplicationBeanRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(ApplicationBeanRetryController.class.getName());
-	
+
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
 
 		if (!isAuthorizedToDisplayPage(req, response,
 				SimplePermission.EDIT_SITE_INFORMATION.ACTION)) {
         	return;
         }
-    	
+
     	VitroRequest request = new VitroRequest(req);
 
         try {
@@ -54,7 +54,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
         ApplicationDao aDao = request.getUnfilteredWebappDaoFactory().getApplicationDao();
         ApplicationBean applicationForEditing = aDao.getApplicationBean();
         epo.setDataAccessObject(aDao);
- 
+
         if (!epo.getUseRecycledBean()){
             action = "update";
             epo.setOriginalBean(applicationForEditing);
@@ -75,15 +75,15 @@ public class ApplicationBeanRetryController extends BaseEditController {
         foo.setErrorMap(epo.getErrMsgMap());
 
         HashMap optionMap = new HashMap();
-        
+
         List<Option> themeOptions = getThemeOptions(applicationForEditing);
         optionMap.put("ThemeDir", themeOptions);
-        
+
         foo.setOptionLists(optionMap);
 
         epo.setFormObject(foo);
         FormUtils.populateFormFromBean(applicationForEditing, epo.getAction(), foo);
-   
+
         request.setAttribute("formJsp","/templates/edit/specific/applicationBean_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Site Information");
@@ -102,22 +102,22 @@ public class ApplicationBeanRetryController extends BaseEditController {
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request, response);
     }
-    
+
     /**
      * Returns a list of Option objects for valid themes in the application, based on names of subdirectories
      * of the "/themes" directory.
-     * 
+     *
      * @return list of Options for valid themes
      */
     private final List<Option> getThemeOptions(ApplicationBean application) {
-    	 
+
     	// Get the available themes
     	ServletContext sc = getServletContext();
     	boolean doSort = true;
     	List<String> themeNames = ApplicationBean.themeInfo.getThemeNames();
 
         // Create the list of theme Options
-        String currentThemeDir = application.getThemeDir(); 
+        String currentThemeDir = application.getThemeDir();
         Iterator<String> i = themeNames.iterator();
         List<Option> themeOptions = new ArrayList<Option>(themeNames.size());
         String themeName, themeDir;
@@ -128,9 +128,9 @@ public class ApplicationBeanRetryController extends BaseEditController {
         	selected = themeDir.equals(currentThemeDir);
         	themeOptions.add(new Option(themeDir, themeName, selected));
         }
-        
+
         return themeOptions;
     }
-    
+
 }
 

@@ -18,10 +18,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 /**
  * The named models in the masking cache will be used in preference to a model
  * of the same name in the base cache.
- * 
+ *
  * If a named model doesn't exist in the masking cache, a warning is written to
  * the log and the name will be ignored.
- * 
+ *
  * New models are created in the base cache only.
  */
 public class MaskingOntModelCache implements OntModelCache {

@@ -8,7 +8,7 @@ import javax.servlet.ServletRequest;
 public interface MenuDao {
     /**
      * @param url - url of request for setting active menu items. This should start with a / and not have the context path.
-     * These values will be checked against urlMapping. ex. /people or /home 
+     * These values will be checked against urlMapping. ex. /people or /home
      */
     public MainMenu getMainMenu( String url);
 

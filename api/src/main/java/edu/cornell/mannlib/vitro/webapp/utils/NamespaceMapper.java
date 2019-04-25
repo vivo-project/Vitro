@@ -14,19 +14,19 @@ public interface NamespaceMapper extends ModelChangedListener {
 	 * @param namespace Namespace
 	 */
 	public String getPrefixForNamespace(String namespace);
-	
+
 	/**
 	 * Returns a list of abbreviations that have been used to
 	 * represent a given namespace.
 	 * @param namespace Namespace
 	 */
 	public List<String> getPrefixesForNamespace(String namespace);
-	
+
 	/**
 	 * Returns the full namespace URI represented by a given
 	 * abbreviation, or null if not found.
 	 * @param prefix Prefix
 	 */
 	public String getNamespaceForPrefix(String prefix);
-	
+
 }

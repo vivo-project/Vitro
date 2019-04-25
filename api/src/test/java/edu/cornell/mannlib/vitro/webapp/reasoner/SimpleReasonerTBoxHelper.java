@@ -17,23 +17,23 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 /**
  * We're using a simple OntModel as the TBox in the SimpleReasoner tests, so we
  * don't get tied to a particular TBox reasoner (like Pellet).
- * 
+ *
  * But the SimpleReasoner expects certain elementary reasoning, so these methods
  * impose that reasoning on the model.
- * 
+ *
  * On the model: Thing is a class.
- * 
+ *
  * On classes: Every class is equivalent to itself, a subclass of itself, and a
  * subclass of Thing. Every class is a subclass of all its ancestors and a
  * superclass of all its descendants. Every class has the same superclasses and
  * subclasses as do all of its equivalent classes.
- * 
+ *
  * On object properties: Every object property is equivalent to itself and a
  * subproperty of itself. Every object property has the same inverses as do all
  * of its equivalent properties.
- * 
+ *
  * ----------------------
- * 
+ *
  * It's a little silly to implement this as a parent class of the unit tests. It
  * would have been nicer to find a way that is more object-oriented but still
  * explicit in what "reasoning" is performed. This will do for now.
@@ -135,15 +135,15 @@ public class SimpleReasonerTBoxHelper extends AbstractTestClass {
 
 	/**
 	 * This has the potential for problems if we set this up:
-	 * 
+	 *
 	 * <pre>
 	 * A -> B -> C
-	 * 
+	 *
 	 * explicit add A -> C
-	 * 
+	 *
 	 * remove A -> B
 	 * </pre>
-	 * 
+	 *
 	 * But why would we do that?
 	 */
 	private void removeSubclass(Set<OntClass> equivalentParents,

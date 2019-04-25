@@ -57,7 +57,7 @@ public class InferenceModelUpdater {
 	/**
 	 * Synchronize the inferences model with the reasoner model, with this
 	 * proviso:
-	 * 
+	 *
 	 * If a statement exists anywhere in the full TBox, don't bother adding it
 	 * to the inferences model.
 	 */

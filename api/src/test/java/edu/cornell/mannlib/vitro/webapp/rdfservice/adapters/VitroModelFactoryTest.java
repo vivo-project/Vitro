@@ -36,31 +36,31 @@ import edu.cornell.mannlib.vitro.testing.RecordingProxy.MethodCallRecorder;
 /**
  * Test that the VitroModelFactory is doing what we want, with regard to bulk
  * updates.
- * 
+ *
  * With the switch to Jena 2.10, bulk update operations are deprecated, but
  * still supported, to a large extent. A Graph still has a bulk updater which
  * can be called for bulk operations (like adding multiple statements). However,
  * the default Model won't call the bulk updater of its Graph, and neither will
  * the default OntModel.
- * 
+ *
  * VitroModelFactory creates Models and OntModels that do call the bulk updaters
  * of their respective graphs.
- * 
+ *
  * ---------------
- * 
+ *
  * These tests show which methods are called on which objects (graph, model,
  * listener) for both simple operations (add a statement) and bulk operations
  * (add multiple statements).
- * 
+ *
  * The tests of the default ModelFactory aren't necessary. They do add
  * confidence to the testing mechanism, and provide a contrast with the
  * VitroModelFactory.
- * 
+ *
  * The tests of simple operations may or may not add value. Probably good to
  * keep them.
- * 
+ *
  * ----------------
- * 
+ *
  * Who knows how we will deal with this in the next Jena upgrade, when
  * presumably the bulk updaters will be removed completely.
  */
@@ -84,7 +84,7 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	/**
 	 * A ModelGroup has a talkative graph, with a talkative bulkUpdater, wrapped
 	 * by a model that has a talkative listener attached.
-	 * 
+	 *
 	 * But what kind of model?
 	 */
 	private static abstract class ModelGroup extends TestObjectGrouping {
@@ -164,7 +164,7 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	/**
 	 * An OntModelGroup is like a ModelGroup, but the model is wrapped in an
 	 * OntModel that has its own talkative listener.
-	 * 
+	 *
 	 * But what kind of Model, and what kind of OntModel?
 	 */
 	private static abstract class OntModelGroup extends ModelGroup {
@@ -256,7 +256,7 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	/**
 	 * A UnionModelGroup is two ModelGroups, joined into a union that has its
 	 * own talkative listener.
-	 * 
+	 *
 	 * But what kind of ModelGroup, and what kind of union?
 	 */
 	private abstract static class UnionModelGroup extends TestObjectGrouping {
@@ -359,7 +359,7 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	/**
 	 * A UnionOntModelGroup is two OntModelGroups, joined into a union that has
 	 * its own talkative listener.
-	 * 
+	 *
 	 * But what kind of OntModelGroup, and what kind of union?
 	 */
 	private abstract static class UnionOntModelGroup extends TestObjectGrouping {
@@ -467,7 +467,7 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	/**
 	 * A OntModelUnionModelGroup is a UnionModelGroup wrapped by an OntModel
 	 * with a listener.
-	 * 
+	 *
 	 * But what kind of UnionModelGroup, and what kind of OntModel?
 	 */
 	private abstract static class OntModelUnionModelGroup extends

@@ -10,12 +10,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
- * 
+ *
  */
 public class GetSearchIndividualsByVClass extends JsonObjectProducer {
 	private static final Log log = LogFactory
 			.getLog(GetSearchIndividualsByVClass.class);
-	
+
 	protected GetSearchIndividualsByVClass(VitroRequest vreq) {
 		super(vreq);
 	}
@@ -23,23 +23,23 @@ public class GetSearchIndividualsByVClass extends JsonObjectProducer {
 	@Override
 	protected ObjectNode process() throws Exception {
         VClass vclass = null;
-        
+
         String queryType = (String) vreq.getAttribute("queryType");
-        String vitroClassIdStr = vreq.getParameter("vclassId");            
-        if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
+        String vitroClassIdStr = vreq.getParameter("vclassId");
+        if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){
             vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
             if (vclass == null) {
-                log.debug("Couldn't retrieve vclass ");   
+                log.debug("Couldn't retrieve vclass ");
                 throw new Exception ("Class " + vitroClassIdStr + " not found");
-            }                           
+            }
         }else{
             log.debug("parameter vclassId URI parameter expected ");
             throw new Exception("parameter vclassId URI parameter expected ");
         }
-        
+
         vreq.setAttribute("displayType", vitroClassIdStr);
         if ( queryType != null && queryType.equals("random")){
-            return JsonServlet.getRandomSearchIndividualsByVClass(vclass.getURI(), vreq);             
+            return JsonServlet.getRandomSearchIndividualsByVClass(vclass.getURI(), vreq);
         } else {
             return JsonServlet.getSearchIndividualsByVClass(vclass.getURI(), vreq);
         }

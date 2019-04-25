@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * Check the ConfigurationProperties for a forced locale, or for a
  * comma-separate list of selectable locales.
- * 
+ *
  * Create the appropriate Locale objects and store them in the ServletContext.
  */
 public class LocaleSelectionSetup implements ServletContextListener {

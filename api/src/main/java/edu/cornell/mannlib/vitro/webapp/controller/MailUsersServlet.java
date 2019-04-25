@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 @WebServlet(name = "mailusers", urlPatterns = {"/mailusers"}, loadOnStartup = 5)
 public class MailUsersServlet extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(MailUsersServlet.class);
-	
+
     public static HttpServletRequest request;
     public static HttpServletRequest response;
 
@@ -43,7 +43,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         String   confirmpage    = "/confirmUserMail.jsp";
         String   errpage        = "/contact_err.jsp";
         String status = null; // holds the error status
-        
+
         if (!FreemarkerEmailFactory.isConfigured(vreq)) {
 			status = "This application has not yet been configured to send mail. "
 					+ "Email properties must be specified in the configuration properties file.";
@@ -77,13 +77,13 @@ public class MailUsersServlet extends VitroHttpServlet {
         List<String> deliverToArray = null;
         int recipientCount = 0;
         String deliveryfrom = null;
-        
+
         // get Individuals that the User mayEditAs
         deliverToArray = getEmailsForAllUserAccounts(vreq);
-        
+
         //Removed all form type stuff b/c recipients pre-configured
         recipientCount=(deliverToArray == null) ? 0 : deliverToArray.size();
-        
+
         if (recipientCount == 0) {
             //log.error("recipientCount is 0 when DeliveryType specified as \""+formType+"\"");
             throw new Error(
@@ -98,9 +98,9 @@ public class MailUsersServlet extends VitroHttpServlet {
         //webusername = "hjk54";
         //webuseremail = "hjk54@cornell.edu";
         //comments = "following are comments";
-        
+
        webusername=webusername.trim();
-       deliveryfrom = webuseremail; 
+       deliveryfrom = webuseremail;
        comments=comments.trim();
         //Removed spam filtering code
 
@@ -160,7 +160,7 @@ public class MailUsersServlet extends VitroHttpServlet {
             msg.setFrom( new InternetAddress( webuseremail ));
 
             // Set the recipient address
-            
+
             if (recipientCount>0){
                 InternetAddress[] address=new InternetAddress[recipientCount];
                 for (int i=0; i<recipientCount; i++){
@@ -208,10 +208,10 @@ public class MailUsersServlet extends VitroHttpServlet {
         }
 
     }
-    
+
 	private List<String> getEmailsForAllUserAccounts(VitroRequest vreq) {
 		UserAccountsDao uaDao = vreq.getWebappDaoFactory().getUserAccountsDao();
-		
+
 		List<String> emails = new ArrayList<String>();
 		for (UserAccount user : uaDao.getAllUserAccounts()) {
 			emails.add(user.getEmailAddress());

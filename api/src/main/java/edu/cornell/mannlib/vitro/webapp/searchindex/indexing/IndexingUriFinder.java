@@ -9,13 +9,13 @@ import org.apache.jena.rdf.model.Statement;
 /**
  * Interface to use with IndexBuilder to find more URIs to index given a changed
  * statement. The statement may have been added or removed from the model.
- * 
+ *
  * Implementing classes must be threadsafe, as multiple threads are used to
  * complete the task.
- * 
+ *
  * The life-cycle is as follows: startIndexing(), 0 or more calls to
  * findAdditionalURIsToIndex(), endIndexing().
- * 
+ *
  * Repeat as desired.
  */
 public interface IndexingUriFinder {
@@ -26,7 +26,7 @@ public interface IndexingUriFinder {
 	 * in the list will be updated by the IndexBuilder, which will handle URIs
 	 * of new individuals, URIs of individuals that have changes, and URIs of
 	 * individuals that have been removed from the model.
-	 * 
+	 *
 	 * @return List of URIs. Never return null.
 	 */
 	List<String> findAdditionalURIsToIndex(Statement stmt);

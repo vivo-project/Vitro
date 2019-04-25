@@ -19,18 +19,18 @@ public class EditConfigurationUtilsTest {
     public void testGetEditKey() {
         HttpServletRequestStub req = new HttpServletRequestStub();
         req.addParameter("datapropKey", "2343");
-        
+
         Integer hash = EditConfigurationUtils.getDataHash(new VitroRequest(req));
         Assert.assertNotNull(hash);
         Assert.assertEquals(new Integer(2343), hash);
-        
-        
-        req = new HttpServletRequestStub();        
-        
+
+
+        req = new HttpServletRequestStub();
+
         hash = EditConfigurationUtils.getDataHash(new VitroRequest(req));
         Assert.assertNull( hash);
-        
-        
+
+
     }
 
 }

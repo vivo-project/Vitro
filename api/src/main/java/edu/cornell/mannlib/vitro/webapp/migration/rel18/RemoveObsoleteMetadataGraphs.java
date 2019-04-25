@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * The graphs http://vitro.mannlib.cornell.edu/ns/vitro/sdb/metadata were used
  * in Content models through release 1.7 and in Configuration models in release
  * 1.7
- * 
+ *
  * In release 1.8, they area no longer used, and produce annoying warning
  * messages.
  */

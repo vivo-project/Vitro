@@ -22,12 +22,12 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
  * If a class changes classgroups, then all members of that class
  * will have to be update in the search since the serach include
  * the clasgroup membership of all individuals.
- * 
- * Ex. when a statement like: 
- * sub='http://vivoweb.org/ontology/core#Summer&#39; 
- * pred='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#inClassGroup&#39; 
- * obj='http://vivoweb.org/ontology#vitroClassGrouppeople&#39; 
- * changes, all members of the class core:Summer need to be update so they get the new classgroup values. 
+ *
+ * Ex. when a statement like:
+ * sub='http://vivoweb.org/ontology/core#Summer&#39;
+ * pred='http://vitro.mannlib.cornell.edu/ns/vitro/0.7#inClassGroup&#39;
+ * obj='http://vivoweb.org/ontology#vitroClassGrouppeople&#39;
+ * changes, all members of the class core:Summer need to be update so they get the new classgroup values.
  */
 public class AdditionalURIsForClassGroupChanges implements IndexingUriFinder, ContextModelsUser {
 
@@ -40,10 +40,10 @@ public class AdditionalURIsForClassGroupChanges implements IndexingUriFinder, Co
 
     @Override
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
-        if( stmt != null 
-            && VitroVocabulary.IN_CLASSGROUP.equals( stmt.getPredicate().getURI() ) 
+        if( stmt != null
+            && VitroVocabulary.IN_CLASSGROUP.equals( stmt.getPredicate().getURI() )
             && stmt.getSubject() != null ){
-            // its a classgroup membership change for a class, 
+            // its a classgroup membership change for a class,
             // update all individuals from the class.
             List<String> uris = new ArrayList<String>();
             model.enterCriticalSection(Lock.READ);
@@ -63,7 +63,7 @@ public class AdditionalURIsForClassGroupChanges implements IndexingUriFinder, Co
             return Collections.emptyList();
         }
     }
-    
+
     @Override
     public void startIndexing() { /* nothing to prepare */ }
 
