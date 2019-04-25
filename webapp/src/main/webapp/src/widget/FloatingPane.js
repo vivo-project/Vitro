@@ -79,20 +79,20 @@ dojo.lang.extend(dojo.widget.html.FloatingPane, {
 			this.titleBarIcon.src = this.iconSrc.toString();// dojo.uri.Uri obj req. toString()
 		}
 
-		if(this.titleBarDisplay!="none"){	
+		if(this.titleBarDisplay!="none"){
 			this.titleBar.style.display="";
 			dojo.html.disableSelection(this.titleBar);
 
 			this.titleBarIcon.style.display = (this.iconSrc=="" ? "none" : "");
 
 			this.minimizeAction.style.display = (this.displayMinimizeAction ? "" : "none");
-			this.maximizeAction.style.display= 
+			this.maximizeAction.style.display=
 				(this.displayMaximizeAction && this.windowState!="maximized" ? "" : "none");
-			this.restoreAction.style.display= 
+			this.restoreAction.style.display=
 				(this.displayMaximizeAction && this.windowState=="maximized" ? "" : "none");
 			this.closeAction.style.display= (this.displayCloseAction ? "" : "none");
 
-			this.drag = new dojo.dnd.HtmlDragMoveSource(this.domNode);	
+			this.drag = new dojo.dnd.HtmlDragMoveSource(this.domNode);
 			if (this.constrainToContainer) {
 				this.drag.constrainTo();
 			}
@@ -184,7 +184,7 @@ dojo.lang.extend(dojo.widget.html.FloatingPane, {
 
 	restoreWindow: function(evt) {
 		if (this.windowState=="minimized") {
-			this.show() 
+			this.show()
 		} else {
 			for(var attr in this.previous){
 				this.domNode.style[attr] = this.previous[attr];
@@ -220,7 +220,7 @@ dojo.lang.extend(dojo.widget.html.FloatingPane, {
 		windows.sort(function(a,b) {
 			return a.domNode.style.zIndex - b.domNode.style.zIndex;
 		});
-		
+
 		windows.push(this);
 
 		var floatingPaneStartingZ = 100;
@@ -288,7 +288,7 @@ dojo.lang.extend(dojo.widget.html.FloatingPane, {
 
 		// If any of the children have layoutAlign specified, obey it
 		dojo.html.layout(this.containerNode, this.children, "top-bottom");
-		
+
 		this.bgIframe.onResized();
 		if(this.shadow){ this.shadow.size(w, h); }
 		this.onResized();

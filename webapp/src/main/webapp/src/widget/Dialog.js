@@ -24,7 +24,7 @@ dojo.widget.defineWidget(
 		templatePath: dojo.uri.dojoUri("src/widget/templates/HtmlDialog.html"),
 		isContainer: true,
 		_scrollConnected: false,
-		
+
 		// provide a focusable element or element id if you need to
 		// work around FF's tendency to send focus into outer space on hide
 		focusElement: "",
@@ -96,7 +96,7 @@ dojo.widget.defineWidget(
 			this.bg.style.backgroundColor = color.toString();
 			return this.bgColor = color;
 		},
-		
+
 		setBackgroundOpacity: function(op) {
 			if(arguments.length == 0) { op = this.bgOpacity; }
 			dojo.style.setOpacity(this.bg, op);
@@ -158,7 +158,7 @@ dojo.widget.defineWidget(
 				this._scrollConnected = true;
 				dojo.event.connect(window, "onscroll", this, "onScroll");
 			}
-			
+
 			if(this.lifetime){
 				this.timeRemaining = this.lifetime;
 				if(!this.blockDuration){
@@ -187,18 +187,18 @@ dojo.widget.defineWidget(
 			// the dialog after the data is loaded
 			this.placeDialog();
 		},
-		
+
 		fillInTemplate: function(){
 			// dojo.event.connect(this.domNode, "onclick", this, "killEvent");
 		},
 
 		hide: function(){
 			// workaround for FF focus going into outer space
-			if (this.focusElement) { 
-				dojo.byId(this.focusElement).focus(); 
+			if (this.focusElement) {
+				dojo.byId(this.focusElement).focus();
 				dojo.byId(this.focusElement).blur();
 			}
-			
+
 			if(this.timer){
 				clearInterval(this.timer);
 			}
@@ -213,7 +213,7 @@ dojo.widget.defineWidget(
 				dojo.event.disconnect(window, "onscroll", this, "onScroll");
 			}
 		},
-		
+
 		setTimerNode: function(node){
 			this.timerNode = node;
 		},
@@ -226,7 +226,7 @@ dojo.widget.defineWidget(
 		setShowControl: function(node) {
 			dojo.event.connect(node, "onclick", this, "show");
 		},
-		
+
 		onTick: function(){
 			if(this.timer){
 				this.timeRemaining -= 100;
@@ -259,7 +259,7 @@ dojo.widget.defineWidget(
 				this.onResized();
 			}
 		},
-		
+
 		killEvent: function(evt){
 			evt.preventDefault();
 			evt.stopPropagation();

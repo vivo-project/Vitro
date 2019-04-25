@@ -21,22 +21,22 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 @WebServlet(name = "Properties2PropertiesOperationController", urlPatterns = {"/props2PropsOp"} )
 public class Properties2PropertiesOperationController extends
 		BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(Properties2PropertiesOperationController.class.getName());
 
 	private static final boolean ADD = false;
 	private static final boolean REMOVE = true;
-	
+
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
-    	
+
     	String defaultLandingPage = getDefaultLandingPage(req);
-    	
+
     	try {
 			VitroRequest request = new VitroRequest(req);
-		    
+
 		    HashMap epoHash = null;
 		    EditProcessObject epo = null;
 		    try {
@@ -52,7 +52,7 @@ public class Properties2PropertiesOperationController extends
 		        }
 		        return;
 		    }
-		
+
 		    if (epo == null) {
 		        log.debug("null epo");
 		        try {
@@ -62,9 +62,9 @@ public class Properties2PropertiesOperationController extends
 		        }
 		        return;
 		    }
-		    
+
 		    // get parameters from request
-		   	        
+
 		    String modeStr = request.getParameter("opMode");
 		    modeStr = (modeStr == null) ? "" : modeStr;
 		    String operationStr = request.getParameter("operation");
@@ -77,14 +77,14 @@ public class Properties2PropertiesOperationController extends
 		    	throw new IllegalArgumentException(
 		    	    "request parameter 'operation' must have value 'add' or 'remove'");
 		    }
-		    	    
+
 		    if (request.getParameter("_cancel") == null) {
 		    	doEdit(modeStr, operation, request);
 		    }
-		    	     
+
 		    //if no page forwarder was set, just go back to referring page:
 		    //the referer stuff all will be changed so as not to rely on the HTTP header
-		    
+
 		    String referer = epo.getReferer();
 		    if (referer == null) {
 		        try {
@@ -108,21 +108,21 @@ public class Properties2PropertiesOperationController extends
 	    }
 
     }
-    
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-    	
+
     	String defaultLandingPage = getDefaultLandingPage(request);
-    	
+
     	try {
             response.sendRedirect(defaultLandingPage);
         } catch (IOException e) {
             log.error("Unable to redirect to default landing page", e);
         }
     }
-    
+
     private void doEdit(String modeStr, boolean operation, VitroRequest request) {
     	PropertyDao opDao = request.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
-   	 
+
         if (operation == REMOVE) {
             String[] subpropertyURIstrs = request.getParameterValues("SubpropertyURI");
             if ((subpropertyURIstrs != null) && (subpropertyURIstrs.length > 1)) {
@@ -156,7 +156,7 @@ public class Properties2PropertiesOperationController extends
         		opDao.addSuperproperty(request.getParameter("SubpropertyURI"), request.getParameter("SuperpropertyURI"));
         	}
         }
-    
+
     }
-	
+
 }

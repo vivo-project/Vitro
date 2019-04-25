@@ -20,7 +20,7 @@ dojo.widget.tags.addParseTreeHandler("dojo:MenuItem");
 
 /* MenuItem
  ***********/
- 
+
 dojo.widget.MenuItem = function(){
 	dojo.widget.MenuItem.superclass.constructor.call(this);
 }

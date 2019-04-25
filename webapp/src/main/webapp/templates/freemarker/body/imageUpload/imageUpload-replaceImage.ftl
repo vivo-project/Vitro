@@ -16,11 +16,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.cs
             <p>${errorMessage}</p>
         </section>
     </#if>
-    
+
     <section id="photoUploadDefaultImage" role="region">
         <h3>${i18n.current_photo}</h3>
             <img src="${thumbnailUrl}" width="115" alt="${i18n.alt_thumbnail_photo}" />
-            
+
             <a class="thumbnail" href="${deleteUrl}">${i18n.delete_link}</a>
     </section>
 
@@ -30,7 +30,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.cs
         <input type="file" name="datafile" size="30">
          <p class="note">${i18n.maximum_file_size(maxFileSize)}<br />
         ${i18n.minimum_image_dimensions(thumbnailWidth, thumbnailHeight)}</p>
-        <input class="submit" type="submit" value="${i18n.submit_upload}"> 
+        <input class="submit" type="submit" value="${i18n.submit_upload}">
 
         <span class="or"> ${i18n.or} <a class="cancel"  href="${cancelUrl}" title="${i18n.cancel_title}">${i18n.cancel_link}</a></span>
      </form>

@@ -22,7 +22,7 @@ import org.apache.jena.rdf.model.Resource;
 /**
  * Build a model of inferred statements by walking through the ontology as
  * represented in the reasoner.
- * 
+ *
  * TODO Get rid of the kluges. Either decide that they are not necessary, or
  * give them full status.
  */

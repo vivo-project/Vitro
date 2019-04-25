@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 @WebServlet(name = "VclassRetryController", urlPatterns = {"/vclass_retry"} )
 public class VclassRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(VclassRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
@@ -48,7 +48,7 @@ public class VclassRetryController extends BaseEditController {
         }
 
     	VitroRequest request = new VitroRequest(req);
-    	
+
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
 
@@ -67,7 +67,7 @@ public class VclassRetryController extends BaseEditController {
         }
 
         WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
-        
+
         VClassDao vcwDao = wadf.getVClassDao();
         epo.setDataAccessObject(vcwDao);
         VClassGroupDao cgDao = wadf.getVClassGroupDao();
@@ -146,9 +146,9 @@ public class VclassRetryController extends BaseEditController {
             log.error(this.getClass().getName() + "unable to create Namespace option list");
         }
 
-        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(vclassForEditing));    
+        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(vclassForEditing));
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(vclassForEditing));
-        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(vclassForEditing));    
+        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(vclassForEditing));
 
         FormObject foo = new FormObject();
         foo.setErrorMap(epo.getErrMsgMap());
@@ -193,7 +193,7 @@ public class VclassRetryController extends BaseEditController {
             Classes2Classes c2c = new Classes2Classes();
             c2c.setSubclassURI(((VClass)newObj).getURI());
             c2c.setSuperclassURI(superclassURI);
-            daoFactory.getVClassDao().insertNewClasses2Classes(c2c);            
+            daoFactory.getVClassDao().insertNewClasses2Classes(c2c);
         }
         public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
             // nothing to do

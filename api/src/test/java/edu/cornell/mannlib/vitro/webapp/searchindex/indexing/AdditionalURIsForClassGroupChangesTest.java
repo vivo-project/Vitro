@@ -37,40 +37,40 @@ public class AdditionalURIsForClassGroupChangesTest {
     public void testFindAdditionalURIsToIndex() {
         OntModel model = ModelFactory.createOntologyModel();
         model.read( new StringReader(n3ForPresentationClass), null,  "N3");
-        
+
         ContextModelAccessStub models = new ContextModelAccessStub();
         models.setOntModel(ModelNames.TBOX_ASSERTIONS, model);
-        
+
         AdditionalURIsForClassGroupChanges uriFinder = new AdditionalURIsForClassGroupChanges( );
         uriFinder.setContextModels(models);
-        
-        List<String> uris = uriFinder.findAdditionalURIsToIndex( 
+
+        List<String> uris = uriFinder.findAdditionalURIsToIndex(
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource("http://vivoweb.org/ontology/core#Presentation"),
                         ResourceFactory.createProperty(VitroVocabulary.IN_CLASSGROUP),
                         ResourceFactory.createResource("http://example.com/someClassGroup")));
-        
+
         Assert.assertNotNull(uris);
         Assert.assertTrue("uris list is empty", uris.size() > 0 );
-        
+
         Assert.assertTrue(uris.contains("http://vivo.scripps.edu/individual/n400"));
         Assert.assertTrue(uris.contains("http://vivo.scripps.edu/individual/n12400"));
         Assert.assertTrue(uris.contains("http://vivo.scripps.edu/individual/n210"));
         Assert.assertTrue(uris.contains("http://vivo.scripps.edu/individual/n264"));
         Assert.assertTrue(uris.contains("http://vivo.scripps.edu/individual/n25031"));
         Assert.assertTrue(uris.contains("http://vivo.scripps.edu/individual/n2486"));
-        
+
         Assert.assertTrue("uris list should not contain n9999",!uris.contains("http://vivo.scripps.edu/individual/n9999"));
         Assert.assertTrue("uris list should not contain n9998",!uris.contains("http://vivo.scripps.edu/individual/n9998"));
-        
+
 //        Assert.assertTrue("uris didn't not contain test:onions", uris.contains(testNS+"onions"));
 //        Assert.assertTrue("uris didn't not contain test:cheese", uris.contains(testNS+"cheese"));
 //        Assert.assertTrue("uris didn't not contain test:icecream", uris.contains(testNS+"icecream"));
-//        
+//
 //        Assert.assertTrue("uris contained test:Person", !uris.contains(testNS+"Person"));
-//        Assert.assertTrue("uris contained owl:Thing", !uris.contains( OWL.Thing.getURI() ));        
+//        Assert.assertTrue("uris contained owl:Thing", !uris.contains( OWL.Thing.getURI() ));
     }
-String n3ForPresentationClass = 
+String n3ForPresentationClass =
     "@prefix dc:      <http://purl.org/dc/elements/1.1/> . \n" +
     "@prefix pvs:     <http://vivoweb.org/ontology/provenance-support#> . \n" +
     "@prefix geo:     <http://aims.fao.org/aos/geopolitical.owl#> . \n" +
@@ -136,16 +136,16 @@ String n3ForPresentationClass =
     "      a       core:Presentation ; \n" +
     "      vitro:mostSpecificType \n" +
     "              core:Presentation . \n" +
-    " \n " + 
+    " \n " +
     "<http://vivo.scripps.edu/individual/n9998> \n" +
-    "      a       core:BogusClass . \n" +   
+    "      a       core:BogusClass . \n" +
     "<http://vivo.scripps.edu/individual/n9999> \n" +
     "      a       core:BogusClass . \n" +
-    " \n" +    
+    " \n" +
     "core:InvitedTalk \n" +
     "      rdfs:subClassOf core:Presentation . \n" +
     " \n" ;
- 
-   
-  
+
+
+
 }

@@ -33,37 +33,37 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 
 /**
  * On creation, populate a map of PropertyRestrictionLevels.
- * 
+ *
  * When a change is detected, update the map accordingly.
- * 
+ *
  * ------------------------------
- * 
+ *
  * How is authorization determined?
- * 
+ *
  * Resources are easy. If they aren't in a prohibited namespace, or are an
  * exception to the prohibition, they are accessible.
- * 
+ *
  * Properties are harder. The prohibited namespace and exceptions still apply,
  * but if we pass that test, then we check the threshold map.
- * 
+ *
  * When a test is made, we look for thresholds in the map. First we look for the
  * full key of domain-base-range, in case we are testing a faux property. Faux
  * properties are recorded in the map with the full key.
- * 
+ *
  * If we don't find the full key, then perhaps we are testing a faux property
  * that has no settings, or perhaps we are testing an object property. We look
  * for the partial key of null-base-null, which covers both of these cases,
  * since object properties (and data properties) are recorded the map with a
  * partial key.
- * 
+ *
  * Similarly, if we find a null threshold value in the full key, we look back to
  * the partial key for a threshold.
- * 
+ *
  * If we find no non-null threshold value then the property is unrestricted for
  * that feature.
- * 
+ *
  * -----------------------------
- * 
+ *
  * It would perhaps be a silly optimization, but if we find a key with 3 null
  * thresholds, we could remove it from the map without changing the behavior.
  */

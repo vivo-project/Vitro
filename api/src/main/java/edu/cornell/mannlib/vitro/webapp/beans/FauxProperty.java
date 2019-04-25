@@ -45,7 +45,7 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	/**
 	 * Arguments are in this order to mimic the relationship: subject ==&gt;
 	 * property ==&gt; object
-	 * 
+	 *
 	 * @param domainURI
 	 *            URI of the subject class. May be null.
 	 * @param baseURI

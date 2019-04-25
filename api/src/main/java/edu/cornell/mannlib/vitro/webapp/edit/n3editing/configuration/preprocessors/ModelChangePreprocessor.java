@@ -9,5 +9,5 @@ import javax.servlet.http.HttpServletRequest;
 public interface ModelChangePreprocessor {
 
 	public abstract void preprocess ( Model retractionsModel, Model additionsModel, HttpServletRequest request );
-	
+
 }

@@ -18,26 +18,26 @@ import org.apache.jena.sdb.StoreDesc;
 public class SDBGraphGenerator implements SQLGraphGenerator {
 
 	private static final Log log = LogFactory.getLog(SDBGraphGenerator.class.getName());
-	
+
 	private SDBGraphConnectionGenerator connGen;
     private Connection connection;
     private StoreDesc storeDesc;
     private String graphID;
-    
+
     public SDBGraphGenerator(DataSource dataSource, StoreDesc storeDesc,
     							String graphID) {
     	this.connGen = new SDBGraphConnectionGenerator(dataSource);
     	this.storeDesc = storeDesc;
     	this.graphID = graphID;
     }
-    
-    public SDBGraphGenerator(SDBGraphConnectionGenerator connectionGenerator, 
+
+    public SDBGraphGenerator(SDBGraphConnectionGenerator connectionGenerator,
             StoreDesc storeDesc, String graphID) {
     	this.connGen = connectionGenerator;
     	this.storeDesc = storeDesc;
     	this.graphID = graphID;
     }
-    
+
     public boolean isGraphClosed() {
     	try {
     		return (connection == null || connection.isClosed());
@@ -50,14 +50,14 @@ public class SDBGraphGenerator implements SQLGraphGenerator {
         try {
         	this.connection = connGen.generateConnection();
             Store store = SDBFactory.connectStore(connection, storeDesc);
-            return SDBFactory.connectNamedGraph(store, graphID); 
+            return SDBFactory.connectNamedGraph(store, graphID);
         } catch (SQLException e) {
-            String errMsg = "Unable to generate SDB graph"; 
+            String errMsg = "Unable to generate SDB graph";
             log.error(errMsg, e);
             throw new RuntimeException(errMsg, e);
         }
     }
-    	
+
 	public Connection getConnection() {
 		return connection;
 	}

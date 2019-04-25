@@ -8,21 +8,21 @@
     <head>
         <title>${subject}</title>
     </head>
-    
+
     <body>
         <h3>${subject}</h3>
-        
+
         <p><strong>${i18n().from_capitalized}:</strong> ${name}</p>
 
         <p><strong>${i18n().email_address}:</strong> ${emailAddress}</p>
-            
+
         <p>
             <strong>${i18n().ip_address}:</strong> ${ip}<br />
             <#if referrer??>
                 <em>${i18n().viewing_page}: ${referrer}</em>
             </#if>
-        </p>  
-        
+        </p>
+
         <p><strong>${i18n().comments}:</strong> ${comments}</p>
     </body>
 </html>

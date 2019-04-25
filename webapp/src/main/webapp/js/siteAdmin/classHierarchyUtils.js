@@ -1,5 +1,5 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
-  
+
     var classHierarchyUtils = {
     onLoad: function(urlBase,displayOption) {
         $.extend(this, i18nStrings);
@@ -24,8 +24,8 @@
         this.bindEventListeners();
     },
 
-    initObjects: function() { 
-        this.expandAll = $('span#expandAll').find('a');   
+    initObjects: function() {
+        this.expandAll = $('span#expandAll').find('a');
         this.classCounter = 1;
         this.expandCounter = 1;
         this.classHtml = "";
@@ -44,7 +44,7 @@
             else if ( classHierarchyUtils.select.val() == "group") {
                 classHierarchyUtils.form.attr("action", "listGroups");
             }
-            
+
             classHierarchyUtils.form.submit();
         });
         this.addClass.click(function() {
@@ -58,8 +58,8 @@
 
         if ( this.displayOption == "group" ) {
             this.expandAll.click(function() {
-            
-                if ( classHierarchyUtils.expandAll.text() == i18nStrings.hideSubclasses ) { 
+
+                if ( classHierarchyUtils.expandAll.text() == i18nStrings.hideSubclasses ) {
                     $('td.subclassCell').parent('tr').hide();
                     $('table.innerDefinition').hide();
                     classHierarchyUtils.expandAll.text(i18nStrings.showSubclasses);
@@ -70,10 +70,10 @@
                     classHierarchyUtils.expandAll.text(i18nStrings.hideSubclasses);
                 }
             });
-        }        
-        
+        }
+
     },
-     
+
     buildClassHierarchyHtml: function() {
 
         $.each(json, function() {
@@ -83,15 +83,15 @@
             var descendants = "";
             var headerSpan = "";
             var closingTable = "</table>";
-            
+
             if ( this.children.length ) {
                 descendants = classHierarchyUtils.getTheChildren(this);
                 closingTable = "";
-                headerSpan = "<span class='headerSpanPlus' id='headerSpan" + classHierarchyUtils.classCounter 
+                headerSpan = "<span class='headerSpanPlus' id='headerSpan" + classHierarchyUtils.classCounter
                               + "' view='less'>&nbsp;</span>";
             }
 
-            classHierarchyUtils.classHtml += "<div>" + this.name + headerSpan + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
+            classHierarchyUtils.classHtml += "<div>" + this.name + headerSpan + "</div>" + "<table class='classHierarchy' id='classHierarchy"
                                       + classHierarchyUtils.classCounter + "'>" ;
 
             if ( this.data.shortDef.length > 0 ) {
@@ -104,11 +104,11 @@
 
             classHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.ontologyString + ":</td><td class='subclassCell'>" + this.data.ontology + "</td></tr>";
 
- 
+
             if ( descendants.length > 1 ) {
                 descendants = descendants.substring(0, descendants.length - 10);
             }
-            
+
             classHierarchyUtils.classHtml += descendants;
 
             classHierarchyUtils.classHtml += closingTable;
@@ -121,7 +121,7 @@
             classHierarchyUtils.classHtml = "";
             classHierarchyUtils.classCounter += 1;
         });
-        
+
     },
 
     getTheChildren: function(node) {
@@ -136,22 +136,22 @@
             else {
                 childDetails += "<tr><td></td>" ;
             }
-            
+
             if ( this.children.length == 1 ) {
-                subclassString += "<span style='font-size:0.8em'> (1 subclass)</span>"; 
+                subclassString += "<span style='font-size:0.8em'> (1 subclass)</span>";
             }
             else if ( this.children.length > 1 ) {
                 subclassString += "<span style='font-size:0.8em'> (" + this.children.length + " subclasses)</span>";
             }
-            childDetails += "<td class='subclassCell'><span class='subclassExpandPlus' id='subclassExpand" 
-                            + classHierarchyUtils.expandCounter + "'>&nbsp;</span>" 
-                            + this.name + subclassString + "</td></tr><tr><td></td><td><table id='subclassTable" 
+            childDetails += "<td class='subclassCell'><span class='subclassExpandPlus' id='subclassExpand"
+                            + classHierarchyUtils.expandCounter + "'>&nbsp;</span>"
+                            + this.name + subclassString + "</td></tr><tr><td></td><td><table id='subclassTable"
                             + classHierarchyUtils.expandCounter + "' class='subclassTable'>";
             subclassString = " ";
             classHierarchyUtils.clickableSpans.push('subclassExpand' + classHierarchyUtils.expandCounter);
-            
+
             classHierarchyUtils.expandCounter += 1;
-            
+
             if ( this.data.shortDef.length > 0 ) {
                 childDetails += "<tr><td colspan='2'>" + this.data.shortDef + "</td></tr>";
             }
@@ -170,7 +170,7 @@
         childDetails += "</table></td></tr>";
         return childDetails;
     },
-    
+
     makeHeaderSpansClickable: function(ctr) {
 
         var $clickableHeader = $('section#classContainer' + ctr).find('span.headerSpanPlus');
@@ -190,7 +190,7 @@
             }
         });
     },//    $('myOjbect').css('background-image', 'url(' + imageUrl + ')');
-    
+
     makeSubclassSpansClickable: function() {
         $.each(classHierarchyUtils.clickableSpans, function() {
             var currentSpan = this;
@@ -211,7 +211,7 @@
             });
         });
     },
-    
+
     wireExpandLink: function() {
         this.expandAll.click(function() {
             if ( classHierarchyUtils.expandAll.text() == i18nStrings.expandAll ) {
@@ -230,15 +230,15 @@
             }
         });
     },
-     
+
     buildAllClassesHtml: function() {
 
         $.each(json, function() {
             $newClassSection = jQuery("<section></section>", {
                 id: "classContainer" + classHierarchyUtils.classCounter
             });
-            
-            classHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
+
+            classHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy"
                                       + classHierarchyUtils.classCounter + "'>" ;
 
             if ( this.data.shortDef.length > 0 ) {
@@ -267,7 +267,7 @@
                 id: "classContainer" + classHierarchyUtils.classCounter
             });
             var descendants = "";
-            
+
             if ( this.children.length ) {
                 var ctr = 0;
                 $.each(this.children, function() {
@@ -281,18 +281,18 @@
 
                     descendants += "<td class='subclassCell'>" + this.name + "</td></tr>";
                     descendants += "<tr><td></td><td><table class='innerDefinition'><tr><td>" + this.data.shortDef + "</td></tr></table></td></tr>";
-                    
+
                 });
                 descendants += "</table></td></tr>";
             }
 
-            classHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
+            classHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy"
                                       + classHierarchyUtils.classCounter + "'>" ;
 
             if ( this.data.displayRank.length > 0 ) {
                 classHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.displayRank + ":</td><td>" + this.data.displayRank + "</td></tr>"
             }
- 
+
             classHierarchyUtils.classHtml += descendants;
 
             classHierarchyUtils.classHtml += "</table>";

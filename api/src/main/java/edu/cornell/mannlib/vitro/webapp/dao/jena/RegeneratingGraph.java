@@ -24,25 +24,25 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 public class RegeneratingGraph implements Graph, Regenerable {
 
 	private final static Log log = LogFactory.getLog(RegeneratingGraph.class);
-	
+
 	private GraphGenerator generator;
 	private Graph g;
-	
+
 	public RegeneratingGraph(GraphGenerator graphGenerator) {
 		this.generator = graphGenerator;
 		regenerate();
 	}
-	
+
 	public RegeneratingGraph(Graph initGraph, GraphGenerator graphGenerator) {
 		this.g = initGraph;
 		this.generator = graphGenerator;
 	}
-	
+
 	@Override
 	public void regenerate() {
 		this.g = generator.generateGraph();
-	}	
-	
+	}
+
 	/*
 	 * a nonsense query that should never send back actual result data
 	 */
@@ -55,7 +55,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	protected void finalize() {
 		close();
 	}
-	
+
 	@Override
 	public void close() {
         try {
@@ -65,7 +65,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
             g.close();
         }
 	}
-	
+
 	@Override
 	public boolean contains(Triple arg0) {
 		try {
@@ -76,7 +76,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
             return g.contains(arg0);
         }
 	}
-	
+
 	@Override
 	public boolean contains(Node arg0, Node arg1, Node arg2) {
 		try {
@@ -87,11 +87,11 @@ public class RegeneratingGraph implements Graph, Regenerable {
             return g.contains(arg0, arg1, arg2);
         }
 	}
-	
+
 	@Override
 	public void delete(Triple arg0) throws DeleteDeniedException {
 		try {
-			regenerateIfClosed();			
+			regenerateIfClosed();
             g.delete(arg0);
         } catch (Exception e) {
             regenerate();
@@ -113,7 +113,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	@Override
 	public boolean dependsOn(Graph arg0) {
 		try {
-			regenerateIfClosed();			
+			regenerateIfClosed();
             return g.dependsOn(arg0);
         } catch (Exception e) {
             regenerate();
@@ -144,7 +144,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public GraphEventManager getEventManager() {
 		try {
@@ -157,7 +157,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public PrefixMapping getPrefixMapping() {
 		try {
@@ -170,7 +170,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public GraphStatisticsHandler getStatisticsHandler() {
 		try {
@@ -183,7 +183,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public TransactionHandler getTransactionHandler() {
 		try {
@@ -196,7 +196,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public boolean isClosed() {
 		try {
@@ -208,7 +208,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public boolean isEmpty() {
 		try {
@@ -220,7 +220,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public boolean isIsomorphicWith(Graph arg0) {
 		try {
@@ -231,7 +231,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
             return g.isIsomorphicWith(arg0);
         }
 	}
-	
+
 	@Override
 	public int size() {
 		try {
@@ -243,7 +243,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	
+
 	@Override
 	public void add(Triple arg0) throws AddDeniedException {
 		try {
@@ -254,7 +254,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
             g.add(arg0);
         }
 	}
-	
+
 	@Override
 	public void clear() {
 		try {

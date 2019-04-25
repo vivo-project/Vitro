@@ -20,16 +20,16 @@
 @prefix vivo:    <http://vivoweb.org/ontology/core#> .
 
 <http://vivo.mydomain.edu/individual/n3639>
-      a       vivo:FacultyMember , 
-              foaf:Person , 
-              owl:Thing , 
-              foaf:Agent , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000001 , 
+      a       vivo:FacultyMember ,
+              foaf:Person ,
+              owl:Thing ,
+              foaf:Agent ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000001 ,
               obo:BFO_0000004 ;
       rdfs:label "Baker, Able "^^xsd:string ;
       obo:ARG_2000028 <http://vivo.mydomain.edu/individual/n3972> ;
-      obo:RO_0000053 <http://vivo.mydomain.edu/individual/n475> , 
+      obo:RO_0000053 <http://vivo.mydomain.edu/individual/n475> ,
                      <http://vivo.mydomain.edu/individual/n7850> ;
       vitro:mostSpecificType
               vivo:FacultyMember ;
@@ -38,104 +38,104 @@
       vivo:hasCollaborator
               <http://vivo.mydomain.edu/individual/n7429> ;
       vivo:hasResearchArea
-              <http://www.eionet.europa.eu/gemet/concept/971> , 
+              <http://www.eionet.europa.eu/gemet/concept/971> ,
               <http://vivo.mydomain.edu/individual/n2158> ;
       vivo:overview "Just an ordinary chap of simple means and simple desires." ;
-      vivo:relatedBy <http://vivo.mydomain.edu/individual/n3401> , 
-                     <http://vivo.mydomain.edu/individual/n5855> , 
+      vivo:relatedBy <http://vivo.mydomain.edu/individual/n3401> ,
+                     <http://vivo.mydomain.edu/individual/n5855> ,
                      <http://vivo.mydomain.edu/individual/n2421> ;
       vivo:researchOverview
               "Whatever strikes my fancy." ;
       vivo:scopusId "abaker" .
 
 <http://vivo.mydomain.edu/individual/n3972>
-      a       vcard:Kind , 
-              obo:BFO_0000031 , 
-              owl:Thing , 
-              obo:ARG_2000379 , 
-              obo:IAO_0000030 , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000001 , 
+      a       vcard:Kind ,
+              obo:BFO_0000031 ,
+              owl:Thing ,
+              obo:ARG_2000379 ,
+              obo:IAO_0000030 ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000001 ,
               vcard:Individual ;
       obo:ARG_2000029 <http://vivo.mydomain.edu/individual/n3639> .
 
 <http://vivo.mydomain.edu/individual/n475>
-      a       owl:Thing , 
-              obo:BFO_0000023 , 
-              vivo:InvestigatorRole , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000017 , 
-              vivo:PrincipalInvestigatorRole , 
-              obo:BFO_0000020 , 
-              obo:BFO_0000001 , 
+      a       owl:Thing ,
+              obo:BFO_0000023 ,
+              vivo:InvestigatorRole ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000017 ,
+              vivo:PrincipalInvestigatorRole ,
+              obo:BFO_0000020 ,
+              obo:BFO_0000001 ,
               vivo:ResearcherRole ;
       obo:RO_0000052 <http://vivo.mydomain.edu/individual/n3639> .
 
 <http://vivo.mydomain.edu/individual/n7850>
-      a       owl:Thing , 
-              obo:BFO_0000023 , 
-              obo:BFO_0000017 , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000020 , 
-              obo:BFO_0000001 , 
+      a       owl:Thing ,
+              obo:BFO_0000023 ,
+              obo:BFO_0000017 ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000020 ,
+              obo:BFO_0000001 ,
               vivo:LeaderRole ;
       rdfs:label "Lead Guitarist"^^xsd:string ;
       obo:RO_0000052 <http://vivo.mydomain.edu/individual/n3639> .
 
 <http://vivo.mydomain.edu/individual/n7429>
-      a       foaf:Person , 
-              vivo:FacultyMember , 
-              foaf:Agent , 
-              owl:Thing , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000001 , 
+      a       foaf:Person ,
+              vivo:FacultyMember ,
+              foaf:Agent ,
+              owl:Thing ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000001 ,
               obo:BFO_0000004 ;
       rdfs:label "Yum, Yum " .
 
 <http://www.eionet.europa.eu/gemet/concept/971>
-      a       owl:Thing , 
-              <http://vivo.mydomain.edu/individual/n7793> , 
+      a       owl:Thing ,
+              <http://vivo.mydomain.edu/individual/n7793> ,
               skos:Concept ;
       rdfs:label "botany"^^xsd:string ;
       vivo:researchAreaOf <http://vivo.mydomain.edu/individual/n3639> .
 
 <http://vivo.mydomain.edu/individual/n2158>
-      a       owl:Thing , 
+      a       owl:Thing ,
               skos:Concept ;
       rdfs:label "What a concept!"^^xsd:string ;
       vivo:researchAreaOf <http://vivo.mydomain.edu/individual/n3639> .
 
 <http://vivo.mydomain.edu/individual/n3401>
-      a       owl:Thing , 
-              vivo:Relationship , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000020 , 
-              obo:BFO_0000001 , 
+      a       owl:Thing ,
+              vivo:Relationship ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000020 ,
+              obo:BFO_0000001 ,
               vivo:Authorship ;
       vivo:relates <http://vivo.mydomain.edu/individual/n3639> .
 
 <http://vivo.mydomain.edu/individual/n5855>
-      a       vivo:FacultyPosition , 
-              owl:Thing , 
-              vivo:Relationship , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000020 , 
-              obo:BFO_0000001 , 
+      a       vivo:FacultyPosition ,
+              owl:Thing ,
+              vivo:Relationship ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000020 ,
+              obo:BFO_0000001 ,
               vivo:Position ;
       rdfs:label "Functionary"^^xsd:string ;
       vivo:relates <http://vivo.mydomain.edu/individual/n3639> .
 
 <http://vivo.mydomain.edu/individual/n2421>
-      a       owl:Thing , 
-              vivo:Relationship , 
-              obo:BFO_0000002 , 
-              obo:BFO_0000020 , 
-              obo:BFO_0000001 , 
+      a       owl:Thing ,
+              vivo:Relationship ,
+              obo:BFO_0000002 ,
+              obo:BFO_0000020 ,
+              obo:BFO_0000001 ,
               vivo:Grant ;
       rdfs:label "Cosmogenic Lassitude in Plegmatic Axolotls" ;
       vivo:relates <http://vivo.mydomain.edu/individual/n3639> .
 
-obo:BFO_0000001 
+obo:BFO_0000001
       a       owl:Class ;
       rdfs:label "Entity" .
 

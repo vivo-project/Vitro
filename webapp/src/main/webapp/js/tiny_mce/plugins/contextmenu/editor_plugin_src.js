@@ -62,7 +62,7 @@
 
 				ed.nodeChanged();
 			});
-			
+
 			ed.onRemove.add(function() {
 				if (t._menu)
 					t._menu.removeAll();

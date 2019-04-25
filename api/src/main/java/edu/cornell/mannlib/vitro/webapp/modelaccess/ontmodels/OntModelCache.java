@@ -8,10 +8,10 @@ import org.apache.jena.ontology.OntModel;
 
 /**
  * A source for OntModels from the triple-store. The contract is this:
- * 
+ *
  * If you ask by a name that is not in use, an OntModel will be created.
- * 
- * If you ask by the same name twice, you get the same OntModel. 
+ *
+ * If you ask by the same name twice, you get the same OntModel.
  */
 public interface OntModelCache {
 	/**

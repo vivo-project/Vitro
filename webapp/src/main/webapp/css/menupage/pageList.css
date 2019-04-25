@@ -3,7 +3,7 @@
 .menuFlag {
 	width:67px;
 	height:18px;
-	background: url("../../images/checkMark.png") no-repeat left center;  
+	background: url("../../images/checkMark.png") no-repeat left center;
 }
 th#isMenuPage {
     width: 86px;

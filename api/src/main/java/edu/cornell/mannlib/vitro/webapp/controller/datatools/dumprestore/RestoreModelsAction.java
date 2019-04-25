@@ -40,15 +40,15 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**
  * Load from a dump file of NQuads, or something equivalent.
- * 
+ *
  * We could process it all a line at a time, except for the blank nodes. If
  * there are two references to the same blank node, they must be processed in
  * the same method call to the RDFService.
- * 
+ *
  * So, process each line as it comes in, unless it contains a blank node. Lines
  * with blank nodes get put into buckets, with one bucket for each model (and
  * one for the default model). At the end, we'll empty each of the buckets.
- * 
+ *
  * And if they ask to purge the models before restoring, do that.
  */
 public class RestoreModelsAction extends AbstractDumpRestoreAction {

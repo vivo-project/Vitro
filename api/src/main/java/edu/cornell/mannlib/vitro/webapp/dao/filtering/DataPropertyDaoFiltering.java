@@ -68,11 +68,11 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
         }
         return filteredProps;
     }
-    
+
 	// ----------------------------------------------------------------------
 	// Unfiltered operations
 	// ----------------------------------------------------------------------
-	
+
     @Override
     public void deleteDataProperty(DataProperty dataProperty) {
         innerDataPropertyDao.deleteDataProperty(dataProperty);
@@ -92,7 +92,7 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
     public String getRequiredDatatypeURI(Individual individual, DataProperty dataProperty) {
     	return innerDataPropertyDao.getRequiredDatatypeURI(individual, dataProperty);
     }
-    
+
     @Override
     public DataProperty getDataPropertyByURI(String dataPropertyURI) {
         return innerDataPropertyDao.getDataPropertyByURI(dataPropertyURI);
@@ -107,27 +107,27 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
     public void updateDataProperty(DataProperty dataProperty) {
         innerDataPropertyDao.updateDataProperty(dataProperty);
     }
-    
+
     @Override
     public void addSuperproperty(String propertyURI, String superpropertyURI) {
     	innerDataPropertyDao.addSuperproperty(propertyURI, superpropertyURI);
     }
-    
+
     @Override
     public void removeSuperproperty(String propertyURI, String superpropertyURI) {
     	innerDataPropertyDao.removeSuperproperty(propertyURI, superpropertyURI);
     }
-    
+
     @Override
     public void addSubproperty(String propertyURI, String subpropertyURI) {
     	innerDataPropertyDao.addSubproperty(propertyURI, subpropertyURI);
     }
-    
+
     @Override
     public void removeSubproperty(String propertyURI, String subpropertyURI) {
     	innerDataPropertyDao.removeSubproperty(propertyURI, subpropertyURI);
     }
-    
+
     @Override
     public List <String> getSubPropertyURIs(String propertyURI) {
     	return innerDataPropertyDao.getSubPropertyURIs(propertyURI);
@@ -147,7 +147,7 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
     public List <String> getAllSuperPropertyURIs(String propertyURI) {
     	return innerDataPropertyDao.getAllSuperPropertyURIs(propertyURI);
     }
-    
+
     @Override
     public List<DataProperty> getRootDataProperties() {
     	return innerDataPropertyDao.getRootDataProperties();
@@ -160,7 +160,7 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
 
     @Override
 	public void addSuperproperty(Property property, Property superproperty) {
-		innerDataPropertyDao.addSuperproperty(property, superproperty);	
+		innerDataPropertyDao.addSuperproperty(property, superproperty);
 	}
 
     @Override
@@ -197,18 +197,18 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
 	public void removeEquivalentProperty(Property property, Property equivalentProperty) {
 		innerDataPropertyDao.removeEquivalentProperty(property, equivalentProperty);
 	}
-	
+
     @Override
    public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
     	return innerDataPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
     }
-    
+
     @Override
     // This may need to be filtered at some point.
     public List<DataProperty> getDataPropertyList(Individual subject) {
         return innerDataPropertyDao.getDataPropertyList(subject);
     }
-    
+
     @Override
     // This may need to be filtered at some point.
     public List<DataProperty> getDataPropertyList(String subjectUri) {

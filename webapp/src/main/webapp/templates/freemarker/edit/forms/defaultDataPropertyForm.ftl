@@ -13,11 +13,11 @@
     <section id="error-alert" role="alert">
         <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
         <p>
-        
+
         <#list submissionErrors?keys as errorFieldName>
             ${submissionErrors[errorFieldName]}
         </#list>
-                        
+
         </p>
     </section>
 </#if>
@@ -29,17 +29,17 @@
     <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input" />
     <#if editConfiguration.dataPredicatePublicDescription?has_content>
        <label for="${editConfiguration.dataLiteral}"><p class="propEntryHelpText">${editConfiguration.dataPredicatePublicDescription}</p></label>
-    </#if>   
-	
+    </#if>
+
 	<#if "HTML" == editConfiguration.dataPredicateProperty.editing!>
 		<textarea rows="2" id="literal" name="literal" class="useTinyMce" role="textarea">${literalValues}</textarea>
-		
+
 	<#elseif datatype = "http://www.w3.org/2001/XMLSchema#integer" || datatype = "http://www.w3.org/2001/XMLSchema#int">
     	<input type="text" id="literal" name="literal" value="${literalValues}" placeholder="123456" />
-		
+
     <#elseif datatype = "http://www.w3.org/2001/XMLSchema#float">
         <input type="text" id="literal" name="literal" value="${literalValues}" placeholder="12.345" />
-		
+
     <#elseif datatype = "http://www.w3.org/2001/XMLSchema#boolean">
         <select id="literal" name="literal">
             <#if literalValues = "true">
@@ -50,22 +50,22 @@
                 <option value="false" selected="true">false</option>
             </#if>
         </select>
-		
+
     <#elseif datatype = "http://www.w3.org/2001/XMLSchema#anyURI">
         <input type="text" id="literal" name="literal" value="${literalValues}" placeholder="http://..." />
-		
-    <#elseif datatype = "http://www.w3.org/2001/XMLSchema#dateTime" || 
+
+    <#elseif datatype = "http://www.w3.org/2001/XMLSchema#dateTime" ||
         		datatype = "http://www.w3.org/2001/XMLSchema#date" ||
         		datatype = "http://www.w3.org/2001/XMLSchema#time" ||
         		datatype = "http://www.w3.org/2001/XMLSchema#gYearMonth" ||
         		datatype = "http://www.w3.org/2001/XMLSchema#gYear"	||
         		datatype = "http://www.w3.org/2001/XMLSchema#gMonth" >
         <#include "dateTimeEntryForm.ftl">
-		
+
     <#else>
         <input type="text" size="70" id="literal" name="literal" value="${literalValues}" />
 
-    </#if> 
+    </#if>
 
     <br />
     <#--The submit label should be set within the template itself, right now
@@ -94,9 +94,9 @@
     	decimal_only: '${i18n().decimal_only}',
     	whole_number: '${i18n().whole_number}'
 	};
-</script> 
+</script>
 
-<#include "defaultFormScripts.ftl">     
+<#include "defaultFormScripts.ftl">
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />')}
 

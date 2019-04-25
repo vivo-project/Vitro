@@ -17,7 +17,7 @@ dojo.require("dojo.event.*");
 dojo.widget.manager = new function(){
 	this.widgets = [];
 	this.widgetIds = [];
-	
+
 	// map of widgetId-->widget for widgets without parents (top level widgets)
 	this.topWidgets = {};
 
@@ -72,7 +72,7 @@ dojo.widget.manager = new function(){
 		delete this.widgetIds[tw];
 		this.widgets.splice(widgetIndex, 1);
 	}
-	
+
 	// FIXME: suboptimal performance
 	this.removeById = function(id) {
 		for (var i=0; i<this.widgets.length; i++){
@@ -152,15 +152,15 @@ dojo.widget.manager = new function(){
 			widgetPackages.push(pname);
 		}
 	}
-	
+
 	this.getWidgetPackageList = function() {
 		return dojo.lang.map(widgetPackages, function(elt) { return(elt!==true ? elt : undefined); });
 	}
-	
+
 	this.getImplementation = function(widgetName, ctorObject, mixins){
 		// try and find a name for the widget
 		var impl = this.getImplementationName(widgetName);
-		if(impl){ 
+		if(impl){
 			// var tic = new Date();
 			var ret = new impl(ctorObject);
 			// dojo.debug(new Date() - tic);
@@ -221,14 +221,14 @@ dojo.widget.manager = new function(){
 				for (var widgetClass in widgetPackage) {
 					if (widgetClass.toLowerCase() !=
 						(renderPrefixCache[j] + lowerCaseWidgetName)) { continue; }
-	
+
 					knownWidgetImplementations[lowerCaseWidgetName] =
 						widgetPackage[widgetClass];
 					return knownWidgetImplementations[lowerCaseWidgetName];
 				}
 			}
 		}
-		
+
 		throw new Error('Could not locate "' + widgetName + '" class');
 	}
 

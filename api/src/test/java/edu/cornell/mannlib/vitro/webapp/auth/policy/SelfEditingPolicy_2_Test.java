@@ -73,7 +73,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	 */
 	private OntModel ontModel;
 
-	
+
 	@Before
 	public void setUp() throws Exception {
 		ServletContextStub ctx = new ServletContextStub();

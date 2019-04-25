@@ -37,29 +37,29 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 public class RunSparqlConstructs implements ServletContextListener {
 
 	private static final Log log = LogFactory.getLog(RunSparqlConstructs.class.getName());
-	
+
 	private static final String DEFAULT_DEFAULT_NAMESPACE = "http://vivo.library.cornell.edu/ns/0.1#individual";
 	private static final String LOCAL_NAME_PREPEND = "individual";
-	
+
 	private static final String SPARQL_DIR = "/WEB-INF/sparqlConstructs";
 	private static Random random = new Random(System.currentTimeMillis());
-	
+
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			ServletContext ctx = sce.getServletContext();
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 
-			String namespace = (wadf != null && wadf.getDefaultNamespace() != null) 
+			String namespace = (wadf != null && wadf.getDefaultNamespace() != null)
 				? wadf.getDefaultNamespace() : DEFAULT_DEFAULT_NAMESPACE;
-			
+
 		    OntModel baseOntModel = ModelAccess.on(ctx).getOntModel(FULL_ASSERTIONS);
 			Model anonModel = ModelFactory.createDefaultModel();
 			Model namedModel = ModelFactory.createDefaultModel();
-			
+
 			Set<String> resourcePaths = ctx.getResourcePaths(SPARQL_DIR);
 			for (String path : resourcePaths) {
 				log.debug("Attempting to execute SPARQL at " + path);
-				File file = new File(ctx.getRealPath(path));			
+				File file = new File(ctx.getRealPath(path));
 				try {
 					BufferedReader reader = new BufferedReader(new FileReader(file));
 					StringBuilder fileContents = new StringBuilder();
@@ -84,11 +84,11 @@ public class RunSparqlConstructs implements ServletContextListener {
 					}
 				} catch (FileNotFoundException fnfe) {
 					log.info(path + " not found. Skipping.");
-				}	
+				}
 			}
-			
+
 			namedModel.add(anonModel);
-			
+
 			for ( Iterator<Resource> i = anonModel.listSubjects(); i.hasNext(); ) {
 				Resource s = i.next();
 				if (s.isAnon()) {
@@ -100,7 +100,7 @@ public class RunSparqlConstructs implements ServletContextListener {
 					ResourceUtils.renameResource(t, namespace + LOCAL_NAME_PREPEND + randomInt);
 				}
 			}
-			
+
 			baseOntModel.addSubModel(namedModel);
 			String msg = "Attaching " + namedModel.size() + " statements as a result of SPARQL CONSTRUCTS";
 			log.info(msg);

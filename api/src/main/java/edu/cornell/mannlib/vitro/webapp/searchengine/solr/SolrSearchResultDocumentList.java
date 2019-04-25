@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchResultDocume
 
 /**
  * A Solr-based implementation of SearchResultDocumentList.
- * 
+ *
  * It's necessary to use this instead of the base version, so the iterator can
  * convert each document as it is requested.
  */

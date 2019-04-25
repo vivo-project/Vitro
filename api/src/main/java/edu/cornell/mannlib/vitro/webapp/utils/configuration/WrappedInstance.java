@@ -37,7 +37,7 @@ public class WrappedInstance<T> {
 
 	/**
 	 * The loader calls this as soon as the instance is created.
-	 * 
+	 *
 	 * If the loader did not have access to a request object, then req will be
 	 * null. If the instance expects request models, an exception will be
 	 * thrown.

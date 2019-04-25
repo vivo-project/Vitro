@@ -79,7 +79,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 		ind.setURI(SELFEDITOR_URI);
 
 		ids = new ArrayIdentifierBundle(new HasProfile(SELFEDITOR_URI));
-		
+
 		ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 	}
 

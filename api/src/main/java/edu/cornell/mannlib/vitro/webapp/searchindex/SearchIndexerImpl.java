@@ -71,15 +71,15 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.Work
 
 /**
  * An implementation of the SearchIndexer interface.
- * 
+ *
  * This implementation uses a single-threaded task queue to permit indexing to
  * run one at a time in a "background" thread. The task queue is controlled by a
  * scheduler that allows us to suspend incoming tasks (pause).
- * 
+ *
  * A thread pool is available so the tasks can create small units of work to be
  * run in parallel. Each task should block until all of its work units are
  * complete, to preserve the pattern of running one task at a time.
- * 
+ *
  * The number of threads in the thread pool is specified in the application
  * setup file.
  */
@@ -467,7 +467,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 	/**
 	 * A single-threaded task queue that can tell us the status of the current
 	 * task.
-	 * 
+	 *
 	 * If no current task, it can return a status of IDLE or SHUTDOWN.
 	 */
 	private static class TaskQueue {
@@ -630,15 +630,15 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 	/**
 	 * A thread pool for handling many small units of work submitted by a task.
-	 * 
+	 *
 	 * The task is notified as each unit completes.
-	 * 
+	 *
 	 * If no thread is available for a work unit, the thread of the task itself
 	 * will run it. This provides automatic throttling.
-	 * 
+	 *
 	 * Only one task is active at a time, so the task can simply wait until this
 	 * pool is idle to know that all of its units have completed.
-	 * 
+	 *
 	 * When shutting down, no attempt is made to interrupt the currently
 	 * executing work units, since they are assumed to be small.
 	 */

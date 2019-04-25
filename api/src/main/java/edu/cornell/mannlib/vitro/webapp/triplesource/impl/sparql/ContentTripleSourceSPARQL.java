@@ -24,11 +24,11 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 /**
  * For a SPARQL endpoint, each connection is created as needed by the
  * RDFService, so there is no need to manage connections here.
- * 
+ *
  * As a result, we have a single RDFService, a RDFServiceFactory that always
  * returns that single RDFService, a single instance of the Dataset and the
  * ModelMaker.
- * 
+ *
  * Memory-map the small content models, and add the standard decorators.
  */
 public class ContentTripleSourceSPARQL extends ContentTripleSource {

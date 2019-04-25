@@ -34,33 +34,33 @@ public class EditConfigurationUtils {
 	private static Log log = LogFactory.getLog(EditConfigurationUtils.class);
 
     protected static final String MULTI_VALUED_EDIT_SUBMISSION = "MultiValueEditSubmission";
-    
+
     /* *************** Static utility methods used in edit configuration and in generators *********** */
     public static String getSubjectUri(VitroRequest vreq) {
     	return vreq.getParameter("subjectUri");
     }
-    
+
     public static String getPredicateUri(VitroRequest vreq) {
     	return vreq.getParameter("predicateUri");
     }
-    
+
     /*
     public static String getData(VitroRequest vreq) {
     	return vreq.getParameter("subjectUri");
     }*/
-    
+
     public static String getObjectUri(VitroRequest vreq) {
     	return vreq.getParameter("objectUri");
     }
-    
+
     public static String getDomainUri(VitroRequest vreq) {
         return vreq.getParameter("domainUri");
     }
-    
+
     public static String getRangeUri(VitroRequest vreq) {
         return vreq.getParameter("rangeUri");
     }
-    
+
     public static VClass getRangeVClass(VitroRequest vreq) {
         // This needs a WebappDaoFactory with no filtering/RDFService
         // funny business because it needs to be able to retrieve anonymous union
@@ -70,22 +70,22 @@ public class EditConfigurationUtils {
                 vreq.getSession().getServletContext()).getWebappDaoFactory();
         return ctxDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
     }
-    
+
     //get individual
-    
+
     public static Individual getSubjectIndividual(VitroRequest vreq) {
     	Individual subject = null;
     	String subjectUri = getSubjectUri(vreq);
     	subject = getIndividual(vreq, subjectUri);
-    	
+
     	 if( subject!= null ){
-	         vreq.setAttribute("subject", subject);    
+	         vreq.setAttribute("subject", subject);
 	 	 }
     	return subject;
     }
-    
+
     public static Individual getIndividual(VitroRequest vreq, String uri) {
-    	Individual individual = null; 
+    	Individual individual = null;
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 
     	 if( uri != null ){
@@ -93,41 +93,41 @@ public class EditConfigurationUtils {
     	 }
     	return individual;
     }
-    
+
     public static Individual getObjectIndividual(VitroRequest vreq) {
     	String objectUri = getObjectUri(vreq);
     	Individual object = getIndividual(vreq, objectUri);
         if( object != null ) {
-             vreq.setAttribute("subject", object);    
+             vreq.setAttribute("subject", object);
  	    }
     	return object;
     }
-   
-    
+
+
     public static ObjectProperty getObjectProperty(VitroRequest vreq) {
     	return getObjectPropertyForPredicate(vreq, getPredicateUri(vreq));
     }
-    
+
     public static DataProperty getDataProperty(VitroRequest vreq) {
     	String predicateUri = getPredicateUri(vreq);
     	return getDataPropertyForPredicate(vreq, predicateUri);
     }
-    
-    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, 
+
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq,
             String predicateUri) {
         String domainUri = getDomainUri(vreq);
         String rangeUri = getRangeUri(vreq);
         return getObjectPropertyForPredicate(vreq, predicateUri, domainUri, rangeUri);
     }
-    
-    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, 
+
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq,
             String predicateUri, String domainUri, String rangeUri) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
     	        predicateUri, domainUri, rangeUri);
     	return objectProp;
     }
-    
+
     public static DataProperty getDataPropertyForPredicate(VitroRequest vreq, String predicateUri) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	//TODO: Check reason for employing unfiltered webapp dao factory and note if using a different version
@@ -143,7 +143,7 @@ public class EditConfigurationUtils {
     	     return wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
     	 }
     }
-    
+
     //get url without context - used for edit configuration object
     public static String getFormUrlWithoutContext(VitroRequest vreq) {
     	return getEditUrlWithoutContext(vreq) + "?" + vreq.getQueryString();
@@ -151,30 +151,30 @@ public class EditConfigurationUtils {
     public static String getFormUrl(VitroRequest vreq) {
     	return getEditUrl(vreq) + "?" + vreq.getQueryString();
     }
-    
+
     public static String getEditUrl(VitroRequest vreq) {
     	return vreq.getContextPath() + getEditUrlWithoutContext(vreq);
     }
-    
+
     public static String getEditUrlWithoutContext(VitroRequest vreq) {
     	return "/editRequestDispatch";
     }
-    
+
     public static String getCancelUrlBase(VitroRequest vreq) {
     	 return vreq.getContextPath() + "/postEditCleanupController";
     }
-    
-    
+
+
     public static String getEditKey(VitroRequest vreq) {
-    	HttpSession session = vreq.getSession();        
-        String editKey = 
-            (EditConfigurationVTwo.getEditKeyFromRequest(vreq) == null) 
+    	HttpSession session = vreq.getSession();
+        String editKey =
+            (EditConfigurationVTwo.getEditKeyFromRequest(vreq) == null)
                 ? EditConfigurationVTwo.newEditKey(session)
                 : EditConfigurationVTwo.getEditKeyFromRequest(vreq);
         return editKey;
-    	
+
     }
-    
+
   //is data property or vitro label
     public static boolean isDataProperty(String predicateUri, VitroRequest vreq) {
     	if(predicateUri == null) {
@@ -187,11 +187,11 @@ public class EditConfigurationUtils {
     	DataProperty dataProp = vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI(predicateUri);
     	return (dataProp != null);
     }
-    
+
     protected static String getDataPropKey(VitroRequest vreq) {
-        return vreq.getParameter("datapropKey");        
+        return vreq.getParameter("datapropKey");
     }
-    
+
     //is object property
     public static boolean isObjectProperty(String predicateUri, VitroRequest vreq) {
     	if(predicateUri == null) {
@@ -204,23 +204,23 @@ public class EditConfigurationUtils {
     	log.debug("For " + predicateUri + ", object property from dao null? " + (op == null) + " and data property  null?" + (dp == null));
     	return (op != null && dp == null);
     }
-    
+
 	private static boolean isVitroLabel(String predicateUri) {
 		return predicateUri.equals(VitroVocabulary.LABEL);
 	}
-	
+
 	/**
-	 * May return null if data property statement cannot be found. 
+	 * May return null if data property statement cannot be found.
 	 */
     public static DataPropertyStatement getDataPropertyStatement(VitroRequest vreq, HttpSession session, Integer dataHash, String predicateUri) {
     	DataPropertyStatement dps = null;
    	    if( dataHash != 0) {
    			OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
-   	        dps = RdfLiteralHash.getPropertyStmtByHash(EditConfigurationUtils.getSubjectUri(vreq), predicateUri, dataHash, model);   	        
+   	        dps = RdfLiteralHash.getPropertyStmtByHash(EditConfigurationUtils.getSubjectUri(vreq), predicateUri, dataHash, model);
    	    }
    	    return dps;
     }
-    
+
     //TODO: Include get object property statement
     public static Integer getDataHash(VitroRequest vreq) {
     	Integer dataHash = null;
@@ -235,9 +235,9 @@ public class EditConfigurationUtils {
 	    }
 		return dataHash;
     }
-    
+
     //
-    
+
     //Copied from the original input element formatting tag
     //Allows the retrieval of the string values for the literals
     //Useful for cases with date/time and other mechanisms
@@ -245,7 +245,7 @@ public class EditConfigurationUtils {
     	Map<String, List<String>> literalsInScopeStringValues = transformLiteralMap(editConfig.getLiteralsInScope());
     	return literalsInScopeStringValues;
     }
-    
+
     private static List<String> transformLiteralListToStringList(List<Literal> literalValues){
     	List<String> stringValues = new ArrayList<String>();
     	if(literalValues != null) {
@@ -253,7 +253,7 @@ public class EditConfigurationUtils {
 	    		//Could do additional processing here if required, for example if date etc. if need be
 	    		if(l != null) {
 	    			stringValues.add(l.getValue().toString());
-	    		} 
+	    		}
 	    		//else {
 	    			//TODO: //Do we keep null as a value for this key?
 	    			//stringValues.add(null);
@@ -262,10 +262,10 @@ public class EditConfigurationUtils {
 		}
     	return stringValues;
     }
-    
+
     public static Map<String, List<String>> transformLiteralMap(Map<String, List<Literal>> map) {
     	Map<String, List<String>> literalMapStringValues = new HashMap<String, List<String>>();
-    	
+
     	for(String key: map.keySet() ) {
     		List<String> stringValues = transformLiteralListToStringList(map.get(key));
     		literalMapStringValues.put(key, stringValues);
@@ -276,8 +276,8 @@ public class EditConfigurationUtils {
 	public static Map<String, List<String>> getExistingUriValues(EditConfigurationVTwo editConfig) {
     	return editConfig.getUrisInScope();
     }
-	
-	//Generate HTML for a specific field name given 
+
+	//Generate HTML for a specific field name given
 	public static String generateHTMLForElement(VitroRequest vreq, String fieldName, EditConfigurationVTwo editConfig) {
 		String html = "";
         Configuration fmConfig = FreemarkerConfiguration.getConfig(vreq);
@@ -286,7 +286,7 @@ public class EditConfigurationUtils {
         MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
         //Should we create one if one doesn't exist?
         //TODO: Check if one needs to be created if it doesn't exist?
-        //MultiValueEditSubmission editSub =  new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);  
+        //MultiValueEditSubmission editSub =  new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);
         if( field != null && field.getEditElement() != null ){
     	  html = field.getEditElement().draw(fieldName, editConfig, editSub, fmConfig);
         }
@@ -298,12 +298,12 @@ public class EditConfigurationUtils {
         List<String> copyList = new ArrayList<String>();
         copyList.addAll(list);
         return copyList;
-   }        
-    
+   }
+
     public static Map<String,String> copyMap(Map<String,String> source) {
         HashMap<String, String> map = new HashMap<String, String>();
         Set<String> keys = map.keySet();
-        for(String key: keys) {            
+        for(String key: keys) {
             if( source.get(key) != null )
                 map.put(key, source.get(key));
             else
@@ -311,7 +311,7 @@ public class EditConfigurationUtils {
         }
         return map;
     }
-    
+
     public static Map<String, List<String>> copyListMap(Map<String, List<String>> source) {
         HashMap<String, List<String>> map = new HashMap<String, List<String>>();
         Set<String> keys = map.keySet();
@@ -320,12 +320,12 @@ public class EditConfigurationUtils {
             map.put(key, copy(vals));
         }
         return map;
-    }    
+    }
 
     public static EditConfigurationVTwo getEditConfiguration(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        EditConfigurationVTwo editConfiguration = EditConfigurationVTwo.getConfigFromSession(session, request);     
+        EditConfigurationVTwo editConfiguration = EditConfigurationVTwo.getConfigFromSession(session, request);
         return editConfiguration;
     }
-    
+
 }

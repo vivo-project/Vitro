@@ -21,7 +21,7 @@ public enum RdfResultMediaType {
 	TTL("text/turtle", false, "N3", "TTL"),
 
 	JSON("application/json", false, "N3", "JSON"),
-	
+
 	JSON_LD("application/ld+json", false, "N3", "JSON");
 
 	// ----------------------------------------------------------------------
@@ -75,7 +75,7 @@ public enum RdfResultMediaType {
 	private final String serializationFormat;
 
 	/**
-	 * What format shall we ask the resulting OntModel to write? 
+	 * What format shall we ask the resulting OntModel to write?
 	 */
 	private final String jenaResponseFormat;
 

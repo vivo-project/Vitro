@@ -32,7 +32,7 @@ Stack trace:
 <c:forEach var="trace" items="${pageContext.exception.stackTrace}">
   ${trace} <%="\n"%>
 </c:forEach>
-___________________________________________________________________________ 
+___________________________________________________________________________
 
 </div><!-- hiddenErrorDiv -->
 

@@ -31,14 +31,14 @@ public class AdditionalURIsForTypeStatementsTest {
         AdditionalURIsForTypeStatements aufts = new AdditionalURIsForTypeStatements();
 
         String subject = "http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n3270";
-        Statement typeChangeStatement =  ResourceFactory.createStatement(                
+        Statement typeChangeStatement =  ResourceFactory.createStatement(
                 ResourceFactory.createResource(subject),
                 ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                 ResourceFactory.createResource( "http://caruso-laptop.mannlib.cornell.edu:8090/vivo/ontology/localOnt#LocalInternalClass"));
-                  
-        
+
+
         List<String> uris = aufts.findAdditionalURIsToIndex( typeChangeStatement );
-        
+
         Assert.assertNotNull(uris);
         Assert.assertTrue("Did not contain subject of type change statement", uris.contains(subject));
     }

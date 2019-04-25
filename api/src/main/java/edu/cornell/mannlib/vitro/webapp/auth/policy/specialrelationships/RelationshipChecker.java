@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 /**
  * Look for relationships within an OntModel. Types of resources, links between
  * resources, and links between resources via a context node.
- * 
+ *
  * Also provides some convenience methods for test lists of URIs and for
  * creating PolicyDecisions.
  */
@@ -85,9 +85,9 @@ public class RelationshipChecker {
 
 	/**
 	 * Get a list of the object URIs that satisfy this statement:
-	 * 
+	 *
 	 * {@code <resourceUri> <propertyUri> <objectUri> }
-	 * 
+	 *
 	 * May return an empty list, but never returns null.
 	 */
 	public List<String> getObjectsOfProperty(String resourceUri,
@@ -116,11 +116,11 @@ public class RelationshipChecker {
 
 	/**
 	 * Get a list of the object URIs that satisfy these statements:
-	 * 
+	 *
 	 * {@code <resourceUri> <linkUri> <contextNodeUri> }
-	 * 
+	 *
 	 * {@code <contextNodeUri> <propertyUri> <objectUri> }
-	 * 
+	 *
 	 * May return an empty list, but never returns null.
 	 */
 	public List<String> getObjectsOfLinkedProperty(String resourceUri,
@@ -158,13 +158,13 @@ public class RelationshipChecker {
 	 * Get a list of URIs for object that link to the specified resource, by
 	 * means of the specified properties, through a linking node of the
 	 * specified type.
-	 * 
+	 *
 	 * So we're looking for object URIs that statisfy these statements:
-	 * 
+	 *
 	 * {@code <resourceUri> <property1Uri> <linkNodeUri> }
-	 * 
+	 *
 	 * {@code <linkNodeUri> rdfs:type <linkNodeTypeUri> }
-	 * 
+	 *
 	 * {@code <linkNodeUri> <property2Uri> <objectUri> }
 	 */
 	public List<String> getObjectsThroughLinkingNode(String resourceUri,
@@ -176,7 +176,7 @@ public class RelationshipChecker {
 				list.addAll(getObjectsOfProperty(linkNodeUri, property2Uri));
 			}
 		}
-		
+
 		return list;
 	}
 

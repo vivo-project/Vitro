@@ -54,7 +54,7 @@ dojo.lang.extend(dojo.widget.TreeRPCController, {
 
 		var success;
 
-		this.runRPC({		
+		this.runRPC({
 			url: this.getRPCUrl('move'),
 			/* I hitch to get this.loadOkHandler */
 			load: function(response){
@@ -93,7 +93,7 @@ dojo.lang.extend(dojo.widget.TreeRPCController, {
 				url: this.getRPCUrl('removeNode'),
 				/* I hitch to get this.loadOkHandler */
 				load: function(response){
-					this.doRemoveNodeProcessResponse(response, node, callObj, callFunc) 
+					this.doRemoveNodeProcessResponse(response, node, callObj, callFunc)
 				},
 				params: params,
 				lock: [node]
@@ -145,7 +145,7 @@ dojo.lang.extend(dojo.widget.TreeRPCController, {
 				url: this.getRPCUrl('createChild'),
 				load: function(response) {
 					// suggested data is dead, fresh data from server is used
-					this.doCreateChildProcessResponse( response, parent, index, callObj, callFunc) 
+					this.doCreateChildProcessResponse( response, parent, index, callObj, callFunc)
 				},
 				params: params,
 				lock: [parent]
@@ -165,7 +165,7 @@ dojo.lang.extend(dojo.widget.TreeRPCController, {
 		}
 
 		var args = [parent, index, response, callObj, callFunc];
-		
+
 		dojo.widget.TreeLoadingController.prototype.doCreateChild.apply(this, args);
 	}
 });

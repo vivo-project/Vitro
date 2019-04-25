@@ -85,7 +85,7 @@ public class IndexRequestProcessorForTPFs
 
         /**
          * Creates a Worker for the datasource index
-         * 
+         *
          * @param req
          */
         public Worker(

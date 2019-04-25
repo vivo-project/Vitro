@@ -1,7 +1,7 @@
 input.dojoComboBoxInput {
 	/* font-size: 0.8em; */
 	border: 0px;
-	
+
 }
 
 .dojoComboBoxOptions {
@@ -10,7 +10,7 @@ input.dojoComboBoxInput {
 	background-color: white;
 	border: 1px solid #afafaf;
 	position: absolute;
-	z-index: 1000; 
+	z-index: 1000;
 	overflow: auto;
 	-moz-opacity: 0;
 	cursor: default;

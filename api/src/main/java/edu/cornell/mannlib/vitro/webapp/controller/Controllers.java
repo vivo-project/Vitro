@@ -16,32 +16,32 @@ import java.util.List;
  */
 
 public class Controllers {
-    
+
     // Servlet urls
 
     public static final String ABOUT = "/about";
     public static final String CONTACT_URL = "/comments";
     public static final String TERMS_OF_USE_URL = "/termsOfUse";
-    public static final String SEARCH_URL = "/search";    
+    public static final String SEARCH_URL = "/search";
     public static final String ENTITY = "/entity";
 
     public static final String RETRY_URL = "editForm";
-    public static final String TAB_ENTITIES = "/TabEntitiesController";  
+    public static final String TAB_ENTITIES = "/TabEntitiesController";
 
     public static final String SITE_ADMIN = "/siteAdmin";
     public static final String LOGIN = "/login";
     public static final String LOGOUT = "/logout";
     public static final String AUTHENTICATE = "/authenticate";
-    
+
     public static final String EXPORT_RDF = "/export";
-    
+
     // jsps go here:
-    
+
     public static final String TAB = "/index.jsp";
 
     public static final String DEBUG_JSP = "/templates/page/debug.jsp";
     public static final Object BODY_MSG = "/templates/page/bodyMsg.jsp";
-    
+
     public static final String DASHBOARD_PROP_LIST_JSP = "edit/dashboardPropsList.jsp";
 
     public static final String ENTITY_EDITABLE_JSP = "templates/entity/entityEditable.jsp";
@@ -57,14 +57,14 @@ public class Controllers {
 
     public static final String HORIZONTAL_JSP = "/templates/edit/fetch/horizontal.jsp";
     public static final String VERTICAL_JSP = "/templates/edit/fetch/vertical.jsp";
-    
+
     public static final String CHECK_DATATYPE_PROPERTIES = "/jsp/checkDatatypeProperties.jsp";
     public static final String EXPORT_SELECTION_JSP = "/jenaIngest/exportSelection.jsp";
 
     public static final String VCLASS_RETRY_URL = "vclass_retry";
 
     public static final String TOGGLE_SCRIPT_ELEMENT = "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
-    
+
     //public static final String TAB_ENTITIES_LIST_JSP = "templates/tab/tabEntities.jsp";
 
     private static List<String> letters = null;

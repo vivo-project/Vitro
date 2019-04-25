@@ -28,9 +28,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
 
 /**
  * Process SPARQL queries as an API.
- * 
+ *
  * Supports GET or POST requests. May produce these responses:
- * 
+ *
  * <pre>
  * 200 Success
  * 400 Failed to parse SPARQL query

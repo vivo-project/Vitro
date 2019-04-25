@@ -14,8 +14,8 @@ public interface SearchIndexExcluder {
     /**
      * REturn a string message if the individual should
      * be excluded from the index.
-     * 
+     *
      * Return null if ind should not be excluded.
      */
-    public String checkForExclusion(Individual ind); 
+    public String checkForExclusion(Individual ind);
 }

@@ -33,14 +33,14 @@ public class GetAllVClasses extends JsonObjectProducer {
 	protected ObjectNode process() throws Exception {
         ObjectNode map = JsonNodeFactory.instance.objectNode();
         //Get all VClassGroups
-        List<VClass> vclasses = new ArrayList<VClass>();     
+        List<VClass> vclasses = new ArrayList<VClass>();
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> groups = vcgc.getGroups();
         for(VClassGroup vcg: groups) {
             vclasses.addAll(vcg);
-            
+
         }
-       
+
         //Sort vclass by name
         Collections.sort(vclasses);
         ArrayNode classes = JsonNodeFactory.instance.arrayNode();
@@ -49,10 +49,10 @@ public class GetAllVClasses extends JsonObjectProducer {
         	ObjectNode vcObj = JsonNodeFactory.instance.objectNode();
         	vcObj.put("name", vc.getName());
         	vcObj.put("URI", vc.getURI());
-        	classes.add(vcObj);            
+        	classes.add(vcObj);
         }
-        map.put("classes", classes);                
-       
+        map.put("classes", classes);
+
         return map;
     }
 

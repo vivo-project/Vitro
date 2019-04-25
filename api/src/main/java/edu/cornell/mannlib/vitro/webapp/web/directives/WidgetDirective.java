@@ -28,7 +28,7 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(WidgetDirective.class);
     private static final String WIDGET_PACKAGE = "edu.cornell.mannlib.vitro.webapp.web.widgets";
-    
+
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
@@ -41,18 +41,18 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
             throw new TemplateModelException(
                 "The dump directive doesn't allow nested content.");
         }
-        
+
         Object nameParam = params.get("name");
         if ( !(nameParam instanceof SimpleScalar)) {
             throw new TemplateModelException(
-               "Value of parameter 'name' must be a string.");     
+               "Value of parameter 'name' must be a string.");
         }
         String widgetName = nameParam.toString();
 
         // Optional param
         Object includeParam = params.get("include");
         String methodName;
-        // If include param is missing, or something other than "assets", 
+        // If include param is missing, or something other than "assets",
         // assign default value "markup"
         if (includeParam == null) {
             methodName = "markup";
@@ -63,13 +63,13 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
             }
         }
         methodName = "do" + StringUtils.capitalize(methodName);
-        
-        try {       
+
+        try {
             String widgetClassName = WIDGET_PACKAGE + "." + StringUtils.capitalize(widgetName) + "Widget";
-            Class<?> widgetClass = Class.forName(widgetClassName); 
-            Widget widget = (Widget) widgetClass.newInstance();             
+            Class<?> widgetClass = Class.forName(widgetClassName);
+            Widget widget = (Widget) widgetClass.newInstance();
             Method method = widgetClass.getMethod(methodName, Environment.class, Map.class);
-            
+
             // Right now it seems to me that we will always be producing a string for the widget calls. If we need greater
             // flexibility, we can return a ResponseValues object and deal with different types here.
             String output = (String) method.invoke(widget, env, params);
@@ -80,18 +80,18 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
             if ("doMarkup".equals(methodName) && FreemarkerHttpServlet.BODY_TEMPLATE_TYPE.equals(templateType)) {
                 output += widgetClass.getMethod("doAssets", Environment.class, Map.class).invoke(widget, env, params);
             }
-              
+
             Writer out = env.getOut();
             out.write(output);
-            
+
         } catch  (ClassNotFoundException e) {
             log.error("Widget " + widgetName + " not found.");
         } catch (IOException e) {
-                log.error("Error writing output for widget " + widgetName, e);  
+                log.error("Error writing output for widget " + widgetName, e);
         } catch (Exception e) {
             log.error("Error invoking widget " + widgetName, e);
         }
-        
+
     }
 
     @Override
@@ -99,24 +99,24 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         map.put("effect", "Add a reuseable block of markup and functionality to the template, with associated scripts and stylesheets injected into the page &lt;head&gt; element.");
-        
+
         map.put("comments", "From a body template, insert widget directive in desired location with no include value or include=\"markup\". Both assets and markup will be included. " +
                             "From a page template, insert widget directive at top of template with include=\"assets\". Insert widget directive in desired location " +
                             "with no include value or include=\"markup\".");
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("name", "name of widget");
         params.put("include", "values: \"assets\" to include scripts and stylesheets associated with the widget; \"markup\" to include the markup. " +
                               "\"markup\" is default value, so does not need to be specified.");
         map.put("parameters", params);
-        
+
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " name=\"login\" /> (use in body and page templates where markup should be inserted)");
         examples.add("<@" + name + " name=\"login\" include=\"markup\" /> (same as example 1)");
         examples.add("<@" + name + " name=\"login\" include=\"assets\" /> (use at top of page template to get scripts and stylesheets inserted into the &lt;head&gt; element)");
-        
+
         map.put("examples", examples);
-        
+
         return map;
     }
 

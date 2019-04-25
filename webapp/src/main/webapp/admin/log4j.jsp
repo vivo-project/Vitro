@@ -105,7 +105,7 @@ try {
     }
     out.write("</table>\r\n");
     out.write("<input type=submit value=\"Submit changes to logging levels\">");
-    out.write("</form>\n");  
+    out.write("</form>\n");
 
     out.write("</BODY></HTML>\r\n");
     out.flush();

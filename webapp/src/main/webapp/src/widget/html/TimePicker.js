@@ -59,9 +59,9 @@ dojo.widget.html.TimePicker = function(){
 
 	this.initData = function() {
 		// FIXME: doesn't currently validate the time before trying to set it
-		// Determine the date/time from stored info, or by default don't 
+		// Determine the date/time from stored info, or by default don't
 		//  have a set time
-		// FIXME: should normalize against whitespace on storedTime... for now 
+		// FIXME: should normalize against whitespace on storedTime... for now
 		// just a lame hack
 		if(this.storedTime.indexOf("T")!=-1 && this.storedTime.split("T")[1] && this.storedTime!=" " && this.storedTime.split("T")[1]!="any") {
 			this.time = dojo.widget.TimePicker.util.fromRfcDateTime(this.storedTime, this.useDefaultMinutes, this.selectedTime.anyTime);
@@ -92,7 +92,7 @@ dojo.widget.html.TimePicker = function(){
 	this.setDateTime = function(rfcDate) {
 		this.storedTime = rfcDate;
 	}
-	
+
 	this.onClearSelectedHour = function(evt) {
 		this.clearSelectedHour();
 	}

@@ -38,11 +38,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 
 public class JenaModelUtils {
-    
+
     private static final Log log = LogFactory.getLog(JenaModelUtils.class.getName());
 
     private static final Set<String>  nonIndividualTypeURIs ;
-    
+
     static {
         nonIndividualTypeURIs = new HashSet<String>();
         nonIndividualTypeURIs.add(OWL.Class.getURI());
@@ -54,11 +54,11 @@ public class JenaModelUtils {
         nonIndividualTypeURIs.add(RDFS.Class.getURI());
         nonIndividualTypeURIs.add(RDF.Property.getURI());
     }
-    
+
     /**
      * Creates a set of vitro:ClassGroup resources for each root class in
-     * an ontology.  Also creates annotations to place each root class and all 
-     * of its children in the appropriate groups.  In the case of multiple 
+     * an ontology.  Also creates annotations to place each root class and all
+     * of its children in the appropriate groups.  In the case of multiple
      * inheritance, classgroup assignment will be arbitrary.
      * @param wadf DAO Factory
      * @param tboxModel containing ontology classes
@@ -68,7 +68,7 @@ public class JenaModelUtils {
      */
     public synchronized static OntModel[] makeClassGroupsFromRootClasses(
             WebappDaoFactory wadf, Model tboxModel) {
-        
+
         OntModel ontModel = ModelFactory.createOntologyModel(
                 OntModelSpec.OWL_DL_MEM, tboxModel);
         OntModel modelForClassgroups = ModelFactory.createOntologyModel(
@@ -82,15 +82,15 @@ public class JenaModelUtils {
         config.setDefaultNamespace(wadf.getDefaultNamespace());
         WebappDaoFactory myWebappDaoFactory = new WebappDaoFactoryJena(
                 new SimpleOntModelSelector(ontModel), config, null);
-        
+
         Resource classGroupClass = ResourceFactory.createResource(
                 VitroVocabulary.CLASSGROUP);
         Property inClassGroupProperty = ResourceFactory.createProperty(
                 VitroVocabulary.IN_CLASSGROUP);
-        
+
         ontModel.enterCriticalSection(Lock.READ);
-        try { 
-            try {                    
+        try {
+            try {
                 List<VClass> rootClasses = myWebappDaoFactory.getVClassDao()
                         .getRootClasses();
                 for (VClass rootClass : rootClasses) {
@@ -127,37 +127,37 @@ public class JenaModelUtils {
         resultArray[1] = modelForClassgroupAnnotations;
         return resultArray;
     }
-    
+
     private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
     private final boolean NORMAL = false;
     private final boolean AGGRESSIVE = true;
 
 
     public OntModel extractTBox( Model inputModel ) {
-        return extractTBox(inputModel, null);    
+        return extractTBox(inputModel, null);
     }
-    
+
     public OntModel extractTBox( Model inputModel, boolean MODE ) {
         Dataset dataset = DatasetFactory.create(inputModel);
-        return extractTBox(dataset, null, null, MODE);   
+        return extractTBox(dataset, null, null, MODE);
     }
-    
+
     public OntModel extractTBox( Model inputModel, String namespace ) {
         Dataset dataset = DatasetFactory.create(inputModel);
         return extractTBox( dataset, namespace, null, NORMAL );
     }
-    
+
     public OntModel extractTBox( Dataset dataset, String namespace, String graphURI) {
         return extractTBox( dataset, namespace, graphURI, NORMAL);
     }
-    
+
     public OntModel extractTBox( Dataset dataset, String namespace, String graphURI, boolean mode ) {
         OntModel tboxModel = ModelFactory.createOntologyModel(DEFAULT_ONT_MODEL_SPEC);
-        
+
         List<String> queryStrList = new LinkedList<String>();
-        
+
         // Use SPARQL DESCRIBE queries to extract the RDF for named ontology entities
-        
+
         queryStrList.add( makeDescribeQueryStr( OWL.Class.getURI(), namespace, graphURI ) );
         queryStrList.add( makeDescribeQueryStr( OWL.Restriction.getURI(), namespace, graphURI ) );
         queryStrList.add( makeDescribeQueryStr( OWL.ObjectProperty.getURI(), namespace, graphURI ) );
@@ -166,11 +166,11 @@ public class JenaModelUtils {
         // if we're using to a hash namespace, the URI of the Ontology resource will be
         // that namespace minus the final hash mark.
         if ( namespace != null && namespace.endsWith("#") ) {
-            queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace.substring(0,namespace.length()-1), graphURI ) );    
+            queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace.substring(0,namespace.length()-1), graphURI ) );
         } else {
             queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace, graphURI ) );
         }
-        
+
         // Perform the SPARQL DESCRIBEs
         for ( String queryStr : queryStrList ) {
             Query tboxSparqlQuery = QueryFactory.create(queryStr);
@@ -182,8 +182,8 @@ public class JenaModelUtils {
                 dataset.getLock().leaveCriticalSection();
             }
         }
-        
-        // Perform possibly-redundant extraction to try ensure we don't miss 
+
+        // Perform possibly-redundant extraction to try ensure we don't miss
         // individual axioms floating around.  We still might miss things;
         // this approach isn't perfect.
         if (mode == AGGRESSIVE) {
@@ -250,10 +250,10 @@ public class JenaModelUtils {
         }
         return tboxModel;
     }
-    
-    private Model construct(Dataset dataset, 
-                            String namespace, 
-                            String graphURI, 
+
+    private Model construct(Dataset dataset,
+                            String namespace,
+                            String graphURI,
                             Resource property) {
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
@@ -279,13 +279,13 @@ public class JenaModelUtils {
             dataset.getLock().leaveCriticalSection();
         }
     }
-    
+
     private String makeDescribeQueryStr( String typeURI, String namespace ) {
         return makeDescribeQueryStr( typeURI, namespace, null );
-    }     
-        
+    }
+
     private String makeDescribeQueryStr( String typeURI, String namespace, String graphURI ) {
-        
+
         StringBuilder describeQueryStrBuff = new StringBuilder()
             .append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n")
             .append("DESCRIBE ?res WHERE { \n");
@@ -294,27 +294,27 @@ public class JenaModelUtils {
             }
             describeQueryStrBuff
             .append("    ?res rdf:type <").append(typeURI).append("> . \n");
-            
+
             describeQueryStrBuff
             .append("    FILTER (!isBlank(?res)) \n")
-    
+
             .append(getNamespaceFilter(namespace));
-    
+
         if (graphURI != null) {
             describeQueryStrBuff
             .append("} \n");
         }
-            
+
         describeQueryStrBuff.append("} \n");
-        
+
         return describeQueryStrBuff.toString();
-        
+
     }
-    
+
     private String getNamespaceFilter(String namespace) {
         StringBuilder buff = new StringBuilder();
         if (namespace == null) {
-            // exclude resources in the Vitro internal namespace or in the 
+            // exclude resources in the Vitro internal namespace or in the
             // OWL namespace, but allow all others
             buff
             .append("    FILTER (REPLACE(STR(?res),\"^(.*)(#)(.*)$\", \"$1$2\") != \"")
@@ -328,43 +328,43 @@ public class JenaModelUtils {
             buff
             .append("    FILTER (regex(str(?res), \"^")
             .append(namespace)
-            .append("\")) \n");  
+            .append("\")) \n");
         }
         return buff.toString();
     }
-    
+
     public Model extractABox(Model inputModel){
         Dataset dataset = DatasetFactory.create(inputModel);
         return extractABox(dataset, null, null);
     }
-    
+
     public Model extractABox( Dataset unionDataset, Dataset baseOrInfDataset, String graphURI ) {
-        
+
         Model aboxModel = ModelFactory.createDefaultModel();
 
         // iterate through all classes and DESCRIBE each of their instances
         // Note that this could be simplified if we knew that the model was a
-        // reasoning model: we could then simply describe all instances of 
+        // reasoning model: we could then simply describe all instances of
         // owl:Thing.
 
-        //OntModel ontModel = ( inputModel instanceof OntModel ) 
+        //OntModel ontModel = ( inputModel instanceof OntModel )
         //? (OntModel)inputModel
         //: ModelFactory.createOntologyModel( DEFAULT_ONT_MODEL_SPEC, inputModel );
-        OntModel ontModel = extractTBox(unionDataset, null, graphURI);    
-    
+        OntModel ontModel = extractTBox(unionDataset, null, graphURI);
+
         try {
             ontModel.enterCriticalSection(Lock.READ);
             Iterator classIt = ontModel.listNamedClasses();
             QueryExecution qe = null;
             while ( classIt.hasNext() ) {
-                
+
                 OntClass ontClass = (OntClass) classIt.next();
-                //if ( !(ontClass.getNameSpace().startsWith(OWL.getURI()) )  
+                //if ( !(ontClass.getNameSpace().startsWith(OWL.getURI()) )
                 // && !(ontClass.getNameSpace().startsWith(VitroVocabulary.vitroURI))    ) {
              if(!(ontClass.getNameSpace().startsWith(OWL.getURI()))){
-                    
+
                     String queryStr = makeDescribeQueryStr( ontClass.getURI(), null, graphURI );
-                    
+
                     Query aboxSparqlQuery = QueryFactory.create(queryStr);
                     if(baseOrInfDataset != null){
                         qe = QueryExecutionFactory.create(aboxSparqlQuery,baseOrInfDataset);
@@ -388,15 +388,15 @@ public class JenaModelUtils {
                             unionDataset.getLock().leaveCriticalSection();
                         }
                     }
-                    
+
                 }
             }
         } finally {
             ontModel.leaveCriticalSection();
         }
-        
+
         return aboxModel;
-        
+
     }
-    
+
 }

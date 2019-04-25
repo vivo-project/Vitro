@@ -18,10 +18,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 /**
  * A base for classes that produce a JSON object, based on the parameters in the
  * request.
- * 
+ *
  * The result is never empty. At worst, it is an object that contains only an
  * "errorMessage" field.
- * 
+ *
  * If an exception occurrs during processing, The "errorMessage" field will
  * contain the exception message and the response status will be set to 500
  * (server error). Normally, "errorMessage" will be empty, and the status will

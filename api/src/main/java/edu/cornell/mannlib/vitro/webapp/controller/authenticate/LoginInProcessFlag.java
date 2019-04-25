@@ -7,10 +7,10 @@ import javax.servlet.http.HttpSession;
 
 /**
  * This sits in the session to say that a login is in process.
- * 
+ *
  * Authenticate sets the flag each time it redirects to the login widget, and
  * the login widget inspects the flag and resets it.
- * 
+ *
  * If ever the login widget finds that the flag is already reset, it knows that
  * the user navigated to the widget directly, rather than coming through
  * Authenticate, and so it discards any existing LoginProcessBean as obsolete.
@@ -26,7 +26,7 @@ public class LoginInProcessFlag {
 		if (request == null) {
 			throw new NullPointerException("request may not be null.");
 		}
-		
+
 		request.getSession().setAttribute(ATTRIBUTE_NAME, Boolean.TRUE);
 	}
 
@@ -37,12 +37,12 @@ public class LoginInProcessFlag {
 		if (request == null) {
 			throw new NullPointerException("request may not be null.");
 		}
-		
+
 		HttpSession session = request.getSession(false);
 		if (session == null) {
 			return false;
 		}
-		
+
 		Object flag = session.getAttribute(ATTRIBUTE_NAME);
 		if (flag == null) {
 			return false;

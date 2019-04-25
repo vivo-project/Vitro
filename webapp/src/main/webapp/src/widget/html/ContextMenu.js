@@ -24,12 +24,12 @@ dojo.widget.html.ContextMenu = function(){
 
 	this.targetNodeIds = []; // fill this with nodeIds upon widget creation and it only responds to those nodes
 
-	// default event detection method 
-	var eventType = "oncontextmenu"; 
+	// default event detection method
+	var eventType = "oncontextmenu";
 
-	var doc = document.documentElement  || document.body; 
+	var doc = document.documentElement  || document.body;
 
-	var _blockHide = false; 
+	var _blockHide = false;
 
 	this.fillInTemplate = function(args, frag){
 
@@ -71,7 +71,7 @@ dojo.widget.html.ContextMenu = function(){
 
 		// if I do this, I cant preventDefault in khtml
 		//evt = dojo.event.browser.fixEvent(evt);
- 
+
 		// stop default contextmenu, needed in khtml
 		if (evt.preventDefault){ evt.preventDefault(); }
 
@@ -141,7 +141,7 @@ dojo.widget.html.ContextMenu = function(){
 
 		this.onHide(evt);
 	}
-	
+
 	this.onHide = function(evt){
 		// FIXME: use whatever we use to do more general style setting?
 		this.domNode.style.display = "none";
@@ -149,11 +149,11 @@ dojo.widget.html.ContextMenu = function(){
 		this.isShowing = 0;
 	}
 
-	// callback for rightclicks, needed for browsers that doesnt implement oncontextmenu, konqueror and more? 
-	this._checkRightClick = function(evt){ 
+	// callback for rightclicks, needed for browsers that doesnt implement oncontextmenu, konqueror and more?
+	this._checkRightClick = function(evt){
 
-		// for some reason konq comes here even when we are not clicking on the attached nodes 
-		// added check for targetnode 
+		// for some reason konq comes here even when we are not clicking on the attached nodes
+		// added check for targetnode
 		if (evt.button==2 && (this.targetNodeIds.length==0 || (evt.currentTarget.id!="" && dojo.lang.inArray(this.targetNodeIds, evt.currentTarget.id)))){
 
 			return this.onOpen(evt);

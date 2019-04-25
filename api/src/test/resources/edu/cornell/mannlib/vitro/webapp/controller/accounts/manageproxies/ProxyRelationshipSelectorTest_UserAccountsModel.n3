@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix mydomain: <http://vivo.mydomain.edu/individual/> .
@@ -29,7 +29,7 @@ mydomain:userProxyForNone
 	.
 
 #
-# This user account is proxy for a bunch of profiles. 
+# This user account is proxy for a bunch of profiles.
 # This user account has no self
 #
 mydomain:userPopularProxy

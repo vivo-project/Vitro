@@ -54,12 +54,12 @@ public class GetEntitiesByVClass extends JsonArrayProducer {
         log.debug("in getEntitiesByVClass()");
         String vclassURI = vreq.getParameter("vclassURI");
         WebappDaoFactory daos = vreq.getUnfilteredWebappDaoFactory();
-        
+
         if( vclassURI == null ){
             throw new ServletException("getEntitiesByVClass(): no value for 'vclassURI' found in the HTTP request");
         }
 
-        VClass vclass = daos.getVClassDao().getVClassByURI( vclassURI );                       
+        VClass vclass = daos.getVClassDao().getVClassByURI( vclassURI );
         if( vclass == null ){
             throw new ServletException("getEntitiesByVClass(): could not find vclass for uri '"+  vclassURI + "'");
         }
@@ -87,17 +87,17 @@ public class GetEntitiesByVClass extends JsonArrayProducer {
                 entsFromVclass.remove();
                 count++;
             }
-            if( log.isDebugEnabled() ){ log.debug("getEntitiesByVClass(): Creating reply with continue token, found " + numberOfEntsInVClass + " Individuals"); } 
+            if( log.isDebugEnabled() ){ log.debug("getEntitiesByVClass(): Creating reply with continue token, found " + numberOfEntsInVClass + " Individuals"); }
         }else{
             if( log.isDebugEnabled() ) log.debug("getEntitiesByVClass(): sending " + numberOfEntsInVClass +" Individuals without continue token");
             entsToReturn = entsInVClass;
             count = entsToReturn.size();
         }
 
-        
+
         //put all the entities on the JSON array
         ArrayNode ja =  individualsToJson( entsToReturn );
-        
+
         //put the responseGroup number on the end of the JSON array
         if( more ){
             ObjectNode obj = JsonNodeFactory.instance.objectNode();
@@ -113,10 +113,10 @@ public class GetEntitiesByVClass extends JsonArrayProducer {
 
             ja.add(obj);
         }
-        
+
         log.debug("done with getEntitiesByVClass()");
         return ja;
     }
-    
+
 
 }

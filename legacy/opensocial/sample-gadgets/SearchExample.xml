@@ -7,45 +7,45 @@
 	<Content type="html"><![CDATA[<!--HTML-->
     <!-- #includes -->
     <!DOCTYPE html>
-    
+
     <style>
 
     .gadget_text {
     	font-family: Verdana, Arial;
     	font-size: 11px;
     }
-    
+
     .gadgets-gadget-chrome {
     	margin-left: 8px;
     }
-    
+
     </style>
-    
+
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
 
     <pre><div id="content" class="gadget_text"></div></pre>
     <script>
-    
-function parseXml(xml) {	
+
+function parseXml(xml) {
 	if (jQuery.browser.msie) {
-		var xmlDoc = new ActiveXObject("Microsoft.XMLDOM"); 
+		var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
 		xmlDoc.loadXML(xml);
 		xml = xmlDoc;
 	}
-	
+
 	return xml;
-}    
+}
 
 function handleResponse(obj) {
   var ids = [];
   var theXML = obj.text;
-  
+
   // IE hack
-  theXML = parseXml(theXML); 
+  theXML = parseXml(theXML);
 
   // JB hack
- 	$("#content").append( "Additional search results for " + gadgets.util.getUrlParameters()['keyword'] )  
-  
+ 	$("#content").append( "Additional search results for " + gadgets.util.getUrlParameters()['keyword'] )
+
   gadgets.window.adjustHeight();
 };
 

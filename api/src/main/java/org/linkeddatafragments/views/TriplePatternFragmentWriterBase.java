@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Base class of any implementation for ITriplePatternFragment.
- * 
+ *
  * @author Miel Vander Sande
  */
 public abstract class TriplePatternFragmentWriterBase extends LinkedDataFragmentWriterBase implements ILinkedDataFragmentWriter {
@@ -27,12 +27,12 @@ public abstract class TriplePatternFragmentWriterBase extends LinkedDataFragment
     public TriplePatternFragmentWriterBase(Map<String, String> prefixes, HashMap<String, IDataSource> datasources) {
         super(prefixes, datasources);
     }
-    
+
     @Override
     public void writeFragment(ServletOutputStream outputStream, IDataSource datasource, ILinkedDataFragment fragment, ILinkedDataFragmentRequest ldfRequest) throws Exception {
         writeFragment(outputStream, datasource, (ITriplePatternFragment) fragment, (ITriplePatternFragmentRequest) ldfRequest);
     }
-    
+
     /**
      *
      * @param outputStream

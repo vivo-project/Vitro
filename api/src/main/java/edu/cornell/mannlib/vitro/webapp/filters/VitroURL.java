@@ -17,44 +17,44 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
+/**
  * Brian Caruso with changes contributed by David Cliff, 2010-11-03
  * Before 2010-11 this was a private class of URLRewritingHttpServletResponse.java.
- * 
+ *
  * Useful reference:
  * http://labs.apache.org/webarch/uri/rfc/rfc3986.html
  */
 class VitroURL {
-    // this is to get away from some of the 
+    // this is to get away from some of the
     // annoyingness of java.net.URL
     // and to handle general weirdness
-    
+
     private String characterEncoding;
-    
+
     public String protocol;
     public String host;
     public String port;
     public List<String> pathParts;
     public List<String[]> queryParams;
     public String fragment;
-    
+
     /**
      * Pattern to get the path and query of a relative URL
      * ex.
-     *   /entity -> /entity 
+     *   /entity -> /entity
      *   /entity?query=abc -> /entity query=abc
      */
     private Pattern pathPattern = Pattern.compile("([^\\?]*)\\??(.*)");
-    
+
     private Pattern commaPattern = Pattern.compile("/");
     private Pattern equalsSignPattern = Pattern.compile("=");
-    private Pattern ampersandPattern = Pattern.compile("&");          
+    private Pattern ampersandPattern = Pattern.compile("&");
     public  boolean pathBeginsWithSlash = false;
     public  boolean pathEndsInSlash = false;
     public  boolean wasXMLEscaped = false;
-    
+
     private final static Log log = LogFactory.getLog(VitroURL.class);
-    
+
     public VitroURL(String urlStr, String characterEncoding) {
         this.characterEncoding = characterEncoding;
         if (urlStr.indexOf("&amp;")>-1) {
@@ -71,7 +71,7 @@ class VitroURL {
             this.pathEndsInSlash = endsInSlash(url.getPath());
             this.queryParams = parseQueryParams(url.getQuery());
             this.fragment = url.getRef();
-        } catch (Exception e) { 
+        } catch (Exception e) {
             // Under normal circumstances, this is because the urlStr is relative
             // We'll assume that we just have a path and possibly a query string.
             // This is likely to be a bad assumption, but let's roll with it.
@@ -84,7 +84,7 @@ class VitroURL {
             }else{
                 //???
             }
-                         
+
             try {
                 this.pathParts = splitPath(URLDecoder.decode(getPath(urlStr),characterEncoding));
                 this.pathBeginsWithSlash = beginsWithSlash(urlParts[0]);
@@ -97,7 +97,7 @@ class VitroURL {
             }
         }
     }
-    
+
     private String getPath(String urlStr){
         Matcher m = pathPattern.matcher(urlStr);
         if( m.matches() )
@@ -105,8 +105,8 @@ class VitroURL {
         else
             return "";
     }
-    
-    
+
+
     private List<String> splitPath(String pathStr) {
         String[] splitStr = commaPattern.split(pathStr);
         if (splitStr.length>0) {
@@ -129,32 +129,32 @@ class VitroURL {
                 splitStr = temp;
             }
         }
-        // TODO: rewrite the chunk above with lists in mind. 
+        // TODO: rewrite the chunk above with lists in mind.
         List<String> strList = new ArrayList<String>();
         Collections.addAll(strList, splitStr);
         return strList;
-    }   
-    
+    }
+
     public boolean beginsWithSlash(String pathStr) {
         if (pathStr.length() == 0) {
             return false;
         }
         return (pathStr.charAt(0) == '/');
     }
-    
+
     public boolean endsInSlash(String pathStr) {
         if (pathStr.length() == 0) {
             return false;
         }
         return (pathStr.charAt(pathStr.length()-1) == '/');
     }
-    
-  
+
+
     /**
      * This is attempting to parse query parameters that might not be URLEncoded.
-     * This seems like a huge problem.  We will only correctly handle odd things 
+     * This seems like a huge problem.  We will only correctly handle odd things
      * as a query parameter 'uri' in the last position.
-     *  
+     *
      * @param queryStr Querst string
      */
     protected List<String[]> parseQueryParams(String queryStr) {
@@ -162,12 +162,12 @@ class VitroURL {
         if (queryStr == null) {
             return queryParamList;
         }
-      
+
         while ( queryStr.length() > 0 ){
             //remove leading & if there was one
             if( queryStr.startsWith("&"))
                 queryStr = queryStr.substring(1);
-            
+
             String[] simplepair = getSimpleQueryMatch(queryStr);
             if( simplepair != null ){
                 if( simplepair[1].contains("?") ){
@@ -179,7 +179,7 @@ class VitroURL {
                     }else{
                         throw new Error("Cannot parse query string for URL " +
                         		"queryParams: \"" + queryStr + "\" this only accepts " +
-                        	    "complex parameters in the final position with the key 'uri'."); 
+                        	    "complex parameters in the final position with the key 'uri'.");
                     }
                 }else{
                     queryParamList.add(simplepair);
@@ -198,13 +198,13 @@ class VitroURL {
         }
         return queryParamList;
     }
-    
+
     /** Query for simple query param at start of string. */
     private Pattern simpleQueryParamPattern = Pattern.compile("^([^\\=]*)=([^\\&]*)");
 
     /**
      * Check for a simple match in a queryParam.
-     * May return null.     
+     * May return null.
      */
     protected String[] getSimpleQueryMatch(String querystr){
         Matcher simpleMatch = simpleQueryParamPattern.matcher(querystr);
@@ -217,7 +217,7 @@ class VitroURL {
             return null;
         }
     }
-    
+
     private Pattern finalQueryParamPattern = Pattern.compile("^(uri)=(.*)");
     /**
      * Checks only for uri=.* as the last match of the queryParams.
@@ -233,9 +233,9 @@ class VitroURL {
         }else{
             return null;
         }
-        
+
     }
-    
+
     public String toString() {
         StringBuilder out = new StringBuilder();
             try {
@@ -275,7 +275,7 @@ class VitroURL {
                     if (keyAndValue.length>1) {
                         out.append(URLEncoder.encode(keyAndValue[1],characterEncoding));
                     }
-                    if (qpIt.hasNext()) { 
+                    if (qpIt.hasNext()) {
                         out.append("&");
                     }
                 }
@@ -288,5 +288,5 @@ class VitroURL {
             str = StringEscapeUtils.escapeXml(str);
         }
         return str;
-    }       
+    }
 }

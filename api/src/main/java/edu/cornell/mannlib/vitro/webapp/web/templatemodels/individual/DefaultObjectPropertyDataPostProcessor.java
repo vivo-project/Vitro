@@ -12,8 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 /** The object property data postprocessor that is used if the view does not specify another postprocessor */
 public class DefaultObjectPropertyDataPostProcessor extends BaseObjectPropertyDataPostProcessor {
 
-    private static final Log log = LogFactory.getLog(DefaultObjectPropertyDataPostProcessor.class);   
-    
+    private static final Log log = LogFactory.getLog(DefaultObjectPropertyDataPostProcessor.class);
+
     public DefaultObjectPropertyDataPostProcessor(ObjectPropertyTemplateModel optm,
             WebappDaoFactory wdf) {
         super(optm, wdf);

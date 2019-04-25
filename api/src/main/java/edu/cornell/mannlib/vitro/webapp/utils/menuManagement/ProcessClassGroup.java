@@ -30,25 +30,25 @@ public class ProcessClassGroup implements ProcessDataGetter{
 	//page data is data retrieved from data getter
     @Override
 	public void populateTemplate(HttpServletRequest req, Map<String, Object> pageData, Map<String, Object> templateData) {
-		//This is a class group page so 
+		//This is a class group page so
 		templateData.put("isClassGroupPage", true);
 		templateData.put("includeAllClasses", true);
-		
+
 		//Get the class group from VClassGroup
 		DataGetterUtils.getClassGroupForDataGetter(req, pageData, templateData);
 	}
-    
-    
+
+
     //Process submission
-    
+
     @Override
 	public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource) {
 		Model dgModel = ModelFactory.createDefaultModel();
 		String dataGetterTypeUri = DataGetterUtils.generateDataGetterTypeURI(ClassGroupPageData.class.getName());
-		dgModel.add(dgModel.createStatement(dataGetterResource, 
-				RDF.type, 
+		dgModel.add(dgModel.createStatement(dataGetterResource,
+				RDF.type,
 				ResourceFactory.createResource(dataGetterTypeUri)));
 		return dgModel;
     }
-    
+
 }

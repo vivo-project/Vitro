@@ -45,7 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * The base class for a delegating model decorator.
- * 
+ *
  * As implemented, all methods simply delegate to the inner model. Subclasses
  * should override selected methods to provide functionality.
  */

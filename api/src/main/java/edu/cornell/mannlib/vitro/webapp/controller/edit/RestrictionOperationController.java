@@ -38,7 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 public class RestrictionOperationController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(RestrictionOperationController.class.getName());
-	
+
 	public void doPost(HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
@@ -46,11 +46,11 @@ public class RestrictionOperationController extends BaseEditController {
 
 		VitroRequest request = new VitroRequest(req);
 		String defaultLandingPage = getDefaultLandingPage(request);
-		
+
 	    try {
 			OntModel ontModel = ModelAccess.on(getServletContext())
 					.getOntModel(TBOX_ASSERTIONS);
-		    
+
             HashMap epoHash = null;
             EditProcessObject epo = null;
             try {
@@ -65,12 +65,12 @@ public class RestrictionOperationController extends BaseEditController {
             if (epo == null) {
                 response.sendRedirect(defaultLandingPage);
                 return;
-            } 
-                
-            if ( (request.getParameter("_cancel") == null ) ) {
-                processRestriction(request, epo, ontModel);   
             }
-                        
+
+            if ( (request.getParameter("_cancel") == null ) ) {
+                processRestriction(request, epo, ontModel);
+            }
+
             //if no page forwarder was set, just go back to referring page:
             String referer = epo.getReferer();
             if (referer == null) {
@@ -78,7 +78,7 @@ public class RestrictionOperationController extends BaseEditController {
             } else {
                 response.sendRedirect(referer);
             }
-		    
+
 	    } catch (Exception e) {
 	    	log.error(e, e);
 	    	try {
@@ -89,52 +89,52 @@ public class RestrictionOperationController extends BaseEditController {
 	    	}
 	    }
 	}
-	
+
 	private void processRestriction(VitroRequest request, EditProcessObject epo, OntModel ontModel) {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
-            
+
             ontModel.getBaseModel().notifyEvent(new EditEvent(request.getUnfilteredWebappDaoFactory().getUserURI(),true));
-            
+
             if ("delete".equals(request.getParameter("_action"))) {
-                processDelete(request, ontModel);   
+                processDelete(request, ontModel);
             }  else {
-                processCreate(request, epo, ontModel);            
+                processCreate(request, epo, ontModel);
             }
-            
+
         } finally {
             ontModel.getBaseModel().notifyEvent(new EditEvent(request.getUnfilteredWebappDaoFactory().getUserURI(),false));
             ontModel.leaveCriticalSection();
         }
-    
+
     }
 
     private void processDelete(VitroRequest request, OntModel ontModel) {
-        
+
         String restId = request.getParameter("restrictionId");
-        
+
         if (restId != null) {
-            
+
             OntClass restrictedClass = ontModel.getOntClass( request.getParameter( "classUri" ) );
-            
+
             OntClass rest = null;
-            
+
             for ( Iterator i = restrictedClass.listEquivalentClasses(); i.hasNext(); ) {
                 OntClass equivClass = (OntClass) i.next();
                 if (equivClass.isAnon() && equivClass.getId().toString().equals(restId)) {
                     rest = equivClass;
                 }
             }
-            
-            if ( rest == null ) { 
+
+            if ( rest == null ) {
                 for ( Iterator i = restrictedClass.listSuperClasses(); i.hasNext(); ) {
                     OntClass  superClass = (OntClass) i.next();
                     if (superClass.isAnon() && superClass.getId().toString().equals(restId)) {
                         rest = superClass;
                     }
-                }   
+                }
             }
-            
+
             /**
              * removing by graph subtraction so that statements with blank nodes
              * stick together and are processed appropriately by the bulk update
@@ -143,37 +143,37 @@ public class RestrictionOperationController extends BaseEditController {
             if ( rest != null ) {
                 Model temp = ModelFactory.createDefaultModel();
                 temp.add(rest.listProperties());
-                ontModel.getBaseModel().remove(temp);                
+                ontModel.getBaseModel().remove(temp);
             }
-            
+
         }
     }
-    
+
     private void processCreate(VitroRequest request, EditProcessObject epo, OntModel origModel) {
-        
+
         Model temp = ModelFactory.createDefaultModel();
         Model dynamicUnion = ModelFactory.createUnion(temp, origModel);
         OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dynamicUnion);
-        
+
         OntProperty onProperty = ontModel.getOntProperty( (String) request.getParameter("onProperty") );
-        
+
         String conditionTypeStr = request.getParameter("conditionType");
-        
+
         String restrictionTypeStr = (String) epo.getAttribute("restrictionType");
         Restriction rest = null;
-        
+
         OntClass ontClass = ontModel.getOntClass( (String) epo.getAttribute("VClassURI") );
-        
+
         String roleFillerURIStr = request.getParameter("ValueClass");
         Resource roleFiller = null;
         if (roleFillerURIStr != null) {
             roleFiller = ontModel.getResource(roleFillerURIStr);
-        }               
-        
+        }
+
         int cardinality = -1;
         String cardinalityStr = request.getParameter("cardinality");
         if (cardinalityStr != null) {
-            cardinality = Integer.decode(cardinalityStr); 
+            cardinality = Integer.decode(cardinalityStr);
         }
 
         switch (restrictionTypeStr) {
@@ -224,15 +224,15 @@ public class RestrictionOperationController extends BaseEditController {
                 rest = ontModel.createCardinalityRestriction(null, onProperty, cardinality);
                 break;
         }
-        
+
         if (conditionTypeStr.equals("necessary")) {
             ontClass.addSuperClass(rest);
         } else if (conditionTypeStr.equals("necessaryAndSufficient")) {
             ontClass.addEquivalentClass(rest);
         }
-        
+
         origModel.add(temp);
-        
+
     }
-    
+
 }

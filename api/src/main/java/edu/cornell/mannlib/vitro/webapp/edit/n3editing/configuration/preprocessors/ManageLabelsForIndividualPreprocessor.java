@@ -19,14 +19,14 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmis
 
 public class ManageLabelsForIndividualPreprocessor extends BaseEditSubmissionPreprocessorVTwo {
 
-	
 
-	
+
+
 	public ManageLabelsForIndividualPreprocessor(EditConfigurationVTwo editConfig) {
 		super(editConfig);
-		
+
 	}
-	
+
 	@Override
 	public void preprocess(MultiValueEditSubmission inputSubmission, VitroRequest vreq) {
 		//Check and see if a language was selected by the user, and this is the regular label submission
@@ -44,8 +44,8 @@ public class ManageLabelsForIndividualPreprocessor extends BaseEditSubmissionPre
 				String lang = this.getLanguage(newLabelLanguage.getString());
 				String label = labelLiteral.getString();
 				//Now add the language category to the literal
-				Literal labelWithLanguage = inputSubmission.createLiteral(label, 
-						newLabelLanguage.getDatatypeURI(), 
+				Literal labelWithLanguage = inputSubmission.createLiteral(label,
+						newLabelLanguage.getDatatypeURI(),
 						lang);
 				labels = new ArrayList<Literal>();
 				labels.add(labelWithLanguage);
@@ -54,9 +54,9 @@ public class ManageLabelsForIndividualPreprocessor extends BaseEditSubmissionPre
 				inputSubmission.setLiteralsFromForm(literalsFromForm);
 			}
 		}
-		
+
 	}
-	
+
 	//The language code returned from JAVA locales has an underscore whereas we need a hyphen
 	protected String getLanguage(String inputLanguageCode) {
 		if(inputLanguageCode.contains("_")) {

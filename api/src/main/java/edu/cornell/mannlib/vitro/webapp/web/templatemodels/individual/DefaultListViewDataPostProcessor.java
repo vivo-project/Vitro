@@ -13,11 +13,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class DefaultListViewDataPostProcessor extends
         BaseObjectPropertyDataPostProcessor {
 
-    private static final Log log = LogFactory.getLog(DefaultListViewDataPostProcessor.class); 
-    
+    private static final Log log = LogFactory.getLog(DefaultListViewDataPostProcessor.class);
+
     private static final String KEY_NAME = "name";
     private static final String KEY_OBJECT = "object";
-    
+
     public DefaultListViewDataPostProcessor(ObjectPropertyTemplateModel optm, WebappDaoFactory wdf) {
         super(optm, wdf);
     }
@@ -27,5 +27,5 @@ public class DefaultListViewDataPostProcessor extends
     protected void process(Map<String, String> map) {
         addName(map, KEY_NAME, KEY_OBJECT);
     }
- 
+
 }

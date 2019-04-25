@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.Sel
 
 /**
  * An implementation of QueryContext based on an RDFService.
- * 
+ *
  * Package access. Instances should be created only by SparqlQueryRunner, or by
  * a method on this class.
  */

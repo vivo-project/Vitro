@@ -88,8 +88,8 @@ public abstract class LinkedDataFragmentBase implements ILinkedDataFragment
 
     /**
      * This implementation uses {@link #addMetadata(Model)}, which should be
-     * overridden in subclasses (instead of overriding this method). 
-     * @return 
+     * overridden in subclasses (instead of overriding this method).
+     * @return
      */
     @Override
     public StmtIterator getMetadata()
@@ -101,8 +101,8 @@ public abstract class LinkedDataFragmentBase implements ILinkedDataFragment
 
     /**
      * This implementation uses {@link #addControls(Model)}, which should be
-     * overridden in subclasses (instead of overriding this method). 
-     * @return 
+     * overridden in subclasses (instead of overriding this method).
+     * @return
      */
     @Override
     public StmtIterator getControls()
@@ -125,7 +125,7 @@ public abstract class LinkedDataFragmentBase implements ILinkedDataFragment
         datasetId.addProperty( CommonResources.RDF_TYPE, CommonResources.VOID_DATASET );
         datasetId.addProperty( CommonResources.RDF_TYPE, CommonResources.HYDRA_COLLECTION );
         datasetId.addProperty( CommonResources.VOID_SUBSET, fragmentId );
-        
+
         Literal itemsPerPage = model.createTypedLiteral(this.getMaxPageSize());
         datasetId.addProperty( CommonResources.HYDRA_ITEMSPERPAGE, itemsPerPage);
 

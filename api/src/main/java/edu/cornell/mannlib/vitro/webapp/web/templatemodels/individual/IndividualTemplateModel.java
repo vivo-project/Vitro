@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 public class IndividualTemplateModel extends BaseIndividualTemplateModel {
 
     private static final Log log = LogFactory.getLog(IndividualTemplateModel.class);
-    
+
     IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         super(individual, vreq);
     }

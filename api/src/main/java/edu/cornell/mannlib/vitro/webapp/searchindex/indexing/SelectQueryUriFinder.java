@@ -27,21 +27,21 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
 
 /**
  * Find URIs based on one or more select queries.
- * 
+ *
  * If the statement qualifies, execute the queries and return the accumulated
  * results.
- * 
+ *
  * A statement qualifies if the predicate matches any of the restrictions, or if
  * there are no restrictions.
- * 
+ *
  * If a query contains a ?subject, ?predicate, or ?object variable, it will be
  * bound to the URI of the subject, predicate, or object of the statement,
  * respectively. If the subject or object has no URI and the query expects one,
  * then the query will be ignored. (Predicates always have URIs.)
- * 
+ *
  * All of the result fields of all result rows of all of the queries will be
  * returned.
- * 
+ *
  * A label may be supplied to the instance, for use in logging. If no label is
  * supplied, one will be generated.
  */

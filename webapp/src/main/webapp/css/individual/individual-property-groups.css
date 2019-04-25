@@ -5,15 +5,15 @@ span#toggleContainer {
     padding:10px 8px 0 0;
     font-size: 0.85em;
 }
-section.property-group  { 
+section.property-group  {
     padding-top: 15px;
-    border-top:none; 
+    border-top:none;
 }
-section.property-group h2 { 
-    padding: 8px 10px 4px 12px; 
+section.property-group h2 {
+    padding: 8px 10px 4px 12px;
 }
 .scroll-up {
-   position: absolute; 
+   position: absolute;
    width: 21px;
    height: 30px;
    top: 8px; /* changed for redesign, was 0 */
@@ -24,10 +24,10 @@ section.property-group > div {
 /*    display:none; */
 }
 section.property-group h2 {
-    font-size: 1.15em !important; 
-    color: #5e6363 !important; 
+    font-size: 1.15em !important;
+    color: #5e6363 !important;
     font-weight: normal !important;
-    background: #fafaf9 !important; 
+    background: #fafaf9 !important;
 }
 ul.propertyTabsList  {
     margin-left: 4px;

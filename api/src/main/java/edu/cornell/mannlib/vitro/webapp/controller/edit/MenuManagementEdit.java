@@ -35,20 +35,20 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
  */
 @WebServlet(name = "MenuManagementEdit", urlPatterns = {"/menuManagementEdit"} )
 public class MenuManagementEdit extends VitroHttpServlet {
-   private static final String CMD_PARAM = "cmd";   
+   private static final String CMD_PARAM = "cmd";
    private final static String REORDER_PARAM_VALUE = "Reorder";
    private final static String REDIRECT_URL = "/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true";
-   private static Model removeStatements = null; 
-   private static Model addStatements = null; 
-    
+   private static Model removeStatements = null;
+   private static Model addStatements = null;
+
     @Override
     protected void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
             throws ServletException, IOException {
-    	
+
     	removeStatements = ModelFactory.createDefaultModel();
     	addStatements = ModelFactory.createDefaultModel();
     	VitroRequest vreq = new VitroRequest(rawRequest);
-    	
+
     	String command = getCommand(vreq);
     	if(command != null) {
     		processCommand(command, vreq, resp);
@@ -59,7 +59,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	if(!isReorder(command)){
     		resp.sendRedirect(rawRequest.getContextPath() + REDIRECT_URL);
     	} else {
-    		
+
     	}
     }
 
@@ -68,16 +68,16 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	String command = vreq.getParameter(CMD_PARAM);
     	return command;
     }
-    
+
     public boolean isReorder(String command) {
     	return command.equals(REORDER_PARAM_VALUE);
     }
-    
+
     public boolean isHomePage(String uri) {
     	return uri.equals(DisplayVocabulary.DISPLAY_NS + "Home");
     }
-    
-   
+
+
     //Process command: in this case just reorder, but may be extended to include delete later
     public void processCommand(String command, VitroRequest vreq, HttpServletResponse resp) {
 
@@ -91,7 +91,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	if(isReorder(command)) {
     		errorMessage = processReorder(displayModel, vreq);
     	}
-    	
+
     	//Edits to model occur here
     	displayModel.enterCriticalSection(Lock.WRITE);
     	try {
@@ -110,46 +110,46 @@ public class MenuManagementEdit extends VitroHttpServlet {
     		//Remove and add statements
      		displayModel.remove(removeStatements);
      		displayModel.add(addStatements);
-    	
+
     	} catch(Exception ex) {
     		log.error("An error occurred in processing command", ex);
     		errorMessage += "An error occurred and the operation could not be completed successfully.";
     	}finally {
     		displayModel.leaveCriticalSection();
     	}
-    	
+
     	//if reorder, need to send back an AJAX response
     	if(isReorder(command)){
     		sendReorderResponse(errorMessage, resp);
     	}
-    	
+
     }
-    
+
     private String processReorder(OntModel displayModel, VitroRequest vreq) {
     	//Assuming individual uris passed in the order of their new menu positions
     	String[]individuals = vreq.getParameterValues("individuals");
 		String errorMessage = null;
 		if(individuals.length > 0 ) {
 			removeStatements = removePositionStatements(displayModel, individuals);
-			addStatements = addPositionStatements(displayModel, individuals); 
+			addStatements = addPositionStatements(displayModel, individuals);
 		} else {
 			errorMessage = "No individuals passed";
 		}
 		return errorMessage;
 	}
-    
+
     private void sendReorderResponse(String errorMessage, HttpServletResponse resp) {
     	try{
 			ObjectNode rObj = JsonNodeFactory.instance.objectNode();
 			resp.setCharacterEncoding("UTF-8");
 			resp.setContentType("application/json;charset=UTF-8");
-      
+
 			if( errorMessage != null && !errorMessage.isEmpty()){
 				rObj.put("errorMessage", errorMessage);
 				resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
 			}else{
 				rObj.put("errorMessage", "");
-			}            
+			}
            Writer writer = resp.getWriter();
            writer.write(rObj.toString());
 		} catch(Exception ex) {
@@ -161,17 +161,17 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	private Model removePositionStatements(OntModel displayModel,
 			String[] individuals) {
 		Model removePositionStatements = ModelFactory.createDefaultModel();
-		
+
 		for(String individual: individuals) {
 			Resource individualResource = ResourceFactory.createResource(individual);
-			
+
 			removePositionStatements.add(displayModel.listStatements(
-					individualResource, 
-					DisplayVocabulary.MENU_POSITION, 
+					individualResource,
+					DisplayVocabulary.MENU_POSITION,
 					(RDFNode) null));
-			
+
 		}
-		
+
 		return removePositionStatements;
 	}
 
@@ -184,17 +184,17 @@ public class MenuManagementEdit extends VitroHttpServlet {
 			Resource individualResource = ResourceFactory.createResource(individuals[index]);
 			int position = index + 1;
 			addPositionStatements.add(addPositionStatements.createStatement(
-					individualResource, 
-					DisplayVocabulary.MENU_POSITION, 
+					individualResource,
+					DisplayVocabulary.MENU_POSITION,
 					addPositionStatements.createTypedLiteral(position)));
-			
+
 		}
 		return addPositionStatements;
 	}
 
-	
-   
-	
+
+
+
 	//This should be in write mode
     //TODO: find better way of doing this
     private OntModel getDisplayModel(VitroRequest vreq) {

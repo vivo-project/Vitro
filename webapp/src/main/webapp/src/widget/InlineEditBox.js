@@ -49,7 +49,7 @@ dojo.lang.extend(dojo.widget.html.InlineEditBox, {
 	textValue: "",
 	defaultText: "",
 	doFade: false,
-	
+
 	onSave: function(newValue, oldValue){},
 	onUndo: function(value){},
 
@@ -65,7 +65,7 @@ dojo.lang.extend(dojo.widget.html.InlineEditBox, {
 		this.textValue = dojo.string.trim(this.editable.innerHTML);
 		if(dojo.string.trim(this.textValue).length == 0){
 			this.editable.innerHTML = this.defaultText;
-		}		
+		}
 	},
 
 	mouseover: function(e){

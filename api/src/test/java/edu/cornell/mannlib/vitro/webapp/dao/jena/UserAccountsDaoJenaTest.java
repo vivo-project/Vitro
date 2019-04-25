@@ -366,7 +366,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		ps3.setLabel("Role 3");
 		ps3.setForPublic(true);
 		expected.add(ps3);
-		
+
 		assertCorrectPermissionSets(expected, dao.getAllPermissionSets());
 	}
 

@@ -13,13 +13,13 @@ public interface ObjectPropertyDao extends PropertyDao {
     public abstract List<ObjectProperty> getAllObjectProperties();
 
     public ObjectProperty getObjectPropertyByURI(String objectPropertyURI);
-    
+
     public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI);
-    
+
     /**
      * Use this method to supply a base ObjectProperty whose fields will be updated
      * as necessary to correspond to the configuration for the specified Domain
-     * and Range.  
+     * and Range.
      * @param objectPropertyURI Object Property URI
      * @param domainURI Domain URI
      * @param rangeURI Range URI
@@ -43,9 +43,9 @@ public interface ObjectPropertyDao extends PropertyDao {
     public void deleteObjectProperty(String objectPropertyURI);
 
     public void deleteObjectProperty(ObjectProperty objectProperty);
-    
+
     public boolean skipEditForm(String predicateURI);
-    
+
 
 //    List /*of ObjectProperty */ getObjectPropertiesForObjectPropertyStatements(List /*of ObjectPropertyStatement */ objectPropertyStatements);
 //
@@ -62,7 +62,7 @@ public interface ObjectPropertyDao extends PropertyDao {
 //    List /* of ObjectProperty */ getAllObjectProperties();
 
     List <ObjectProperty> getRootObjectProperties();
-    
+
     /**
      * Returns a list of ObjectProperty objects for which statements exist about
      * the individual.  Note that this method now returns multiple copies of
@@ -71,7 +71,7 @@ public interface ObjectPropertyDao extends PropertyDao {
      * views for the "faux" qualified properties.
      */
     public List<ObjectProperty> getObjectPropertyList(Individual subject);
-    
+
     /**
      * Returns a list of ObjectProperty objects for which statements exist about
      * the individual.  Note that this method now returns multiple copies of
@@ -79,7 +79,7 @@ public interface ObjectPropertyDao extends PropertyDao {
      * types of the related objects.  This supports finding the approriate list
      * views for the "faux" qualified properties.
      */
-    public List<ObjectProperty> getObjectPropertyList(String subjectUri); 
-    
+    public List<ObjectProperty> getObjectPropertyList(String subjectUri);
+
     public String getCustomListViewConfigFileName(ObjectProperty objectProperty);
 }

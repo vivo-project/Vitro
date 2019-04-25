@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 /**
  * A base class with some utility routines for page handler (created by
  * controller classes.
- * 
+ *
  * The controller logic is often complicated by the fact that the servlet must
  * be multi-threaded. If a "page handler" instance is created for each request,
  * it may share instance variables among its methods, which frequently makes for
@@ -113,7 +113,7 @@ public abstract class AbstractPageHandler {
 	/**
 	 * Treat the presence of a certain parameter, with a desired value, as a
 	 * boolean flag.
-	 * 
+	 *
 	 * An example would be radio buttons with values of "yes" and "no". The
 	 * expected value would be "yes".
 	 */
@@ -150,7 +150,7 @@ public abstract class AbstractPageHandler {
 	/**
 	 * Set one of these on the session, so it can be interpreted and displayed
 	 * at the next request. It will only be displayed once.
-	 * 
+	 *
 	 * Allows one page handler to pass a message to another page handler through
 	 * a re-direct.
 	 */

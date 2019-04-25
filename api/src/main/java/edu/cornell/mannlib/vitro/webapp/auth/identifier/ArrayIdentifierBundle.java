@@ -14,7 +14,7 @@ public class ArrayIdentifierBundle extends ArrayList<Identifier> implements
 	public ArrayIdentifierBundle(Collection<? extends Identifier> ids) {
 		super(ids);
 	}
-	
+
 	public ArrayIdentifierBundle(Identifier... ids) {
 		this(Arrays.asList(ids));
 	}

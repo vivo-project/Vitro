@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 @WebServlet(name = "RDFUploadFormController", urlPatterns = {"/uploadRDFForm"} )
 public class RDFUploadFormController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(RDFUploadFormController.class.getName());
 
     @Override

@@ -15,13 +15,13 @@ import org.apache.http.message.BasicHeaderValueParser;
 
 /**
  * A utility for selecting content types, in the context of the Accept header.
- * 
+ *
  * -------------------
- * 
+ *
  * This does not support matching against content types with extensions, like
  * "level=1", as illustrated in RFC-2616:
  * http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1
- * 
+ *
  * However, as long as we don't offer such extensions on our available types,
  * the use of extensions in the Accept header is moot.
  */
@@ -30,9 +30,9 @@ public class ContentTypeUtil {
 	/**
 	 * Given an Accept header value and a list of available type names, decide
 	 * which type is the best fit.
-	 * 
+	 *
 	 * If there is no fit, throw a NotAcceptableException
-	 * 
+	 *
 	 * The only thing to do is to match all available against all acceptable,
 	 * and pick the best match. Try to do as little work as possible inside the
 	 * nested loop.
@@ -43,7 +43,7 @@ public class ContentTypeUtil {
 		if (availableTypeNames == null) {
 			throw new NotAcceptableException("availableTypeNames may not be null.");
 		}
-		
+
 		Set<AcceptableType> acceptableTypes = parseAcceptHeader(acceptHeader);
 		List<MatchCriteria> availableTypes = convertToMatchCriteria(availableTypeNames);
 
@@ -73,7 +73,7 @@ public class ContentTypeUtil {
 	/**
 	 * The order of items in the Accept header is not important. We rely on the
 	 * specificity of the match and the "q" factor, in that order.
-	 * 
+	 *
 	 * Since q ranges between 1.0 and 0.001, we add a specificity offset of 2, 3
 	 * or 4. That way, matches with equal specificity are decided by q factor.
 	 */
@@ -110,7 +110,7 @@ public class ContentTypeUtil {
 
 	/**
 	 * Parsing the Accept header returns a set of these.
-	 * 
+	 *
 	 * Package access to permit unit testing.
 	 */
 	static class AcceptableType {
@@ -126,7 +126,7 @@ public class ContentTypeUtil {
 		private float parseQValue(String qString)
 				throws AcceptHeaderParsingException {
 			float qValue = 0.0F;
-			
+
 			if (qString == null || qString.trim().isEmpty()) {
 				qString = "1";
 			}
@@ -167,7 +167,7 @@ public class ContentTypeUtil {
 	/**
 	 * Parse the available type names into a list of these, so we only do the
 	 * substring operations once.
-	 * 
+	 *
 	 * Package access to permit unit testing.
 	 */
 	static class MatchCriteria {
@@ -200,13 +200,13 @@ public class ContentTypeUtil {
 
 		/**
 		 * If one of the types is a wild-card, it's a weak match.
-		 * 
+		 *
 		 * Otherwise, if the types match and one of the subtypes is a wild-card,
 		 * it's a medium match.
-		 * 
+		 *
 		 * Otherwise, if the types match and the subtypes match, it's a strong
 		 * match.
-		 * 
+		 *
 		 * Otherwise, it is no match.
 		 */
 		public int matchQuality(MatchCriteria that) {

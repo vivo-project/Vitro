@@ -27,7 +27,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 
 /**
  * This is the matching order we expect to see:
- * 
+ *
  * <pre>
  * exact match to preferred, by order.
  * partial match to preferred, by order.

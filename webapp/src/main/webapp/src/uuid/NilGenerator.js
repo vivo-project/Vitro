@@ -13,7 +13,7 @@ dojo.provide("dojo.uuid.NilGenerator");
 dojo.uuid.NilGenerator = new function() {
 
 /**
- * This function returns the Nil UUID: 
+ * This function returns the Nil UUID:
  * "00000000-0000-0000-0000-000000000000".
  * The Nil UUID is described in section 4.1.7 of
  * RFC 4122: http://www.ietf.org/rfc/rfc4122.txt

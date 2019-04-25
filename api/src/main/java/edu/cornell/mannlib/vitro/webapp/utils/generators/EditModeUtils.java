@@ -16,13 +16,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
 public class EditModeUtils {
 	private static Log log = LogFactory.getLog(EditModeUtils.class);
 
-    
+
     /* *************** Static utility methods used in role-based generators *********** */
 	public static EditMode getEditMode(VitroRequest vreq, List<String> possiblePredicates) {
     	//We're making some assumptions here: That there is only one role objec tot one activity object
     	//pairing, i.e. the same role object can't be related to a different activity object
     	//That said, there should only be one role to Activity predicate linking a role to an activity
-    	//So if 
+    	//So if
     	Individual object = EditConfigurationUtils.getObjectIndividual(vreq);
     	boolean foundErrorMode = false;
     	int numberEditModes = 0;
@@ -45,14 +45,14 @@ public class EditModeUtils {
     			log.debug("Edit mode is REPAIR for " + predicate);
     			numberRepairModes++;
     		}
-    		
+
     	}
     	log.debug("Number of edit editModes " + numberEditModes);
     	log.debug("Number of repair editModes " + numberRepairModes);
     	log.debug("Found error mode: " + foundErrorMode);
     	//if found an error or if more than one edit mode returned, incorrect
 
-    	if(foundErrorMode || numberEditModes > 1) 
+    	if(foundErrorMode || numberEditModes > 1)
     	{
     		return EditMode.ERROR;
     	}
@@ -65,19 +65,19 @@ public class EditModeUtils {
     	//which is incorrect
     	if(numberRepairModes == numberPredicates) {
     		mode = EditMode.REPAIR;
-    	}    	
+    	}
     	//otherwise all the modes are Add and Add will be returned
     	return mode;
 	}
-	
+
 	public static boolean isAddMode(EditMode mode) {
     	return (mode == EditMode.ADD);
     }
-    
+
     public static boolean isEditMode(EditMode mode) {
     	return (mode == EditMode.EDIT);
     }
-    
+
    public static boolean isRepairMode(EditMode mode) {
     	return (mode == EditMode.REPAIR);
     }

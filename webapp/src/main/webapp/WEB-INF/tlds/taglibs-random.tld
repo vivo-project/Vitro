@@ -7,10 +7,10 @@
   <shortname>random</shortname>
   <uri>http://jakarta.apache.org/taglibs/random-1.0</uri>
   <info>
-     The Random tag library creates random strings and random numbers. You may 
-     specify a set of allowable characters as well as the length for randomly 
-     generated strings. You may specify a range of allowable integers or a 
-     random floating point number between zero and one for randomly generated 
+     The Random tag library creates random strings and random numbers. You may
+     specify a set of allowable characters as well as the length for randomly
+     generated strings. You may specify a range of allowable integers or a
+     random floating point number between zero and one for randomly generated
      numbers.  </info>
   <tag>
     <name>string</name>
@@ -83,6 +83,6 @@
 
 
 
-       
+
 
 

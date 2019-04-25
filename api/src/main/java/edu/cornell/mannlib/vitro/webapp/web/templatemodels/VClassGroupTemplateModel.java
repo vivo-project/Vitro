@@ -15,10 +15,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 public class VClassGroupTemplateModel extends BaseTemplateModel {
 
 	private static final Log log = LogFactory.getLog(VClassGroupTemplateModel.class.getName());
-	
+
     private final VClassGroup vClassGroup;
     private List<VClassTemplateModel> classes;
-    
+
     public VClassGroupTemplateModel(VClassGroup vClassGroup) {
         this.vClassGroup = vClassGroup;
     }
@@ -26,15 +26,15 @@ public class VClassGroupTemplateModel extends BaseTemplateModel {
     public int getDisplayRank() {
         return vClassGroup.getDisplayRank();
     }
-    
+
     public String getUri() {
     	return vClassGroup.getURI();
     }
-    
+
     public String getNamespace() {
     	return vClassGroup.getNamespace();
     }
-    
+
     public String getLocalName() {
     	return vClassGroup.getLocalName();
     }
@@ -42,7 +42,7 @@ public class VClassGroupTemplateModel extends BaseTemplateModel {
     public String getPublicName() {
     	return vClassGroup.getPublicName();
     }
-    
+
     // Protect the template against a group without a name.
     public String getDisplayName() {
         String displayName = getPublicName();
@@ -51,7 +51,7 @@ public class VClassGroupTemplateModel extends BaseTemplateModel {
         }
         return displayName;
     }
-    
+
     public List<VClassTemplateModel> getClasses() {
         if (classes == null) {
             List<VClass> classList = vClassGroup.getVitroClassList();
@@ -60,19 +60,19 @@ public class VClassGroupTemplateModel extends BaseTemplateModel {
                 classes.add(new VClassTemplateModel(vc));
             }
         }
-        
+
         return classes;
     }
-    
+
     public int getIndividualCount(){
         if( vClassGroup.isIndividualCountSet() )
             return vClassGroup.getIndividualCount();
         else
             return 0;
     }
-    
+
     public boolean isIndividualCountSet(){
         return vClassGroup.isIndividualCountSet();
-    }    
-    
+    }
+
 }

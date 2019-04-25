@@ -26,34 +26,34 @@ import freemarker.cache.TemplateLoader;
 
 /**
  * Loads Freemarker templates from a given directory.
- * 
+ *
  * Different from a file loader in two ways:
- * 
+ *
  * 1) Flattens the directory. When it searches for a template, it will look in
  * the base directory and in any sub-directories. While doing this, it ignores
  * any path that is attached to the template name.
- * 
+ *
  * So if you were to ask for 'admin/silly.ftl', it would search for 'silly.ftl'
  * in the base directory, and in any sub-directories, until it finds one.
- * 
+ *
  * 2) Accepts approximate matches on locales. When asked for a template, it will
  * accepts an approximate match that matches the basename and extension, and
  * language or region if specifed. So a search for a template with no language
  * or region will prefer an exact match, but will accept one with language or
  * both language and region.
- * 
+ *
  * <pre>
  * "this_es_MX.ftl" matches "this_es_MX.ftl"
  * "this_es.ftl"    matches "this_es.ftl" or "this_es_MX.ftl"
  * "this.ftl"       matches "this.ftl" or "this_es.ftl" or "this_es_MX.ftl"
  * </pre>
- * 
+ *
  * This allows Freemarker to mimic the behavior of the language filtering RDF
  * service, because if Freemarker does not find a match for "this_es_MX.ftl", it
  * will try again with "this_es.ftl" and "this.ftl". So the net effect is that a
  * search for "silly_es_MX.ftl" would eventually return any of these, in order
  * of preference:
- * 
+ *
  * <pre>
  * silly_es_MX.ftl
  * silly_es.ftl
@@ -61,7 +61,7 @@ import freemarker.cache.TemplateLoader;
  * silly.ftl
  * silly_*.ftl
  * </pre>
- * 
+ *
  * If more than one template file qualifies, we choose by best fit, shortest
  * path, and alphabetical order, to insure that identical requests produce
  * identical results.
@@ -126,7 +126,7 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 
 	/**
 	 * Ask the file when it was last modified.
-	 * 
+	 *
 	 * @param templateSource
 	 *            a File that was obtained earlier from findTemplateSource().
 	 */
@@ -138,7 +138,7 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 	/**
 	 * Get a Reader on this File. The framework will close the Reader after
 	 * reading it.
-	 * 
+	 *
 	 * @param templateSource
 	 *            a File that was obtained earlier from findTemplateSource().
 	 */
@@ -150,7 +150,7 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 
 	/**
 	 * Nothing to do here. No resources to free up.
-	 * 
+	 *
 	 * @param templateSource
 	 *            a File that was obtained earlier from findTemplateSource().
 	 */
@@ -221,7 +221,7 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 
 		/**
 		 * If I'm searching for this, is that an acceptable match?
-		 * 
+		 *
 		 * Note that this is asymetrical -- a search term without a region will
 		 * match a candidate with a region, but not vice versa. Same with
 		 * language.

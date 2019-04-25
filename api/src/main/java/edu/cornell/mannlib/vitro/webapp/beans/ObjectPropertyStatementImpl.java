@@ -17,14 +17,14 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
 
     private String propertyURI = null;
     private ObjectProperty property = null;
-    private boolean subjectOriented = true; //is the range the item of interest?  
-    
+    private boolean subjectOriented = true; //is the range the item of interest?
+
    public ObjectPropertyStatementImpl() { }
 
    public ObjectPropertyStatementImpl(String subjectUri, String propertyUri, String objectUri) {
         subjectURI = subjectUri;
         propertyURI = propertyUri;
-        objectURI = objectUri;        
+        objectURI = objectUri;
     }
 
     /* (non-Javadoc)
@@ -82,7 +82,7 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
     public void setSubject(Individual subject) {
         this.subject = subject;
         if (subject == null || subject.isAnonymous()) {
-            setSubjectURI(null);    
+            setSubjectURI(null);
         } else {
             setSubjectURI(subject.getURI());
         }
@@ -123,7 +123,7 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
     public void setObject(Individual object) {
         this.object = object;
         if (object == null || object.isAnonymous()) {
-            setObjectURI(null);    
+            setObjectURI(null);
         } else {
             setObjectURI(object.getURI());
         }
@@ -147,10 +147,10 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
      * Sorts entity object for display presentation.
      * @author bdc34
      */
-    public static class DisplayComparator implements Comparator{    	    	
+    public static class DisplayComparator implements Comparator{
         public int compare(Object o1, Object o2) {
             Individual ent1 = ((ObjectPropertyStatement) o1).getSubject();
-            Individual ent2 = ((ObjectPropertyStatement) o2).getSubject();            
+            Individual ent2 = ((ObjectPropertyStatement) o2).getSubject();
             return ent1.getName().compareTo(ent2.getName());
         }
     }

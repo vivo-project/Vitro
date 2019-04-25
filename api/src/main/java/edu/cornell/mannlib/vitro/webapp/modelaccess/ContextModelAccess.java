@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /**
  * Data structures on the context have fewer options than those on a request.
- * 
+ *
  * There is no Preferred Language or Policy restrictions if there is no
  * "current user".
  */
@@ -30,22 +30,22 @@ public interface ContextModelAccess {
 
 	/** Get the Dataset for either CONTENT or CONFIGURATION models. */
 	public Dataset getDataset(WhichService which);
-	
+
 	/** Get the ModelMaker for the CONTENT models. */
 	public ModelMaker getModelMaker();
 
 	/** Get the ModelMaker for either CONTENT or CONFIGURATION models. */
 	public ModelMaker getModelMaker(WhichService which);
-	
+
 	/** Get the FULL_UNION OntModel. */
 	public OntModel getOntModel();
 
 	/** Get an OntModel by name. */
 	public OntModel getOntModel(String name);
-	
+
 	/** Get the ASSERTIONS_AND_INFERENCES OntModelSelector. */
 	public OntModelSelector getOntModelSelector();
-	
+
 	/** Get an OntModelSelector based on ASSERTIONS, INFERENCES, or both. */
 	public OntModelSelector getOntModelSelector(ReasoningOption option);
 

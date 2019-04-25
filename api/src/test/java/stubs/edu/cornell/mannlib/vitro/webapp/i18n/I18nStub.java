@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 /**
  * An implementation of I18n for unit tests. Construct a new instance and it
  * replaces the instance of I18n.
- * 
+ *
  * Each bundle that you get from it is the same, returning the key itself as the
  * value of that key.
  */
@@ -42,12 +42,12 @@ public class I18nStub extends I18n {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/** Make it private, so they will use the setup() method. */
 	private I18nStub() {
 		// Nothing to initialize.
 	}
-	
+
 	@Override
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
 		return new I18nBundleStub(bundleName);

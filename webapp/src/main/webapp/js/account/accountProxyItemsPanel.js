@@ -4,18 +4,18 @@
  * ----------------------------------------------------------------------------
  * proxyItemsPanel
  * ----------------------------------------------------------------------------
- * Display an AJAX-enabled list of proxy-related items (either proxies or 
- * profiles). 
- * 
- * The list may start out with a population of items. items may be added by 
+ * Display an AJAX-enabled list of proxy-related items (either proxies or
+ * profiles).
+ *
+ * The list may start out with a population of items. items may be added by
  * selecting them in the auto-complete box. Items may be removed by clicking
  * the "remove" link next to that item.
- * 
+ *
  * A hidden field will hold the URI for each item, so when the form is submitted,
  * the controller can determine the list of items.
  * ----------------------------------------------------------------------------
  * You provide:
- *   p -- the DOM element that contains the template and the data. 
+ *   p -- the DOM element that contains the template and the data.
  *         It also contains the autocomplete field, with a status element and
  *         perhaps 1 or more excluded URIs
  * ----------------------------------------------------------------------------
@@ -43,14 +43,14 @@ function proxyItemsPanel(panel, contextInfo)  {
 
 	this.displayItemData = function() {
 		$(".proxyInfoElement", dataContainerElement).remove();
-		
+
 		for (i = 0; i < self.itemData.length; i++) {
 			self.itemData[i].element().appendTo(dataContainerElement);
 		}
 	}
 
 	var getItemData = function() {
-		return self.itemData;	
+		return self.itemData;
 	}
 
 	this.removeItem = function(info) {
@@ -65,7 +65,7 @@ function proxyItemsPanel(panel, contextInfo)  {
 	}
 
 	this.addItemData = function(selection) {
-		var info = new itemElement(self.templateHtml, selection.uri, selection.label, 
+		var info = new itemElement(self.templateHtml, selection.uri, selection.label,
 				selection.classLabel, selection.imageUrl, self.removeItem);
         self.itemData.unshift(info);
         self.displayItemData();
@@ -95,7 +95,7 @@ function proxyItemsPanel(panel, contextInfo)  {
 	        }
 	    });
 	}
-	
+
 	var parseOriginalData = function() {
 		var dataDivs = $("div[name='data']", dataContainerElement)
 		var data = [];
@@ -175,7 +175,7 @@ $(document).ready(function() {
 		}
 		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);
 	});
-	
+
 	$("section[name='proxyProxiesPanel']").each(function(i) {
 		var context = {
 			baseUrl: proxyContextInfo.baseUrl,
@@ -185,32 +185,32 @@ $(document).ready(function() {
 		}
 		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);
 	});
-	
+
 	//Add progress indicator for autocomplete input fields
-	
+
 	var progressImage;
-	
+
 	$('#addProfileEditor').click(function(event){
         progressImage = $(event.target).closest("section").find(".loading-profileMyAccoount")
     });
-    
+
     $('#selectProfileEditors').click(function(event){
         progressImage = $(event.target).closest("section").find(".loading-relateEditor")
     });
-    
+
     $('#selectProfiles').click(function(event){
         progressImage = $(event.target).closest("section").find(".loading-relateProfile")
     });
-    
+
     $('#addProfile').click(function(event){
         progressImage = $(event.target).closest("section").find(".loading-addProfile")
     });
-    
-    
+
+
     $(document).ajaxStart(function(){
       progressImage.removeClass('hidden').css('display', 'inline-block');
     });
-    
+
     $(document).ajaxStop(function(){
       progressImage.hide().addClass('hidden');
     });

@@ -26,15 +26,15 @@ public class RDFServiceDataset implements Dataset {
 
     private RDFServiceDatasetGraph g;
     private ReadWrite transactionMode;
-    
+
     public RDFServiceDataset(RDFServiceDatasetGraph g) {
         this.g = g;
     }
-    
+
     public RDFServiceDataset(RDFService rdfService) {
         this.g = new RDFServiceDatasetGraph(rdfService);
     }
-    
+
     @Override
     public DatasetGraph asDatasetGraph() {
         return g;
@@ -66,7 +66,7 @@ public class RDFServiceDataset implements Dataset {
     }
 
     private final static Log log = LogFactory.getLog(RDFServiceDataset.class);
-    
+
     @Override
     public Model getNamedModel(String arg0) {
         Model model = RDFServiceGraph.createRDFServiceModel(
@@ -134,9 +134,9 @@ public class RDFServiceDataset implements Dataset {
 	public boolean isInTransaction() {
 		return (transactionMode != null);
 	}
-	
+
     private boolean supportsTransactions(Graph graph) {
-        return (graph.getTransactionHandler() != null 
+        return (graph.getTransactionHandler() != null
                 && graph.getTransactionHandler().transactionsSupported());
     }
 

@@ -80,7 +80,7 @@ dojo.widget.HtmlCiviCrmDatePicker = function(){
 
 		if(this.mode.indexOf("date") != -1){
 			this.datePicker = dojo.widget.createWidget("DatePicker", {}, this.dateHolderTd);
-			dojo.event.connect(	this.datePicker, "onSetDate", 
+			dojo.event.connect(	this.datePicker, "onSetDate",
 								this, "setDateSelects");
 
 			var mfd = this.modeFormats.date;
@@ -90,7 +90,7 @@ dojo.widget.HtmlCiviCrmDatePicker = function(){
 		}
 		if(this.mode.indexOf("time") != -1){
 			this.timePicker = dojo.widget.createWidget("TimePicker", {}, this.timeHolderTd);
-			dojo.event.connect(	this.timePicker, "onSetTime", 
+			dojo.event.connect(	this.timePicker, "onSetTime",
 								this, "setTimeSelects");
 			var mfd = this.modeFormats.time;
 			for(var x=0; x<mfd.length; x++){
@@ -105,9 +105,9 @@ dojo.widget.HtmlCiviCrmDatePicker = function(){
 
 	this.postCreate = function(){
 		dojo.event.kwConnect({
-			type: "before", 
+			type: "before",
 			srcObj: dojo.html.getParentByType(this.domNode, "form"),
-			srcFunc: "onsubmit", 
+			srcFunc: "onsubmit",
 			targetObj: this,
 			targetFunc: "unhide"
 		});

@@ -45,7 +45,7 @@ function init(){
         <input type="hidden" name="modelType" value="${modelType}"/>
         <input type="submit" name="submit" value="Create Model"/>
     </form>
-    
+
             Currently showing <font color="red">${infoLine}</font>
     <ul>
       <c:forEach var="modelName" items="${modelNames}">
@@ -103,7 +103,7 @@ function init(){
             <td>
 			<form action="ingest" method="get">
 			    <input type="hidden" name="action" value="permanentURI" />
-			    <input type="hidden" name="modelName" value="${modelName}" /> 
+			    <input type="hidden" name="modelName" value="${modelName}" />
 				<input type="hidden" name="modelType" value="${modelType}"/>
 				<input type="submit" name="submit" value="generate permanent URIs" /></form>
 			</td>

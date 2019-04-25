@@ -19,15 +19,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 
 public class SelectListGeneratorVTwo {
-    
+
     static Log log = LogFactory.getLog(SelectListGeneratorVTwo.class);
-    
+
     public static Map<String,String> getOptions(
-            EditConfigurationVTwo editConfig, 
-            String fieldName, 
+            EditConfigurationVTwo editConfig,
+            String fieldName,
             WebappDaoFactory wDaoFact){
 
-        
+
         if( editConfig == null ){
             log.error( "fieldToSelectItemList() must be called with a non-null EditConfigurationVTwo ");
             return Collections.emptyMap();
@@ -35,18 +35,18 @@ public class SelectListGeneratorVTwo {
         if( fieldName == null ){
             log.error( "fieldToSelectItemList() must be called with a non-null fieldName");
             return Collections.emptyMap();
-        }                            
-        
+        }
+
         FieldVTwo field = editConfig.getField(fieldName);
         if (field==null) {
             log.error("no field \""+fieldName+"\" found from editConfig.");
             return Collections.emptyMap();
         }
-        
+
         if( field.getFieldOptions() == null ){
             return Collections.emptyMap();
         }
-        
+
         try {
             return field.getFieldOptions().getOptions(editConfig,fieldName,wDaoFact);
         } catch (Exception e) {
@@ -54,12 +54,12 @@ public class SelectListGeneratorVTwo {
             return Collections.emptyMap();
         }
     }
-   
-      
-    //Methods to sort the options map 
+
+
+    //Methods to sort the options map
     // from http://forum.java.sun.com/thread.jspa?threadID=639077&messageID=4250708
     //Modified to allow for a custom comparator to be sent in, defaults to mapPairsComparator
-    public static Map<String,String> getSortedMap(Map<String,String> hmap, 
+    public static Map<String,String> getSortedMap(Map<String,String> hmap,
             Comparator<String[]> comparator, VitroRequest vreq){
         // first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
         List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
@@ -69,12 +69,12 @@ public class SelectListGeneratorVTwo {
             x[1] = hmap.get(key);
             objectsToSort.add(x);
         }
-        
+
         //if no comparator is passed in, utilize MapPairsComparator
         if(comparator == null) {
         	comparator = new MapPairsComparator(vreq);
         }
-        
+
         objectsToSort.sort(comparator);
 
         HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
@@ -84,11 +84,11 @@ public class SelectListGeneratorVTwo {
         return map;
     }
 
-    //Sorts by the value of the 2nd element in each of the arrays 
+    //Sorts by the value of the 2nd element in each of the arrays
     private static class MapPairsComparator implements Comparator<String[]> {
-        
+
         private Collator collator;
-        
+
         public MapPairsComparator(VitroRequest vreq) {
             this.collator = vreq.getCollator();
         }
@@ -112,5 +112,5 @@ public class SelectListGeneratorVTwo {
                 }
             }
         }
-    }    
+    }
 }

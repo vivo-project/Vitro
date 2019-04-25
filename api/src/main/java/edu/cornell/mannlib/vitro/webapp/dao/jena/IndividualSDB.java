@@ -67,13 +67,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     private Float _searchBoostJena = null;
     private boolean retreivedNullRdfsLabel = false;
     private DatasetWrapperFactory dwf = null;
-    private SDBDatasetMode datasetMode = 
+    private SDBDatasetMode datasetMode =
                 SDBDatasetMode.ASSERTIONS_AND_INFERENCES;
-    private String individualURI = null; 
+    private String individualURI = null;
     private Model model = null;
-    private Boolean _hasThumb = null; 
-    
-    public IndividualSDB(String individualURI, 
+    private Boolean _hasThumb = null;
+
+    public IndividualSDB(String individualURI,
                          DatasetWrapperFactory datasetWrapperFactory,
                          SDBDatasetMode datasetMode,
                          WebappDaoFactorySDB wadf,
@@ -81,37 +81,37 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.individualURI = individualURI;
 		this.webappDaoFactory = wadf;
     	this.dwf = datasetWrapperFactory;
-      
+
     	try {
 	    	initModel.getLock().enterCriticalSection(Lock.READ);
-	    	String getStatements = 
+	    	String getStatements =
 	    		"CONSTRUCT \n" +
-	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
+	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() +
 	    		        "> ?ooo. \n" +
 	    		   "<"+individualURI+">  a ?type . \n" +
 	    		 "} \n" +
 	    		 "WHERE { \n" +
-	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
+	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() +
 	    		 	        "> ?ooo }  \n" +
 	    		 	" UNION { <"+individualURI+"> a ?type } \n" +
-	    		 "} "; 
+	    		 "} ";
     		this.model = QueryExecutionFactory.create(
     		        QueryFactory.create(getStatements), initModel)
     		                .execConstruct();
     	} finally {
     		initModel.getLock().leaveCriticalSection();
     	}
-    	
+
     	OntModel ontModel = ModelFactory.createOntologyModel(
     	        OntModelSpec.OWL_MEM, model);
-    	this.ind = ontModel.createOntResource(individualURI);  
+    	this.ind = ontModel.createOntResource(individualURI);
     	setUpURIParts(ind);
     }
-    
-    public IndividualSDB(String individualURI, 
-            DatasetWrapperFactory datasetWrapperFactory, 
+
+    public IndividualSDB(String individualURI,
+            DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode,
-            WebappDaoFactorySDB wadf, 
+            WebappDaoFactorySDB wadf,
             boolean skipInitialization) throws IndividualNotFoundException {
     	this.individualURI = individualURI;
     	this.datasetMode = datasetMode;
@@ -121,15 +121,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	if (skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
-            this.ind = ontModel.createOntResource(individualURI);  
+            this.ind = ontModel.createOntResource(individualURI);
     	} else {
         	try {
     	    	String getStatements =
     	    		"CONSTRUCT " +
-    	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
+    	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() +
     	    		        "> ?ooo \n" +
     	    		 "} WHERE {" +
-    	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
+    	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() +
     	    		 	        "> ?ooo } \n" +
     	    		 "}";
 
@@ -137,19 +137,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 				webappDaoFactory.getRDFService().sparqlConstructQuery(getStatements, model);
         	} catch (RDFServiceException e) {
         	}
-        	
+
         	OntModel ontModel = ModelFactory.createOntologyModel(
         	        OntModelSpec.OWL_MEM, model);
-        	
+
         	if (model.isEmpty() && noTriplesFor(individualURI)) {
         	    throw new IndividualNotFoundException();
         	}
-        	
-        	this.ind = ontModel.createOntResource(individualURI);  
+
+        	this.ind = ontModel.createOntResource(individualURI);
     	}
     	setUpURIParts(ind);
     }
-    
+
     private boolean noTriplesFor(String individualURI) {
 		try {
 			return !webappDaoFactory.getRDFService().sparqlAskQuery("ASK { <" + individualURI + "> ?p ?o }");
@@ -158,22 +158,22 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 
 		return true;
     }
-    
+
     static final boolean SKIP_INITIALIZATION = true;
 
     public IndividualSDB(String individualURI,
             DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode,
             WebappDaoFactorySDB wadf) throws IndividualNotFoundException {
-        this(individualURI, 
-             datasetWrapperFactory, 
-             datasetMode, 
-             wadf, 
+        this(individualURI,
+             datasetWrapperFactory,
+             datasetMode,
+             wadf,
              !SKIP_INITIALIZATION);
     }
-    
+
     public class IndividualNotFoundException extends Exception {}
-    
+
     private void setUpURIParts(OntResource ind) {
         if (ind != null) {
             if (ind.isAnon()) {
@@ -192,52 +192,52 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     private DatasetWrapper getDatasetWrapper() {
         return this.dwf.getDatasetWrapper();
     }
-    
-    public String getName() { 
+
+    public String getName() {
         if (this.name != null) {
             return name;
         } else {
         	ind.getOntModel().enterCriticalSection(Lock.READ);
-        	
+
             try {
                 this.name = webappDaoFactory.getJenaBaseDao().getLabelOrId(ind);
                 if (this.name == null) {
                     this.name = "[null]";
                 }
                 return this.name;
-          
+
             } finally {
-              
+
             	ind.getOntModel().leaveCriticalSection();
             }
         }
     }
 
-    public String getRdfsLabel() { 
+    public String getRdfsLabel() {
         if (this.rdfsLabel != null) {
             return rdfsLabel;
         } else if( this.rdfsLabel == null && retreivedNullRdfsLabel ){
         	return null;
-        } else { 
-           
+        } else {
+
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 this.rdfsLabel = webappDaoFactory.getJenaBaseDao().getLabel(ind);
                 retreivedNullRdfsLabel = this.rdfsLabel == null;
                 return this.rdfsLabel;
             } finally {
-               
+
             	ind.getOntModel().leaveCriticalSection();
             }
         }
     }
-    
-	public String getVClassURI() { 
+
+	public String getVClassURI() {
         if (this.vClassURI != null) {
             return vClassURI;
         } else {
         	List<VClass> clist = getVClasses(true);
-        	return (clist.size() > 0) ? clist.get(0).getURI() : null; 
+        	return (clist.size() > 0) ? clist.get(0).getURI() : null;
         }
     }
 
@@ -246,17 +246,17 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             return this.vClass;
         } else {
         	List<VClass> clist = getVClasses(true);
-            return (clist.size() > 0) ? clist.get(0) : null ; 
-        } 
+            return (clist.size() > 0) ? clist.get(0) : null ;
+        }
     }
-    
+
     @Override
     public List<String> getMostSpecificTypeURIs() {
         final List<String> typeURIs = new ArrayList<String>();
         if (this.getURI() == null) {
             return typeURIs;
         } else {
-            String queryStr = "SELECT ?type WHERE { <" + this.getURI() + "> <" + 
+            String queryStr = "SELECT ?type WHERE { <" + this.getURI() + "> <" +
                     VitroVocabulary.MOST_SPECIFIC_TYPE + "> ?type }";
             try {
 				webappDaoFactory.getRDFService().sparqlSelectQuery(queryStr, new ResultSetConsumer() {
@@ -280,7 +280,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         if (modTime != null) {
             return modTime;
         } else {
-           
+
         	ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 Date modDate = webappDaoFactory.getJenaBaseDao()
@@ -291,20 +291,20 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 }
                 return modTime;
             } finally {
-               
+
             	ind.getOntModel().leaveCriticalSection();
             }
         }
     }
 
-    public Float getSearchBoost(){ 
+    public Float getSearchBoost(){
         if( this._searchBoostJena != null ){
             return this._searchBoostJena;
         }else{
-            String getPropertyValue = 
+            String getPropertyValue =
             	"SELECT ?value \n" +
             	"WHERE { \n" +
-            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value \n" + 
+            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value \n" +
             	"}";
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
@@ -312,7 +312,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	QueryExecution qe = QueryExecutionFactory.create(
                     QueryFactory.create(getPropertyValue), dataset);
             try{
-                ResultSet rs = qe.execSelect();       
+                ResultSet rs = qe.execSelect();
                 if(rs.hasNext()){
                 	QuerySolution qs = rs.nextSolution();
                 	if(qs.get("value") !=null){
@@ -324,8 +324,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                    return null;
                 }
             } catch (Exception e){
-            	log.error(e,e); 
-                return null;            	
+            	log.error(e,e);
+                return null;
             } finally{
                 qe.close();
             	dataset.getLock().leaveCriticalSection();
@@ -333,26 +333,26 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             }
         }
         return null;
-    }    
+    }
 
 	@Override
-	public String getMainImageUri() {  
+	public String getMainImageUri() {
 		if (this.mainImageUri != NOT_INITIALIZED) {
 			return mainImageUri;
 		} else {
-			List<ObjectPropertyStatement> mainImgStmts = 
+			List<ObjectPropertyStatement> mainImgStmts =
 					getObjectPropertyStatements(VitroVocabulary.IND_MAIN_IMAGE);
 			if (mainImgStmts != null && mainImgStmts.size() > 0) {
 				// arbitrarily return the first value in the list
 				mainImageUri = mainImgStmts.get(0).getObjectURI();
-				return mainImageUri;				
-			} 
+				return mainImageUri;
+			}
 			return null;
 		}
 	}
 
 	@Override
-	public String getImageUrl() { 
+	public String getImageUrl() {
 		if (this.imageInfo == null) {
 			this.imageInfo = ImageInfo.instanceFromEntityUri(
 			        webappDaoFactory, this);
@@ -367,7 +367,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	}
 
 	@Override
-	public String getThumbUrl() { 
+	public String getThumbUrl() {
 		if (this.imageInfo == null) {
 			this.imageInfo = ImageInfo.instanceFromEntityUri(
 			        webappDaoFactory, this);
@@ -384,12 +384,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	@Override
 	public boolean hasThumb(){
 	    if( _hasThumb != null ){
-	        return _hasThumb;	    
-        }else{            
-            String ask = 
+	        return _hasThumb;
+        }else{
+            String ask =
                 "ASK { " +
                 "    <" + individualURI + "> <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?mainImage . \n" +
-                "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  ;                     
+                "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  ;
             try{
 				_hasThumb = webappDaoFactory.getRDFService().sparqlAskQuery(ask);
             }catch(Exception ex){
@@ -399,8 +399,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             return _hasThumb;
         }
 	}
-	
-    public List<ObjectPropertyStatement> getObjectPropertyStatements() { 
+
+    public List<ObjectPropertyStatement> getObjectPropertyStatements() {
         if (this.objectPropertyStatements != null) {
             return this.objectPropertyStatements;
         } else {
@@ -414,7 +414,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             return this.objectPropertyStatements;
         }
     }
-    
+
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyURI) {
     	if (propertyURI == null) {
@@ -430,7 +430,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	dataset.getLock().enterCriticalSection(Lock.READ);
         QueryExecution qexec = null;
     	try {
-    		String valuesOfProperty = 
+    		String valuesOfProperty =
     			"CONSTRUCT{ <" + this.individualURI + "> <" + propertyURI + "> ?object }" +
     			"WHERE{ <" + this.individualURI + "> <" + propertyURI + "> ?object } \n";
             qexec = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset);
@@ -441,12 +441,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    while (sit.hasNext()) {
     			Statement s = sit.nextStatement();
     			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
-    			    continue;	
+    			    continue;
     			}
     			Individual subj = null;
     			try {
     			    subj = new IndividualSDB(
-    			            s.getSubject().as(OntResource.class).getURI(), 
+    			            s.getSubject().as(OntResource.class).getURI(),
     			                            this.dwf, datasetMode, webappDaoFactory);
     			} catch (IndividualNotFoundException e) {
     			    // leave null subject
@@ -454,14 +454,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			Individual obj = null;
     			try {
     			    obj = new IndividualSDB(
-    			            s.getObject().as(OntResource.class).getURI(), 
+    			            s.getObject().as(OntResource.class).getURI(),
     			                            this.dwf, datasetMode, webappDaoFactory);
     			} catch (IndividualNotFoundException e) {
     			    // leave null object
     			}
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
-    			// We don't want to filter out statements simply because we 
-    			// can't find a type for the property, so we'll just make a 
+    			// We don't want to filter out statements simply because we
+    			// can't find a type for the property, so we'll just make a
     			// new ObjectProperty bean if we can't get one from the DAO.
     			if (op == null) {
     				op = new ObjectProperty();
@@ -489,19 +489,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
 
     @Override
-    public List<Individual> getRelatedIndividuals(String propertyURI) { 
+    public List<Individual> getRelatedIndividuals(String propertyURI) {
     	if (propertyURI == null) {
     		return null;
     	}
     	List<Individual> relatedIndividuals = new ArrayList<Individual>();
-    	
+
     	DatasetWrapper w = getDatasetWrapper();
     	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    		String valuesOfProperty = 
+    		String valuesOfProperty =
     			"SELECT ?object " +
-    			"WHERE{ <" + this.individualURI + "> <" + 
+    			"WHERE{ <" + this.individualURI + "> <" +
     			        propertyURI + "> ?object } \n";
     		ResultSet values = QueryExecutionFactory.create(
     		        QueryFactory.create(valuesOfProperty), dataset)
@@ -514,11 +514,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	    	if (value.canAs(OntResource.class)) {
             	    	relatedIndividuals.add(
             	    		new IndividualSDB(
-            	    		        value.as(OntResource.class).getURI(), 
-            	    		                this.dwf, 
-            	    		                datasetMode, 
-            	    		                webappDaoFactory) );  
-            	    } 
+            	    		        value.as(OntResource.class).getURI(),
+            	    		                this.dwf,
+            	    		                datasetMode,
+            	    		                webappDaoFactory) );
+            	    }
     	    	} catch (IndividualNotFoundException e) {
     	    	    // don't add to the list
     	    	}
@@ -529,9 +529,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	}
     	return relatedIndividuals;
     }
-    
+
     @Override
-    public Individual getRelatedIndividual(String propertyURI) { 
+    public Individual getRelatedIndividual(String propertyURI) {
     	if (propertyURI == null) {
     		return null;
     	}
@@ -539,9 +539,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    		String valueOfProperty = 
+    		String valueOfProperty =
     			"SELECT ?object " +
-    			"WHERE{ <" + this.individualURI + "> <" + 
+    			"WHERE{ <" + this.individualURI + "> <" +
     			        propertyURI + "> ?object } \n";
     		QueryExecution qe = QueryExecutionFactory.create(
                     QueryFactory.create(valueOfProperty), dataset);
@@ -553,12 +553,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             	    if (value != null && value.canAs(OntResource.class)) {
             	        try {
                 	    	return new IndividualSDB(
-                	    	        value.as(OntResource.class).getURI(), 
+                	    	        value.as(OntResource.class).getURI(),
                 	    	                dwf, datasetMode, webappDaoFactory);
             	        } catch (IndividualNotFoundException e) {
             	            return null;
             	        }
-            	    } 
+            	    }
         	    }
         		return null;
     		} finally {
@@ -569,8 +569,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		w.close();
     	}
     }
-    
-    public List<ObjectProperty> getObjectPropertyList() { 
+
+    public List<ObjectProperty> getObjectPropertyList() {
         if (this.propertyList != null) {
             return this.propertyList;
         } else {
@@ -584,17 +584,17 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
 
-    @Override 
+    @Override
     public List<ObjectProperty> getPopulatedObjectPropertyList() {
         if (populatedObjectPropertyList == null) {
             populatedObjectPropertyList = webappDaoFactory
                     .getObjectPropertyDao().getObjectPropertyList(this);
         }
-        return populatedObjectPropertyList;       
+        return populatedObjectPropertyList;
     }
-    
+
     @Override
-    public Map<String,ObjectProperty> getObjectPropertyMap() { 
+    public Map<String,ObjectProperty> getObjectPropertyMap() {
     	if (this.objectPropertyMap != null) {
     		return objectPropertyMap;
     	} else {
@@ -608,11 +608,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 				}
 			}
     		this.objectPropertyMap = map;
-    		return map;    		
+    		return map;
     	}
     }
 
-    public List<DataPropertyStatement> getDataPropertyStatements() { 
+    public List<DataPropertyStatement> getDataPropertyStatements() {
         if (this.dataPropertyStatements != null) {
             return this.dataPropertyStatements;
         } else {
@@ -628,7 +628,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
 
     public List getDataPropertyList() {
-        if (this.datatypePropertyList != null) { 
+        if (this.datatypePropertyList != null) {
             return this.datatypePropertyList;
         } else {
             try {
@@ -641,17 +641,17 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
 
-    @Override 
+    @Override
     public List<DataProperty> getPopulatedDataPropertyList() {
         if (populatedDataPropertyList == null) {
             populatedDataPropertyList = webappDaoFactory.getDataPropertyDao()
                     .getDataPropertyList(this);
         }
-        return populatedDataPropertyList;       
+        return populatedDataPropertyList;
     }
-    
+
     @Override
-    public Map<String,DataProperty> getDataPropertyMap() { 
+    public Map<String,DataProperty> getDataPropertyMap() {
     	if (this.dataPropertyMap != null) {
     		return dataPropertyMap;
     	} else {
@@ -665,11 +665,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 				}
 			}
     		this.dataPropertyMap = map;
-    		return map;    		
+    		return map;
     	}
     }
-    
-    @Override 
+
+    @Override
     public List<DataPropertyStatement> getDataPropertyStatements(String propertyUri) {
         List<DataPropertyStatement> stmts = this.dataPropertyStatements;
         if (stmts == null) {
@@ -684,14 +684,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             return stmtsForProp;
         }
     }
-    
+
     @Override
     public String getDataValue(String propertyUri) {
         if (propertyUri == null) {
             log.error("Cannot retrieve value for null property");
             return null;
         } else if (this.getURI() == null) {
-            log.error("Cannot retrieve value of property " + propertyUri + 
+            log.error("Cannot retrieve value of property " + propertyUri +
                     " for anonymous individual");
             return null;
         } else {
@@ -703,15 +703,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
         return null; // not found
     }
-    
-    @Override 
+
+    @Override
     public List<String> getDataValues(String propertyUri) {
         List<String> values = new ArrayList<String>();
         if (propertyUri == null) {
             log.error("Cannot retrieve value for null property");
             return null;
         } else if (this.getURI() == null) {
-            log.error("Cannot retrieve value of property " + propertyUri + 
+            log.error("Cannot retrieve value of property " + propertyUri +
                     " for anonymous individual");
             return null;
         } else {
@@ -730,8 +730,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         final List<DataPropertyStatement> stmts = new ArrayList<DataPropertyStatement>();
 		final IndividualSDB individualSDB = this;
 
-        String queryStr = "SELECT (str(?value) as ?valueString) WHERE { <" 
-                + this.getURI() + "> <" + propertyUri + "> ?value }"; 
+        String queryStr = "SELECT (str(?value) as ?valueString) WHERE { <"
+                + this.getURI() + "> <" + propertyUri + "> ?value }";
         try {
 			webappDaoFactory.getRDFService().sparqlSelectQuery(
 					queryStr, new ResultSetConsumer() {
@@ -761,13 +761,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
         return stmts;
     }
-    
-    public List<DataPropertyStatement> getExternalIds() { 
+
+    public List<DataPropertyStatement> getExternalIds() {
         if (this.externalIds != null) {
             return this.externalIds;
         } else {
             try {
-                List<DataPropertyStatement> dpsList = 
+                List<DataPropertyStatement> dpsList =
                         new ArrayList<DataPropertyStatement>();
                 dpsList.addAll(webappDaoFactory.getIndividualDao()
                         .getExternalIds(this.getURI(), null));
@@ -778,12 +778,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             return this.externalIds;
         }
     }
-    
+
     @Override
-    public List<VClass> getVClasses() { 
+    public List<VClass> getVClasses() {
     	return getVClasses(false);
     }
-    
+
     @Override
     public List<VClass> getVClasses(boolean assertedOnly) {
     	if (assertedOnly) {
@@ -802,9 +802,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		}
     	}
     }
-    
+
     private List<VClass> getMyVClasses(boolean assertedOnly) {
-		List<VClass> vClassList = new ArrayList<VClass>(); 
+		List<VClass> vClassList = new ArrayList<VClass>();
 		Model tempModel = null;
 		if (ind.getModel().contains((Resource) null, RDF.type, (RDFNode) null)){
 		    tempModel = ind.getModel();
@@ -812,7 +812,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 			tempModel = ModelFactory.createDefaultModel();
 			String getTypesQuery = buildMyVClassesQuery(assertedOnly);
 
-    		RDFService service = webappDaoFactory.getRDFService();	
+    		RDFService service = webappDaoFactory.getRDFService();
         	try {
 				service.sparqlConstructQuery(getTypesQuery, tempModel);
         	} catch (RDFServiceException e) {
@@ -833,12 +833,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	boolean directTypes = false;
     	String currentType = null;
 	    ArrayList<String> done = new ArrayList<String>();
-	    
+
 	    /* Loop for comparing starts here */
 	    if(assertedOnly){
         	while(!directTypes){
         		 itr = list.listIterator();
-        		 
+
         		do{
         			if(itr.hasNext()){
         		 currentType = itr.next();}
@@ -846,36 +846,36 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         				directTypes = true; // get next element for comparison
         			 break;}
         		}while(done.contains(currentType));
-        		
+
         		if(directTypes)
-        			break; 
+        			break;
         		    // check to see if it's all over otherwise start comparing
         		else
-        	    itr = list.listIterator();	
-        		
+        	    itr = list.listIterator();
+
             	while(itr.hasNext()){
             		String nextType = itr.next();
-            	    if(checkSubClass.isSubClassOf(currentType, nextType) 
+            	    if(checkSubClass.isSubClassOf(currentType, nextType)
             	            && !currentType.equalsIgnoreCase(nextType)){
             	    	itr.remove();
             	    }
             	}
-            	
-            	done.add(currentType);  // add the uri to done list. 
+
+            	done.add(currentType);  // add the uri to done list.
         	}
 	    }
-    	
+
     	/* Loop for comparing ends here */
 	    Iterator<String> typeIt = list.iterator();
-		
+
 		for (Iterator it = typeIt; it.hasNext();) {
 			Resource type = ResourceFactory
 			        .createResource(it.next().toString());
-			String typeURI = (!type.isAnon()) 
-			        ? type.getURI() 
-			        : VitroVocabulary.PSEUDO_BNODE_NS 
+			String typeURI = (!type.isAnon())
+			        ? type.getURI()
+			        : VitroVocabulary.PSEUDO_BNODE_NS
 			                + type.getId().toString();
-			if (type.getNameSpace() == null || 
+			if (type.getNameSpace() == null ||
 			        (!webappDaoFactory.getNonuserNamespaces()
 			                .contains(type.getNameSpace())) ) {
 				VClass vc = webappDaoFactory.getVClassDao()
@@ -891,7 +891,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		} catch (Exception e) {
 		    log.error("Unable to sort VClass list", e);
 		}
-		
+
 		return vClassList;
 	}
 
@@ -903,32 +903,32 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	 */
 	private String buildMyVClassesQuery(boolean assertedOnly) {
 		SDBDatasetMode queryMode = assertedOnly ? ASSERTIONS_ONLY : datasetMode;
-		
+
 		String filterBlock = WebappDaoFactorySDB.getFilterBlock(new String[] { "?g" }, queryMode);
-		
+
 		if (filterBlock.isEmpty()) {
-			return 
+			return
 				"CONSTRUCT { <" + this.individualURI + "> " + "<" + RDF.type + "> ?types }\n" +
-				"WHERE { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n"; 
+				"WHERE { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n";
 		} else {
-			String unionBlock = (queryMode.equals(ASSERTIONS_ONLY)) ? 
-				"" : 
+			String unionBlock = (queryMode.equals(ASSERTIONS_ONLY)) ?
+				"" :
 				"UNION { <" + this.individualURI +"> <" +RDF.type+ "> ?types }";
-			return 
+			return
 				"CONSTRUCT{ <" + this.individualURI + "> " + "<" + RDF.type + "> ?types }\n" +
-				"WHERE{ { GRAPH ?g"   
-				+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" 
-			    + filterBlock 
-				+ "} \n" 
-			    + unionBlock 
+				"WHERE{ { GRAPH ?g"
+				+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n"
+			    + filterBlock
+				+ "} \n"
+			    + unionBlock
 			    + "} \n";
 		}
 	}
-    
+
 	/**
 	 * The base method in {@link IndividualImpl} is adequate if the reasoner is
-	 * up to date. 
-	 * 
+	 * up to date.
+	 *
 	 * If the base method returns false, check directly to see if
 	 * any of the super classes of the direct classes will satisfy this request.
 	 */
@@ -944,13 +944,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             throw new RuntimeException(e);
         }
 	}
-	
+
     /**
      * Overriding the base method so that we can do the sorting by arbitrary property here.  An
      * IndividualSDB has a reference back to the model; everything else is just a dumb bean (for now).
      */
     @Override
-    protected void sortEnts2EntsForDisplay(){ 
+    protected void sortEnts2EntsForDisplay(){
         if( getObjectPropertyList() == null ) return;
 
 		for (ObjectProperty prop : getObjectPropertyList()) {
@@ -961,10 +961,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         /*  }*/
 		}
     }
-    
+
     private Collator collator = Collator.getInstance();
-    
-    private void sortObjectPropertyStatementsForDisplay(ObjectProperty prop) { 
+
+    private void sortObjectPropertyStatementsForDisplay(ObjectProperty prop) {
     	try {
     		log.info("Doing special sort for "+prop.getDomainPublic());
     		final String sortPropertyURI = prop.getObjectIndividualSortPropertyURI();
@@ -1043,15 +1043,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 log.error("Exception sorting object property statements for object property "+this.getURI());
             }
 
-    		
+
     	} catch (Exception e) {
     		log.error(e, e);
     	}
     }
-    
+
 	@Override
 	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatements(list);
 	}
-    
+
 }

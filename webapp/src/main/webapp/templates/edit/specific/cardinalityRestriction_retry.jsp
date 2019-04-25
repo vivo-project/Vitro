@@ -33,5 +33,5 @@ ${requestScope.restrictionType}
         <input name="cardinality"/>
 
     </td>
-  
+
 </tr>

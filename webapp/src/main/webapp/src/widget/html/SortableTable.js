@@ -41,8 +41,8 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 	getTypeFromString:function(/* string */ s){
 		//	summary
 		//	Find the constructor that matches param s by searching through the entire object tree.
-		var parts=s.split("."),i=0,obj=dj_global; 
-		do{obj=obj[parts[i++]];}while(i<parts.length&&obj); 
+		var parts=s.split("."),i=0,obj=dj_global;
+		do{obj=obj[parts[i++]];}while(i<parts.length&&obj);
 		return(obj!=dj_global)?obj:null;	//	function
 	},
 	compare:function(/* object */ o1, /* object */ o2){
@@ -191,7 +191,7 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 			if(dojo.html.hasAttribute(cells[i], "sortusing")){
 				var trans=dojo.html.getAttribute(cells[i],"sortusing");
 				var f=this.getTypeFromString(trans);
-				if (f!=null && f!=window && typeof(f)=="function") 
+				if (f!=null && f!=window && typeof(f)=="function")
 					o.sortFunction=f;
 			}
 
@@ -259,7 +259,7 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 			}
 			this.data.push(o);
 		}
-	}, 
+	},
 
 	parseDataFromTable:function(/* HTMLTableBodyElement */ tbody){
 		//	summary
@@ -291,14 +291,14 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 			}
 			//	FIXME: add code to preserve row attributes in __metadata__ field?
 			this.data.push(o);
-			
+
 			//	add it to the selections if selected="true" is present.
 			if(dojo.html.getAttribute(rows[i],"selected")=="true"){
 				this.selected.push(o);
 			}
 		}
 	},
-	
+
 	showSelections:function(){
 		var body=this.domNode.getElementsByTagName("tbody")[0];
 		var rows=body.getElementsByTagName("tr");
@@ -333,7 +333,7 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 		for(var i=0; i<this.data.length; i++){
 			data.push(this.data[i]);
 		}
-		
+
 		var col=this.columns[this.sortIndex];
 		if(!col.noSort){
 			var field=col.getField();
@@ -396,7 +396,7 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 			body.appendChild(row);
 			dojo.event.connect(row, "onclick", this, "onUISelect");
 		}
-		
+
 		//	if minRows exist.
 		var minRows=parseInt(this.minRows);
 		if (!isNaN(minRows) && minRows>0 && data.length<minRows){
@@ -420,7 +420,7 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 	},
 
 	//	the following the user can override.
-	onSelect:function(/* DomEvent */ e){ 
+	onSelect:function(/* DomEvent */ e){
 		//	summary
 		//	empty function for the user to attach code to, fired by onUISelect
 	},
@@ -440,11 +440,11 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 					row.setAttribute("selected","true");
 				}
 			}else if(e.shiftKey){
-				//	the tricky one.  We need to figure out the *last* selected row above, 
+				//	the tricky one.  We need to figure out the *last* selected row above,
 				//	and select all the rows in between.
 				var startRow;
 				var rows=body.getElementsByTagName("tr");
-				//	if there's a selection above, we go with that first. 
+				//	if there's a selection above, we go with that first.
 				for(var i=0;i<rows.length;i++){
 					if(rows[i].parentNode==body){
 						if(rows[i]==row) break;
@@ -515,7 +515,7 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 
 		var headers=row.getElementsByTagName(cellTag);
 		var header=dojo.html.getParentByType(source,cellTag);
-		
+
 		for(var i=0; i<headers.length; i++){
 			if(headers[i]==header){
 				if(i!=oldIndex){
@@ -539,7 +539,7 @@ dojo.lang.extend(dojo.widget.html.SortableTable, {
 		this.render();
 	},
 
-	postCreate:function(){ 
+	postCreate:function(){
 		// 	summary
 		//	overridden from HtmlWidget, initializes and renders the widget.
 		var thead=this.domNode.getElementsByTagName("thead")[0];

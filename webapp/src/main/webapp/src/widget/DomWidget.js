@@ -46,7 +46,7 @@ dojo.widget.fillFromTemplateCache = function(obj, templatePath, templateCssPath,
 		cpath = dojo.uri.dojoUri(cpath);
 		dojo.deprecated("templateCssPath should be of type dojo.uri.Uri", null, "0.4");
 	}
-	
+
 	var tmplts = dojo.widget._templateCache;
 	if(!obj["widgetType"]) { // don't have a real template here
 		do {
@@ -115,14 +115,14 @@ dojo.widget.eventAttachProperty = "dojoAttachEvent";
 dojo.widget.onBuildProperty = "dojoOnBuild";
 dojo.widget.waiNames  = ["waiRole", "waiState"];
 dojo.widget.wai = {
-	waiRole: { 	name: "waiRole", 
-				namespace: "http://www.w3.org/TR/xhtml2", 
+	waiRole: { 	name: "waiRole",
+				namespace: "http://www.w3.org/TR/xhtml2",
 				alias: "x2",
 				prefix: "wairole:",
 				nsName: "role"
 	},
-	waiState: { name: "waiState", 
-				namespace: "http://www.w3.org/2005/07/aaa" , 
+	waiState: { name: "waiState",
+				namespace: "http://www.w3.org/2005/07/aaa" ,
 				alias: "aaa",
 				prefix: "",
 				nsName: "state"
@@ -148,7 +148,7 @@ dojo.widget.attachTemplateNodes = function(rootNode, targetObj, events){
 		return str.replace(/^\s+|\s+$/g, "");
 	}
 
-	if(!rootNode){ 
+	if(!rootNode){
 		rootNode = targetObj.domNode;
 	}
 
@@ -213,7 +213,7 @@ dojo.widget.attachTemplateNodes = function(rootNode, targetObj, events){
 					thisFunc = tevt;
 				}
 
-				var tf = function(){ 
+				var tf = function(){
 					var ntf = new String(thisFunc);
 					return function(evt){
 						if(_this[ntf]){
@@ -239,7 +239,7 @@ dojo.widget.attachTemplateNodes = function(rootNode, targetObj, events){
 				}
 				for(var z=0; z<funcs.length; z++){
 					if(!funcs[z].length){ continue; }
-					var tf = function(){ 
+					var tf = function(){
 						var ntf = new String(funcs[z]);
 						return function(evt){
 							if(_this[ntf]){
@@ -294,7 +294,7 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 			this.create(arguments[0]);
 		}
 	},
-								 
+
 	templateNode: null,
 	templateString: null,
 	templateCssString: null,
@@ -315,17 +315,17 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 		}
 		return widget;
 	},
-	
+
 	addWidgetAsDirectChild: function(widget, overrideContainerNode, pos, ref, insertIndex){
 		if((!this.containerNode)&&(!overrideContainerNode)){
 			this.containerNode = this.domNode;
 		}
 		var cn = (overrideContainerNode) ? overrideContainerNode : this.containerNode;
 		if(!pos){ pos = "after"; }
-		if(!ref){ 
+		if(!ref){
 			// if(!cn){ cn = document.body; }
 			if(!cn){ cn = document.body; }
-			ref = cn.lastChild; 
+			ref = cn.lastChild;
 		}
 		if(!insertIndex) { insertIndex = 0; }
 		widget.domNode.setAttribute("dojoinsertionindex", insertIndex);
@@ -356,7 +356,7 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 	// Record that given widget descends from me
 	registerChild: function(widget, insertionIndex){
 
-		// we need to insert the child at the right point in the parent's 
+		// we need to insert the child at the right point in the parent's
 		// 'children' array, based on the insertionIndex
 
 		widget.dojoInsertionIndex = insertionIndex;
@@ -372,7 +372,7 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 
 		widget.parent = this;
 		widget.addedTo(this);
-		
+
 		// If this widget was created programatically, then it was erroneously added
 		// to dojo.widget.manager.topWidgets.  Fix that here.
 		delete dojo.widget.manager.topWidgets[widget.widgetId];
@@ -393,7 +393,7 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 		}
 		return (frag ? frag["dojo:"+this.widgetType.toLowerCase()]["nodeRef"] : null);
 	},
-	
+
 	// Replace source domNode with generated dom structure, and register
 	// widget with parent.
 	postInitialize: function(args, frag, parentComp){
@@ -435,12 +435,12 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 	buildRendering: function(args, frag){
 		// DOM widgets construct themselves from a template
 		var ts = dojo.widget._templateCache[this.widgetType];
-		if(	
+		if(
 			(!this.preventClobber)&&(
 				(this.templatePath)||
 				(this.templateNode)||
 				(
-					(this["templateString"])&&(this.templateString.length) 
+					(this["templateString"])&&(this.templateString.length)
 				)||
 				(
 					(typeof ts != "undefined")&&( (ts["string"])||(ts["node"]) )
@@ -472,8 +472,8 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 			avoidCache = true;
 			args["templatePath"] = args["templatepath"];
 		}
-		dojo.widget.fillFromTemplateCache(	this, 
-											args["templatePath"], 
+		dojo.widget.fillFromTemplateCache(	this,
+											args["templatePath"],
 											args["templateCssPath"],
 											null,
 											avoidCache);
@@ -488,8 +488,8 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 		}
 		var matches = false;
 		var node = null;
-		// var tstr = new String(this.templateString); 
-		var tstr = this.templateString; 
+		// var tstr = new String(this.templateString);
+		var tstr = this.templateString;
 		// attempt to clone a template node, if there is one
 		if((!this.templateNode)&&(this.templateString)){
 			matches = this.templateString.match(/\$\{([^\}]+)\}/g);
@@ -518,10 +518,10 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 			}else{
 				// otherwise, we are required to instantiate a copy of the template
 				// string if one is provided.
-				
+
 				// FIXME: need to be able to distinguish here what should be done
 				// or provide a generic interface across all DOM implementations
-				// FIMXE: this breaks if the template has whitespace as its first 
+				// FIMXE: this breaks if the template has whitespace as its first
 				// characters
 				// node = this.createNodesFromText(this.templateString, true);
 				// this.templateNode = node[0].cloneNode(true); // we're optimistic here
@@ -531,7 +531,7 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 				}
 			}
 		}
-		if((!this.templateNode)&&(!matches)){ 
+		if((!this.templateNode)&&(!matches)){
 			dojo.debug("weren't able to create template!");
 			return false;
 		}else if(!matches){
@@ -548,7 +548,7 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 		// dojo.profile.start("attachTemplateNodes");
 		this.attachTemplateNodes(this.domNode, this);
 		// dojo.profile.end("attachTemplateNodes");
-		
+
 		// relocate source contents to templated container node
 		// this.containerNode must be able to receive children, or exceptions will be thrown
 		if (this.isContainer && this.containerNode){
@@ -561,14 +561,14 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 
 	attachTemplateNodes: function(baseNode, targetObj){
 		if(!targetObj){ targetObj = this; }
-		return dojo.widget.attachTemplateNodes(baseNode, targetObj, 
+		return dojo.widget.attachTemplateNodes(baseNode, targetObj,
 					dojo.widget.getDojoEventsFromStr(this.templateString));
 	},
 
 	fillInTemplate: function(){
 		// dojo.unimplemented("dojo.widget.DomWidget.fillInTemplate");
 	},
-	
+
 	// method over-ride
 	destroyRendering: function(){
 		try{
@@ -578,7 +578,7 @@ dojo.declare("dojo.widget.DomWidget", dojo.widget.Widget, {
 
 	// FIXME: method over-ride
 	cleanUp: function(){},
-	
+
 	getContainerHeight: function(){
 		dojo.unimplemented("dojo.widget.DomWidget.getContainerHeight");
 	},

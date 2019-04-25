@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 
 /**
  *This generator selects the actual generator to be employed.  This generator can be overwritten in applications
- *that use/extend Vitro to allow for class-based label handling.  
+ *that use/extend Vitro to allow for class-based label handling.
  */
 public class ManageLabelsGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
     public static Log log = LogFactory.getLog(ManageLabelsForIndividualGenerator.class);

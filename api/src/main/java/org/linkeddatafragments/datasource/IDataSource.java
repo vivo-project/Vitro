@@ -17,7 +17,7 @@ public interface IDataSource extends Closeable {
      * @return
      */
     public String getTitle();
-        
+
     /**
      *
      * @return
@@ -26,13 +26,13 @@ public interface IDataSource extends Closeable {
 
     /**
      * Returns a data source specific {@link IFragmentRequestParser}.
-     * @return 
+     * @return
      */
     IFragmentRequestParser getRequestParser();
 
     /**
      * Returns a data source specific {@link IFragmentRequestProcessor}.
-     * @return 
+     * @return
      */
     IFragmentRequestProcessor getRequestProcessor();
 }

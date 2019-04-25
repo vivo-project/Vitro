@@ -29,51 +29,51 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  *
  */
 public class NewIndividualFormGenerator implements EditConfigurationGenerator {
-	
+
 	private String subjectUri = null;
 	private String predicateUri = null;
 	private String objectUri = null;
-		
+
 	private String template = "newIndividualForm.ftl";
-	
+
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
-    
+
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
-    	
+
       	//Assumes this is a simple case of subject predicate var
     	editConfiguration.setN3Required(this.generateN3Required(vreq));
-    	    	
+
     	//n3 optional
     	editConfiguration.setN3Optional(this.generateN3Optional());
-    	
+
     	//Todo: what do new resources depend on here?
     	//In original form, these variables start off empty
     	editConfiguration.setNewResources(this.generateNewResources(vreq));
     	//In scope
     	this.setUrisAndLiteralsInScope(editConfiguration);
-    	
+
     	//on Form
     	this.setUrisAndLiteralsOnForm(editConfiguration, vreq);
-    	
+
     	editConfiguration.setFilesOnForm(new ArrayList<String>());
-    	
+
     	//Sparql queries
     	this.setSparqlQueries(editConfiguration);
-    	
+
     	//set fields
     	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq));
-    	
+
     //	No need to put in session here b/c put in session within edit request dispatch controller instead
     	//placing in session depends on having edit key which is handled in edit request dispatch controller
     //	editConfiguration.putConfigInSession(editConfiguration, session);
 
     	prepareForUpdate(vreq, session, editConfiguration);
-    	
+
     	editConfiguration.addValidator(new AntiXssValidation());
-    	
+
     	//Form title and submit label now moved to edit configuration template
     	//TODO: check if edit configuration template correct place to set those or whether
     	//additional methods here should be used and reference instead, e.g. edit configuration template could call
@@ -85,10 +85,10 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
         addFormSpecificData(editConfiguration, vreq);
 
     	return editConfiguration;
-    	
+
 
     }
-    
+
     private Map<String, String> generateNewResources(VitroRequest vreq) {
     	HashMap<String, String> newResources = new HashMap<String, String>();
 		//null makes default namespace be triggered
@@ -97,14 +97,14 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 	}
 
 	private void setEditKey(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-    	String editKey = EditConfigurationUtils.getEditKey(vreq);	
+    	String editKey = EditConfigurationUtils.getEditKey(vreq);
     	editConfiguration.setEditKey(editKey);
     }
-    
+
 	private void setTemplate(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq) {
     	editConfiguration.setTemplate(template);
-		
+
 	}
 
 	//Initialize setup: process parameters
@@ -113,138 +113,138 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 
     	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-    
+
     	editConfiguration.setFormUrl(formUrl);
-    	
+
     	editConfiguration.setUrlPatternToReturnTo("/individual");
-    	
+
     	editConfiguration.setVarNameForSubject("subjectNotUsed");
     	editConfiguration.setSubjectUri(subjectUri);
     	editConfiguration.setEntityToReturnTo("?newInd");
     	editConfiguration.setVarNameForPredicate("predicateNotUsed");
     	editConfiguration.setPredicateUri(predicateUri);
-    	
+
 		//not concerned about remainder, can move into default obj prop form if required
 		this.initObjectParameters(vreq);
 		this.processObjectPropForm(vreq, editConfiguration);
     }
 
-    
+
 	private void initObjectParameters(VitroRequest vreq) {
 		//in case of object property
     	objectUri = EditConfigurationUtils.getObjectUri(vreq);
 	}
 
 	private void processObjectPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	editConfiguration.setVarNameForObject("objectNotUsed");    	
+    	editConfiguration.setVarNameForObject("objectNotUsed");
     	editConfiguration.setObject(objectUri);
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
     	//TODO: Check if null in case no object uri exists but this is still an object property
     }
-       
-    //Get N3 required 
-    //Handles both object and data property    
+
+    //Get N3 required
+    //Handles both object and data property
     private List<String> generateN3Required(VitroRequest vreq) {
     	List<String> n3ForEdit = new ArrayList<String>();
     	String editString = "?newInd <" + VitroVocabulary.RDF_TYPE + "> <" + getTypeOfNew(vreq) + "> .";
     	n3ForEdit.add(editString);
     	return n3ForEdit;
     }
-    
+
     private List<String> generateN3Optional() {
     	List<String> n3Optional = new ArrayList<String>();
     	String editString = "?newInd <" + RDFS.label.getURI() + "> ?label .";
     	n3Optional.add(editString);
     	return n3Optional;
-    	
+
     }
-       
+
     private void setUrisAndLiteralsInScope(EditConfigurationVTwo editConfiguration) {
     	HashMap<String, List<String>> urisInScope = new HashMap<String, List<String>>();
     	//note that at this point the subject, predicate, and object var parameters have already been processed
-    	urisInScope.put(editConfiguration.getVarNameForSubject(), 
+    	urisInScope.put(editConfiguration.getVarNameForSubject(),
     			Arrays.asList(new String[]{editConfiguration.getSubjectUri()}));
-    	urisInScope.put(editConfiguration.getVarNameForPredicate(), 
+    	urisInScope.put(editConfiguration.getVarNameForPredicate(),
     			Arrays.asList(new String[]{editConfiguration.getPredicateUri()}));
     	editConfiguration.setUrisInScope(urisInScope);
     	//Uris in scope include subject, predicate, and object var
-    	
+
     	editConfiguration.setLiteralsInScope(new HashMap<String, List<Literal>>());
     }
-    
+
     //n3 should look as follows
-    //?subject ?predicate ?objectVar 
-    
+    //?subject ?predicate ?objectVar
+
     private void setUrisAndLiteralsOnForm(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	List<String> urisOnForm = new ArrayList<String>();
     	List<String> literalsOnForm = new ArrayList<String>();
     	literalsOnForm.add("label");
     	editConfiguration.setUrisOnform(urisOnForm);
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
-    }    
-    
+    }
+
     //This is for various items
     private void setSparqlQueries(EditConfigurationVTwo editConfiguration) {
     	//Sparql queries defining retrieval of literals etc.
     	editConfiguration.setSparqlForAdditionalLiteralsInScope(new HashMap<String, String>());
-    	
+
     	Map<String, String> urisInScope = new HashMap<String, String>();
     	editConfiguration.setSparqlForAdditionalUrisInScope(urisInScope);
-    	
+
     	editConfiguration.setSparqlForExistingLiterals(generateSparqlForExistingLiterals());
     	editConfiguration.setSparqlForExistingUris(generateSparqlForExistingUris());
     }
-    
-    
+
+
     //Get page uri for object
     private HashMap<String, String> generateSparqlForExistingUris() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	return map;
     }
-    
+
     private HashMap<String, String> generateSparqlForExistingLiterals() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	return map;
     }
 
-    
+
     private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	setLabelField(editConfiguration, vreq, fields);
 
     }
-    
+
     private void setLabelField(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq, Map<String, FieldVTwo> fields) {
     	FieldVTwo field = new FieldVTwo();
     	field.setName("label");
-    	field.setRangeDatatypeUri( XSD.xstring.toString() );        
-    	
+    	field.setRangeDatatypeUri( XSD.xstring.toString() );
+
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
-    	field.setValidators(validators);    	
-    	
-    	fields.put(field.getName(), field);		
+    	field.setValidators(validators);
+
+    	fields.put(field.getName(), field);
     	editConfiguration.setFields(fields);
 	}
 
-	
+
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
-    	//Here, retrieve model from 
+    	//Here, retrieve model from
 		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
     	//This form is always doing a non-update
     	editConfiguration.prepareForNonUpdate( model );
-	      
+
     }
-    
-    
+
+
     //Get parameter
     private String getTypeOfNew(VitroRequest vreq) {
     	return vreq.getParameter("typeOfNew");
     }
-    
+
   //Form specific data
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
@@ -258,6 +258,6 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 		VClass type = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(typeOfNew);
 		return type.getName();
 	}
-    
+
 
 }

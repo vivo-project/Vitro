@@ -31,11 +31,11 @@
     <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
         <input type="hidden" name="externalAuthId" value="${externalAuthId}" role="input" />
         <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" role="input" />
-    
-        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label> 
+
+        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label> 
+        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
@@ -46,7 +46,7 @@
         </#if>
 
         <p><input type="submit" name="submit" value="${strings.create_account}" class="submit"/>
-            ${strings.or} 
+            ${strings.or}
             <a class="cancel" href="${urls.home}" title="${strings.cancel_title}">${strings.cancel_link}</a>
         </p>
 

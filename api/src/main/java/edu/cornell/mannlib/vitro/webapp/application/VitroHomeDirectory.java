@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class VitroHomeDirectory {
 	private static final Log log = LogFactory.getLog(VitroHomeDirectory.class);
-	
+
 	public static VitroHomeDirectory find(ServletContext ctx) {
 		HomeDirectoryFinder finder = new HomeDirectoryFinder(ctx);
 		return new VitroHomeDirectory(ctx, finder.getPath(),
@@ -51,12 +51,12 @@ public class VitroHomeDirectory {
 	public String getDiscoveryMessage() {
 		return discoveryMessage;
 	}
-	
+
 	/**
 	 * Find something that specifies the location of the Vitro home directory.
 	 * Look in the JDNI environment, the system properties, and the
 	 * build.properties file.
-	 * 
+	 *
 	 * If we don't find it, fail. If we find it more than once, use the first
 	 * one (with a warning). If it is not an existing, readable directory, fail.
 	 */
@@ -90,7 +90,7 @@ public class VitroHomeDirectory {
 		public Path getPath() {
 			return foundLocations.get(0).getPath();
 		}
-		
+
 		public void getVhdFromJndi() {
 			try {
 				String vhdPath = (String) new InitialContext()

@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -9,7 +9,7 @@
 ### This file is for the test UserAccountsSelectorTest.java.
 
 #
-# Note: each optional field (everything except URI and emailAddress) is missing 
+# Note: each optional field (everything except URI and emailAddress) is missing
 # from some user account.
 #
 # Note: user accounts have 0, 1, or 2 permission sets.
@@ -27,7 +27,7 @@ mydomain:user01
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
-	
+
 mydomain:user02
 	a auth:UserAccount ;
 	auth:emailAddress "email@bob.edu" ;
@@ -40,7 +40,7 @@ mydomain:user02
 	auth:status "INACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
-	
+
 mydomain:user03
 	a auth:UserAccount ;
 	auth:emailAddress "email@charlie.edu" ;
@@ -54,7 +54,7 @@ mydomain:user03
 	auth:hasPermissionSet mydomain:role1 ;
 	auth:hasPermissionSet mydomain:role2 ;
 	.
-	
+
 mydomain:user04
 	a auth:UserAccount ;
 	auth:emailAddress "email@delta.edu" ;
@@ -66,7 +66,7 @@ mydomain:user04
 	auth:lastLoginTime 3 ;
 	auth:status "ACTIVE" ;
 	.
-	
+
 mydomain:user05
 	a auth:UserAccount ;
 	auth:emailAddress "email@echo.edu" ;
@@ -79,7 +79,7 @@ mydomain:user05
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
-	
+
 mydomain:user06
 	a auth:UserAccount ;
 	auth:emailAddress "email@foxtrot.edu" ;
@@ -92,7 +92,7 @@ mydomain:user06
 	auth:status "INACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
-	
+
 mydomain:user07
 	a auth:UserAccount ;
 	auth:emailAddress "email@golf.edu" ;
@@ -105,7 +105,7 @@ mydomain:user07
 #	auth:status NONE ;
 	auth:hasPermissionSet mydomain:role22 ;
 	.
-	
+
 mydomain:user08
 	a auth:UserAccount ;
 	a auth:RootUserAccount ;
@@ -119,7 +119,7 @@ mydomain:user08
 	auth:lastLoginTime 1122334455667788 ;
 	auth:status "ACTIVE" ;
 	.
-	
+
 mydomain:user09
 	a auth:UserAccount ;
 	auth:emailAddress "email@indigo.edu" ;
@@ -132,7 +132,7 @@ mydomain:user09
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
-	
+
 mydomain:user10
 	a auth:UserAccount ;
 	auth:emailAddress "email@jones.edu" ;
@@ -146,21 +146,21 @@ mydomain:user10
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role2 ;
 	.
-	
+
 mydomain:role1
 	a auth:PermissionSet ;
 	rdfs:label "Role 1" ;
 	.
-	
+
 mydomain:role2
 	a auth:PermissionSet ;
 	rdfs:label "Role 2" ;
 	.
-	
-# this is intentionally a typographical extension of mydomain:role2 
+
+# this is intentionally a typographical extension of mydomain:role2
 #    to test that our reg-exp filters correctly.
 mydomain:role22
 	a auth:PermissionSet ;
 	rdfs:label "Role 22" ;
 	.
-	
+

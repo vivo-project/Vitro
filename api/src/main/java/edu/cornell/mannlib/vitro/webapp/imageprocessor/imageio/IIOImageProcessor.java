@@ -27,19 +27,19 @@ import com.twelvemonkeys.image.ResampleOp;
 /**
  * Crop the main image as specified, and scale it to the correct size for a
  * thumbnail.
- * 
+ *
  * Use the JAI library to read the file because the javax.imageio package
  * doesn't read extended JPEG properly. Use JAI to remove transparency from
  * JPEGs and PNGs, simply by removing the alpha channel. Annoyingly, this will
  * not work with GIFs with transparent pixels.
- * 
+ *
  * The transforms in the JAI library are buggy, so standard AWT operations do
  * the scaling and cropping. The most obvious problem in the JAI library is the
  * refusal to crop after scaling an image.
- * 
+ *
  * Scale first to avoid the boundary error that produces black lines along the
  * edge of the image.
- * 
+ *
  * Use the javax.imagio pacakge to write the thumbnail image as a JPEG file.
  */
 public class IIOImageProcessor implements ImageProcessor {
@@ -173,10 +173,10 @@ public class IIOImageProcessor implements ImageProcessor {
 	private byte[] encodeAsJpeg(BufferedImage image) throws IOException {
 		ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
 		ImageWriteParam param = writer.getDefaultWriteParam();
-		param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT); 
-		param.setCompressionQuality(0.8f); 
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
-		writer.setOutput(new MemoryCacheImageOutputStream(bytes)); 
+		param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		param.setCompressionQuality(0.8f);
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		writer.setOutput(new MemoryCacheImageOutputStream(bytes));
 		writer.write(null, new IIOImage(image,null,null),param);
 		writer.dispose();
 		return bytes.toByteArray();

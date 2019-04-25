@@ -20,7 +20,7 @@
 			<div class="resultHeading resultRow">
 			<#list resultKeys as resultKey>
 					<div class="resultCell">${resultKey}</div>
-			</#list>	
+			</#list>
 			</div>
 			<#assign firstRow = true/>
 		</#if>
@@ -31,7 +31,7 @@
 		</div>
 	</#list>
 <#else>
-	${i18n().no_results_returned} 
+	${i18n().no_results_returned}
 </#if>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/sparqlresults.css" />')}

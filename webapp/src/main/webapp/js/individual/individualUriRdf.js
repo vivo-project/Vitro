@@ -1,7 +1,7 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
 $(document).ready(function(){
-    
+
     $.extend(this, i18nStringsUriRdf);
 
     $('head').append('<style id="uriIconCSS">.qtip { font-size: 14px; max-width: none !important; } .uriIconTip { background-color: #f1f2ee; } </style>');

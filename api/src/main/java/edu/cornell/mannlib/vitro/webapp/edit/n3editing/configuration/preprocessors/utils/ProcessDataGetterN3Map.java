@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /*
- * This class determines what n3 should be returned for a particular data getter and can be overwritten or extended in VIVO. 
+ * This class determines what n3 should be returned for a particular data getter and can be overwritten or extended in VIVO.
  */
 public class ProcessDataGetterN3Map {
     private static final Log log = LogFactory.getLog(ProcessDataGetterN3Map.class);

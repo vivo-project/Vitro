@@ -20,9 +20,9 @@
         <input type="hidden" name="action" value="executeWorkflow"/>
 
     <h3>Workflow</h3>
-   
+
         <select name="workflowURI">
-             
+
         <%
               OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
@@ -39,5 +39,5 @@
 	      }
         %>
         </select>
-  
+
     <input class="submit" type="submit" value="Next &gt;"/>

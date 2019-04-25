@@ -88,7 +88,7 @@ dojo.lang.extend(dojo.widget.html.YahooMap, {
 			}
 		}
 	},
-	
+
 	parse:function(table){
 		this.data=[];
 
@@ -108,7 +108,7 @@ dojo.lang.extend(dojo.widget.html.YahooMap, {
 			if(c=="long") c="lng";
 			a.push(c);
 		}
-		
+
 		//	parse the data
 		var b=table.getElementsByTagName("tbody")[0];
 		if(!b){
@@ -123,7 +123,7 @@ dojo.lang.extend(dojo.widget.html.YahooMap, {
 			for(var j=0; j<a.length; j++){
 				var col=a[j];
 				if(col=="lat"||col=="lng"){
-					o[col]=parseFloat(cells[j].innerHTML);					
+					o[col]=parseFloat(cells[j].innerHTML);
 				}else{
 					o[col]=cells[j].innerHTML;
 				}
@@ -151,7 +151,7 @@ dojo.lang.extend(dojo.widget.html.YahooMap, {
 		var z=this.map.getZoomLevel(pts);
 		this.map.drawZoomAndCenter(c,z);
 	},
-	
+
 	initialize:function(args, frag){
 		if(!YMap || !YGeoPoint){
 			dojo.raise("dojo.widget.YahooMap: The Yahoo Map script must be included in order to use this widget.");

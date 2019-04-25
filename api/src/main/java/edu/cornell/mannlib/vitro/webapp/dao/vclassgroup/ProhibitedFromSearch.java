@@ -28,19 +28,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 public class ProhibitedFromSearch {
 	List<String> prohibitedClasses;
 	String ProhibitedFromSearchURI;
-	
+
 	private static final String queryForProhibitedClasses = "SELECT ?prohibited WHERE{" +
 			"?searchConfig <" + DisplayVocabulary.EXCLUDE_CLASS + "> ?prohibited . }";
-		
-	protected static final Log log = LogFactory.getLog(ProhibitedFromSearch.class.getName()); 
-		
+
+	protected static final Log log = LogFactory.getLog(ProhibitedFromSearch.class.getName());
+
 	public ProhibitedFromSearch(String URI, OntModel model){
 		this.ProhibitedFromSearchURI = URI;
 		this.prohibitedClasses = new ArrayList<String>();
 		addAllProhibitedClasses( buildProhibitedClassesList(URI,model) );
 		model.register(new ProhibitedFromSearchChangeListener( this ));
 	}
-	 
+
 	public synchronized boolean isClassProhibitedFromSearch(String classURI){
 		if( classURI != null ){
 			boolean p = prohibitedClasses.contains(classURI);
@@ -51,22 +51,22 @@ public class ProhibitedFromSearch {
 			return false;
 		}
 	}
-	
+
 	private synchronized void removeProhibitedClass(String classURI){
 		prohibitedClasses.remove(classURI);
 	}
-	
+
 	private synchronized void addProhibitedClass(String classURI){
 		prohibitedClasses.add(classURI);
 	}
-	
+
 	private synchronized void addAllProhibitedClasses(List<String> classURIs){
 		prohibitedClasses.addAll(classURIs);
 	}
-	
+
 	private List<String> buildProhibitedClassesList( String URI, OntModel model){
 		List<String> newProhibitedClasses = new ArrayList<String>();
-		
+
 		QuerySolutionMap initialBinding = new QuerySolutionMap();
 		Resource searchConfig = ResourceFactory.createResource(URI);
 		initialBinding.add("searchConfig", searchConfig);
@@ -78,7 +78,7 @@ public class ProhibitedFromSearch {
 			try{
 				ResultSet results = qExec.execSelect();
 				for(;results.hasNext();){
-					QuerySolution soln = results.nextSolution();				
+					QuerySolution soln = results.nextSolution();
 					RDFNode n = soln.get("prohibited");
 					if( n.isResource() && !n.isAnon()){
 						newProhibitedClasses.add(((Resource) n).getURI());
@@ -87,34 +87,34 @@ public class ProhibitedFromSearch {
 					}
 				}
 			}catch(Throwable t){
-				log.error(t,t);			
+				log.error(t,t);
 			}finally{ qExec.close(); }
 		}finally{ model.leaveCriticalSection(); }
-		
+
 		return newProhibitedClasses;
 	}
 
 	private static enum ChangeType { ADD, REMOVE }
-	
+
 	class ProhibitedFromSearchChangeListener extends StatementListener {
 		ProhibitedFromSearch pfs;
-		
+
 		ProhibitedFromSearchChangeListener(ProhibitedFromSearch pfs){
 			this.pfs = pfs;
 		}
-		
+
 		@Override
 		public void addedStatement(Statement s) { processChange(s,ChangeType.ADD);}
 
 		@Override
 		public void removedStatement(Statement s) {	processChange(s,ChangeType.REMOVE); }
-	
+
 		private void processChange( Statement s, ChangeType add){
 			//is it a change to an exclude class property?
-			if( s != null && s.getPredicate() != null 
-				&& s.getPredicate().getURI() != null 
+			if( s != null && s.getPredicate() != null
+				&& s.getPredicate().getURI() != null
 				&& s.getPredicate().getURI().equals(DisplayVocabulary.EXCLUDE_CLASS.getURI())){
-				
+
 				//is it about this ProhibitedFromSearch?
 				if( s.getSubject() != null ){
 					String subURI = s.getSubject().getURI() ;
@@ -128,8 +128,8 @@ public class ProhibitedFromSearch {
 						}
 					}
 				}
-			}							
+			}
 		}
-		
+
 	}
 }

@@ -9,7 +9,7 @@
 <#if htmlExists>
 	${.globals[variableName]}
 <#else>
-	${i18n().no_html_specified}  
+	${i18n().no_html_specified}
 </#if>
 
 

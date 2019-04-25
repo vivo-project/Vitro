@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class LocalNamespaceClassUtils {
     private static final Log log = LogFactory.getLog(LocalNamespaceClassUtils.class.getName());
-    
+
     //Expects hash where key = namespace uri
     //return hash where key = class uri, and value = display Name + (prefix) of ontology
     public static HashMap<String, String> getLocalNamespacesClasses(VitroRequest vreq, HashMap<String, String> namespaces) {
@@ -24,7 +24,7 @@ public class LocalNamespaceClassUtils {
        for(VClass v: allClasses) {
     	   String classNamespace = v.getNamespace();
     	   String classUri = v.getURI();
-    	   
+
     	   if(namespaces.containsKey(classNamespace)){
     		   String namespaceLabel = namespaces.get(classNamespace);
     		   String prefix = namespaceLabel.substring(namespaceLabel.indexOf("(") + 1, namespaceLabel.indexOf(")"));
@@ -33,7 +33,7 @@ public class LocalNamespaceClassUtils {
        }
        return localClasses;
     }
-    
+
     private static HashMap<String, String> convertToHash(List<String> namespaces) {
     	HashMap<String, String> namespaceHash = new HashMap<String, String>();
     	for(String n: namespaces){
@@ -41,15 +41,15 @@ public class LocalNamespaceClassUtils {
     	}
     	return namespaceHash;
     }
-    
-    //Retrieve all VClasses and sort into local namespaces 
+
+    //Retrieve all VClasses and sort into local namespaces
     //TODO: Check better mechanism utilizing sparql query
     //Can't depend on retrieval of classes b/c an ontology may not have any classes yet
     //Display name and URI, with URI being key
     public static HashMap<String, String> getLocalOntologyNamespaces(VitroRequest vreq) {
         HashMap<String, String> foundNamespaces = new HashMap<String, String>();
         String defaultNamespacePattern = getDefaultOntologyNamespace(vreq);
-        
+
     	//Get all namespacs
     	//There's an APP for that!
         //defualt namespace pattern is null if the default namespace does not employ /individual
@@ -65,10 +65,10 @@ public class LocalNamespaceClassUtils {
 	        	}
 	         }
         }
-    	
+
         return foundNamespaces;
     }
-    
+
     public static String getDefaultOntologyNamespace(VitroRequest vreq) {
     	String defaultNamespace= vreq.getWebappDaoFactory().getDefaultNamespace();
     	//Assuming following linked data approach so expects /individual at end

@@ -17,7 +17,7 @@ public class ExceptionResponseValues extends TemplateResponseValues {
         super(DEFAULT_TEMPLATE_NAME, statusCode);
         this.cause = cause;
     }
-    
+
     public ExceptionResponseValues(String templateName, Throwable cause) {
         super(templateName);
         this.cause = cause;
@@ -27,7 +27,7 @@ public class ExceptionResponseValues extends TemplateResponseValues {
         super(templateName, statusCode);
         this.cause = cause;
     }
-    
+
     public ExceptionResponseValues(String templateName, Map<String, Object> map, Throwable cause) {
         super(templateName, map);
         this.cause = cause;
@@ -41,5 +41,5 @@ public class ExceptionResponseValues extends TemplateResponseValues {
     @Override
     public Throwable getException() {
         return cause;
-    }       
+    }
 }

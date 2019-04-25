@@ -37,7 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 
 /**
  * Handle the List page.
- * 
+ *
  * TODO: auto-complete
  */
 public class UserAccountsListPage extends UserAccountsPage {

@@ -31,7 +31,7 @@
     xmlns:mann="http://vivo.cornell.edu/ns/mannadditions/0.1#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:fabio="http://purl.org/spar/fabio/"
-    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" >
   <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n56282">
     <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">AgriVIVO: an Ontology-based Store of URIs and Relations between Entities in Agricultural Research</rdfs:label>
   </rdfsyn:Description>

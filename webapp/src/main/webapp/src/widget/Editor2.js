@@ -38,14 +38,14 @@ dojo.widget.defineWidget(
 		commandList: dojo.widget.html.Editor2Toolbar.prototype.commandList,
 		toolbarWidget: null,
 		scrollInterval: null,
-		
+
 
 		editorOnLoad: function(){
 			var toolbars = dojo.widget.byType("Editor2Toolbar");
 			if((!toolbars.length)||(!this.shareToolbar)){
 				var tbOpts = {};
 				tbOpts.templatePath = dojo.uri.dojoUri("src/widget/templates/HtmlEditorToolbarOneline.html");
-				this.toolbarWidget = dojo.widget.createWidget("Editor2Toolbar", 
+				this.toolbarWidget = dojo.widget.createWidget("Editor2Toolbar",
 										tbOpts, this.domNode, "before");
 				dojo.event.connect(this, "destroy", this.toolbarWidget, "destroy");
 				this.toolbarWidget.hideUnusableButtons(this);
@@ -74,7 +74,7 @@ dojo.widget.defineWidget(
 			// dojo.event.topic.registerPublisher("Editor2.clobberFocus", this.editNode, "onclick");
 			dojo.event.topic.subscribe("Editor2.clobberFocus", this, "setBlur");
 			dojo.event.connect(this.editNode, "onfocus", this, "setFocus");
-			dojo.event.connect(this.toolbarWidget.linkButton, "onclick", 
+			dojo.event.connect(this.toolbarWidget.linkButton, "onclick",
 				dojo.lang.hitch(this, function(){
 					var range;
 					if(this.document.selection){
@@ -83,7 +83,7 @@ dojo.widget.defineWidget(
 						range = this.window.getSelection().toString();
 					}
 					if(range.length){
-						this.toolbarWidget.exec("createlink", 
+						this.toolbarWidget.exec("createlink",
 							prompt("Please enter the URL of the link:", "http://"));
 					}else{
 						alert("Please select text to link");
@@ -91,11 +91,11 @@ dojo.widget.defineWidget(
 				})
 			);
 
-			var focusFunc = dojo.lang.hitch(this, function(){ 
+			var focusFunc = dojo.lang.hitch(this, function(){
 				if(dojo.render.html.ie){
 					this.editNode.focus();
 				}else{
-					this.window.focus(); 
+					this.window.focus();
 				}
 			});
 
@@ -158,7 +158,7 @@ dojo.widget.defineWidget(
 			var totalHeight = ds.getOuterHeight(tdn);
 			if(!this._scrollSetUp){
 				this._scrollSetUp = true;
-				var editorWidth =  ds.getOuterWidth(this.domNode); 
+				var editorWidth =  ds.getOuterWidth(this.domNode);
 				this._scrollThreshold = ds.abs(tdn, false).y;
 				// dojo.debug("threshold:", this._scrollThreshold);
 				if((isIE)&&(db)&&(ds.getStyle(db, "background-image")=="none")){
@@ -185,7 +185,7 @@ dojo.widget.defineWidget(
 						if(this.object){
 							dojo.html.addClass(this.tbBgIframe, "IEFixedToolbar");
 						}
-						
+
 					}else{
 						with(tdn.style){
 							position = "fixed";
@@ -281,7 +281,7 @@ dojo.widget.defineWidget(
 				}, this);
 
 			var h = dojo.render.html;
-			
+
 			// safari f's us for selection primitives
 			if(h.safari){ return; }
 
@@ -354,7 +354,7 @@ dojo.widget.defineWidget(
 				/*
 				dojo.event.kwConnect({
 					srcObj:		this.document,
-					srcFunc:	"click", 
+					srcFunc:	"click",
 					targetObj:	this.toolbarWidget,
 					targetFunc:	"hideAllDropDowns",
 					once:		true
@@ -374,7 +374,7 @@ dojo.widget.defineWidget(
 					this.editorOnLoad();
 				};
 			})(cp.fillInTemplate);
-		
+
 			cp.onDisplayChanged = (function(odc){
 				return function(){
 					try{

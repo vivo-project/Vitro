@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 public class CustomListViewConfigFileTest extends AbstractTestClass {
 	/**
 	 * Use this XML to test the methods that strip tags from the select clause.
-	 * 
+	 *
 	 * If not collated, omit the "collated" tag. If editing, omit the
 	 * "critical-data-required" tag.
 	 */
@@ -41,7 +41,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	/**
 	 * In general, we expect no exception, but individual tests may override,
 	 * like this:
-	 * 
+	 *
 	 * <pre>
 	 * thrown.expect(InvalidConfigurationException.class);
 	 * thrown.expectMessage(&quot;Bozo&quot;);
@@ -204,7 +204,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	 * TODO Successes:
 	 *   select query with all tags
 	 *   	collated, editing, both, neither
-	 * 
+	 *
 	 * </pre>
 	 */
 

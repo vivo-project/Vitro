@@ -37,11 +37,11 @@ dojo.lang.extend(dojo.widget.html.TitlePane, {
 
 		if (this.labelNodeClass) {
 			dojo.html.addClass(this.labelNode, this.labelNodeClass);
-		}	
+		}
 
 		if (this.containerNodeClass) {
 			dojo.html.addClass(this.containerNode, this.containerNodeClass);
-		}	
+		}
 
 		if (!this.open) {
 			dojo.lfx.wipeOut(this.containerNode,0).play();

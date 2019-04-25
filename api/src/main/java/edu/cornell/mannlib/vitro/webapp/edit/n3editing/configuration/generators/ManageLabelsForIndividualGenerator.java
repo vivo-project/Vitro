@@ -45,7 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataProper
 
 /**
  *This allows the page to show all the labels for a particular individual and sets up code
- *enabling the addition of a new label.  Links on the page will allow for removal or editing of a given label. 
+ *enabling the addition of a new label.  Links on the page will allow for removal or editing of a given label.
  */
 public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
     public static Log log = LogFactory.getLog(ManageLabelsForIndividualGenerator.class);
@@ -55,7 +55,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
     //list of language names sorted alphabetically
     private List<String> existingSortedLanguageNameList = null;
     //This would be for the full list and can be used for the existing labels list as well
-    
+
     private HashMap<String, String> fullLanguageNameToCodeMap = null;
     private static String predicateUri = RDFS.label.getURI();
     @Override
@@ -66,7 +66,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 
         initBasics(config, vreq);
         initPropertyParameters(vreq, session, config);
-       
+
         //This form is technically not an object property form in the true sense
         //or a data property form because it is used to list the various labels
         //and allow for adding new labels
@@ -74,7 +74,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
         this.setUrlToReturnTo(config, vreq);
 
         config.setSubjectUri(EditConfigurationUtils.getSubjectUri(vreq));
-        
+
         setVarNames(config);
         config.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
         //Add n3, fields, etc. in the case where the user wants to add a label
@@ -85,10 +85,10 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
     	setUrisAndLiteralsInScope(config);
         this.setFields(config, vreq, EditConfigurationUtils
 				.getPredicateUri(vreq));
-        
+
         //Get existing labels
         //this.initExistingLabels(config, vreq);
-        
+
         //Add form specific data used to populate template
         addFormSpecificData(config, vreq);
         //This preprocessor handles getting the correct label language and putting the attribute on the label
@@ -96,12 +96,12 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 			   new ManageLabelsForIndividualPreprocessor(config));
  	   //This will handle generating the label from the first name and last name and also make sure to associate
  	   //a language with that label
-       config.addModelChangePreprocessor(new FoafNameToRdfsLabelPreprocessor());        
+       config.addModelChangePreprocessor(new FoafNameToRdfsLabelPreprocessor());
 
         prepare(vreq, config);
         return config;
     }
-    
+
     /**With ISF Changes**/
     //For addition of a label, with ISF changes, the name is now linked to a vcard which  in turn is linked to a "fullname" that then has first/middle/last names
     /*
@@ -109,11 +109,11 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
     	conf.addNewResource("fullName", DEFAULT_NS_FOR_NEW_RESOURCE);
         conf.addNewResource("individualVcard", DEFAULT_NS_FOR_NEW_RESOURCE);
     }*/
-  
+
     private void setUrlToReturnTo(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		editConfiguration.setUrlPatternToReturnTo(EditConfigurationUtils.getFormUrlWithoutContext(vreq));		
+		editConfiguration.setUrlPatternToReturnTo(EditConfigurationUtils.getFormUrlWithoutContext(vreq));
 	}
-    
+
     private void setVarNames(EditConfigurationVTwo editConfiguration) {
 		  editConfiguration.setVarNameForSubject("subject");
 	      editConfiguration.setVarNameForPredicate("predicate");
@@ -129,61 +129,61 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 	private List<String> generateN3Optional(VitroRequest vreq) {
 		List<String> n3Optional = new ArrayList<String>();
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		String n3 = "?subject <" + predicateUri + "> ?label ";		
+		String n3 = "?subject <" + predicateUri + "> ?label ";
 		n3Optional.add(n3);
 		return n3Optional;
 	}
-	
-	
-	
+
+
+
 	private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	editConfiguration.setFields(fields);
     	editConfiguration.addField(new FieldVTwo().
                 setName("label").
-                setValidators(getLabelValidators(vreq, editConfiguration)));    
+                setValidators(getLabelValidators(vreq, editConfiguration)));
     	editConfiguration.addField(new FieldVTwo(
-    			).setName("newLabelLanguage"));    	
+    			).setName("newLabelLanguage"));
     }
-    
-	
+
+
 
 	//validate label if person is not true
 	private List<String> getLabelValidators(VitroRequest vreq, EditConfigurationVTwo config) {
 		List<String> validators = new ArrayList<String>();
 		return validators;
 	}
-    
 
-    
+
+
 	private void setUrisAndLiteralsOnForm(EditConfigurationVTwo config,
 			VitroRequest vreq) {
 		List<String> literalsOnForm = new ArrayList<String>();
 		literalsOnForm.add("label");
 		literalsOnForm.add("newLabelLanguage");
 		config.setLiteralsOnForm(literalsOnForm);
-		
+
 	}
 
 
 	private void setUrisAndLiteralsInScope(EditConfigurationVTwo editConfiguration) {
     	HashMap<String, List<String>> urisInScope = new HashMap<String, List<String>>();
     	//note that at this point the subject, predicate, and object var parameters have already been processed
-    	urisInScope.put(editConfiguration.getVarNameForSubject(), 
+    	urisInScope.put(editConfiguration.getVarNameForSubject(),
     			Arrays.asList(new String[]{editConfiguration.getSubjectUri()}));
-    	urisInScope.put(editConfiguration.getVarNameForPredicate(), 
+    	urisInScope.put(editConfiguration.getVarNameForPredicate(),
     			Arrays.asList(new String[]{editConfiguration.getPredicateUri()}));
     	editConfiguration.setUrisInScope(urisInScope);
     	//Uris in scope include subject, predicate, and object var
-    	
+
     	editConfiguration.setLiteralsInScope(new HashMap<String, List<Literal>>());
     }
-	
+
 	private void initExistingLabels(EditConfigurationVTwo config,
 			VitroRequest vreq) {
-		this.existingLabelLiterals = this.getExistingLabels(config.getSubjectUri(), vreq);		
+		this.existingLabelLiterals = this.getExistingLabels(config.getSubjectUri(), vreq);
 	}
-    
+
 
 	private List<String> getExistingSortedLanguageNamesList() {
 		HashSet<String> existingLanguages = new HashSet<String>();
@@ -214,7 +214,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		//Get available locales for the drop down for adding a new label, also sorted by language name
 		HashSet<String> existingLanguageNames = new HashSet<String>(existingLabelsByLanguageName.keySet());
 		List<HashMap<String, String>> availableLocalesForAdd = getAvailableLocales(locales, existingLanguageNames);
-		
+
 
 		//Save all locales
 		 config.addFormSpecificData("selectLocaleFullList", locales);
@@ -222,26 +222,26 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		 config.addFormSpecificData("labelsSortedByLanguageName", existingLabelsByLanguageName);
 		 config.addFormSpecificData("selectLocale",availableLocalesForAdd);
 		 config.addFormSpecificData("displayRemoveLink", (numberExistingLabels > 1));
-      
-		
-        //How do we edit? Will need to see
-        config.addFormSpecificData("deleteWebpageUrl", "/edit/primitiveDelete");              
 
-      
+
+        //How do we edit? Will need to see
+        config.addFormSpecificData("deleteWebpageUrl", "/edit/primitiveDelete");
+
+
         Individual subject = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(config.getSubjectUri());
         if( subject != null && subject.getName() != null ){
             config.addFormSpecificData("subjectName", subject.getName());
         }else{
             config.addFormSpecificData("subjectName", null);
         }
-       
+
   		//Include whether or not editable to enable edit/remove links and add to show up
   		config.addFormSpecificData("editable", isEditable(vreq, config));
 	}
-	
 
 
-	//Based on what locales have already been selected for labels, return a list of 
+
+	//Based on what locales have already been selected for labels, return a list of
 	//locales for which new labels can be added and have these sorted by the name of the language
 	private List<HashMap<String, String>> getAvailableLocales(List<HashMap<String, String>> allLocales,
 			HashSet<String> existingLabelsLanguageNames) {
@@ -264,7 +264,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
                 return languageName1.compareTo(languageName2);
             }
         });
-		
+
 		return availableLocales;
 	}
 
@@ -282,7 +282,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 
 
 
-	
+
 	//how to get the type of the individual in question
 	public List<VClass> getVClasses(EditConfigurationVTwo config, VitroRequest vreq) {
 		Individual subject = EditConfigurationUtils.getIndividual(vreq, config.getSubjectUri());
@@ -295,11 +295,11 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 			VitroRequest vreq) {
 		String subjectUri = config.getSubjectUri();
 		String propertyUri = config.getPredicateUri();
-		
-		
+
+
 		//Iterate through the labels and create a hashmap
 		HashMap<String, List<LabelInformation>> labelsHash= new HashMap<String, List<LabelInformation>>();
-		
+
 		for(Literal l: labels) {
 			String languageTag = l.getLanguage();
 			String languageName = "";
@@ -311,7 +311,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 			} else {
 				log.warn("This language tag " + languageTag + " does not have corresponding name in the system and was not processed");
 			}
-			
+
 			if(!StringUtils.isEmpty(languageName)) {
 				if(!labelsHash.containsKey(languageName)) {
 					labelsHash.put(languageName, new ArrayList<LabelInformation>());
@@ -326,7 +326,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 						l, dpstm.getEditUrl(), dpstm.getDeleteUrl(), languageTag, languageName));
 			}
 		}
-		
+
 		//Sort each label list
 		LabelInformationComparator lic = new LabelInformationComparator();
 		for(String languageName: labelsHash.keySet()) {
@@ -334,12 +334,12 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 			labelInfo.sort(lic);
 		}
 		return labelsHash;
-		
+
 	}
-	
-	
+
+
 	public static class LabelInformationComparator implements Comparator<LabelInformation> {
-		
+
 		public int compare(LabelInformation l1, LabelInformation l2) {
 			return l1.getLabelStringValue().compareTo(l2.getLabelStringValue());
 		}
@@ -351,8 +351,8 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 	        + "SELECT DISTINCT ?label WHERE { \n"
 	        + "    ?subject rdfs:label ?label \n"
 	        + "} ORDER BY ?label";
-	    
-	       
+
+
     private ArrayList<Literal>  getExistingLabels(String subjectUri, VitroRequest vreq) {
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
@@ -364,31 +364,31 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 Literal nodeLiteral = soln.get("label").asLiteral();
-                labels.add(nodeLiteral); 
+                labels.add(nodeLiteral);
 
 
             }
         } catch (Exception e) {
             log.error(e, e);
-        }    
+        }
        return labels;
 }
-	
 
-	
+
+
     //Putting this into a method allows overriding it in subclasses
     protected String getEditForm() {
     	return null;
     	//return AddEditWebpageFormGenerator.class.getName();
     }
-    
-   
+
+
     protected String getTemplate() {
     	return template;
     }
-    
-    
-    
+
+
+
     //get locales
     public List<HashMap<String, String>> getLocales(VitroRequest vreq) {
     	List<Locale> selectables = SelectedLocale.getSelectableLocales(vreq);
@@ -405,27 +405,27 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 						+ "': " + e);
 			}
 		}
-		
+
 		return list;
     }
-    
-    
-    
+
+
+
     public HashMap<String, String> getFullCodeToLanguageNameMap(List<HashMap<String, String>> localesList) {
     	HashMap<String, String> codeToLanguageMap = new HashMap<String, String>();
     	for(Map<String, String> locale: localesList) {
     		String code = (String) locale.get("code");
     		String label = (String) locale.get("label");
     		if(!codeToLanguageMap.containsKey(code)) {
-    			codeToLanguageMap.put(code, label); 
-    		} 
+    			codeToLanguageMap.put(code, label);
+    		}
     		else {
-    			log.warn("Language code " + code + " for " + label  + " was not associated in map becayse label already exists");    		
+    			log.warn("Language code " + code + " for " + label  + " was not associated in map becayse label already exists");
     		}
     	}
     	return codeToLanguageMap;
     }
-    
+
     public List<String> getFullLanguagesNamesSortedList(List<Map<String, Object>> localesList) {
     	HashSet<String> languageNamesSet = new HashSet<String>();
     	for(Map<String, Object> locale: localesList) {
@@ -433,13 +433,13 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
     		if(!languageNamesSet.contains(label)) {
     			languageNamesSet.add(label);
     		}
-    		
+
     	}
     	List<String> languageNames =  new ArrayList<String>(languageNamesSet);
     	Collections.sort(languageNames);
     	return languageNames;
     }
-    
+
     //copied from locale selection data getter but don't need all this information
     private HashMap<String, String> buildLocaleMap(Locale locale,
 			Locale currentLocale) throws FileNotFoundException {
@@ -449,14 +449,14 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		map.put("label", locale.getDisplayName(currentLocale));
 		return map;
 	}
-    
+
     //Class used to store the information needed for the template, such as the labels, their languages, their edit links
     public class LabelInformation {
     	private Literal labelLiteral = null;
     	private String editLinkURL;
     	private String deleteLinkURL;
     	private String languageCode; //languageCode
-    	private String languageName; 
+    	private String languageName;
     	public LabelInformation(Literal inputLiteral, String inputEditLinkURL, String inputDeleteLinkURL, String inputLanguageCode, String inputLanguageName) {
     		this.labelLiteral = inputLiteral;
     		this.editLinkURL = inputEditLinkURL;
@@ -464,32 +464,32 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
     		this.languageCode = inputLanguageCode;
     		this.languageName = inputLanguageName;
     	}
-    	
-    	
+
+
     	public Literal getLabelLiteral() {
     		return this.labelLiteral;
     	}
-    	
+
     	public String getLabelStringValue() {
     		return this.labelLiteral.getString();
     	}
-    	
+
     	public String getEditLinkURL() {
     		return this.editLinkURL;
     	}
-    	
+
     	public String getDeleteLinkURL() {
     		return this.deleteLinkURL;
     	}
     	public String getLanguageCode() {
     		return this.languageCode;
     	}
-    	
+
     	public String getLanguageName() {
     		return this.languageName;
     	}
     }
-    
+
 	private String N3_PREFIX = "@prefix foaf:<http://xmlns.com/foaf/0.1/> .\n";
 
 }

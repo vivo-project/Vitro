@@ -64,7 +64,7 @@
                   jenaOntModel.leaveCriticalSection();
 	      }
         %>
-</select> 
+</select>
 
 <textarea rows="25" cols="40" name="sparqlQueryStr" class="maxWidth"><c:choose>
     <c:when test="${param.sparqlQueryStr != null}">
@@ -85,7 +85,7 @@ if(prefixes != null){
 		String prefixText = (String) prefixItr.next();
 		if(prefixText.equals("(not yet specified)")){
 			count++;
-			prefixText = "p." + count.toString();		
+			prefixText = "p." + count.toString();
 		}
 		String urlText = (String) prefixItr.next();%>
 PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
@@ -138,7 +138,7 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 		checked="checked" <%
                         }
                     %> /><%=modelName%></li>
-	<%    
+	<%
     }
 %>
 </ul>
@@ -171,8 +171,8 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 		selected="selected" <%
                  }
                 %> /><%=modelName%></option>
-	<%    
+	<%
     }
 %>
-</select> 
+</select>
 <input id="submit" type="submit" value="Execute CONSTRUCT" />

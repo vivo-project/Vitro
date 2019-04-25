@@ -12,14 +12,14 @@ var processFixedHTMLDataGetterContent = {
 	processPageContentSection:function(pageContentSection) {
 		var saveToVarValue = pageContentSection.find("input[name='saveToVar']").val();
 		var htmlValue = pageContentSection.find("textarea[name='htmlValue']").val();
-	    //JSON parsing on the server side does not handle single quotes, as it appears it thinks the string has 
+	    //JSON parsing on the server side does not handle single quotes, as it appears it thinks the string has
 	    //ended.  Different data getter types may handle apostrophes/single quotes differently
 		//In this case, this is HTML so it simply html Encodes any apostrophes
 		htmlValue = processFixedHTMLDataGetterContent.encodeQuotes(htmlValue);
 		var returnObject = {saveToVar:saveToVarValue, htmlValue:htmlValue, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	},
-	//For an existing set of content where form is already set, fill in the values 
+	//For an existing set of content where form is already set, fill in the values
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		var htmlValue = existingContentObject["htmlValue"];
@@ -38,7 +38,7 @@ var processFixedHTMLDataGetterContent = {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		return saveToVarValue;
 	},
-    //Validation on form submit: Check to see that class group has been selected 
+    //Validation on form submit: Check to see that class group has been selected
     validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
     	var validationError = "";
     	//Check that query and saveToVar have been input
@@ -72,6 +72,6 @@ var processFixedHTMLDataGetterContent = {
     replaceEncodedWithEscapedQuotes: function(inputStr) {
     	return inputStr.replace(/&#39;/g, "\'").replace(/&quot;/g, "\"");
     }
-		
-		
+
+
 }

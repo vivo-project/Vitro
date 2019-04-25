@@ -7,12 +7,12 @@ import java.util.Stack;
 /**
  * <pre>
  * The string form of a data structure might look like this:
- * HolderOfSeveralComponents[@1023948fe, 
+ * HolderOfSeveralComponents[@1023948fe,
  *     AComponentThing[@dc0048ba],
  *     AThingWithSurprisingFormatting,
  *     ThingWithOneComponent[@120985093,
  *         HoldsNoComponents[@99999999]
- *         ], 
+ *         ],
  *     ThingWithNoHashCodeAndAMap[
  *         map={
  *             one,
@@ -22,7 +22,7 @@ import java.util.Stack;
  *         ],
  *     AnotherThingWithSurprisingFormatting
  *     ]
- *    
+ *
  * Created by following these rules:
  *    create stack holding line number: size of stack is indent level
  *    on [ or { -- write "[" or "{", add line number to stack. If next character is not @, } or ], line-break.

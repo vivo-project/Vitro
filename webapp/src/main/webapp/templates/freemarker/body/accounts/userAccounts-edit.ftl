@@ -27,7 +27,7 @@
     <#elseif errorPasswordsDontMatch??>
         <#assign errorMessage = strings.error_password_mismatch />
     </#if>
-    
+
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
             <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${strings.alt_error_alert}" />
@@ -40,10 +40,10 @@
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label> 
+        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label> 
+        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
 		<#if externalAuthPermitted??>
@@ -74,8 +74,8 @@
                 <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
                 <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}<br />
                 ${strings.leave_password_unchanged}</p>
-                
-                <label for="confirm-password">${strings.confirm_password}</label> 
+
+                <label for="confirm-password">${strings.confirm_password}</label>
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </section>
         </#if>

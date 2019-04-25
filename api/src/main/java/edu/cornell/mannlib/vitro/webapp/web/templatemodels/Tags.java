@@ -24,13 +24,13 @@ import freemarker.template.TemplateModelException;
 /**
  * Provides a mechanism for Freemarker templates (main or included, parent or
  * child) to add to the lists of scripts and style sheets for the current page.
- * 
+ *
  * Each page uses 3 instances of Tags, exposed as ${scripts}, ${headScripts} and
  * ${stylesheets}. A template may add a complete &lt;script/$gt; element (for
  * scripts or headScripts) or a &lt;link&gt; tag (for stylesheets), and these
  * elements will appear at the proper location in the rendered HTML for the
  * page.
- * 
+ *
  * VIVO-1405: This process is augmented by the TagVersionInfo inner class, which
  * attempts to add a "version=" query string to the URL in the supplied element.
  * The version number is derived from the last-modified date of the specified
@@ -65,7 +65,7 @@ public class Tags extends BaseTemplateModel {
 	 * that exposes certain write methods, instead of the configuration's object
 	 * wrapper, which doesn't. The templates can then add stylesheets and
 	 * scripts to the lists by calling their add() methods.
-	 * 
+	 *
 	 * @param Tags
 	 *            tags
 	 * @return TemplateModel
@@ -74,7 +74,7 @@ public class Tags extends BaseTemplateModel {
 
 		public TagsWrapper() {
 			super(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-			
+
 			// Start by exposing all safe methods.
 			setExposureLevel(EXPOSE_SAFE);
 		}
@@ -119,12 +119,12 @@ public class Tags extends BaseTemplateModel {
 
 	/**
 	 * Find the value of "href" or "src".
-	 * 
+	 *
 	 * If there is such a value, and it doesn't have a query string already, and
 	 * it represents a local URL, and we can locate the file that is served by
 	 * the URL and get the last modified date, then we have found a "version
 	 * number" that we can add to the attribute value.
-	 * 
+	 *
 	 * Reference for parsing attributes:
 	 * https://www.w3.org/TR/html/syntax.html#elements-attributes
 	 */

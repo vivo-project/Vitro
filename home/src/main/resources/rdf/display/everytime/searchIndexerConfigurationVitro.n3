@@ -64,13 +64,13 @@
     rdfs:label "All labels are added to name fields." ;
     :hasTargetField "nameRaw" ;
     :hasSelectQuery """
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
-		SELECT ?label 
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+		SELECT ?label
 		WHERE {
 			?uri rdfs:label ?label .
 	    }
         """ .
-    
+
 :documentModifier_NameFieldBooster
     a   searchIndex:documentBuilding.FieldBooster ,
         searchIndex:documentBuilding.DocumentModifier ;

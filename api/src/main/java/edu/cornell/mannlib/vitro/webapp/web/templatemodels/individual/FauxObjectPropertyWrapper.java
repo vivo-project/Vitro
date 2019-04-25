@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 /**
  * An ObjectProperty that has some of its values overridden by a FauxProperty.
- * 
+ *
  * TODO This is a horrible kluge that should be discarded as soon as we can
  * rewrite GroupedPropertyList.
  */

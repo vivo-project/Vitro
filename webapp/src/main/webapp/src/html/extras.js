@@ -10,7 +10,7 @@
 
 dojo.require("dojo.html");
 dojo.provide("dojo.html.extras");
-dojo.require("dojo.string.extras"); 
+dojo.require("dojo.string.extras");
 
 /**
  * Calculates the mouse's direction of gravity relative to the centre
@@ -36,7 +36,7 @@ dojo.html.gravity = function(node, e){
 		var nodecenterx = getAbsoluteX(node, true) + (getInnerWidth(node) / 2);
 		var nodecentery = getAbsoluteY(node, true) + (getInnerHeight(node) / 2);
 	}
-	
+
 	with (dojo.html.gravity) {
 		return ((mouse.x < nodecenterx ? WEST : EAST) |
 			(mouse.y < nodecentery ? NORTH : SOUTH));
@@ -75,9 +75,9 @@ dojo.html.renderedTextContent = function(node){
 						result += dojo.html.renderedTextContent(node.childNodes[i]);
 						result += "\n";
 						break;
-					
+
 					case "none": break;
-					
+
 					default:
 						if(node.childNodes[i].tagName && node.childNodes[i].tagName.toLowerCase() == "br") {
 							result += "\n";
@@ -162,7 +162,7 @@ dojo.html.createNodesFromText = function(txt, trim){
 	}
 
 	/* this doesn't make much sense, I'm assuming it just meant trim() so wrap was replaced with trim
-	if(wrap){ 
+	if(wrap){
 		var ret = [];
 		// start hack
 		var fc = tn.firstChild;

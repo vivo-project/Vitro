@@ -1,9 +1,9 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<#-- VIVO-specific default data property statement template. 
-    
+<#-- VIVO-specific default data property statement template.
+
      This template must be self-contained and not rely on other variables set for the individual page, because it
-     is also used to generate the property statement during a deletion.  
+     is also used to generate the property statement during a deletion.
  -->
 <#import "lib-datetime.ftl" as dt>
 <#import "lib-meta-tags.ftl" as lmt>
@@ -19,7 +19,7 @@
     <#if datatype == "anyURI" && theValue?starts_with("http")>
 	<#assign theValue = "<a href=\"" + statement.value + "\" target=\"_blank\">" + statement.value + "</a>" />
     </#if>
-	
+
     <#if theValue?contains("<ul>") >
         <#assign theValue = theValue?replace("<ul>","<ul class='tinyMCEDisc'>") />
     </#if>

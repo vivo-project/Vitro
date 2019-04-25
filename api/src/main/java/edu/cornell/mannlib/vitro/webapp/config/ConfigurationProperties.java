@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Provides an mechanism for modules to read the configuration properties that
  * are attached to the servlet context.
- * 
+ *
  * The customary behavior is for ConfigurationPropertiesSetup to create a
  * ConfigurationPropertiesImpl, which will obtain the properties from the
  * build.properties file and the runtime.properties file.

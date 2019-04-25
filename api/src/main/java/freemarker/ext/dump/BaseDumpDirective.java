@@ -55,12 +55,12 @@ import freemarker.template.utility.DeepUnwrap;
 public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseDumpDirective.class);
-    
-    private static final String TEMPLATE_DEFAULT = "dump.ftl";  // change to dump.ftl when old dump is removed  
+
+    private static final String TEMPLATE_DEFAULT = "dump.ftl";  // change to dump.ftl when old dump is removed
     private static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
-    
+
     private ObjectWrapper defaultWrapper;
-    
+
     enum Key {
         CLASS("class"),
         DATE_TYPE("dateType"),
@@ -69,13 +69,13 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         PROPERTIES("properties"),
         TYPE("type"),
         VALUE("value");
-    
+
         private final String key;
-        
+
         Key(String key) {
             this.key = key;
         }
-        
+
         public String toString() {
             return key;
         }
@@ -84,18 +84,18 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     enum Value {
         NULL("[null]"),
         UNDEFINED("[undefined]");
-    
+
         private final String value;
-        
+
         Value(String value) {
             this.value = value;
         }
-        
+
         public String toString() {
             return value;
         }
     }
-    
+
     enum Type {
         BOOLEAN("Boolean"),
         COLLECTION("Collection"),
@@ -104,57 +104,57 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         HASH("Hash"),
         // Technically it's a HashEx, but for the templates call it a Hash
         HASH_EX("Hash"), // ("HashEx")
-        METHOD("Method"),        
+        METHOD("Method"),
         NUMBER("Number"),
         SEQUENCE("Sequence"),
         STRING("String");
-        
+
         private final String type;
-        
+
         Type(String type) {
             this.type = type;
-        }        
-        
+        }
+
         public String toString() {
             return type;
-        }        
+        }
     }
-    
+
     enum DateType {
         DATE("Date"),
         DATETIME("DateTime"),
         TIME("Time"),
         UNKNOWN("Unknown");
-        
+
         private final String type;
-        
+
         DateType(String type) {
             this.type = type;
         }
 
         public String toString() {
             return type;
-        } 
+        }
     }
-    
-    protected Map<String, Object> getTemplateVariableDump(String varName, Environment env) 
+
+    protected Map<String, Object> getTemplateVariableDump(String varName, Environment env)
     throws TemplateModelException {
 
         defaultWrapper = env.getObjectWrapper();
         if (defaultWrapper == null) {
             defaultWrapper = env.getConfiguration().getObjectWrapper();
         }
-        
-        TemplateHashModel dataModel = env.getDataModel();       
+
+        TemplateHashModel dataModel = env.getDataModel();
         TemplateModel valueToDump = dataModel.get(varName);
         return getTemplateVariableDump(varName, valueToDump);
     }
 
-    protected Map<String, Object> getTemplateVariableDump(String varName, TemplateModel valueToDump) 
+    protected Map<String, Object> getTemplateVariableDump(String varName, TemplateModel valueToDump)
     throws TemplateModelException {
 
         Map<String, Object> value = new HashMap<String, Object>();
-        
+
         if (valueToDump == null) {
             value.put(Key.VALUE.toString(), Value.UNDEFINED.toString());
 
@@ -162,45 +162,45 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         // included in the data model at the top level.
         } else if (valueToDump instanceof TemplateMethodModel) {
             value.putAll( getTemplateModelDump( ( TemplateMethodModel)valueToDump, varName ) );
-            
+
         } else if (valueToDump instanceof TemplateDirectiveModel) {
             value.putAll( getTemplateModelDump( ( TemplateDirectiveModel)valueToDump, varName ) );
-            
+
         } else {
             value.putAll(getDump(valueToDump));
         }
 
         Map<String, Object> dump = new HashMap<String, Object>();
         dump.put(varName, value);
-        return dump;        
+        return dump;
     }
 
     private Map<String, Object> getDump(TemplateModel valueToDump) throws TemplateModelException {
-        
+
         Map<String, Object> map = new HashMap<String, Object>();
-        
+
         // Don't return null if model == null. We still want to send the map to the template.
         if (valueToDump != null) {
-            
+
             if ( valueToDump instanceof TemplateSequenceModel ) {
                 if (valueToDump instanceof CollectionModel && ! ((CollectionModel)valueToDump).getSupportsIndexedAccess()) {
-                    map.putAll( getTemplateModelDump( (TemplateCollectionModel)valueToDump ) );                   
+                    map.putAll( getTemplateModelDump( (TemplateCollectionModel)valueToDump ) );
                 } else {
                     map.putAll( getTemplateModelDump( (TemplateSequenceModel)valueToDump ) );
                 }
-                
+
             } else if ( valueToDump instanceof TemplateNumberModel ) {
                 map.putAll( getTemplateModelDump( (TemplateNumberModel)valueToDump ) );
-                
+
             } else if ( valueToDump instanceof TemplateBooleanModel ) {
                 map.putAll( getTemplateModelDump( (TemplateBooleanModel)valueToDump ) );
 
-            } else if ( valueToDump instanceof TemplateDateModel ) { 
+            } else if ( valueToDump instanceof TemplateDateModel ) {
                 map.putAll( getTemplateModelDump( (TemplateDateModel)valueToDump ) );
 
             } else if ( valueToDump instanceof TemplateCollectionModel ) {
                 map.putAll( getTemplateModelDump( (TemplateCollectionModel)valueToDump ) );
-                
+
             } else if ( valueToDump instanceof StringModel ) {
                 // A StringModel can wrap either a String or a plain Java object.
                 // Unwrap it to figure out what to do.
@@ -211,18 +211,18 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 } else {
                     map.putAll( getTemplateModelDump( (TemplateHashModelEx)valueToDump ) );
                 }
-             
+
             } else if ( valueToDump instanceof TemplateScalarModel ) {
                     map.putAll( getTemplateModelDump( (TemplateScalarModel)valueToDump ) );
 
             } else if ( valueToDump instanceof TemplateHashModelEx ) {
                 map.putAll( getTemplateModelDump( (TemplateHashModelEx)valueToDump ) );
-                
+
             } else if  (valueToDump instanceof TemplateHashModel ) {
                 map.putAll( getTemplateModelDump( (TemplateHashModel)valueToDump ) );
 
-            // Nodes and transforms not included here     
-                
+            // Nodes and transforms not included here
+
             } else {
                 // We shouldn't get here; provide as a safety net.
                 map.putAll( getTemplateModelDump( (TemplateModel)valueToDump ) );
@@ -230,17 +230,17 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         } else {
             map.put(Key.VALUE.toString(), Value.NULL.toString());
         }
-        
+
         return map;
-    }    
-    
+    }
+
     private Map<String, Object> getTemplateModelDump(TemplateScalarModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.STRING);
         map.put(Key.VALUE.toString(), model.getAsString());
         return map;
     }
-    
+
     private Map<String, Object> getTemplateModelDump(TemplateBooleanModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.BOOLEAN);
@@ -254,7 +254,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         map.put(Key.VALUE.toString(), model.getAsNumber());
         return map;
     }
-    
+
     private Map<String, Object> getTemplateModelDump(TemplateDateModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.DATE);
@@ -262,7 +262,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
         DateType type;
         switch (dateType) {
-        case TemplateDateModel.DATE: 
+        case TemplateDateModel.DATE:
             type = DateType.DATE;
             break;
         case TemplateDateModel.DATETIME:
@@ -275,7 +275,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             type = DateType.UNKNOWN;
         }
         map.put(Key.DATE_TYPE.toString(), type);
-        
+
         map.put(Key.VALUE.toString(), model.getAsDate());
         return map;
     }
@@ -301,7 +301,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         map.put(Key.VALUE.toString(), items);
         return map;
     }
-    
+
     private Map<String, Object> getTemplateModelDump(TemplateHashModelEx model) throws TemplateModelException {
         Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
         // This seems to be the most reliable way of distinguishing a wrapped map from a wrapped object.
@@ -310,13 +310,13 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         if ( unwrappedModel instanceof Map ) {
             return getMapDump(model);
         }
-        
+
          // Java objects are wrapped as TemplateHashModelEx-s.
         return getObjectDump(model, unwrappedModel);
     }
-    
-    private Map<String, Object> getMapDump(TemplateHashModelEx model) throws TemplateModelException {        
-        Map<String, Object> map = new HashMap<String, Object>();        
+
+    private Map<String, Object> getMapDump(TemplateHashModelEx model) throws TemplateModelException {
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.HASH_EX);
         SortedMap<String, Object> items = new TreeMap<String, Object>();
         TemplateCollectionModel keys = model.keys();
@@ -324,7 +324,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         while (iModel.hasNext()) {
             String key = iModel.next().toString();
             // Work around this oddity: model.object does not contain
-            // values for "empty" and "keys", but model.keys() does. 
+            // values for "empty" and "keys", but model.keys() does.
             if ("class".equals(key) || "empty".equals(key)) {
                 continue;
             }
@@ -335,74 +335,74 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             // the dump should also expose them. I'm guessing that in most cases these
             // methods are not relevant to template authors.
             if (! (value instanceof TemplateMethodModel)) {
-                items.put(key, getDump(value)); 
-            } 
-            
-        }   
-        map.put(Key.VALUE.toString(), items);  
+                items.put(key, getDump(value));
+            }
+
+        }
+        map.put(Key.VALUE.toString(), items);
         return map;
     }
-    
+
     private Map<String, Object> getObjectDump(TemplateHashModelEx model, Object object) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), object.getClass().getName());
-        
+
         if( object instanceof java.lang.reflect.Method)
-            return map;                   
-        
+            return map;
+
         // Compile the collections of properties and methods available to the template
         SortedMap<String, Object> properties = new TreeMap<String, Object>();
         SortedMap<String, Object> methods = new TreeMap<String, Object>();
-        
+
         // keys() gets only values visible to template based on the BeansWrapper used.
         // Note: if the BeansWrapper exposure level > BeansWrapper.EXPOSE_PROPERTIES_ONLY,
         // keys() returns both method and property name for any available method with no
         // parameters: e.g., both name and getName(). We are going to eliminate the latter.
         TemplateCollectionModel keys = model.keys();
         TemplateModelIterator iModel = keys.iterator();
-        
+
         // Create a Set from keys so we can use the Set API.
         Set<String> keySet = new HashSet<String>();
         while (iModel.hasNext()) {
             String key = iModel.next().toString();
             keySet.add(key);
         }
-        
+
         if (keySet.size() > 0) {
-            
+
             Class<?> cls = object.getClass();
-            Method[] classMethods = cls.getMethods(); 
-    
+            Method[] classMethods = cls.getMethods();
+
             // Iterate through the methods rather than the keys, so that we can remove
             // some keys based on reflection on the methods. We also want to remove duplicates
             // like name/getName - we'll keep only the first form.
             for ( Method method : classMethods ) {
-    
-                if( "declaringClass".equals( method.getName() )) 
+
+                if( "declaringClass".equals( method.getName() ))
                         continue;
-                
+
                 // Eliminate methods declared on Object
                 // and other unusual places that can cause problems.
                 Class<?> c = method.getDeclaringClass();
-                
-                if (c == null || 
+
+                if (c == null ||
                     c.equals(java.lang.Object.class) ||
                     c.equals(java.lang.reflect.Constructor.class) ||
-                    c.equals(java.lang.reflect.Field.class )    ) 
+                    c.equals(java.lang.reflect.Field.class )    )
                     continue;
-                if( 
+                if(
                     c.getPackage().getName().startsWith("sun.") ||
                     c.getPackage().getName().startsWith("java.lang") ||
                     c.getPackage().getName().startsWith("java.security") )
-                    continue;                                
-                
+                    continue;
+
                 // Eliminate deprecated methods
                 if (method.isAnnotationPresent(Deprecated.class)) {
                     continue;
                 }
 
                 // Include only methods included in keys(). This factors in visibility
-                // defined by the model's BeansWrapper.                 
+                // defined by the model's BeansWrapper.
                 String methodName = method.getName();
 
                 Matcher matcher = PROPERTY_NAME_PATTERN.matcher(methodName);
@@ -410,9 +410,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 // as a property
                 if (matcher.find()) {
                     String propertyName = getPropertyName(methodName);
-                    
+
                     // The method is available as a property
-                    if (keySet.contains(propertyName)) {   
+                    if (keySet.contains(propertyName)) {
                         try{
                             TemplateModel value = model.get(propertyName);
                             properties.put(propertyName, getDump(value));
@@ -423,13 +423,13 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                         continue;
                     }
                 }
-                
+
                 // Else look for the entire methodName in the key set, to include
-                // those that are exposed as methods rather than properties. 
-                if (keySet.contains(methodName)) {               
-                    String methodDisplayName = getMethodDisplayName(method);  
+                // those that are exposed as methods rather than properties.
+                if (keySet.contains(methodName)) {
+                    String methodDisplayName = getMethodDisplayName(method);
                     // If no arguments, invoke the method to get the result
-                    if ( methodDisplayName.endsWith("()") ) {                     
+                    if ( methodDisplayName.endsWith("()") ) {
                         SimpleMethodModel methodModel = (SimpleMethodModel)model.get(methodName);
                         try {
                             Object result = methodModel.exec(null);
@@ -437,7 +437,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                             TemplateModel wrappedResult = wrapper.wrap(result);
                             methods.put(methodDisplayName, getDump(wrappedResult));
                         } catch (Exception e) {
-                            log.error(e, e);    
+                            log.error(e, e);
                         }
                     // Else display method name, parameter types, and return type
                     } else {
@@ -446,25 +446,25 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                         if ( ! returnTypeName.equals("void") ) {
                             methodValue.put(Key.TYPE.toString(), returnTypeName);
                         }
-                        methods.put(methodDisplayName, methodValue);                           
-                    }                    
+                        methods.put(methodDisplayName, methodValue);
+                    }
                 }
-            }           
+            }
         }
-        
+
         Map<String, Object> objectValue = new HashMap<String, Object>(2);
         objectValue.put(Key.PROPERTIES.toString(), properties);
         objectValue.put(Key.METHODS.toString(), methods);
-    
+
         map.put(Key.VALUE.toString(), objectValue);
         return map;
     }
-    
+
     private ObjectWrapper getWrapper(TemplateHashModelEx model) {
         // Attempt to find the wrapper that this template model object was wrapped with.
         if (model instanceof BeanModel) {
             return WrapperExtractor.getWrapper((BeanModel)model);
-        // Otherwise return the wrapper defined for the Environment or Configuration, 
+        // Otherwise return the wrapper defined for the Environment or Configuration,
         // if there is one. Why can't we get the wrapper for any type of TemplateModel??
         } else if (defaultWrapper != null) {
             return defaultWrapper;
@@ -472,20 +472,20 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             return new BeansWrapper();
         }
     }
-    
+
     private String getMethodDisplayName(Method method) {
         String methodName = method.getName();
         Class<?>[] paramTypes = method.getParameterTypes();
         List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
-        if (paramTypes.length > 0) {           
+        if (paramTypes.length > 0) {
             for (Class<?> cls : paramTypes) {
                 paramTypeList.add(getSimpleTypeName(cls));
-            }            
-        } 
+            }
+        }
         methodName += "(" + StringUtils.join(paramTypeList, ", ") + ")";
-        return methodName;               
-    }    
-    
+        return methodName;
+    }
+
     private String getReturnTypeName(Method method) {
         Class<?> cls = method.getReturnType();
         Package pkg = cls.getPackage();
@@ -494,10 +494,10 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             if (packageName.startsWith("java")) {
                 return getSimpleTypeName(cls);
             }
-        } 
+        }
         return cls.getName();
     }
-    
+
     private String getSimpleTypeName(Class<?> cls) {
         return cls.getSimpleName().replace("[]", "s");
     }
@@ -505,9 +505,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     // Return the method name as it is represented in TemplateHashModelEx.keys()
     private String getPropertyName(String methodName) {
         String keyName = methodName.replaceAll("^(get|is)", "");
-        return StringUtils.uncapitalize(keyName);        
+        return StringUtils.uncapitalize(keyName);
     }
-    
+
     private Map<String, Object> getTemplateModelDump(TemplateCollectionModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.COLLECTION);
@@ -517,18 +517,18 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             TemplateModel m = iModel.next();
             items.add(getDump(m));
         }
-        map.put(Key.VALUE.toString(), items);  
+        map.put(Key.VALUE.toString(), items);
         return map;
     }
-    
+
     private Map<String, Object> getTemplateModelDump(TemplateMethodModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.METHOD);
         map.put(Key.CLASS.toString(), model.getClass().getName());
-        map.put(Key.HELP.toString(), getHelp(model, varName));       
+        map.put(Key.HELP.toString(), getHelp(model, varName));
         return map;
     }
-    
+
     private Map<String, Object> getTemplateModelDump(TemplateDirectiveModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.DIRECTIVE);
@@ -536,7 +536,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         map.put(Key.HELP.toString(), getHelp(model, varName));
         return map;
     }
-    
+
     @SuppressWarnings("unchecked")
     private Map<String, Object> getHelp(TemplateModel model, String varName) {
         if ( model instanceof TemplateMethodModel || model instanceof TemplateDirectiveModel ) {
@@ -552,7 +552,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 } catch (Exception e) {
                     log.error("Error invoking method help() on " + modelClass + " of class " + cls.getName());
                     return null;
-                } 
+                }
             } catch (NoSuchMethodException e) {
                 log.info("No help() method defined for " + modelClass + " of class " + cls.getName());
                 return null;
@@ -562,74 +562,74 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             }
         }
         return null;
-    }   
-    
+    }
+
     private Map<String, Object> getTemplateModelDump(TemplateModel model) throws TemplateModelException {
         // One of the more specific cases should have applied. Track whether this actually occurs.
-        log.debug("Found template model of type " + model.getClass().getName()); 
+        log.debug("Found template model of type " + model.getClass().getName());
         Map<String, Object> map = new HashMap<String, Object>();
         Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
         map.put(Key.TYPE.toString(), unwrappedModel.getClass().getName());
         map.put(Key.VALUE.toString(), unwrappedModel.toString());
-        return map;        
+        return map;
     }
-    
-    protected void dump(Map<String, Object> dump, Environment env, String title) 
+
+    protected void dump(Map<String, Object> dump, Environment env, String title)
     throws TemplateException, IOException {
         dump(dump, env, title, TEMPLATE_DEFAULT);
     }
-    
-    protected void dump(Map<String, Object> dump, Environment env, String title, String templateName) 
+
+    protected void dump(Map<String, Object> dump, Environment env, String title, String templateName)
     throws TemplateException, IOException {
-        
+
         // Wrap the dump in another map so the template has a handle to iterate through
         // the values: <#list dump?keys as key>...</#list>
         Map<String, Object> map = new HashMap<String, Object>();
-        
+
         //put the TemplateModel to be dumped at 'dumpValue'
         map.put("dumpValue", dump);
         map.put("title", title);
-        writeDump(map, env, templateName);      
+        writeDump(map, env, templateName);
     }
-    
-    protected void writeDump(Map<String, Object> map, Environment env, String templateName) 
-    throws TemplateException, IOException {        
-        
-        //bdc34: not sure what to do there to 
+
+    protected void writeDump(Map<String, Object> map, Environment env, String templateName)
+    throws TemplateException, IOException {
+
+        //bdc34: not sure what to do there to
         //get the scope from the env to this dump template, trying an ugly copy
-        map.putAll( toMap( env.getDataModel() )); 
-        
+        map.putAll( toMap( env.getDataModel() ));
+
         Template template = env.getConfiguration().getTemplate(templateName);
         StringWriter sw = new StringWriter();
-        template.process(map, sw);        
+        template.process(map, sw);
         Writer out = env.getOut();
         out.write(sw.toString());
-        
+
     }
 
     public Map<String, Object> help(String name) {
         return new HashMap<String, Object>();
     }
-    
+
     /**
      * Convert a Freemarker TemplateObject to a usable map.
-     * @throws TemplateModelException 
+     * @throws TemplateModelException
      */
     protected Map<? extends String, ? extends Object> toMap( Object hash ) throws TemplateModelException{
         Map<String,Object> outMap = new HashMap<String,Object>();
-        
+
         if( hash instanceof TemplateHashModelEx ){
             TemplateHashModelEx thme = (TemplateHashModelEx) hash;
-            for( String key : junkToStrings( thme.keys() )){                
+            for( String key : junkToStrings( thme.keys() )){
                 outMap.put(key, thme.get(key));
             }
         }else{
             log.error("Freemarker is passing odd objects to method toMap(): " + hash.getClass().getName());
         }
-        
+
         return outMap;
     }
-    
+
     protected List<String> junkToStrings( TemplateCollectionModel junk ){
         List<String> keys = new ArrayList<String>();
         try{
@@ -637,12 +637,12 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             while( it.hasNext() ){
                 Object obj = it.next();
                 if( obj instanceof StringModel){
-                    keys.add( ((StringModel)obj).getAsString() ); 
+                    keys.add( ((StringModel)obj).getAsString() );
                 }else if( obj instanceof SimpleScalar ){
                     keys.add( ((SimpleScalar)obj).getAsString());
-                }else{                
+                }else{
                     log.error("Freemarker is setting keys to hashes as non-strings: " + obj.getClass().getName());
-                }                
+                }
             }
         }catch(Exception ex){
             log.error("Freemarker is messing with us",ex);

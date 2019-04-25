@@ -136,7 +136,7 @@ dojo.requireLocalization = function(modulename, bundlename, locale /*optional*/)
 	var bundlepackage = [modulename, "_nls", bundlename].join(".");
 	var bundle = dojo.hostenv.startPackage(bundlepackage);
 	dojo.hostenv.loaded_modules_[bundlepackage] = bundle;
-	
+
 	var inherit = false;
 	for(var i = searchlist.length - 1; i >= 0; i--){
 		var loc = searchlist[i];

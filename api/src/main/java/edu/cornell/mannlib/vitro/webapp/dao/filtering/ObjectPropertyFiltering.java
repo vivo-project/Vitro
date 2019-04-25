@@ -16,34 +16,34 @@ public class ObjectPropertyFiltering extends ObjectProperty {
 
     private VitroFilters filters;
     private ObjectProperty innerObjectProperty;
-    
+
     public ObjectPropertyFiltering(ObjectProperty innerObjectProperty, VitroFilters filters){
         this.innerObjectProperty = innerObjectProperty;
         this.filters = filters;
     }
-    
+
     /**
      * Need to filter ObjectPropertyStatements and return ObjectPropertyStatements
-     * wrapped in ObjectPropertyStatementsFiltering. 
+     * wrapped in ObjectPropertyStatementsFiltering.
      */
     @Override
-    public List<ObjectPropertyStatement> getObjectPropertyStatements() {        
+    public List<ObjectPropertyStatement> getObjectPropertyStatements() {
         List<ObjectPropertyStatement> propStmts =  innerObjectProperty.getObjectPropertyStatements();
         if( propStmts == null ) return null;
-        
+
         List<ObjectPropertyStatement> fileredStmts = new LinkedList<ObjectPropertyStatement>();
         Filter.filter(propStmts, filters.getObjectPropertyStatementFilter(), fileredStmts);
-        
+
         List<ObjectPropertyStatement> filteredOnSubjStmts = new LinkedList<ObjectPropertyStatement>();
         for( ObjectPropertyStatement stmt : fileredStmts){
             //uncomment condition to get hard edge portals:
             //if( filters.getIndividualFilter().fn( stmt.getObject()) )
                 filteredOnSubjStmts.add( new ObjectPropertyStatementFiltering(stmt, filters) );
         }
-        
-        return filteredOnSubjStmts;        
+
+        return filteredOnSubjStmts;
     }
-               
+
     /* the rest of the methods are delegated with no filtering */
     @Override
     public int compareTo(ObjectProperty op) {
@@ -74,7 +74,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public Integer getDomainDisplayLimitInteger() {
         return innerObjectProperty.getDomainDisplayLimitInteger();
     }
-    
+
     @Override
     public int getDomainDisplayTier() {
         return innerObjectProperty.getDomainDisplayTier();
@@ -84,7 +84,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public Integer getDomainDisplayTierInteger() {
         return innerObjectProperty.getDomainDisplayTierInteger();
     }
-    
+
     @Override
     public String getDomainEntitySortDirection() {
         return innerObjectProperty.getDomainEntitySortDirection();
@@ -93,13 +93,13 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     @Override
     public String getDomainEntityURI() {
         return innerObjectProperty.getDomainEntityURI();
-    }    
+    }
 
     @Override
     public String getDomainPublic() {
         return innerObjectProperty.getDomainPublic();
     }
-    
+
     @Override
     public VClass getDomainVClass() {
         return innerObjectProperty.getDomainVClass();
@@ -134,7 +134,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
         return innerObjectProperty.getHiddenFromDisplayBelowRoleLevel();
     }
-    
+
     @Override
     public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
         return innerObjectProperty.getProhibitedFromUpdateBelowRoleLevel();
@@ -144,7 +144,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public RoleLevel getHiddenFromPublishBelowRoleLevel() {
         return innerObjectProperty.getHiddenFromPublishBelowRoleLevel();
     }
-    
+
     @Override
     public boolean getInverseFunctional() {
         return innerObjectProperty.getInverseFunctional();
@@ -164,7 +164,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public String getLocalNameWithPrefix() {
         return innerObjectProperty.getLocalNameWithPrefix();
     }
-    
+
     @Override
     public String getPickListName() {
         return innerObjectProperty.getPickListName();
@@ -211,7 +211,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public Integer getRangeDisplayLimitInteger() {
         return innerObjectProperty.getRangeDisplayLimitInteger();
     }
-    
+
     @Override
     public int getRangeDisplayTier() {
         return innerObjectProperty.getRangeDisplayTier();
@@ -221,7 +221,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public Integer getRangeDisplayTierInteger() {
         return innerObjectProperty.getRangeDisplayTierInteger();
     }
-    
+
     @Override
     public String getRangeEntitySortDirection() {
         return innerObjectProperty.getRangeEntitySortDirection();
@@ -357,7 +357,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
         innerObjectProperty.setHiddenFromDisplayBelowRoleLevel(eR);
     }
-    
+
     @Override
     public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
         innerObjectProperty.setHiddenFromDisplayBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
@@ -367,7 +367,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
         innerObjectProperty.setProhibitedFromUpdateBelowRoleLevel(eR);
     }
-    
+
     @Override
     public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
         innerObjectProperty.setProhibitedFromUpdateBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
@@ -377,7 +377,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
         innerObjectProperty.setHiddenFromPublishBelowRoleLevel(eR);
     }
-    
+
     @Override
     public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
         innerObjectProperty.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
@@ -392,7 +392,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public void setLocalName(String localName) {
         innerObjectProperty.setLocalName(localName);
     }
-    
+
     @Override
     public void setLocalNameInverse(String localNameInverse) {
         innerObjectProperty.setLocalNameInverse(localNameInverse);
@@ -402,7 +402,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public void setLocalNameWithPrefix(String localNameWithPrefix) {
         innerObjectProperty.setLocalNameWithPrefix(localNameWithPrefix);
     }
-    
+
     @Override
     public void setPickListName(String pickListName) {
         innerObjectProperty.setPickListName(pickListName);
@@ -530,44 +530,44 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
 	@Override
-	public boolean getCollateBySubclass() {		
+	public boolean getCollateBySubclass() {
 		return innerObjectProperty.getCollateBySubclass();
 	}
 
 	@Override
-	public void setCollateBySubclass(boolean collate) {		
+	public void setCollateBySubclass(boolean collate) {
 		innerObjectProperty.setCollateBySubclass(collate);
 	}
-	
+
 	@Override
 	public boolean isEditLinkSuppressed() {
 	    return innerObjectProperty.isEditLinkSuppressed();
 	}
-	
-	@Override 
+
+	@Override
 	public boolean isAddLinkSuppressed() {
 	    return innerObjectProperty.isAddLinkSuppressed();
 	}
-	
-	@Override 
+
+	@Override
 	public boolean isDeleteLinkSuppressed() {
 	    return innerObjectProperty.isDeleteLinkSuppressed();
 	}
-	
+
 	@Override
     public void setEditLinkSuppressed(boolean editLinkSuppressed) {
         innerObjectProperty.setEditLinkSuppressed(editLinkSuppressed);
     }
-    
-    @Override 
+
+    @Override
     public void setAddLinkSuppressed(boolean addLinkSuppressed) {
         innerObjectProperty.setAddLinkSuppressed(addLinkSuppressed);
     }
-    
-    @Override 
+
+    @Override
     public void setDeleteLinkSuppressed(boolean deleteLinkSuppressed) {
         innerObjectProperty.setDeleteLinkSuppressed(deleteLinkSuppressed);
     }
 
-    
+
 }

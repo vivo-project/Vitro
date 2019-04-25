@@ -11,11 +11,11 @@
 			minSize: [ 115, 115 ],
 			boxWidth: 650,
 			aspectRatio: 1
-			
+
 		});
-		
-		
-		
+
+
+
 
 		var bounds = jcrop_api.getBounds();
 		var boundx = bounds[0];
@@ -41,7 +41,7 @@
 				$('input[name=h]').val(Math.round(coords.h));
 			}
 		};
-		
+
 	});
 
 }(jQuery));

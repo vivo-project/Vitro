@@ -33,11 +33,11 @@ public class FormUtils {
 
     protected static final Log log = LogFactory.getLog(FormUtils.class.getName());
     protected static final int BASE_10 = 10;
-    protected static final Class[] SUPPORTED_TYPES = { String.class, 
-            int.class, 
-            Integer.class, 
-            boolean.class, 
-            Date.class 
+    protected static final Class[] SUPPORTED_TYPES = { String.class,
+            int.class,
+            Integer.class,
+            boolean.class,
+            Date.class
           };
 
     protected static final List<Class> SUPPORTED_TYPE_LIST = Arrays
@@ -45,15 +45,15 @@ public class FormUtils {
 
     /* this class needs to be reworked */
 
-    public static void populateFormFromBean (Object bean, 
-    		                                 String action, 
+    public static void populateFormFromBean (Object bean,
+    		                                 String action,
     		                                 FormObject foo) {
         populateFormFromBean(bean,action,null,foo,new HashMap());
     }
 
-    public static void populateFormFromBean (Object bean, 
-    		                                 String action, 
-    		                                 FormObject foo, 
+    public static void populateFormFromBean (Object bean,
+    		                                 String action,
+    		                                 FormObject foo,
     		                                 Map<String, String> badValuesHash) {
         populateFormFromBean(bean,action,null,foo,badValuesHash);
     }
@@ -61,14 +61,14 @@ public class FormUtils {
     /**
      * Populates form objects with bean values
      */
-    public static void populateFormFromBean (Object bean, 
-    		                                 String action, 
-    		                                 EditProcessObject epo, 
-    		                                 FormObject foo, 
+    public static void populateFormFromBean (Object bean,
+    		                                 String action,
+    		                                 EditProcessObject epo,
+    		                                 FormObject foo,
     		                                 Map<String, String> BadValuesHash) {
-        Class beanClass = 
-        	    (epo != null && epo.getBeanClass() != null) 
-        	            ? epo.getBeanClass() 
+        Class beanClass =
+        	    (epo != null && epo.getBeanClass() != null)
+        	            ? epo.getBeanClass()
         	            : bean.getClass();
 
         Method[] meths = beanClass.getMethods();
@@ -121,20 +121,20 @@ public class FormUtils {
         }
     }
 
-    public static List<Option> makeOptionListFromBeans (List beanList, 
-    		                                            String valueField, 
-    		                                            String bodyField, 
-    		                                            String selectedValue, 
+    public static List<Option> makeOptionListFromBeans (List beanList,
+    		                                            String valueField,
+    		                                            String bodyField,
+    		                                            String selectedValue,
     		                                            String selectedBody) {
         return makeOptionListFromBeans (
         		beanList, valueField, bodyField, selectedValue, selectedBody, true);
     }
 
-    public static List<Option> makeOptionListFromBeans(List beanList, 
-    		                                           String valueField, 
-    		                                           String bodyField, 
-    		                                           String selectedValue, 
-    		                                           String selectedBody, 
+    public static List<Option> makeOptionListFromBeans(List beanList,
+    		                                           String valueField,
+    		                                           String bodyField,
+    		                                           String selectedValue,
+    		                                           String selectedBody,
     		                                           boolean forceSelectedInclusion) {
         List<Option> optList = new LinkedList();
 
@@ -155,7 +155,7 @@ public class FormUtils {
                 		"get" + valueField, (Class[]) null);
                 valueObj = valueMeth.invoke(bean, (Object[]) null);
             } catch (Exception e) {
-                log.warn("Could not find method get" + valueField + " on " + 
+                log.warn("Could not find method get" + valueField + " on " +
                 		bean.getClass());
             }
 
@@ -200,11 +200,11 @@ public class FormUtils {
 
         }
 
-        // if the list of beans doesn't include the selected value/body, 
+        // if the list of beans doesn't include the selected value/body,
         // insert it anyway so we don't inadvertently change the value of the
-        // field to the first thing that happens to be in the select list 
+        // field to the first thing that happens to be in the select list
         boolean skipThisStep = !forceSelectedInclusion;
-        // For now, if the value is a negative integer, we won't try to 
+        // For now, if the value is a negative integer, we won't try to
         // preserve it, as the bean was probably just instantiated.
         // Should switch to a more robust way of handling inital bean values.
         if (selectedValue == null) {
@@ -231,8 +231,8 @@ public class FormUtils {
         return optList;
 
     }
-    
-    public static List<Option> makeVClassOptionList(WebappDaoFactory wadf, 
+
+    public static List<Option> makeVClassOptionList(WebappDaoFactory wadf,
     		                                        String selectedVClassURI) {
         List<Option> vclassOptionList = new LinkedList<Option>();
         for (VClass vclass : wadf.getVClassDao().getAllVclasses()) {
@@ -246,15 +246,15 @@ public class FormUtils {
         }
         return vclassOptionList;
     }
-    
+
 	public static List<Option> makeOptionListOfSubVClasses(
 			WebappDaoFactory wadf, String parentVClassUri,
 			String selectedVClassURI) {
 		VClassDao vClassDao = wadf.getVClassDao();
-		
+
 		Set<String> uris = new HashSet<>(vClassDao.getAllSubClassURIs(parentVClassUri));
 		uris.add(parentVClassUri);
-		
+
 		List<Option> options = new LinkedList<>();
 		for (String vclassUri: uris) {
 			VClass vclass = vClassDao.getVClassByURI(vclassUri);
@@ -266,9 +266,9 @@ public class FormUtils {
         	    option.setSelected(true);
         	}
 		}
-		
+
 		options.sort((o1, o2) -> o1.getBody().compareTo(o2.getBody()));
-		
+
 		return options;
 	}
 
@@ -276,38 +276,38 @@ public class FormUtils {
         beanSet (newObj, field, value, null);
     }
 
-    public static void beanSet(Object newObj, 
-    		                   String field, 
-    		                   String value, 
+    public static void beanSet(Object newObj,
+    		                   String field,
+    		                   String value,
     		                   EditProcessObject epo) {
         SimpleDateFormat standardDateFormat = new SimpleDateFormat(
         		"yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat minutesOnlyDateFormat = new SimpleDateFormat(
         		"yyyy-MM-dd HH:mm");
-        Class cls = 
-        	    (epo != null && epo.getBeanClass() != null) 
-        	            ? epo.getBeanClass() 
+        Class cls =
+        	    (epo != null && epo.getBeanClass() != null)
+        	            ? epo.getBeanClass()
         	            : newObj.getClass();
         Class[] paramList = new Class[1];
         Method setterMethod = getSetterMethod(cls, field, SUPPORTED_TYPE_LIST);
         if (setterMethod == null) {
-        	log.debug("Could not find method set" + field + " on " 
+        	log.debug("Could not find method set" + field + " on "
         			+ cls.getName());
         	return;
         }
-        Class argumentType = setterMethod.getParameterTypes()[0];   
+        Class argumentType = setterMethod.getParameterTypes()[0];
         Object[] arglist = new Object[1];
-        if (int.class.equals(argumentType) 
+        if (int.class.equals(argumentType)
         		|| Integer.class.equals(argumentType)) {
             arglist[0] = (int.class.equals(argumentType)) ? -1 : null;
-            if (!value.isEmpty()) { 
+            if (!value.isEmpty()) {
                 int parsedInt = Integer.parseInt(value, BASE_10);
                 if (parsedInt < 0) {
-                	throw new FormUtils.NegativeIntegerException();    	
+                	throw new FormUtils.NegativeIntegerException();
                 } else {
                 	arglist[0] = parsedInt;
                 }
-            }                	
+            }
         } else if (Date.class.equals(argumentType)) {
             // this isn't so great ; should probably be in a validator
             if (value != null && value.length() > 0 && value.indexOf(":") < 1) {
@@ -331,7 +331,7 @@ public class FormUtils {
             } else {
                 arglist[0] = null;
             }
-        } else if (boolean.class.equals(argumentType)) {      	
+        } else if (boolean.class.equals(argumentType)) {
             arglist[0] = (value.equalsIgnoreCase("true"));
         } else {
             arglist[0] = value;
@@ -343,8 +343,8 @@ public class FormUtils {
         }
     }
 
-    private static Method getSetterMethod(Class beanClass, 
-    		                              String fieldName, 
+    private static Method getSetterMethod(Class beanClass,
+    		                              String fieldName,
     		                              List<Class> supportedTypes) {
     	for (Class clazz : supportedTypes) {
     		try {
@@ -354,12 +354,12 @@ public class FormUtils {
     		} catch (NoSuchMethodException nsme) {
     			// just try the next type
     		}
-     	} 
+     	}
     	return null;
     }
 
     /**
-     * Decodes a Base-64-encoded String of format 
+     * Decodes a Base-64-encoded String of format
      * key:value;key2:value2;key3:value, and puts the keys and values in a Map
      * @param params Parameters
      */
@@ -372,7 +372,7 @@ public class FormUtils {
         }
         return beanParamMap;
     }
-    
+
     public static class NegativeIntegerException extends RuntimeException {}
 
 }

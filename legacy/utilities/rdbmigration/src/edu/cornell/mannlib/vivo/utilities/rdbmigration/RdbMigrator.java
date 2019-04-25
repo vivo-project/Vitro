@@ -55,7 +55,7 @@ public class RdbMigrator {
 	/**
 	 * Confirm all of the parameters. Ask the user for approval. Do the
 	 * migration.
-	 * 
+	 *
 	 * @throws UserDeclinedException
 	 *             If the user decides not to continue.
 	 */

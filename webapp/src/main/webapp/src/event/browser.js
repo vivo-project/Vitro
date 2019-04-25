@@ -76,7 +76,7 @@ dojo.event.browser = new function(){
 	var clobberIdx = 0;
 
 	this.clean = function(node){
-		if(dojo.render.html.ie){ 
+		if(dojo.render.html.ie){
 			dojo._ie_clobber.clobber(node);
 		}
 	}
@@ -132,7 +132,7 @@ dojo.event.browser = new function(){
 			newfp = fp;
 		}
 
-		if(node.addEventListener){ 
+		if(node.addEventListener){
 			node.addEventListener(evtName.substr(2), newfp, capture);
 			return newfp;
 		}else{
@@ -161,7 +161,7 @@ dojo.event.browser = new function(){
 	}
 
 	this.currentEvent = null;
-	
+
 	this.callListener = function(listener, curTarget){
 		if(typeof listener != 'function'){
 			dojo.raise("listener not a function: " + listener);
@@ -228,7 +228,7 @@ dojo.event.browser = new function(){
 		if((!evt)&&(window["event"])){
 			var evt = window.event;
 		}
-		
+
 		if((evt["type"])&&(evt["type"].indexOf("key") == 0)){ // key events
 			evt.keys = this.revKeys;
 			// FIXME: how can we eliminate this iteration?
@@ -239,7 +239,7 @@ dojo.event.browser = new function(){
 				evt.charCode = evt.keyCode;
 			}
 		}
-	
+
 		if(dojo.render.html.ie){
 			if(!evt.target){ evt.target = evt.srcElement; }
 			if(!evt.currentTarget){ evt.currentTarget = (sender ? sender : evt.srcElement); }

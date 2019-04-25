@@ -24,10 +24,10 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Check for a Locale in the ServletContext or the Session that should override
  * the Locale in the ServletRequest.
- * 
+ *
  * If there is such a Locale, wrap the ServletRequest so it behaves as if that
  * is the preferred Locale.
- * 
+ *
  * Otherwise, just process the request as usual.
  */
 @WebFilter(filterName = "Locale selection filter", urlPatterns = {"/*"})
@@ -86,7 +86,7 @@ public class LocaleSelectionFilter implements Filter {
 				throw new NullPointerException(
 						"selectedLocale may not be null.");
 			}
-			
+
 			this.selectedLocale = selectedLocale;
 		}
 

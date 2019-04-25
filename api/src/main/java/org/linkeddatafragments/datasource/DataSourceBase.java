@@ -16,8 +16,8 @@ public abstract class DataSourceBase implements IDataSource {
     /**
      * Get the datasource description
      */
-    protected String description; 
-    
+    protected String description;
+
     /**
      * Create a base for a {@link IDataSource}
      *
@@ -31,7 +31,7 @@ public abstract class DataSourceBase implements IDataSource {
 
     /**
      * Get the datasource description
-     * 
+     *
      * @return
      */
     @Override
@@ -41,7 +41,7 @@ public abstract class DataSourceBase implements IDataSource {
 
     /**
      * Get the datasource title
-     * 
+     *
      * @return
      */
     @Override

@@ -10,9 +10,9 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 /**
  * Provide the short-term data structures. Should be closed when no longer
  * needed.
- * 
+ *
  * Repeated calls for the same data structure should yield the same instance.
- * 
+ *
  * Repeated calls for the WebappDaoFactoryConfig need not yield the same
  * instance.
  */

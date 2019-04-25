@@ -39,13 +39,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 public class N3EditUtils {
     final static Log log = LogFactory.getLog(N3EditUtils.class);
 
-    
+
     /**
-     * Execute any modelChangePreprocessors in the editConfiguration; 
+     * Execute any modelChangePreprocessors in the editConfiguration;
      */
     public static void preprocessModels(
-            AdditionsAndRetractions changes, 
-            EditConfigurationVTwo editConfiguration, 
+            AdditionsAndRetractions changes,
+            EditConfigurationVTwo editConfiguration,
             VitroRequest request){
 
         List<ModelChangePreprocessor> modelChangePreprocessors = editConfiguration.getModelChangePreprocessors();
@@ -58,37 +58,37 @@ public class N3EditUtils {
         	//if configuration specific preprocessors are null, use default preprocessors instead
         	modelChangePreprocessors = defaultPreprocessors;
         }
-        
+
        if(modelChangePreprocessors != null) {
             for ( ModelChangePreprocessor pp : modelChangePreprocessors ) {
                 //these work by side effect
                 pp.preprocess( changes.getRetractions(), changes.getAdditions(), request );
             }
-       }                   
+       }
     }
-    
+
     /**
-     * Find which default model preprocessors are associated with the application.  These will 
-     * be run everytime an edit/addition occurs, i.e. whenever the preprocessModels method is called. 
+     * Find which default model preprocessors are associated with the application.  These will
+     * be run everytime an edit/addition occurs, i.e. whenever the preprocessModels method is called.
      */
-    
+
     public static List<ModelChangePreprocessor> getDefaultModelChangePreprocessors(VitroRequest vreq, Model displayModel) {
     	List<ModelChangePreprocessor> preprocessors = new ArrayList<ModelChangePreprocessor>();
-    	
+
     	//From the display model, find which preprocessors have been declared
     	String preprocessorOwlClass = "java:edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor";
     	String prefixes =        "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
-    	        "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" + 
+    	        "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" +
     	        "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#> \n" +
     	        "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n";
-    	String query = prefixes + 
+    	String query = prefixes +
                 "SELECT ?modelChangePreprocessor  WHERE { ?modelChangePreprocessor a <" + preprocessorOwlClass + "> . }";
         Query preprocessorQuery = QueryFactory.create(query);
         displayModel.enterCriticalSection(false);
            try{
                QueryExecution qexec = QueryExecutionFactory.create(preprocessorQuery,displayModel );
-               try{                                                    
-                   ResultSet results = qexec.execSelect();                
+               try{
+                   ResultSet results = qexec.execSelect();
                    while (results.hasNext()) {
                        QuerySolution soln = results.nextSolution();
                        Resource modelChangePreprocessor = soln.getResource("modelChangePreprocessor");
@@ -100,7 +100,7 @@ public class N3EditUtils {
                         	  if(p != null) {
                         		  preprocessors.add(p);
                         	  }
-                          
+
                           } catch(Exception ex) {
                         	  log.error("Retrieving model change preprocessor resulted in an error", ex);
                           }
@@ -108,35 +108,35 @@ public class N3EditUtils {
                    }
                }finally{ qexec.close(); }
            }finally{ displayModel.leaveCriticalSection(); }
-                   
-   	
+
+
     	return preprocessors;
     }
-    
+
     //Copied this from DataGetterUtils - will need to refactor to put all of this in one place
     /**
-     * Returns a DataGetter using information in the 
+     * Returns a DataGetter using information in the
      * displayModel for the individual with the URI given by dataGetterURI
-     * to configure it. 
-     * 
+     * to configure it.
+     *
      * May return null.
      * This should not throw an exception if the URI exists and has a type
      * that does not implement the DataGetter interface.
      */
-    public static ModelChangePreprocessor preprocessorForURI(VitroRequest vreq, Model displayModel, String preprocessorURI) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException 
+    public static ModelChangePreprocessor preprocessorForURI(VitroRequest vreq, Model displayModel, String preprocessorURI)
+    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException
     {
         //get java class for dataGetterURI
-    	
+
         String preprocessorClassName = DataGetterUtils.getClassNameFromUri(preprocessorURI);
-        
+
         //figure out if it implements interface DataGetter
         Class<?> clz = Class.forName(preprocessorClassName);
         if( ! ModelChangePreprocessor.class.isAssignableFrom(clz) ){
     		log.debug("Class doesn't implement ModelChangePreprocessor: '" + preprocessorClassName + "'");
             return null;
         }
-        
+
        //We should get the arguments from the constructor from the display model as well
         //So we don't need to check or constrain what can be passed here
        //Right now, this supports a preprocessor with no arguments
@@ -150,20 +150,20 @@ public class N3EditUtils {
         return (ModelChangePreprocessor) clz.newInstance();
     }
 
-    /** 
-     * Process Entity to Return to - substituting uris etc. 
+    /**
+     * Process Entity to Return to - substituting uris etc.
      * May return null.  */
     public static String processEntityToReturnTo(
-            EditConfigurationVTwo configuration, 
-            MultiValueEditSubmission submission, 
-            VitroRequest vreq) {      
+            EditConfigurationVTwo configuration,
+            MultiValueEditSubmission submission,
+            VitroRequest vreq) {
         String returnTo = null;
-        
+
         //usually the submission should have a returnTo that is
         // already substituted in with values during ProcessRdfForm.process()
-        if( submission != null && submission.getEntityToReturnTo() != null 
+        if( submission != null && submission.getEntityToReturnTo() != null
                 && !submission.getEntityToReturnTo().trim().isEmpty()){
-            returnTo = submission.getEntityToReturnTo();            
+            returnTo = submission.getEntityToReturnTo();
         }else{
             //If submission doesn't have it, do the best that we can do.
             //this will not have the new resource URIs.
@@ -171,26 +171,26 @@ public class N3EditUtils {
             String entity = configuration.getEntityToReturnTo();
             entityToReturnTo.add(entity);
             EditN3GeneratorVTwo n3Subber = configuration.getN3Generator();
-        
+
             //Substitute URIs and literals from form
             n3Subber.subInMultiUris(submission.getUrisFromForm(), entityToReturnTo);
             n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), entityToReturnTo);
-        
+
             //TODO: this won't work to get new resoruce URIs,
             //must the same new resources as in ProcessRdfForm.process
             //setVarToNewResource(configuration, vreq);
             //entityToReturnTo = n3Subber.subInMultiUris(varToNewResource, entityToReturnTo);
-            
+
             returnTo = entityToReturnTo.get(0);
         }
 
-        //remove brackets from sub in of URIs 
-        if(returnTo != null) {            
-            returnTo = returnTo.trim().replaceAll("<","").replaceAll(">","");       
+        //remove brackets from sub in of URIs
+        if(returnTo != null) {
+            returnTo = returnTo.trim().replaceAll("<","").replaceAll(">","");
         }
         return returnTo;
     }
-    
+
     /**
      * If the edit was a data property statement edit, then this updates the EditConfiguration to
      * be an edit of the new post-edit statement.  This allows a back button to the form to get the
@@ -199,20 +199,20 @@ public class N3EditUtils {
      */
     public static void updateEditConfigurationForBackButton(
             EditConfigurationVTwo editConfig,
-            MultiValueEditSubmission submission, 
-            VitroRequest vreq, 
+            MultiValueEditSubmission submission,
+            VitroRequest vreq,
             Model writeModel) {
-        
+
         //now setup an EditConfiguration so a single back button submissions can be handled
         //Do this if data property
         if(EditConfigurationUtils.isDataProperty(editConfig.getPredicateUri(), vreq)) {
             EditConfigurationVTwo copy = editConfig.copy();
-            
-            //need a new DataPropHash and a new editConfig that uses that, and replace 
+
+            //need a new DataPropHash and a new editConfig that uses that, and replace
             //the editConfig used for this submission in the session.  The same thing
             //is done for an update or a new insert since it will convert the insert
-            //EditConfig into an update EditConfig.                       
-             
+            //EditConfig into an update EditConfig.
+
             DataPropertyStatement dps = new DataPropertyStatementImpl();
             List<Literal> submitted = submission.getLiteralsFromForm().get(copy.getVarNameForObject());
             if( submitted != null && submitted.size() > 0){
@@ -222,21 +222,21 @@ public class N3EditUtils {
                     dps.setDatatypeURI( submittedLiteral.getDatatypeURI());
                     dps.setLanguage( submittedLiteral.getLanguage() );
                     dps.setData( submittedLiteral.getLexicalForm() );
-                   
-                    copy.setDatapropKey( RdfLiteralHash.makeRdfLiteralHash(dps) );                    
-                    copy.prepareForDataPropUpdate(writeModel, vreq.getWebappDaoFactory().getDataPropertyDao());                    
+
+                    copy.setDatapropKey( RdfLiteralHash.makeRdfLiteralHash(dps) );
+                    copy.prepareForDataPropUpdate(writeModel, vreq.getWebappDaoFactory().getDataPropertyDao());
                 }
                 EditConfigurationVTwo.putConfigInSession(copy,vreq.getSession());
             }
         }
-        
+
     }
 
 
     /** Several places could give an editor URI. Return the first one. */
     public static String getEditorUri(HttpServletRequest request) {
         IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
-    
+
         List<String> uris = new ArrayList<String>();
         uris.addAll(IsUser.getUserUris(ids));
         uris.addAll(HasProfile.getProfileUris(ids));
@@ -261,7 +261,7 @@ public class N3EditUtils {
             }
         }
         return out.toString();
-    }    
-    
-   
+    }
+
+
 }

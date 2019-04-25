@@ -31,16 +31,16 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * <pre>
  * Read the revision information, and store it in the servlet context.
- * 
- * - The revision information is in a file in the classpath. 
+ *
+ * - The revision information is in a file in the classpath.
  * - The name of the file is in RESOURCE_PATH, below.
  * - The first line is the build date, with a format as in DATE_FORMAT, below.
  * - Each additional non-blank line holds revision info for one application level:
  *    - level info is from inner (vitro) to outer (top-level product).
- *    - level info appears as product name, release name and revision level, 
- *        delimited by " ~ ". 
+ *    - level info appears as product name, release name and revision level,
+ *        delimited by " ~ ".
  *    - additional white space before and after info values is ignored.
- * 
+ *
  * Example file:
  *    2010-11-14 23:58:00
  *    vitroCore ~ Release 1.1 ~ 6604
@@ -59,9 +59,9 @@ public class RevisionInfoSetup implements ServletContextListener {
 	/**
 	 * On startup, read the revision info from the resource file in the
 	 * classpath.
-	 * 
+	 *
 	 * If we can't find the file, or can't parse it, store an empty bean.
-	 * 
+	 *
 	 * Don't allow any Exceptions to percolate up past this point.
 	 */
 	@Override

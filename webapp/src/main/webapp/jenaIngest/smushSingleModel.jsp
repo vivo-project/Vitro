@@ -13,14 +13,14 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
 <% request.setAttribute("requestedActions", SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
-  
+
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Smush Resources</h2>
 
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="smushSingleModel"/>
 
     <h3>URI of Property with which To Smush
-	<input type="text" style="width:40%;" name="propertyURI"/> 
+	<input type="text" style="width:40%;" name="propertyURI"/>
 
     <h3>Select Source Models</h3>
 

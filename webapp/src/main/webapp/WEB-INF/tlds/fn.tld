@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
   version="2.0">
-    
+
   <description>JSTL 1.1 functions library</description>
   <display-name>JSTL functions</display-name>
   <tlib-version>1.1</tlib-version>
@@ -201,7 +201,7 @@
     <function-signature>java.lang.String trim(java.lang.String)</function-signature>
     <example>
       Name: ${fn.trim(name)}
-    </example>  
+    </example>
   </function>
 
 </taglib>

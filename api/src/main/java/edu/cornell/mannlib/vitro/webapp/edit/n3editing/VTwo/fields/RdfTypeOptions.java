@@ -12,24 +12,24 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 
 public class RdfTypeOptions implements FieldOptions {
 
-    String[] typeURIs;        
-    
-    public RdfTypeOptions(String ... superClassURIs) 
+    String[] typeURIs;
+
+    public RdfTypeOptions(String ... superClassURIs)
     throws Exception {
         super();
         if( superClassURIs == null )
             throw new Exception("superClassURIs must be supplied "+
             		"to constructor.");
-        
-        this.typeURIs = superClassURIs;        
+
+        this.typeURIs = superClassURIs;
     }
 
 
     @Override
     public Map<String, String> getOptions(
-            EditConfigurationVTwo editConfig, 
-            String fieldName, 
-            WebappDaoFactory wdf) {        
+            EditConfigurationVTwo editConfig,
+            String fieldName,
+            WebappDaoFactory wdf) {
         Map<String,String> uriToLabel = new HashMap<String,String>();
 
         for (String uri : typeURIs) {
@@ -53,10 +53,10 @@ public class RdfTypeOptions implements FieldOptions {
                 }
             }
         }
-        
+
         return uriToLabel;
     }
-    
+
     public Comparator<String[]> getCustomComparator() {
     	return null;
     }

@@ -19,7 +19,7 @@ dojo.widget.defineWidget(
 	dojo.widget.HtmlWidget,
 	{
 		widgetType: "Checkbox",
-	
+
 		templatePath: dojo.uri.dojoUri('src/widget/templates/HtmlCheckBox.html'),
 
 		srcOn: dojo.uri.dojoUri('src/widget/templates/check_on.gif'),

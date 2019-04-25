@@ -11,7 +11,7 @@
       <script type="text/javascript" src="js/jquery-1.4.4.js"></script>
       <script type="text/javascript" src="js/prettyprint.js" ></script>
       <script type="text/javascript">
-      
+
 	// use pretty print!
         function loadPeople() {
 	    osapi.people.getViewer().execute(function(result) {
@@ -41,7 +41,7 @@
    	    });
       }
 
-        function onLoadPeopleOsapi(person, divId) {          
+        function onLoadPeopleOsapi(person, divId) {
           html = new Array();
           html.push('<ul>');
           html.push('<li>You are looking at ' + person.displayName + '</li>');
@@ -50,11 +50,11 @@
           document.getElementById(divId).innerHTML = html.join('');
         }
 
-        function onLoadPeopleRdf(person, divId) {          
+        function onLoadPeopleRdf(person, divId) {
           html = new Array();
           html.push('<ul>');
           html.push('<li>You are looking at ' + person.label + '</li>');
-          html.push('<li>Their URI is ' + (person.uri || person._about) + '</li>');	    
+          html.push('<li>Their URI is ' + (person.uri || person._about) + '</li>');
           html.push('<li>Their email is ' + person.primaryEmail + '</li>');
           html.push('</ul>');
           var ppTable = prettyPrint(person);
@@ -70,7 +70,7 @@
   function submitform() {
 	var rdfurl = document.getElementById('rdfurl');
 	if (ndx == 0 || priorurl[ndx] != rdfurl.value) {
-        priorurl[ndx++] = rdfurl.value; 
+        priorurl[ndx++] = rdfurl.value;
       }
 	    document.getElementById('rdf').innerHTML = '...fetching content...';
 	    osapi.rdf.getRDF(rdfurl.value).execute(function(result) {

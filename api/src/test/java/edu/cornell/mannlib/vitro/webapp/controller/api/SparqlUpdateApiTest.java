@@ -30,24 +30,24 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceMod
  */
 public class SparqlUpdateApiTest extends AbstractTestClass {
 
-    private final String GRAPH_URI = "http://example.org/graph"; 
-    
-    private final String updateStr1 = 
+    private final String GRAPH_URI = "http://example.org/graph";
+
+    private final String updateStr1 =
         "INSERT DATA { GRAPH <" + GRAPH_URI + "> { \n" +
-        "    <http://here.edu/n1> a <http://here.edu/Class1> . \n" +        
+        "    <http://here.edu/n1> a <http://here.edu/Class1> . \n" +
         "} } ; \n" +
         "INSERT { GRAPH <" + GRAPH_URI + "> { \n " +
-        "     ?x a <http://here.edu/Class2> . \n " +  
+        "     ?x a <http://here.edu/Class2> . \n " +
         "} } WHERE { \n" +
-        "    GRAPH <" + GRAPH_URI + "> { ?x a <http://here.edu/Class1> } \n " + 
+        "    GRAPH <" + GRAPH_URI + "> { ?x a <http://here.edu/Class1> } \n " +
         "}";
 
-    private final String result1 = 
+    private final String result1 =
         "<http://here.edu/n1> a <http://here.edu/Class1> . \n" +
         "<http://here.edu/n1> a <http://here.edu/Class2> ." ;
-    
+
     // look at how the SimpleReasoner is set up.
-    
+
     private Model model;
     private RDFService rdfService;
 

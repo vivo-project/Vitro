@@ -72,7 +72,7 @@ dojo.lang.extend(dojo.widget.vml.Chart, {
 			}
 		}
 	},
-	
+
 	fillInTemplate:function(args,frag){
 		this.initialize();
 		this.render();
@@ -82,7 +82,7 @@ dojo.lang.extend(dojo.widget.vml.Chart, {
 	initialize:function(){
 		//	parse the data first.
 		this.parseData();
-	
+
 		// render the body of the chart, not the chart data.
 		if(this.vectorNode){ this.destroy(); }
 		this.vectorNode=document.createElement("div");
@@ -102,7 +102,7 @@ dojo.lang.extend(dojo.widget.vml.Chart, {
 		this.plotArea.style.width=plotWidth+"px";
 		this.plotArea.style.height=plotHeight+"px";
 		this.vectorNode.appendChild(this.plotArea);
-		
+
 		this.dataGroup=document.createElement("div");
 		this.dataGroup.style.position="relative";
 		this.plotArea.appendChild(this.dataGroup);
@@ -138,7 +138,7 @@ dojo.lang.extend(dojo.widget.vml.Chart, {
 		r.style.width=(this.properties.padding.left-1)+"px";
 		r.style.height=plotHeight+"px";
 		this.vectorNode.appendChild(r);
-		
+
 		r=document.createElement("v:rect");
 		r.setAttribute("fillcolor", bg);
 		r.setAttribute("stroked", "false");
@@ -177,7 +177,7 @@ dojo.lang.extend(dojo.widget.vml.Chart, {
 		line.setAttribute("strokecolor", "#666");
 		line.setAttribute("strokeweight", stroke*2+"px");
 		this.axisGroup.appendChild(line);
-		
+
 		//	labels
 		var size=10;
 
@@ -209,7 +209,7 @@ dojo.lang.extend(dojo.widget.vml.Chart, {
 		t.style.fontSize=size+"px";
 		t.innerHTML=dojo.math.round(parseFloat(this.properties.axes.y.range.max),2);
 		this.axisGroup.appendChild(t);
-		
+
 		t=document.createElement("div");
 		t.style.position="absolute";
 		t.style.top=(this.properties.height-this.properties.padding.bottom)+"px";
@@ -218,7 +218,7 @@ dojo.lang.extend(dojo.widget.vml.Chart, {
 		t.style.fontSize=size+"px";
 		t.innerHTML=dojo.math.round(parseFloat(this.properties.axes.y.range.min),2);
 		this.axisGroup.appendChild(t);
-		
+
 		//	this is last.
 		this.assignColors();
 		this._isInitialized=true;
@@ -247,7 +247,7 @@ dojo.widget.vml.Chart.Plotter=new function(){
 	var _this=this;
 	var plotters = {};
 	var types=dojo.widget.Chart.PlotTypes;
-	
+
 	this.getX=function(value, chart){
 		var v=parseFloat(value);
 		var min=chart.properties.axes.x.range.min;
@@ -267,7 +267,7 @@ dojo.widget.vml.Chart.Plotter=new function(){
 		var ofst=0;
 		if(min<0)ofst+=Math.abs(min);
 		min+=ofst; max+=ofst; v+=ofst;
-		
+
 		var ymin=chart.properties.height-chart.properties.padding.bottom;
 		var ymax=chart.properties.padding.top;
 		var y=(((ymin-ymax)/(max-min))*(max-v))+ymax;
@@ -325,7 +325,7 @@ dojo.widget.vml.Chart.Plotter=new function(){
 			bar.appendChild(fill);
 			chart.dataGroup.appendChild(bar);
 		}
-	};	
+	};
 	plotters[types.Line]=function(series, chart){
 		var tension=3;
 
@@ -357,7 +357,7 @@ dojo.widget.vml.Chart.Plotter=new function(){
 				var lastx=_this.getX(series.values[i-1].x, chart);
 				var lasty=_this.getY(series.values[i-1].value, chart);
 				var dx=x-lastx;
-				
+
 				path.push("v");
 				var cx=x-(tension-1)*(dx/tension);
 				path.push(cx+",0");
@@ -391,11 +391,11 @@ dojo.widget.vml.Chart.Plotter=new function(){
 			point.appendChild(fill);
 			chart.dataGroup.appendChild(point);
 		}
-	};	
+	};
 	plotters[types.Bubble]=function(series, chart){
 		//	added param for series[n].value: size
 		var minR=1;
-		
+
 		//	do this off the x axis?
 		var min=chart.properties.axes.x.range.min;
 		var max=chart.properties.axes.x.range.max;
@@ -405,7 +405,7 @@ dojo.widget.vml.Chart.Plotter=new function(){
 		var xmin=chart.properties.padding.left;
 		var xmax=chart.properties.width-chart.properties.padding.right;
 		var factor=(max-min)/(xmax-xmin)*25;
-		
+
 		for (var i=0; i<series.values.length; i++){
 			var size = series.values[i].size;
 			if (isNaN(parseFloat(size))) size=minR;

@@ -54,7 +54,7 @@ public class SearchQueryUtils {
 
 	/**
 	 * Parse a response into a list of maps, one map for each document.
-	 * 
+	 *
 	 * The search result field names in the document are replaced by json field
 	 * names in the result, according to the fieldMap.
 	 */
@@ -66,7 +66,7 @@ public class SearchQueryUtils {
 	/**
 	 * Parse a response into a list of maps, accepting only those maps that pass
 	 * a filter, and only up to a maximum number of records.
-	 * 
+	 *
 	 * The search result field names in the document are replaced by json field
 	 * names in the result, according to the fieldMap.
 	 */
@@ -110,45 +110,45 @@ public class SearchQueryUtils {
 	private static String buildTerm(String fieldName, String word) {
 		return fieldName + ":\"" + word + "\"";
 	}
-	
+
 	/**
 	 * Methods that can be used in multiple places, such as
 	 * IndividualListController and SearchIndividualsDataGetter
 	 */
-	
+
 	public static String getAlphaParameter(VitroRequest request){
         return request.getParameter("alpha");
     }
-    
+
     public static int getPageParameter(VitroRequest request) {
         String pageStr = request.getParameter("page");
         if( pageStr != null ){
             try{
-                return Integer.parseInt(pageStr);                
+                return Integer.parseInt(pageStr);
             }catch(NumberFormatException nfe){
                 log.debug("could not parse page parameter");
                 return 1;
-            }                
-        }else{                   
+            }
+        }else{
             return 1;
         }
     }
-	
+
 	//Get count of individuals without actually getting the results
-    public static long getIndividualCount(List<String> vclassUris) {    	    	       
+    public static long getIndividualCount(List<String> vclassUris) {
        SearchEngine search = ApplicationUtils.instance().getSearchEngine();
        SearchQuery query = search.createQuery(makeMultiClassQuery(vclassUris));
        query.setRows(0);
-    	try {    	              
-            SearchResponse response = null;                      
-            response = search.query(query);            
-            return response.getResults().getNumFound();                        
+    	try {
+            SearchResponse response = null;
+            response = search.query(query);
+            return response.getResults().getNumFound();
     	} catch(Exception ex) {
     		log.error("An error occured in retrieving individual count", ex);
     	}
     	return 0;
     }
-	
+
 	/**
      * builds a query with a type clause for each type in vclassUris, NAME_LOWERCASE filetred by
      * alpha, and just the hits for the page for pageSize.
@@ -156,66 +156,66 @@ public class SearchQueryUtils {
     public static SearchQuery getQuery(List<String> vclassUris, String alpha, int page, int pageSize){
         String queryText = "";
         SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
-        
-        try {            
+
+        try {
             queryText = makeMultiClassQuery(vclassUris);
-            
+
         	 // Add alpha filter if applicable
-            if ( alpha != null && !"".equals(alpha) && alpha.length() == 1) {      
+            if ( alpha != null && !"".equals(alpha) && alpha.length() == 1) {
                 queryText += VitroSearchTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
-            }     
-            
+            }
+
             SearchQuery query = searchEngine.createQuery(queryText);
 
             //page count starts at 1, row count starts at 0
-            int startRow = (page-1) * pageSize ;            
+            int startRow = (page-1) * pageSize ;
             query.setStart( startRow ).setRows( pageSize );
-            
+
             // Need a single-valued field for sorting
             query.addSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED, Order.ASC);
 
             log.debug("Query is " + query.toString());
             return query;
-            
+
         } catch (Exception ex){
             log.error("Could not make the search query",ex);
-            return searchEngine.createQuery();        
-        }      
-    }    
+            return searchEngine.createQuery();
+        }
+    }
 
     public static SearchQuery getRandomQuery(List<String> vclassUris, int page, int pageSize){
         String queryText = "";
         SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
-        
-		try {            
+
+		try {
             queryText = makeMultiClassQuery(vclassUris);
             log.debug("queryText is " + queryText);
             SearchQuery query = searchEngine.createQuery(queryText);
 
             //page count starts at 1, row count starts at 0
             query.setStart( page ).setRows( pageSize );
-            
+
             log.debug("Query is " + query.toString());
             return query;
-            
+
         } catch (Exception ex){
             log.error("Could not make the search query",ex);
-            return searchEngine.createQuery();        
-        }      
-    }    
+            return searchEngine.createQuery();
+        }
+    }
 
     public static String makeMultiClassQuery( List<String> vclassUris){
-        List<String> queryTypes = new ArrayList<String>();  
-        try {            
+        List<String> queryTypes = new ArrayList<String>();
+        try {
             // query term for rdf:type - multiple types possible
             for(String vclassUri: vclassUris) {
                 queryTypes.add(VitroSearchTermNames.RDFTYPE + ":\"" + vclassUri + "\" ");
-            }           
+            }
 			return StringUtils.join(queryTypes, " AND ");
         } catch (Exception ex){
             log.error("Could not make the search query",ex);
             return "";
-        }            
+        }
     }
-    
+
 }

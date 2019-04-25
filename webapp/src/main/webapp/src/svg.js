@@ -267,7 +267,7 @@ dojo.svg.createNodesFromText=function(/* string */ txt, /* bool? */ wrap){
 	//	summary
 	//	Create a list of nodes from text
 	var docFrag=(new DOMParser()).parseFromString(txt, "text/xml").normalize();
-	if(wrap){ 
+	if(wrap){
 		return [docFrag.firstChild.cloneNode(true)];	//	array
 	}
 	var nodes=[];

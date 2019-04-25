@@ -59,7 +59,7 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 	public void suppressMessagesFromStartupStatus() {
 		setLoggerLevel(StartupStatus.class, Level.OFF);
 	}
-	
+
 	@Test
 	public void noResourceFile() {
 		setLoggerLevel(RevisionInfoSetup.class, Level.OFF);

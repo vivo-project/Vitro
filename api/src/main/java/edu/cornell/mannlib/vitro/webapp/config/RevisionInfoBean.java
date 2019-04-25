@@ -19,18 +19,18 @@ import com.ibm.icu.text.SimpleDateFormat;
 /**
  * Information about the provenance of this application: release, revision
  * level, build date, etc.
- * 
+ *
  * Except for the build date, the information is stored for all levels of the
  * application. So an instance of NIHVIVO might read:
- * 
+ *
  * date: 2010-11-09 12:15:44
- * 
+ *
  * level: vitro-core, trunk, 1234:1236M
- * 
+ *
  * level: vivo, branch rel_1.1_maint, 798
- * 
+ *
  * Note that the levels should be listed from inner to outer.
- * 
+ *
  * Instances of this class are immutable.
  */
 public class RevisionInfoBean {

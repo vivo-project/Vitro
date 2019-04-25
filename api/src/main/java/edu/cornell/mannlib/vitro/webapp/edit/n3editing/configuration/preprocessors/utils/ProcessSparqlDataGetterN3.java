@@ -31,9 +31,9 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 	private Log log = LogFactory.getLog(ProcessSparqlDataGetterN3.class);
 
 	public ProcessSparqlDataGetterN3(){
-		
+
 	}
-	//Pass in variable that represents the counter 
+	//Pass in variable that represents the counter
 
 	//We shouldn't use the ACTUAL values here but generate the n3 required
     public List<String> retrieveN3Required(int counter) {
@@ -41,33 +41,33 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
     	//UPDATE: Using variable for class type
     	String classTypeVar = getN3VarName(classTypeVarBase, counter);
 
-    	String n3 = dataGetterVar + " a " + classTypeVar + "; \n" + 
-    	"display:saveToVar " + getN3VarName("saveToVar", counter) + "; \n" + 
+    	String n3 = dataGetterVar + " a " + classTypeVar + "; \n" +
+    	"display:saveToVar " + getN3VarName("saveToVar", counter) + "; \n" +
     	"display:query " + getN3VarName("query", counter) + " .";
     	List<String> requiredList = new ArrayList<String>();
     	requiredList.add(getPrefixes() + n3);
     	return requiredList;
-    	
+
     }
     //Query model is optional
     public List<String> retrieveN3Optional(int counter) {
     	String dataGetterVar = getDataGetterVar(counter);
-    	String n3 = dataGetterVar + " display:queryModel " + getN3VarName("queryModel", counter) + ". "; 
+    	String n3 = dataGetterVar + " display:queryModel " + getN3VarName("queryModel", counter) + ". ";
     	List<String> optionalList = new ArrayList<String>();
     	optionalList.add(getPrefixes() + n3);
     	return optionalList;
     }
-  
-    
+
+
     public List<String> retrieveLiteralsOnForm(int counter) {
     	List<String> literalsOnForm = new ArrayList<String>();
     	literalsOnForm.add(getVarName("saveToVar",counter));
     	literalsOnForm.add(getVarName("query", counter));
     	return literalsOnForm;
-    	
+
     }
-    
-     
+
+
     public List<String> retrieveUrisOnForm(int counter) {
     	List<String> urisOnForm = new ArrayList<String>();
     	//We have no uris as far as I know.. well query Model is a uri
@@ -75,12 +75,12 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
     	//UPDATE: adding class type as uri on form
     	urisOnForm.add(getVarName(classTypeVarBase, counter));
     	return urisOnForm;
-    	
+
     }
-    
+
    public List<FieldVTwo> retrieveFields(int counter) {
 	   List<FieldVTwo> fields = new ArrayList<FieldVTwo>();
-	  
+
 	   //For existing data getters
 	   //fields.add(new FieldVTwo().setName(getVarName("dataGetter", counter)));
 	   fields.add(new FieldVTwo().setName(getVarName("queryModel", counter)));
@@ -91,19 +91,19 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 
 	   return fields;
    }
-   
+
    public List<String> getLiteralVarNamesBase() {
-	   return Arrays.asList("saveToVar", "query");   
+	   return Arrays.asList("saveToVar", "query");
    }
 
    //these are for the fields ON the form
    public List<String> getUriVarNamesBase() {
-	   return Arrays.asList("queryModel", classTypeVarBase);   
+	   return Arrays.asList("queryModel", classTypeVarBase);
    }
-   
+
    //Existing values
    //TODO: Correct
-   
+
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
 	   //First, put dataGetterURI within scope as well
 	   this.populateExistingDataGetterURI(dataGetterURI, counter);
@@ -124,38 +124,38 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
         	   Resource queryModelResource = qs.getResource("queryModel");
         	   existingLiteralValues.put(this.getVarName("saveToVar", counter),
         			   new ArrayList<Literal>(Arrays.asList(saveToVarLiteral)));
-       
+
         	   existingLiteralValues.put(this.getVarName("query", counter),
         			   new ArrayList<Literal>(Arrays.asList(queryLiteral)));
         	   //Query model is optional
         	   if(queryModelResource != null && queryModelResource.getURI() != null) {
-        		   existingUriValues.put(this.getVarName("queryModel", counter), 
+        		   existingUriValues.put(this.getVarName("queryModel", counter),
         			   new ArrayList<String>(Arrays.asList(queryModelResource.getURI())));
         	   }
-        	   
+
            }
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }
-	   
-	   
+
+
    }
-  
-	
-   
+
+
+
    //?dataGetter a SparqlDataGetter ; display:saveToVar ?saveToVar; display:queryModel ?queryModel;
 	//display:query ?query ..
    protected String getExistingValuesSparqlQuery(String dataGetterURI) {
-	   String query = this.getSparqlPrefix() + " SELECT ?saveToVar ?query ?queryModel WHERE {" + 
-			   "<" + dataGetterURI + "> display:query ?query . \n" + 
-			   "OPTIONAL {<" + dataGetterURI + "> display:saveToVar ?saveToVar .} \n" + 
-			   "OPTIONAL {<" + dataGetterURI + "> display:queryModel ?queryModel . }\n" + 
+	   String query = this.getSparqlPrefix() + " SELECT ?saveToVar ?query ?queryModel WHERE {" +
+			   "<" + dataGetterURI + "> display:query ?query . \n" +
+			   "OPTIONAL {<" + dataGetterURI + "> display:saveToVar ?saveToVar .} \n" +
+			   "OPTIONAL {<" + dataGetterURI + "> display:queryModel ?queryModel . }\n" +
 			   "}";
 	   return query;
    }
 
 
-   
+
    public ObjectNode getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
 	   ObjectNode jObject = new ObjectMapper().createObjectNode();
 	   jObject.put("dataGetterClass", classType);
@@ -190,16 +190,16 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }
-	   
+
 	   return jObject;
    }
-   
+
    //Escape single and double quotes for html string to be returned to form
    public String replaceQuotes(String inputStr) {
 	   return inputStr.replaceAll("\'", "&#39;").replaceAll("\"", "&quot;");
-	   
+
    }
-   
+
    //This class can be extended so returning type here
    public String getClassType() {
 	   return classType;

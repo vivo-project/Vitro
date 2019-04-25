@@ -22,7 +22,7 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
     public VClassGroupDaoFiltering(VClassGroupDao classGroupDao,
             WebappDaoFactoryFiltering webappDaoFactoryFiltering,
             VitroFilters filters) {
-        
+
         this.innerDao = classGroupDao;
         this.filteredDaos = webappDaoFactoryFiltering;
         this.filters =  filters;

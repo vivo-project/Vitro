@@ -19,7 +19,7 @@ vitro.utils = {
 	borrowPrototypeMethods: function(borrowFrom, addTo) {
 		borrowMethods(borrowFrom.prototype, addTo.prototype);
 	},
-	
+
 	borrowMethods: function(borrowFrom, addTo) {
 		for (m in borrowFrom) { // loop through all properties of the prototype
 			if (typeof borrowFrom[m] != "function") { continue; } // ignore non-functions

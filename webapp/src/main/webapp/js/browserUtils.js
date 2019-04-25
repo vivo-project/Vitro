@@ -4,12 +4,12 @@ var vitro;
 // vitro == null: true
 // vitro === null: false (only true if undefined)
 // typeof vitro == 'undefined': true
-if (!vitro) { 
+if (!vitro) {
     vitro = {};
 }
 
 vitro.browserUtils = {
-    
+
     isIELessThan8: function() {
         var version;
         if (navigator.appVersion.indexOf("MSIE") == -1) {
@@ -18,7 +18,7 @@ vitro.browserUtils = {
         else {
             version = parseFloat(navigator.appVersion.split("MSIE")[1]);
             return version < 8;
-        }    
+        }
     }
 };
 

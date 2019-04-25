@@ -38,7 +38,7 @@ dojo.lang.extend(dojo.widget.html.TabContainer, {
 	closeButton: "none",
 
 	useVisibility: false,		// true-->use visibility:hidden instead of display:none
-	
+
 	// if false, TabContainers size changes according to size of currently selected tab
 	doLayout: true,
 
@@ -114,7 +114,7 @@ dojo.lang.extend(dojo.widget.html.TabContainer, {
 		}
 		tab.div.appendChild(span);
 		this.dojoTabLabels.appendChild(tab.div);
-		
+
 		var self = this;
 		dojo.event.connect(tab.div, "onclick", function(){ self.selectTab(tab); });
 
@@ -143,8 +143,8 @@ dojo.lang.extend(dojo.widget.html.TabContainer, {
 
 		if (this.doLayout) {
 			dojo.html.layout(this.domNode, children);
-		} 
-			
+		}
+
 		// size the current tab
 		// TODO: should have ptr to current tab rather than searching
 		var cw=dojo.style.getContentWidth(this.containerNode);
@@ -153,12 +153,12 @@ dojo.lang.extend(dojo.widget.html.TabContainer, {
 			//if (this.doLayout) {
 				if(child.selected){
 					child.resizeTo(cw, ch);
-				} 
+				}
 			//} else {
 			//	child.onResized();
 			//}
 		});
-		
+
 	},
 
     removeChild: function(tab) {

@@ -5,14 +5,14 @@ String.prototype.capitalize = function() {
 };
 
 String.prototype.capitalizeWords = function() {
-	var words = this.split(/\s+/), 
+	var words = this.split(/\s+/),
 		wordCount = words.length,
 		i,
 		newWords = [];
-	
+
 	for (i = 0; i < wordCount; i++) {
 		newWords.push(words[i].capitalize());
 	}
-	
-	return newWords.join(' ');	
+
+	return newWords.join(' ');
 };
