@@ -24,16 +24,7 @@
                     ${i18n()["dd_config_" + distributor.className]}
                 </td>
                 <td>
-                    <#if distributor.persistent>
-                        <a href="${submitUrlBase}?editUri=${distributor.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().dd_config_edit}"></a>
-                        &nbsp; &nbsp;
-                        <a href="${submitUrlBase}?deleteUri=${distributor.uri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().dd_config_delete}"></a>
-                    <#else>
-                        <a href="${submitUrlBase}?editUri=${distributor.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().dd_config_edit}"></a>
-                        <!--
-                            TODO: Add message / indicator that transient config can not be edited
-                        -->
-                    </#if>
+                    <a href="${submitUrlBase}?editUri=${distributor.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().dd_config_edit}"></a>
                 </td>
             </tr>
         </#list>
