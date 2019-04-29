@@ -35,73 +35,42 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     private final String name;
     private List<PropertyTemplateModel> properties;
 
-    List<Future<?>> futures = null;
+    private List<Future<?>> futures = null;
     
-    public List<Future<?>> getFutures() {
+    List<Future<?>> getFutures() {
 		return futures;
 	}
 
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
-            Individual subject, boolean editing, 
-            List<DataProperty> populatedDataPropertyList, 
-            List<ObjectProperty> populatedObjectPropertyList,
-            boolean parallel,ExecutorService executor
+            Individual subject, boolean editing, List<DataProperty> populatedDataPropertyList, List<ObjectProperty> populatedObjectPropertyList, ExecutorService executor
     		) {
 
         this.name = group.getName();
         
-        if(parallel) {
-        	futures = new ArrayList<>();
-        }
+        futures = new ArrayList<>();
         
         List<Property> propertyList = group.getPropertyList();
         properties = new ArrayList<PropertyTemplateModel>(propertyList.size());
         
         for (Property p : propertyList)  {
         	
-        	
-        	
             if (p instanceof ObjectProperty) {
+                
                 ObjectProperty op = (ObjectProperty) p;
                 if (!allowedToDisplay(vreq, op, subject)) {
                     continue;
                 }
                 
-                if(!parallel) {
-                
-                	ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
-                        op, subject, vreq, editing, populatedObjectPropertyList);
-                	if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
-                		properties.add(tm);                    
-                	}
-                
-                }else {
-                	
-                    futures.add(
-                  	      executor.submit(
-                  	    		  new ObjectPropertyTemplateModelCallable(op, subject, vreq, editing, populatedObjectPropertyList,op.getLocalName())
-                  	        ));
-    
-                	
-                }
-                
+                futures.add(executor.submit(new ObjectPropertyTemplateModelCallable(op, subject, vreq, editing, populatedObjectPropertyList,op.getLocalName())));
 
             } else if (p instanceof DataProperty){
             		
-            	
             	DataProperty dp = (DataProperty) p;
        		 	if (!allowedToDisplay(vreq, dp, subject))  {
        		 		continue;
        		 	}
             	
-            	 if(!parallel) {
-            		 properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
-             	 }else {
-            		 futures.add(
-                     	      executor.submit(
-                     	    		  new DataPropertyTemplateModelCallable(dp, subject, vreq, editing, populatedDataPropertyList,dp.getLocalName())
-                     	        ));
-            	 }
+             	 futures.add(executor.submit(new DataPropertyTemplateModelCallable(dp, subject, vreq, editing, populatedDataPropertyList,dp.getLocalName())));
             
             } else {
                 log.debug(p.getURI() + " is neither an ObjectProperty nor a DataProperty; skipping display");

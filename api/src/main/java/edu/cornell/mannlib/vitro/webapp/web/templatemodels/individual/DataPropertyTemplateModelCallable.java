@@ -7,33 +7,27 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-public class DataPropertyTemplateModelCallable 
-implements Callable<DataPropertyTemplateModel> {
+public class DataPropertyTemplateModelCallable implements Callable<DataPropertyTemplateModel> {
 
-	final DataProperty dp;
-	Individual subject;
-	final VitroRequest vreq;
-	final boolean editing;
-	final List<DataProperty> populatedDataPropertyList;
-	final String callableName;
-	
-	
-	public DataPropertyTemplateModelCallable(DataProperty dp, Individual subject, VitroRequest vreq,
-			boolean editing, List<DataProperty> populatedDataPropertyList,	String callableName) {
-		super();
-		this.dp = dp;
-		this.subject = subject;
-		this.vreq = vreq;
-		this.editing = editing;
-		this.populatedDataPropertyList = populatedDataPropertyList;
-		this.callableName = callableName;
-	}
+    private final DataProperty dp;
+    private Individual subject;
+    private final VitroRequest vreq;
+    private final boolean editing;
+    private final List<DataProperty> populatedDataPropertyList;
 
-	@Override
-	public DataPropertyTemplateModel call() throws Exception {
-		DataPropertyTemplateModel dptm = new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList);
-		return dptm;
-		
-	}
+    public DataPropertyTemplateModelCallable(DataProperty dp, Individual subject, VitroRequest vreq, boolean editing,
+            List<DataProperty> populatedDataPropertyList, String callableName) {
+        super();
+        this.dp = dp;
+        this.subject = subject;
+        this.vreq = vreq;
+        this.editing = editing;
+        this.populatedDataPropertyList = populatedDataPropertyList;
+    }
+
+    @Override
+    public DataPropertyTemplateModel call() {
+        return new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList);
+    }
 
 }

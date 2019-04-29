@@ -161,7 +161,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 		return FreemarkerConfiguration.getConfig(vreq).getTemplateLoader();
 	}
     
-	private List<Map<String, String>> statementData = null;;
+	private List<Map<String, String>> statementData = null;
 	
     protected List<Map<String, String>> getStatementData() {
         
