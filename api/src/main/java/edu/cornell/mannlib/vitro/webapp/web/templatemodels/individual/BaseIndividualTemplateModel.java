@@ -103,23 +103,13 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         	return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
         }
     }
-
-    /*
-     * https://wiki.blazegraph.com/wiki/index.php/PerformanceOptimization, Parallel is perfect
-     * -60% on sparqlContentTripleSource
-     * -50% on tdbContentTripleSource
+    
+    /** 
+     * this method get the individual properties list and fetch the object properties statements 
      */
     public GroupedPropertyList getPropertyList() {
-        if (propertyList == null) {
-        	try{
-        		boolean parallel = true;
-        		long t1 = System.currentTimeMillis();
-        		propertyList = new GroupedPropertyList(individual, vreq, editing,parallel);
-        		log.debug(" getPropertyList parallel: "+parallel+" time :"+(System.currentTimeMillis()-t1)+" ms");
-        	}catch(Exception e) {
-        		e.printStackTrace();
-        	}
-        	}
+        if (propertyList == null) 
+            propertyList = new GroupedPropertyList(individual, vreq, editing,true);
         return propertyList;
     }
     
