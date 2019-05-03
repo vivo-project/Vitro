@@ -5,7 +5,7 @@
    Dual licensed under the MIT (MIT-LICENSE.txt)
    and GPL (GPL-LICENSE.txt) licenses.
    Date: 09-03-2007  */
-   
+
 ;(function($) { // hide the namespace
 
 /* Date picker manager.
@@ -75,7 +75,7 @@ function Datepicker() {
 		calculateWeek: this.iso8601Week, // How to calculate the week of the year,
 			// takes a Date and returns the number of the week for it
 		shortYearCutoff: '+10', // Short year values < this are in the current century,
-			// > this are in the previous century, 
+			// > this are in the previous century,
 			// string value starting with '+' for current year + value
 		showStatus: false, // True to show status bar at bottom, false to not show it
 		statusForDate: this.dateStatus, // Function to provide status text for a date -
@@ -108,7 +108,7 @@ $.extend(Datepicker.prototype, {
 		if (this.debug)
 			console.log.apply('', arguments);
 	},
-	
+
 	/* Register a new date picker instance - with custom settings. */
 	_register: function(inst) {
 		var id = this._nextId++;
@@ -121,7 +121,7 @@ $.extend(Datepicker.prototype, {
 		return this._inst[id] || id;
 	},
 
-	/* Override the default settings for all instances of the date picker. 
+	/* Override the default settings for all instances of the date picker.
 	   @param  settings  object - the new settings to use as defaults (anonymous object)
 	   @return the manager object */
 	setDefaults: function(settings) {
@@ -147,7 +147,7 @@ $.extend(Datepicker.prototype, {
 			}
 		}
 		var nodeName = target.nodeName.toLowerCase();
-		var instSettings = (inlineSettings ? 
+		var instSettings = (inlineSettings ?
 			$.extend(settings || {}, inlineSettings || {}) : settings);
 		if (nodeName == 'input') {
 			var inst = (inst && !inlineSettings ? inst :
@@ -318,9 +318,9 @@ $.extend(Datepicker.prototype, {
 			input.wrap('<span class="datepicker_wrap">');
 			var buttonText = inst._get('buttonText');
 			var buttonImage = inst._get('buttonImage');
-			var trigger = $(inst._get('buttonImageOnly') ? 
+			var trigger = $(inst._get('buttonImageOnly') ?
 				$('<img>').addClass('datepicker_trigger').attr({ src: buttonImage, alt: buttonText, title: buttonText }) :
-				$('<button>').addClass('datepicker_trigger').attr({ type: 'button' }).html(buttonImage != '' ? 
+				$('<button>').addClass('datepicker_trigger').attr({ type: 'button' }).html(buttonImage != '' ?
 						$('<img>').attr({ src:buttonImage, alt:buttonText, title:buttonText }) : buttonText));
 			if (isRTL)
 				input.before(trigger);
@@ -361,7 +361,7 @@ $.extend(Datepicker.prototype, {
 	_inlineShow: function(inst) {
 		var numMonths = inst._getNumberOfMonths(); // fix width for dynamic number of date pickers
 		inst._datepickerDiv.width(numMonths[1] * $('.datepicker', inst._datepickerDiv[0]).width());
-	}, 
+	},
 
 	/* Pop-up the date picker in a "dialog" box.
 	   @param  input     element - ignored
@@ -506,7 +506,7 @@ $.extend(Datepicker.prototype, {
 				(isFixed && $.browser.opera ? document.documentElement.scrollTop : 0)) + 'px');
 		}
 	},
-	
+
 	/* Find an object's position on the screen. */
 	_findPos: function(obj) {
         while (obj && (obj.type == 'hidden' || obj.nodeType != 1)) {
@@ -627,7 +627,7 @@ $.extend(Datepicker.prototype, {
 			if (!this._stayOpen) {
 				$('.datepicker td').removeClass('datepicker_currentDay');
 				$(td).addClass('datepicker_currentDay');
-			} 
+			}
 			this._stayOpen = !this._stayOpen;
 		}
 		inst._selectedDay = inst._currentDay = $('a', td).html();
@@ -694,7 +694,7 @@ $.extend(Datepicker.prototype, {
 		var day = date.getDay();
 		return [(day > 0 && day < 6), ''];
 	},
-	
+
 	/* Set as calculateWeek to determine the week of the year based on the ISO 8601 definition.
 	   @param  date  Date - the date to get the week for
 	   @return  number - the number of the week within the year that contains this date */
@@ -715,7 +715,7 @@ $.extend(Datepicker.prototype, {
 		}
 		return Math.floor(((checkDate - firstMon) / 86400000) / 7) + 1; // Weeks to given date
 	},
-	
+
 	/* Provide status text for a particular date.
 	   @param  date  the date to get the status for
 	   @param  inst  the current datepicker instance
@@ -768,7 +768,7 @@ $.extend(Datepicker.prototype, {
 			var matches = (iFormat + 1 < format.length && format.charAt(iFormat + 1) == match);
 			if (matches)
 				iFormat++;
-			return matches;	
+			return matches;
 		};
 		// Extract a number from the string value
 		var getNumber = function(match) {
@@ -819,14 +819,14 @@ $.extend(Datepicker.prototype, {
 					case 'd':
 						day = getNumber('d');
 						break;
-					case 'D': 
+					case 'D':
 						getName('D', dayNamesShort, dayNames);
 						break;
-					case 'm': 
+					case 'm':
 						month = getNumber('m');
 						break;
 					case 'M':
-						month = getName('M', monthNamesShort, monthNames); 
+						month = getName('M', monthNamesShort, monthNames);
 						break;
 					case 'y':
 						year = getNumber('y');
@@ -887,7 +887,7 @@ $.extend(Datepicker.prototype, {
 			var matches = (iFormat + 1 < format.length && format.charAt(iFormat + 1) == match);
 			if (matches)
 				iFormat++;
-			return matches;	
+			return matches;
 		};
 		// Format a number, with leading zero if necessary
 		var formatNumber = function(match, value) {
@@ -909,19 +909,19 @@ $.extend(Datepicker.prototype, {
 				else
 					switch (format.charAt(iFormat)) {
 						case 'd':
-							output += formatNumber('d', date.getDate()); 
+							output += formatNumber('d', date.getDate());
 							break;
-						case 'D': 
+						case 'D':
 							output += formatName('D', date.getDay(), dayNamesShort, dayNames);
 							break;
-						case 'm': 
-							output += formatNumber('m', date.getMonth() + 1); 
+						case 'm':
+							output += formatNumber('m', date.getMonth() + 1);
 							break;
 						case 'M':
-							output += formatName('M', date.getMonth(), monthNamesShort, monthNames); 
+							output += formatName('M', date.getMonth(), monthNamesShort, monthNames);
 							break;
 						case 'y':
-							output += (lookAhead('y') ? date.getFullYear() : 
+							output += (lookAhead('y') ? date.getFullYear() :
 								(date.getYear() % 100 < 10 ? '0' : '') + date.getYear() % 100);
 							break;
 						case "'":
@@ -951,7 +951,7 @@ $.extend(Datepicker.prototype, {
 			else
 				switch (format.charAt(iFormat)) {
 					case 'd' || 'm' || 'y':
-						chars += '0123456789'; 
+						chars += '0123456789';
 						break;
 					case 'D' || 'M':
 						return null; // Accept anything
@@ -997,7 +997,7 @@ $.extend(DatepickerInstance.prototype, {
 	_setDateFromField: function(input) {
 		this._input = $(input);
 		var dateFormat = this._get('dateFormat');
-		var dates = this._input ? this._input.val().split(this._get('rangeSeparator')) : null; 
+		var dates = this._input ? this._input.val().split(this._get('rangeSeparator')) : null;
 		this._endDay = this._endMonth = this._endYear = null;
 		var date = defaultDate = this._getDefaultDate();
 		if (dates.length > 0) {
@@ -1023,7 +1023,7 @@ $.extend(DatepickerInstance.prototype, {
 		this._currentYear = (dates[0] ? date.getFullYear() : 0);
 		this._adjustDate();
 	},
-	
+
 	/* Retrieve the default date shown on opening. */
 	_getDefaultDate: function() {
 		var date = this._determineDate('defaultDate', new Date());
@@ -1054,7 +1054,7 @@ $.extend(DatepickerInstance.prototype, {
 					case 'w' : case 'W' :
 						day += (matches[1] * 7); break;
 					case 'm' : case 'M' :
-						month += (matches[1] - 0); 
+						month += (matches[1] - 0);
 						day = Math.min(day, getDaysInMonth(year, month));
 						break;
 					case 'y': case 'Y' :
@@ -1110,7 +1110,7 @@ $.extend(DatepickerInstance.prototype, {
 		var isRTL = this._get('isRTL');
 		// build the date picker HTML
 		var clear = (this._get('mandatory') ? '' :
-			'<div class="datepicker_clear"><a onclick="jQuery.datepicker._clearDate(' + this._id + ');"' + 
+			'<div class="datepicker_clear"><a onclick="jQuery.datepicker._clearDate(' + this._id + ');"' +
 			(showStatus ? this._addStatus(this._get('clearStatus') || '&#xa0;') : '') + '>' +
 			this._get('clearText') + '</a></div>');
 		var controls = '<div class="datepicker_control">' + (isRTL ? '' : clear) +
@@ -1140,7 +1140,7 @@ $.extend(DatepickerInstance.prototype, {
 			}
 		}
 		// controls and links
-		var prev = '<div class="datepicker_prev">' + (this._canAdjustMonth(-1, drawYear, drawMonth) ? 
+		var prev = '<div class="datepicker_prev">' + (this._canAdjustMonth(-1, drawYear, drawMonth) ?
 			'<a onclick="jQuery.datepicker._adjustDate(' + this._id + ', -' + stepMonths + ', \'M\');"' +
 			(showStatus ? this._addStatus(this._get('prevStatus') || '&#xa0;') : '') + '>' +
 			this._get('prevText') + '</a>' :
@@ -1164,7 +1164,7 @@ $.extend(DatepickerInstance.prototype, {
 				html += '<div class="datepicker_oneMonth' + (col == 0 ? ' datepicker_newRow' : '') + '">' +
 					this._generateMonthYearHeader(drawMonth, drawYear, minDate, maxDate,
 					selectedDate, row > 0 || col > 0) + // draw month headers
-					'<table class="datepicker" cellpadding="0" cellspacing="0"><thead>' + 
+					'<table class="datepicker" cellpadding="0" cellspacing="0"><thead>' +
 					'<tr class="datepicker_titleRow">' +
 					(showWeeks ? '<td>' + this._get('weekHeader') + '</td>' : '');
 				var firstDay = this._get('firstDay');
@@ -1179,7 +1179,7 @@ $.extend(DatepickerInstance.prototype, {
 						status.replace(/D/, dayNamesShort[day]));
 					html += '<td' + ((dow + firstDay + 6) % 7 >= 5 ? ' class="datepicker_weekEndCell"' : '') + '>' +
 						(!changeFirstDay ? '<span' :
-						'<a onclick="jQuery.datepicker._changeFirstDay(' + this._id + ', ' + day + ');"') + 
+						'<a onclick="jQuery.datepicker._changeFirstDay(' + this._id + ', ' + day + ');"') +
 						(showStatus ? this._addStatus(status) : '') + ' title="' + dayNames[day] + '">' +
 						dayNamesMin[day] + (changeFirstDay ? '</a>' : '</span>') + '</td>';
 				}
@@ -1238,15 +1238,15 @@ $.extend(DatepickerInstance.prototype, {
 				}
 				html += '</tbody></table></div>';
 			}
-		html += (showStatus ? '<div style="clear: both;"></div><div id="datepicker_status_' + this._id + 
+		html += (showStatus ? '<div style="clear: both;"></div><div id="datepicker_status_' + this._id +
 			'" class="datepicker_status">' + (this._get('initStatus') || '&#xa0;') + '</div>' : '') +
 			(!closeAtTop && !this._inline ? controls : '') +
-			'<div style="clear: both;"></div>' + 
-			($.browser.msie && parseInt($.browser.version) < 7 && !this._inline ? 
+			'<div style="clear: both;"></div>' +
+			($.browser.msie && parseInt($.browser.version) < 7 && !this._inline ?
 			'<iframe src="javascript:false;" class="datepicker_cover"></iframe>' : '');
 		return html;
 	},
-	
+
 	/* Generate the month and year header. */
 	_generateMonthYearHeader: function(drawMonth, drawYear, minDate, maxDate, selectedDate, secondary) {
 		minDate = (this._rangeStart && minDate && selectedDate < minDate ? selectedDate : minDate);
@@ -1256,7 +1256,7 @@ $.extend(DatepickerInstance.prototype, {
 		var monthNames = this._get('monthNames');
 		if (secondary || !this._get('changeMonth'))
 			html += monthNames[drawMonth] + '&#xa0;';
-			
+
 		else {
 			var inMinYear = (minDate && minDate.getFullYear() == drawYear);
 			var inMaxYear = (maxDate && maxDate.getFullYear() == drawYear);
@@ -1331,7 +1331,7 @@ $.extend(DatepickerInstance.prototype, {
 		this._drawMonth = this._selectedMonth = date.getMonth();
 		this._drawYear = this._selectedYear = date.getFullYear();
 	},
-	
+
 	/* Determine the number of months to show. */
 	_getNumberOfMonths: function() {
 		var numMonths = this._get('numberOfMonths');
@@ -1379,7 +1379,7 @@ $.extend(DatepickerInstance.prototype, {
 		var maxDate = this._getMinMaxDate('max');
 		return ((!minDate || date >= minDate) && (!maxDate || date <= maxDate));
 	},
-	
+
 	/* Provide the configuration settings for formatting/parsing. */
 	_getFormatConfig: function() {
 		var shortYearCutoff = this._get('shortYearCutoff');
@@ -1429,7 +1429,7 @@ $.fn.datepicker = function(options){
 };
 
 $.datepicker = new Datepicker(); // singleton instance
-	
+
 /* Initialise the date picker. */
 $(document).ready(function() {
 	$(document.body).append($.datepicker._datepickerDiv)

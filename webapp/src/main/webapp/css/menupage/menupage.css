@@ -73,7 +73,7 @@ ul#find-filters li {
     padding-right: 15px;
     border-right: 1px solid #E4EAE9;
 }
-ul#find-filters li:last-child { 
+ul#find-filters li:last-child {
     border-bottom: 0;
     border-right: none;
 }

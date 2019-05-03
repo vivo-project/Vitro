@@ -10,7 +10,7 @@ public class IndividualTemplateModelBuilder {
         if (customBuilder != null) {
             return customBuilder.build(individual, vreq);
         }
-        
+
         return new IndividualTemplateModel(individual, vreq);
     }
 

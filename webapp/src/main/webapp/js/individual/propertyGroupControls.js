@@ -1,12 +1,12 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
 $(document).ready(function(){
-        
+
     $.extend(this, individualLocalName);
     adjustFontSize();
     padSectionBottoms();
     checkLocationHash();
-    
+
     // ensures that shorter property group sections don't cause the page to "jump around"
     // when the tabs are clicked
     function padSectionBottoms() {
@@ -22,9 +22,9 @@ $(document).ready(function(){
     $.each($('li.clickable'), function() {
         var groupName = $(this).attr("groupName");
         var $propertyGroupLi = $(this);
-        
+
         $(this).click(function() {
-            
+
             if ( $propertyGroupLi.attr("class") == "nonSelectedGroupTab clickable" ) {
                 $.each($('li.selectedGroupTab'), function() {
                     $(this).removeClass("selectedGroupTab clickable");
@@ -41,24 +41,24 @@ $(document).ready(function(){
                 var $visibleSection = $('section.property-group:visible');
                 $visibleSection.hide();
                 $('h2[pgroup=tabs]').addClass("hidden");
-                $('nav#scroller').addClass("hidden"); 
+                $('nav#scroller').addClass("hidden");
                 $('section#' + groupName).show();
             }
             manageLocalStorage();
             return false;
         });
     });
-    
+
     function processViewAllTab() {
         $.each($('section.property-group'), function() {
             $(this).css("margin-bottom", "1px");
             $(this).children('h2').css("margin-top", "-15px").css("border-bottom","1px solid #DFEBE5").css("padding","12px 25px 10px 20px");
-            $(this).show(); 
+            $(this).show();
             $('h2[pgroup=tabs]').removeClass("hidden");
-            $('nav#scroller').removeClass("hidden"); 
-        });        
+            $('nav#scroller').removeClass("hidden");
+        });
     }
-   
+
     // If users click a marker on the home page map, they are taken to the profile
     // page of the corresponding country. The url contains the word "Research" in
     // the location hash. Use this to select the Research tab, which displays the
@@ -67,7 +67,7 @@ $(document).ready(function(){
         if ( location.hash ) {
             // remove the trailing white space
             location.hash = location.hash.replace(/\s+/g, '');
-            if ( location.hash.indexOf("map") >= 0 ) {  
+            if ( location.hash.indexOf("map") >= 0 ) {
                 // get the name of the group that contains the geographicFocusOf property.
                 var tabName = $('h3#geographicFocusOf').parent('article').parent('div').attr("id");
                 tabName = tabName.replace("Group","");
@@ -84,15 +84,15 @@ $(document).ready(function(){
                     $firstTab.addClass("nonSelectedGroupTab clickable");
                     $('section.property-group:visible').hide();
                     // show the selected tab section
-                    $('section#' + tabName).show();                
+                    $('section#' + tabName).show();
                 }
                 // if there is a more link, "click" more to show all the researchers
-                // we need the timeout delay so that the more link can get rendered                
+                // we need the timeout delay so that the more link can get rendered
                 setTimeout(geoFocusExpand,250);
             }
             else {
                 retrieveLocalStorage();
-            }            
+            }
         }
         else {
             retrieveLocalStorage();
@@ -100,7 +100,7 @@ $(document).ready(function(){
     }
 
     function geoFocusExpand() {
-        // if the ontology is set to collate by subclass, $list.length will be > 0 
+        // if the ontology is set to collate by subclass, $list.length will be > 0
         // this ensures both possibilities are covered
         var $list = $('ul#geographicFocusOfList').find('ul');
         if ( $list.length > 0 )
@@ -113,7 +113,7 @@ $(document).ready(function(){
             $more.click();
         }
     }
-    
+
     //  Next two functions --  keep track of which property group tab was selected,
     //  so if we return from a custom form or a related individual, even via the back button,
     //  the same property group will be selected as before.
@@ -151,19 +151,19 @@ $(document).ready(function(){
     }
 
     function retrieveLocalStorage() {
-        
+
         var localName = this.individualLocalName;
         var selectedTab = amplify.store(individualLocalName);
-        
+
         if ( selectedTab != undefined ) {
             var groupName = selectedTab[0];
-            
-            // unlikely, but it's possible a tab that was previously selected and stored won't be 
-            // displayed because the object properties would have been deleted (in non-edit mode). 
-            // So ensure that the tab in local storage has been rendered on the page.     
-            if ( $("ul.propertyTabsList li[groupName='" + groupName + "']").length ) { 
+
+            // unlikely, but it's possible a tab that was previously selected and stored won't be
+            // displayed because the object properties would have been deleted (in non-edit mode).
+            // So ensure that the tab in local storage has been rendered on the page.
+            if ( $("ul.propertyTabsList li[groupName='" + groupName + "']").length ) {
                 // if the selected tab is the default first one, don't do anything
-                if ( $('li.clickable').first().attr("groupName") != groupName ) {   
+                if ( $('li.clickable').first().attr("groupName") != groupName ) {
                     // deselect the default first tab
                     var $firstTab = $('li.clickable').first();
                     $firstTab.removeClass("selectedGroupTab clickable");
@@ -184,7 +184,7 @@ $(document).ready(function(){
             }
         }
     }
-    // if there are so many tabs that they wrap to a second line, adjust the font size to 
+    // if there are so many tabs that they wrap to a second line, adjust the font size to
     //prevent wrapping
     function adjustFontSize() {
         var width = 0;

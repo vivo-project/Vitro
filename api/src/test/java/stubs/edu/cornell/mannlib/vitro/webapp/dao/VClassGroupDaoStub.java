@@ -16,11 +16,11 @@ public class VClassGroupDaoStub implements VClassGroupDao {
 	// ----------------------------------------------------------------------
 
 	private List<VClassGroup> groups = new ArrayList<>();
-	
+
 	public void setGroups(VClassGroup... groups) {
 		this.groups = new ArrayList<>(Arrays.asList(groups));
 	}
-	
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -34,7 +34,7 @@ public class VClassGroupDaoStub implements VClassGroupDao {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public List<VClassGroup> getPublicGroupsWithVClasses() {
 		List<VClassGroup> list = new ArrayList<>();

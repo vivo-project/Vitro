@@ -16,8 +16,8 @@
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Vitro Application Public Ontology
 
-	This ontology is used by the Vitro application. 
-	It contains constructs that are available for public export and use. 
+	This ontology is used by the Vitro application.
+	It contains constructs that are available for public export and use.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 <owl:Ontology rdf:about="">

@@ -29,6 +29,6 @@ public abstract class AbstractPropertyStatementAction extends RequestedAction {
 	public abstract String[] getResourceUris();
 
 	public abstract Property getPredicate();
-	
+
 	public abstract String getPredicateUri();
 }

@@ -10,8 +10,8 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 
 /**
  * quotes,\, \r, \n, \b, \f, \t and other control characters.
- * 
- * 
+ *
+ *
  */
 public class JacksonUtilsTest extends AbstractTestClass {
 

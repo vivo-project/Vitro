@@ -20,22 +20,22 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 
-    private static final Property LINKED_NAMESPACE_PROP = 
+    private static final Property LINKED_NAMESPACE_PROP =
             ResourceFactory.createProperty(
                     VitroVocabulary.DISPLAY + "linkedNamespace");
-    
+
 	Integer portalCount = null;
 	List<String> externallyLinkedNamespaces = null;
-	
+
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
-    
+
     private String getApplicationResourceURI() {
     	// TODO migrate to "application" in the resource URI
     	return super.DEFAULT_NAMESPACE + "portal" + 1;
     }
-    
+
     public ApplicationBean getApplicationBean() {
     	ApplicationBean application = new ApplicationBean();
     	OntModel ontModel = getOntModelSelector().getApplicationMetadataModel();
@@ -61,7 +61,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 	        application.setCopyrightAnchor(getPropertyStringValue(
 	        		appInd, APPLICATION_COPYRIGHTANCHOR));
             application.setCopyrightURL(getPropertyStringValue(
-            		appInd, APPLICATION_COPYRIGHTURL)); 
+            		appInd, APPLICATION_COPYRIGHTURL));
             application.setThemeDir(getPropertyStringValue(
             		appInd, APPLICATION_THEMEDIR));
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     	}
         return application;
     }
-    
+
     public void updateApplicationBean(ApplicationBean application) {
     	// TODO migrate to "application" in the resource URI
     	OntModel ontModel = getOntModelSelector().getApplicationMetadataModel();
@@ -85,25 +85,25 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     	try {
     		appInd.setLabel(application.getApplicationName(), null);
 	        updatePropertyStringValue(
-	        		appInd, APPLICATION_ABOUTTEXT, application.getAboutText(), 
+	        		appInd, APPLICATION_ABOUTTEXT, application.getAboutText(),
 	        		    ontModel);
 	        updatePropertyStringValue(
-	        		appInd, APPLICATION_ACKNOWLEGETEXT, 
+	        		appInd, APPLICATION_ACKNOWLEGETEXT,
 	        		    application.getAcknowledgeText(), ontModel);
 	        updatePropertyStringValue(
-	        		appInd, APPLICATION_CONTACTMAIL, 
-	        		    application.getContactMail(), ontModel); 
+	        		appInd, APPLICATION_CONTACTMAIL,
+	        		    application.getContactMail(), ontModel);
 	        updatePropertyStringValue(
-	        		appInd, APPLICATION_CORRECTIONMAIL, 
+	        		appInd, APPLICATION_CORRECTIONMAIL,
 	        		    application.getCorrectionMail(), ontModel);
 	        updatePropertyStringValue(
-	        		appInd, APPLICATION_COPYRIGHTANCHOR, 
+	        		appInd, APPLICATION_COPYRIGHTANCHOR,
 	        		    application.getCopyrightAnchor(), ontModel);
             updatePropertyStringValue(
-            		appInd, APPLICATION_COPYRIGHTURL, 
-            		    application.getCopyrightURL(), ontModel); 
+            		appInd, APPLICATION_COPYRIGHTURL,
+            		    application.getCopyrightURL(), ontModel);
             updatePropertyStringValue(
-            		appInd, APPLICATION_THEMEDIR, 
+            		appInd, APPLICATION_THEMEDIR,
             		    application.getThemeDir(), ontModel);
         } catch (Exception e) {
     		log.error(e, e);
@@ -111,20 +111,20 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     		ontModel.leaveCriticalSection();
     	}
     }
-    
+
     public void close() {
             // nothing to do right now
     }
 
 	private static final boolean CLEAR_CACHE = true;
-	
+
 	@Override
 	public synchronized List<String> getExternallyLinkedNamespaces() {
 	    return getExternallyLinkedNamespaces(!CLEAR_CACHE);
 	}
 
     private synchronized List<String> getExternallyLinkedNamespaces(boolean clearCache) {
-        if (clearCache || externallyLinkedNamespaces == null) {            
+        if (clearCache || externallyLinkedNamespaces == null) {
             externallyLinkedNamespaces = new ArrayList<String>();
             OntModel ontModel = getOntModelSelector().getDisplayModel();
             NodeIterator nodes = ontModel.listObjectsOfProperty(LINKED_NAMESPACE_PROP);
@@ -132,7 +132,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
                 RDFNode node = nodes.next();
                 if (node.isLiteral()) {
                     String namespace = ((Literal)node).getLexicalForm();
-                    // org.openrdf.model.impl.URIImpl.URIImpl.getNamespace() returns a 
+                    // org.openrdf.model.impl.URIImpl.URIImpl.getNamespace() returns a
                     // namespace with a final slash, so this makes matching easier.
                     // It also accords with the way the default namespace is defined.
                     if (!namespace.endsWith("/")) {
@@ -144,10 +144,10 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
         }
         return externallyLinkedNamespaces;
     }
-    
+
     public boolean isExternallyLinkedNamespace(String namespace) {
         List<String> namespaces = getExternallyLinkedNamespaces();
         return namespaces.contains(namespace);
     }
-    
+
 }

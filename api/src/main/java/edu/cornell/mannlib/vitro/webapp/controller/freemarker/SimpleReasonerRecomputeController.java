@@ -25,31 +25,31 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(
             SimpleReasonerRecomputeController.class);
-    
+
     private static final String RECOMPUTE_INFERENCES_FTL = "recomputeInferences.ftl";
-    
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION;
 	}
 
-	protected ResponseValues processRequest(VitroRequest vreq) { 
+	protected ResponseValues processRequest(VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();
-        
+
         String messageStr = "";
         try {
-        	
+
         	Object sr = getServletContext().getAttribute(SimpleReasoner.class.getName());
-        	
+
             if (!(sr instanceof SimpleReasoner)) {
                 messageStr = "No SimpleReasoner has been set up.";
-                
+
             } else {
                 SimpleReasoner simpleReasoner = (SimpleReasoner) sr;
                 if (simpleReasoner.isABoxReasoningAsynchronous()) {
                     messageStr = "Reasoning is currently in asynchronous mode so a recompute cannot be started. Please try again later.";
                 } else if (simpleReasoner.isRecomputing()) {
-                        messageStr = 
+                        messageStr =
                             "The system is currently in the process of " +
                             "recomputing inferences.";
                 } else {
@@ -59,38 +59,38 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
 								"SimpleReasonerRecomputController.Recomputer");
 						thread.setWorkLevel(WORKING);
 						thread.start();
-                        messageStr = "Recompute of inferences started. See log for further details.";                       
+                        messageStr = "Recompute of inferences started. See log for further details.";
                     } else {
                         body.put("formAction", UrlBuilder.getUrl("/RecomputeInferences"));
-                    } 
+                    }
                 }
             }
-            
+
         } catch (Exception e) {
             log.error("Error recomputing inferences with SimpleReasoner", e);
-            body.put("errorMessage", 
-                    "There was an error while recomputing inferences: " + 
+            body.put("errorMessage",
+                    "There was an error while recomputing inferences: " +
                     e.getMessage());
           return new ExceptionResponseValues(
-            RECOMPUTE_INFERENCES_FTL, body, e);  
+            RECOMPUTE_INFERENCES_FTL, body, e);
         }
-        
-        body.put("message", messageStr); 
+
+        body.put("message", messageStr);
         return new TemplateResponseValues(RECOMPUTE_INFERENCES_FTL, body);
     }
-    
+
     private class Recomputer implements Runnable {
-        
+
         private SimpleReasoner simpleReasoner;
-        
+
         public Recomputer(SimpleReasoner simpleReasoner) {
             this.simpleReasoner = simpleReasoner;
         }
-        
+
         public void run() {
             simpleReasoner.recompute();
         }
-        
+
     }
-    
+
 }

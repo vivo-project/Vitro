@@ -22,34 +22,34 @@ public class ChildVClassesWithParent implements FieldOptions {
     String fieldName;
     String classUri;
     String defaultOptionLabel = null;
-    
+
     public ChildVClassesWithParent(String classUri) throws Exception {
         super();
-        
+
         if (classUri==null || classUri.equals(""))
             throw new Exception ("vclassUri not set");
-        
+
         this.classUri = classUri;
     }
-   
+
     public ChildVClassesWithParent setDefaultOption(String label){
         this.defaultOptionLabel = label;
         return this;
     }
-    
+
     @Override
     public Map<String, String> getOptions(
-            EditConfigurationVTwo editConfig, 
-            String fieldName, 
+            EditConfigurationVTwo editConfig,
+            String fieldName,
             WebappDaoFactory wDaoFact) throws Exception {
-        
-        HashMap <String,String> optionsMap = new LinkedHashMap<String,String>();      
-        // first test to see whether there's a default "leave blank" value specified with the literal options        
+
+        HashMap <String,String> optionsMap = new LinkedHashMap<String,String>();
+        // first test to see whether there's a default "leave blank" value specified with the literal options
         if ( ! StringUtils.isEmpty( defaultOptionLabel ) ){
-            optionsMap.put(LEFT_BLANK, defaultOptionLabel);        
-        } 
-        
-        optionsMap.put(classUri, "Other");       
+            optionsMap.put(LEFT_BLANK, defaultOptionLabel);
+        }
+
+        optionsMap.put(classUri, "Other");
 
         VClassDao vclassDao = wDaoFact.getVClassDao();
         List<String> subClassList = vclassDao.getAllSubClassURIs(classUri);
@@ -57,13 +57,13 @@ public class ChildVClassesWithParent implements FieldOptions {
             for (String subClassUri : subClassList) {
                 VClass subClass = vclassDao.getVClassByURI(subClassUri);
                 if (subClass != null && !OWL.Nothing.getURI().equals(subClassUri)) {
-                    optionsMap.put(subClassUri, subClass.getName().trim());         
+                    optionsMap.put(subClassUri, subClass.getName().trim());
                 }
             }
         }
        return optionsMap;
     }
-    
+
     public Comparator<String[]> getCustomComparator() {
     	return null;
     }

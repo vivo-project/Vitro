@@ -48,8 +48,8 @@ ArrayList<String> logResults = (ArrayList<String>)request.getAttribute("results"
 			%><tr>
 				<td><%=logResults.get(i)%></td>
 				</tr>
-				
-		<%			
+
+		<%
 		}
 	%>
 	</table>

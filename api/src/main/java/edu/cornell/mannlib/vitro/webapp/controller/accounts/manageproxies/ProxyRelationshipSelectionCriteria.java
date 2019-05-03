@@ -5,10 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies;
 
 /**
  * On what basis are we selecting proxy relationships?
- * 
+ *
  * Are we viewing by Proxy or by Profile? What is the search term, if any? How
  * many results per page, and what page are we on?
- * 
+ *
  * Search terms are matched against last name combined with first name, of
  * either UserAccount(Proxy) or Individual(Profile), depending on how we are
  * listing. Searches are case-insensitive.

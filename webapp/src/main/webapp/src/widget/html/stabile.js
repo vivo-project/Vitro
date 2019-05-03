@@ -36,7 +36,7 @@ dojo.widget.html.stabile = {
 
 // Get the state stored for the widget with the given ID, or undefined
 // if none.
-// 
+//
 dojo.widget.html.stabile.getState = function(id){
 	dojo.widget.html.stabile.setup();
 	return dojo.widget.html.stabile.widgetState[id];
@@ -45,7 +45,7 @@ dojo.widget.html.stabile.getState = function(id){
 
 // Set the state stored for the widget with the given ID.  If isCommit
 // is true, commits all widget state to more stable storage.
-// 
+//
 dojo.widget.html.stabile.setState = function(id, state, isCommit){
 	dojo.widget.html.stabile.setup();
 	dojo.widget.html.stabile.widgetState[id] = state;
@@ -58,7 +58,7 @@ dojo.widget.html.stabile.setState = function(id, state, isCommit){
 // Sets up widgetState: a hash keyed by widgetId, maps to an object
 // or array writable with "describe".  If there is data in the widget
 // storage area, use it, otherwise initialize an empty object.
-// 
+//
 dojo.widget.html.stabile.setup = function(){
 	if(!dojo.widget.html.stabile.widgetState){
 		var text = dojo.widget.html.stabile.getStorage().value;
@@ -69,7 +69,7 @@ dojo.widget.html.stabile.setup = function(){
 
 // Commits all widget state to more stable storage, so if the user
 // navigates away and returns, it can be restored.
-// 
+//
 dojo.widget.html.stabile.commit = function(state){
 	dojo.widget.html.stabile.getStorage().value = dojo.widget.html.stabile.description(state);
 }
@@ -86,8 +86,8 @@ dojo.widget.html.stabile.description = function(v, showAll){
 
 	var describeThis = function() {
 		 return this.description(this, true);
-	} 
-	
+	}
+
 	try {
 
 		if(v===void(0)){
@@ -104,7 +104,7 @@ dojo.widget.html.stabile.description = function(v, showAll){
 		if(typeof(v)=="string" || v instanceof String){
 			// Quote strings and their contents as required.
 			// Replacing by $& fails in IE 5.0
-			var v1 = v.replace(dojo.widget.html.stabile._sqQuotables, "\\$1"); 
+			var v1 = v.replace(dojo.widget.html.stabile._sqQuotables, "\\$1");
 			v1 = v1.replace(/\n/g, "\\n");
 			v1 = v1.replace(/\r/g, "\\r");
 			// Any other important special cases?
@@ -202,7 +202,7 @@ dojo.widget.html.stabile.description = function(v, showAll){
 //// PRIVATE TO MODULE
 
 // Gets an object (form field) with a read/write "value" property.
-// 
+//
 dojo.widget.html.stabile.getStorage = function(){
 	if (dojo.widget.html.stabile.dataField) {
 		return dojo.widget.html.stabile.dataField;

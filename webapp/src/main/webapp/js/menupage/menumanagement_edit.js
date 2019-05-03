@@ -20,17 +20,17 @@ var menuManagementEdit = {
         this.allClassesSelectedCheckbox = $('#allSelected');
         this.displayInternalMessage = $('#internal-class label em');
     },
-    bindEventListeners: function() {        
+    bindEventListeners: function() {
         // Listeners for vClass switching
         this.changeContentType.click(function() {
            menuManagementEdit.showClassGroups();
-         
+
            return false;
         });
         this.selectClassGroupDropdown.change(function() {
             menuManagementEdit.chooseClassGroup();
         });
-        
+
         // Listeners for template field
         this.defaultTemplateRadio.click(function(){
             menuManagementEdit.customTemplate.addClass('hidden');
@@ -39,7 +39,7 @@ var menuManagementEdit = {
             // If checked, hide this input element
             menuManagementEdit.customTemplate.removeClass('hidden');
         });
-        $("form").submit(function () { 
+        $("form").submit(function () {
             var validationError = menuManagementEdit.validateMenuItemForm();
             if (validationError == "") {
                    $(this).submit();
@@ -48,10 +48,10 @@ var menuManagementEdit = {
                    $('#error-alert p').html(validationError);
                    $.scrollTo({ top:0, left:0}, 500)
                    return false;
-               } 
+               }
          });
     },
-    updateInternalClassMessage:function(classGroupName) { //User has changed content type 
+    updateInternalClassMessage:function(classGroupName) { //User has changed content type
         //Set content type within internal class message
         this.displayInternalMessage.filter(":first").html(classGroupName);
     },
@@ -70,7 +70,7 @@ var menuManagementEdit = {
         this.existingContentType.removeClass("hidden");
         //Show the classes in the class group
         this.classesForClassGroup.removeClass("hidden");
-        
+
     },
     toggleClassSelection: function() {
         // Check/unckeck all classes for selection
@@ -91,29 +91,29 @@ var menuManagementEdit = {
     },
     validateMenuItemForm: function() {
         var validationError = "";
-        
+
         // Check menu name
         if ($('input[type=text][name=menuName]').val() == "") {
             validationError += menuManagementEdit.supplyName + "<br />";
             }
-        // Check pretty url     
+        // Check pretty url
         if ($('input[type=text][name=prettyUrl]').val() == "") {
             validationError += menuManagementEdit.supplyPrettyUrl + "<br />";
         }
         if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
             validationError += menuManagementEdit.startUrlWithSlash + "<br />";
         }
-        
+
         // Check custom template
         if ($('input:radio[name=selectedTemplate]:checked').val() == "custom") {
             if ($('input[name=customTemplate]').val() == "") {
-                validationError += menuManagementEdit.supplyTemplate + "<br />"; 
+                validationError += menuManagementEdit.supplyTemplate + "<br />";
             }
         }
-        
+
         // if no class group selected, this is an error
         if ($('#selectClassGroup').val() =='-1') {
-            validationError += menuManagementEdit.supplyContentType + "<br />"; 
+            validationError += menuManagementEdit.supplyContentType + "<br />";
         } else {
             //class group has been selected, make sure there is at least one class selected
             var allSelected = $('input[name="allSelected"]:checked').length;
@@ -123,52 +123,52 @@ var menuManagementEdit = {
                 validationError += menuManagementEdit.selectContentType + "<br />";
             }
         }
-      
-       
+
+
         //check select class group
-       
+
         return validationError;
     },
-    chooseClassGroup: function() {        
+    chooseClassGroup: function() {
         var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
         var vclassUri = this.selectClassGroupDropdown.val();
         url += encodeURIComponent(vclassUri);
         //Make ajax call to retrieve vclasses
         $.getJSON(url, function(results) {
-  
+
           if ( results.classes.length == 0 ) {
-     
+
           } else {
               //update existing content type with correct class group name and hide class group select again
               var _this = menuManagementEdit;
               menuManagementEdit.hideClassGroups();
-      
+
               menuManagementEdit.selectedGroupForPage.html(results.classGroupName);
               //update content type in message to "display x within my institution"
               menuManagementEdit.updateInternalClassMessage(results.classGroupName);
               //retrieve classes for class group and display with all selected
               var selectedClassesList = menuManagementEdit.classesForClassGroup.children('ul#selectedClasses');
-              
+
               selectedClassesList.empty();
               selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> ' + menuManagementEdit.allCapitalized + '</label> </li>');
-              
+
               $.each(results.classes, function(i, item) {
                   var thisClass = results.classes[i];
                   var thisClassName = thisClass.name;
                   //When first selecting new content type, all classes should be selected
-                  appendHtml = ' <li class="ui-state-default">' + 
-                          '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
-                         '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
+                  appendHtml = ' <li class="ui-state-default">' +
+                          '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +
+                         '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' +
                           '</li>';
                   selectedClassesList.append(appendHtml);
               });
               menuManagementEdit.toggleClassSelection();
           }
- 
+
         });
     }
 };
 
-$(document).ready(function() {   
+$(document).ready(function() {
     menuManagementEdit.onLoad();
 });

@@ -23,11 +23,11 @@ public class DedupAndExtract {
 	 * @param preferredNamespace Preferred namespace
 	 */
 	public Model dedupAndExtract( Model model, String preferredNamespace ) {
-		
+
 		Model extractsModel = ModelFactory.createDefaultModel();
-		
+
 		HashMap<String, String> rewriteURIUsing = new HashMap<String, String>();
-		
+
 		Iterator haveSameAsIt = model.listSubjectsWithProperty(OWL.sameAs);
 		while (haveSameAsIt.hasNext()) {
 			String preferredURI = null;
@@ -57,13 +57,13 @@ public class DedupAndExtract {
 				}
 			}
 		}
-		
+
 		StmtIterator modelStmtIt = model.listStatements();
 		while (modelStmtIt.hasNext()) {
 			Statement origStmt = modelStmtIt.nextStatement();
 			Resource newSubj = null;
 			RDFNode newObj = null;
-			if (!origStmt.getSubject().isAnon()) { 
+			if (!origStmt.getSubject().isAnon()) {
 				String rewriteURI = rewriteURIUsing.get(origStmt.getSubject().getURI());
 				if (rewriteURI != null) {
 					newSubj = extractsModel.getResource(rewriteURI);
@@ -83,9 +83,9 @@ public class DedupAndExtract {
 			}
 			extractsModel.add(newSubj, origStmt.getPredicate(), newObj);
 		}
-		
+
 		return extractsModel;
-		
+
 	}
-	
+
 }

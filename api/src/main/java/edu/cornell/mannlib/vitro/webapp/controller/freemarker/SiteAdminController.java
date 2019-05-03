@@ -9,7 +9,7 @@ import javax.servlet.annotation.WebServlet;
 
 @WebServlet(name = "SiteAdminController", urlPatterns = {"/siteAdmin","/siteAdmin.jsp"} )
 public class SiteAdminController extends BaseSiteAdminController {
-	
+
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
 

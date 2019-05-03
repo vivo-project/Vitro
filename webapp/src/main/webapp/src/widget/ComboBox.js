@@ -88,7 +88,7 @@ dojo.widget.ComboBoxDataProvider = function(dataPairs, limit, timeout){
 				for(var x=0; x<ol; x++){
 					var keyValArr = [new String(opts[x].innerHTML), new String(opts[x].value)];
 					data.push(keyValArr);
-					if(opts[x].selected){ 
+					if(opts[x].selected){
 						cbox.setAllValues(keyValArr[0], keyValArr[1]);
 					}
 				}
@@ -100,7 +100,7 @@ dojo.widget.ComboBoxDataProvider = function(dataPairs, limit, timeout){
 	this.getData = function(url){
 		dojo.io.bind({
 			url: url,
-			load: dojo.lang.hitch(this, function(type, data, evt){ 
+			load: dojo.lang.hitch(this, function(type, data, evt){
 				if(!dojo.lang.isArray(data)){
 					var arrData = [];
 					for(var key in data){
@@ -204,7 +204,7 @@ dojo.widget.ComboBoxDataProvider = function(dataPairs, limit, timeout){
 		// populate this.data and initialize lookup structures
 		this.data = pdata;
 	}
-	
+
 	if(dataPairs){
 		this.setData(dataPairs);
 	}
@@ -216,11 +216,11 @@ dojo.declare(
 	{
 		widgetType: "ComboBox",
 		isContainer: false,
-	
+
 		forceValidOption: false,
 		searchType: "stringstart",
 		dataProvider: null,
-	
+
 		startSearch: function(searchString){},
 		openResultList: function(results){},
 		clearResultList: function(){},

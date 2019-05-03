@@ -25,9 +25,9 @@ public interface DataPropertyStatementDao {
 
     @Deprecated
     List getExistingQualifiers(String dataPropertyURI);
-    
+
     List<DataPropertyStatement> getDataPropertyStatements(DataProperty dataProperty);
-    
+
     List<DataPropertyStatement> getDataPropertyStatements(DataProperty dataProperty, int startIndex, int endIndex);
 
     @SuppressWarnings("unchecked")
@@ -42,7 +42,7 @@ public interface DataPropertyStatementDao {
     int insertNewDataPropertyStatement(DataPropertyStatement dataPropertyStatement );
 
     List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property);
-    
+
     List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri);
 
     List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property, String queryString, Set<String> constructQueryStrings);

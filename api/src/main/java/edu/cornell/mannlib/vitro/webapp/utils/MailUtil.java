@@ -20,30 +20,30 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 public class MailUtil {
 	private static final Log log = LogFactory.getLog(MailUtil.class);
 	private final HttpServletRequest req;
-	
+
 		public MailUtil(HttpServletRequest req) {
 			this.req = req;
 		}
-        
+
         public void sendMessage(String messageText, String subject, String from, String to, List<String> deliverToArray) throws IOException{
-        	
+
             Session s = FreemarkerEmailFactory.getEmailSession(req);
-            
+
             try{
-            	
+
             	int recipientCount = (deliverToArray == null) ? 0 : deliverToArray.size();
                 if (recipientCount == 0) {
                     log.error(
                             "To establish the Contact Us mail capability the system administrators must  "
                             + "specify at least one email address in the current portal.");
                 }
-               
+
                 MimeMessage msg = new MimeMessage( s );
                 // Set the from address
                 msg.setFrom( new InternetAddress( from ));
 
 	            // Set the recipient address
-	            
+
 	            if (recipientCount>0){
 	                InternetAddress[] address=new InternetAddress[recipientCount];
 	                for (int i=0; i<recipientCount; i++){
@@ -65,5 +65,5 @@ public class MailUtil {
             	log.error("Exception sending message :"  + ex.getMessage(), ex);
             }
         }
-        
+
 }

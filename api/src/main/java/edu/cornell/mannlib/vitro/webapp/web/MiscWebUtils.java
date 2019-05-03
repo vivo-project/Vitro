@@ -31,9 +31,9 @@ public class MiscWebUtils {
          * a key of a property in properties, and updates the value in current.
          *
          */
-	
+
 	private static final Log log = LogFactory.getLog(MiscWebUtils.class.getName());
-	
+
         public static Properties loadPropertiesFromRequest(Properties current, ServletRequest req){
             if(req == null || current == null){
                 log.error("UtilBean.loadPropertiesFromRequest() exiting because of null input");
@@ -60,7 +60,7 @@ public class MiscWebUtils {
             }
             return current;
         }
-        
+
     /**
      * Gets an attribute from the request, if it is not null, and of Class String
      * print it to req.out, otherwise throw an exception.
@@ -80,14 +80,14 @@ public class MiscWebUtils {
         return (String) contentObj;
     }
 
-	public static String getCustomShortView(HttpServletRequest request) {	
+	public static String getCustomShortView(HttpServletRequest request) {
 		Individual object = ((ObjectPropertyStatement) request
 				.getAttribute("opStmt")).getObject();
 		return getCustomShortView(object, request);
 	}
 
 	// Get custom short view from either the object's class or one of its
-    // superclasses. This is needed because the inference update happens asynchronously, 
+    // superclasses. This is needed because the inference update happens asynchronously,
     // so when a new property has been added and the page is reloaded, the custom short view
     // from a superclass may not have been inferred yet.
 
@@ -95,14 +95,14 @@ public class MiscWebUtils {
 	if( individual == null ) return null;
 
         VitroRequest vreq = new VitroRequest(request);
-        VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();	
-       log.debug("searching for custom short view for " + individual.getURI()); 
+        VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
+       log.debug("searching for custom short view for " + individual.getURI());
 
 	String customShortView = null;
         List<VClass> vclasses = individual.getVClasses(true); // get directly
         // asserted vclasses
         Set<String> superClasses = new HashSet<String>();
-        
+
         // First try directly asserted classes, there is no useful decision
         // mechanism for the case where two directly asserted classes
         // have a custom short view.
@@ -121,7 +121,7 @@ public class MiscWebUtils {
             String vclassUri = vclass.getURI();
             superClasses.addAll(vcDao.getAllSuperClassURIs(vclassUri));
         }
-        
+
         // Next try super classes. There is no useful decision mechanism for
         // the case where two super classes have a custom short view.
 	log.debug("checking superclasses for custom short view");
@@ -135,9 +135,9 @@ public class MiscWebUtils {
             }
         }
 
-        return null;	    
+        return null;
 	}
-	
+
     /**
      * returns a table of the req attributes
      * @param req Servlet Request
@@ -152,7 +152,7 @@ public class MiscWebUtils {
             try{
                 Object obj = req.getAttribute(name);
                 value = (obj instanceof Model || obj instanceof ModelCom) ? "[Jena model object]" :
-                	(obj == null) ? "[null]" : 
+                	(obj == null) ? "[null]" :
                 		StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             } catch (Throwable th){
                 value = "unable to get value";
@@ -172,7 +172,7 @@ public class MiscWebUtils {
             String value = null;
             try{
                 Object obj = req.getParameter(name);
-                value = (obj == null) ? "[null]" : 
+                value = (obj == null) ? "[null]" :
                 	StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             } catch (Throwable th){
                 value = "unable to get value";
@@ -192,7 +192,7 @@ public class MiscWebUtils {
             try{
                 Object obj = req.getSession().getAttribute(name);
                 value = (obj instanceof Model || obj instanceof ModelCom) ? "[Jena model object]" :
-                	(obj == null) ? "[null]" : 
+                	(obj == null) ? "[null]" :
                 		StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             } catch (Throwable th){
                 value = "unable to get value";
@@ -233,17 +233,17 @@ public class MiscWebUtils {
 	    	log.debug("    " + value);
 	    	Enumeration values = req.getHeaders(name);
 	    	if( values == null ){
-	    		log.debug("    enumeration was null");            		
+	    		log.debug("    enumeration was null");
 	    	}else{
 	    		log.debug("    enumeration values");
 	    		while( values.hasMoreElements() ){
 	    			String val = (String) values.nextElement();
 	    			log.debug("    " + value);
 	    		}
-	    	}            
+	    	}
 	    }
     }
-    
+
     /**
         This isfrom org.json.simple.JSONObject
 

@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpNod
 /**
  * A utility class for NquadsParser. Breaks an NQuad line into 3 or 4 strings,
  * each holding the text representation of a node.
- * 
+ *
  * It's a little tricky where literals are involved, because white space is
  * significant, except between quotes, and quotes are only quotes if they aren't
  * escaped.

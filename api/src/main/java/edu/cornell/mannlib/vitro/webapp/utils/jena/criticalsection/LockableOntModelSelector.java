@@ -10,10 +10,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
  * Makes it easy to use a Jena OntModel with a try-with-resources block. If you
  * have access to an OntModelSelector, you can wrap it and then use it obtain
  * LockableOntModels.
- * 
+ *
  * <pre>
  * LockableOntModelSelector lockableOms = new LockableOntModelSelector(oms);
- *  
+ *
  * try (LockedOntModel m = lockableOms.getDisplayModel.read()) {
  *    ...
  * }

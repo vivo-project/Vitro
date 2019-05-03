@@ -38,44 +38,44 @@ public class DumpTestController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        
+
         Map<String, Object> body = new HashMap<String, Object>();
-        
+
         body.put("title", "Freemarker Test");
-        
+
         body.put("dog", "Rover");
         body.put("int", 7);
         body.put("bool", false);
         body.put("now", new Date());
-        
+
         java.sql.Date date = new java.sql.Date(1302297332043L);
         body.put("date", date);
-        
+
         Time time = new Time(1302297332043L);
         body.put("time", time);
-        
+
         Timestamp ts = new Timestamp(1302297332043L);
         body.put("timestamp", ts);
-        
+
         // List of strings
         List<String> fruit = new ArrayList<String>();
         fruit.add("apples");
         fruit.add("bananas");
         fruit.add("peaches");
         body.put("fruit", fruit);
-        
+
         // Mixed list
         List<Object> mixedList = new ArrayList<Object>();
-        
+
         String myString = "apples";
         mixedList.add(myString);
-        
+
         int myInt = 4;
         mixedList.add(myInt);
-        
+
         boolean myBool = true;
         mixedList.add(myBool);
-        
+
         List<String> myList = new ArrayList<String>();
         myList.add("dog");
         myList.add("cat");
@@ -91,7 +91,7 @@ public class DumpTestController extends FreemarkerHttpServlet {
             }
         }
         body.put("oddNums", new SimpleCollection(odds));
-        
+
         // String-string map
         Map<String, String> myMap = new HashMap<String, String>();
         myMap.put("Albany", "New York");
@@ -100,14 +100,14 @@ public class DumpTestController extends FreemarkerHttpServlet {
         myMap.put("Sacramento", "California");
         myMap.put("Richmond", "Virginia");
         body.put("capitals", myMap);
-        
-        
+
+
         // Mixed map
         Map<String, Object> mixedMap = new HashMap<String, Object>();
-        
-        mixedMap.put("myString", myString);        
+
+        mixedMap.put("myString", myString);
         mixedMap.put("myBoolean", myBool);
-        mixedMap.put("myNumber", myInt);        
+        mixedMap.put("myNumber", myInt);
         Date myDate = new Date();
         mixedMap.put("myDate", myDate);
         mixedMap.put("myList", myList);
@@ -125,18 +125,18 @@ public class DumpTestController extends FreemarkerHttpServlet {
             e.printStackTrace();
         }
 
-        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);       
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
-    
+
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return "Test";
     }
 
     public static class Employee {
-        
+
         private static int count = 0;
-        
+
         private String firstName;
         private String lastName;
         private String nickname;
@@ -147,7 +147,7 @@ public class DumpTestController extends FreemarkerHttpServlet {
         private List<String> favoriteColors;
         private Employee supervisor;
         private float salary;
-        
+
         Employee(String firstName, String lastName, int id, Date birthdate) {
             this.firstName = firstName;
             this.lastName = lastName;
@@ -167,11 +167,11 @@ public class DumpTestController extends FreemarkerHttpServlet {
         void setSalary(float salary) {
             this.salary = salary;
         }
-        
+
         public void setNickname(String nickname) {
             this.nickname = nickname;
         }
-         
+
         public void setFavoriteColors(String...colors) {
             Collections.addAll(favoriteColors, colors);
         }
@@ -179,21 +179,21 @@ public class DumpTestController extends FreemarkerHttpServlet {
         float getSalary() {
             return salary;
         }
-        
+
         public static int getEmployeeCount() {
             return count;
         }
-        
+
         /*  Public accessor methods for templates */
-        
+
         public String getFullName() {
             return firstName + " " + lastName;
         }
-        
+
         public String getName(String which) {
             return "first".equals(which) ? firstName : lastName;
         }
-        
+
         public String getMiddleName() {
             return middleName;
         }
@@ -201,19 +201,19 @@ public class DumpTestController extends FreemarkerHttpServlet {
         public String getNickname() {
             return nickname;
         }
-        
+
         public Date getBirthdate() {
             return birthdate;
         }
-        
+
         public int getId() {
             return id;
-        }      
-        
+        }
+
         public boolean isMarried() {
             return married;
         }
- 
+
         @Deprecated
         public int getFormerId() {
             return id % 10000;
@@ -222,12 +222,12 @@ public class DumpTestController extends FreemarkerHttpServlet {
         public Employee getSupervisor() {
             return supervisor;
         }
-        
+
         public List<String> getFavoriteColors() {
             return favoriteColors;
         }
     }
-    
+
     private Employee getEmployee() {
 
         Calendar c = Calendar.getInstance();

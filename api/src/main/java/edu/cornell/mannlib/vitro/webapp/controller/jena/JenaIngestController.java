@@ -84,7 +84,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 @WebServlet(name = "JenaIngestController", urlPatterns = {"/ingest"} )
 public class JenaIngestController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(JenaIngestController.class);
-    
+
     private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
     private static final String LIST_MODELS_JSP = "/jenaIngest/listModels.jsp";
     private static final String CREATE_MODEL_JSP = "/jenaIngest/createModel.jsp";
@@ -111,24 +111,24 @@ public class JenaIngestController extends BaseEditController {
     private static final String WHICH_MODEL_MAKER = "jenaIngestModelMakerID";
 
     private static final Map<String, Model> attachedModels = new HashMap<String, Model>();
-    
+
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
             return;
         }
-        
-        VitroRequest vreq = new VitroRequest(request);   
+
+        VitroRequest vreq = new VitroRequest(request);
         ModelMaker maker = getModelMaker(vreq);
         WhichService modelType = getModelType(vreq);
-        
+
         String actionStr = vreq.getParameter("action");
         actionStr = (actionStr != null) ? actionStr : "";
 
         String bodyJsp;
-        
+
         if("listModels".equals(actionStr)) {
             bodyJsp = processListModelsRequest(vreq, maker, modelType);
         } else if("configModels".equals(actionStr)){
@@ -185,12 +185,12 @@ public class JenaIngestController extends BaseEditController {
         	processDumpRestore(vreq, response);
         	return;
         }
-        
+
         else {
             request.setAttribute("title","Ingest Menu");
             bodyJsp = INGEST_MENU_JSP;
         }
-        
+
         maker = getModelMaker(vreq);
         List<String> modelNames = maker.listModels().toList();
         for (int mnIdx = modelNames.size() - 1; mnIdx > -1; mnIdx--) {
@@ -200,49 +200,49 @@ public class JenaIngestController extends BaseEditController {
         }
 
         request.setAttribute("modelNames", modelNames);
-   
+
         try {
             JSPPageHandler.renderBasicPage(request, response, bodyJsp);
         } catch (Exception e) {
             log.error(e,e);
             throw new ServletException(e);
         }
-        
+
     }
-    
+
     private String processListModelsRequest(VitroRequest vreq, ModelMaker maker, WhichService modelType) {
         return showModelList(vreq, maker, modelType);
     }
-    
+
     protected static boolean isUsingMainStoreForIngest(HttpServletRequest req) {
-    	return CONFIGURATION != req.getSession().getAttribute(WHICH_MODEL_MAKER); 
+    	return CONFIGURATION != req.getSession().getAttribute(WHICH_MODEL_MAKER);
     }
-    
+
     private String processConfigModelsRequest(VitroRequest vreq) {
         ModelMaker vjmm = ModelAccess.on(getServletContext()).getModelMaker(CONFIGURATION);
         vreq.getSession().setAttribute(WHICH_MODEL_MAKER, CONFIGURATION);
         return showModelList(vreq, vjmm, CONFIGURATION);
     }
-    
+
     private String processContentModelsRequest(VitroRequest vreq) {
         ModelMaker vsmm = ModelAccess.on(getServletContext()).getModelMaker(CONTENT);
         vreq.getSession().setAttribute(WHICH_MODEL_MAKER, CONTENT);
         return showModelList(vreq, vsmm, CONTENT);
     }
-    
+
     private String processCreateModelRequest(VitroRequest vreq, ModelMaker maker, WhichService modelType) {
         String modelName = vreq.getParameter("modelName");
-    	
+
         if (modelName != null) {
         	try {
             	URI graphURI = new URI(modelName);
-            	
+
             	if (graphURI.getScheme() == null) {
-            	   String origName = modelName;	
+            	   String origName = modelName;
             	   modelName =CREATED_GRAPH_BASE_URI + modelName;
                    log.info("The model name has been changed from " + origName + " to " + modelName);
             	}
-            	           	
+
                 doCreateModel(modelName, maker);
                 return showModelList(vreq, maker, modelType);
         	} catch (URISyntaxException e) {
@@ -254,7 +254,7 @@ public class JenaIngestController extends BaseEditController {
             return CREATE_MODEL_JSP;
         }
     }
-    
+
     private String processRemoveModelRequest(VitroRequest vreq, ModelMaker maker, WhichService modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName!=null) {
@@ -262,7 +262,7 @@ public class JenaIngestController extends BaseEditController {
         }
         return showModelList(vreq, maker, modelType);
     }
-    
+
     private String processClearModelRequest(VitroRequest vreq, ModelMaker maker, WhichService modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName != null) {
@@ -270,7 +270,7 @@ public class JenaIngestController extends BaseEditController {
         }
         return showModelList(vreq, maker, modelType);
     }
-    
+
     private String processLoadRDFDataRequest(VitroRequest vreq, ModelMaker maker) {
         String docLoc = vreq.getParameter("docLoc");
         String filePath = vreq.getParameter("filePath");
@@ -286,8 +286,8 @@ public class JenaIngestController extends BaseEditController {
             return LOAD_RDF_DATA_JSP;
         }
     }
-    
-    private void processOutputModelRequest(VitroRequest vreq, 
+
+    private void processOutputModelRequest(VitroRequest vreq,
                                            HttpServletResponse response) {
         String modelNameStr = vreq.getParameter("modelName");
         Model model = getModel(modelNameStr,vreq);
@@ -314,7 +314,7 @@ public class JenaIngestController extends BaseEditController {
             model.leaveCriticalSection();
         }
     }
-    
+
     private String processCleanLiteralsRequest(VitroRequest vreq) {
         String modelNameStr = vreq.getParameter("modelName");
         Model model = getModel(modelNameStr,vreq);
@@ -322,7 +322,7 @@ public class JenaIngestController extends BaseEditController {
         vreq.setAttribute("title","Ingest Menu");
         return INGEST_MENU_JSP;
     }
-    
+
     private String processAttachModelRequest(VitroRequest vreq, ModelMaker maker, WhichService modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName != null) {
@@ -330,7 +330,7 @@ public class JenaIngestController extends BaseEditController {
         }
         return showModelList(vreq, maker, modelType);
     }
-    
+
     private String processDetachModelRequest(VitroRequest vreq, ModelMaker maker, WhichService modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName != null) {
@@ -338,7 +338,7 @@ public class JenaIngestController extends BaseEditController {
         }
         return showModelList(vreq, maker, modelType);
     }
-    
+
     private String processRenameBNodesRequest(VitroRequest vreq, ModelMaker maker) {
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
         JenaIngestUtils utils = new JenaIngestUtils();
@@ -350,7 +350,7 @@ public class JenaIngestController extends BaseEditController {
                     sourceModelList.add(m);
                 }
             }
-            Map<String,LinkedList<String>> propertyMap = 
+            Map<String,LinkedList<String>> propertyMap =
                     utils.generatePropertyMap(sourceModelList, maker);
             List<String> sourceModelNameList = Arrays.asList(sourceModel);
             vreq.setAttribute("sourceModel",sourceModelNameList);
@@ -363,7 +363,7 @@ public class JenaIngestController extends BaseEditController {
             return RENAME_BNODES_JSP;
         }
     }
-    
+
     private String processRenameBNodesURISelectRequest(VitroRequest vreq, ModelMaker maker) {
         String namespaceEtcStr = vreq.getParameter("namespaceEtcStr");
         String pattern = vreq.getParameter("pattern");
@@ -392,7 +392,7 @@ public class JenaIngestController extends BaseEditController {
             return RENAME_BNODES_URI_SELECT_JSP;
         }
     }
-    
+
     private String processSmushSingleModelRequest(VitroRequest vreq) {
         String propertyURIStr = vreq.getParameter("propertyURI");
         if (propertyURIStr != null) {
@@ -404,7 +404,7 @@ public class JenaIngestController extends BaseEditController {
             return SMUSH_JSP;
         }
     }
-    
+
     private String processCsv2rdfRequest(VitroRequest vreq) {
         String csvUrl = vreq.getParameter("csvUrl");
         if (csvUrl != null) {
@@ -416,7 +416,7 @@ public class JenaIngestController extends BaseEditController {
             return CSV2RDF_JSP;
         }
     }
-    
+
     private String processProcessStringsRequest(VitroRequest vreq) {
         String className = vreq.getParameter("className");
         if (className != null) {
@@ -428,7 +428,7 @@ public class JenaIngestController extends BaseEditController {
             return PROCESS_STRINGS_JSP;
         }
     }
-    
+
     private String processSplitPropertyValuesRequest(VitroRequest vreq) {
         String splitRegex = vreq.getParameter("splitRegex");
         if (splitRegex != null) {
@@ -440,7 +440,7 @@ public class JenaIngestController extends BaseEditController {
             return SPLIT_PROPERTY_VALUES_JSP;
         }
     }
-    
+
     private String processSubtractModelRequest(VitroRequest vreq) {
         String modela = vreq.getParameter("modela");
         if (modela != null) {
@@ -452,7 +452,7 @@ public class JenaIngestController extends BaseEditController {
             return SUBTRACT_MODELS_JSP;
         }
     }
-    
+
     private String processExecuteWorkflowRequest(VitroRequest vreq) {
         String workflowURIStr = vreq.getParameter("workflowURI");
         String workflowStepURIStr = vreq.getParameter("workflowStepURI");
@@ -483,7 +483,7 @@ public class JenaIngestController extends BaseEditController {
             return EXECUTE_WORKFLOW_JSP;
         }
     }
-    
+
     private String processExecuteSparqlRequest(VitroRequest vreq) {
         String sparqlQueryStr = vreq.getParameter("sparqlQueryStr");
 		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
@@ -498,7 +498,7 @@ public class JenaIngestController extends BaseEditController {
         /*ass92*/
         OntologyDao daoObj = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
         List<Ontology> ontologiesObj = daoObj.getAllOntologies();
-        List<String> prefixList = new ArrayList<>();       
+        List<String> prefixList = new ArrayList<>();
         if(ontologiesObj !=null && ontologiesObj.size()>0){
             for (Ontology ont : ontologiesObj) {
                 prefixList.add(ont.getPrefix() == null ? "(not yet specified)" : ont.getPrefix());
@@ -508,7 +508,7 @@ public class JenaIngestController extends BaseEditController {
         else{
             prefixList.add("<strong>" + "No Ontologies added" + "</strong>");
             prefixList.add("<strong>" + "Load Ontologies" + "</strong>");
-        }     
+        }
         vreq.setAttribute("prefixList", prefixList);
         /*complete*/
         if (sparqlQueryStr != null) {
@@ -528,7 +528,7 @@ public class JenaIngestController extends BaseEditController {
                 } catch (QueryParseException qpe) {
                     String errorMsg = "<p>Unable to parse query:</p>";
                     if (qpe.getMessage() != null) {
-                        errorMsg += "<p>" + qpe.getMessage() + "</p>"; 
+                        errorMsg += "<p>" + qpe.getMessage() + "</p>";
                     }
                     vreq.setAttribute("errorMsg", errorMsg);
                 } catch (InconsistentOntologyException ioe) {
@@ -543,13 +543,13 @@ public class JenaIngestController extends BaseEditController {
             vreq.setAttribute("savedQueries",savedQueryList);
             vreq.setAttribute("title","SPARQL CONSTRUCT result");
             return EXECUTE_SPARQL_JSP;
-        } else {    
+        } else {
             vreq.setAttribute("savedQueries",savedQueryList);
             vreq.setAttribute("title","Execute SPARQL Construct");
             return EXECUTE_SPARQL_JSP;
         }
     }
-    
+
     private String processGenerateTBoxRequest(VitroRequest vreq) {
         String testParam = vreq.getParameter("sourceModelName");
         if (testParam != null) {
@@ -559,9 +559,9 @@ public class JenaIngestController extends BaseEditController {
         } else {
             vreq.setAttribute("title","Generate TBox from Assertions Data");
             return GENERATE_TBOX_JSP;
-        }    
+        }
     }
-    
+
     private String processPermanentURIRequest(VitroRequest vreq, ModelMaker maker) {
         String modelName = vreq.getParameter("modelName");
         String oldModel = vreq.getParameter("oldModel");
@@ -580,7 +580,7 @@ public class JenaIngestController extends BaseEditController {
                     String namespace = resItr.nextResource().getNameSpace();
                     if(!namespaceList.contains(namespace)){
                         namespaceList.add(namespace);
-                    }        
+                    }
                 }
             } else {
                 namespaceList.add("no resources present");
@@ -601,13 +601,13 @@ public class JenaIngestController extends BaseEditController {
         vreq.setAttribute("title","Ingest Menu");
         return INGEST_MENU_JSP;
     }
-    
+
     private String processMergeResourceRequest(VitroRequest vreq) {
           String uri1 = vreq.getParameter("uri1"); // get primary uri
           String uri2 = vreq.getParameter("uri2"); // get secondary uri
           String usePrimaryLabelOnlyStr = vreq.getParameter("usePrimaryLabelOnly");;
           boolean usePrimaryLabelOnly = usePrimaryLabelOnlyStr != null && !usePrimaryLabelOnlyStr.isEmpty();
-          
+
           if(uri1!=null){
               JenaIngestUtils utils = new JenaIngestUtils();
               /*
@@ -615,13 +615,13 @@ public class JenaIngestController extends BaseEditController {
                */
               OntModel baseOntModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
               OntModel tboxOntModel = ModelAccess.on(getServletContext()).getOntModel(TBOX_UNION);
-              
+
               /*
                * calling method that does the merge operation.
                */
               MergeResult result = utils.doMerge(
                       uri1, uri2, baseOntModel, tboxOntModel, usePrimaryLabelOnly);
-              
+
               vreq.getSession().setAttribute(
                       "leftoverModel", result.getLeftoverModel());
               vreq.setAttribute("result", result);
@@ -632,7 +632,7 @@ public class JenaIngestController extends BaseEditController {
               return MERGE_RESOURCES;
           }
     }
-    
+
     private String processRenameResourceRequest(VitroRequest vreq) {
           String oldNamespace = vreq.getParameter("oldNamespace");
           String newNamespace = vreq.getParameter("newNamespace");
@@ -641,7 +641,7 @@ public class JenaIngestController extends BaseEditController {
               if (oldNamespace.isEmpty() && !newNamespace.isEmpty()) {
                   errorMsg = "Please enter the old namespace to be changed.";
               } else if (!oldNamespace.isEmpty() && newNamespace.isEmpty()) {
-                  errorMsg = "Please enter the new namespace."; 
+                  errorMsg = "Please enter the new namespace.";
               } else if (oldNamespace.isEmpty() && newNamespace.isEmpty()) {
                   errorMsg = "Please enter the namespaces.";
               } else if (oldNamespace.equals(newNamespace)) {
@@ -664,8 +664,8 @@ public class JenaIngestController extends BaseEditController {
               return RENAME_RESOURCE;
           }
     }
-    
-    private void processMergeResultRequest(VitroRequest vreq, 
+
+    private void processMergeResultRequest(VitroRequest vreq,
                                            HttpServletResponse response) {
 
         Model lmodel = (Model) vreq.getSession().getAttribute("leftoverModel");
@@ -700,18 +700,18 @@ public class JenaIngestController extends BaseEditController {
 			return CONTENT;
 		}
     }
-    
+
     private void doCreateModel(String modelName, ModelMaker modelMaker) {
         modelMaker.createModel(modelName);
     }
-    
+
     private void doRemoveModel(String modelName, ModelMaker modelMaker) {
-        //Try to detach first since it cause problems to remove an attached model.        
+        //Try to detach first since it cause problems to remove an attached model.
         doDetachModel(modelName);
         log.debug("Removing " + modelName + " from webapp");
-        modelMaker.removeModel(modelName);        
+        modelMaker.removeModel(modelName);
     }
-    
+
     private void doClearModel(String modelName, ModelMaker modelMaker) {
         Model m = modelMaker.getModel(modelName);
         OntModel o = VitroModelFactory.createOntologyModel(m);
@@ -722,7 +722,7 @@ public class JenaIngestController extends BaseEditController {
             o.leaveCriticalSection();
         }
     }
-    
+
     private void doLoadRDFData(String modelName, String docLoc, String filePath, String language, ModelMaker modelMaker) {
         Model m = modelMaker.getModel(modelName);
         m.enterCriticalSection(Lock.WRITE);
@@ -750,22 +750,22 @@ public class JenaIngestController extends BaseEditController {
                     }
                 }
             }
-        } finally { 
+        } finally {
             m.leaveCriticalSection();
         }
     }
-    
+
     private void doAttachModel(String modelName, ModelMaker modelMaker) {
         if (attachedModels.containsKey(modelName)) {
             doDetachModel(modelName);
         }
         Model m = ModelFactory.createDefaultModel();
-        m.add(modelMaker.getModel(modelName));        
+        m.add(modelMaker.getModel(modelName));
         ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS).addSubModel(m);
         attachedModels.put(modelName, m);
         log.info("Attached " + modelName + " (" + m.hashCode() + ") to webapp");
     }
-    
+
     private void doDetachModel(String modelName) {
         Model m = attachedModels.get(modelName);
         if (m == null) {
@@ -775,32 +775,32 @@ public class JenaIngestController extends BaseEditController {
         attachedModels.remove(modelName);
         log.info("Detached " + modelName + " (" + m.hashCode() + ") from webapp");
     }
-    
+
     private void doRenameBNodes(VitroRequest vreq, String namespaceEtc, boolean patternBoolean, String pattern, String[] sourceModel) {
         OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         String property = vreq.getParameter("property");
-        
+
         Boolean csv2rdf = false;
         try {
             csv2rdf = Boolean.parseBoolean(vreq.getParameter("csv2rdf"));
         } catch (Exception e) {
             log.error(e, e);
         }
-        
+
         if (csv2rdf) {
             source.addSubModel(
-                    (Model) vreq.getSession().getAttribute("csv2rdfResult")); 
+                    (Model) vreq.getSession().getAttribute("csv2rdfResult"));
         } else {
             for (String aSourceModel : sourceModel) {
                 Model m = getModel(aSourceModel, vreq);
                 source.addSubModel(m);
             }
         }
-        
-        Model destination = (csv2rdf) 
+
+        Model destination = (csv2rdf)
                ? ModelFactory.createDefaultModel()
                : getModel(vreq.getParameter("destinationModelName"),vreq);
-               
+
         JenaIngestUtils utils = new JenaIngestUtils();
         destination.enterCriticalSection(Lock.WRITE);
         try {
@@ -818,7 +818,7 @@ public class JenaIngestController extends BaseEditController {
             destination.leaveCriticalSection();
         }
     }
-    
+
     private void doSmushSingleModel(VitroRequest vreq) {
         OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
@@ -837,7 +837,7 @@ public class JenaIngestController extends BaseEditController {
             destination.leaveCriticalSection();
         }
     }
-    
+
     private long doExecuteSparql(VitroRequest vreq) {
 		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
         OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
@@ -846,7 +846,7 @@ public class JenaIngestController extends BaseEditController {
             Model m = getModel(aSourceModel, vreq);
             source.addSubModel(m);
         }
-        Model destination = getModel(vreq.getParameter("destinationModelName"),vreq); 
+        Model destination = getModel(vreq.getParameter("destinationModelName"),vreq);
         String sparqlQueryStr = vreq.getParameter("sparqlQueryStr");
         String savedQueryURIStr = vreq.getParameter("savedQuery");
         String queryStr;
@@ -880,7 +880,7 @@ public class JenaIngestController extends BaseEditController {
             } else {
                 destination.notifyEvent(new EditEvent(null, true));
             }
-            destination.add(tempModel);      
+            destination.add(tempModel);
         } finally {
             if (destination instanceof OntModel) {
                 ((OntModel) destination).getBaseModel().notifyEvent(new EditEvent(null, false));
@@ -889,9 +889,9 @@ public class JenaIngestController extends BaseEditController {
             }
             destination.leaveCriticalSection();
         }
-        return tempModel.size();     
+        return tempModel.size();
     }
-    
+
     public void doSubtractModels(VitroRequest vreq) {
             String modela = vreq.getParameter("modela");
             String modelb = vreq.getParameter("modelb");
@@ -904,7 +904,7 @@ public class JenaIngestController extends BaseEditController {
             else
                 ma.remove(mb);
     }
-    
+
     public void doSplitPropertyValues(VitroRequest vreq) {
         String sourceModelStr = vreq.getParameter("sourceModelName");
         String destinationModelStr = vreq.getParameter("destinationModelName");
@@ -917,7 +917,7 @@ public class JenaIngestController extends BaseEditController {
         boolean trim = ( "TRUE".equalsIgnoreCase(trimStr) );
         destinationModel.add( (new JenaIngestUtils()).splitPropertyValues(sourceModel, propertyURI, splitRegex, newPropertyURI, trim));
     }
-    
+
     public void doGenerateTBox(VitroRequest vreq) {
         OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
@@ -929,7 +929,7 @@ public class JenaIngestController extends BaseEditController {
         Model destination = getModel(destinationModelStr,vreq);
         destination.add( (new JenaIngestUtils()).generateTBox(source));
     }
-        
+
     public void doProcessStrings(VitroRequest vreq) {
         try {
             String className = vreq.getParameter("className");
@@ -948,7 +948,7 @@ public class JenaIngestController extends BaseEditController {
             String retractionsModelStr = vreq.getParameter("retractionsModel");
             if ( (retractionsModelStr != null) && ( retractionsModelStr.length() > 0 ) ) {
                 savedRetractionsModel = getModel(retractionsModelStr, vreq);
-            } 
+            }
             Model additionsModel = ModelFactory.createDefaultModel();
             Model retractionsModel = ModelFactory.createDefaultModel();
             Class<?> stringProcessorClass = Class.forName(className);
@@ -974,7 +974,7 @@ public class JenaIngestController extends BaseEditController {
                         }
                         if (!newLex.equals(lex)) {
                             retractionsModel.add(stmt);
-                            if (newLex.length()>0) {    
+                            if (newLex.length()>0) {
                                     Literal newLit = null;
                                     if (lit.getLanguage()!=null && lit.getLanguage().length()>0) {
                                         newLit = additionsModel.createLiteral(newLex,lit.getLanguage());
@@ -1000,7 +1000,7 @@ public class JenaIngestController extends BaseEditController {
                 }
             } finally {
                 destination.leaveCriticalSection();
-            } 
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1046,7 +1046,7 @@ public class JenaIngestController extends BaseEditController {
                             additionsModel.add(stmt.getSubject(),stmt.getPredicate(),newLit);
                         }
                     }
-                }    
+                }
             } finally {
                 closeIt.close();
             }
@@ -1057,7 +1057,7 @@ public class JenaIngestController extends BaseEditController {
             model.leaveCriticalSection();
         }
     }
-    
+
     private void doExecuteWorkflow(VitroRequest vreq) {
         String workflowURI = vreq.getParameter("workflowURI");
         String workflowStepURI = vreq.getParameter("workflowStepURI");
@@ -1066,8 +1066,8 @@ public class JenaIngestController extends BaseEditController {
                 jenaOntModel.getIndividual(workflowURI),getModelMaker(
                         vreq)).run(jenaOntModel.getIndividual(workflowStepURI));
     }
-    
-    private String doRename(String oldNamespace,String newNamespace){    
+
+    private String doRename(String oldNamespace,String newNamespace){
         String uri = null;
         String result = null;
         Integer counter = 0;
@@ -1079,7 +1079,7 @@ public class JenaIngestController extends BaseEditController {
                     (new RDFServiceGraph(
                             rdfService, ABOX_ASSERTIONS));
     		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
-            List<String> urisToChange = new LinkedList<String>();        
+            List<String> urisToChange = new LinkedList<String>();
             ontModel.enterCriticalSection(Lock.READ);
             try {
                 Iterator<Individual> indIter = ontModel.listIndividuals();
@@ -1088,7 +1088,7 @@ public class JenaIngestController extends BaseEditController {
                     String namespace = ind.getNameSpace();
                     if( namespace != null ){
                         if( oldNamespace.equals(namespace) ){
-                            uri = ind.getURI();    
+                            uri = ind.getURI();
                             urisToChange.add(uri);
                             namespacePresent = true;
                         }
@@ -1100,7 +1100,7 @@ public class JenaIngestController extends BaseEditController {
             if(!namespacePresent){
                 result = "no resources renamed";
                 return result;
-            }    
+            }
             for( String oldURIStr : urisToChange){
                 long time1 = System.currentTimeMillis();
                 Resource res = baseOntModel.getResource(oldURIStr);
@@ -1111,50 +1111,50 @@ public class JenaIngestController extends BaseEditController {
                 Matcher matcher = p.matcher(candidateString);
                 newURIStr = matcher.replaceFirst(newNamespace);
                 long time3 = System.currentTimeMillis();
-                log.debug("time to get new uri: " + 
+                log.debug("time to get new uri: " +
                         Long.toString(time3 - time2));
                 log.debug("Renaming "+ oldURIStr + " to " + newURIStr);
-         
+
                 String whereClause = "} WHERE { \n" +
-                        "  GRAPH <" + ABOX_ASSERTIONS + "> { \n" +  
+                        "  GRAPH <" + ABOX_ASSERTIONS + "> { \n" +
                         "   { <" + oldURIStr + "> ?p <" + oldURIStr + "> } \n " +
-                        "     UNION \n" +  
+                        "     UNION \n" +
                         "   { <" + oldURIStr + "> ?q ?o } \n " +
                         "     UNION \n" +
                         "   { ?s ?r <" + oldURIStr + "> } \n" +
                         "  } \n" +
                         "}";
-                
-                String removeQuery = "CONSTRUCT { \n" + 
+
+                String removeQuery = "CONSTRUCT { \n" +
                                    "   <" + oldURIStr + "> ?p <" + oldURIStr + "> . \n " +
                                    "   <" + oldURIStr + "> ?q ?o . \n " +
                                    "   ?s ?r <" + oldURIStr + "> \n" + whereClause;
 
-                String addQuery = "CONSTRUCT { \n" + 
+                String addQuery = "CONSTRUCT { \n" +
                         "   <" + newURIStr + "> ?p <" + newURIStr + "> . \n " +
                         "   <" + newURIStr + "> ?q ?o . \n " +
-                        "   ?s ?r <" + newURIStr + "> \n" + whereClause;                   
-                try {                   
+                        "   ?s ?r <" + newURIStr + "> \n" + whereClause;
+                try {
                     ChangeSet cs = rdfService.manufactureChangeSet();
                     cs.addAddition(rdfService.sparqlConstructQuery(
-                            addQuery, RDFService.ModelSerializationFormat.N3), 
-                                    RDFService.ModelSerializationFormat.N3, 
+                            addQuery, RDFService.ModelSerializationFormat.N3),
+                                    RDFService.ModelSerializationFormat.N3,
                                             ABOX_ASSERTIONS);
                     cs.addRemoval(rdfService.sparqlConstructQuery(
-                            removeQuery, RDFService.ModelSerializationFormat.N3), 
-                                    RDFService.ModelSerializationFormat.N3, 
-                                            ABOX_ASSERTIONS); 
+                            removeQuery, RDFService.ModelSerializationFormat.N3),
+                                    RDFService.ModelSerializationFormat.N3,
+                                            ABOX_ASSERTIONS);
                     rdfService.changeSetUpdate(cs);
                 } catch (RDFServiceException e) {
                     throw new RuntimeException(e);
                 }
-                 
+
                 long time4 = System.currentTimeMillis();
                 log.debug(" time to rename : " + Long.toString( time4 - time3));
-                log.debug(" time for one resource: " + 
-                        Long.toString( time4 -time1));          
+                log.debug(" time for one resource: " +
+                        Long.toString( time4 -time1));
                 counter++;
-            }        
+            }
             result = counter.toString() + " resources renamed";
             return result;
         } finally {
@@ -1163,11 +1163,11 @@ public class JenaIngestController extends BaseEditController {
             }
         }
     }
-    
+
     protected String showModelList(VitroRequest vreq, ModelMaker maker, WhichService modelType) {
     	vreq.setAttribute("modelType", modelType.toString());
         if(modelType == CONTENT){
-        	vreq.setAttribute("infoLine", "Main Store models");            
+        	vreq.setAttribute("infoLine", "Main Store models");
         } else {
         	vreq.setAttribute("infoLine", "Configuration models");
         }
@@ -1181,11 +1181,11 @@ public class JenaIngestController extends BaseEditController {
 			HttpServletResponse response) throws ServletException, IOException {
         JSPPageHandler.renderPlainPage(vreq, response, "/dumpRestore");
 	}
-	
+
 	public static Model getModel(String name, HttpServletRequest request) {
 		return getModelMaker(request).getModel(name);
 	}
-    
+
     protected static ModelMaker getModelMaker(HttpServletRequest req){
         ServletContext ctx = req.getSession().getServletContext();
 		if (isUsingMainStoreForIngest(req)) {

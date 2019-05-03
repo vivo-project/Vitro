@@ -15,12 +15,12 @@ import freemarker.cache.TemplateLoader;
  * Wrap a TemplateLoader, so each time a template is read, delimiters will be
  * inserted at the beginning and end. This makes it easier for a developer can
  * see what lines of HTML come from which templates.
- * 
+ *
  * TemplateLoader returns a token object when finding a template, and then
  * recognizes that object when it is used as an argument to getLastModified() or
  * getReader(). In order to keep track of the template name, we wrap the token
  * object and the name in a token of our own.
- * 
+ *
  * Taking the easy way out and reading in the entire template into a string.
  * This limits the template size to less than 2^31 characters (~2 GBytes). That
  * seems adequate.

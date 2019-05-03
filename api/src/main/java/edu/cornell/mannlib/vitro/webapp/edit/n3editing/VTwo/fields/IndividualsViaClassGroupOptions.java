@@ -11,8 +11,8 @@ public class IndividualsViaClassGroupOptions implements FieldOptions {
 
     String classGroupUri;
     String defualtOptionLabel=null;
-    
-    
+
+
     public IndividualsViaClassGroupOptions(String classGroupUri) {
         super();
         this.classGroupUri = classGroupUri;
@@ -25,19 +25,19 @@ public class IndividualsViaClassGroupOptions implements FieldOptions {
 
     @Override
     public Map<String, String> getOptions(
-            EditConfigurationVTwo editConfig, 
-            String fieldName, 
+            EditConfigurationVTwo editConfig,
+            String fieldName,
             WebappDaoFactory wDaoFact) throws Exception {
         throw new Error("not implemented");
     }
-    
-    
+
+
     public String getClassGroupUri(){
         return classGroupUri;
     }
-    
+
     public Comparator<String[]> getCustomComparator() {
     	return null;
     }
-    
+
 }

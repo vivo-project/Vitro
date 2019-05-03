@@ -160,7 +160,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		adminPermissionSet.setUri(URI_DBA);
 		adminPermissionSet.setPermissionUris(Collections
 				.singleton(SimplePermission.SEE_SITE_ADMIN_PAGE.getUri()));
-		
+
 		userAccountsDao = new UserAccountsDaoStub();
 		userAccountsDao.addPermissionSet(adminPermissionSet);
 		for (UserAccount account : userAccounts) {

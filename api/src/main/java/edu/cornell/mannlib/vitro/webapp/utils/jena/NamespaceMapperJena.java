@@ -28,51 +28,51 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 
 public class NamespaceMapperJena extends StatementListener implements
 		NamespaceMapper {
-	
+
     private static final Log log = LogFactory.getLog(NamespaceMapperJena.class);
-    
+
 	private HashMap<String,String> prefixToNamespaceMap;
 	private HashMap<String,List<String>> namespaceToPrefixMap;
-	
+
 	private HashSet<String> knownNamespaces;
-	
+
 	private OntModel metadataModel;
 	private OntModel dataModel;
-	
+
 	private boolean pipeOpen = true;
-	
+
 	private String namespaceForNamespaceObjects;
 
 	private HashSet<String> propertyURIsToListenFor;
-	
+
 	public NamespaceMapperJena(OntModel dataModel, OntModel metadataModel, String namespaceForNamespaceObjects) {
 		prefixToNamespaceMap = new HashMap<String,String>();
 		namespaceToPrefixMap = new HashMap<String,List<String>>();
-		
+
 		knownNamespaces = new HashSet<String>();
-		
+
 		this.dataModel = dataModel;
 		dataModel.getBaseModel().register(this);
 		this.metadataModel = metadataModel;
-		this.namespaceForNamespaceObjects = namespaceForNamespaceObjects; 
-		
+		this.namespaceForNamespaceObjects = namespaceForNamespaceObjects;
+
 		propertyURIsToListenFor = new HashSet<String>();
 		propertyURIsToListenFor.add(VitroVocabulary.NAMESPACE_HASPREFIXMAPPING);
 		propertyURIsToListenFor.add(VitroVocabulary.NAMESPACE_ISCURRENTPREFIXMAPPING);
 		propertyURIsToListenFor.add(VitroVocabulary.NAMESPACE_PREFIX);
-		
+
 		rebuildNamespaceCache();
-		
+
 	}
-	
+
 	private static int LARGE_NS = 200;
-	
+
 	private void rebuildNamespaceCache() {
 		HashMap<String,String> tempPrefixToNamespaceMap = new HashMap<String,String>();
 		HashMap<String,List<String>> tempNamespaceToPrefixMap = new HashMap<String,List<String>>();
 		metadataModel.enterCriticalSection(Lock.READ);
 		int nsCount = 0;
-		try {	
+		try {
 			// Iterate through all the namespace objects
 			ClosableIterator closeIt = metadataModel.listIndividuals(metadataModel.getResource(VitroVocabulary.NAMESPACE));
 			try {
@@ -105,7 +105,7 @@ public class NamespaceMapperJena extends StatementListener implements
 									RDFNode isCurrentValue = namespacePrefixMappingInd.getPropertyValue(metadataModel.getProperty(VitroVocabulary.NAMESPACE_ISCURRENTPREFIXMAPPING));
 									if ( (isCurrentValue != null) && (isCurrentValue.isLiteral()) ) {
 										isCurrent = ((Literal)isCurrentValue).getBoolean();
-									} 
+									}
 									// if it's the current prefix, we want to put it at the head of the list
 									if (isCurrent) {
 										prefixList.add(0, prefix);
@@ -130,7 +130,7 @@ public class NamespaceMapperJena extends StatementListener implements
 		namespaceToPrefixMap = tempNamespaceToPrefixMap;
 		prefixToNamespaceMap = tempPrefixToNamespaceMap;
 	}
-	
+
 	private void makeNewNamespaces(Statement s) {
 		List<String> namespacesToCheck = new LinkedList<String>();
 		Resource subj = s.getSubject();
@@ -139,7 +139,7 @@ public class NamespaceMapperJena extends StatementListener implements
 		}
 		Property pred = s.getPredicate();
 		if (pred.getNameSpace() != null) {
-			namespacesToCheck.add(pred.getNameSpace());		
+			namespacesToCheck.add(pred.getNameSpace());
 		}
 		if ( s.getObject().isResource() ) {
 			if ( ((Resource)s.getObject()).getNameSpace() != null ) {
@@ -148,7 +148,7 @@ public class NamespaceMapperJena extends StatementListener implements
 		}
 		processPossibleNewNamespaces(namespacesToCheck);
 	}
-	
+
 	private void processPossibleNewNamespaces(List<String> namespaceList) {
 		Set<String> newNamespaces = new HashSet<String>();
 		for (String namespace : namespaceList) {
@@ -167,7 +167,7 @@ public class NamespaceMapperJena extends StatementListener implements
 			createNewNamespaceObjects(newNamespaceList);
 		}
 	}
-	
+
 	private void createNewNamespaceObjects(List<String> newNamespaces) {
 		for (String newNamespace : newNamespaces) {
 			metadataModel.enterCriticalSection(Lock.WRITE);
@@ -185,7 +185,7 @@ public class NamespaceMapperJena extends StatementListener implements
 			}
 		}
 	}
-	
+
 	@Override
 	public void addedStatement(Statement s) {
 		if (!pipeOpen) return;
@@ -222,7 +222,7 @@ public class NamespaceMapperJena extends StatementListener implements
 	public List<String> getPrefixesForNamespace(String namespace) {
 		return namespaceToPrefixMap.get(namespace);
 	}
-	
+
 	public String toString(){
 	    return namespaceToPrefixMap.toString();
 	}

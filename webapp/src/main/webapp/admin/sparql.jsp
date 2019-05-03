@@ -63,7 +63,7 @@ td {
 			<form action="sparqlquery">
 				<div>
 					<textarea id="query" name="query" rows="20" cols="111" class="maxWidth">
-							
+
 						</textarea>
 				</div>
 				<p>

@@ -25,10 +25,10 @@ import edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner.ReportLevel;
  * Listen to events as they come from the JUnit test runner. The events from the
  * lifecycle methods are broken down into semantic chunks and executed. Three
  * levels of output are available.
- * 
+ *
  * On the surface, JUnit treats "failures" (failed assertions) the same as
  * "errors" (unexpected exceptions). We're going to distinguish between them.
- * 
+ *
  * @author jeb228
  */
 public class VitroTestRunListener extends RunListener {
@@ -303,10 +303,10 @@ public class VitroTestRunListener extends RunListener {
 	/**
 	 * Trim the stack trace: don't show the line saying "23 more", and don't
 	 * show the lines about org.junit or java.lang.reflect or sun.reflect.
-	 * 
+	 *
 	 * Once we hit some "client code", we won't trim any futher lines even if
 	 * they belong to org.junit, or the others.
-	 * 
+	 *
 	 * If we have nested exceptions, the process repeats for each "Caused by"
 	 * section.
 	 */

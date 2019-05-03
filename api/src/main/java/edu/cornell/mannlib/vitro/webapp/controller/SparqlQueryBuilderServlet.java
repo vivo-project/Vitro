@@ -32,7 +32,7 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryBuilderServlet.class.getName());
 
     protected static final Syntax SYNTAX = Syntax.syntaxARQ;
-    
+
     protected static HashMap<String,ResultsFormat>formatSymbols = new HashMap<String,ResultsFormat>();
     static{
         formatSymbols.put( ResultsFormat.FMT_RS_XML.getSymbol(),   ResultsFormat.FMT_RS_XML);
@@ -42,7 +42,7 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
         formatSymbols.put( ResultsFormat.FMT_RS_JSON.getSymbol() , ResultsFormat.FMT_RS_JSON);
         formatSymbols.put( "vitro:csv", null);
     }
-    
+
     protected static HashMap<String,String> rdfFormatSymbols = new HashMap<String,String>();
     static {
     	rdfFormatSymbols.put( "RDF/XML", "application/rdf+xml" );
@@ -68,18 +68,18 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     {
         this.doGet(request,response);
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
-    {    	    	   	
+    {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
     		return;
     	}
 
     	VitroRequest vreq = new VitroRequest(request);
-        
+
         Model model = vreq.getJenaOntModel(); // getModel()
         if( model == null ){
             doNoModelInContext(request,response);
@@ -88,7 +88,7 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
 
         doHelp(request,response);
     }
-    
+
     private void doNoModelInContext(HttpServletRequest request, HttpServletResponse res){
         try {
             res.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);

@@ -16,7 +16,7 @@
             <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" role="input" />
             <input type="submit" id="submit" value="${i18n().add_individual_of_class}" role="button" />
         </form>
-        
+
         <section id="addClassBubble" role="region">
             <p>${i18n().please_create} <a title="${i18n().create_classgroup}" href="${urls.base}/editForm?controller=Classgroup">${i18n().a_classgroup}</a> ${i18n().associate_classes_with_group}</p>
         </section>

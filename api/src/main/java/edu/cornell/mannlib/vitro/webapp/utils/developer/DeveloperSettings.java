@@ -25,23 +25,23 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * A singleton holder for the developer settings.
- * 
+ *
  * Start with an empty settings map.
- * 
+ *
  * The Setup class will read "developer.properties" from the "config"
  * sub-directory of the Vitro home directory, and load its settings. If the file
  * doesn't exist, or doesn't contain values for certain properties, those
  * properties will keep their default values.
- * 
+ *
  * An AJAX request can be used to update the properties. If the request has
  * multiple values for a property, the first value will be used. If the request
  * does not contain a value for a property, that property will keep its current
  * value.
- * 
+ *
  * The property names in "developer.properties" are not suitable as fields in
  * the HTML panel, because they contain periods. For the HTML panel, we
  * translate those periods to underscores.
- * 
+ *
  * If the ENABLED flag is not set, then getBinary() will return false for all
  * keys, and getString() will return the empty string. This simplifies the logic
  * in the client code. Use getRawSettingsMap() to display the actual values in

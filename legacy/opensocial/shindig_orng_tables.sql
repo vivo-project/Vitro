@@ -104,23 +104,23 @@ DROP PROCEDURE IF EXISTS `orng_registerAppPerson`;
 DROP PROCEDURE IF EXISTS `orng_upsertAppData`;
 DROP PROCEDURE IF EXISTS `orng_deleteAppData`;
 
-DELIMITER // 
+DELIMITER //
 CREATE PROCEDURE orng_registerAppPerson (uid varchar(255), aid INT, v BOOL)
 BEGIN
 	IF (v)
 	THEN
 		INSERT INTO orng_app_registry (appId, personId, createdDT) values (aid, uid, now());
-	ELSE 
+	ELSE
 		DELETE FROM orng_app_registry where appId = aid AND personId = uid;
-	END IF;	
-END // 
-DELIMITER ; 
+	END IF;
+END //
+DELIMITER ;
 
-DELIMITER // 
+DELIMITER //
 CREATE PROCEDURE orng_upsertAppData(uid varchar(255), aid INT, kn varchar(255),v varchar(4000))
 BEGIN
 	DECLARE cnt int;
-	SELECT count(*) FROM orng_appdata WHERE userId = uid AND appId = aid and keyname = kn INTO cnt; 
+	SELECT count(*) FROM orng_appdata WHERE userId = uid AND appId = aid and keyname = kn INTO cnt;
 	IF (cnt > 0)
 	THEN
 		UPDATE orng_appdata set `value` = v, updatedDT = NOW() WHERE userId = uid AND appId = aid and keyname = kn;
@@ -128,26 +128,26 @@ BEGIN
 		INSERT INTO orng_appdata (userId, appId, keyname, `value`) values (uid, aid, kn, v);
 	END IF;
 		-- if keyname is VISIBLE, do more
-	IF (kn = 'VISIBLE' AND v = 'Y') 
+	IF (kn = 'VISIBLE' AND v = 'Y')
 	THEN
 		CALL orng_registerAppPerson(uid, aid, 1);
 	ELSEIF (kn = 'VISIBLE' )
 	THEN
 		CALL orng_registerAppPerson(uid, aid, 0);
 	END IF;
-END // 
-DELIMITER ;					
+END //
+DELIMITER ;
 
-DELIMITER // 
+DELIMITER //
 CREATE PROCEDURE orng_deleteAppData(uid varchar(255), aid INT, kn varchar(255))
 BEGIN
 	DELETE FROM orng_appdata WHERE userId = uid AND appId = aid and keyname = kn;
 		-- if keyname is VISIBLE, do more
-	IF (kn = 'VISIBLE' ) 
+	IF (kn = 'VISIBLE' )
 	THEN
 		CALL orng_registerAppPerson(uid, aid, 0);
 	END IF;
-END // 
+END //
 DELIMITER ;
 
 

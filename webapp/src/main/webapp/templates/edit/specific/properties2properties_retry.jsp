@@ -35,6 +35,6 @@
             <span class="warning"><form:error name="SubpropertyURI"/></span>
         </td>
     </tr>
-    
+
     <input type="hidden" name="operation" value="${operation}" />
     <input type="hidden" name="opMode" value="${opMode}" />

@@ -93,7 +93,7 @@ public class RestrictLoginsController extends FreemarkerHttpServlet {
 					PARAMETER_RESTRICT, "true"));
 			body.put("openUrl", UrlBuilder.getUrl("/admin/restrictLogins",
 					PARAMETER_OPEN, "true"));
-			
+
 			return new TemplateResponseValues("admin-restrictLogins.ftl", body);
 		}
 

@@ -35,12 +35,12 @@ import freemarker.template.TemplateException;
 /**
  * A framework that makes it simpler to send email messages with a body built
  * from a Freemarker template.
- * 
+ *
  * The template must call the @email directive, which may provide the subject
  * line, the HTML content, and the plain text content. If these values are not
  * provided by the directive, they default to empty strings, or to values that
  * were set by the controller.
- * 
+ *
  * @see EmailDirective
  */
 public class FreemarkerEmailMessage {

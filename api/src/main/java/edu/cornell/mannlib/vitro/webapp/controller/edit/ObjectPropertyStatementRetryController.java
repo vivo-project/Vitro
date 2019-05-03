@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class ObjectPropertyStatementRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(ObjectPropertyStatementRetryController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
@@ -54,7 +54,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         } catch (NoSuchMethodException nsme) {
         	log.error("Unable to find "+PropertyInstanceDao.class.getName()+".insertProp("+PropertyInstanceIface.class.getName()+")");
         }
-        
+
         try {
         	epo.setDeleteMethod(
         			PropertyInstanceDao.class.getMethod(
@@ -64,7 +64,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         			".deletePropertyInstance("+
         					PropertyInstanceIface.class.getName()+")");
         }
-                
+
         String action = "insert";
 
         PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();

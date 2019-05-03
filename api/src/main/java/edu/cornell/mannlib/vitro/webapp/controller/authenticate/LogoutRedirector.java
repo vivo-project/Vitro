@@ -79,7 +79,7 @@ public class LogoutRedirector {
 	/**
 	 * This must be called each time VitroHttpRequest checks to see whether a
 	 * page's restrictions are met, so we know which pages are restricted.
-	 * 
+	 *
 	 * We might be content to just know the last restricted page, but that could
 	 * lead to problems if two pages are nested.
 	 */

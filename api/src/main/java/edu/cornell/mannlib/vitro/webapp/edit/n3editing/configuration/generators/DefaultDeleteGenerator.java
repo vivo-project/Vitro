@@ -16,15 +16,15 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 
 /**
  * Generates delete form which submits the deletion request to the deletion controller.
- * This is the page to which the user is redirected if they select Delete on the default property form. 
+ * This is the page to which the user is redirected if they select Delete on the default property form.
  *
  */
 public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
-	
+
 	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
 	private String subjectUri = null;
 	private String predicateUri = null;
-	private String objectUri = null;	
+	private String objectUri = null;
 	private Integer dataHash = 0;
 	private DataPropertyStatement dps = null;
 	private String dataLiteral = null;
@@ -55,9 +55,9 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
 		//set edit key for this as well
 		editConfiguration.setEditKey(editConfiguration.newEditKey(session));
 		return editConfiguration;
-		
+
 	}
-	
+
 	//Do need to know whether data or object property and how to handle that
     private void initProcessParameters(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
@@ -71,13 +71,13 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     		//not concerned about remainder, can move into default obj prop form if required
     		this.initObjectParameters(vreq);
     		this.processObjectPropForm(vreq, editConfiguration);
-    	} else {    		
+    	} else {
     	   this.processDataPropForm(vreq, session, editConfiguration);
     	}
     }
 
 
-    
+
 	private void initObjectParameters(VitroRequest vreq) {
 		//in case of object property
     	objectUri = EditConfigurationUtils.getObjectUri(vreq);
@@ -89,11 +89,11 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     	//pretends this is a data property editing statement and throws an error
     	//TODO: Check if null in case no object uri exists but this is still an object property
     }
-    
-	
+
+
     private void processDataPropForm(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
         dataHash = EditConfigurationUtils.getDataHash(vreq);
-        if( dataHash != null ){     
+        if( dataHash != null ){
             log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
             editConfiguration.setDatapropKey( dataHash );
             dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
@@ -105,9 +105,9 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
         }else{
             log.debug("Did NOT find a datapropKey for hte data hash.");
             editConfiguration.addFormSpecificData("dataPropertyLexicalValue", "unknown value");
-        }                
+        }
     }
-    
+
 
 
 }

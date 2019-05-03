@@ -44,15 +44,15 @@ public class IsRootUserFactoryTest extends AbstractTestClass {
 	public void setup() {
 		UserAccount plainUser = new UserAccount();
 		plainUser.setUri(PLAIN_USER_URI);
-		
+
 		UserAccount rootUser = new UserAccount();
 		rootUser.setUri(ROOT_USER_URI);
 		rootUser.setRootUser(true);
-		
+
 		uaDao = new UserAccountsDaoStub();
 		uaDao.addUser(plainUser);
 		uaDao.addUser(rootUser);
-		
+
 		wdf = new WebappDaoFactoryStub();
 		wdf.setUserAccountsDao(uaDao);
 

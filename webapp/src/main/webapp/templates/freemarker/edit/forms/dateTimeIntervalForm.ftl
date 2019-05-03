@@ -6,12 +6,12 @@
 <#assign editMode = editConfiguration.pageData.editMode />
 <#assign htmlForElements = editConfiguration.pageData.htmlForElements />
 
-<#if editMode == "edit">        
-        <#assign titleVerb="${i18n().edit_capitalized}">        
+<#if editMode == "edit">
+        <#assign titleVerb="${i18n().edit_capitalized}">
         <#assign submitButtonText="${i18n().edit_date_time_value}">
         <#assign disabledVal="disabled">
 <#else>
-        <#assign titleVerb="${i18n().create_capitalized}">        
+        <#assign titleVerb="${i18n().create_capitalized}">
         <#assign submitButtonText="${i18n().create_date_time_value}">
         <#assign disabledVal=""/>
 </#if>
@@ -62,9 +62,9 @@
     <p class="submit">
         <input type="hidden" name="editKey" value="${editKey}" />
         <input type="submit" id="submit" value="${submitButtonText}" role="button" />
-    
+
         <span class="or"> ${i18n().or} </span>
-    
+
         <a class="cancel" href="${editConfiguration.cancelUrl}" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
     </p>
 </form>

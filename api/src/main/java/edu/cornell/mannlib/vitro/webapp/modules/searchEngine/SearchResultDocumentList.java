@@ -20,7 +20,7 @@ public interface SearchResultDocumentList extends
 
 	/**
 	 * Retrieve the i'th document, starting with 0.
-	 * 
+	 *
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	SearchResultDocument get(int i);

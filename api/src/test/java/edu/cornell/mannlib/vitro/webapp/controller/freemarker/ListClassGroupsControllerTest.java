@@ -21,33 +21,33 @@ import java.util.Collections;
 /**
  * Not a well-formed set of unit tests. But it's a pretty good exercise of the
  * different possibilities in the output stage.
- * 
+ *
  * Test plan:
- * 
+ *
  * <pre>
  * No data - roots is null -- NONSENSICAL
  * No data - roots is empty
- * 
+ *
  * name
  * no name
- * 
+ *
  * displayRank
  * no displayRank
- * 
+ *
  * no child classes
  * child classes
- * 
+ *
  * child class has name
  * child class has no name
- * 
+ *
  * child class has shortDef
  * child class has no shortDef
- * 
+ *
  * G1 no name, displayRank, no classes
  * G2 name, no displayRank, classes
  * G2C1 no name, no shortDef
- * G2C2 name, shortdef 
- * 
+ * G2C2 name, shortdef
+ *
  * Try once with no data
  * Try with all data
  * </pre>

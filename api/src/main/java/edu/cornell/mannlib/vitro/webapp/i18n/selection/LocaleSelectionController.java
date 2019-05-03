@@ -24,16 +24,16 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 /**
  * {@code
  * Call this at /selectLocale&selection=[locale_string]
- * 
+ *
  * For example: /selectLocale&selection=en_US or /selectLocale&selection=es
  * }
  * Write an error to the log (and to DisplayMessage) if the selection is not
  * syntactically valid.
- * 
+ *
  * Write a warning to the log if the selection code is not one of the selectable
  * Locales from runtime.properties, or if the selection code is not recognized
  * by the system.
- * 
+ *
  * Set the new Locale in the Session using SelectedLocale and return to the
  * referrer.
  */

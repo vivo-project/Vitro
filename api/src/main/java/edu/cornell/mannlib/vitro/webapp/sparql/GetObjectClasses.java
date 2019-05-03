@@ -34,9 +34,9 @@ public class GetObjectClasses extends BaseEditController {
 
 	/**
 	 * The doGet method of the servlet. <br>
-	 * 
+	 *
 	 * This method is called when a form has its tag value method equals to get.
-	 * 
+	 *
 	 * @param request
 	 *            the request send by the client to the server
 	 * @param response
@@ -97,7 +97,7 @@ public class GetObjectClasses extends BaseEditController {
 		 * response.setCharacterEncoding("UTF-8"); PrintWriter out =
 		 * response.getWriter(); String respo =
 		 * "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; respo += "<options>";
-		 * 
+		 *
 		 * if (clazz != null) { respo += "<option>" + "<key>" +
 		 * clazz.getPickListName() + "</key>" + "<value>" + clazz.getURI() +
 		 * "</value>" + "</option>"; } else{ List classGroups =
@@ -112,7 +112,7 @@ public class GetObjectClasses extends BaseEditController {
 		 * System.out.println(clazz.getPickListName()); respo += "<option>" +
 		 * "<key>" + clazz.getPickListName() + "</key>" + "<value>" +
 		 * clazz.getURI() + "</value>" + "</option>"; } }
-		 * 
+		 *
 		 * }
 		 */
 		respo.append("</options>");
@@ -123,10 +123,10 @@ public class GetObjectClasses extends BaseEditController {
 
 	/**
 	 * The doPost method of the servlet. <br>
-	 * 
+	 *
 	 * This method is called when a form has its tag value method equals to
 	 * post.
-	 * 
+	 *
 	 * @param request
 	 *            the request send by the client to the server
 	 * @param response

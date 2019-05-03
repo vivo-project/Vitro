@@ -53,7 +53,7 @@ public class UploadedFileHelper {
 	/**
 	 * We have a filename, a mimetype, and some content. Create a file in the
 	 * file storage system and in the model.
-	 * 
+	 *
 	 * @return information about the newly created file.
 	 */
 	public FileInfo createFile(String filename, String mimeType,
@@ -129,7 +129,7 @@ public class UploadedFileHelper {
 	 * If this Individual has an image, remove it and the thumbnail. If the
 	 * image file and/or the thumbnail file have no other references, delete
 	 * them.
-	 * 
+	 *
 	 * Note: after this operation, entity is stale.
 	 */
 	public void removeMainImage(Individual entity) {

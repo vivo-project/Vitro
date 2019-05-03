@@ -21,7 +21,7 @@
 
     <input type="text" style="width:80%;" name="className"/>
     <p>String processor class</p>
-    
+
     <input type="text" name="methodName"/>
     <p>String processor method</p>
 
@@ -38,7 +38,7 @@
     </select>
     <input type="checkbox" name="processModel" value="TRUE"/> apply changes directly to this model
     <p>model to use</p>
-   
+
     <select name="additionsModel">
 		<option value="">none</option>
 		<forEach var="modelName" items="${modelNames}">

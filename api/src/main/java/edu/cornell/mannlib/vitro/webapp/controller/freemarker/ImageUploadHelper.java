@@ -105,12 +105,12 @@ public class ImageUploadHelper {
 	/**
 	 * The image must be present and non-empty, and must have a mime-type that
 	 * represents an image we support.
-	 * 
+	 *
 	 * We rely on the fact that a FileUploadServletRequest will always
 	 * have a map of {@link FileItem}s, even if it is empty. However, that map
 	 * may not contain the field that we want, or that field may contain an
 	 * empty file.
-	 * 
+	 *
 	 * @throws UserMistakeException
 	 *             if there is no file, if it is empty, or if it is not an image
 	 *             file.
@@ -121,7 +121,7 @@ public class ImageUploadHelper {
 		if (map == null) {
 			throw new IllegalStateException(ERROR_CODE_BAD_MULTIPART_REQUEST);
 		}
-		
+
 		List<FileItem> list = map.get(PARAMETER_UPLOADED_FILE);
 		if ((list == null) || list.isEmpty()) {
 			throw new UserMistakeException(ERROR_CODE_FORM_FIELD_MISSING,
@@ -147,7 +147,7 @@ public class ImageUploadHelper {
 	/**
 	 * The user has uploaded a new main image, but we're not ready to assign it
 	 * to them.
-	 * 
+	 *
 	 * Put it into the file storage system, and attach it as a temp file on the
 	 * session until we need it.
 	 */
@@ -180,7 +180,7 @@ public class ImageUploadHelper {
 
 	/**
 	 * Find out how big this image is.
-	 * 
+	 *
 	 * @throws UserMistakeException
 	 *             if the image is smaller than a thumbnail.
 	 */
@@ -225,7 +225,7 @@ public class ImageUploadHelper {
 
 	/**
 	 * Get the info for the new image, from where we stored it in the session.
-	 * 
+	 *
 	 * @throws UserMistakeException
 	 *             if it isn't there.
 	 */

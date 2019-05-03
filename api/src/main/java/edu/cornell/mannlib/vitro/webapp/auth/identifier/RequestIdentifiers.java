@@ -21,7 +21,7 @@ public class RequestIdentifiers {
 	 * If the currently applicable Identifiers have been cached in the request,
 	 * get them. If not, assemble them from the active factories, and cache them
 	 * in the request.
-	 * 
+	 *
 	 * This method might return an empty bundle, but it never returns null.
 	 */
 	public static IdentifierBundle getIdBundleForRequest(ServletRequest request) {

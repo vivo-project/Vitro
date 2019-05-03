@@ -16,10 +16,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * Use two OntModelCaches as one.
- * 
+ *
  * If both caches contain models with the same name, a warning will be written
  * to the log, and the model from the primary cache will be used.
- * 
+ *
  * Any new models will be created on the primary cache.
  */
 public class JoinedOntModelCache implements OntModelCache {

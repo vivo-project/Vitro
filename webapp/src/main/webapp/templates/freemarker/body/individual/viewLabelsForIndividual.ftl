@@ -18,23 +18,23 @@
 
 
     <section id="rdfsLabels" role="container">
-    
+
         <ul id="existingLabelsList" name="existingLabelsList">
         <#if labelsSortedByLanguageName?has_content>
         	<#--List of labelInformation objects as value where key = language name -->
         	<#assign labelsSorted = labelsSortedByLanguageName />
         	<#--Keys would be the actual names of languages-->
         	<#assign labelLanguages = labelsSorted?keys?sort />
-        	
+
         	<#--What we need here is printing out the labels by the language Name and not language code, starting with untyped first-->
         	<@m.displayExistingLabelsForLanguage "untyped" labelsSorted editable ""/>
         	<@m.displayExistingTypedLabels  labelLanguages labelsSorted editable ""/>
-        	
+
         </#if>
         </ul>
 
 	</section>
-	    
+
 
 
 
@@ -42,4 +42,4 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/utils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
-              
+

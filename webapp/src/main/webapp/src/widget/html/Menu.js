@@ -13,7 +13,7 @@ dojo.provide("dojo.widget.html.Menu");
 
 /* HtmlMenu
  ***********/
- 
+
 dojo.widget.html.Menu = function(){
 	dojo.widget.html.Menu.superclass.constructor.call(this);
 	this.items = [];
@@ -30,13 +30,13 @@ dojo.lang.extend(dojo.widget.html.Menu, {
 
 	templateString: '<ul></ul>',
 	templateCssPath: dojo.uri.dojoUri("src/widget/templates/Menu.css"),
-	
+
 	fillInTemplate: function (args, frag){
 		//dojo.widget.HtmlMenu.superclass.fillInTemplate.apply(this, arguments);
 		this.domNode.className = "dojoMenu";
 	},
-	
- 
+
+
 	_register: function (item ) {
 		dojo.event.connect(item, "onSelect", this, "onSelect");
 		this.items.push(item);

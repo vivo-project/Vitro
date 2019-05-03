@@ -4,6 +4,6 @@
 Results from ${siteName} for ${querytext} on ${todayDate}
 
 Name, URI, URL
-<#list individuals as individual>                 
+<#list individuals as individual>
 "${individual.name}","${individual.uri}","${individual.profileUrl}"
 </#list>

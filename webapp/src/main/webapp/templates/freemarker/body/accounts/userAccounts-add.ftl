@@ -40,10 +40,10 @@
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label> 
+        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label> 
+        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
         <#include "userAccounts-associateProfilePanel.ftl">
@@ -63,12 +63,12 @@
                 <label for="initial-password">${strings.initial_password}<span class="requiredHint"> *</span></label>
                 <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
                 <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}</p>
-                
-                <label for="confirm-password">${strings.confirm_initial_password}<span class="requiredHint"> *</span></label> 
+
+                <label for="confirm-password">${strings.confirm_initial_password}<span class="requiredHint"> *</span></label>
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </section>
         </#if>
-        
+
         <p><input type="submit" name="submitAdd" value="${strings.submit_add_new_account}" class="submit" /> ${strings.or} <a class="cancel" href="${formUrls.list}" title="${strings.cancel_title}">${strings.cancel_link}</a></p>
 
         <p class="requiredHint">* ${strings.required_fields}</p>

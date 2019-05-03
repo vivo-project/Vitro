@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 
 public class ExecuteDataRetrieval {
-    
+
     final static Log log = LogFactory.getLog(ExecuteDataRetrieval.class);
     Individual individual = null;
     VitroRequest vreq = null;
@@ -31,8 +31,8 @@ public class ExecuteDataRetrieval {
     	this.individual = individual;
     	this.vreq = vreq;
     	this.displayModel = displayModel;
-    }   
-    
+    }
+
     public List<DataGetter> retrieveDataGetters() {
     	//Using a hashset to prevent duplicates
     	//Would this work with interfaces? In this case, all of them would be interfaces?
@@ -45,7 +45,7 @@ public class ExecuteDataRetrieval {
 	    		String classURI = v.getURI();
 	    		//How to handle duplicates?
 	    		dataGetters.addAll(DataGetterUtils.getDataGettersForClass(vreq, displayModel, classURI));
-	    	} 
+	    	}
 	    }
     	catch(Exception ex) {
     		log.error("Error occurred in retrieving datagetters for vclasses", ex);
@@ -53,23 +53,23 @@ public class ExecuteDataRetrieval {
     	List<DataGetter> dgList = new ArrayList<DataGetter>(dataGetters);
     	return dgList;
     }
-    
+
     //retrieve data getters for the classes that apply to this individual
     //execute the data getters, and return the data in a map
-    public void executeDataGetters(Map<String, Object> mapForTemplate) 
+    public void executeDataGetters(Map<String, Object> mapForTemplate)
     throws Exception {
         List<DataGetter> dgList = retrieveDataGetters();
-        //Put in individual URI in map for template - e.g. sparql query can then use that information and add bindings    
+        //Put in individual URI in map for template - e.g. sparql query can then use that information and add bindings
         mapForTemplate.put("individualURI", this.individual.getURI());
-        for( DataGetter dg : dgList){            
-            Map<String,Object> moreData = dg.getData(mapForTemplate);            
+        for( DataGetter dg : dgList){
+            Map<String,Object> moreData = dg.getData(mapForTemplate);
             if( moreData != null ){
                 mapForTemplate.putAll(moreData);
             }
-        }                       
+        }
     }
-    
-	
-	
-    
+
+
+
+
 }

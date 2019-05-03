@@ -28,22 +28,22 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
 
 /**
  * Modify the document, adding the results of one or more select queries.
- * 
+ *
  * If the individual qualifies, execute the queries and add the results to the
  * specified search fields.
- * 
+ *
  * If there are no specified search fields, ALLTEXT and ALLTEXTUNSTEMMED are
  * assumed.
- * 
+ *
  * An individual qualifies if it satisfies any of the type restrictions, or if
  * there are no type restrictions.
- * 
+ *
  * Each query should contain a ?uri variable, which will be replaced by the URI
  * of the individual.
- * 
+ *
  * All of the result fields of all result rows of all of the queries will be
  * converted to strings and added to each of the specified search fields.
- * 
+ *
  * A label may be supplied to the instance, for use in logging. If no label is
  * supplied, one will be generated.
  */

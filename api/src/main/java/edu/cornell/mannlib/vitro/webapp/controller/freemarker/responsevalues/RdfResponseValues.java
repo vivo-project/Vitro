@@ -8,7 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 public class RdfResponseValues extends BaseResponseValues {
     private final Model model;
-    
+
     public RdfResponseValues(ContentType contentType, Model model) {
         super(contentType);
         this.model = model;
@@ -18,7 +18,7 @@ public class RdfResponseValues extends BaseResponseValues {
         super(contentType, statusCode);
         this.model = model;
     }
-    
+
     @Override
     public Model getModel() {
        return model;

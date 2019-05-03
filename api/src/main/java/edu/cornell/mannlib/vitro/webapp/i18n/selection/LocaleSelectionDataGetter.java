@@ -20,15 +20,15 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 /**
  * Get the data for the selectable Locales, so the Freemarker template can
  * create a row of flag images that will select the desired locale.
- * 
+ *
  * If there are no selectable Locales in runtime.properties, we return an empty
  * map. (selectLocale?? will return false)
- * 
+ *
  * If the Locale has been forced by runtime.properties, we do the same.
- * 
+ *
  * If there are selectable Locales, the returned map will contain a structure
  * like this:
- * 
+ *
  * <pre>
  * {selectLocale={
  *   selectLocaleUrl = [the URL for the form action to select a Locale]
@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
  *         imageUrl =      [the URL of the image that represents the Locale]
  *         selected =      [true, if this locale is currently selected]
  *       }
- *     }  
+ *     }
  *   }
  * }
  * </pre>
@@ -94,5 +94,5 @@ public class LocaleSelectionDataGetter implements DataGetter {
 		map.put("selected", currentLocale.equals(locale));
 		return map;
 	}
-	
+
 }

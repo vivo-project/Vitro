@@ -38,34 +38,34 @@ import org.xml.sax.SAXException;
 /**
  * Look at web.xml, and check for conditions that violate the Servlet 2.4 spec,
  * but that might not be noticed because Tomcat doesn't complain.
- * 
+ *
  * ------
- * 
+ *
  * Values of the <dispatcher/> tag:
- * 
+ *
  * The spec permits only these values: "FORWARD", "REQUEST", "INCLUDE", "ERROR",
  * but Tomcat also allows the lower-case equivalents. GlassFish or WebLogic will
  * barf on lower-case.
- * 
+ *
  * Check to see that only the upper-case values are used.
- * 
+ *
  * ------
- * 
+ *
  * Existence of Servlet classes:
- * 
+ *
  * The spec allows the container to either load all servlets at startup, or to
  * load them when requested. Since Tomcat only loads servlet when requested, it
  * doesn't notice or complain if web.xml cites a <servlet-class/> that doesn't
  * exist, as long as it is never invoked. On the other hand, WebLogic loads all
  * serlvets at startup, and will barf if the class is not found.
- * 
+ *
  * Check each <servlet-class/> to insure that the class can be loaded and
  * instantiated and assigned to HttpServlet.
- * 
+ *
  * ------
- * 
+ *
  * Embedded URIs in taglibs.
- * 
+ *
  * I can't find this definitively in the JSP spec, but some containers complain
  * if web.xml specifies a <taglib-uri/> that conflicts with the <uri/> embedded
  * in the taglib itself. As far as I can see in the spec, the embedded <uri/>
@@ -73,51 +73,51 @@ import org.xml.sax.SAXException;
  * "Implicit Map Entries From TLDs", which in turn is only relevant for TLDs
  * packaged in JAR files. So, I can't find support for this complaint, but it
  * seems a reasonable one.
- * 
+ *
  * Check each <taglib/> specified in web.xml. If the taglib has an embedded
  * <uri/> tag, it should match the <taglib-uri/> from web.xml.
- * 
+ *
  * ------
- * 
+ *
  * Existence of Listener and Filter classes.
- * 
+ *
  * As far as I can tell, there is no ambiguity here, and every container will
  * complain if any of the <listener-class/> or <filter-class/> entries are
  * unsuitable. I check them anyway, since the mechanism was already assembled
  * for checking <servlet-class/> entries.
- * 
+ *
  * Check each <listener-class/> to insure that the class can be loaded and
  * instantiated and assigned to ServletContextListener.
- * 
+ *
  * Check each <filter-class/> to insure that the class can be loaded and
  * instantiated and assigned to Filter.
- * 
+ *
  * ------
- * 
+ *
  * A <servlet/> tag for every <servlet-mapping/> tag
- * 
+ *
  * I can't find a mention of this in the spec, but Tomcat complains and refuses
  * to load the app if there is a <servlet-mapping/> tag whose <servlet-name/> is
  * not matched by a <servlet-name/> in a <servlet/> tag.
- * 
+ *
  * Get sets of all <servlet-name/> tags that are specified in <servlet/> and
  * <servlet-mapping/> tags. There should not be any names in the
  * servlet-mappings that are not in the servlets.
- * 
+ *
  * ---------------------------------------------------------------------
- * 
+ *
  * Although this class is executed as a JUnit test, it doesn't have the usual
  * structure for a unit test.
- * 
+ *
  * In order to produce the most diagnostic information, the test does not abort
  * on the first failure. Rather, failure messages are accumulated until all
  * checks have been performed, and the test list all such messages on failure.
- * 
+ *
  * ---------------------------------------------------------------------
- * 
+ *
  * Since this is not executed as part of the standard Vitro unit tests, it also
  * cannot use the standard logging mechanism. Log4J has not been initialized.
- * 
+ *
  */
 public class CheckContainerNeutrality {
 	private static final String PROPERTY_WEBAPP_DIR = "CheckContainerNeutrality.webapp.dir";

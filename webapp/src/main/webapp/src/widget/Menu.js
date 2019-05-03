@@ -28,7 +28,7 @@ dojo.inherits(dojo.widget.Menu, dojo.widget.Widget);
 dojo.lang.extend(dojo.widget.Menu, {
 	widgetType: "Menu",
 	isContainer: true,
-	
+
 	items: [],
 	push: function(item){
 		dojo.connect.event(item, "onSelect", this, "onSelect");

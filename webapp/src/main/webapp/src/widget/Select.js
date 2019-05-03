@@ -47,7 +47,7 @@ dojo.widget.defineWidget(
 			if (this.textInputNode.value != value) { // prevent mucking up of selection
 				this.textInputNode.value = value;
 			}
-		},	  
+		},
 
 		getLabel: function(){
 			return this.comboBoxSelectionValue.value;

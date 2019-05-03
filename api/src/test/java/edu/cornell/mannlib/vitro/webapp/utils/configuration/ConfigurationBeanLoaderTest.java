@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.Reso
 
 /**
  * TODO
- * 
+ *
  * Circularity prevention. Before setting properties, create a WeakMap of
  * instances by URIs, so if a property refers to a created instance, we just
  * pass it in.
@@ -387,14 +387,14 @@ public class ConfigurationBeanLoaderTest extends
 
 		SimpleSuccess instance = loader.loadInstance(
 				SIMPLE_SUCCESS_INSTANCE_URI, SimpleSuccess.class);
-		
+
 		assertNotNull(instance);
 	}
-	
+
 	public static class SimpleSuccess {
 		// Nothing of interest.
 	}
-	
+
 	// --------------------------------------------
 
 	/**
@@ -599,7 +599,7 @@ public class ConfigurationBeanLoaderTest extends
 
 	/**
 	 * FullSuccess already tests for multiple validation methods.
-	 * 
+	 *
 	 * SimpleSuccess already test for no validation methods, and for no property
 	 * methods.
 	 */

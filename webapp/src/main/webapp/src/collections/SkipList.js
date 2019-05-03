@@ -99,7 +99,7 @@ dojo.collections.SkipList = function(){
 			}
 		}
 	};
-	
+
 	this.contains = function(val){
 		var current = this.head;
 		var i;
@@ -129,7 +129,7 @@ dojo.collections.SkipList = function(){
 			}
 			updates[i] = current;
 		}
-		
+
 		current = current.nodes[0];
 		if (current != null && current.compare(val) == 0){
 			this.count--;
@@ -140,7 +140,7 @@ dojo.collections.SkipList = function(){
 			if (this.head.nodes[this.head.height - 1] == null) this.head.decrementHeight();
 		}
 	};
-	this.resetComparisons = function(){ 
-		comparisons = 0; 
+	this.resetComparisons = function(){
+		comparisons = 0;
 	};
 }

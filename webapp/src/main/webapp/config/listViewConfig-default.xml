@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<!-- Default list view config file for object properties 
-    
+<!-- Default list view config file for object properties
+
      See guidelines at https://wiki.duraspace.org/x/eYXVAw -->
 
 <list-view-config>
-    <query-select>    
-        
-        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+    <query-select>
+
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
-        
+
         SELECT <collated> ?subclass </collated>
-               ?object 
-               ?label 
+               ?object
+               ?label
                ?localName
         WHERE {
             ?subject ?property ?object .
             LET (?localName := REPLACE(STR(?object),"^.*(#)(.*)$", "$2"))
-                
+
             OPTIONAL {
                 <precise-subquery>?subject ?property ?object .</precise-subquery>
                 ?object rdfs:label ?label .
             }
-            
-            <collated> 
+
+            <collated>
             OPTIONAL {
                 <precise-subquery>?subject ?property ?object .</precise-subquery>
                 ?object a ?subclass .
                 # Require the subclasses retrieved to be in a classgroup, since others are not generally
                 # for display. See vivo-dev-all thread titled "Internal Entity and mostSpecificType,"
                 # Aug 9-10, 2011.
-                # ?subclass vitro:inClassGroup ?classgroup 
-            } 
-            FILTER ( REPLACE(STR(?subclass),"^(.*)(#)(.*)$", "$1$2") != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
-            </collated>       
-        
+                # ?subclass vitro:inClassGroup ?classgroup
+            }
+            FILTER ( REPLACE(STR(?subclass),"^(.*)(#)(.*)$", "$1$2") != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )
+            </collated>
+
         } ORDER BY <collated> ?subclass </collated> ASC( ?label ) ASC( ?label ) ASC( ?localName )
     </query-select>
 

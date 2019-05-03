@@ -148,7 +148,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 	 * TODO The LoginRedirector gives a URI that includes the context path. But
 	 * the RedirectResponseValues wants a URI that does not include the context
 	 * path.
-	 * 
+	 *
 	 * Bridge the gap.
 	 */
 	private String stripContextPath(VitroRequest vreq, String uri) {

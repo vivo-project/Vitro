@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument
 /**
  * An implementation that accumulates timing figures for each modifier and
  * writes them to the log.
- * 
+ *
  * Note that this must be thread-safe.
  */
 public class DocumentModifierListDeveloper implements DocumentModifierList {

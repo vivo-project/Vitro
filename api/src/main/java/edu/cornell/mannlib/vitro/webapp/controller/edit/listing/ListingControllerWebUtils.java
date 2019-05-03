@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 public class ListingControllerWebUtils {
-	
+
 	private static final Log log = LogFactory.getLog(ListingControllerWebUtils.class.getName());
 
 	public static synchronized String formatIndividualLink(Individual ind) {
@@ -27,7 +27,7 @@ public class ListingControllerWebUtils {
     		return ind.getName();
     	}
 	}
-	
+
 	public static synchronized String formatVClassLinks(List<VClass> vList) {
 	    StringBuilder linksStr= new StringBuilder();
 	    if (vList!=null) {
@@ -44,12 +44,12 @@ public class ListingControllerWebUtils {
 	                ++count;
 	        	} catch (Exception e) {
 	        		if (obj == null) {
-	        			log.error(ListingControllerWebUtils.class.getName()+" could not format null VClass");	        		
+	        			log.error(ListingControllerWebUtils.class.getName()+" could not format null VClass");
 	        		}
 	        	}
 	        }
 	    }
 	    return linksStr.toString();
 	}
-	
+
 }

@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.MemoryMappedModel;
 /**
  * Provides fast read access to small models, by creating a "mapped" model in
  * memory.
- * 
+ *
  * When updates are detected on the "mapped" model, they are propagated to the
  * base model.
  */

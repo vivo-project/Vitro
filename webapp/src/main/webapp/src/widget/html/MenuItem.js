@@ -32,19 +32,19 @@ dojo.lang.extend(dojo.widget.html.MenuItem, {
 			this.domNode.appendChild(frag["dojo:"+this.widgetType.toLowerCase()]["nodeRef"]);
 		}
 	},
-	
+
 	onMouseOver: function(e){
 		dojo.html.addClass(this.domNode, "dojoMenuItemHover");
 	},
-	
+
 	onMouseOut: function(e){
 		dojo.html.removeClass(this.domNode, "dojoMenuItemHover");
 	},
-	
+
 	onClick: function(e){ this.onSelect(this, e); },
 	onMouseDown: function(e){},
 	onMouseUp: function(e){},
-	
+
 	// By default, when I am clicked, click the item inside of me
 	onSelect: function (item, e) {
 		var child = dojo.dom.getFirstChildElement(this.domNode);

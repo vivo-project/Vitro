@@ -37,34 +37,34 @@ import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResultsParser;
 
 /**
  * Assist in cache management for individual profile pages.
- * 
+ *
  * Must be enabled in runtime.properties.
- * 
+ *
  * Only works for users who are not logged in.
- * 
+ *
  * The search index must be configured to keep an ETAG on each individual's
  * record. The ETAG is a hash of the record's content and is updated each time
  * the individual is re-indexed.
- * 
+ *
  * But this ETAG is not sufficient, since the page may have different versions
  * for different languages. So we append a hash of the Locales from the request
  * to the ETAG to make it unique. NOTE: If we allow users to choose their
  * preferred languages, the LocalSelectionFilter must execute before this one.
- * 
+ *
  * When an external cache (e.g. Squid) is asked for an individual's profile
  * page, it will ask VIVO whether the version in the cache is still current, and
  * to provide a new version if it is not. This is a conditional request.
- * 
+ *
  * When a conditional request is received, this filter will check to see whether
  * the request is on behalf of a logged-in user. If so, a fresh response is
  * generated, with a Cache-Control header that should prevent the cache from
  * storing that response.
- * 
+ *
  * If the requesting user is not logged in, this filter will ask the search
  * engine for the ETAG on the requested individual. If it is the same as the
  * ETAG supplied by the cache in the request, then the response is 304 Not
  * Modified. Otherwise, a fresh response is generated.
- * 
+ *
  * An unconditional request may mean that there is no external cache, or that
  * the cache doesn't have a copy of this particular page.
  */
@@ -183,11 +183,11 @@ public class CachingResponseFilter implements Filter {
 	/**
 	 * This rejects some of the requests as being obviously not individuals, and
 	 * then assumes that the last part of any request is a Localname.
-	 * 
+	 *
 	 * This is not always true, of course, but it will work because we will
 	 * prepend the default namespace and look for the resulting "URI" in the URI
 	 * field of the search index. If we find it there, then it is valid.
-	 * 
+	 *
 	 * If we were to make this more rigorous, it would reduce the number of
 	 * unnecessary searches.
 	 */
@@ -211,16 +211,16 @@ public class CachingResponseFilter implements Filter {
 	/**
 	 * Requests for profile pages come in many forms, but we can still narrow
 	 * them down.
-	 * 
+	 *
 	 * Eliminate CSS files, JavaScript files, and images.
-	 * 
+	 *
 	 * That leaves these acceptable forms:
-	 * 
+	 *
 	 * <pre>
 	 *     /individual?uri=urlencodedURI
 	 *     /individual?netId=bdc34
 	 *     /individual?netid=bdc34
-	 *     /individual/localname         
+	 *     /individual/localname
 	 *     /display/localname
 	 *     /individual/localname/localname.rdf
 	 *     /individual/localname/localname.n3

@@ -242,7 +242,7 @@ public class BasicAuthenticator extends Authenticator {
 
 	/**
 	 * Record the login in the user/session map.
-	 * 
+	 *
 	 * TODO What is this map used for?
 	 */
 	private void recordInUserSessionMap(String userUri, HttpSession session) {

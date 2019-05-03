@@ -1,8 +1,8 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
 label {
-    display: block; 
-    margin-top: .5em; 
+    display: block;
+    margin-top: .5em;
 }
 label.inline,
 div.sparqlform label {
@@ -48,7 +48,7 @@ form dl dt, form dl dd {
   font-weight: bold;
   color: #cc0000;
 }
-.inlineForm input, 
+.inlineForm input,
 .inlineForm label {
   display: inline;
 }
@@ -66,7 +66,7 @@ p.submit {
     line-height: 16px;
     min-height: 100px;
     display: inline;
-} 
+}
 .editingForm {
     margin-top: 0;
     margin-bottom: 0;
@@ -140,7 +140,7 @@ td.verticalfieldlabel {
 }
 tr.form-row-even {
     background-color: #e9f0ff;
-    border-color: #eec; 
+    border-color: #eec;
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size: 10px;
     border-width: 1px;
@@ -148,7 +148,7 @@ tr.form-row-even {
 }
 tr.form-row-odd {
     background-color: #e9f9ff;
-    border-color: #eec; 
+    border-color: #eec;
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size: 10px;
     border-width: 1px;
@@ -156,7 +156,7 @@ tr.form-row-odd {
 }
 .form-editingRow {
     background-color: #ff9;
-    border-color: #eec; 
+    border-color: #eec;
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size: 10px;
     border-width: 1px;
@@ -185,7 +185,7 @@ table.form-background td form {
 }
 .form-table-head {
     background-color: #ccf;
-    border-color: #eec; 
+    border-color: #eec;
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-size: 10px;
     border-width: 1px;
@@ -326,12 +326,12 @@ div.adr {
     display: none;
     height: 0;
 }
-.notice{ 
-    padding: .8em; 
-    margin-bottom: 1em; 
+.notice{
+    padding: .8em;
+    margin-bottom: 1em;
     border: 1px solid #ddd;
     display: block;
-    background: #FFF6BF; 
+    background: #FFF6BF;
     color: #7F7034;
 }
 .note {

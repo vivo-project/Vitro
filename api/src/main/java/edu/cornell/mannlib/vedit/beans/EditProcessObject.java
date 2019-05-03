@@ -63,7 +63,7 @@ public class EditProcessObject implements Serializable {
     private Map<String, String[]> requestParameterMap = null;
 
     private Map<String, String> badValueMap = new HashMap<String, String>();
-    
+
     private Map<String,Object> attributeMap = new HashMap<String, Object>();
 
     private Method getMethod = null;
@@ -311,13 +311,13 @@ public class EditProcessObject implements Serializable {
     public Map<String, Object> getAttributeMap() {
     	return this.attributeMap;
     }
-    
+
     public Object getAttribute(String key) {
     	return this.attributeMap.get(key);
     }
-    
+
     public void setAttribute(String key, Object value) {
     	this.attributeMap.put(key, value);
     }
-    
+
 }

@@ -17,9 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Load the initial configuration of PermissionSets and Permissions.
- * 
+ *
  * The UserAccounts model must be created before this runs.
- * 
+ *
  * The PermissionRegistry must be created before this runs.
  */
 public class PermissionSetsSmokeTest implements ServletContextListener {

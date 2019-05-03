@@ -52,7 +52,7 @@
                             <#assign groupCount = groupCount + 1>
                         </#if>
                     </#if>
-                    
+
                 </#list>
             </ul>
         </section>
@@ -63,7 +63,7 @@
             ${classGroupList}
     <#else>
         <h3 id="noContentMsg">${i18n().no_content_create_groups_classes}</h3>
-        
+
         <#if user.loggedIn>
             <#if user.hasSiteAdminAccess>
                 <p>${i18n().you_can} <a href="${urls.siteAdmin}" title="${i18n().add_content_manage_site}">${i18n().add_content_manage_site}</a>${i18n().from_site_admin_page}</p>
@@ -72,5 +72,5 @@
             <p>${i18n().please} <a href="${urls.login}" title="${i18n().login_to_manage_site}">${i18n().log_in}</a> ${i18n().to_manage_content}.</p>
         </#if>
     </#if>
-            
+
 </#macro>

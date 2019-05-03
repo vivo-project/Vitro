@@ -19,27 +19,27 @@ import net.sf.jga.fn.UnaryFunctor;
  */
 
 public class StringProcessorTag extends BodyTagSupport {
-    
+
     public void setPageContext(PageContext pageContext){
         this.pageContext = pageContext;
     }
-    
+
     @Override
     public int doStartTag(){
         Object obj =  pageContext.getRequest().getAttribute(STRING_PROCESSOR) ;
-        if( obj == null || !(obj instanceof UnaryFunctor) )                   
+        if( obj == null || !(obj instanceof UnaryFunctor) )
             return EVAL_BODY_INCLUDE;
         else
-            return EVAL_BODY_BUFFERED;        
+            return EVAL_BODY_BUFFERED;
     }
-    
+
     @Override
     public int doAfterBody() throws JspException{
         Object obj =  pageContext.getRequest().getAttribute(STRING_PROCESSOR) ;
-        if( obj == null || !(obj instanceof UnaryFunctor) )               
+        if( obj == null || !(obj instanceof UnaryFunctor) )
             return EVAL_PAGE;
-        
-        UnaryFunctor<String,String> functor = (UnaryFunctor<String,String>)obj;        
+
+        UnaryFunctor<String,String> functor = (UnaryFunctor<String,String>)obj;
         BodyContent bc = getBodyContent();
         JspWriter out = getPreviousOut();
         try{
@@ -50,15 +50,15 @@ public class StringProcessorTag extends BodyTagSupport {
 
     public static void putStringProcessorInRequest(HttpServletRequest request, UnaryFunctor<String,String>processor){
         if( request==null || processor==null) return;
-        
+
         Object obj =  request.getAttribute(STRING_PROCESSOR) ;
-        if( obj == null )               
+        if( obj == null )
             request.setAttribute(STRING_PROCESSOR, processor);
-        else{            
+        else{
             UnaryFunctor<String,String> functor = (UnaryFunctor<String,String>)obj;
             request.setAttribute(STRING_PROCESSOR,processor.compose(functor));
         }
     }
-    
+
    public static String STRING_PROCESSOR = "StringProcessor";
 }

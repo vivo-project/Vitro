@@ -1,8 +1,8 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<#-- 
+<#--
         Used to display both the object and data property hierarchies, though there are
-        separate controllers for those. Also used to display lists of "all" object and 
+        separate controllers for those. Also used to display lists of "all" object and
         data properties, though there are separate controllers for those, too.
  -->
  <#if propertyType??>
@@ -56,7 +56,7 @@
           </tr>
         </tbody>
       </table>
-      </section>	
+      </section>
     </#list>
   <#else>
 	<#assign keys = fauxProps?keys />
@@ -95,9 +95,9 @@
 		  </table>
 		  <#assign firstLoop = false />
       </#list>
-      </section>	
+      </section>
 	</#list>
-  </#if> 
+  </#if>
   </section>
   </#if>
 </section>
@@ -110,7 +110,7 @@
 <script language="javascript" type="text/javascript" >
 $(document).ready(function() {
     fauxPropertiesListingUtils.onLoad();
-});    
+});
 </script>
 
 
@@ -118,4 +118,4 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/classHierarchy.
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/siteAdmin/fauxPropertiesListingUtils.js"></script>')}
-              
+

@@ -26,12 +26,12 @@ import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessing
  * Accept an AJAX request to update the developer settings. Return an HTML
  * representation of the developer panel from the settings and a Freemarker
  * template.
- * 
+ *
  * If developer mode is not enabled, the HTML response is empty.
- * 
+ *
  * You may only control the panel if you are logged in with sufficient
  * authorization, or if anonymous control is permitted by the settings.
- * 
+ *
  * If you are not allowed to control the panel, then the HTML response
  * is only a statement that developer mode is enabled. Otherwise, it
  * is a full panel (collapsed at first).
@@ -74,7 +74,7 @@ public class DeveloperSettingsServlet extends VitroAjaxController {
 		Map<String, Object> settingsMap = new HashMap<>();
 		settingsMap.putAll(settings.getRawSettingsMap());
 		settingsMap.put("mayControl", authorized);
-		
+
 		Map<String, Object> bodyMap = new HashMap<>();
 		bodyMap.put("settings", settingsMap);
 		return bodyMap;

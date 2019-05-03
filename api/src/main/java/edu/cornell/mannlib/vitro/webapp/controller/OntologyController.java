@@ -34,66 +34,66 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 @WebServlet(name = "ontology", urlPatterns = {"/ontology/*"})
 public class OntologyController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(OntologyController.class.getName());
-    
+
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException,IOException{
 		doGet(request, response);
 	}
-	
+
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException,IOException{
-		super.doGet(req, res);            
-       
+		super.doGet(req, res);
+
         //get URL without hostname or servlet context
-        String url = req.getRequestURI().substring(req.getContextPath().length()); 
-        
+        String url = req.getRequestURI().substring(req.getContextPath().length());
+
         String redirectURL = checkForRedirect ( url, req.getHeader("accept") );
-       
+
         if( redirectURL != null ){
         	doRedirect( req, res, redirectURL );
         	return;
-        }            	    
-		
+        }
+
         ContentType rdfFormat = checkForLinkedDataRequest(url,req.getHeader("accept"));
-   
+
        if( rdfFormat != null ){
         	doRdf(req, res, rdfFormat );
        }
 	}
-	
+
 	private static Pattern RDF_REQUEST = Pattern.compile("^/ontology/([^/]*)/([^/]*).rdf$");
     private static Pattern N3_REQUEST = Pattern.compile("^/ontology/([^/]*)/([^/]*).n3$");
     private static Pattern TTL_REQUEST = Pattern.compile("^/ontology/([^/]*)/([^/]*).ttl$");
     private static Pattern HTML_REQUEST = Pattern.compile("^/ontology/([^/]*)$");
-	
-	protected ContentType checkForLinkedDataRequest(String url, String acceptHeader) {		
+
+	protected ContentType checkForLinkedDataRequest(String url, String acceptHeader) {
 		try {
-			//check the accept header			
+			//check the accept header
 			if (acceptHeader != null) {
-				List<ContentType> actualContentTypes = new ArrayList<ContentType>();				
+				List<ContentType> actualContentTypes = new ArrayList<ContentType>();
 				actualContentTypes.add(new ContentType( XHTML_MIMETYPE ));
-				actualContentTypes.add(new ContentType( HTML_MIMETYPE ));				
-				
+				actualContentTypes.add(new ContentType( HTML_MIMETYPE ));
+
 				actualContentTypes.add(new ContentType( RDFXML_MIMETYPE ));
 				actualContentTypes.add(new ContentType( N3_MIMETYPE ));
 				actualContentTypes.add(new ContentType( TTL_MIMETYPE ));
-				
-								
+
+
 				ContentType best = ContentType.getBestContentType(acceptHeader,actualContentTypes);
 				if (best!=null && (
-						RDFXML_MIMETYPE.equals(best.getMediaType()) || 
+						RDFXML_MIMETYPE.equals(best.getMediaType()) ||
 						N3_MIMETYPE.equals(best.getMediaType()) ||
 						TTL_MIMETYPE.equals(best.getMediaType()) ))
-					return best;				
+					return best;
 			}
-			
+
 			/*
 			 * check for parts of URL that indicate request for RDF
 			   http://vivo.cornell.edu/ontology/(ontologyname)/n23.rdf
 			   http://vivo.cornell.edu/ontology/(ontologyname)/n23.n3
 			   http://vivo.cornell.edu/ontology/(ontologyname)/n23.ttl
 			 */
-						
+
 			Matcher m = RDF_REQUEST.matcher(url);
 			if( m.matches() ){
 				return new ContentType(RDFXML_MIMETYPE);}
@@ -103,20 +103,20 @@ public class OntologyController extends VitroHttpServlet{
 			m = TTL_REQUEST.matcher(url);
 			if( m.matches() ){
 				return new ContentType(TTL_MIMETYPE);}
-			
+
 		} catch (Throwable th) {
 			log.error("problem while checking accept header " , th);
-		} 
+		}
 		//return null;
 		// Returning null would default to html in the calling method.
 		// But since we don't have a useful html representation yet,
 		// we're going to default to returning RDF/XML.
 		return new ContentType(RDFXML_MIMETYPE);
-	}  
-	
+	}
+
 	private void doRdf(HttpServletRequest req, HttpServletResponse res,
-			ContentType rdfFormat) throws IOException, ServletException {   
-		
+			ContentType rdfFormat) throws IOException, ServletException {
+
 		VitroRequest vreq = new VitroRequest(req);
 		int index = vreq.getRequestURL().lastIndexOf("/");
 	     String ontology = vreq.getRequestURL().substring(0, index);
@@ -126,12 +126,12 @@ public class OntologyController extends VitroHttpServlet{
 	    	 classOrProperty = classOrProperty.substring(0, indexx);
 	     }
 	     String url = ontology;
-	     
-	    		
+
+
 		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
 
         boolean found = false;
-        Model newModel = ModelFactory.createDefaultModel();			
+        Model newModel = ModelFactory.createDefaultModel();
 		ontModel.enterCriticalSection(Lock.READ);
         try{
             OntResource ontResource = ontModel.getOntResource(url);
@@ -142,7 +142,7 @@ public class OntologyController extends VitroHttpServlet{
                 Resource resource = (Resource)ontResource;
                 QueryExecution qexec = null;
                 try{
-                    String queryString = "Describe <" + resource.getURI() + ">"; 
+                    String queryString = "Describe <" + resource.getURI() + ">";
                     qexec = QueryExecutionFactory.create(QueryFactory.create(queryString), ontModel);
                     newModel = qexec.execDescribe();
                 } finally{
@@ -161,57 +161,57 @@ public class OntologyController extends VitroHttpServlet{
         } else {
         	JenaOutputUtils.setNameSpacePrefixes(newModel,vreq.getWebappDaoFactory());
             res.setContentType(rdfFormat.getMediaType());
-            String format = ""; 
+            String format = "";
             if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))
                 format = "RDF/XML";
             else if( N3_MIMETYPE.equals(rdfFormat.getMediaType()))
                 format = "N3";
             else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
                 format ="TTL";
-		
+
             newModel.write( res.getOutputStream(), format );
         }
 	}
-	
+
 	private static Pattern URI_PATTERN = Pattern.compile("^/ontology/([^/]*)/([^/]*)$");
     //Redirect if the request is for http://hostname/individual/localname
     // if accept is nothing or text/html redirect to ???
     // if accept is some RDF thing redirect to the URL for RDF
 	private String checkForRedirect(String url, String acceptHeader) {
-		ContentType c = checkForLinkedDataRequest(url, acceptHeader);	
+		ContentType c = checkForLinkedDataRequest(url, acceptHeader);
 		Matcher m = URI_PATTERN.matcher(url);
 		if( m.matches() && m.groupCount() <=2 ){
 			String group2="";
-			
+
 			if(m.group(2).indexOf(".")!=-1){
 				group2 = m.group(2).substring(0, m.group(2).indexOf("."));
 				System.out.println("group2 " + group2);
 				System.out.println("group1 " + m.group(1));}
-			
-			
+
+
 			if( c != null && !group2.trim().equals(m.group(1).trim()) ){
 				String redirectUrl = null;
 				if(m.group(2).isEmpty() || m.group(2) == null){
 					redirectUrl = "/ontology/" + m.group(1) + "/" + m.group(1); }
 				else{
 					redirectUrl = "/ontology/" + m.group(1) + "/" + m.group(2) + "/" + m.group(2) ; }
-					
-				
+
+
 				if( RDFXML_MIMETYPE.equals( c.getMediaType())  ){
 					return redirectUrl + ".rdf";
 				}else if( N3_MIMETYPE.equals( c.getMediaType() )){
 					return redirectUrl + ".n3";
 				}else if( TTL_MIMETYPE.equals( c.getMediaType() )){
 					return redirectUrl + ".ttl";
-				}//else send them to html													
+				}//else send them to html
 			}
 			//else redirect to HTML representation
 			return null;
-		}else{			
+		}else{
 			return null;
 		}
 	}
-	
+
 	 private void doRedirect(HttpServletRequest req, HttpServletResponse res,
 	            String redirectURL) throws IOException {
 	        //It seems like there must be a more standard way to do a redirect in tomcat.
@@ -227,12 +227,12 @@ public class OntologyController extends VitroHttpServlet{
 	        }
 	       res.setStatus(res.SC_SEE_OTHER);
 	    }
-	 
-	 
+
+
 	private void doNotFound(HttpServletRequest req, HttpServletResponse res)
     throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(req);
-        
+
         ApplicationBean appBean = vreq.getAppBean();
 
         //set title before we do the highlighting so we don't get markup in it.
@@ -246,8 +246,8 @@ public class OntologyController extends VitroHttpServlet{
 
 		JSPPageHandler.renderBasicPage(req, res, "/"+Controllers.ENTITY_NOT_FOUND_JSP);
     }
-	
-	
-	
-	
+
+
+
+
 }

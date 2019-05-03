@@ -67,7 +67,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 			if (log.isTraceEnabled()) {
 				dumpRequestHeaders(hreq);
 			}
-	
+
 			super.service(hreq, resp);
 		} else {
 			super.service(req, resp);
@@ -82,7 +82,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	public long maximumMultipartFileSize() {
 		return 50 * 1024 * 1024; // default is 50 megabytes
 	}
-	
+
 	/**
 	 * Override this to change the way that exceptions are handled when parsing
 	 * a multipart request. Be aware that multipart parameters have been lost,
@@ -113,7 +113,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 
 	/**
 	 * Don't display a page that the user isn't authorized to see.
-	 * 
+	 *
 	 * @param actions
 	 *            the combination of RequestedActions that must be authorized.
 	 */
@@ -148,7 +148,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 			redirectToLoginPage(request, response);
 		}
 	}
-	
+
 	/**
 	 * Logged in, but with insufficient authorization. Send them to the home page
 	 * with a message. They won't be coming back.
@@ -202,24 +202,24 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 		return request.getContextPath() + Controllers.AUTHENTICATE
 				+ "?afterLogin=" + encodedAfterLoginUrl;
 	}
-	
-	protected void sortForPickList(List<? extends ResourceBean> beans, 
+
+	protected void sortForPickList(List<? extends ResourceBean> beans,
 	        VitroRequest vreq) {
 	    beans.sort(new PickListSorter(vreq));
 	}
-	
+
 	protected class PickListSorter implements Comparator<ResourceBean> {
-	    
+
 	    Collator collator;
-	    
+
 	    public PickListSorter(VitroRequest vreq) {
 	        this.collator = vreq.getCollator();
 	    }
-	    
+
 	    public int compare(ResourceBean b1, ResourceBean b2) {
 	        return collator.compare(b1.getPickListName(), b2.getPickListName());
 	    }
-	    
+
 	}
 
 	/**
@@ -252,10 +252,10 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	 */
 	protected void dumpRequestParameters(HttpServletRequest req) {
 		Log subclassLog = LogFactory.getLog(this.getClass());
-		
+
 		@SuppressWarnings("unchecked")
 		Map<String, String[]> map = req.getParameterMap();
-		
+
 		for (String key : map.keySet()) {
 			String[] values = map.get(key);
 			subclassLog.debug("Parameter '" + key + "' = "

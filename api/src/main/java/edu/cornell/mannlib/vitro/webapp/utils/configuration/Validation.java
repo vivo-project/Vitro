@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * The annotated method should be called after the bean is instantiated, to
  * confirm that the bean is correctly formed.
- * 
+ *
  * If the bean is not correctly formed, throw a runtime exception.
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -24,7 +24,7 @@ dojo.lang.mixin(dojo.html, dojo.style);
 
 dojo.html.clearSelection = function(){
 	try{
-		if(window["getSelection"]){ 
+		if(window["getSelection"]){
 			if(dojo.render.html.safari){
 				// pulled from WebCore/ecma/kjs_window.cpp, line 2536
 				window.getSelection().collapse();
@@ -48,11 +48,11 @@ dojo.html.clearSelection = function(){
 dojo.html.disableSelection = function(element){
 	element = dojo.byId(element)||document.body;
 	var h = dojo.render.html;
-	
+
 	if(h.mozilla){
 		element.style.MozUserSelect = "none";
 	}else if(h.safari){
-		element.style.KhtmlUserSelect = "none"; 
+		element.style.KhtmlUserSelect = "none";
 	}else if(h.ie){
 		element.unselectable = "on";
 	}else{
@@ -63,10 +63,10 @@ dojo.html.disableSelection = function(element){
 
 dojo.html.enableSelection = function(element){
 	element = dojo.byId(element)||document.body;
-	
+
 	var h = dojo.render.html;
-	if(h.mozilla){ 
-		element.style.MozUserSelect = ""; 
+	if(h.mozilla){
+		element.style.MozUserSelect = "";
 	}else if(h.safari){
 		element.style.KhtmlUserSelect = "";
 	}else if(h.ie){
@@ -232,7 +232,7 @@ dojo.html.getAttribute = function(node, attr){
 	// FIXME: need to add support for attr-specific accessors
 	if((!node)||(!node.getAttribute)){
 		// if(attr !== 'nwType'){
-		//	alert("getAttr of '" + attr + "' with bad node"); 
+		//	alert("getAttr of '" + attr + "' with bad node");
 		// }
 		return null;
 	}
@@ -255,7 +255,7 @@ dojo.html.getAttribute = function(node, attr){
 	}
 	return null;
 }
-	
+
 /**
  *	Determines whether or not the specified node carries a value for the
  *	attribute in question.
@@ -264,7 +264,7 @@ dojo.html.hasAttribute = function(node, attr){
 	node = dojo.byId(node);
 	return dojo.html.getAttribute(node, attr) ? true : false;
 }
-	
+
 /**
  * Returns the string value of the list of CSS classes currently assigned
  * directly to the node in question. Returns an empty string if no class attribute
@@ -350,7 +350,7 @@ dojo.html.setClass = function(node, classStr){
 /**
  * Removes the className from the node;. Returns
  * true or false indicating success or failure.
- */ 
+ */
 dojo.html.removeClass = function(node, classStr, allowPartialMatches){
 	var classStr = dojo.string.trim(new String(classStr));
 
@@ -359,13 +359,13 @@ dojo.html.removeClass = function(node, classStr, allowPartialMatches){
 		var nca	= [];
 		if(allowPartialMatches){
 			for(var i = 0; i<cs.length; i++){
-				if(cs[i].indexOf(classStr) == -1){ 
+				if(cs[i].indexOf(classStr) == -1){
 					nca.push(cs[i]);
 				}
 			}
 		}else{
 			for(var i=0; i<cs.length; i++){
-				if(cs[i] != classStr){ 
+				if(cs[i] != classStr){
 					nca.push(cs[i]);
 				}
 			}
@@ -405,7 +405,7 @@ dojo.html.getElementsByClass = function(classStr, parent, nodeType, classMatchTy
 	if( classMatchType != 1 && classMatchType != 2 ) classMatchType = 0; // make it enum
 	var reClass = new RegExp("(\\s|^)((" + classes.join(")|(") + "))(\\s|$)");
 	var candidateNodes = [];
-	
+
 	if(!useNonXpath && document.evaluate) { // supports dom 3 xpath
 		var xpath = "//" + (nodeType || "*") + "[contains(";
 		if(classMatchType != dojo.html.classMatchType.ContainsAny){
@@ -438,7 +438,7 @@ dojo.html.getElementsByClass = function(classStr, parent, nodeType, classMatchTy
 			var nodeClasses = dojo.html.getClasses(node);
 			if(nodeClasses.length == 0){ continue outer; }
 			var matches = 0;
-	
+
 			for(var j = 0; j < nodeClasses.length; j++){
 				if(reClass.test(nodeClasses[j])){
 					if(classMatchType == dojo.html.classMatchType.ContainsAny){
@@ -453,7 +453,7 @@ dojo.html.getElementsByClass = function(classStr, parent, nodeType, classMatchTy
 					}
 				}
 			}
-	
+
 			if(matches == classes.length){
 				if(	(classMatchType == dojo.html.classMatchType.IsOnly)&&
 					(matches == nodeClasses.length)){
@@ -501,7 +501,7 @@ dojo.html.overElement = function(element, e){
 		var left = getAbsoluteX(element, true);
 		var right = left + getInnerWidth(element);
 	}
-	
+
 	return (mouse.x >= left && mouse.x <= right &&
 		mouse.y >= top && mouse.y <= bottom);
 }
@@ -554,11 +554,11 @@ dojo.html.isTag = function(node /* ... */) {
 }
 
 dojo.html.copyStyle = function(target, source){
-	// work around for opera which doesn't have cssText, and for IE which fails on setAttribute 
-	if(dojo.lang.isUndefined(source.style.cssText)){ 
-		target.setAttribute("style", source.getAttribute("style")); 
+	// work around for opera which doesn't have cssText, and for IE which fails on setAttribute
+	if(dojo.lang.isUndefined(source.style.cssText)){
+		target.setAttribute("style", source.getAttribute("style"));
 	}else{
-		target.style.cssText = source.style.cssText; 
+		target.style.cssText = source.style.cssText;
 	}
 	dojo.html.addClass(target, dojo.html.getClass(source));
 }

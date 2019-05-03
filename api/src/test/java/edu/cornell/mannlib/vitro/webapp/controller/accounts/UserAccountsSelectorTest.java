@@ -249,7 +249,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		// user06 has no login count: reads as 0.
 		assertSelectedUris(10, "user07", "user03", "user06");
 	}
-	
+
 	@Test
 	public void sortByLastLoginTimeDescending() {
 		UserAccountsOrdering orderBy = new UserAccountsOrdering(
@@ -257,7 +257,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		selectOnCriteria(3, 1, orderBy, "", "");
 		assertSelectedUris(10, "user08", "user10", "user09");
 	}
-	
+
 	// ----------------------------------------------------------------------
 	// filtering tests
 	// ----------------------------------------------------------------------
@@ -274,7 +274,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role2", "");
 		assertSelectedUris(2, "user03", "user10");
 	}
-	
+
 	@Test
 	public void filterAgainstNoSuchRole() {
 		selectOnCriteria(20, 1, DEFAULT_ORDERING, "BogusRole", "");

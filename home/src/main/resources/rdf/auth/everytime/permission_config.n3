@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
@@ -7,13 +7,13 @@
 @prefix editByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EditByRolePermission#> .
 @prefix publishByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.PublishByRolePermission#> .
 
-auth:ADMIN 
+auth:ADMIN
     a auth:PermissionSet ;
     rdfs:label "Site Admin" ;
-    
+
     # ADMIN-only permissions
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
-   	auth:hasPermission simplePermission:EnableDeveloperPanel ;    
+   	auth:hasPermission simplePermission:EnableDeveloperPanel ;
     auth:hasPermission simplePermission:LoginDuringMaintenance ;
     auth:hasPermission simplePermission:ManageMenus ;
     auth:hasPermission simplePermission:ManageProxies ;
@@ -25,20 +25,20 @@ auth:ADMIN
     auth:hasPermission simplePermission:UseAdvancedDataToolsPages ;
     auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
     auth:hasPermission simplePermission:UseSparqlQueryPage ;
-    auth:hasPermission simplePermission:PageViewableAdmin ;  
-   	
-    # Uncomment the following permission line to enable the SPARQL update API. 
-    # Before enabling, be sure that the URL api/sparqlUpdate is secured by HTTPS, 
-    # so passwords will not be sent in clear text.   	  
-    #auth:hasPermission simplePermission:UseSparqlUpdateApi ;    
-    
+    auth:hasPermission simplePermission:PageViewableAdmin ;
+
+    # Uncomment the following permission line to enable the SPARQL update API.
+    # Before enabling, be sure that the URL api/sparqlUpdate is secured by HTTPS,
+    # so passwords will not be sent in clear text.
+    #auth:hasPermission simplePermission:UseSparqlUpdateApi ;
+
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
 	auth:hasPermission simplePermission:PageViewableCurator ;
-    
+
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:DoBackEndEditing ;
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
@@ -55,28 +55,28 @@ auth:ADMIN
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
   	auth:hasPermission simplePermission:PageViewableLoggedIn ;
-    
+
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
 	auth:hasPermission simplePermission:PageViewablePublic ;
-    
+
     # role-based permissions for ADMIN
     auth:hasPermission displayByRole:Admin ;
     auth:hasPermission editByRole:Admin ;
     auth:hasPermission publishByRole:Admin ;
     .
 
-auth:CURATOR 
+auth:CURATOR
     a auth:PermissionSet ;
     rdfs:label "Curator" ;
-    
+
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
     auth:hasPermission simplePermission:PageViewableCurator ;
-    
+
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:DoBackEndEditing ;
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
@@ -93,21 +93,21 @@ auth:CURATOR
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
    	auth:hasPermission simplePermission:PageViewableLoggedIn ;
-    
+
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
     auth:hasPermission simplePermission:PageViewablePublic ;
-    
+
     # role-based permissions for CURATOR
     auth:hasPermission displayByRole:Curator ;
     auth:hasPermission editByRole:Curator ;
     auth:hasPermission publishByRole:Curator ;
     .
 
-auth:EDITOR 
+auth:EDITOR
     a auth:PermissionSet ;
     rdfs:label "Editor" ;
-    
+
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:DoBackEndEditing ;
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
@@ -124,11 +124,11 @@ auth:EDITOR
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
     auth:hasPermission simplePermission:PageViewableLoggedIn ;
-    
+
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
    	auth:hasPermission simplePermission:PageViewablePublic ;
-    
+
     # role-based permissions for EDITOR
     auth:hasPermission displayByRole:Editor ;
     auth:hasPermission editByRole:Editor ;
@@ -148,23 +148,23 @@ auth:SELF_EDITOR
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
     auth:hasPermission simplePermission:PageViewableLoggedIn ;
-    
+
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
 	auth:hasPermission simplePermission:PageViewablePublic ;
 
     # role-based permissions for SELF_EDITOR
-    #     For role-based display and editing, SelfEditor is like Public. 
+    #     For role-based display and editing, SelfEditor is like Public.
     #     SelfEditor uses its special permissions to edit/display its own values.
-    auth:hasPermission displayByRole:Public ; 
-    auth:hasPermission publishByRole:Public ; 
+    auth:hasPermission displayByRole:Public ;
+    auth:hasPermission publishByRole:Public ;
     .
 
 auth:PUBLIC
     a auth:PermissionSet ;
     a auth:PermissionSetForPublic ;
     rdfs:label "Public" ;
-    
+
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
 	auth:hasPermission simplePermission:PageViewablePublic ;

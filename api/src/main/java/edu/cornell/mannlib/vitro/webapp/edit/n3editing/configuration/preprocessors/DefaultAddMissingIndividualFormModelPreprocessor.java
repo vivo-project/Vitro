@@ -10,14 +10,14 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This will remove old relation triple for an edit.  
+ * This will remove old relation triple for an edit.
  * @author bdc34
  *
  */
 public class DefaultAddMissingIndividualFormModelPreprocessor implements
         ModelChangePreprocessor {
     private String subjectUri, predicateUri, objectUri;
-    
+
     public DefaultAddMissingIndividualFormModelPreprocessor(String subjectUri,
             String predicateUri, String objectUri) {
         super();
@@ -28,12 +28,12 @@ public class DefaultAddMissingIndividualFormModelPreprocessor implements
 
     public void preprocess( Model retractionsModel, Model additionsModel, HttpServletRequest r) {
         if( retractionsModel == null || additionsModel == null)
-            return;                
-        
+            return;
+
         retractionsModel.add(
                 ResourceFactory.createResource(subjectUri),
                 ResourceFactory.createProperty(predicateUri),
-                ResourceFactory.createResource(objectUri));           
+                ResourceFactory.createResource(objectUri));
     }
 
 }

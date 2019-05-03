@@ -2,10 +2,10 @@
 
 <% /* For now, not using XML syntax because the output XHTML is not indented */ %>
 <% /* <?xml version="1.0" encoding="UTF-8"?> */ %>
-<% /* <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" 
+<% /* <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
           xmlns:c="http://java.sun.com/jsp/jstl/core"
           xmlns:form="http://vitro.mannlib.cornell.edu/edit/tags"
-          version="2.0"> */ %> 
+          version="2.0"> */ %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper" %>
@@ -30,14 +30,14 @@
             	<input type="submit" class="form-button" value="Display This Individual (public)"/>
             	<input type="hidden" name="uri" value="${individual.URI}"/>
         	</form>
-        	
-        	<c:set var="query" 
+
+        	<c:set var="query"
                  value="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                         SELECT   ?pred ?obj ?graph
-                        WHERE 
+                        WHERE
                         {
-                          GRAPH ?graph { <${entity.URI}> ?pred ?obj} 
+                          GRAPH ?graph { <${entity.URI}> ?pred ?obj}
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
@@ -46,11 +46,11 @@
             <input type="submit" class="form-button" value="Raw Statements with This Resource as Subject"/>
           </form>
 
-          <c:set var="query" 
+          <c:set var="query"
                  value="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                         SELECT ?sub ?pred ?graph
-                        WHERE 
+                        WHERE
                         {
                           GRAPH ?graph { ?sub ?pred <${entity.URI}> }
                         } ORDER BY ?graph ?pred
@@ -60,7 +60,7 @@
             <input type="hidden" name="resultFormat" value="text/plain"/>
             <input type="submit" class="form-button" value="Raw Statements with This Resource as Object"/>
           </form>
-        	
+
     	</td>
     	<td valign="bottom" align="center">
         	<form action="editForm" method="get">
@@ -68,8 +68,8 @@
             	<input name="controller" type = "hidden" value="Entity" />
             	<input type="submit" class="form-button" value="Edit This Individual"/>
         	</form><br/>
-	
-        	<c:if test="${!empty individual.externalIds}"> 
+
+        	<c:if test="${!empty individual.externalIds}">
 	        	<form action="editForm" method="get">
 	            	<select name="multiplexedParam" class="form-item">
 	            		<form:option name="externalIds"/>
@@ -97,9 +97,9 @@
     	</td>
     </tr>
     <tr><td colspan="3"><hr/></td></tr>
-    
-    <!-- TYPES --> 
-    
+
+    <!-- TYPES -->
+
     <tr valign="bottom" align="center">
 	<td colspan="1" valign="bottom" align="left">
 	    <c:if test="${!empty types}">
@@ -113,7 +113,7 @@
 					<c:param name="uri" value="${type.URI}"/>
 				</c:url>
 				<li><input type="checkbox" name="TypeURI" value="${type.URI}" class="form-item"/><a href="${typeURL}"> ${type.pickListName} </a></li>
-			</c:forEach>	
+			</c:forEach>
 			</ul>
 			<input type="hidden" name="individualURI" value="${individual.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Asserted Types"/>
@@ -123,20 +123,20 @@
              </c:if>
         <form action="editForm" method="get">
 			<input type="hidden" name="controller" value="IndividualType"/>
-			<input type="hidden" name="IndividualURI" value="${individual.URI}"/> 
+			<input type="hidden" name="IndividualURI" value="${individual.URI}"/>
 			<input type="submit" class="form-button" value="Add Type"/>
 		</form>
-	</td>    
+	</td>
 
-<td colspan="2">    
+<td colspan="2">
     &nbsp; <!--  empty now that flags are gone -->
 </td>
 
 </tr>
-  
+
 	</table>
 
-	<c:if test="${dwrDisabled != true}"> 
+	<c:if test="${dwrDisabled != true}">
     	<div id="entityUriForDwr" style="visibility:hidden;">${individual.URI}</div>
     		<div>
         	<table class="form-background" border="0" cellpadding="2" cellspacing="2" width="100%">
@@ -186,8 +186,8 @@
                 	<tr><td>Object Individual:</td>
                     	<td colspan="9"><select id="entitiesList" class="form-item"><option>select individual</option></select></td>
                 	</tr>
-                	
-                	
+
+
                 	<tr>
                     	<td><input type="button" id="saveButt" class="form-button"
                                	   value="Save" onclick="writeProp()"/></td>

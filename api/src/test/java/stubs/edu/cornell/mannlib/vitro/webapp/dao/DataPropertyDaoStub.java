@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 
 /**
  * A minimal implementation of the DataPropertyDao.
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */

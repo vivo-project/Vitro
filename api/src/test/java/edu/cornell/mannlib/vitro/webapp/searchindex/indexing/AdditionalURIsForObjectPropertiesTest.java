@@ -27,7 +27,7 @@ public class AdditionalURIsForObjectPropertiesTest {
     Model model;
     RDFService rdfService;
     AdditionalURIsForObjectProperties aufop;
-    
+
     String testNS = "http://example.com/test#";
     String n3 = "" +
     	"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
@@ -43,102 +43,102 @@ public class AdditionalURIsForObjectPropertiesTest {
         "test:bob a test:Person .  \n" +
         "test:bob a owl:Thing .  \n" +
         "test:bob test:likes [ rdfs:label \"this is a blank node\" ] . ";
-    
+
     @Before
     public void setUp() throws Exception {
         model = ModelFactory.createDefaultModel();
         model.read(new StringReader(n3 ), null , "N3");
         rdfService = new RDFServiceModel(model);
-        
+
         ContextModelAccessStub models = new ContextModelAccessStub();
         models.setRDFService(CONTENT, rdfService);
-        
+
         aufop = new AdditionalURIsForObjectProperties();
         aufop.setContextModels(models);
     }
 
     @Test
     public void testChangeOfRdfsLabel() {
-        List<String> uris = aufop.findAdditionalURIsToIndex( 
+        List<String> uris = aufop.findAdditionalURIsToIndex(
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
                         RDFS.label,
                         ResourceFactory.createPlainLiteral("Some new label for bob")));
-        
+
         Assert.assertNotNull(uris);
-        Assert.assertTrue("uris was empty", uris.size() > 0 );        
-        
+        Assert.assertTrue("uris was empty", uris.size() > 0 );
+
         Assert.assertTrue("uris didn't not contain test:onions", uris.contains(testNS+"onions"));
         Assert.assertTrue("uris didn't not contain test:cheese", uris.contains(testNS+"cheese"));
         Assert.assertTrue("uris didn't not contain test:icecream", uris.contains(testNS+"icecream"));
-        
+
         Assert.assertTrue("uris contained test:Person", !uris.contains(testNS+"Person"));
         Assert.assertTrue("uris contained owl:Thing", !uris.contains( OWL.Thing.getURI() ));
-        
+
         Assert.assertEquals(3, uris.size());
     }
-    
+
     @Test
     public void testChangeOfObjPropStmt() {
-        List<String> uris = aufop.findAdditionalURIsToIndex( 
+        List<String> uris = aufop.findAdditionalURIsToIndex(
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
                         ResourceFactory.createProperty(testNS+"likes"),
                         ResourceFactory.createResource(testNS+"cheese")));
-        
+
         Assert.assertNotNull(uris);
-        Assert.assertTrue("uris was empty", uris.size() > 0 );        
-        
+        Assert.assertTrue("uris was empty", uris.size() > 0 );
+
         Assert.assertTrue("uris didn't not contain test:cheese", uris.contains(testNS+"cheese"));
-        
+
         Assert.assertTrue("uris contained test:Person", !uris.contains(testNS+"Person"));
         Assert.assertTrue("uris contained owl:Thing", !uris.contains( OWL.Thing.getURI() ));
-        Assert.assertTrue("uris contained test:onions", !uris.contains(testNS+"onions"));        
+        Assert.assertTrue("uris contained test:onions", !uris.contains(testNS+"onions"));
         Assert.assertTrue("uris contained test:icecream", !uris.contains(testNS+"icecream"));
-        
+
         Assert.assertEquals(1, uris.size());
     }
-    
+
     @Test
     public void testOfDataPropChange() {
-        List<String> uris = aufop.findAdditionalURIsToIndex( 
+        List<String> uris = aufop.findAdditionalURIsToIndex(
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
                         ResourceFactory.createProperty(testNS+"hatsize"),
                         ResourceFactory.createPlainLiteral("Some new hat size for bob")));
-        
+
         Assert.assertNotNull(uris);
-        Assert.assertTrue("uris was not empty", uris.size() == 0 );                        
+        Assert.assertTrue("uris was not empty", uris.size() == 0 );
     }
-    
+
     // For NIHVIVO-2902
     @Test
     public void testNIHVIVO_2902 (){
         //Update search index for research area when a statement is
         //removed between a person and the research area.
-        
+
         Model model = ModelFactory.createDefaultModel();
         model.read(new StringReader( n3ForNIHVIVO_2902 ), null , "N3");
-        
+
         ContextModelAccessStub models = new ContextModelAccessStub();
         models.setRDFService(CONTENT, new RDFServiceModel(model));
 
         aufop.setContextModels(models);
-        
-        List<String> uris = aufop.findAdditionalURIsToIndex( 
+
+        List<String> uris = aufop.findAdditionalURIsToIndex(
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n2241"),
                         ResourceFactory.createProperty("http://vivoweb.org/ontology/core#hasResearchArea"),
                         ResourceFactory.createResource("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n7416")));
-        
+
         Assert.assertNotNull(uris);
         Assert.assertTrue("uris was empty", uris.size() > 0 );
-        
-        Assert.assertTrue("NIHVIVO-2902 regression, research area is not getting reindexed", uris.contains("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n7416"));       
+
+        Assert.assertTrue("NIHVIVO-2902 regression, research area is not getting reindexed", uris.contains("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n7416"));
     }
-    
+
     // For NIHVIVO-2902
-    String n3ForNIHVIVO_2902 = 
+    String n3ForNIHVIVO_2902 =
         "@prefix dc:      <http://purl.org/dc/elements/1.1/> . \n" +
         "@prefix pvs:     <http://vivoweb.org/ontology/provenance-support#> . \n" +
         "@prefix geo:     <http://aims.fao.org/aos/geopolitical.owl#> . \n" +

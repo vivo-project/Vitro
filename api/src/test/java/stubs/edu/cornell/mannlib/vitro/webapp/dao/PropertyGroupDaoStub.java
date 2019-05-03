@@ -14,11 +14,11 @@ public class PropertyGroupDaoStub implements PropertyGroupDao {
 	// ----------------------------------------------------------------------
 
 	private final Map<String, PropertyGroup> map = new HashMap<>();
-	
+
 	public void addPropertyGroup(PropertyGroup group) {
 		map.put(group.getURI(), group);
 	}
-	
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -27,7 +27,7 @@ public class PropertyGroupDaoStub implements PropertyGroupDao {
 	public PropertyGroup getGroupByURI(String uri) {
 		return (uri == null) ? null : copyGroup(map.get(uri), false);
 	}
-	
+
 	@Override
 	public List<PropertyGroup> getPublicGroups(boolean withProperties) {
 		List<PropertyGroup> list = new ArrayList<>();
@@ -36,22 +36,22 @@ public class PropertyGroupDaoStub implements PropertyGroupDao {
 		}
 		return list;
 	}
-	
+
 	private PropertyGroup copyGroup(PropertyGroup source, boolean withProperties) {
 		if (source == null) {
 			return null;
 		}
-		
+
 		PropertyGroup target = new PropertyGroup();
-	
+
 		target.setURI(source.getURI());
 		target.setPickListName(source.getPickListName());
-		
+
 		target.setDisplayRank(source.getDisplayRank());
 		target.setName(source.getName());
 		target.setStatementCount(source.getStatementCount());
 		target.setPublicDescription(source.getPublicDescription());
-		
+
 		if (withProperties) {
 			target.setPropertyList(source.getPropertyList());
 		}

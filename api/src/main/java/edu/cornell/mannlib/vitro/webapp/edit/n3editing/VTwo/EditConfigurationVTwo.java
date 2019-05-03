@@ -49,7 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocesso
  * in preparation for N3. They may also be appended with a datatype or lang.
  */
 public class EditConfigurationVTwo {
-    
+
 	//Strings representing required n3 for RDF
     List<String> n3Required = new ArrayList<String>();
     //String representing optional N3 for RDF
@@ -60,25 +60,25 @@ public class EditConfigurationVTwo {
     List<String> literalsOnForm = new ArrayList<String>();
     //Names of variables corresponding to Files on form
     List<String> filesOnForm = new ArrayList<String>();
-    
+
     //Multi values now supported for uris and literals, so second parameter needs to be List<String>
     //Mapping of variable name for object to values for object, i.e. URIs, e.g. "hasElement" = "<a.com>, <b.com>"
     Map<String,List<String>> urisInScope = new HashMap<String,List<String>>();
     //Mapping from variable name to values for literals
     Map<String, List<Literal>> literalsInScope = new HashMap<String,List<Literal>>();
-    
+
     //Map name of variable to sparql query which should return a one-column result set of URIs corresponding to variable
     //E.g. sparql for inverse of object property
     Map<String,String> sparqlForAdditionalUrisInScope = new HashMap<String,String>();
-    //Mapping variable to sparql query returning literals 
+    //Mapping variable to sparql query returning literals
     Map<String,String> sparqlForAdditionalLiteralsInScope = new HashMap<String,String>();
-    
+
     //Variable names to URI prefixes for variables that are allowed to have new instances created
     Map<String,String> newResources = new HashMap<String,String>();
-    
+
     //Variable names to fields, Field = additional configuration for variable
     Map<String,FieldVTwo> fields = new HashMap<String,FieldVTwo>();
-    
+
     //Mapping variable name to Sparql query to find existing literals corresponding to variable, result set should be one-column multi-row of literals
     Map<String,String>sparqlForExistingLiterals = new HashMap<String,String>();
     //Mapping variable name to Sparql query to find existing URIs corresponding to variable, result set should be one-column multi-row of URIs/URI resources
@@ -96,83 +96,83 @@ public class EditConfigurationVTwo {
      * object is the URI, it has no quoting or &lt; or &gt;.
      */
     String object;
-    
+
     /**
      * This can be the variable name for the object of a statement in
      * a object property or data property form.
      */
-    String varNameForObject;   
+    String varNameForObject;
 
     Integer datapropKey=null;
-    
+
     /** urlPatternToReturnTo is the URL to use as the servlet to return to.
      * Usually it is "/individual" and entityToReturnTo will be added as a
      * "uri" parameter.   */
     String urlPatternToReturnTo = INDIVIDUAL_CONTROLLER ;
-    
+
     /** If this is non-null it should be the URI of an Individual to return to after
-     * the edit. */     
+     * the edit. */
     String entityToReturnTo;
-    
+
     /**
-     * If this value is not null, it will force the edit to return to the specified 
-     * URL from the PostEditCleanupController after an edit or a cancel.  This string does 
-     * NOT get values substituted in and it does NOT get the context appended. 
+     * If this value is not null, it will force the edit to return to the specified
+     * URL from the PostEditCleanupController after an edit or a cancel.  This string does
+     * NOT get values substituted in and it does NOT get the context appended.
      */
     String urlToReturnTo = null;
-    
+
     /**
-     * formUrl saves the URL that was used to request the form so that it can be 
+     * formUrl saves the URL that was used to request the form so that it can be
      * reissued if a form validation fails and the client can be redirected back
      * to the original form. */
     String formUrl;
-    
+
     /**
      * skipToUrl is a URL that should be forwarded to instead of displaying
      * a form.  This will need the context if it is relative.  It may be a
      * full off site URL.
      */
     String skipToUrl;
-    
+
     String editKey;
 
     List<N3ValidatorVTwo> validators;
 
-	EditN3GeneratorVTwo n3generator;   
+	EditN3GeneratorVTwo n3generator;
 
     private List<ModelChangePreprocessor> modelChangePreprocessors =new LinkedList<ModelChangePreprocessor>();
-    
+
     private List<EditSubmissionVTwoPreprocessor> editSubmissionPreprocessors;
-    
+
     private ProhibitedFromSearch prohibitedFromSearch;
 
     //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
     //How about we change pageData to something else since page is in the name of just about everything related
     //to templates.
     private HashMap<String, Object> formSpecificData;
-    
+
     /** Name of freemarker template to generate form. */
     String template;
-    
+
     /** URL to submit form to. */
     String submitToUrl;
-    
-    /** 
+
+    /**
      * If true, then any dependent resources that are unlinked should be
-     * removed using DependentResourceDelete. 
+     * removed using DependentResourceDelete.
      *Setting to false for now as we should no longer be utilizing dependent resource deletion.
      */
-    private boolean useDependentResourceDelete = false;   
+    private boolean useDependentResourceDelete = false;
 
     /** Model id from write model. */
     private String writeModelId;
-    
-    /** Model id for the abox. */    
+
+    /** Model id for the abox. */
     private String aboxModelId;
-    
+
     /** Model id for the tbox. */
     private String tboxModelId;
-    
+
 	/** Model to write changes of a completed edit to. Usually this is null
      * and the edit will be written to the main graph of the system.     */
     private ModelSelector writeModelSelector;
@@ -180,22 +180,22 @@ public class EditConfigurationVTwo {
     /** Model to query for existing and things like that. Usually this is null
      * and the main Model of the system will be used as the default.     */
     private ModelSelector queryModelSelector;
-    
+
     /** Model to check when making new URIs to check that there is not already
      * a resource with a given URI. */
     private ModelSelector resourceModelSelector;
-    
-    /** WebappDaoFactory to build option, check box, and radio button lists. 
+
+    /** WebappDaoFactory to build option, check box, and radio button lists.
      * Usually this is set to null and the main model will be used. */
     private WDFSelector wdfSelectorForOptons;
-    
+
     private boolean hasBeenPreparedForUpdate;
-    
-    public EditConfigurationVTwo(){ 
+
+    public EditConfigurationVTwo(){
         writeModelSelector = StandardModelSelector.selector;
-        queryModelSelector = StandardModelSelector.selector;   
+        queryModelSelector = StandardModelSelector.selector;
         resourceModelSelector = StandardModelSelector.selector;
-        wdfSelectorForOptons = StandardWDFSelector.selector;        
+        wdfSelectorForOptons = StandardWDFSelector.selector;
         n3generator = new EditN3GeneratorVTwo();
     }
 
@@ -223,9 +223,9 @@ public class EditConfigurationVTwo {
     	editConfig.setVarNameForObject(this.getVarNameForObject());
 
     	editConfig.setDatapropKey(this.getDatapropKey());
-    	    	
+
     	editConfig.setUrlPatternToReturnTo(this.getUrlPatternToReturnTo());
-   
+
     	//n3 required
     	editConfig.setN3Required(EditConfigurationUtils.copy(this.getN3Required()));
     	//n3 optional
@@ -236,63 +236,63 @@ public class EditConfigurationVTwo {
     	editConfig.setLiteralsOnForm(EditConfigurationUtils.copy(this.getLiteralsOnForm()));
     	//files on form
     	editConfig.setFilesOnForm(EditConfigurationUtils.copy(this.getFilesOnForm()));
-    	//new resources    	
+    	//new resources
     	editConfig.setNewResources(EditConfigurationUtils.copyMap(this.getNewResources()));
     	//uris in scope
     	editConfig.setUrisInScope(EditConfigurationUtils.copyListMap(this.getUrisInScope()));
 
     	//TODO: ensure this is not a shallow copy of literals but makes entirely new literal objects
-    	editConfig.setLiteralsInScope(this.getLiteralsInScope());    	
+    	editConfig.setLiteralsInScope(this.getLiteralsInScope());
     	//editConfig.setLiteralsInScope(EditConfigurationUtils.copy(this.getLiteralsInScope()));
-    	
+
     	//sparql for additional uris in scope
     	editConfig.setSparqlForAdditionalUrisInScope(
-    			EditConfigurationUtils.copyMap(this.getSparqlForAdditionalUrisInScope()));     					
+    			EditConfigurationUtils.copyMap(this.getSparqlForAdditionalUrisInScope()));
     	//sparql for additional literals in scope
     	editConfig.setSparqlForAdditionalLiteralsInScope(
-    			EditConfigurationUtils.copyMap(this.getSparqlForAdditionalLiteralsInScope()));     					
+    			EditConfigurationUtils.copyMap(this.getSparqlForAdditionalLiteralsInScope()));
     	//sparql for existing literals
     	editConfig.setSparqlForExistingLiterals(
-    			EditConfigurationUtils.copyMap(this.getSparqlForExistingLiterals()));     					
+    			EditConfigurationUtils.copyMap(this.getSparqlForExistingLiterals()));
     	//sparql for existing uris
     	editConfig.setSparqlForExistingUris(
-    			EditConfigurationUtils.copyMap(this.getSparqlForExistingUris()));     					
-    	
+    			EditConfigurationUtils.copyMap(this.getSparqlForExistingUris()));
+
     	//TODO: Ensure this is true copy of field and not just shallow copy with same references
     	Map<String, FieldVTwo> fields = this.getFields();
     	editConfig.setFields(fields);
-    	
+
     	return editConfig;
-    }     	   
-    
-    
+    }
+
+
     /**
-     * Add symbols for things like currentTime and editingUser to 
+     * Add symbols for things like currentTime and editingUser to
      * editConfig.urisInScope and editConfig.literalsInScope.
      */
     public void addSystemValues( Model model, HttpServletRequest request, ServletContext context){
         if( model == null ) throw new Error("EditConfiguration.addSystemValues() needs a Model");
-        if( request == null ) throw new Error("EditConfiguration.addSystemValues() needs a request");        
-     
+        if( request == null ) throw new Error("EditConfiguration.addSystemValues() needs a request");
+
         /* current time */
-        if( getSparqlForAdditionalLiteralsInScope() != null && 
+        if( getSparqlForAdditionalLiteralsInScope() != null &&
             getSparqlForAdditionalLiteralsInScope().containsKey("currentTime") &&
             USE_SYSTEM_VALUE.equals(getSparqlForAdditionalLiteralsInScope().get("currentTime"))){
         	//Updating so that this is represented as an XSD Date Time literal - to allow for comparison later
-        	//Currently it appears that this is only used for file upload 
+        	//Currently it appears that this is only used for file upload
             //getLiteralsInScope().put("currentTime", ResourceFactory.createTypedLiteral(new Date()));
         	SimpleDateFormat dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     		String formattedDate = dateTime.format(Calendar.getInstance().getTime());
     		List<Literal> dateLiterals = new ArrayList<Literal>();
     		dateLiterals.add(ResourceFactory.createTypedLiteral(formattedDate, XSDDatatype.XSDdateTime));
     		literalsInScope.put("currentTime", dateLiterals);
-        }            
-        
+        }
+
         /* editing user */
-        if( getSparqlForAdditionalUrisInScope() != null && 
+        if( getSparqlForAdditionalUrisInScope() != null &&
             getSparqlForAdditionalUrisInScope().containsKey("editingUser") &&
             USE_SYSTEM_VALUE.equals(getSparqlForAdditionalUrisInScope().get("editingUser"))) {
-            
+
             if( request.getSession() == null )
                 throw new Error("EditConfiguration.addSystemValues() needs a session");
 
@@ -302,53 +302,53 @@ public class EditConfigurationVTwo {
            	List<String> userUriList = new ArrayList<String>();
            	userUriList.add(userUri);
             urisInScope.put("editingUser", userUriList);
-        }   
+        }
     }
-    
+
     protected void basicPrepare( ){
-        if( subjectUri != null && ! subjectUri.trim().isEmpty() && 
-            varNameForSubject != null && ! varNameForSubject.trim().isEmpty() ){            
+        if( subjectUri != null && ! subjectUri.trim().isEmpty() &&
+            varNameForSubject != null && ! varNameForSubject.trim().isEmpty() ){
             urisInScope.put( varNameForSubject, Arrays.asList( subjectUri ));
             log.debug("Putting uris in scope - var name for subject "
                     + varNameForSubject + " and subject is " + subjectUri);
         }
-        
+
         if( predicateUri != null && ! predicateUri.trim().isEmpty() &&
             varNameForPredicate != null && ! varNameForPredicate.trim().isEmpty() ){
             urisInScope.put( varNameForPredicate, Arrays.asList( predicateUri ));
             log.debug("Putting uris in scope - var name for predicate "
                     + varNameForPredicate + " and predicate is " + predicateUri);
         }
-        
-        if( isObjectResource() && 
+
+        if( isObjectResource() &&
             varNameForObject != null && ! varNameForObject.trim().isEmpty() ){
             urisInScope.put( varNameForObject, Arrays.asList(getObject()));
-            log.debug("Putting uris in scope - var name for object " 
+            log.debug("Putting uris in scope - var name for object "
                     + varNameForObject + " and object is " + object);
-        }        
+        }
     }
-     
+
     /**
      * Prepare an EditConfiguration for a DataProperty update.
-     * This should only be used when editing a existing data property statement. 
+     * This should only be used when editing a existing data property statement.
      */
     public void prepareForDataPropUpdate( Model model, DataPropertyDao dataPropertyDao ){
-        if( model == null ) throw new Error("EditConfiguration.prepareForDataPropUpdate() needs a Model");        
+        if( model == null ) throw new Error("EditConfiguration.prepareForDataPropUpdate() needs a Model");
         if( isObjectResource() ){
            throw new Error("This request does not seems to be a DataPropStmt update");
         } else  if (datapropKey == null) {
-            throw new Error("This request does not appear to be for an update since it lacks a dataProp hash key ");                           
-        }                     
-        
+            throw new Error("This request does not appear to be for an update since it lacks a dataProp hash key ");
+        }
+
         basicPrepare();
-        
-        DefaultDataPropertyFormGenerator.prepareForDataPropUpdate(model, this,dataPropertyDao );        
+
+        DefaultDataPropertyFormGenerator.prepareForDataPropUpdate(model, this,dataPropertyDao );
 
         // run SPARQL, sub in values
         SparqlEvaluateVTwo sparqlEval = new SparqlEvaluateVTwo(model);
         runSparqlForAdditional( sparqlEval );
         runSparqlForExisting( sparqlEval );
-       
+
         hasBeenPreparedForUpdate = true;
     }
 
@@ -362,11 +362,11 @@ public class EditConfigurationVTwo {
         	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a non-null Model");}
         if( !isObjectResource() ) {
         	log.debug("This does not seem to be an object property update. Lacks object.");
-            throw new Error("This request does not appear to be for a object property update.");              
-        }        
-        
-        basicPrepare();        
-        
+            throw new Error("This request does not appear to be for a object property update.");
+        }
+
+        basicPrepare();
+
         // run SPARQL, sub in values
         SparqlEvaluateVTwo sparqlEval = new SparqlEvaluateVTwo( model );
         runSparqlForAdditional( sparqlEval );
@@ -378,7 +378,7 @@ public class EditConfigurationVTwo {
 
         hasBeenPreparedForUpdate = true;
     }
-    
+
     /**
      * Prepare for a param update: Run SPARQL for existing values.
      *  This can be used for a direct form which does not correspond directly to either
@@ -388,10 +388,10 @@ public class EditConfigurationVTwo {
         if( model == null ) {
         	log.debug("Model is null and will be throwing an error");
         	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a non-null Model");}
-            
-        
-        basicPrepare();        
-        
+
+
+        basicPrepare();
+
         // run SPARQL, sub in values
         SparqlEvaluateVTwo sparqlEval = new SparqlEvaluateVTwo( model );
         runSparqlForAdditional( sparqlEval );
@@ -412,12 +412,12 @@ public class EditConfigurationVTwo {
         if( model == null ) throw new Error("prepareForNonUpdate() needs a non-null Model");
 
         basicPrepare();
-        
+
         SparqlEvaluateVTwo sparqlEval = new SparqlEvaluateVTwo( model );
         runSparqlForAdditional( sparqlEval );
-        //runSparqlForExisting( sparqlEval );                
+        //runSparqlForExisting( sparqlEval );
     }
-    
+
     public void setFields(Map<String,FieldVTwo> fields) {
     	this.fields = fields;
     }
@@ -465,9 +465,9 @@ public class EditConfigurationVTwo {
     public void addN3Required(List<String> n3RequiredInput) {
     	this.n3Required.addAll(n3RequiredInput);
     }
-    
+
     public void addN3Required(String ... n3RequiredStrsInput) {
-    	 this.n3Required.addAll(Arrays.asList( n3RequiredStrsInput ));  
+    	 this.n3Required.addAll(Arrays.asList( n3RequiredStrsInput ));
     }
      /** return a copy of the value so that the configuration is not modified by external code.
      */
@@ -480,18 +480,18 @@ public class EditConfigurationVTwo {
     }
 
     public void setN3Optional(String ... n3Strs){
-        this.n3Optional = new ArrayList<String>(Arrays.asList( n3Strs )); //using ArrayList to allow list to be resized       
+        this.n3Optional = new ArrayList<String>(Arrays.asList( n3Strs )); //using ArrayList to allow list to be resized
     }
-    
+
     public void addN3Optional(List<String> n3Optional) {
         this.n3Optional.addAll(n3Optional);
     }
 
     public void addN3Optional(String ... n3Strs){
-        this.n3Optional.addAll(Arrays.asList( n3Strs ));        
+        this.n3Optional.addAll(Arrays.asList( n3Strs ));
     }
 
-    
+
     public Map<String,String> getNewResources() {
         return newResources;
     }
@@ -499,21 +499,21 @@ public class EditConfigurationVTwo {
     public void setNewResources(Map<String,String> newResources) {
         this.newResources = newResources;
     }
-    
+
     public void setNewResources(String ... strs){
         if( strs == null || strs.length % 2 != 0 ){
             throw new Error(" setNewResources() must have pairs of varName, prefix ");
         }
         Map<String,String> map = new HashMap<String,String>();
-        
+
         for( int i=0;i<strs.length;i=i+2 ){
-            map.put(strs[i],strs[i+1]);            
+            map.put(strs[i],strs[i+1]);
         }
-        
+
         this.newResources = map;
     }
 
-    
+
     public List<String> getUrisOnform() {
         return urisOnform;
     }
@@ -523,7 +523,7 @@ public class EditConfigurationVTwo {
     }
 
     public void setUrisOnForm(String ... strs){
-        this.urisOnform = new ArrayList<String>(Arrays.asList( strs )); //using ArrayList to allow resizing        
+        this.urisOnform = new ArrayList<String>(Arrays.asList( strs )); //using ArrayList to allow resizing
     }
     //This doesn't overwrite or set but adds to existing list
     public void addUrisOnForm(List<String> urisOnform) {
@@ -531,10 +531,10 @@ public class EditConfigurationVTwo {
     }
 
     public void addUrisOnForm(String ... strs){
-        this.urisOnform.addAll(Arrays.asList( strs ));        
+        this.urisOnform.addAll(Arrays.asList( strs ));
     }
-    
-    
+
+
     public void setFilesOnForm(List<String> filesOnForm){
         this.filesOnForm = filesOnForm;
     }
@@ -552,17 +552,17 @@ public class EditConfigurationVTwo {
     }
 
     public void setLiteralsOnForm(String ... strs){
-        this.literalsOnForm = new ArrayList<String>(Arrays.asList( strs ));//using ArrayList to allow resizing        
+        this.literalsOnForm = new ArrayList<String>(Arrays.asList( strs ));//using ArrayList to allow resizing
     }
-    
+
     public void addLiteralsOnForm(List<String> literalsOnForm) {
     	this.literalsOnForm.addAll(literalsOnForm);
     }
-    
+
     public void addLiteralsOnForm(String ... strs){
-        this.literalsOnForm.addAll(Arrays.asList( strs ));        
+        this.literalsOnForm.addAll(Arrays.asList( strs ));
     }
-    
+
     public Map<String, List<String>> getUrisInScope() {
         return urisInScope;
     }
@@ -576,19 +576,19 @@ public class EditConfigurationVTwo {
             urisInScope = new HashMap<String, List<String>>();
         }
         urisInScope.put(key, list);
-        return this;        
+        return this;
     }
-    
+
     public EditConfigurationVTwo addUrisInScope(Map<String, List<String>> uriValues) {
         if( urisInScope  == null ){
             urisInScope = new HashMap<String, List<String>>();
         }
         urisInScope.putAll(uriValues);
-        return this;        
+        return this;
     }
-    
-   
-    
+
+
+
     public Map<String, List<Literal>> getLiteralsInScope() {
         return literalsInScope;
     }
@@ -599,8 +599,8 @@ public class EditConfigurationVTwo {
 
     /** Return a copy of the value so that the configuration is not modified by external code.
      */
-    public Map<String, String> getSparqlForAdditionalUrisInScope() {        
-        return copyMap(sparqlForAdditionalUrisInScope);        
+    public Map<String, String> getSparqlForAdditionalUrisInScope() {
+        return copyMap(sparqlForAdditionalUrisInScope);
     }
 
     public void setSparqlForAdditionalUrisInScope(Map<String, String> sparqlForAdditionalUrisInScope) {
@@ -609,17 +609,17 @@ public class EditConfigurationVTwo {
 
      /** Return a copy of the value so that the configuration is not modified by external code.
      */
-    public Map<String, String> getSparqlForAdditionalLiteralsInScope() {        
-        return copyMap(sparqlForAdditionalLiteralsInScope);        
-    }        
-    
+    public Map<String, String> getSparqlForAdditionalLiteralsInScope() {
+        return copyMap(sparqlForAdditionalLiteralsInScope);
+    }
+
     private Map<String,String> copyMap(Map<String,String> source){
         if( source == null ) return null;
-        Map<String, String> dest = new HashMap<String, String>();        
+        Map<String, String> dest = new HashMap<String, String>();
         for( String key : source.keySet()){
             if( source.get(key) != null )
                 dest.put(key, source.get(key));
-            else 
+            else
                 dest.put(key, null);
         }
         return dest;
@@ -648,7 +648,7 @@ public class EditConfigurationVTwo {
      /** return a copy of the value so that the configuration is not modified by external code.
      */
     public Map<String, String> getSparqlForExistingLiterals() {
-        return copyMap(sparqlForExistingLiterals);        
+        return copyMap(sparqlForExistingLiterals);
     }
 
     public void setSparqlForExistingLiterals(Map<String, String> sparqlForExistingLiterals) {
@@ -657,13 +657,13 @@ public class EditConfigurationVTwo {
 
      /** return a copy of the value so that the configuration is not modified by external code.
      */
-    public Map<String, String> getSparqlForExistingUris() {         
-        return copyMap(sparqlForExistingUris);        
+    public Map<String, String> getSparqlForExistingUris() {
+        return copyMap(sparqlForExistingUris);
     }
 
     public void setSparqlForExistingUris(Map<String, String> sparqlForExistingUris) {
         this.sparqlForExistingUris = sparqlForExistingUris;
-    }       
+    }
 
     /* ********************** static methods to get EditConfigs from Session ******************************** */
 
@@ -709,7 +709,7 @@ public class EditConfigurationVTwo {
      */
     public static EditConfigurationVTwo getConfigFromSession( HttpSession sess, HttpServletRequest request ){
         String key = getEditKeyFromRequest(request);
-        
+
         if( key == null )
             return null;
         return getConfigFromSession(sess, key);
@@ -728,13 +728,13 @@ public class EditConfigurationVTwo {
             if( isMultipart ) {
                 //multipart parsing will consume all request parameters so
                 //the editKey needs to be stashed in the request attributes.
-                key = (String)request.getAttribute("editKey");    
+                key = (String)request.getAttribute("editKey");
                 if( key == null ) {
                     // handle the cancel button where nothing is really uploaded
                     key = request.getParameter("editKey");
-                }                               
-            }else{            	
-            	key = (String)request.getAttribute("editKey");                
+                }
+            }else{
+            	key = (String)request.getAttribute("editKey");
                 if( key  != null  ){
                     return key;
                 } else {
@@ -765,7 +765,7 @@ public class EditConfigurationVTwo {
             return Integer.toString(mills);
         }
     }
-    
+
     /*
      * getters and setters
      */
@@ -788,7 +788,7 @@ public class EditConfigurationVTwo {
 		if( dataKeyFound && objectFound )
 		    throw new Error("Bad configuration: both datapropKey and object are defined.");
 		return objectFound;
-	}	
+	}
 
 	public Integer getDatapropKey() {
         return datapropKey;
@@ -797,7 +797,7 @@ public class EditConfigurationVTwo {
     public void setDatapropKey(Integer datapropKey) {
         this.datapropKey = datapropKey;
     }
-    
+
     public String getSubjectUri() {
         return subjectUri;
     }
@@ -821,15 +821,15 @@ public class EditConfigurationVTwo {
     public String getEditKey() {
         return editKey;
     }
-    
+
     public void setEditKey(String editKey) {
     	this.editKey = editKey;
     }
-    
+
     public String getFormUrl() {
         return formUrl;
     }
-    
+
     public void setFormUrl(String formUrl) {
     	this.formUrl = formUrl;
     }
@@ -837,23 +837,23 @@ public class EditConfigurationVTwo {
     public EditN3GeneratorVTwo getN3Generator(){
         return n3generator;
     }
-    
+
     public void setN3Generator(EditN3GeneratorVTwo gen) {
     	this.n3generator = gen;
     }
-    
+
     public String getVarNameForSubject() {
     	return this.varNameForSubject;
     }
-    
+
     public void setVarNameForSubject(String varName) {
     	this.varNameForSubject = varName;
     }
-    
+
     public String getVarNameForPredicate() {
     	return this.varNameForPredicate;
     }
-    
+
     public void setVarNameForPredicate(String varName) {
     	this.varNameForPredicate = varName;
     }
@@ -861,11 +861,11 @@ public class EditConfigurationVTwo {
     public String getVarNameForObject(){
         return this.varNameForObject;
     }
-    
+
     public void setVarNameForObject(String varName) {
     	this.varNameForObject = varName;
     }
-    
+
     /**If this is set to true, then dependent resources should be deleted on edits that
      * remove the parent resource.
      */
@@ -879,23 +879,23 @@ public class EditConfigurationVTwo {
 	public void setUseDependentResourceDelete(boolean useDependentResourceDelete) {
 		this.useDependentResourceDelete = useDependentResourceDelete;
 	}
-	
+
     public List<ModelChangePreprocessor> getModelChangePreprocessors() {
     	return this.modelChangePreprocessors;
     }
-       
+
     public void addModelChangePreprocessor( ModelChangePreprocessor modelChangePreprocessor) {
     	this.modelChangePreprocessors.add( modelChangePreprocessor );
     }
-    
+
     public void setProhibitedFromSearch( ProhibitedFromSearch prohibitedFromSearch) {
     	this.prohibitedFromSearch = prohibitedFromSearch;
     }
-    
+
     public ProhibitedFromSearch getProhibitedFromSearch() {
     	return this.prohibitedFromSearch;
     }
-    
+
     private void debugScope(String msg){
         if( log.isDebugEnabled()){
             log.debug(msg);
@@ -911,9 +911,9 @@ public class EditConfigurationVTwo {
             }
         }
     }
-    
+
     public final static String USE_SYSTEM_VALUE = "USE_SYSTEM_VALUE";
-    
+
     private static final Log log = LogFactory.getLog(EditConfigurationVTwo.class.getName());
 
     public ModelSelector getWriteModelSelector() {
@@ -922,7 +922,7 @@ public class EditConfigurationVTwo {
 
     public void setWriteModelSelector(ModelSelector writeModel) {
         if( writeModel != null )
-            this.writeModelSelector = writeModel;        
+            this.writeModelSelector = writeModel;
     }
 
     public ModelSelector getQueryModelSelector() {
@@ -950,7 +950,7 @@ public class EditConfigurationVTwo {
         if( resourceModelSelector != null )
             this.resourceModelSelector = resourceModelSelector;
     }
-        
+
     public List<N3ValidatorVTwo> getValidators() {
 		return validators;
 	}
@@ -958,15 +958,15 @@ public class EditConfigurationVTwo {
     public void addValidator( N3ValidatorVTwo validator){
     	if( this.validators == null )
     		this.validators = new ArrayList<N3ValidatorVTwo>();
-    	this.validators.add(validator);    		
-    }    
+    	this.validators.add(validator);
+    }
 
     public void addEditSubmissionPreprocessor( EditSubmissionVTwoPreprocessor preprocessor){
         if( editSubmissionPreprocessors == null )
             editSubmissionPreprocessors = new ArrayList<EditSubmissionVTwoPreprocessor>();
-        editSubmissionPreprocessors.add(preprocessor);         
-    }  
-    
+        editSubmissionPreprocessors.add(preprocessor);
+    }
+
     public List<EditSubmissionVTwoPreprocessor> getEditSubmissionPreprocessors() {
         return editSubmissionPreprocessors;
     }
@@ -974,7 +974,7 @@ public class EditConfigurationVTwo {
     public void setTemplate(String template){
         this.template = template;
     }
-    
+
     public String getTemplate() {
         return this.template;
     }
@@ -986,21 +986,21 @@ public class EditConfigurationVTwo {
     public void setSubmitToUrl(String submitToUrl) {
         this.submitToUrl = submitToUrl;
     }
-    
+
     public boolean isUpdate(){
-        //return isObjectPropertyUpdate() || isDataPropertyUpdate(); 
+        //return isObjectPropertyUpdate() || isDataPropertyUpdate();
     	//TODO: Change back if this doesn't work
     	return isObjectPropertyUpdate() || isDataPropertyUpdate() || isParamUpdate();
     }
-    
+
     public boolean isObjectPropertyUpdate(){
-        return this.getObject() != null && this.getObject().trim().length() > 0;  
+        return this.getObject() != null && this.getObject().trim().length() > 0;
     }
-    
+
     public boolean isDataPropertyUpdate() {
     	return this.getDatapropKey() != null ;
     }
-    
+
     //*****TEST Method***Remove if doesn't work******//
     public boolean isParamUpdate = false;
     public void setParamUpdate (boolean inputParamUpdate) {
@@ -1009,12 +1009,12 @@ public class EditConfigurationVTwo {
     public boolean isParamUpdate() {
     	return this.isParamUpdate;
     }
-    
+
     //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
     //How about we change pageData to something else since page is in the name of just about everything related
     //to templates.
-    
-    /** This is for specific data for a form that will be set by the generator. */    
+
+    /** This is for specific data for a form that will be set by the generator. */
 	public  void setFormSpecificData(HashMap<String, Object> formSpecificData) {
 		this.formSpecificData = formSpecificData;
 	}
@@ -1026,141 +1026,141 @@ public class EditConfigurationVTwo {
 	    if( this.formSpecificData == null){
 	        this.formSpecificData = new HashMap<String,Object>();
 	    }
-	    this.formSpecificData.put(key,value);	    
+	    this.formSpecificData.put(key,value);
 	}
-	
+
     //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
     //How about we change pageData to something else since page is in the name of just about everything related
     //to templates.
-	
-	public HashMap<String, Object> getFormSpecificData() {	
+
+	public HashMap<String, Object> getFormSpecificData() {
 		return this.formSpecificData;
 	}
 
 	public boolean hasBeenPreparedForUpdate() {
 	    return hasBeenPreparedForUpdate;
 	}
-	
-    public void addNewResource(String key, String namespace){        
-        if( key == null || key.isEmpty() ) 
+
+    public void addNewResource(String key, String namespace){
+        if( key == null || key.isEmpty() )
             throw new IllegalArgumentException("key of new resource must not be null");
         if( newResources == null ) {
             newResources = new HashMap<String,String>();
-            newResources.put(key, namespace);            
+            newResources.put(key, namespace);
         }else{
-            newResources.put(key, namespace);            
-        }        
+            newResources.put(key, namespace);
+        }
     }
-    
+
     public void addSparqlForExistingLiteral(String key, String sparql){
-        if( key == null || key.isEmpty() ) 
-            throw new IllegalArgumentException("key must not be null");
-        if( sparql == null || sparql .isEmpty() ) 
-            throw new IllegalArgumentException("sparql must not be null");
-        
-        Map<String,String> map = sparqlForExistingLiterals;
-        if( map == null ) {
-            map = new HashMap<String,String>();
-            map.put(key, sparql);   
-            setSparqlForExistingLiterals(map);
-        }else{
-            map.put(key, sparql);            
-        }        
-    }
-    
-    public void addSparqlForExistingUris(String key, String sparql){
-        if( key == null || key.isEmpty() ) 
+        if( key == null || key.isEmpty() )
             throw new IllegalArgumentException("key must not be null");
         if( sparql == null || sparql .isEmpty() )
             throw new IllegalArgumentException("sparql must not be null");
-        
+
+        Map<String,String> map = sparqlForExistingLiterals;
+        if( map == null ) {
+            map = new HashMap<String,String>();
+            map.put(key, sparql);
+            setSparqlForExistingLiterals(map);
+        }else{
+            map.put(key, sparql);
+        }
+    }
+
+    public void addSparqlForExistingUris(String key, String sparql){
+        if( key == null || key.isEmpty() )
+            throw new IllegalArgumentException("key must not be null");
+        if( sparql == null || sparql .isEmpty() )
+            throw new IllegalArgumentException("sparql must not be null");
+
         Map<String,String> map = sparqlForExistingUris;
         if( map == null ) {
             map = new HashMap<String,String>();
             map.put(key, sparql);
             setSparqlForExistingUris(map);
         }else{
-            map.put(key, sparql);            
-        }        
+            map.put(key, sparql);
+        }
     }
-    
+
     public void addSparqlForAdditionalLiteralsInScope(String key, String sparql){
-        if( key == null || key.isEmpty() ) 
-            throw new IllegalArgumentException("key must not be null");
-        if( sparql == null || sparql .isEmpty() ) 
-            throw new IllegalArgumentException("sparql must not be null");
-        
-        Map<String,String> map = sparqlForAdditionalLiteralsInScope;
-        if( map == null ) {
-            map = new HashMap<String,String>();
-            map.put(key, sparql);      
-            setSparqlForAdditionalLiteralsInScope(map);
-        }else{
-            map.put(key, sparql);            
-        }        
-    }
-    
-    public void addSparqlForAdditionalUrisInScope(String key, String sparql){
-        if( key == null || key.isEmpty() ) 
+        if( key == null || key.isEmpty() )
             throw new IllegalArgumentException("key must not be null");
         if( sparql == null || sparql .isEmpty() )
             throw new IllegalArgumentException("sparql must not be null");
-        
+
+        Map<String,String> map = sparqlForAdditionalLiteralsInScope;
+        if( map == null ) {
+            map = new HashMap<String,String>();
+            map.put(key, sparql);
+            setSparqlForAdditionalLiteralsInScope(map);
+        }else{
+            map.put(key, sparql);
+        }
+    }
+
+    public void addSparqlForAdditionalUrisInScope(String key, String sparql){
+        if( key == null || key.isEmpty() )
+            throw new IllegalArgumentException("key must not be null");
+        if( sparql == null || sparql .isEmpty() )
+            throw new IllegalArgumentException("sparql must not be null");
+
         Map<String,String> map = sparqlForAdditionalUrisInScope;
         if( map == null ) {
             map = new HashMap<String,String>();
             map.put(key, sparql);
             setSparqlForAdditionalUrisInScope(map);
         }else{
-            map.put(key, sparql);            
-        }        
+            map.put(key, sparql);
+        }
     }
 
     public void addField( FieldVTwo field){
-        if( field == null ) 
+        if( field == null )
             throw new IllegalArgumentException("field must not be null");
-        if( field.getName() == null || field.getName().isEmpty() ) 
-            throw new IllegalArgumentException("field must not have null or empty name");        
+        if( field.getName() == null || field.getName().isEmpty() )
+            throw new IllegalArgumentException("field must not have null or empty name");
         if( fields == null )
             fields = new HashMap<String, FieldVTwo>();
-                
+
         if( fields.containsKey(field.getName() ))
             throw new IllegalArgumentException("adding filed that is already in the field list");
-        
-        fields.put( field.getName(), field);                
+
+        fields.put( field.getName(), field);
     }
 
     public void addFields(List<FieldVTwo> fields) {
-    	if( fields != null ) 
-	    {    	
+    	if( fields != null )
+	    {
     		for(FieldVTwo f: fields) {
 	    		this.addField(f);
 	    	}
     	}
-    	
+
     }
-    
+
     @Override
-    public String toString(){        
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        
+    public String toString(){
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
-    
+
     private static final String INDIVIDUAL_CONTROLLER = "/individual";
 
     public EditConfigurationVTwo addLiteralInScope(String key, Literal ... values) {
         if( literalsInScope  == null ){
             literalsInScope = new HashMap<String, List<Literal>>();
-        }        
+        }
         literalsInScope.put(key, Arrays.asList(values));
-        return this;                
+        return this;
     }
-    
+
     public EditConfigurationVTwo addLiteralsInScope(Map<String, List<Literal>> scopeLiterals) {
         if( literalsInScope  == null ){
             literalsInScope = new HashMap<String, List<Literal>>();
-        }        
+        }
         literalsInScope.putAll(scopeLiterals);
-        return this;                
+        return this;
     }
 
     public void setUrlToReturnTo(String url){
@@ -1174,7 +1174,7 @@ public class EditConfigurationVTwo {
     public void setSkipToUrl(String url){
         skipToUrl=url;
     }
-    
+
     public String getSkipToUrl() {
         return skipToUrl;
     }
@@ -1201,5 +1201,5 @@ public class EditConfigurationVTwo {
 
     public String getTboxModelId() {
         return tboxModelId;
-    }    
+    }
 }

@@ -29,14 +29,14 @@ public class TestController extends FreemarkerHttpServlet {
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
         //Portal portal = vreq.getPortal();
-        
+
         Map<String, Object> body = new HashMap<String, Object>();
-        
+
         body.put("title", "Freemarker Test");
 
-        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);       
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
-    
+
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return "Test";

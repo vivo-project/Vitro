@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 public class RefactorRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(RefactorRetryController.class.getName());
 
 	private void doRenameResource(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
@@ -38,7 +38,7 @@ public class RefactorRetryController extends BaseEditController {
 		request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
 	}
-	
+
 	private void doMovePropertyStatements(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		epo.setAttribute("modeStr","movePropertyStatements");
 		String propertyURI = request.getParameter("propertyURI");
@@ -52,7 +52,7 @@ public class RefactorRetryController extends BaseEditController {
 		subjectClassOpts.add(0,new Option("","? wildcard",true));
 		optMap.put("SubjectClassURI", subjectClassOpts);
 		optMap.put("ObjectClassURI", subjectClassOpts);
-		
+
 		List newPropertyOpts;
 		if (epo.getAttribute("propertyType").equals("ObjectProperty"))  {
 			List<ObjectProperty> opList = request.getUnfilteredWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties();
@@ -66,8 +66,8 @@ public class RefactorRetryController extends BaseEditController {
 		HashMap<String,Option> hashMap = new HashMap<String,Option>();
         newPropertyOpts = getSortedList(hashMap,newPropertyOpts,request);
 		newPropertyOpts.add(new Option("","(move to trash)"));
-		optMap.put("NewPropertyURI", newPropertyOpts);				
-		
+		optMap.put("NewPropertyURI", newPropertyOpts);
+
 		request.setAttribute("editAction","refactorOp");
 		request.setAttribute("title", "Move Property Statements");
 		request.setAttribute("formJsp", "/templates/edit/specific/movePropertyStatements_retry.jsp");
@@ -75,7 +75,7 @@ public class RefactorRetryController extends BaseEditController {
 		request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
 	}
-	
+
 	public void doMoveInstances(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		epo.setAttribute("modeStr","moveInstances");
 		String propertyURI = request.getParameter("VClassURI");
@@ -94,17 +94,17 @@ public class RefactorRetryController extends BaseEditController {
 		request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
 	}
-	
+
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
-	
+
 	    //create an EditProcessObject for this and put it in the session
 	    EditProcessObject epo = super.createEpo(request);
-	    
+
 	    VitroRequest vreq = new VitroRequest(request);
-	    
+
 	    String modeStr = request.getParameter("mode");
 
 	    if (modeStr != null) {
@@ -131,9 +131,9 @@ public class RefactorRetryController extends BaseEditController {
             log.error(e.getStackTrace());
         }
 
-	    
+
 	}
-	
-	
-    
+
+
+
 }

@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -22,27 +22,27 @@ mydomain:user01
 	auth:externalAuthId "user1";
 	auth:hasPermissionSet mydomain:role1 ;
 	.
-	
+
 mydomain:role1
 	a auth:PermissionSet ;
 	rdfs:label "Role 1" ;
 	auth:hasPermission mydomain:permissionA ;
 	.
-	
+
 mydomain:role2
 	a auth:PermissionSet ;
     a auth:PermissionSetForNewUsers ;
 	rdfs:label "Role 2" ;
 	.
-	
+
 mydomain:role3
 	a auth:PermissionSet ;
     a auth:PermissionSetForPublic ;
 	rdfs:label "Role 3" ;
 	.
-	
+
 mydomain:permissionA
     a auth:Permission ;
     rdfs:label "Permission A" ;
     .
-    
+

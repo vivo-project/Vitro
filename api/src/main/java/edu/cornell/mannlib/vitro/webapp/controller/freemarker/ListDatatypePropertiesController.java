@@ -37,12 +37,12 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
     private static Log log = LogFactory.getLog( ListDatatypePropertiesController.class );
 
     private static final String TEMPLATE_NAME = "siteAdmin-objectPropHierarchy.ftl";
-        
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
@@ -111,7 +111,7 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                         if ( counter > 0 ) {
                             json.append(", ");
                         }
-                        
+
                         String nameStr = prop.getPickListName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPickListName();
 
                         try {
@@ -119,9 +119,9 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                         } catch (Exception e) {
                             json.append("{ \"name\": ").append(JacksonUtils.quote(nameStr)).append(", ");
                         }
-                        
+
                         json.append("\"data\": { \"internalName\": ").append(JacksonUtils.quote(prop.getPickListName())).append(", ");
-                        
+
 /*                        VClass vc = null;
                         String domainStr="";
                         if (prop.getDomainClassURI() != null) {
@@ -134,12 +134,12 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                                 }
                             }
                         }
-*/                        
+*/
                         DataProperty dpLangNeut = dpDaoLangNeut.getDataPropertyByURI(prop.getURI());
                         if(dpLangNeut == null) {
                             dpLangNeut = prop;
                         }
-                        String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut); 
+                        String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut);
                         json.append("\"domainVClass\": ").append(JacksonUtils.quote(domainStr)).append(", ");
 
                         Datatype rangeDatatype = dDao.getDatatypeByURI(prop.getRangeDatatypeURI());
@@ -162,14 +162,14 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
         }
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
-    
+
     private String getVClassNameFromURI(String vclassURI, VClassDao vcDao, VClassDao vcDaoLangNeut) {
         if(vclassURI == null) {
             return "";
         }
         VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
         if(vclass == null) {
-            return ""; 
+            return "";
         }
         if(vclass.isAnonymous()) {
             return vclass.getPickListName();

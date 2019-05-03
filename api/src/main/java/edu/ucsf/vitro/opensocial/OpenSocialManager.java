@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestI
 
 public class OpenSocialManager {
 	public static final String SHINDIG_URL_PROP = "OpenSocial.shindigURL";
-	
+
 	public static final String OPENSOCIAL_DEBUG = "OPENSOCIAL_DEBUG";
 	public static final String OPENSOCIAL_NOCACHE = "OPENSOCIAL_NOCACHE";
 	public static final String OPENSOCIAL_GADGETS = "OPENSOCIAL_GADGETS";
@@ -45,12 +45,12 @@ public class OpenSocialManager {
 	public static final String TAG_NAME = "openSocial";
 
 	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
-	
-    private static final Log log = LogFactory.getLog(OpenSocialManager.class);	
+
+    private static final Log log = LogFactory.getLog(OpenSocialManager.class);
 
 	// for performance
 	private static Map<String, GadgetSpec> gadgetCache;
-	
+
 	private List<PreparedGadget> gadgets = new ArrayList<PreparedGadget>();
 	private Map<String, String> pubsubdata = new HashMap<String, String>();
 	private String viewerId = null;
@@ -65,7 +65,7 @@ public class OpenSocialManager {
 	public OpenSocialManager(VitroRequest vreq, String pageName) throws SQLException, IOException {
 		this(vreq, pageName, false);
 	}
-	
+
 	public OpenSocialManager(VitroRequest vreq, String pageName, boolean editMode) throws SQLException, IOException {
 		this.isDebug = vreq.getSession() != null
 				&& Boolean.TRUE.equals(vreq.getSession().getAttribute(OPENSOCIAL_DEBUG));
@@ -101,7 +101,7 @@ public class OpenSocialManager {
 				this.viewerId = null;
 			}
 		}
-		
+
 		String requestAppId = vreq.getParameter("appId");
 
 		dataSource = new BasicDataSource();
@@ -117,19 +117,19 @@ public class OpenSocialManager {
 		Map<String, GadgetSpec> allDBGadgets = getAllDBGadgets(!noCache);
 
 		// Add sandbox gadgets if they are present
-		if (vreq.getSession() != null && vreq.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {		
+		if (vreq.getSession() != null && vreq.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {
 			gadgets = getSandboxGadgets(vreq, allDBGadgets, requestAppId);
 		}
-		else { 		
+		else {
 			// if no manual one were added, use the ones from the DB
 			for (GadgetSpec gadgetSpec : allDBGadgets.values()) {
 				// only add ones that are visible in this context!
 				int moduleId = 0;
 				if (
 						(
-								(requestAppId == null && gadgetSpec.isEnabled()) || 
+								(requestAppId == null && gadgetSpec.isEnabled()) ||
 								(requestAppId != null && gadgetSpec.getAppId() ==  Integer.parseInt(requestAppId))
-						) && 
+						) &&
 						gadgetSpec.show(viewerId, ownerId, pageName, dataSource)
 						) {
 					String securityToken = socketSendReceive(viewerId, ownerId, "" + gadgetSpec.getAppId());
@@ -141,7 +141,7 @@ public class OpenSocialManager {
 		// sort the gadgets
 		Collections.sort(gadgets);
 	}
-	
+
 	public static void clearCache() {
 		gadgetCache = null;
 	}
@@ -153,7 +153,7 @@ public class OpenSocialManager {
 		Individual owner = requestInfo.getIndividual();
 		return owner != null ? owner.getURI() : null;
 	}
-	
+
 	private String getGadgetFileNameFromURL(String url) {
 		String[] urlbits = url.split("/");
 		return urlbits[urlbits.length - 1];
@@ -202,7 +202,7 @@ public class OpenSocialManager {
 		json.put("personIds", persons);
 		return json.toString();
 	}
-	
+
 	public static String buildJSONPersonIds(String personId, String message) {
 		List<String> personIds = new ArrayList<String>();
 		personIds.add(personId);
@@ -296,7 +296,7 @@ public class OpenSocialManager {
 			String xtraId1Type, String xtraId1Value) throws SQLException {
 		String sqlCommand = "INSERT INTO orng_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ('"
 				+ userId +  "','<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
-				+ System.currentTimeMillis() + "</postedTime><title>" + title + "</title>" 
+				+ System.currentTimeMillis() + "</postedTime><title>" + title + "</title>"
 				+ (body != null ? "<body>" + body + "</body>" : "") + "</activity>','"
 				+ xtraId1Type + "','" + xtraId1Value + "');";
 
@@ -314,7 +314,7 @@ public class OpenSocialManager {
 		// Shindig
 		String[] tokenService = configuration.getProperty(
 				"OpenSocial.tokenService").split(":");
-		String request = "c=default" + (viewer != null ? "&v=" + URLEncoder.encode(viewer, "UTF-8") : "") + 
+		String request = "c=default" + (viewer != null ? "&v=" + URLEncoder.encode(viewer, "UTF-8") : "") +
 				(owner != null ? "&o=" + URLEncoder.encode(owner, "UTF-8") : "") + "&g=" + gadget + "\r\n";
 
 		// Create a socket connection with the specified server and port.
@@ -336,7 +336,7 @@ public class OpenSocialManager {
 
 		return page.toString();
 	}
-	
+
 	public String getContainerJavascriptSrc() {
 		return configuration.getProperty(SHINDIG_URL_PROP)
 				+ "/gadgets/js/core:dynamic-height:osapi:pubsub:rpc:views:rdf:shindig-container.js?c=1"
@@ -369,12 +369,12 @@ public class OpenSocialManager {
 
 		return gadgetScriptText.toString();
 	}
-	
-	Map<String, GadgetSpec> getAllDBGadgets(boolean useCache) throws SQLException 
+
+	Map<String, GadgetSpec> getAllDBGadgets(boolean useCache) throws SQLException
 	{
 		// great place to add cache
         // check cache first
-		Map<String, GadgetSpec> allDBGadgets = useCache ? gadgetCache : null;		
+		Map<String, GadgetSpec> allDBGadgets = useCache ? gadgetCache : null;
 		if (allDBGadgets == null) {
 			allDBGadgets = new HashMap<String, GadgetSpec>();
 			String sqlCommand = "select appId, name, url, channels, enabled from orng_apps";
@@ -402,10 +402,10 @@ public class OpenSocialManager {
 
 		return allDBGadgets;
 	}
-	
+
 	private List<PreparedGadget> getSandboxGadgets(VitroRequest vreq, Map<String, GadgetSpec> allDBGadgets, String requestAppId) throws SQLException, IOException {
 		List<PreparedGadget> sandboxGadgets = new ArrayList<PreparedGadget>();
-		// Note that this block of code only gets executed after someone fills in the 
+		// Note that this block of code only gets executed after someone fills in the
 		// gadget/sandbox form!
 		String openSocialGadgetURLS = (String) vreq.getSession()
 				.getAttribute(OPENSOCIAL_GADGETS);
@@ -446,6 +446,6 @@ public class OpenSocialManager {
 			}
 		}
 		return sandboxGadgets;
-		
+
 	}
 }

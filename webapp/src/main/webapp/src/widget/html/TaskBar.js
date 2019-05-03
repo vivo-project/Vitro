@@ -68,7 +68,7 @@ dojo.lang.extend(dojo.widget.html.TaskBar, {
 	titleBarDisplay: "none",
 
 	addChild: function(child) {
-		if(!this.containerNode){ 
+		if(!this.containerNode){
 			this._addChildStack.push(child);
 		}else if(this._addChildStack.length > 0){
 			var oarr = this._addChildStack;
@@ -76,8 +76,8 @@ dojo.lang.extend(dojo.widget.html.TaskBar, {
 			dojo.lang.forEach(oarr, this.addChild, this);
 		}
 		var tbi = dojo.widget.createWidget("TaskBarItem",
-			{	windowId: child.widgetId, 
-				caption: child.title, 
+			{	windowId: child.widgetId,
+				caption: child.title,
 				iconSrc: child.iconSrc
 			});
 		dojo.widget.html.TaskBar.superclass.addChild.call(this,tbi);

@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * An immutable relationship between Proxies and Profiles.
- * 
+ *
  * In most cases, this will either be between one Proxy and many Profiles (view
  * by Proxy), or between on Profile and many Proxies (view by Profile). However,
  * we can imagine it being a many-to-many relationship.

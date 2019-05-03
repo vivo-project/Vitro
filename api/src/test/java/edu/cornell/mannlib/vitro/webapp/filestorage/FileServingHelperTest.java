@@ -30,7 +30,7 @@ public class FileServingHelperTest extends AbstractTestClass {
 	@Before
 	public void createConfigurationProperties() throws Exception {
 		setLoggerLevel(ConfigurationProperties.class, Level.WARN);
-		
+
 		ctx = new ServletContextStub();
 
 		ConfigurationPropertiesStub props = new ConfigurationPropertiesStub();

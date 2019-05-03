@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 /**
  * Some useful methods for assembling JSON structures that will match the test
  * results.
- * 
+ *
  * Also, some methods for running the tests, with and without kluging the
  * results.
  */
@@ -136,7 +136,7 @@ public class ListControllerTestBase extends AbstractTestClass {
 	 * That jsonTree would be an standard JSON array, except that it is missing
 	 * the enclosing brackets, so we need to add them before comparing to the
 	 * expected value.
-	 * 
+	 *
 	 * Add the brackets, read the strings, and compare.
 	 */
 	protected static void assertMatchingJson(FreemarkerHttpServlet controller,

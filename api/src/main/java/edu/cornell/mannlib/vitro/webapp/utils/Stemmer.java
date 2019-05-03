@@ -59,7 +59,7 @@ public class Stemmer
       i = 0;
       i_end = 0;
    }
-   
+
    private static final Log log = LogFactory.getLog(Stemmer.class.getName());
 
    /**
@@ -552,6 +552,6 @@ public class Stemmer
            log.trace(StemString(arg, 100));
        }
    }
-  
-   
+
+
 }

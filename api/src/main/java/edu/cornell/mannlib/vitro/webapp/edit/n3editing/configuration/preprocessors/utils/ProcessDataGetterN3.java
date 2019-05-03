@@ -21,8 +21,8 @@ public interface ProcessDataGetterN3 {
 	public List<String> retrieveN3Required(int counter);
     public List<String> retrieveN3Optional(int counter);
     public List<String >retrieveLiteralsOnForm(int counter);
-    
-     
+
+
     public List<String> retrieveUrisOnForm(int counter);
     public List<FieldVTwo> retrieveFields(int counter);
     public List<String> getLiteralVarNamesBase();
@@ -31,7 +31,7 @@ public interface ProcessDataGetterN3 {
     public String getDataGetterVar(int counter);
     public String getDataGetterVarName(int counter);
     public List<String> getNewResources(int counter);
-    
+
     //Get Existing values to put in scope
     public Map<String, List<Literal>> retrieveExistingLiteralValues();
     public Map<String, List<String>> retrieveExistingUriValues();

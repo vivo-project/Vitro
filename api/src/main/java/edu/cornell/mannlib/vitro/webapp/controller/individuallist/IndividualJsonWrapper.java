@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * Wrap an Individual in a JSON object for display by the script.
- * 
+ *
  * This will be overridden in VIVO so we can have more info in the display.
  */
 public class IndividualJsonWrapper {

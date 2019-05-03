@@ -33,7 +33,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 			.getLog(IndividualController.class);
 
 	private static final String TEMPLATE_HELP = "individual-help.ftl";
-	
+
 	@Deprecated
 	private static final String PROPERTY_EXTENDED_LOD = "serveExtendedLinkedData";
 

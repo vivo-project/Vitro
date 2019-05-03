@@ -17,7 +17,7 @@ public class JenaTDBDataSource extends DataSourceBase {
 
     /**
      * The request processor
-     * 
+     *
      */
     protected final JenaTDBBasedRequestProcessorForTPFs requestProcessor;
 

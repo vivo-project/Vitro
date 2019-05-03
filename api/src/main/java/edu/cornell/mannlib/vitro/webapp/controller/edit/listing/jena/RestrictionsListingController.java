@@ -42,10 +42,10 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 public class RestrictionsListingController extends BaseEditController {
 
 	private static String LAMBDA = "";
-	
+
 	private EditProcessObject epo = null;
-	
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {    	
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
@@ -53,13 +53,13 @@ public class RestrictionsListingController extends BaseEditController {
         VitroRequest vrequest = new VitroRequest(request);
 
         epo = super.createEpo(request);
-        
+
 		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
 
         ObjectPropertyDao opDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         VClassDao vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
         IndividualDao iDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
-        
+
         ArrayList results = new ArrayList();
         request.setAttribute("results",results);
         results.add("XX");
@@ -67,7 +67,7 @@ public class RestrictionsListingController extends BaseEditController {
         results.add("restriction");
         results.add("filler(s)");
         results.add(LAMBDA);
-        
+
         String vClassURI = request.getParameter("VClassURI");
 
         if (vClassURI != null) {
@@ -104,7 +104,7 @@ public class RestrictionsListingController extends BaseEditController {
         }
 
 
-        
+
 
         request.setAttribute("columncount",new Integer(5));
         request.setAttribute("suppressquery","true");
@@ -116,7 +116,7 @@ public class RestrictionsListingController extends BaseEditController {
         }
 
     }
-    
+
     private void tryRestriction(OntClass theClass, VClassDao vcDao, ObjectPropertyDao opDao, IndividualDao iDao, ArrayList results, String vClassURI) {
 		if (theClass.isRestriction()) {
 			Restriction rest = (Restriction) theClass.as(Restriction.class);
@@ -129,7 +129,7 @@ public class RestrictionsListingController extends BaseEditController {
 					results.add("all values from");
 					AllValuesFromRestriction avfrest = (AllValuesFromRestriction) rest.as(AllValuesFromRestriction.class);
 					Resource allValuesFrom = avfrest.getAllValuesFrom();
-					results.add(printAsClass(vcDao, allValuesFrom));	        					
+					results.add(printAsClass(vcDao, allValuesFrom));
 				} else if (rest.isSomeValuesFromRestriction()) {
 					results.add("some values from");
 					SomeValuesFromRestriction svfrest = (SomeValuesFromRestriction) rest.as(SomeValuesFromRestriction.class);
@@ -152,7 +152,7 @@ public class RestrictionsListingController extends BaseEditController {
 							results.add("???");
 						}
 					}
-					
+
 				} else if (rest.isMinCardinalityRestriction()) {
 					MinCardinalityRestriction crest = (MinCardinalityRestriction) rest.as(MinCardinalityRestriction.class);
 					results.add("at least "+crest.getMinCardinality());
@@ -166,22 +166,22 @@ public class RestrictionsListingController extends BaseEditController {
 					results.add("exactly "+crest.getCardinality());
 					results.add(LAMBDA);
 				}
-				
+
 				results.add("<form action=\"addRestriction\" method=\"post\">" +
 						        "<input type=\"hidden\" name=\"_action\" value=\"delete\"/>" +
-						        "<input type=\"submit\" value=\"Delete\"/>" + 
+						        "<input type=\"submit\" value=\"Delete\"/>" +
 						        "<input type=\"hidden\" name=\"_epoKey\" value=\""+epo.getKey()+"\"/>" +
 						        "<input type=\"hidden\" name=\"classUri\" value=\""+vClassURI+"\"/>" +
 						        "<input type=\"hidden\" name=\"restrictionId\" value=\""+( (rest.getId() != null) ? rest.getId() : rest.getURI() )+"\"/>" +
 						    "</form>");
-				
+
 			} catch (Exception e) {
 				e.printStackTrace(); // results.add("unknown property");
 			}
-					
-		}	
+
+		}
     }
-    
+
     private String printAsClass(VClassDao vcDao, Resource res) {
     	String UNKNOWN = "???";
     	try {
@@ -199,6 +199,6 @@ public class RestrictionsListingController extends BaseEditController {
     	results.add(LAMBDA);
     	results.add(LAMBDA);
     }
-    
-	
+
+
 }

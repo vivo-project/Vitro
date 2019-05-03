@@ -29,14 +29,14 @@ import javax.servlet.annotation.WebServlet;
 public class ListClassGroupsController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ListClassGroupsController.class.getName());
-    
+
     private static final String TEMPLATE_NAME = "siteAdmin-classHierarchy.ftl";
-        
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
@@ -48,7 +48,7 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
 
             VClassGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getVClassGroupDao();
 
-            List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); 
+            List<VClassGroup> groups = dao.getPublicGroupsWithVClasses();
 
             StringBuilder json = new StringBuilder();
             int counter = 0;
@@ -61,16 +61,16 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                     String publicName = vcg.getPublicName();
                     if ( StringUtils.isBlank(publicName) ) {
                         publicName = "(unnamed group)";
-                    }           
+                    }
                     try {
                         json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./editForm?uri=" + URLEncoder.encode(vcg.getURI()) + "&amp;controller=Classgroup'>" + publicName + "</a>")).append(", ");
                     } catch (Exception e) {
                         json.append("{ \"name\": ").append(JacksonUtils.quote(publicName)).append(", ");
                     }
                     Integer t;
-                    
+
                     json.append("\"data\": { \"displayRank\": \"").append(((t = Integer.valueOf(vcg.getDisplayRank())) != -1) ? t.toString() : "").append("\"}, ");
-                    
+
                     List<VClass> classList = vcg.getVitroClassList();
                     if (classList != null && classList.size()>0) {
                         json.append("\"children\": [");
@@ -91,7 +91,7 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                             json.append("\"data\": { \"shortDef\": ").append(JacksonUtils.quote(shortDefStr)).append("}, \"children\": [] ");
                             if (classIt.hasNext())
                                 json.append("} , ");
-                            else 
+                            else
                                 json.append("}] ");
                         }
                     }
@@ -108,7 +108,7 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
         } catch (Throwable t) {
                 t.printStackTrace();
         }
-        
+
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
 

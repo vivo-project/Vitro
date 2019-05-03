@@ -103,7 +103,7 @@ dojo.lang.mixin(dojo.doc, {
 		dojo.debug("getSrc()");
 		if(!selectKey){
 			selectKey = ++dojo.doc._count;
-		}	
+		}
 		dojo.doc._buildCache({
 			type: "src",
 			callbacks: [callback],
@@ -115,7 +115,7 @@ dojo.lang.mixin(dojo.doc, {
 
 	_getSrc: function(/*String*/ type, /*Object*/ data, /*Object*/ evt){
 		dojo.debug("_getSrc()");
-		if(evt.pkg){	
+		if(evt.pkg){
 			evt.type = "src";
 			dojo.doc._buildCache(evt);
 		}else{
@@ -144,7 +144,7 @@ dojo.lang.mixin(dojo.doc, {
 
 	_getDoc: function(/*String*/ type, /*Object*/ data, /*Object*/ evt){
 		dojo.debug("_getDoc(" + evt.pkg + "/" + evt.name + ")");
-	
+
 		dojo.doc._keys[evt.selectKey] = {count: 0};
 
 		var search = {};
@@ -157,9 +157,9 @@ dojo.lang.mixin(dojo.doc, {
 			search.filter = "it/DocFnForm/require = '" + evt.pkg + "' and it/DocFnForm/name = '" + evt.name + "' and it/DocFnForm/id = '" + evt.id + "'";
 		}
 		dojo.debug(dojo.json.serialize(search));
-	
+
 		dojo.doc._rpc.callRemote("search", search).addCallbacks(function(data){ evt.type = "fn"; dojo.doc._gotDoc("load", data.list[0], evt); }, function(data){ evt.type = "fn"; dojo.doc._gotDoc("error", {}, evt); });
-	
+
 		search.forFormName = "DocParamForm";
 
 		if(!evt.id){
@@ -186,7 +186,7 @@ dojo.lang.mixin(dojo.doc, {
 				description = dojo.dom.createDocumentFromText(keys.fn["main/text"]).childNodes[0].innerHTML;
 				if(!description){
 					description = keys.fn["main/text"];
-				}			
+				}
 			}
 			data = {
 				description: description,
@@ -202,7 +202,7 @@ dojo.lang.mixin(dojo.doc, {
 			}
 
 			delete dojo.doc._keys[evt.selectKey];
-		
+
 			if(evt.callbacks && evt.callbacks.length){
 				var callback = evt.callbacks.shift();
 				callback.call(null, "load", data, evt);
@@ -308,7 +308,7 @@ dojo.lang.mixin(dojo.doc, {
 			dojo.doc._printResults(results);
 		}
 	},
-	
+
 	_printResults: function(results){
 		dojo.debug("_printResults(): called");
 		// summary: Call this function to send the /doc/results topic
@@ -349,7 +349,7 @@ dojo.lang.mixin(dojo.doc, {
 			delete dojo.doc._myKeys[evt.selectKey];
 		}
 	},
-	
+
 	_printFunctionDetail: function(results) {
 		// summary: Call this function to send the /doc/functionDetail topic event
 	},
@@ -363,7 +363,7 @@ dojo.lang.mixin(dojo.doc, {
 			id = "_";
 		}
 		var name = input.name;
-	
+
 		dojo.debug("_buildCache() type: " + type);
 		if(type == "function_names"){
 			if(!dojo.doc._cache["function_names"]){
@@ -525,11 +525,11 @@ dojo.lang.mixin(dojo.doc, {
 					if(!cache[pkg]){
 						dojo.doc._cache[pkg] = {};
 					}
-				
+
 					if(!cache[pkg]["meta"]){
 						dojo.doc._cache[pkg]["meta"] = {};
 					}
-				
+
 					var methods = data.methods;
 					if(methods){
 						for(var method in methods){

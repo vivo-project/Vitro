@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /**
  * A mock instance of ContextModelAccess for use in unit tests.
- * 
+ *
  * I have only implemented the methods that I needed for my tests. Feel free to
  * implement the rest, as needed.
  */
@@ -47,11 +47,11 @@ public class ContextModelAccessStub implements ContextModelAccess {
 			ReasoningOption option) {
 		wadfMap.put(option, wadf);
 	}
-	
+
 	public void setRDFService(WhichService which, RDFService rdfService) {
 		rdfServiceMap.put(which, rdfService);
 	}
-	
+
 	public void setOntModel(String name, OntModel model) {
 		ontModelMap.put(name, model);
 	}
@@ -69,12 +69,12 @@ public class ContextModelAccessStub implements ContextModelAccess {
 	public RDFService getRDFService() {
 		return getRDFService(CONTENT);
 	}
-	
+
 	@Override
 	public RDFService getRDFService(WhichService which) {
 		return rdfServiceMap.get(which);
 	}
-	
+
 	@Override
 	public OntModel getOntModel() {
 		return getOntModel(FULL_UNION);

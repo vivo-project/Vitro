@@ -2,13 +2,13 @@
 
 /* styles for log in */
 
-#login-form label, 
+#login-form label,
 #login-form input.text,
 #login-form #password,
 #login-form #confirmPassword,
 #login-form label.label-remember-me,
 #vivoAccountError {
-    display: block;  
+    display: block;
 }
 #login-form p.submit {
     float: left;
@@ -63,8 +63,8 @@ h3.internal-auth {
     margin-bottom: 0;
     padding-bottom: 0;
     text-decoration: none;
-    cursor: hand; 
-    cursor: pointer; 
+    cursor: hand;
+    cursor: pointer;
     text-align: center;
     line-height: 1.4em;
 }

@@ -60,10 +60,10 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
 
 @WebServlet(name = "RefactorOperationController", urlPatterns = {"/refactorOp"} )
 public class RefactorOperationController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(RefactorOperationController.class.getName());
 	private static final boolean NOTIFY = true;
-	
+
 	private String doFixDataTypes(HttpServletRequest request, HttpServletResponse response)
 	{
 		try {
@@ -75,11 +75,11 @@ public class RefactorOperationController extends BaseEditController {
 
         request.setAttribute("title","Check Datatype Properties");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
-        
+
         OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
 		ontModel.enterCriticalSection(Lock.WRITE);
 		ArrayList<String> results = new ArrayList<String>();
-				
+
 		try
 		{
 			ExtendedIterator dataProperties = ontModel.listDatatypeProperties();
@@ -116,7 +116,7 @@ public class RefactorOperationController extends BaseEditController {
 								usingPandL.close();
 								boolean valid = range.getURI().equals(l.getDatatypeURI());
 								if(valid) consistent+= size;
-								else 
+								else
 									{
 										results.add(p.getLocalName()+" has object "+l.getLexicalForm()+" of type "+l.getDatatypeURI()+" which is inconsistent");
 										String typeName = "";
@@ -132,7 +132,7 @@ public class RefactorOperationController extends BaseEditController {
 										StmtIterator badStatements = ontModel.listStatements(null, p, l);
 										StmtIterator toRemove = ontModel.listStatements(null, p, l);
 										ArrayList<Statement> queue = new ArrayList<Statement>();
-										while(badStatements.hasNext()) 
+										while(badStatements.hasNext())
 										{
 											Statement badState = badStatements.nextStatement();
 											Statement goodState = ontModel.createStatement(badState.getSubject(), p, newLiteral);
@@ -153,17 +153,17 @@ public class RefactorOperationController extends BaseEditController {
 							}
 					}
 					else results.add("ERROR: "+node.toString()+" is not a literal");
-					
+
 				}
 				n.close();
 			}
 			dataProperties.close();
-			
+
 			results.add(hasRange+" of "+total+" datatype properties have defined ranges.");
 			results.add("Of the statements that contain datatype properties with defined ranges, "+consistent+" are consistent and "+fixed+" are inconsistent.");
 			results.add(fixed+" statements have been fixed.");
 			//for(int i=0; i<results.size(); i++) System.out.println(results.get(i));
-			
+
 		}
 		finally
 		{
@@ -180,13 +180,13 @@ public class RefactorOperationController extends BaseEditController {
 
 		return "";
 	}
-	
+
 	private String doRenameResource(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
-		
+
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		String oldURIStr = (String) epo.getAttribute("oldURI");
 		String newURIStr = request.getParameter("newURI");
-			
+
 		// validateURI
 		String errorMsg = null;
 		try {
@@ -194,7 +194,7 @@ public class RefactorOperationController extends BaseEditController {
 		} catch (InvalidPropertyURIException ipue) {
 			// TODO We don't know if we're editing a property's URI or not here!
 		}
-		
+
 		if (errorMsg != null) {
 			epo.setAttribute("errorMsg",errorMsg);
             String referer = request.getHeader("Referer");
@@ -211,31 +211,31 @@ public class RefactorOperationController extends BaseEditController {
             }
             return "STOP";
 		}
-		
+
 		// find the models that the resource is referred to in and change
-		// the name in each of those models.		
+		// the name in each of those models.
 		String queryStr = "SELECT distinct ?graph WHERE {{ GRAPH ?graph { ?subj <" +  oldURIStr  + "> ?obj }} ";
 		queryStr += " union { GRAPH ?graph { <" + oldURIStr + "> ?prop ?obj }} ";
 		queryStr += " union { GRAPH ?graph { ?subj ?prop <" +  oldURIStr  + ">}}}";
 		Dataset dataset = request.getDataset();
-		
+
         QueryExecution qexec = null;
-    	dataset.getLock().enterCriticalSection(Lock.READ);        
+    	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
             qexec = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset);
     		ResultSet resultSet = qexec.execSelect();
-    		
+
     		while (resultSet.hasNext()) {
     			QuerySolution qs = resultSet.next();
     			String graphURI = qs.get("graph").asNode().toString();
-    			
+
     			if (graphURI.startsWith(FileGraphSetup.FILEGRAPH_URI_ROOT)) {
-    			   continue;	
+    			   continue;
     			}
-    			
+
     			boolean doNotify = false;
     			Model model = null;
-    			
+
     			if (TBOX_ASSERTIONS.equals(graphURI)) {
     				model = ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS).getBaseModel();
     				doNotify = true;
@@ -245,22 +245,22 @@ public class RefactorOperationController extends BaseEditController {
     			} else {
     			    model = dataset.getNamedModel(graphURI);
     		    }
-    			
+
     			renameResourceInModel(model, userURI, oldURIStr, newURIStr, doNotify);
-    		}	
+    		}
     	} finally {
             if(qexec != null) qexec.close();
     		dataset.getLock().leaveCriticalSection();
     	}
-		
-		renameResourceInModel(ModelAccess.on(getServletContext()).getOntModel(USER_ACCOUNTS), 
+
+		renameResourceInModel(ModelAccess.on(getServletContext()).getOntModel(USER_ACCOUNTS),
 				        userURI, oldURIStr, newURIStr, !NOTIFY);
-    	
+
 		// there are no statements to delete, but we want indexes updated appropriately
 		request.getUnfilteredWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
-		
+
 		String redirectStr = null;
-		
+
 		/* we can't go back to the referer, because the URI is now different. */
 		String refererStr;
 		if ( (refererStr = epo.getReferer()) != null) {
@@ -278,19 +278,19 @@ public class RefactorOperationController extends BaseEditController {
 				redirectStr = controllerStr+"?uri="+newURIStr;
 			}
 		}
-		
+
 		return redirectStr;
-		
+
 	}
-	
+
 	private void renameResourceInModel(Model model, String userURI, String oldURIStr, String newURIStr, boolean doNotify) {
-				
+
 		model.enterCriticalSection(Lock.WRITE);
-		
+
 		if (doNotify) {
 		   model.notifyEvent(new EditEvent(userURI,true));
 		}
-		
+
 		try {
 			Property prop = model.getProperty(oldURIStr); // this will create a resource if there isn't
 			                                              // one by this URI (we don't expect this to happen
@@ -314,32 +314,32 @@ public class RefactorOperationController extends BaseEditController {
 				}
 				model.remove(model.listStatements(null, prop, (RDFNode)null));
 			} catch (InvalidPropertyURIException ipue) {
-				/* if it can't be a property, don't bother with predicates */ 
-			}			
+				/* if it can't be a property, don't bother with predicates */
+			}
 			Resource res = model.getResource(oldURIStr);
 			ResourceUtils.renameResource(res,newURIStr);
-			
+
 		} finally {
 			if (doNotify) {
 			   model.notifyEvent(new EditEvent(userURI,false));
 			}
 			model.leaveCriticalSection();
-		}		
+		}
 	}
-	
+
 	private void doMovePropertyStatements(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
-		
+
 		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
-		
+
 		Model tempRetractModel = ModelFactory.createDefaultModel();
 		Model tempAddModel = ModelFactory.createDefaultModel();
-		
+
 		String oldURIStr = (String) epo.getAttribute("propertyURI");
 		String newURIStr = request.getParameter("NewPropertyURI");
 		String subjectClassURIStr = request.getParameter("SubjectClassURI");
 		String objectClassURIStr = request.getParameter("ObjectClassURI");
-		
+
 		ontModel.enterCriticalSection(Lock.READ);
 		try {
 			Resource subjClass = (subjectClassURIStr.equals("") ? null : ResourceFactory.createResource(subjectClassURIStr));
@@ -354,13 +354,13 @@ public class RefactorOperationController extends BaseEditController {
 			}
 			try {
 				newPropInv = ontModel.getObjectProperty(newProp.getURI()).getInverse();
-			} catch (Exception e) { 
+			} catch (Exception e) {
 			    // forget about dealing with an inverse if we hit any trouble here
 			}
-			RDFNode objClass = (objectClassURIStr == null || objectClassURIStr.equals("")) 
-			        ? null 
+			RDFNode objClass = (objectClassURIStr == null || objectClassURIStr.equals(""))
+			        ? null
 			        : ResourceFactory.createResource(objectClassURIStr);
-			
+
 			StmtIterator closeIt = (epo.getAttribute("propertyType").equals("ObjectProperty")) ?
 				ontModel.listStatements(null,prop,(Resource)null) :
 				ontModel.listStatements(null,prop,(Literal)null);
@@ -410,18 +410,18 @@ public class RefactorOperationController extends BaseEditController {
 		}
 
 	}
-	
+
 	private void doMoveInstances(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
-		
+
 		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
-		
+
 		String oldClassURIStr = (String) epo.getAttribute("VClassURI");
 		String newClassURIStr = (String) request.getParameter("NewVClassURI");
-		
+
 		Model tempRetractModel = ModelFactory.createDefaultModel();
 		Model tempAddModel = ModelFactory.createDefaultModel();
-		
+
 		ontModel.enterCriticalSection(Lock.READ);
 		try {
 			Resource oldClassRes = ontModel.getResource(oldClassURIStr);
@@ -441,7 +441,7 @@ public class RefactorOperationController extends BaseEditController {
 		} finally {
 			ontModel.leaveCriticalSection();
 		}
-		
+
 		ontModel.enterCriticalSection(Lock.WRITE);
 		ontModel.getBaseModel().notifyEvent(new EditEvent(userURI,true));
 		try {
@@ -451,9 +451,9 @@ public class RefactorOperationController extends BaseEditController {
 			ontModel.getBaseModel().notifyEvent(new EditEvent(userURI,false));
 			ontModel.leaveCriticalSection();
 		}
-		
+
 	}
-	
+
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
@@ -461,7 +461,7 @@ public class RefactorOperationController extends BaseEditController {
 
     	VitroRequest vreq = new VitroRequest(req);
     	String defaultLandingPage = getDefaultLandingPage(vreq);
-    	
+
         HashMap epoHash = null;
         EditProcessObject epo = null;
         try {
@@ -477,18 +477,18 @@ public class RefactorOperationController extends BaseEditController {
             }
             return;
         }
-        
+
         String modeStr;
-        if (epo == null) 
+        if (epo == null)
         {
         	// Handles the case where we want to a type check on objects of datatype properties
         	handleConsistencyCheckRequest(vreq, response);
         	return;
         }
         else modeStr = (String)epo.getAttribute("modeStr");
-        
+
         String redirectStr = null;
-        
+
         if (vreq.getParameter("_cancel") == null) {
 	        if (modeStr != null) {
 
@@ -505,7 +505,7 @@ public class RefactorOperationController extends BaseEditController {
 				}
 	        }
         }
-        
+
         if (!"STOP".equals(redirectStr)) {
 	        if (redirectStr == null) {
 	        	redirectStr = (epo.getReferer()==null) ? defaultLandingPage : epo.getReferer();
@@ -519,20 +519,20 @@ public class RefactorOperationController extends BaseEditController {
         }
 
     }
-    
-    
+
+
     private void handleConsistencyCheckRequest(HttpServletRequest req, HttpServletResponse response)
     {
     	String modeStr = req.getParameter("modeStr");
     	if(modeStr != null)
     		if (modeStr.equals("fixDataTypes")) doFixDataTypes(req,response);
     }
-    
+
     public void doGet(HttpServletRequest req, HttpServletResponse response)
     {
     	doPost(req, response);
     }
-        
+
 }
-        
+
 

@@ -26,13 +26,13 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 /*
- * Custom deletion controller to which deletion requests from default property form are sent. May be replaced 
+ * Custom deletion controller to which deletion requests from default property form are sent. May be replaced
  * later with additional features in process rdf form controller or alternative location.
  */
 @WebServlet(name = "DeletePropertyController", urlPatterns = {"/deletePropertyController"} )
 public class DeletePropertyController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(DeletePropertyController.class);
- 
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.DO_FRONT_END_EDITING.ACTION ;
@@ -45,7 +45,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	if(errorMessage != null) {
     		return doErrorMessage(errorMessage);
     	}
-    	
+
     	//handle based on whether object property or data property
     	if(EditConfigurationUtils.isObjectProperty(
     			EditConfigurationUtils.getPredicateUri(vreq), vreq))
@@ -54,12 +54,12 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	} else {
     		processDataProperty(vreq);
     	}
-   
+
     	String redirectUrl = getRedirectUrl(vreq);
     	return new RedirectResponseValues(redirectUrl, HttpServletResponse.SC_SEE_OTHER);
     }
-    
-    
+
+
     private String getRedirectUrl(VitroRequest vreq) {
 		// TODO Auto-generated method stub
     	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
@@ -81,7 +81,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	if(subject == null) {
     		return "could not find subject " + EditConfigurationUtils.getSubjectUri(vreq);
     	}
-    	
+
     	//if object property, check object property otherwise check data property
     	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
     	if(EditConfigurationUtils.isObjectProperty(predicateUri, vreq)) {
@@ -91,14 +91,14 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     		}
     	} else {
     		DataProperty prop = getDataProperty(vreq);
-    		
+
     		if(prop == null) {
     			return "In delete property controller, could not find data property " + predicateUri;
     		}
     	}
-    	
+
     	return null;
-		
+
 	}
 
 	private DataProperty getDataProperty(VitroRequest vreq) {
@@ -116,16 +116,16 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 	private TemplateResponseValues doErrorMessage(String errorMessage) {
 		HashMap<String,Object> map = new HashMap<String,Object>();
 	   	map.put("errorMessage", errorMessage);
-	   	return new TemplateResponseValues("error-message.ftl", map); 
+	   	return new TemplateResponseValues("error-message.ftl", map);
 	}
-		
+
 
 
 	//process data property
     private void processDataProperty(VitroRequest vreq) {
-    	deleteDataPropertyStatement(vreq);		
+    	deleteDataPropertyStatement(vreq);
     }
-    
+
     private void deleteDataPropertyStatement(VitroRequest vreq) {
     	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
@@ -133,9 +133,9 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	int dataHash = EditConfigurationUtils.getDataHash(vreq);
 		DataPropertyStatement dps = EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-		
-		
-		
+
+
+
 		if(dps != null) {
 			logDataPropertyDeletionMessages(dps);
 			processDataPropertyStatement(dps, subjectUri, predicateUri);
@@ -164,14 +164,14 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
         log.debug( "predicateURI <" + dps.getDatapropURI() + ">");
         log.debug( "literal \"" + dps.getData() + "\"" );
         log.debug( "lang @" + (dps.getLanguage() == null ? "null" : dps.getLanguage()));
-        log.debug( "datatype ^^" + (dps.getDatatypeURI() == null ? "null" : dps.getDatatypeURI() ));       
-		
+        log.debug( "datatype ^^" + (dps.getDatatypeURI() == null ? "null" : dps.getDatatypeURI() ));
+
 	}
 
 	//process object property
     private void processObjectProperty(VitroRequest vreq) {
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
-    	    	
+
     	//if this property is true, it means the object needs to be deleted along with statement
     	//while the second test is to see if a different object uri (i.e. not the direct objet of the predicate)
     	//needs to be deleted
@@ -179,13 +179,13 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	{
     		deleteObjectIndividual(vreq);
     	}
-    	
+
     	if(!hasDeleteObjectUri(vreq)) {
     		deleteObjectPropertyStatement(vreq);
     	}
-		
+
     }
-    
+
     private void deleteObjectPropertyStatement(VitroRequest vreq) {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
@@ -196,17 +196,17 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 	}
 
 	private Individual getObjectIndividualForDeletion(VitroRequest vreq, String objectUri) {
-    
+
     	Individual object = EditConfigurationUtils.getIndividual(vreq, objectUri);
     	if(object == null) {
 			WebappDaoFactory wadf = ModelAccess.on(vreq.getSession().getServletContext()).getWebappDaoFactory();
     		object = wadf.getIndividualDao().getIndividualByURI(objectUri);
     	}
-    	
+
     	return object;
-    	
+
     }
-    
+
     private void deleteObjectIndividual(VitroRequest vreq) {
     	String objectUri = EditConfigurationUtils.getObjectUri(vreq);
     	if(hasDeleteObjectUri(vreq)) {
@@ -223,21 +223,21 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     		log.error("could not find object as request attribute or in model " + objectUri);
     	}
     }
-    
+
     //This checks if the object uri is not the individual to be deleted but another individual connected
     private String getDeleteObjectUri(VitroRequest vreq) {
     	return (String) vreq.getParameter("deleteObjectUri");
     }
-    
+
     private boolean hasDeleteObjectUri(VitroRequest vreq) {
     	String deleteObjectUri = getDeleteObjectUri(vreq);
     	return (deleteObjectUri != null && !deleteObjectUri.isEmpty());
     }
 
-    
 
-    
-    
-    
-    
+
+
+
+
+
 }

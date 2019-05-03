@@ -10,15 +10,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FreemarkerSetup implements ServletContextListener {
-    
+
     private static final Log log = LogFactory.getLog(FreemarkerSetup.class);
 
 	@Override
-	public void contextInitialized(ServletContextEvent event) {	
-		ServletContext sc = event.getServletContext();	
+	public void contextInitialized(ServletContextEvent event) {
+		ServletContext sc = event.getServletContext();
         FreemarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
-		
+
 		log.info("Freemarker templating system initialized.");
 	}
 

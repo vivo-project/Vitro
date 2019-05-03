@@ -8,11 +8,11 @@ import java.util.Map;
 /**
  * A builder object that can assemble a map of search result field names to JSON
  * field names.
- * 
+ *
  * Use like this:
- * 
+ *
  * m = SearchQueryUtils.fieldMap().put("this", "that").put("2nd", "row").map();
- * 
+ *
  */
 public class FieldMap {
 	private final Map<String, String> m = new HashMap<String, String>();

@@ -63,9 +63,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(PagedSearchController.class);
-    
+
     protected static final int DEFAULT_HITS_PER_PAGE = 25;
-    protected static final int DEFAULT_MAX_HIT_COUNT = 1000;   
+    protected static final int DEFAULT_MAX_HIT_COUNT = 1000;
 
     private static final String PARAM_XML_REQUEST = "xml";
     private static final String PARAM_CSV_REQUEST = "csv";
@@ -77,22 +77,22 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     protected static final Map<Format,Map<Result,String>> templateTable;
 
-    protected enum Format { 
-        HTML, XML, CSV; 
+    protected enum Format {
+        HTML, XML, CSV;
     }
-    
+
     protected enum Result {
-        PAGED, ERROR, BAD_QUERY         
+        PAGED, ERROR, BAD_QUERY
     }
-    
+
     static{
         templateTable = setupTemplateTable();
     }
-         
+
     /**
      * Overriding doGet from FreemarkerHttpController to do a page template (as
      * opposed to body template) style output for XML requests.
-     * 
+     *
      * This follows the pattern in AutocompleteController.java.
      */
     @Override
@@ -104,9 +104,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         if( !wasXmlRequested && !wasCSVRequested){
             super.doGet(vreq,response);
         }else if (wasXmlRequested){
-            try {                
+            try {
                 ResponseValues rvalues = processRequest(vreq);
-                
+
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/xml;charset=UTF-8");
                 response.setHeader("Content-Disposition", "attachment; filename=search.xml");
@@ -115,9 +115,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 log.error(e, e);
             }
         }else if (wasCSVRequested){
-        	try {                
+        	try {
                 ResponseValues rvalues = processRequest(vreq);
-                
+
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/csv;charset=UTF-8");
                 response.setHeader("Content-Disposition", "attachment; filename=search.csv");
@@ -129,19 +129,19 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     }
 
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {    	    	
-    	
+    protected ResponseValues processRequest(VitroRequest vreq) {
+
         //There may be other non-html formats in the future
-        Format format = getFormat(vreq);            
+        Format format = getFormat(vreq);
         boolean wasXmlRequested = Format.XML == format;
         boolean wasCSVRequested = Format.CSV == format;
         log.debug("Requested format was " + (wasXmlRequested ? "xml" : "html"));
-        boolean wasHtmlRequested = ! (wasXmlRequested || wasCSVRequested); 
-        
+        boolean wasHtmlRequested = ! (wasXmlRequested || wasCSVRequested);
+
         try {
-            
-            //make sure an IndividualDao is available 
-            if( vreq.getWebappDaoFactory() == null 
+
+            //make sure an IndividualDao is available
+            if( vreq.getWebappDaoFactory() == null
                     || vreq.getWebappDaoFactory().getIndividualDao() == null ){
                 log.error("Could not get webappDaoFactory or IndividualDao");
                 throw new Exception("Could not access model.");
@@ -149,53 +149,53 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();
             VClassGroupDao grpDao = vreq.getWebappDaoFactory().getVClassGroupDao();
             VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
-            
-            ApplicationBean appBean = vreq.getAppBean();
-            
-            log.debug("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
-            log.debug("VClassDao is "+ vclassDao.toString() );            
-            
-            int startIndex = getStartIndex(vreq);            
-            int hitsPerPage = getHitsPerPage( vreq );           
 
-            String queryText = vreq.getParameter(PARAM_QUERY_TEXT);  
-            log.debug("Query text is \""+ queryText + "\""); 
+            ApplicationBean appBean = vreq.getAppBean();
+
+            log.debug("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
+            log.debug("VClassDao is "+ vclassDao.toString() );
+
+            int startIndex = getStartIndex(vreq);
+            int hitsPerPage = getHitsPerPage( vreq );
+
+            String queryText = vreq.getParameter(PARAM_QUERY_TEXT);
+            log.debug("Query text is \""+ queryText + "\"");
 
 
             String badQueryMsg = badQueryText( queryText, vreq );
             if( badQueryMsg != null ){
                 return doFailedSearch(badQueryMsg, queryText, format, vreq);
             }
-                
-            SearchQuery query = getQuery(queryText, hitsPerPage, startIndex, vreq);            
+
+            SearchQuery query = getQuery(queryText, hitsPerPage, startIndex, vreq);
             SearchEngine search = ApplicationUtils.instance().getSearchEngine();
-            SearchResponse response = null;           
-            
+            SearchResponse response = null;
+
             try {
                 response = search.query(query);
-            } catch (Exception ex) {                
+            } catch (Exception ex) {
                 String msg = makeBadSearchMessage(queryText, ex.getMessage(), vreq);
                 log.error("could not run search query",ex);
-                return doFailedSearch(msg, queryText, format, vreq);              
+                return doFailedSearch(msg, queryText, format, vreq);
             }
-            
+
             if (response == null) {
-                log.error("Search response was null");                                
+                log.error("Search response was null");
                 return doFailedSearch(I18n.text(vreq, "error_in_search_request"), queryText, format, vreq);
             }
-            
+
             SearchResultDocumentList docs = response.getResults();
             if (docs == null) {
-                log.error("Document list for a search was null");                
+                log.error("Document list for a search was null");
                 return doFailedSearch(I18n.text(vreq, "error_in_search_request"), queryText,format, vreq);
             }
-                       
+
             long hitCount = docs.getNumFound();
             log.debug("Number of hits = " + hitCount);
-            if ( hitCount < 1 ) {                
+            if ( hitCount < 1 ) {
                 return doNoHits(queryText,format, vreq);
-            }            
-            
+            }
+
             List<Individual> individuals = new ArrayList<Individual>(docs.size());
             for (SearchResultDocument doc : docs) {
                 try {
@@ -208,22 +208,22 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 } catch (Exception e) {
                     log.error("Problem getting usable individuals from search hits. ", e);
                 }
-            }          
-  
+            }
+
             ParamMap pagingLinkParams = new ParamMap();
             pagingLinkParams.put(PARAM_QUERY_TEXT, queryText);
             pagingLinkParams.put(PARAM_HITS_PER_PAGE, String.valueOf(hitsPerPage));
-            
+
             if( wasXmlRequested ){
-                pagingLinkParams.put(PARAM_XML_REQUEST,"1");                
+                pagingLinkParams.put(PARAM_XML_REQUEST,"1");
             }
-            
+
             /* Compile the data for the templates */
-            
+
             Map<String, Object> body = new HashMap<String, Object>();
-            
-            String classGroupParam = vreq.getParameter(PARAM_CLASSGROUP); 
-            log.debug("ClassGroupParam is \""+ classGroupParam + "\"");   
+
+            String classGroupParam = vreq.getParameter(PARAM_CLASSGROUP);
+            log.debug("ClassGroupParam is \""+ classGroupParam + "\"");
             boolean classGroupFilterRequested = false;
             if (!StringUtils.isEmpty(classGroupParam)) {
                 VClassGroup grp = grpDao.getGroupByURI(classGroupParam);
@@ -231,7 +231,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 if (grp != null && grp.getPublicName() != null)
                     body.put("classGroupName", grp.getPublicName());
             }
-            
+
             String typeParam = vreq.getParameter(PARAM_RDFTYPE);
             boolean typeFilterRequested = false;
             if (!StringUtils.isEmpty(typeParam)) {
@@ -240,23 +240,23 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 if (type != null && type.getName() != null)
                     body.put("typeName", type.getName());
             }
-            
+
             /* Add ClassGroup and type refinement links to body */
-            if( wasHtmlRequested ){                                
+            if( wasHtmlRequested ){
                 if ( !classGroupFilterRequested && !typeFilterRequested ) {
                     // Search request includes no ClassGroup and no type, so add ClassGroup search refinement links.
-                    body.put("classGroupLinks", getClassGroupsLinks(vreq, grpDao, docs, response, queryText));                            
+                    body.put("classGroupLinks", getClassGroupsLinks(vreq, grpDao, docs, response, queryText));
                 } else if ( classGroupFilterRequested && !typeFilterRequested ) {
                     // Search request is for a ClassGroup, so add rdf:type search refinement links
                     // but try to filter out classes that are subclasses
-                    body.put("classLinks", getVClassLinks(vclassDao, docs, response, queryText));                       
+                    body.put("classLinks", getVClassLinks(vclassDao, docs, response, queryText));
                     pagingLinkParams.put(PARAM_CLASSGROUP, classGroupParam);
 
                 } else {
                     //search request is for a class so there are no more refinements
                     pagingLinkParams.put(PARAM_RDFTYPE, typeParam);
                 }
-            }           
+            }
 
             body.put("individuals", IndividualSearchResult
                     .getIndividualTemplateModels(individuals, vreq));
@@ -264,12 +264,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             body.put("querytext", queryText);
             body.put("title", new StringBuilder().append(appBean.getApplicationName()).append(" - ").
                     append(I18n.text(vreq, "search_results_for")).append(" '").append(queryText).append("'").toString());
-            
+
             body.put("hitCount", hitCount);
             body.put("startIndex", startIndex);
-            
-            body.put("pagingLinks", 
-                    getPagingLinks(startIndex, hitsPerPage, hitCount,  
+
+            body.put("pagingLinks",
+                    getPagingLinks(startIndex, hitsPerPage, hitCount,
                                    vreq.getServletPath(),
                                    pagingLinkParams, vreq));
 
@@ -285,11 +285,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 	        // VIVO OpenSocial Extension by UCSF
 	        try {
 		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "search");
-		        // put list of people found onto pubsub channel 
+		        // put list of people found onto pubsub channel
 	            // only turn this on for a people only search
 	            if ("http://vivoweb.org/ontology#vitroClassGrouppeople".equals(vreq.getParameter(PARAM_CLASSGROUP))) {
 			        List<String> ids = OpenSocialManager.getOpenSocialId(individuals);
-			        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
+			        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL,
 			        		OpenSocialManager.buildJSONPersonIds(ids, "" + ids.size() + " people found"));
 	            }
 				// TODO put this in a better place to guarantee that it gets called at the proper time!
@@ -305,32 +305,32 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 	        }
 
 	        String template = templateTable.get(format).get(Result.PAGED);
-            
+
             return new TemplateResponseValues(template, body);
         } catch (Throwable e) {
             return doSearchError(e,format);
-        }        
+        }
     }
 
 
     private int getHitsPerPage(VitroRequest vreq) {
         int hitsPerPage = DEFAULT_HITS_PER_PAGE;
-        try{ 
-            hitsPerPage = Integer.parseInt(vreq.getParameter(PARAM_HITS_PER_PAGE)); 
-        } catch (Throwable e) { 
-            hitsPerPage = DEFAULT_HITS_PER_PAGE; 
-        }                        
-        log.debug("hitsPerPage is " + hitsPerPage);  
+        try{
+            hitsPerPage = Integer.parseInt(vreq.getParameter(PARAM_HITS_PER_PAGE));
+        } catch (Throwable e) {
+            hitsPerPage = DEFAULT_HITS_PER_PAGE;
+        }
+        log.debug("hitsPerPage is " + hitsPerPage);
         return hitsPerPage;
     }
 
     private int getStartIndex(VitroRequest vreq) {
         int startIndex = 0;
-        try{ 
-            startIndex = Integer.parseInt(vreq.getParameter(PARAM_START_INDEX)); 
-        }catch (Throwable e) { 
-            startIndex = 0; 
-        }            
+        try{
+            startIndex = Integer.parseInt(vreq.getParameter(PARAM_START_INDEX));
+        }catch (Throwable e) {
+            startIndex = 0;
+        }
         log.debug("startIndex is " + startIndex);
         return startIndex;
     }
@@ -338,38 +338,38 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     private String badQueryText(String qtxt, VitroRequest vreq) {
         if( qtxt == null || "".equals( qtxt.trim() ) )
         	return I18n.text(vreq, "enter_search_term");
-        
+
         if( qtxt.equals("*:*") )
         	return I18n.text(vreq, "invalid_search_term") ;
-        
+
         return null;
     }
 
     /**
      * Get the class groups represented for the individuals in the documents.
      */
-    private List<VClassGroupSearchLink> getClassGroupsLinks(VitroRequest vreq, VClassGroupDao grpDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt) {                                 
+    private List<VClassGroupSearchLink> getClassGroupsLinks(VitroRequest vreq, VClassGroupDao grpDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt) {
         Map<String,Long> cgURItoCount = new HashMap<String,Long>();
-        
+
         List<VClassGroup> classgroups = new ArrayList<VClassGroup>( );
         List<SearchFacetField> ffs = rsp.getFacetFields();
         for(SearchFacetField ff : ffs){
             if(VitroSearchTermNames.CLASSGROUP_URI.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
-                for( Count ct: counts){                    
+                for( Count ct: counts){
                     VClassGroup vcg = grpDao.getGroupByURI( ct.getName() );
                     if( vcg == null ){
                         log.debug("could not get classgroup for URI " + ct.getName());
                     }else{
                         classgroups.add(vcg);
                         cgURItoCount.put(vcg.getURI(),  ct.getCount());
-                    }                    
-                }                
-            }            
+                    }
+                }
+            }
         }
-        
-        grpDao.sortGroupList(classgroups);     
-        
+
+        grpDao.sortGroupList(classgroups);
+
         VClassGroupsForRequest vcgfr = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
         for (VClassGroup vcg : classgroups) {
@@ -383,19 +383,19 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return classGroupLinks;
     }
 
-    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt){        
-        HashSet<String> typesInHits = getVClassUrisForHits(docs);                                
+    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt){
+        HashSet<String> typesInHits = getVClassUrisForHits(docs);
         List<VClass> classes = new ArrayList<VClass>(typesInHits.size());
-        Map<String,Long> typeURItoCount = new HashMap<String,Long>();        
-        
+        Map<String,Long> typeURItoCount = new HashMap<String,Long>();
+
         List<SearchFacetField> ffs = rsp.getFacetFields();
         for(SearchFacetField ff : ffs){
             if(VitroSearchTermNames.RDFTYPE.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
-                for( Count ct: counts){  
+                for( Count ct: counts){
                     String typeUri = ct.getName();
                     long count = ct.getCount();
-                    try{                                                   
+                    try{
                         if( VitroVocabulary.OWL_THING.equals(typeUri) ||
                             count == 0 )
                             continue;
@@ -403,39 +403,39 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                         if( type != null &&
                             ! type.isAnonymous() &&
                               type.getName() != null && !"".equals(type.getName()) &&
-                              type.getGroupURI() != null ){ //don't display classes that aren't in classgroups                                   
+                              type.getGroupURI() != null ){ //don't display classes that aren't in classgroups
                             typeURItoCount.put(typeUri,count);
                             classes.add(type);
                         }
                     }catch(Exception ex){
                         if( log.isDebugEnabled() )
                             log.debug("could not add type " + typeUri, ex);
-                    }                                                
-                }                
-            }            
+                    }
+                }
+            }
         }
-        
-        
+
+
         classes.sort(new Comparator<VClass>() {
             public int compare(VClass o1, VClass o2) {
                 return o1.compareTo(o2);
             }
         });
-        
+
         List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(classes.size());
-        for (VClass vc : classes) {                        
+        for (VClass vc : classes) {
             long count = typeURItoCount.get(vc.getURI());
             vClassLinks.add(new VClassSearchLink(qtxt, vc, count ));
         }
-        
+
         return vClassLinks;
-    }       
-        
+    }
+
     private HashSet<String> getVClassUrisForHits(SearchResultDocumentList docs){
-        HashSet<String> typesInHits = new HashSet<String>();  
+        HashSet<String> typesInHits = new HashSet<String>();
         for (SearchResultDocument doc : docs) {
             try {
-                Collection<Object> types = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);     
+                Collection<Object> types = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);
                 if (types != null) {
                     for (Object o : types) {
                         String typeUri = o.toString();
@@ -448,7 +448,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
         return typesInHits;
     }
-    
+
     private String getSnippet(SearchResultDocument doc, SearchResponse response) {
         String docId = doc.getStringValue(VitroSearchTermNames.DOCID);
         StringBuilder text = new StringBuilder();
@@ -457,87 +457,87 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             List<String> snippets = highlights.get(docId).get(VitroSearchTermNames.ALLTEXT);
             if (snippets != null && snippets.size() > 0) {
                 text.append("... ").append(snippets.get(0)).append(" ...");
-            }       
+            }
         }
         return text.toString();
-    }       
+    }
 
     private SearchQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq) {
         // Lowercase the search term to support wildcard searches: The search engine applies no text
         // processing to a wildcard search term.
         SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery(queryText);
-        
+
         query.setStart( startIndex )
              .setRows(hitsPerPage);
 
         // ClassGroup filtering param
         String classgroupParam = vreq.getParameter(PARAM_CLASSGROUP);
-        
+
         // rdf:type filtering param
         String typeParam = vreq.getParameter(PARAM_RDFTYPE);
-        
+
         if ( ! StringUtils.isBlank(classgroupParam) ) {
             // ClassGroup filtering
             log.debug("Firing classgroup query ");
             log.debug("request.getParameter(classgroup) is "+ classgroupParam);
             query.addFilterQuery(VitroSearchTermNames.CLASSGROUP_URI + ":\"" + classgroupParam + "\"");
-            
+
             //with ClassGroup filtering we want type facets
             query.addFacetFields(VitroSearchTermNames.RDFTYPE).setFacetLimit(-1);
-            
+
         }else if (  ! StringUtils.isBlank(typeParam) ) {
             // rdf:type filtering
             log.debug("Firing type query ");
-            log.debug("request.getParameter(type) is "+ typeParam);   
+            log.debug("request.getParameter(type) is "+ typeParam);
             query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
-            //with type filtering we don't have facets.            
-        }else{ 
+            //with type filtering we don't have facets.
+        }else{
             //When no filtering is set, we want ClassGroup facets
         	query.addFacetFields(VitroSearchTermNames.CLASSGROUP_URI).setFacetLimit(-1);
-        }                        
-        
+        }
+
         log.debug("Query = " + query.toString());
         return query;
-    }   
-    
-    public static class VClassGroupSearchLink extends LinkTemplateModel {        
+    }
+
+    public static class VClassGroupSearchLink extends LinkTemplateModel {
         long count = 0;
         VClassGroupSearchLink(String querytext, VClassGroup classgroup, long count) {
             super(classgroup.getPublicName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_CLASSGROUP, classgroup.getURI());
             this.count = count;
         }
-        
+
         public String getCount() { return Long.toString(count); }
     }
-    
+
     public static class VClassSearchLink extends LinkTemplateModel {
         long count = 0;
         VClassSearchLink(String querytext, VClass type, long count) {
             super(type.getName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_RDFTYPE, type.getURI());
             this.count = count;
         }
-        
-        public String getCount() { return Long.toString(count); }               
+
+        public String getCount() { return Long.toString(count); }
     }
-    
+
     protected static List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, String baseUrl, ParamMap params, VitroRequest vreq) {
 
         List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
-        
+
         // No paging links if only one page of results
         if (hitCount <= hitsPerPage) {
             return pagingLinks;
         }
-        
+
         int maxHitCount = DEFAULT_MAX_HIT_COUNT ;
         if( startIndex >= DEFAULT_MAX_HIT_COUNT  - hitsPerPage )
-            maxHitCount = startIndex + DEFAULT_MAX_HIT_COUNT ;                
-            
+            maxHitCount = startIndex + DEFAULT_MAX_HIT_COUNT ;
+
         for (int i = 0; i < hitCount; i += hitsPerPage) {
             params.put(PARAM_START_INDEX, String.valueOf(i));
             if ( i < maxHitCount - hitsPerPage) {
                 int pageNumber = i/hitsPerPage + 1;
-                boolean iIsCurrentPage = (i >= startIndex && i < (startIndex + hitsPerPage)); 
+                boolean iIsCurrentPage = (i >= startIndex && i < (startIndex + hitsPerPage));
                 if ( iIsCurrentPage ) {
                     pagingLinks.add(new PagingLink(pageNumber));
                 } else {
@@ -547,59 +547,59 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             	pagingLinks.add(new PagingLink(I18n.text(vreq, "paging_link_more"), baseUrl, params));
                 break;
             }
-        }   
-        
+        }
+
         return pagingLinks;
     }
-    
+
     private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
         params.put(PARAM_START_INDEX, String.valueOf(startIndex-hitsPerPage));
         return UrlBuilder.getUrl(baseUrl, params);
     }
-    
+
     private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
         params.put(PARAM_START_INDEX, String.valueOf(startIndex+hitsPerPage));
         return UrlBuilder.getUrl(baseUrl, params);
     }
-    
+
     protected static class PagingLink extends LinkTemplateModel {
-        
+
         PagingLink(int pageNumber, String baseUrl, ParamMap params) {
             super(String.valueOf(pageNumber), baseUrl, params);
         }
-        
+
         // Constructor for current page item: not a link, so no url value.
         PagingLink(int pageNumber) {
             setText(String.valueOf(pageNumber));
         }
-        
+
         // Constructor for "more..." item
         PagingLink(String text, String baseUrl, ParamMap params) {
             super(text, baseUrl, params);
         }
     }
-   
+
     private ExceptionResponseValues doSearchError(Throwable e, Format f) {
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("message", "Search failed: " + e.getMessage());  
+        body.put("message", "Search failed: " + e.getMessage());
         return new ExceptionResponseValues(getTemplate(f,Result.ERROR), body, e);
-    }   
-    
+    }
+
     private TemplateResponseValues doFailedSearch(String message, String querytext, Format f, VitroRequest vreq) {
-        Map<String, Object> body = new HashMap<String, Object>();       
-        body.put("title", I18n.text(vreq, "search_for", querytext));        
+        Map<String, Object> body = new HashMap<String, Object>();
+        body.put("title", I18n.text(vreq, "search_for", querytext));
         if ( StringUtils.isEmpty(message) ) {
         	message = I18n.text(vreq, "search_failed");
-        }        
+        }
         body.put("message", message);
         return new TemplateResponseValues(getTemplate(f,Result.ERROR), body);
     }
 
     private TemplateResponseValues doNoHits(String querytext, Format f, VitroRequest vreq) {
-        Map<String, Object> body = new HashMap<String, Object>();       
-        body.put("title", I18n.text(vreq, "search_for", querytext));        
-        body.put("message", I18n.text(vreq, "no_matching_results"));     
-        return new TemplateResponseValues(getTemplate(f,Result.ERROR), body);        
+        Map<String, Object> body = new HashMap<String, Object>();
+        body.put("title", I18n.text(vreq, "search_for", querytext));
+        body.put("message", I18n.text(vreq, "no_matching_results"));
+        return new TemplateResponseValues(getTemplate(f,Result.ERROR), body);
     }
 
     /**
@@ -642,7 +642,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
         return rv;
     }
-    
+
     public static final int MAX_QUERY_LENGTH = 500;
 
     protected boolean isRequestedFormatXml(VitroRequest req){
@@ -653,7 +653,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             return false;
         }
     }
-    
+
     protected boolean isRequestedFormatCSV(VitroRequest req){
         if( req != null ){
             String param = req.getParameter(PARAM_CSV_REQUEST);
@@ -668,10 +668,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             return Format.XML;
         else if ( req != null && req.getParameter("csv") != null && "1".equals(req.getParameter("csv")))
         	return Format.CSV;
-        else 
+        else
             return Format.HTML;
     }
-    
+
     protected static String getTemplate(Format format, Result result){
         if( format != null && result != null)
             return templateTable.get(format).get(result);
@@ -680,36 +680,36 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             return templateTable.get(Format.HTML).get(Result.ERROR);
         }
     }
-    
+
     protected static Map<Format,Map<Result,String>> setupTemplateTable(){
         Map<Format,Map<Result,String>> table = new HashMap<>();
-        
+
         HashMap<Result,String> resultsToTemplates = new HashMap<Result,String>();
-        
+
         // set up HTML format
         resultsToTemplates.put(Result.PAGED, "search-pagedResults.ftl");
         resultsToTemplates.put(Result.ERROR, "search-error.ftl");
-        // resultsToTemplates.put(Result.BAD_QUERY, "search-badQuery.ftl");        
+        // resultsToTemplates.put(Result.BAD_QUERY, "search-badQuery.ftl");
         table.put(Format.HTML, Collections.unmodifiableMap(resultsToTemplates));
-        
+
         // set up XML format
         resultsToTemplates = new HashMap<Result,String>();
         resultsToTemplates.put(Result.PAGED, "search-xmlResults.ftl");
         resultsToTemplates.put(Result.ERROR, "search-xmlError.ftl");
 
-        // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
+        // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");
         table.put(Format.XML, Collections.unmodifiableMap(resultsToTemplates));
-        
-        
+
+
         // set up CSV format
         resultsToTemplates = new HashMap<Result,String>();
         resultsToTemplates.put(Result.PAGED, "search-csvResults.ftl");
         resultsToTemplates.put(Result.ERROR, "search-csvError.ftl");
-        
-        // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
+
+        // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");
         table.put(Format.CSV, Collections.unmodifiableMap(resultsToTemplates));
 
-        
+
         return Collections.unmodifiableMap(table);
     }
 }

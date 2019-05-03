@@ -34,7 +34,7 @@ import javax.servlet.annotation.WebServlet;
 public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
 
 	private static final Log log = LogFactory.getLog(ShowDataPropertyHierarchyController.class.getName());
-	
+
     private static final String TEMPLATE_NAME = "siteAdmin-objectPropHierarchy.ftl";
     private int MAXDEPTH = 5;
 
@@ -51,7 +51,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
@@ -59,7 +59,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         try {
 
             String displayOption = "";
-            
+
             if ( vreq.getParameter("displayOption") != null ) {
                 displayOption = vreq.getParameter("displayOption");
             }
@@ -67,16 +67,16 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                 displayOption = "hierarchy";
             }
             body.put("displayOption", displayOption);
-            
+
             if ( displayOption.equals("all") ) {
                 body.put("pageTitle", "All Data Properties");
             }
             else {
                 body.put("pageTitle", "Data Property Hierarchy");
             }
-            
+
             body.put("propertyType", "data");
-            
+
             dpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
             dpDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
             vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
@@ -108,7 +108,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                 if (!rootIt.hasNext()) {
                     DataProperty dp = new DataProperty();
                     dp.setURI(ontologyUri + "fake");
-                    String notFoundMessage = "<strong>No data properties found.</strong>"; 
+                    String notFoundMessage = "<strong>No data properties found.</strong>";
                     dp.setName(notFoundMessage);
                     dp.setName(notFoundMessage);
                     json.append(addDataPropertyDataToResultsList(dp, 0, ontologyUri, counter));
@@ -119,7 +119,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                     	    json.append(addChildren(root, 0, ontologyUri, counter, vreq));
                     	    counter += 1;
                 	    }
-                    }	
+                    }
                     int length = json.length();
                     if ( length > 0 ) {
                         json.append(" }");
@@ -128,7 +128,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             }
 
             body.put("jsonTree", json.toString());
-        
+
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -200,7 +200,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             }
             else if ( position == previous_posn ) {
                         tempString += "}, { \"name\": ";
-            } 
+            }
             else if ( position > previous_posn ) {
                 tempString += " { \"name\": ";
             }
@@ -208,14 +208,14 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                 tempString += "}, { \"name\": ";
             }
 
-            String nameStr = dp.getPickListName() == null 
-                    ? dp.getName() == null 
-                            ? dp.getURI() == null 
+            String nameStr = dp.getPickListName() == null
+                    ? dp.getName() == null
+                            ? dp.getURI() == null
                                     ? "(no name)" : dp.getURI() : dp.getName() : dp.getPickListName();
-  
+
             tempString += JacksonUtils.quote(
                     "<a href='datapropEdit?uri=" + URLEncoder.encode(
-                            dp.getURI()) + "'>" + nameStr + "</a>") + ", ";                 
+                            dp.getURI()) + "'>" + nameStr + "</a>") + ", ";
 
             tempString += "\"data\": { \"internalName\": " + JacksonUtils.quote(
                     dp.getPickListName()) + ", ";
@@ -225,7 +225,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                 dpLangNeut = dp;
             }
             String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut);
-            
+
             try {
             	tempString += "\"domainVClass\": " + JacksonUtils.quote(domainStr) + ", " ;
             } catch (NullPointerException e) {
@@ -234,18 +234,18 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             try {
             	Datatype rangeDatatype = dDao.getDatatypeByURI(dp.getRangeDatatypeURI());
                 String rangeDatatypeStr = (rangeDatatype==null)?dp.getRangeDatatypeURI():rangeDatatype.getName();
-            	tempString += "\"rangeVClass\": " + JacksonUtils.quote((rangeDatatypeStr != null) ? rangeDatatypeStr : "") + ", " ; 
+            	tempString += "\"rangeVClass\": " + JacksonUtils.quote((rangeDatatypeStr != null) ? rangeDatatypeStr : "") + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
             if (dp.getGroupURI() != null) {
                 PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
-                tempString += "\"group\": " + JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()); 
+                tempString += "\"group\": " + JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName());
             } else {
                 tempString += "\"group\": \"unspecified\"";
             }
             tempString += "}, \"children\": [";
-            
+
             previous_posn = position;
        }
         return tempString;
@@ -257,7 +257,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         }
         VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
         if(vclass == null) {
-            return ""; 
+            return "";
         }
         if(vclass.isAnonymous()) {
             return vclass.getPickListName();
@@ -266,5 +266,5 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             return (vclassWLang != null) ? vclassWLang.getPickListName() : vclass.getPickListName();
         }
     }
-    
+
 }

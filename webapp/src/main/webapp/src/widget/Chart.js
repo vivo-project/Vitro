@@ -165,7 +165,7 @@ dojo.lang.extend(dojo.widget.Chart.DataSeries, {
 			if (!isNaN(n)){
 				var b=false;
 				for(var j=0; j<a.length&&!b; j++){
-					if (n==a[j]) b=true; 
+					if (n==a[j]) b=true;
 				}
 				if(!b){ a.push(n); }
 			}

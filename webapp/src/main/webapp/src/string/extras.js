@@ -18,7 +18,7 @@ dojo.require("dojo.lang");
  *   dojo.string.substituteParams("File '%{0}' is not found in directory '%{1}'.","foo.html","/temp");
  * returns
  *   "File 'foo.html' is not found in directory '/temp'."
- * 
+ *
  * @param template the original string template with %{values} to be replaced
  * @param hash name/value pairs (type object) to provide substitutions.  Alternatively, substitutions may be
  *  included as arguments 1..n to this function, corresponding to template parameters 0..n-1
@@ -130,7 +130,7 @@ dojo.string.escapeJavaScript = function(str) {
 	return str.replace(/(["'\f\b\n\t\r])/gm, "\\$1");
 }
 
-dojo.string.escapeString = function(str){ 
+dojo.string.escapeString = function(str){
 	return ('"' + str.replace(/(["\\])/g, '\\$1') + '"'
 		).replace(/[\f]/g, "\\f"
 		).replace(/[\b]/g, "\\b"

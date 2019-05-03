@@ -11,11 +11,11 @@ import javax.servlet.http.HttpSession;
 public class EditSubmissionUtils {
 
     protected static final String MULTI_VALUED_EDIT_SUBMISSION = "MultiValueEditSubmission";
-    
+
     /* *************** Static utility methods to get EditSub from Session *********** */
 
     public static MultiValueEditSubmission getEditSubmissionFromSession(HttpSession sess, EditConfigurationVTwo editConfig){
-        Map<String,MultiValueEditSubmission> submissions = 
+        Map<String,MultiValueEditSubmission> submissions =
             (Map<String,MultiValueEditSubmission>)sess.getAttribute(MULTI_VALUED_EDIT_SUBMISSION);
         if( submissions == null )
           return null;
@@ -55,9 +55,9 @@ public class EditSubmissionUtils {
             Map<String, List<String>> queryParameters) {
         HashMap<String,String[]> out = new HashMap<String,String[]>();
         for( String key : queryParameters.keySet()){
-            List item = queryParameters.get(key);            
+            List item = queryParameters.get(key);
             out.put(key, (String[])item.toArray(new String[item.size()]));
         }
         return out;
-    }                 
+    }
 }

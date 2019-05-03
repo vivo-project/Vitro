@@ -67,7 +67,7 @@ import org.apache.jena.rdf.model.ModelFactory;
  * <li>Create URLs from Strings without throwing checked exceptions.</li>
  * <li>Compare the contents of XML documents.</li>
  * </ul>
- * 
+ *
  * @author jeb228
  */
 public abstract class AbstractTestClass {

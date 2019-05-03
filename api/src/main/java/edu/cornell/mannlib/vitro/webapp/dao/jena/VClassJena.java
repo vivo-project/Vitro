@@ -27,14 +27,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  *
  */
 public class VClassJena extends VClass {
-	
+
     private static final Log log = LogFactory.getLog(VClassJena.class.getName());
     private OntClass cls = null;
     private WebappDaoFactoryJena webappDaoFactory = null;
 
     public VClassJena(OntClass cls, WebappDaoFactoryJena wadf) {
         this.cls = cls;
-        
+
         if (cls.isAnon()) {
         	this.setNamespace(VitroVocabulary.PSEUDO_BNODE_NS);
         	this.setLocalName(cls.getId().toString());
@@ -43,12 +43,12 @@ public class VClassJena extends VClass {
         	this.namespace = cls.getNameSpace();
         	this.localName = cls.getLocalName();
         }
-                
+
         this.webappDaoFactory = wadf;
     }
-    
+
     /**
- 	 * Constructs the VClassJena as a deep copy of an existing VClassJena. 
+ 	 * Constructs the VClassJena as a deep copy of an existing VClassJena.
  	 */
      @Override
 	public VClassJena copy() {
@@ -62,35 +62,35 @@ public class VClassJena extends VClass {
      */
     @Override
     public String getName() {
-    	
+
         if (this.myName != null) {
             return myName;
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 VClassDao vClassDao = webappDaoFactory.getVClassDao();
-                
+
                 if (vClassDao instanceof VClassDaoJena) {
                 	this.myName = ((VClassDaoJena) vClassDao).getLabelForClass(cls,false,false);
                 } else {
                     log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
                     this.myName = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
                 }
-                         
+
                 return this.myName;
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
         }
     }
-    
-    @Override 
+
+    @Override
     public String getLabel() {
         return getName();
     }
-    
+
     @Override
-    public String getLocalNameWithPrefix() { 	
+    public String getLocalNameWithPrefix() {
         if (this.localNameWithPrefix != null) {
             return localNameWithPrefix;
         } else {
@@ -98,7 +98,7 @@ public class VClassJena extends VClass {
             return this.localNameWithPrefix;
         }
     }
-    
+
     @Override
     public String getPickListName() {
         if (this.pickListName != null) {
@@ -114,7 +114,7 @@ public class VClassJena extends VClass {
      */
     @Override
     public  String getExample()  {
-    	
+
         if (this.myExample != null) {
             return myExample;
         } else {
@@ -127,13 +127,13 @@ public class VClassJena extends VClass {
             }
         }
     }
-    
+
     /**
      * Information about the type of information expected of a member of this VClass
      */
     @Override
     public  String getDescription()  {
-    	
+
         if (this.myDescription != null) {
             return myDescription;
         } else {
@@ -146,10 +146,10 @@ public class VClassJena extends VClass {
             }
         }
     }
-   
+
     @Override
     public  String getShortDef()  {
-    	
+
         if (this.myShortDefinition != null) {
             return myShortDefinition;
         } else {
@@ -160,12 +160,12 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		
+        }
     }
-       
+
     @Override
     public  int  getDisplayLimit() {
-    	
+
         if (this.displayLimit != null) {
             return displayLimit;
         } else {
@@ -176,12 +176,12 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		 	 	
+        }
     }
-   
+
     @Override
     public  int  getDisplayRank()  {
-    	
+
         if (this.displayRank != null) {
             return displayRank;
         } else {
@@ -192,37 +192,37 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		 	    
+        }
     }
-   
+
     @Override
     public String  getGroupURI()  {
-    	
+
         if (this.groupURI != null) {
             return this.groupURI;
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 Resource groupRes = (Resource) cls.getPropertyValue(webappDaoFactory.getJenaBaseDao().IN_CLASSGROUP);
-                
+
                 if (groupRes != null) {
                     setGroupURI(groupRes.getURI());
                 }
-                
+
             } catch (Exception e) {
                 log.error("error retrieving vitro:inClassGroup property value for " + cls.getURI());
-                log.trace(e);           	
+                log.trace(e);
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-            
+
             return this.groupURI;
-        }		 	         
+        }
     }
-    
+
     @Override
     public  String getCustomEntryForm()  {
-    	
+
         if (this.customEntryForm != null) {
             return this.customEntryForm;
         } else {
@@ -233,12 +233,12 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		       
+        }
     }
-    
+
     @Override
     public  String getCustomDisplayView()  {
-    	
+
         if (this.customDisplayView != null) {
             return this.customDisplayView;
         } else {
@@ -249,12 +249,12 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		        	
+        }
     }
-    
+
     @Override
-    public  String getCustomShortView() { 
-    	
+    public  String getCustomShortView() {
+
         if (this.customShortView != null) {
             return this.customShortView;
         } else {
@@ -265,12 +265,12 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		        	   		
+        }
     }
-    
+
     @Override
     public  String getCustomSearchView() {
-    	
+
         if (this.customSearchView != null) {
             return this.customSearchView;
         } else {
@@ -281,12 +281,12 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		        	   		
+        }
     }
-        
+
     @Override
     public Float getSearchBoost() {
-    	
+
         if (this.searchBoost != null) {
             return this.searchBoost;
         } else {
@@ -297,21 +297,21 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		 	    
-    } 
-    
+        }
+    }
+
     @Override
     public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
-       
+
         if (this.hiddenFromDisplayBelowRoleLevel != null) {
             return this.hiddenFromDisplayBelowRoleLevel;
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {            	
+            try {
                 //There might be multiple HIDDEN_FROM_EDIT_DISPLAY_ANNOT properties, only use the highest
                 StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
                 BaseResourceBean.RoleLevel hiddenRoleLevel = null;
-            
+
                 while( it.hasNext() ){
                     Statement stmt = it.nextStatement();
                     RDFNode obj;
@@ -319,30 +319,30 @@ public class VClassJena extends VClass {
                         Resource res = obj.as(Resource.class);
                         if( res != null && res.getURI() != null ){
                             BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null && 
+                            if( roleFromModel != null &&
                                 (hiddenRoleLevel == null || roleFromModel.compareTo(hiddenRoleLevel) > 0 )){
-                                hiddenRoleLevel = roleFromModel;                            
+                                hiddenRoleLevel = roleFromModel;
                             }
                         }
                     }
                 }
-                
+
                 setHiddenFromDisplayBelowRoleLevel(hiddenRoleLevel); //this might get set to null
             	return this.hiddenFromDisplayBelowRoleLevel;
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		 	               
+        }
     }
-    
+
     @Override
     public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-        
+
         if (this.prohibitedFromUpdateBelowRoleLevel != null) {
             return this.prohibitedFromUpdateBelowRoleLevel;
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {            	
+            try {
                 //There might be multiple PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
             	StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
                 BaseResourceBean.RoleLevel prohibitedRoleLevel = null;
@@ -353,34 +353,34 @@ public class VClassJena extends VClass {
                         Resource res = obj.as(Resource.class);
                         if( res != null && res.getURI() != null ){
                             BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null && 
+                            if( roleFromModel != null &&
                                 (prohibitedRoleLevel == null || roleFromModel.compareTo(prohibitedRoleLevel) > 0 )){
-                                prohibitedRoleLevel = roleFromModel;                            
+                                prohibitedRoleLevel = roleFromModel;
                             }
                         }
                     }
                 }
-                
+
                 setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel); //this might get set to null
             	return this.prohibitedFromUpdateBelowRoleLevel;
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		 	                      
+        }
     }
-    
+
     @Override
     public RoleLevel getHiddenFromPublishBelowRoleLevel() {
-       
+
         if (this.hiddenFromPublishBelowRoleLevel != null) {
             return this.hiddenFromPublishBelowRoleLevel;
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {            	
+            try {
                 //There might be multiple HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
                 StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
                 BaseResourceBean.RoleLevel publishRoleLevel = null;
-            
+
                 while( it.hasNext() ){
                     Statement stmt = it.nextStatement();
                     RDFNode obj;
@@ -388,27 +388,27 @@ public class VClassJena extends VClass {
                         Resource res = obj.as(Resource.class);
                         if( res != null && res.getURI() != null ){
                             BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null && 
+                            if( roleFromModel != null &&
                                 (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
-                                publishRoleLevel = roleFromModel;                            
+                                publishRoleLevel = roleFromModel;
                             }
                         }
                     }
                 }
-                
+
                 setHiddenFromPublishBelowRoleLevel(publishRoleLevel); //this might get set to null
             	return this.hiddenFromPublishBelowRoleLevel;
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }		 	               
+        }
     }
-    
+
     @Override
     public boolean isUnion() {
         return this.cls.isUnionClass();
     }
-    
+
     //TODO consider anonymous components
     @Override
     public List<VClass> getUnionComponents() {
@@ -419,11 +419,11 @@ public class VClassJena extends VClass {
             while(opIt.hasNext()) {
                 OntClass component = opIt.next();
                 if (!component.isAnon()) {
-                    unionComponents.add(new VClassJena(component, this.webappDaoFactory));  
+                    unionComponents.add(new VClassJena(component, this.webappDaoFactory));
                 }
             }
         }
         return unionComponents;
     }
-    
+
 }

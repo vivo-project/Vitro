@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class RoleLevelOptionsSetup {
     private static final Log log = LogFactory.getLog(RoleLevelOptionsSetup.class.getName());
-    
+
     public static List<Option> getDisplayOptionsList(ResourceBean b) {
         List<Option> hiddenFromDisplayList = new LinkedList<Option>();
         try {
@@ -41,7 +41,7 @@ public class RoleLevelOptionsSetup {
         }
         return hiddenFromDisplayList;
     }
-    
+
     public static List<Option> getUpdateOptionsList(ResourceBean b) {
         List<Option> prohibitedFromUpdateList = new LinkedList<Option>();
         try {
@@ -95,6 +95,6 @@ public class RoleLevelOptionsSetup {
         }
         return hiddenFromPublishList;
     }
-    
+
 
 }

@@ -20,10 +20,10 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**
  * The user has requested a dump.
- * 
+ *
  * First time through, figure out what filename we would like to put on the
  * dump, and send a redirect.
- * 
+ *
  * Second time thorugh, actually create the dump.
  */
 class DumpModelsAction extends AbstractDumpRestoreAction {
@@ -57,7 +57,7 @@ class DumpModelsAction extends AbstractDumpRestoreAction {
 			String query = "SELECT * WHERE { GRAPH ?g {?s ?p ?o}}";
 
 			resp.setContentType(N_QUADS_MIME_TYPE);
-			
+
 			dumpNQuads(rdfService, query);
 		} catch (Throwable t) {
 			log.error("Failed to dump " + which + " models as N-Quads.", t);

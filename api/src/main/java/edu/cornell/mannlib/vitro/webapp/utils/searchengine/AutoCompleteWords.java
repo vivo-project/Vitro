@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * A helper class for use with an Auto-complete query.
- * 
+ *
  * Any word that is followed by a delimiter is considered to be complete, and
  * should be matched exactly in the query. If there is a word on the end that is
  * not followed by a delimiter, it is incomplete, and should act like a

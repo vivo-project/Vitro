@@ -55,7 +55,7 @@ dojo.fx.svg.fade = function(node, duration, startOpac, endOpac, callback){
 //	SLIDES
 dojo.fx.svg.slideTo = function(node, endCoords, duration, callback) { };
 dojo.fx.svg.slideBy = function(node, coords, duration, callback) { };
-dojo.fx.svg.slide = function(node, startCoords, endCoords, duration, callback) { 
+dojo.fx.svg.slide = function(node, startCoords, endCoords, duration, callback) {
 	var anim = new dojo.animation.Animation(
 		new dojo.math.curves.Line([startCoords],[endCoords]),
 		duration,

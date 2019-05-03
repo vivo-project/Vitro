@@ -20,9 +20,9 @@ dojo.require("dojo.date");
 	Some assumptions:
 	- I'm planning on always showing 42 days at a time, and we can scroll by week,
 	not just by month or year
-	- To get a sense of what month to highlight, I basically initialize on the 
-	first Saturday of each month, since that will be either the first of two or 
-	the second of three months being partially displayed, and then I work forwards 
+	- To get a sense of what month to highlight, I basically initialize on the
+	first Saturday of each month, since that will be either the first of two or
+	the second of three months being partially displayed, and then I work forwards
 	and backwards from that point.
 	Currently, I assume that dates are stored in the RFC 3339 format,
 	because I find it to be most human readable and easy to parse
@@ -78,11 +78,11 @@ dojo.widget.defineWidget(
 			this.firstSaturday.month = tempSaturday.month;
 			this.firstSaturday.date = tempSaturday.date;
 		},
-		
+
 		setDate: function(rfcDate) {
 			this.storedDate = rfcDate;
 		},
-		
+
 		initUI: function() {
 			this.selectedIsUsed = false;
 			this.currentIsUsed = false;
@@ -90,11 +90,11 @@ dojo.widget.defineWidget(
 			var previousDate = new Date();
 			var calendarNodes = this.calendarDatesContainerNode.getElementsByTagName("td");
 			var currentCalendarNode;
-			// set hours of date such that there is no chance of rounding error due to 
+			// set hours of date such that there is no chance of rounding error due to
 			// time change in local time zones
 			previousDate.setHours(8);
 			var nextDate = new Date(this.firstSaturday.year, this.firstSaturday.month, this.firstSaturday.date, 8);
-			
+
 			if(this.firstSaturday.date < 7) {
 				// this means there are days to show from the previous month
 				var dayInWeek = 6;
@@ -111,7 +111,7 @@ dojo.widget.defineWidget(
 					currentCalendarNode.innerHTML = nextDate.getDate();
 					dojo.html.setClass(currentCalendarNode, this.getDateClassName(nextDate, "previous"));
 					previousDate = nextDate;
-					nextDate = this.incrementDate(nextDate, false);				
+					nextDate = this.incrementDate(nextDate, false);
 				}
 			} else {
 				nextDate.setDate(this.firstSaturday.date-6);
@@ -120,7 +120,7 @@ dojo.widget.defineWidget(
 					currentCalendarNode.innerHTML = nextDate.getDate();
 					dojo.html.setClass(currentCalendarNode, this.getDateClassName(nextDate, "current"));
 					previousDate = nextDate;
-					nextDate = this.incrementDate(nextDate, true);				
+					nextDate = this.incrementDate(nextDate, true);
 				}
 			}
 			previousDate.setDate(this.firstSaturday.date);
@@ -136,7 +136,7 @@ dojo.widget.defineWidget(
 				previousDate = nextDate;
 				nextDate = this.incrementDate(nextDate, true);
 			}
-			
+
 			while(count < 42) {
 				currentCalendarNode.innerHTML = nextDate.getDate();
 				dojo.html.setClass(currentCalendarNode, this.getDateClassName(nextDate, "next"));
@@ -147,7 +147,7 @@ dojo.widget.defineWidget(
 			this.setMonthLabel(this.firstSaturday.month);
 			this.setYearLabels(this.firstSaturday.year);
 		},
-		
+
 		incrementDate: function(date, bool) {
 			// bool: true to increase, false to decrease
 			var time = date.getTime();
@@ -157,19 +157,19 @@ dojo.widget.defineWidget(
 			returnDate.setTime(time);
 			return returnDate;
 		},
-		
+
 		incrementWeek: function(evt) {
 			var date = this.firstSaturday.date;
 			var month = this.firstSaturday.month;
 			var year = this.firstSaturday.year;
 			switch(evt.target) {
-				case this.increaseWeekNode.getElementsByTagName("img").item(0): 
+				case this.increaseWeekNode.getElementsByTagName("img").item(0):
 				case this.increaseWeekNode:
 					date = date + 7;
 					if (date>this._daysIn(month,year)) {
 						date = date - this._daysIn(month,year);
 						if (month < 11) {
-							month++;	
+							month++;
 						} else {
 							month=0;
 							year++;
@@ -192,15 +192,15 @@ dojo.widget.defineWidget(
 						}
 					}
 					break;
-	
+
 			}
-	
+
 			this.firstSaturday.date=date;
 			this.firstSaturday.month=month;
 			this.firstSaturday.year=year;
 			this.initUI();
 		},
-	
+
 		incrementMonth: function(evt) {
 			var month = this.firstSaturday.month;
 			var year = this.firstSaturday.year;
@@ -211,7 +211,7 @@ dojo.widget.defineWidget(
 					} else {
 						month = 0;
 						year++;
-						
+
 						this.setYearLabels(year);
 					}
 					break;
@@ -249,7 +249,7 @@ dojo.widget.defineWidget(
 			this.firstSaturday.date = tempSaturday.date;
 			this.initUI();
 		},
-	
+
 		incrementYear: function(evt) {
 			var year = this.firstSaturday.year;
 			switch(evt.target) {
@@ -266,46 +266,46 @@ dojo.widget.defineWidget(
 			this.firstSaturday.date = tempSaturday.date;
 			this.initUI();
 		},
-	
+
 		_daysIn: function(month,year) {
-			var daysIn = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; 
-			
+			var daysIn = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
 			if (month==1) {
 				return (year%400 == 0) ? 29: (year%100 == 0) ? 28: (year%4 == 0) ? 29: 28;
 			} else {
 				return daysIn[month];
 			}
 		},
-	
+
 		onIncrementDate: function(evt) {
 			dojo.unimplemented('dojo.widget.html.DatePicker.onIncrementDate');
 		},
-	
+
 		onIncrementWeek: function(evt) {
 			evt.stopPropagation();
 			this.incrementWeek(evt);
 		},
-	
+
 		onIncrementMonth: function(evt) {
 			evt.stopPropagation();
 			this.incrementMonth(evt);
 		},
-		
+
 		onIncrementYear: function(evt) {
 			evt.stopPropagation();
 			this.incrementYear(evt);
 		},
-	
+
 		setMonthLabel: function(monthIndex) {
 			this.monthLabelNode.innerHTML = dojo.date.months[monthIndex];
 		},
-		
+
 		setYearLabels: function(year) {
 			this.previousYearLabelNode.innerHTML = year - 1;
 			this.currentYearLabelNode.innerHTML = year;
 			this.nextYearLabelNode.innerHTML = year + 1;
 		},
-		
+
 		getDateClassName: function(date, monthState) {
 			var currentClassName = this.classNames[monthState];
 			if ((!this.selectedIsUsed) && (date.getDate() == this.date.getDate()) && (date.getMonth() == this.date.getMonth()) && (date.getFullYear() == this.date.getFullYear())) {
@@ -318,11 +318,11 @@ dojo.widget.defineWidget(
 			}
 			return currentClassName;
 		},
-	
+
 		onClick: function(evt) {
 			dojo.event.browser.stopEvent(evt)
 		},
-		
+
 		onSetDate: function(evt) {
 			dojo.event.browser.stopEvent(evt);
 			this.selectedIsUsed = 0;

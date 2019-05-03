@@ -34,19 +34,19 @@ public interface ITriplePatternFragmentRequest<ConstantTermType,NamedVarType,Ano
 
     /**
      * Returns the subject position of the requested triple pattern.
-     * @return 
+     * @return
      */
     ITriplePatternElement<ConstantTermType,NamedVarType,AnonVarType> getSubject();
 
     /**
      * Returns the predicate position of the requested triple pattern.
-     * @return 
+     * @return
      */
     ITriplePatternElement<ConstantTermType,NamedVarType,AnonVarType> getPredicate();
 
     /**
      * Returns the object position of the requested triple pattern.
-     * @return 
+     * @return
      */
     ITriplePatternElement<ConstantTermType,NamedVarType,AnonVarType> getObject();
 }

@@ -35,7 +35,7 @@
             </ul>
         </nav>
     </nav>
-    
+
     <section id="individuals-in-class" role="region">
         <ul role="list">
 

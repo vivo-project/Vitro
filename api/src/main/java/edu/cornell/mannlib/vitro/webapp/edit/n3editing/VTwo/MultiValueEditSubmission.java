@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 public class MultiValueEditSubmission {
 
     String editKey;
-    
+
     private Map<String,List<Literal>> literalsFromForm ;
     private Map<String,List<String>> urisFromForm ;
 
@@ -41,46 +41,46 @@ public class MultiValueEditSubmission {
     private Map<String, List<FileItem>> filesFromForm;
 
     private static Model literalCreationModel;
-    
+
     private String entityToReturnTo;
-    
+
     static{
         literalCreationModel = ModelFactory.createDefaultModel();
     }
-    
+
     public MultiValueEditSubmission(Map<String,String[]> queryParameters,  EditConfigurationVTwo editConfig){
         if( editConfig == null )
-            throw new Error("EditSubmission needs an EditConfiguration");            
-        this.editKey = editConfig.getEditKey();         
+            throw new Error("EditSubmission needs an EditConfiguration");
+        this.editKey = editConfig.getEditKey();
         if( this.editKey == null || this.editKey.trim().length() == 0)
-            throw new Error("EditSubmission needs an 'editKey' parameter from the EditConfiguration");        
+            throw new Error("EditSubmission needs an 'editKey' parameter from the EditConfiguration");
 
         entityToReturnTo = editConfig.getEntityToReturnTo();
-        
+
         validationErrors = new HashMap<String,String>();
-        
+
         this.urisFromForm = new HashMap<String,List<String>>();
-        for( String var: editConfig.getUrisOnform() ){     
+        for( String var: editConfig.getUrisOnform() ){
             String[] valuesArray = queryParameters.get( var );
             //String uri = null;
             addUriToForm(editConfig, var, valuesArray);
         }
-        
-        this.literalsFromForm =new HashMap<String,List<Literal>>();        
-        for(String var: editConfig.getLiteralsOnForm() ){            
+
+        this.literalsFromForm =new HashMap<String,List<Literal>>();
+        for(String var: editConfig.getLiteralsOnForm() ){
             FieldVTwo field = editConfig.getField(var);
             if( field == null ) {
                 log.error("could not find field " + var + " in EditConfiguration" );
-                continue;   
-            } else if( field.getEditElement() != null ){                
+                continue;
+            } else if( field.getEditElement() != null ){
                 log.debug("skipping field with edit element, it should not be in literals on form list");
             }else{
-               String[] valuesArray = queryParameters.get(var); 
+               String[] valuesArray = queryParameters.get(var);
                addLiteralToForm(editConfig, field, var, valuesArray);
             }
         }
 
-        if( log.isDebugEnabled() ){         
+        if( log.isDebugEnabled() ){
             for( String key : literalsFromForm.keySet() ){
                 log.debug( key + " literal " + literalsFromForm.get(key) );
             }
@@ -88,29 +88,29 @@ public class MultiValueEditSubmission {
                 log.debug( key + " uri " + urisFromForm.get(key) );
             }
         }
-        
+
         processEditElementFields(editConfig,queryParameters);
         //Incorporating basic validation
         //Validate URIS
         this.basicValidation = new BasicValidationVTwo(editConfig, this);
-        Map<String,String> errors = basicValidation.validateUris( urisFromForm ); 
+        Map<String,String> errors = basicValidation.validateUris( urisFromForm );
         //Validate literals and add errors to the list of existing errors
         errors.putAll(basicValidation.validateLiterals( literalsFromForm ));
         if( errors != null ) {
             validationErrors.putAll( errors);
-        }              
-        
+        }
+
         if(editConfig.getValidators() != null ){
             for( N3ValidatorVTwo validator : editConfig.getValidators()){
-                if( validator != null ){     
+                if( validator != null ){
                     //throw new Error("need to implemente a validator interface that works with the new MultivalueEditSubmission.");
                     errors = validator.validate(editConfig, this);
                     if ( errors != null )
                         validationErrors.putAll(errors);
                 }
             }
-        }           
-                
+        }
+
         if( log.isDebugEnabled() )
             log.debug( this.toString() );
     }
@@ -119,15 +119,15 @@ public class MultiValueEditSubmission {
         for( String fieldName : editConfig.getFields().keySet()){
             FieldVTwo field = editConfig.getFields().get(fieldName);
             if( field != null && field.getEditElement() != null ){
-                EditElementVTwo element = field.getEditElement();                
+                EditElementVTwo element = field.getEditElement();
                 log.debug("Checking EditElement for field " + fieldName + " type: " + element.getClass().getName());
-                
+
                 //check for validation error messages
-                Map<String,String> errMsgs = 
+                Map<String,String> errMsgs =
                     element.getValidationMessages(fieldName, editConfig, queryParameters);
                 validationErrors.putAll(errMsgs);
-                                
-                if( errMsgs == null || errMsgs.isEmpty()){                    
+
+                if( errMsgs == null || errMsgs.isEmpty()){
                     //only check for uris and literals when element has no validation errors
                     Map<String,List<String>> urisFromElement = element.getURIs(fieldName, editConfig, queryParameters);
                     if( urisFromElement != null )
@@ -138,26 +138,26 @@ public class MultiValueEditSubmission {
                 }else{
                     log.debug("got validation errors for field " + fieldName + " not processing field for literals or URIs");
                 }
-            }            
-        }        
-    }    
+            }
+        }
+    }
 
     /* maybe this could be static */
     public Literal createLiteral(String value, String datatypeUri, String lang) {
-        if( datatypeUri != null ){            
+        if( datatypeUri != null ){
             if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
                 try {
                     return literalCreationModel.createTypedLiteral( URLEncoder.encode(value, "UTF8"), datatypeUri);
-                } catch (UnsupportedEncodingException e) { 
+                } catch (UnsupportedEncodingException e) {
                     log.error(e, e);
-                }                
-            }   
+                }
+            }
             return literalCreationModel.createTypedLiteral(value, datatypeUri);
         }else if( lang != null && lang.length() > 0 )
             return literalCreationModel.createLiteral(value, lang);
-        else 
-            return ResourceFactory.createPlainLiteral(value);        
-    }               
+        else
+            return ResourceFactory.createPlainLiteral(value);
+    }
 
     private static final String DATE_TIME_URI = XSD.dateTime.getURI();
     private static final String DATE_URI = XSD.date.getURI();
@@ -180,58 +180,58 @@ public class MultiValueEditSubmission {
     /**
      * need to generate something like
      *  {@code "09:10:11"^^<http://www.w3.org/2001/XMLSchema#time>}
-     */ 
+     */
     public Literal getTime(Map<String,String[]> queryParameters,String fieldName) {
         List<String> hour = Arrays.asList(queryParameters.get("hour" + fieldName));
         List<String> minute = Arrays.asList(queryParameters.get("minute" + fieldName));
-        
+
         if ( hour == null || hour.size() == 0 ||
              minute == null || minute.size() == 0 ) {
             log.info("Could not find query parameter values for time field " + fieldName);
             validationErrors.put(fieldName, "time must be supplied");
             return null;
         }
-        
+
         int hourInt = -1;
         int minuteInt = -1;
-        
+
         String hourParamStr = hour.get(0);
         String minuteParamStr = minute.get(0);
-        
+
         // if all fields are blank, just return a null value
         if (hourParamStr.length() == 0 && minuteParamStr.length() == 0) {
             return null;
         }
-        
+
          String errors = "";
-         try{ 
+         try{
              hourInt = Integer.parseInt(hour.get(0));
              if (hourInt < 0 || hourInt > 23) {
                  throw new NumberFormatException();
              }
-         } catch( NumberFormatException nfe ) { 
-             errors += "Please enter a valid hour.  "; 
-         }        
+         } catch( NumberFormatException nfe ) {
+             errors += "Please enter a valid hour.  ";
+         }
          try{
              minuteInt = Integer.parseInt(minute.get(0));
              if (minuteInt < 0 || minuteInt > 59) {
                  throw new NumberFormatException();
              }
-         } catch( NumberFormatException nfe ) { 
-             errors += "Please enter a valid minute.  "; 
-         }        
+         } catch( NumberFormatException nfe ) {
+             errors += "Please enter a valid minute.  ";
+         }
          if( errors.length() > 0 ){
              validationErrors.put( fieldName, errors);
              return null;
          }
-        
-         
+
+
          String hourStr = (hourInt < 10) ? "0" + Integer.toString(hourInt) :  Integer.toString(hourInt);
          String minuteStr = (minuteInt < 10) ? "0" + Integer.toString(minuteInt) :  Integer.toString(minuteInt);
          String secondStr = "00";
-         
+
          return new EditLiteral(hourStr + ":" + minuteStr + ":" + secondStr, TIME_URI, null);
-         
+
     }
     public void setLiteralsFromForm(Map<String, List<Literal>> literalsFromForm) {
         this.literalsFromForm = literalsFromForm;
@@ -241,8 +241,8 @@ public class MultiValueEditSubmission {
         this.urisFromForm = urisFromForm;
     }
 
-    public String toString(){        
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        
+    public String toString(){
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 
     private Log log = LogFactory.getLog(MultiValueEditSubmission.class);
@@ -253,11 +253,11 @@ public class MultiValueEditSubmission {
 
     public void setEntityToReturnTo(String string) {
         entityToReturnTo = string;
-    }    
-    
+    }
+
     //Added specifically to help with "dynamic" forms such as addition of concept
     public void addLiteralToForm(EditConfigurationVTwo editConfig, FieldVTwo field, String var, String[] valuesArray) {
-    	List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
+    	List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
         if( valueList != null && valueList.size() > 0 ) {
         	List<Literal> literalsArray = new ArrayList<Literal>();
         	//now support multiple values
@@ -266,13 +266,13 @@ public class MultiValueEditSubmission {
                 //Add to array of literals corresponding to this variable
                 if (!StringUtils.isEmpty(value)) {
                     literalsArray.add(createLiteral(
-                                                value, 
-                                                field.getRangeDatatypeUri(), 
+                                                value,
+                                                field.getRangeDatatypeUri(),
                                                 field.getRangeLang()));
                 }
         	}
         	literalsFromForm.put(var, literalsArray);
-            
+
         }else{
             log.debug("could not find value for parameter " + var  );
         }
@@ -291,16 +291,16 @@ public class MultiValueEditSubmission {
 		            }
 	            }
          }  else {
-             log.debug("No value found for query parameter " + var);              
+             log.debug("No value found for query parameter " + var);
          }
     }
-    
-    //Check if a certain key has a value associated that is not null 
-    
+
+    //Check if a certain key has a value associated that is not null
+
     public boolean hasLiteralValue(String key) {
     	return (this.literalsFromForm.containsKey(key) && this.literalsFromForm.get(key) != null);
     }
-    
+
     public boolean hasUriValue(String key) {
     	return (this.urisFromForm.containsKey(key) && this.urisFromForm.get(key) != null);
     }

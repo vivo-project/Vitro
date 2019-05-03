@@ -32,14 +32,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 public class ApplicationConfigurationOntologyUtils {
 
     private static final Log log = LogFactory.getLog(ApplicationConfigurationOntologyUtils.class);
-    
+
     public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, Individual subject, VitroRequest vreq) {
 		Model displayModel = vreq.getDisplayModel();
         Model tboxModel = vreq.getOntModelSelector().getTBoxModel();
         return getAdditionalFauxSubpropertiesForList(propList, subject, displayModel, tboxModel);
     }
-    
-    public static List<ObjectProperty> getAdditionalFauxSubproperties(ObjectProperty prop, 
+
+    public static List<ObjectProperty> getAdditionalFauxSubproperties(ObjectProperty prop,
                                                                          Individual subject,
                                                                          Model tboxModel,
                                                                          Model union) {
@@ -54,8 +54,8 @@ public class ApplicationConfigurationOntologyUtils {
                 "    ?context config:hasConfiguration ?configuration . \n" +
                 "    ?configuration a config:ObjectPropertyDisplayConfig . \n" +
                 "    OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
-                "}"; 
-      
+                "}";
+
         if(prop != null) {
             log.debug("Checking " + prop.getURI() + " for additional properties");
             queryStr = queryStr.replaceAll("For \\?property", "For <" + prop.getURI() + ">");
@@ -83,33 +83,33 @@ public class ApplicationConfigurationOntologyUtils {
                         additionalProps.add(faux);
                     } else {
                         log.error("Could not retrieve " + opURI + " qualified by " +
-                                " domain " + domainURI + " and range " + rangeURI); 
+                                " domain " + domainURI + " and range " + rangeURI);
                     }
                 }
-            }  
+            }
         } finally {
             qe.close();
         }
         return additionalProps;
-    }   
-    
-    
-    
-    public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, 
-                                                                         Individual subject, 
-                                                                         Model displayModel, 
+    }
+
+
+
+    public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList,
+                                                                         Individual subject,
+                                                                         Model displayModel,
                                                                          Model tboxModel) {
-        
+
         List<ObjectProperty> additionalProps = new ArrayList<ObjectProperty>();
         Model union = ModelFactory.createUnion(displayModel, tboxModel);
-        
+
         for (ObjectProperty op : propList) {
             additionalProps.addAll(getAdditionalFauxSubproperties(op, subject, tboxModel, union));
-        }    
+        }
 
         return additionalProps;
     }
-    
+
     private static boolean appropriateDomain(Resource domainRes, Individual subject, Model tboxModel) {
         if (subject == null || domainRes == null) {
             return true;
@@ -125,5 +125,5 @@ public class ApplicationConfigurationOntologyUtils {
         }
         return false;
     }
-    
+
 }

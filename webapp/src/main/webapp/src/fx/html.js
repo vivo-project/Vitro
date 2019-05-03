@@ -522,7 +522,7 @@ dojo.fx.html.Exploder = function(triggerNode, boxNode) {
 	return this;
 };
 
-/**** 
+/****
 	Strategies for displaying/hiding objects
 	This presents a standard interface for each of the effects
 *****/

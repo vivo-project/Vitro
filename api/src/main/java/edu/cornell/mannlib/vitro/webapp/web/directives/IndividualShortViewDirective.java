@@ -86,7 +86,7 @@ public class IndividualShortViewDirective extends BaseTemplateDirectiveModel {
 			log.warn("ShortViewService was not initialized properly.");
 			return;
 		}
-		
+
 		TemplateAndSupplementalData svInfo = svs.getShortViewInfo(individual,
 				svContext, new VitroRequest(request));
 

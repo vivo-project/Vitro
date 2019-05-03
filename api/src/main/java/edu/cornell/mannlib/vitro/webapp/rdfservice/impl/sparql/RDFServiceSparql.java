@@ -187,8 +187,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
 				performChange(modelChange);
 			}
-			
-			notifyListenersOfChanges(changeSet);						
+
+			notifyListenersOfChanges(changeSet);
 
 			for (Object o : changeSet.getPostChangeEvents()) {
 				this.notifyListenersOfEvent(o);

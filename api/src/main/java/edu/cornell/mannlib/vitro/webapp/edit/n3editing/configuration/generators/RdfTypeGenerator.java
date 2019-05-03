@@ -18,30 +18,30 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.ChildVClasses
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
 public class RdfTypeGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator  {
-    
+
     private Log log = LogFactory.getLog(RdfTypeGenerator.class);
-    
+
     @Override
-    public EditConfigurationVTwo getEditConfiguration( VitroRequest vreq, HttpSession session) {        
+    public EditConfigurationVTwo getEditConfiguration( VitroRequest vreq, HttpSession session) {
         EditConfigurationVTwo editConfig = new EditConfigurationVTwo();
-        
+
         //get editkey and url of form
-        initBasics(editConfig, vreq);        
+        initBasics(editConfig, vreq);
         initPropertyParameters(vreq, session, editConfig);
-        initObjectPropForm(editConfig, vreq);                         
-        
-        editConfig.addUrisInScope("rdfTypeUri", Arrays.asList( RDF.type.getURI() ) );       
-        
-        editConfig.setN3Required( " ?subject ?rdfTypeUri ?object . ");                        
-                
+        initObjectPropForm(editConfig, vreq);
+
+        editConfig.addUrisInScope("rdfTypeUri", Arrays.asList( RDF.type.getURI() ) );
+
+        editConfig.setN3Required( " ?subject ?rdfTypeUri ?object . ");
+
         //set fields
         editConfig.setUrisOnForm("object");
         editConfig.addField( new FieldVTwo( )
             .setName("object")
-            .setOptions( 
-                    new ChildVClassesOptions(OWL.Class.getURI()) )            
+            .setOptions(
+                    new ChildVClassesOptions(OWL.Class.getURI()) )
         );
-                      
+
         editConfig.setTemplate("rdfTypeForm.ftl");
         return editConfig;
     }

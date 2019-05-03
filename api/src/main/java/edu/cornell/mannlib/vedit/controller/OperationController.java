@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vedit.validator.Validator;
 
 @WebServlet(name = "OperationController", urlPatterns = {"/doEdit"} )
 public class OperationController extends BaseEditController {
-	
+
     private static final Log log = LogFactory.getLog(OperationController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
@@ -61,7 +61,7 @@ public class OperationController extends BaseEditController {
         	}
             return;
         }
-        
+
         // if we're canceling, we don't need to do anything
         if (request.getParameter("_cancel") != null){
             String referer = epo.getReferer();
@@ -94,15 +94,15 @@ public class OperationController extends BaseEditController {
         }
 
         try {
-        	
+
             Object newObj = getNewObj(epo);
-            
+
             //populate this object from the req. params
             boolean valid = populateObjectFromRequestParamsAndValidate(epo, newObj, request);
-            
+
             //run preprocessors
             runPreprocessors(epo, newObj);
-            
+
             //applySimpleMask(epo, newObj);
 
             //put the newObj back in the epo where other things can look at it
@@ -115,14 +115,14 @@ public class OperationController extends BaseEditController {
             	return;
             }
 
-            String action = getAction(request);       
-            
+            String action = getAction(request);
+
             boolean status = performEdit(epo, newObj, action);
             if (status == FAILURE) {
             	retry(request, response, epo);
             	return;
             }
-            
+
             /* put request parameters and attributes into epo where the listeners can see */
             epo.setRequestParameterMap(request.getParameterMap());
 
@@ -165,13 +165,13 @@ public class OperationController extends BaseEditController {
 
         } catch (Exception e) {
             log.error("Error performing edit", e);
-            
+
             String errMsg = (e.getMessage() != null)
                 ? e.getMessage()
                 : "Error performing edit";
-            
+
             epo.setAttribute("globalErrorMsg", errMsg);
-       
+
             try {
             	retry(request, response, epo);
             } catch (IOException ioe) {
@@ -179,30 +179,30 @@ public class OperationController extends BaseEditController {
             }
         }
     }
-    
-    private void retry(HttpServletRequest request, 
-    		           HttpServletResponse response, 
+
+    private void retry(HttpServletRequest request,
+    		           HttpServletResponse response,
     		           EditProcessObject epo) throws IOException {
-        String referer = request.getHeader("Referer");        
+        String referer = request.getHeader("Referer");
         referer = (referer == null) ? epo.getReferer() : referer;
         if( referer != null ){
             int epoKeyIndex = referer.indexOf("_epoKey");
             if (epoKeyIndex >= 0){
-                String url = referer.substring(0,epoKeyIndex) + "_epoKey=" + 
+                String url = referer.substring(0,epoKeyIndex) + "_epoKey=" +
                         request.getParameter("_epoKey");
                 response.sendRedirect(url);
                 return;
             }
-            String redirectUrl = (referer.indexOf("?") > -1) 
-                    ? referer + "&"  
+            String redirectUrl = (referer.indexOf("?") > -1)
+                    ? referer + "&"
                     : referer + "?";
             redirectUrl += "_epoKey="+request.getParameter("_epoKey");
-            response.sendRedirect(redirectUrl);        
+            response.sendRedirect(redirectUrl);
         } else {
         	response.sendRedirect(getDefaultLandingPage(request));
         }
     }
-    
+
     private void runPreprocessors(EditProcessObject epo, Object newObj) {
     	if (epo.getPreProcessorList() != null && epo.getPreProcessorList().size()>0) {
             for (EditPreProcessor epp : epo.getPreProcessorList()) {
@@ -210,14 +210,14 @@ public class OperationController extends BaseEditController {
             }
         }
     }
-    
+
     private Object getNewObj(EditProcessObject epo) {
     	Object newObj = null;
     	if (epo.getOriginalBean() != null) { // we're updating or deleting an existing bean
             if (epo.getImplementationClass() != null) {
                 newObj = OperationUtils.cloneBean(
-                        epo.getOriginalBean(), 
-                        epo.getImplementationClass(), 
+                        epo.getOriginalBean(),
+                        epo.getImplementationClass(),
                         epo.getBeanClass());
             } else {
                 newObj = OperationUtils.cloneBean(epo.getOriginalBean());
@@ -235,7 +235,7 @@ public class OperationController extends BaseEditController {
         epo.setNewBean(newObj); // is this dangerous?
         return newObj;
     }
-    
+
     private boolean populateObjectFromRequestParamsAndValidate(EditProcessObject epo, Object newObj, HttpServletRequest request) {
         boolean valid = true;
         String currParam="";
@@ -298,7 +298,7 @@ public class OperationController extends BaseEditController {
                     } catch (NegativeIntegerException nie) {
                         valid = false;
                         epo.getErrMsgMap().put(currParam,"Please enter a positive integer");
-                        epo.getBadValueMap().put(currParam,currValue);                    	
+                        epo.getBadValueMap().put(currParam,currValue);
                     } catch (IllegalArgumentException f) {
                         valid=false;
                         log.error("doPost() reports IllegalArgumentException for "+currParam);
@@ -311,7 +311,7 @@ public class OperationController extends BaseEditController {
         }
         return valid;
     }
-    
+
     private String getAction(HttpServletRequest request) {
     	if (request.getParameter("_update") != null ) {
         	return "update";
@@ -321,7 +321,7 @@ public class OperationController extends BaseEditController {
         	return "insert";
         }
     }
-    
+
     private void notifyChangeListeners(EditProcessObject epo, String action) {
     	List<ChangeListener> changeListeners = epo.getChangeListenerList();
         if (changeListeners != null){
@@ -340,10 +340,10 @@ public class OperationController extends BaseEditController {
             }
         }
     }
-    
+
     private boolean SUCCESS = false;
     private boolean FAILURE = !SUCCESS;
-    
+
     private boolean performEdit(EditProcessObject epo, Object newObj, String action) {
     	/* do the actual edit operation */
         String partialClassName;
@@ -366,7 +366,7 @@ public class OperationController extends BaseEditController {
         Method meth=null;
         Method deleteMeth=null;
         Method insertMeth=null;
-        
+
         // probably want to change this so it will walk up the class tree indefinitely looking for a good method to use
         if ("update".equals(action)){
         	if (epo.getUpdateMethod() != null) {
@@ -475,7 +475,7 @@ public class OperationController extends BaseEditController {
             	return FAILURE;
             }
         }
-        
+
         if (result != null) {
             // need to put the result of the insert in the id of the newbean
             try {
@@ -504,9 +504,9 @@ public class OperationController extends BaseEditController {
                 //log.error("doPost() could not set id of new bean.");
             }
         }
-        
+
         return SUCCESS;
-        
+
     }
 
 }

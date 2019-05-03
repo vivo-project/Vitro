@@ -6,7 +6,7 @@
 		<br/>
 	<#else>
     	<h2>${pageTitle!}</h2>
-    	
+
     	<#if !displayOption?has_content>
     	    <#assign displayOption = "asserted">
     	</#if>
@@ -23,7 +23,7 @@
     	            <input type="submit" id="addGroup" class="form-button" value="${i18n().add_new_group}"/>
     	    </#if>
     	</form>
-    	    
+
     	<#if displayOption == "group">
     	    <div id="expandLink"><span id="expandAll" ><a href="javascript:" title="${i18n().hide_show_subclasses}">${i18n().hide_subclasses}</a></span></div>
     	<#else>
@@ -54,11 +54,11 @@
 <script language="javascript" type="text/javascript" >
 $(document).ready(function() {
     classHierarchyUtils.onLoad("${urls.base!}","${displayOption!}");
-});    
+});
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/classHierarchy.css" />')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/siteAdmin/classHierarchyUtils.js"></script>')}
-              
+

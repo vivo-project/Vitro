@@ -15,11 +15,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListCont
 
 /**
  * These are the paged results of a query for Individuals.
- * 
+ *
  * The criteria for the search are the index of the desired page, the number of
  * results displayed on each page, and an optional initial letter to search
  * against.
- * 
+ *
  * By the time this is built, the results have already been partially processed.
  * A list of PageRecord object is included, with values that the GUI can use to
  * create Alphabetical links. Maybe this processing should have been done later.

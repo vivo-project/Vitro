@@ -34,7 +34,7 @@ public class HasPermissionSet extends AbstractCommonIdentifier implements
 		}
 		return set;
 	}
-	
+
 	private final PermissionSet permissionSet; // never null
 
 	public HasPermissionSet(PermissionSet permissionSet) {

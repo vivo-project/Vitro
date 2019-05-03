@@ -3,10 +3,10 @@
 <#--
     Template for the raw page that displays the StartupStatus if there
     are warnings or errors.
-    
+
     "raw" because this template works outside of the usual framework, in
     case the Freemarker context didn't initialize properly.
-    
+
     This file can't even include a reference to an external CSS file, in case
     the servlet routing filters are broken.
 -->
@@ -25,7 +25,7 @@
     </#if>
     <li class="item ${color}" role="listitem">
         <h4>${item.level}: ${item.shortSourceName}</h4>
-        
+
         <ul class="item-spec" role="navigation">
             <li role="listitem">${item.message}</li>
             <li role="listitem">${item.sourceName}</li>
@@ -41,7 +41,7 @@
 <html lang="en">
     <head>
         <title>Startup Status</title>
-        
+
         <style TYPE="text/css">
            #startup-trace {
                width: 100%;
@@ -71,7 +71,7 @@
            #startup-trace li.not_executed {
                background-color: #F3F3F0;
            }
-           
+
         </style>
     </head>
 
@@ -97,12 +97,12 @@
               <@statusItem item=item />
             </#list>
             </ul>
-            
+
             <#-- If there were no fatal errors, let them go forward from here. -->
             <#if showLink>
                 <p><a href="${url}" title="continue">Continue</a></p>
      </#if>
-            
+
         </#if>
 
         <h2>Startup trace</h2>
