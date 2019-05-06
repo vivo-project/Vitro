@@ -7,6 +7,8 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAct
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,14 +35,20 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     private final String name;
     private final List<PropertyTemplateModel> properties;
 
-
+    private List<Future<?>> futures = null;
+    
+    List<Future<?>> getFutures() {
+		return futures;
+	}
 
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
             Individual subject, boolean editing, 
             List<DataProperty> populatedDataPropertyList, 
-            List<ObjectProperty> populatedObjectPropertyList) {
+            List<ObjectProperty> populatedObjectPropertyList, ExecutorService executor) {
 
         this.name = group.getName();
+        
+        futures = new ArrayList<>();
         
         List<Property> propertyList = group.getPropertyList();
         properties = new ArrayList<PropertyTemplateModel>(propertyList.size());
@@ -51,18 +59,16 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
                 if (!allowedToDisplay(vreq, op, subject)) {
                     continue;
                 }
-                ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
-                        op, subject, vreq, editing, populatedObjectPropertyList);
-                if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
-                    properties.add(tm);                    
-                }
+                futures.add(executor.submit(new ObjectPropertyTemplateModelCallable(
+                		op, subject, vreq, editing, populatedObjectPropertyList)));
 
             } else if (p instanceof DataProperty){
                 DataProperty dp = (DataProperty) p;
                 if (!allowedToDisplay(vreq, dp, subject))  {
                     continue;
                 }
-                properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
+                futures.add(executor.submit(new DataPropertyTemplateModelCallable(dp, subject, vreq, editing, populatedDataPropertyList)));
+                
             } else {
                 log.debug(p.getURI() + " is neither an ObjectProperty nor a DataProperty; skipping display");
             }

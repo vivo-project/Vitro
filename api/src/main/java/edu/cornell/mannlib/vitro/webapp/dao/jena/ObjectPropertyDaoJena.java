@@ -1087,7 +1087,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     Map<FullPropertyKey, String> customListViewConfigFileMap;
     
     @Override
-    public String getCustomListViewConfigFileName(ObjectProperty op) {
+    public synchronized String getCustomListViewConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
             customListViewConfigFileMap = new HashMap<>();
         }

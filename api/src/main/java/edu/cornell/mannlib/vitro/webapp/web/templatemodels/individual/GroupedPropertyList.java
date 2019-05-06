@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,7 +71,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private List<PropertyGroupTemplateModel> groups;
 
     GroupedPropertyList(Individual subject, VitroRequest vreq,
-            boolean editing) {
+            boolean editing) throws Exception {
         this.vreq = vreq;
         this.subject = subject;
         this.wdf = vreq.getWebappDaoFactory();
@@ -136,10 +140,36 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(
                 propertyGroupList.size());
+        // submit parallel
+        ExecutorService executor = Executors.newCachedThreadPool();
         for (PropertyGroup propertyGroup : propertyGroupList) {
-            groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup,
-                    subject, editing, populatedDataPropertyList,
-                    populatedObjectPropertyList));
+            groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, editing,
+                    populatedDataPropertyList, populatedObjectPropertyList, executor));
+        }
+        
+        // wait all
+        for (PropertyGroupTemplateModel pgtm : groups) {
+            List<Future<?>> futures = pgtm.getFutures();
+            List<PropertyTemplateModel> properties = pgtm.getProperties();
+            for (Future<?> f : futures) {
+                try {
+                    if (f.get() instanceof ObjectPropertyTemplateModel) {
+                        ObjectPropertyTemplateModel tm = (ObjectPropertyTemplateModel) f.get();
+                        if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
+                            properties.add(tm);
+                        }
+                    } else if (f.get() instanceof DataPropertyTemplateModel) {
+                        DataPropertyTemplateModel dptm = (DataPropertyTemplateModel) f.get();
+                        properties.add(dptm);
+                    } else {
+                        log.error("unexpected class " + f.get().getClass());
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    throw e;
+                } finally {
+                    executor.shutdown();
+                }
+            }
         }
         
         if (!editing) {
