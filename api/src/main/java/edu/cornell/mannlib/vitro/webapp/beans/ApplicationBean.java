@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ApplicationBean {
 	private static final Log log = LogFactory.getLog(ApplicationBean.class);
-	
+
     public final static int      CALS_SEARCHBOX_SIZE         = 25;
     public final static int      VIVO_SEARCHBOX_SIZE         = 20;
 
@@ -24,7 +24,7 @@ public class ApplicationBean {
     private final static int     DEFAULT_ROOT_LOGOTYPE_WIDTH  = 0;
     private final static int     DEFAULT_ROOT_LOGOTYPE_HEIGHT = 0;
     private final static String  DEFAULT_ROOT_LOGOTYPE_TITLE  = "";
-    
+
     // Value gets set in default theme setup context listener at application startup
     public static ThemeInfo themeInfo  = new ThemeInfo(null, "no_default_theme", new ArrayList<String>());
 
@@ -33,12 +33,12 @@ public class ApplicationBean {
     private boolean   initialized             = false;
     private String    sessionIdStr            = null;
     private String    applicationName         = DEFAULT_APPLICATION_NAME;
- 
+
     private String    rootLogotypeImage       = DEFAULT_ROOT_LOGOTYPE_IMAGE;
     private int       rootLogotypeWidth       = DEFAULT_ROOT_LOGOTYPE_WIDTH;
     private int       rootLogotypeHeight      = DEFAULT_ROOT_LOGOTYPE_HEIGHT;
     private String    rootLogotypeTitle       = DEFAULT_ROOT_LOGOTYPE_TITLE;
-    
+
     private String    aboutText;
     private String    acknowledgeText;
     private String    contactMail;
@@ -46,7 +46,7 @@ public class ApplicationBean {
     private String    copyrightURL;
     private String    copyrightAnchor;
     private String    themeDir;
-       
+
     public String toString() {
         String output = "Application Bean Contents:\n";
         output += "  initialized from DB:    [" + initialized             + "]\n";
@@ -84,7 +84,7 @@ public class ApplicationBean {
     public void setRootLogotypeTitle(String string_val) {
         rootLogotypeTitle=string_val;
     }
-    
+
     public void setAboutText(String string_val) {
         aboutText = string_val;
     }
@@ -92,7 +92,7 @@ public class ApplicationBean {
     public void setAcknowledgeText(String string_val) {
         acknowledgeText = string_val;
     }
-    
+
     public void setContactMail(String string_val) {
         contactMail = string_val;
     }
@@ -100,7 +100,7 @@ public class ApplicationBean {
     public void setCorrectionMail(String string_val) {
         correctionMail = string_val;
     }
-    
+
     public void setCopyrightURL(String string_val) {
         copyrightURL = string_val;
     }
@@ -108,7 +108,7 @@ public class ApplicationBean {
     public void setCopyrightAnchor(String string_val) {
         copyrightAnchor = string_val;
     }
-    
+
 	public void setThemeDir(String string_val) {
 		themeDir = string_val;
 	}
@@ -138,7 +138,7 @@ public class ApplicationBean {
     public String getRootLogotypeTitle() {
         return rootLogotypeTitle;
     }
-    
+
     public String getAboutText() {
         return aboutText;
     }
@@ -146,7 +146,7 @@ public class ApplicationBean {
     public String getAcknowledgeText() {
         return acknowledgeText;
     }
-    
+
     public String getContactMail() {
         return contactMail;
     }
@@ -154,7 +154,7 @@ public class ApplicationBean {
     public String getCorrectionMail() {
         return correctionMail;
     }
-    
+
     public String getCopyrightURL() {
         return copyrightURL;
     }
@@ -168,11 +168,11 @@ public class ApplicationBean {
     public String getRootBreadCrumbURL() {
     	return "";
     }
-    
+
     public String getRootBreadCrumbAnchor() {
     	return "";
     }
-    
+
     public String getShortHand() {
     	return "";
     }
@@ -194,9 +194,9 @@ public class ApplicationBean {
 	/**
 	 * Hold the names of the available themes, the name of the default theme,
 	 * and the base directory that contains the theme directories.
-	 * 
+	 *
 	 * The theme names are stored as simple strings, like "wilma".
-	 * 
+	 *
 	 * To be backwards compatible, we need to be able to test a string like
 	 * "themes/wilma/ to see whether it is available, or to return the default
 	 * directory in that form.
@@ -248,6 +248,6 @@ public class ApplicationBean {
 		}
 
 	}
-	
+
 }
 

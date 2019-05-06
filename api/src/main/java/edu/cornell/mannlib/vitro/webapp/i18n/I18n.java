@@ -27,9 +27,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 /**
  * Provides access to a bundle of text strings, based on the name of the bundle,
  * the Locale of the requesting browser, and the current theme directory.
- * 
+ *
  * If the bundle name is not specified, the default name of "all" is used.
- * 
+ *
  * If a requested bundle is not found, no error is thrown. Instead, an empty
  * bundle is returned that produces error message strings when asked for text.
  */
@@ -97,12 +97,12 @@ public class I18n {
 	 * Get an I18nBundle by this name. The request provides the preferred
 	 * Locale, the application directory, the theme directory and the
 	 * development mode flag.
-	 * 
+	 *
 	 * If the request indicates that the system is in development mode, then the
 	 * cache is cleared on each request.
-	 * 
+	 *
 	 * If the theme directory has changed, the cache is cleared.
-	 * 
+	 *
 	 * Declared 'protected' so it can be overridden in unit tests.
 	 */
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
@@ -223,7 +223,7 @@ public class I18n {
 		/**
 		 * When creating the chain of acceptable Locales, include approximate
 		 * matches before giving up and using the root Locale.
-		 * 
+		 *
 		 * Check the list of supported Locales to see if any have the same
 		 * language but different region. If we find any, sort them and insert
 		 * them into the usual result list, just before the root Locale.

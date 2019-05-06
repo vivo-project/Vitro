@@ -129,7 +129,7 @@ dojo.lang.delayThese = function(farr, cb, delay, onend){
 	 * alternate: (array funcArray, function callback)
 	 * alternate: (array funcArray)
 	 */
-	if(!farr.length){ 
+	if(!farr.length){
 		if(typeof onend == "function"){
 			onend();
 		}

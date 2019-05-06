@@ -40,25 +40,25 @@ import org.apache.jena.tdb.TDBFactory;
 /**
  * Copy all of the data from an SDB triple-store to a TDB triple-store. See
  * README.txt for more details.
- * 
+ *
  * Examples of invoking it:
- * 
+ *
  * <pre>
- *    java -jar sdb2tdb.jar \ 
- *    		'jdbc:mysql://localhost/vitrodb?user=vivoUser&password=vivoPass'\ 
+ *    java -jar sdb2tdb.jar \
+ *    		'jdbc:mysql://localhost/vitrodb?user=vivoUser&password=vivoPass'\
  *    		/usr/local/my/tdb
- *    
+ *
  *    java -Xms2048m -Xmx2048m -jar .work/sdb2tdb.jar \
  *          'jdbc:mysql://localhost/weill17?user=vivoUser&password=vivoPass' \
  *          /Users/jeb228/Testing/instances/weill-develop/vivo_home/contentTdb \
  *          force
  * </pre>
- * 
+ *
  * Each graph is copied separately. Small graphs are simply loaded into memory
  * and transferred. Large graphs are read to produce a streaming result set
  * which is written to a temporary file. That file is then read into a TDB
  * model.
- * 
+ *
  * This has been tested with graphs up to 6 million triples without crashing.
  */
 public class Sdb2Tdb {

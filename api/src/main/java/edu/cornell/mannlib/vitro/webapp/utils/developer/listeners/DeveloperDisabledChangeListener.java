@@ -12,10 +12,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
 /**
  * If a particular developer flag is NOT set to true, this is transparent.
- * 
+ *
  * Set the flag and this becomes opaque, passing no events through.
  */
-public class DeveloperDisabledChangeListener extends StatementListener 
+public class DeveloperDisabledChangeListener extends StatementListener
         implements ModelChangedListener {
 	private final ModelChangedListener inner;
 	private final Key disablingKey;

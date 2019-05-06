@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
@@ -9,16 +9,16 @@
 ### This file is for the test DataGetterUtilsTest.java
 
 display:SPARQLPage
-    a display:Page ;            
+    a display:Page ;
     display:title "TestQuery" ;
     display:urlMapping "/query1" ;
     display:hasDataGetter display:query1data .
-    
-display:query1data 
+
+display:query1data
     a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
     display:query "SELECT * WHERE { ?uri a <http://xmlns.com/foaf/0.1/Person> } " ;
-    display:saveToVar "people" .      
-    
-    
+    display:saveToVar "people" .
 
-      
+
+
+

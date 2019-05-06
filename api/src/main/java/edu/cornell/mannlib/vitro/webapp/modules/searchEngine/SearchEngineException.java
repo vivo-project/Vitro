@@ -14,11 +14,11 @@ public class SearchEngineException extends Exception {
 	public SearchEngineException(String message) {
 		super(message);
 	}
-	
+
 	public SearchEngineException(Throwable cause) {
 		super(cause);
 	}
-	
+
 	public SearchEngineException(String message, Throwable cause) {
 		super(message, cause);
 	}

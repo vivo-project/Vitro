@@ -97,7 +97,7 @@ dojo.lang.extend(dojo.widget.html.GoogleMap, {
 			}
 		}
 	},
-	
+
 	findCenter:function(bounds){
 		var clat=(bounds.getNorthEast().lat()+bounds.getSouthWest().lat())/2;
 		var clng=(bounds.getNorthEast().lng()+bounds.getSouthWest().lng())/2;
@@ -133,7 +133,7 @@ dojo.lang.extend(dojo.widget.html.GoogleMap, {
 			if(c=="long") c="lng";
 			a.push(c);
 		}
-		
+
 		//	parse the data
 		var b=table.getElementsByTagName("tbody")[0];
 		if(!b){
@@ -148,7 +148,7 @@ dojo.lang.extend(dojo.widget.html.GoogleMap, {
 			for(var j=0; j<a.length; j++){
 				var col=a[j];
 				if(col=="lat"||col=="lng"){
-					o[col]=parseFloat(cells[j].innerHTML);					
+					o[col]=parseFloat(cells[j].innerHTML);
 				}else{
 					o[col]=cells[j].innerHTML;
 				}
@@ -173,7 +173,7 @@ dojo.lang.extend(dojo.widget.html.GoogleMap, {
 			this.map.addOverlay(m);
 		}
 	},
-	
+
 
 	initialize:function(args, frag){
 		if(!GMap2){

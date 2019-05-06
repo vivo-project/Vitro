@@ -60,15 +60,15 @@
     	}
     	return removedStmts;
     }
-    
+
     private Model describeBnode(String bnodeId) {
-        String describeQueryStr = 
+        String describeQueryStr =
             "PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
             "DESCRIBE ?bnode \n" +
             "WHERE { \n" +
             "    FILTER(afn:bnode(?bnode) = \"" + bnodeId + "\")\n" +
             "}";
-            
+
     	OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.FULL_ASSERTIONS);
         Model conceptDescription = ModelFactory.createDefaultModel();
         try {
@@ -76,14 +76,14 @@
             Query describeQuery = QueryFactory.create(describeQueryStr, Syntax.syntaxARQ);
             QueryExecution qe = QueryExecutionFactory.create(describeQuery, ontModel);
             qe.execDescribe(conceptDescription);
-            
+
             conceptDescription.add(ontModel.listStatements((Resource) null, (Property) null, ontModel.createResource(new AnonId(bnodeId))));
             return conceptDescription;
         } finally {
             ontModel.leaveCriticalSection();
         }
     }
-    
+
 %>
 
 
@@ -118,4 +118,4 @@
     <form action="" method="post">
         <p><input name="execute" type="submit" value="Remove now"/></p>
     </form>
-</body></html>    
+</body></html>

@@ -15,12 +15,12 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 
 /**
  * An immutable collection of options that can be used as a key in a hashmap.
- * 
+ *
  * The class of the key is part of the hash, so a OntModelKey and a
  * RDFServiceKey can both be used in the same map without conflict.
  */
 public abstract class ModelAccessKey {
-	
+
 	// ----------------------------------------------------------------------
 	// Static methods
 	// ----------------------------------------------------------------------
@@ -69,7 +69,7 @@ public abstract class ModelAccessKey {
 	/**
 	 * Search through the options for values from the specified class. If none
 	 * are found, use the default value.
-	 * 
+	 *
 	 * Redundant options are silently accepted, but conflicting options will
 	 * throw an exception.
 	 */

@@ -15,9 +15,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  */
 public class ImageInfo {
 	private static final Log log = LogFactory.getLog(ImageInfo.class);
-	
+
 	public static final ImageInfo EMPTY_IMAGE_INFO = emptyInstance();
-	
+
 	// ----------------------------------------------------------------------
 	// static Factory methods.
 	// ----------------------------------------------------------------------
@@ -29,7 +29,7 @@ public class ImageInfo {
 		FileInfo emptyFileInfo = new FileInfo.Builder().build();
 		return new ImageInfo(emptyFileInfo, emptyFileInfo);
 	}
-	
+
 	/**
 	 * If this Individual has a main image and a thumbnail, return their info.
 	 * Otherwise, return null.

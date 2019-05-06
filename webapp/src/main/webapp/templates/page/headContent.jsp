@@ -7,14 +7,14 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean"%>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<%! 
+<%!
   public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.page.headContent.jsp");
 %>
 <%
-  VitroRequest vreq = new VitroRequest(request); 
+  VitroRequest vreq = new VitroRequest(request);
 
   String themeDir = vreq.getAppBean().getThemeDir();
-  themeDir = vreq.getContextPath() + '/' + themeDir;   
+  themeDir = vreq.getContextPath() + '/' + themeDir;
 %>
 
 <!-- headContent.jsp -->
@@ -30,4 +30,4 @@
 <c:if test="${!empty scripts}"><jsp:include page="${scripts}"/></c:if>
 
 <!-- end headContent.jsp -->
-     
+

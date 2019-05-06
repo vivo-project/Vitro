@@ -8,16 +8,16 @@ import org.apache.log4j.spi.LoggingEvent;
 /**
  * This is a nasty Layout that prints a full stack trace for every logging
  * event.
- * 
+ *
  * Here is an example of how to use this to show full stack traces every time we
  * get a log message from org.apache.jena.riot.
- * 
+ *
  * <pre>
- * log4j.appender.RiotAppender=org.apache.log4j.RollingFileAppender 
+ * log4j.appender.RiotAppender=org.apache.log4j.RollingFileAppender
  * log4j.appender.RiotAppender.File= $${catalina.base}/logs/${webapp.name}.riot.log
- * log4j.appender.RiotAppender.MaxFileSize=10MB 
- * log4j.appender.RiotAppender.MaxBackupIndex=10 
- * log4j.appender.RiotAppender.layout=edu.cornell.mannlib.vitro.webapp.utils.logging.StackTraceLayout 
+ * log4j.appender.RiotAppender.MaxFileSize=10MB
+ * log4j.appender.RiotAppender.MaxBackupIndex=10
+ * log4j.appender.RiotAppender.layout=edu.cornell.mannlib.vitro.webapp.utils.logging.StackTraceLayout
  * log4j.logger.org.apache.jena.riot=INFO, RiotAppender
  * </pre>
  */

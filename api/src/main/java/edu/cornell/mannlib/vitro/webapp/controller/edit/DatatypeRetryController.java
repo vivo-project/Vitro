@@ -27,7 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 public class DatatypeRetryController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(DatatypeRetryController.class.getName());
-	
+
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;

@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 /**
  * A minimal implementation of the IndividualDao.
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */
@@ -32,12 +32,12 @@ public class IndividualDaoStub implements IndividualDao {
 		if (individual == null) {
 			throw new NullPointerException("individual may not be null.");
 		}
-		
+
 		String uri = individual.getURI();
 		if (uri == null) {
 			throw new NullPointerException("uri may not be null.");
 		}
-		
+
 		indMap.put(uri, individual);
 	}
 
@@ -133,13 +133,13 @@ public class IndividualDaoStub implements IndividualDao {
 	public Collection<String> getAllIndividualUris() {
 		throw new RuntimeException(
 				"IndividualDaoStub.getAllIndividualUris() not implemented.");
-	}	
+	}
 
 	@Override
 	public Iterator<String> getUpdatedSinceIterator(long updatedSince) {
 		throw new RuntimeException(
 				"IndividualDaoStub.getUpdatedSinceIterator() not implemented.");
-	}	
+	}
 
 	@Override
 	public boolean isIndividualOfClass(String vclassURI, String indURI) {

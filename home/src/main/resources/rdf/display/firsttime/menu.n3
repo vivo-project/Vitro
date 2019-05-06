@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
@@ -31,8 +31,8 @@ display:Home
     display:urlMapping "/" ;
     display:hasDataGetter display:homeDataGetter;
     display:cannotDeletePage "true" .
-    
+
 ########## Data Getter ############
-    
+
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#homeDataGetter>
-      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> .  
+      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> .

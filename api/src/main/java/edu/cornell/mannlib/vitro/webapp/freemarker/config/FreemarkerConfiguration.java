@@ -44,15 +44,15 @@ import freemarker.template.TemplateModelException;
 
 /**
  * Access point for a singleton Configuration instance.
- * 
+ *
  * The instance is created at system startup, so we can fail early if there are
  * any problems.
- * 
+ *
  * The Configuration is slightly extended to hold request-based information in a
  * ThreadLocal. The net result is although there is only one configuration (and
  * hence only one template cache), each request gets a customization with its
  * own locale, etc.
- * 
+ *
  * Each time a request asks for the configuration, check to see whether the
  * cache is still valid, whether the theme has changed (needs a new
  * TemplateLoader), and whether the DeveloperSettings have changed (might need a
@@ -95,7 +95,7 @@ public abstract class FreemarkerConfiguration {
 	/**
 	 * Keep track of the theme directory. If it changes, create an appropriate
 	 * new TemplateLoader.
-	 * 
+	 *
 	 * Note that setting a new TemplateLoader on the context Configuration also
 	 * creates a new, empty TemplateCache.
 	 */
@@ -154,7 +154,7 @@ public abstract class FreemarkerConfiguration {
 
 		// TODO VIVO-243 Why is this here?
 		loaders.add(new ClassTemplateLoader(FreemarkerConfiguration.class, ""));
-		
+
 		TemplateLoader[] loaderArray = loaders
 				.toArray(new TemplateLoader[loaders.size()]);
 		TemplateLoader tl = new MultiTemplateLoader(loaderArray);
@@ -164,7 +164,7 @@ public abstract class FreemarkerConfiguration {
 		if (settings.getBoolean(Key.INSERT_FREEMARKER_DELIMITERS)) {
 			tl =  new DelimitingTemplateLoader(tl);
 		}
-		
+
 		return tl;
 	}
 

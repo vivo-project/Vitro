@@ -15,9 +15,9 @@ public abstract class BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
 
-	private static final String URI_CHARACTERS = 
+	private static final String URI_CHARACTERS =
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&%'()*+,;=";
-    
+
     // Convenience method so subclasses can call getUrl(path)
     protected String getUrl(String path) {
         return UrlBuilder.getUrl(path);
@@ -27,23 +27,23 @@ public abstract class BaseTemplateModel {
     protected String getUrl(String path, ParamMap params) {
         return UrlBuilder.getUrl(path, params);
     }
-    
+
     // Convenience method so subclasses can call getUrl(path, params)
     protected String getUrl(String path, String... params) {
         return UrlBuilder.getUrl(path, params);
     }
 
     /**
-     * Used to do any processing for display of URIs or URLs.  
-     * 
+     * Used to do any processing for display of URIs or URLs.
+     *
      * If we used AntiSami on a URI it would escape any ampersands as &amp;
-     * and perhaps do other nastiness as well. Instead we delete any character 
+     * and perhaps do other nastiness as well. Instead we delete any character
      * that shouldn't be in a URI.
      */
     protected String cleanURIForDisplay( String dirty ){
         if( dirty == null )
             return null;
-        
+
     	StringBuilder clean = new StringBuilder(dirty.length());
     	for (char ch: dirty.toCharArray()) {
     		if (URI_CHARACTERS.indexOf(ch) != -1) {
@@ -52,18 +52,18 @@ public abstract class BaseTemplateModel {
     	}
         return clean.toString();
     }
-    
+
     /**
-     * Used to do any processing for display of general text.  
+     * Used to do any processing for display of general text.
      * Currently this only checks for XSS exploits.
      */
     protected String cleanTextForDisplay( String dirty){
         return simpleScriptStripper(dirty);
     }
-    
+
     /**
      * Used to do any processing for display of values in
-     * a map.  Map may be modified. 
+     * a map.  Map may be modified.
      */
     protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
         for( T key : map.keySet() ){

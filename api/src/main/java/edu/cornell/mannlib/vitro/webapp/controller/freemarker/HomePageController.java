@@ -28,35 +28,35 @@ public class HomePageController extends FreemarkerHttpServlet {
     private static final String BODY_TEMPLATE = "home.ftl";
 
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException { 
-        
-        Map<String, Object> body = new HashMap<String, Object>();    
-        
+    protected ResponseValues processRequest(VitroRequest vreq) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+
+        Map<String, Object> body = new HashMap<String, Object>();
+
         List<DataGetter> dgList = DataGetterUtils.getDataGettersForPage(vreq, vreq.getDisplayModel(), DisplayVocabulary.HOME_PAGE_URI);
 
-        for( DataGetter dg : dgList){            
-            Map<String,Object> moreData = dg.getData(body);            
+        for( DataGetter dg : dgList){
+            Map<String,Object> moreData = dg.getData(body);
             if( moreData != null ){
                 body.putAll(moreData);
             }
-        }    
+        }
         /*
         for(PageDataGetter dataGetter: dataGetters) {
 	        if( dataGetter != null ){
-	            String uriOfPageInDisplayModel = "not defined";            
-	            Map<String, Object> pageData = 
-	                dataGetter.getData(getServletContext(), vreq, 
+	            String uriOfPageInDisplayModel = "not defined";
+	            Map<String, Object> pageData =
+	                dataGetter.getData(getServletContext(), vreq,
 	                        uriOfPageInDisplayModel, body);
 	            if(pageData != null)
-	                body.putAll(pageData);            
+	                body.putAll(pageData);
 	        }
         }*/
         body.put("dataServiceUrlVClassesForVClassGroup", UrlBuilder.getUrl("/dataservice?getVClassesForVClassGroup=1&classgroupUri="));
 	    body.put("geoFocusMapsEnabled", getGeoFocusMapsFlag(vreq));
-        
+
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }
-    
+
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName;

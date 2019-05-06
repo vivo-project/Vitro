@@ -25,7 +25,7 @@ function removeComments(contents){
 dojo.hostenv.getRequiresAndProvides = function(contents){
 	// FIXME: should probably memoize this!
 	if(!contents){ return []; }
-	
+
 
 	// check to see if we need to load anything else first. Ugg.
 	var deps = [];
@@ -128,7 +128,7 @@ dojo.hostenv.loadUri = function(uri){
 		dojo.hostenv.loadedUris[uri] = true;
 		var delayRequires = dojo.hostenv.getDelayRequiresAndProvides(text);
 		eval(delayRequires.join(";"));
-	}catch(e){ 
+	}catch(e){
 		alert(e);
 	}
 	return true;

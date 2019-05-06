@@ -20,7 +20,7 @@ body{
     margin: 0;
     padding: 0;
     height: 100%; /* needed for container min-height */
-    font-family: 'Arimo', "Lucida Sans Unicode","Lucida Grande", Geneva, helvetica, sans-serif; 
+    font-family: 'Arimo', "Lucida Sans Unicode","Lucida Grande", Geneva, helvetica, sans-serif;
     font-size: 1em;
     height: auto !important; /* real browsers */
     height: 100%; /* IE6: treaded as min-height*/;
@@ -28,46 +28,46 @@ body{
     margin: 0 auto;
 }
 body{
-   background: #fff url(../images/header-background.gif) center 0 repeat-x; 
+   background: #fff url(../images/header-background.gif) center 0 repeat-x;
 }
 /* h1,h2,h3,h4,h5,h6 ------>  */
 h1 {
     padding: 8px 0 6px 0;
     margin: 0;
-    font-size: 1.5em;	
+    font-size: 1.5em;
 }
 h2 {
     padding: 8px 0 6px 0;
     margin: 0;
     font-size: 1.4em;
-    color: #2485ae; 
+    color: #2485ae;
 }
 h2 a{
-    color: #2485ae; 
+    color: #2485ae;
 }
 h2 a:link, h2 a:visited{
-    text-decoration: underline; 
+    text-decoration: underline;
 }
 h2 a:hover, h2 a:active{
-    text-decoration: none; 
+    text-decoration: none;
 }
 h3{
     padding: 8px 0 6px 0;
     margin: 0;
     font-size: 1.2em;
-    color: #2485ae; 
+    color: #2485ae;
 }
 h4{
     padding: 4px 0 4px 0;
     margin: 0;
     font-size: 1.1em;
-    color: #000000; 
+    color: #000000;
 }
 h5{
     padding: 3px 0 2px 0;
     margin: 0;
     font-size: 1em;
-    color: #2485ae; 
+    color: #2485ae;
 }
 
 a {
@@ -224,7 +224,7 @@ p{
 
 /* MISCELLANEOUS ------>  */
 .blue{
-    color: #2485ae; 
+    color: #2485ae;
 }
 .grey{
     color: #5e6363;

@@ -32,11 +32,11 @@ import freemarker.cache.TemplateLoader;
 
 public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
-    private static final Log log = LogFactory.getLog(DataPropertyTemplateModel.class);  
-    
+    private static final Log log = LogFactory.getLog(DataPropertyTemplateModel.class);
+
     private static final String TYPE = "data";
-    private static final String EDIT_PATH = "editRequestDispatch";  
-    
+    private static final String EDIT_PATH = "editRequestDispatch";
+
     private final List<DataPropertyStatementTemplateModel> statements;
     private static final String KEY_SUBJECT = "subject";
     private static final String KEY_PROPERTY = "property";
@@ -45,32 +45,32 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         NO_SELECT_QUERY("Missing select query specification"),
         NO_TEMPLATE("Missing template specification"),
         TEMPLATE_NOT_FOUND("Specified template does not exist");
-        
+
         String message;
-        
+
         ConfigError(String message) {
             this.message = message;
         }
-        
+
         public String getMessage() {
             return message;
         }
-        
+
         public String toString() {
             return getMessage();
         }
     }
-    
+
     private DataPropertyListConfig config;
-    private String objectKey;   
+    private String objectKey;
     private String queryString;
     private String rangeDatatypeURI;
     private Set<String> constructQueries;
     private int displayLimit;
-    
-    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
+
+    DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq,
             boolean editing, List<DataProperty> populatedDataPropertyList) {
-        
+
         super(dp, subject, vreq, dp.getPublicName());
 
         // Get the config for this data property
@@ -79,7 +79,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         } catch (Exception e) {
             log.error(e, e);
         }
-        
+
         queryString = getSelectQuery();
         constructQueries = getConstructQueries();
 
@@ -90,29 +90,29 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         if (populatedDataPropertyList.contains(dp)) {
             log.debug("Getting data for populated data property " + getUri());
             DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
-            List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp, queryString, constructQueries);            
+            List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp, queryString, constructQueries);
             for (Literal value : values) {
                 statements.add(new DataPropertyStatementTemplateModel(subjectUri, dp, value, getTemplateName(), vreq));
             }
         } else {
             log.debug("Data property " + getUri() + " is unpopulated.");
-        }        
-        
+        }
+
         if ( editing ) {
         	setAddUrl(dp);
         }
     }
 
     protected void setAddUrl(Property property) {
-           
-        DataProperty dp = (DataProperty) property;        
+
+        DataProperty dp = (DataProperty) property;
         // NIHVIVO-2790 vitro:moniker now included in the display, but don't allow new statements
         if (dp.getURI().equals(VitroVocabulary.MONIKER)) {
             return;
         }
-        
+
 /*       If the display limit has already been reached, we can't add a new statement.
-         NB This appears to be a misuse of a value called "display limit". Note that it's 
+         NB This appears to be a misuse of a value called "display limit". Note that it's
          not used to limit display, either, so should be renamed.
         int displayLimit = dp.getDisplayLimit();
          Display limit of -1 (default value for new property) means no display limit
@@ -127,33 +127,33 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 		if ( functional && statements.size() >= 1 ) {
 			return;
 		}
-          
+
         // Determine whether a new statement can be added
 		RequestedAction action = new AddDataPropertyStatement(
 				vreq.getJenaOntModel(), subjectUri, propertyUri, SOME_LITERAL);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }
-        
+
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
                 "predicateUri", propertyUri);
-        
+
         params.putAll(UrlBuilder.getModelParams(vreq));
-        
-        addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
+
+        addUrl = UrlBuilder.getUrl(EDIT_PATH, params);
     }
-    
+
 	protected TemplateLoader getFreemarkerTemplateLoader() {
 		return FreemarkerConfiguration.getConfig(vreq).getTemplateLoader();
 	}
-    
-    @Override 
+
+    @Override
     protected int getPropertyDisplayTier(Property p) {
         return ((DataProperty)p).getDisplayTier();
     }
 
-    @Override 
+    @Override
     protected Route getPropertyEditRoute() {
         return Route.DATA_PROPERTY_EDIT;
     }
@@ -161,12 +161,12 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 	@Override
 	public int getDisplayLimit() {
 			return displayLimit;
-	}	
-    
+	}
+
 //	@Override
 	public String getRangeDatatypeURI() {
 			return rangeDatatypeURI;
-	}	
+	}
 
     public ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
@@ -174,15 +174,15 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         }
         return null;
     }
-      
+
     private String getSelectQuery() {
         return config.getSelectQuery();
     }
-    
+
     private Set<String> getConstructQueries() {
         return config.getConstructQueries();
     }
-    
+
     protected String getTemplateName() {
         return config.getTemplateName();
     }
@@ -190,7 +190,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     protected boolean hasDefaultListView() {
         return config.isDefaultListView();
     }
-    
+
     protected String getObjectKey() {
         return objectKey;
     }
@@ -200,7 +200,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     }
 
     /* Template properties */
-    
+
     public String getType() {
         return TYPE;
     }
@@ -208,21 +208,21 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     public List<DataPropertyStatementTemplateModel> getStatements() {
         return statements;
     }
-    
+
     public String getTemplate() {
         return getTemplateName();
     }
 
-    
+
     /* Template methods */
-    
+
     public DataPropertyStatementTemplateModel first() {
         return ( (statements == null || statements.isEmpty()) ) ? null : statements.get(0);
     }
-    
+
     public String firstValue() {
         DataPropertyStatementTemplateModel first = first();
         return first == null ? null : first.getValue();
     }
-    
+
 }

@@ -63,8 +63,8 @@ dojo.inherits(dojo.widget.validate.Textbox, dojo.widget.HtmlWidget);
 
 dojo.lang.extend(dojo.widget.validate.Textbox, {
 	// default values for new subclass properties
-	widgetId: "", 
-	widgetType: "Textbox", 
+	widgetId: "",
+	widgetType: "Textbox",
 	id: "",
 	className: "",
 	name: "",
@@ -75,7 +75,7 @@ dojo.lang.extend(dojo.widget.validate.Textbox, {
 	ucFirst: false,
 	digit: false,
 	htmlfloat: "none",
-	
+
 	templateString: "<span style='float:${this.htmlfloat};'><input dojoAttachPoint='textbox' dojoAttachEvent='onblur;onfocus'"
 					+ " id='${this.widgetId}' name='${this.name}' "
 					+ " value='${this.value}' class='${this.className}'></input></span>",
@@ -84,23 +84,23 @@ dojo.lang.extend(dojo.widget.validate.Textbox, {
 	textbox: null,
 
 	// Apply various filters to textbox value
-	filter: function() { 
+	filter: function() {
 		if (this.trim) {
 			this.textbox.value = this.textbox.value.replace(/(^\s*|\s*$)/g, "");
-		} 
+		}
 		if (this.uppercase) {
 			this.textbox.value = this.textbox.value.toUpperCase();
-		} 
+		}
 		if (this.lowercase) {
 			this.textbox.value = this.textbox.value.toLowerCase();
-		} 
+		}
 		if (this.ucFirst) {
-			this.textbox.value = this.textbox.value.replace(/\b\w+\b/g, 
+			this.textbox.value = this.textbox.value.replace(/\b\w+\b/g,
 				function(word) { return word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase(); });
-		} 
+		}
 		if (this.digit) {
 			this.textbox.value = this.textbox.value.replace(/\D/g, "");
-		} 
+		}
 	},
 
 	// event handlers, you can over-ride these in your own subclasses
@@ -110,7 +110,7 @@ dojo.lang.extend(dojo.widget.validate.Textbox, {
 	// All functions below are called by create from dojo.widget.Widget
 	mixInProperties: function(localProperties, frag) {
 		dojo.widget.validate.Textbox.superclass.mixInProperties.apply(this, arguments);
-		if ( localProperties["class"] ) { 
+		if ( localProperties["class"] ) {
 			this.className = localProperties["class"];
 		}
 	},
@@ -134,7 +134,7 @@ dojo.widget.tags.addParseTreeHandler("dojo:Textbox");
 
 	@attr type          		Basic input tag type declaration.
 	@attr size          		Basic input tag size declaration.
-	@attr type          		Basic input tag maxlength declaration.	
+	@attr type          		Basic input tag maxlength declaration.
   @attr required          Can be true or false, default is false.
   @attr validColor        The color textbox is highlighted for valid input. Default is #cfc.
   @attr invalidColor      The color textbox is highlighted for invalid input. Default is #fcc.
@@ -151,7 +151,7 @@ dojo.inherits(dojo.widget.validate.ValidationTextbox, dojo.widget.validate.Textb
 
 dojo.lang.extend(dojo.widget.validate.ValidationTextbox, {
 	// default values for new subclass properties
-	widgetType: "ValidationTextbox", 
+	widgetType: "ValidationTextbox",
 	type: "",
 	required: false,
 	validColor: "#cfc",
@@ -199,12 +199,12 @@ dojo.lang.extend(dojo.widget.validate.ValidationTextbox, {
 	isInRange: function() { return true; },
 
 	// Returns true if value is all whitespace
-	isEmpty: function() { 
+	isEmpty: function() {
 		return ( /^\s*$/.test(this.textbox.value) );
 	},
 
 	// Returns true if value is required and it is all whitespace.
-	isMissing: function() { 
+	isMissing: function() {
 		return ( this.required && this.isEmpty() );
 	},
 
@@ -218,8 +218,8 @@ dojo.lang.extend(dojo.widget.validate.ValidationTextbox, {
 
 		var empty = this.isEmpty();
 		var valid = true;
-		if(this.promptMessage != this.textbox.value){ 
-			valid = this.isValid(); 
+		if(this.promptMessage != this.textbox.value){
+			valid = this.isValid();
 		}
 		var missing = this.isMissing();
 
@@ -236,12 +236,12 @@ dojo.lang.extend(dojo.widget.validate.ValidationTextbox, {
 
 	// Called oninit, and onblur.
 	highlight: function() {
-		// highlight textbox background 
+		// highlight textbox background
 		if ( this.isEmpty() ) {
 			this.textbox.style.backgroundColor = "";
 		}else if ( this.isValid() && this.isInRange() ){
 			this.textbox.style.backgroundColor = this.validColor;
-		}else if( this.textbox.value != this.promptMessage){ 
+		}else if( this.textbox.value != this.promptMessage){
 			this.textbox.style.backgroundColor = this.invalidColor;
 		}
 	},
@@ -252,15 +252,15 @@ dojo.lang.extend(dojo.widget.validate.ValidationTextbox, {
 		}
 	},
 
-	onblur: function() { 
+	onblur: function() {
 		this.filter();
-		this.update(); 
+		this.update();
 	},
 
-	onkeyup: function(){ 
-		if(this.listenOnKeyPress){ 
+	onkeyup: function(){
+		if(this.listenOnKeyPress){
 			//this.filter();  trim is problem if you have to type two words
-			this.update(); 
+			this.update();
 		}else if (this.textbox.value != this.lastCheckedValue){
 		    this.textbox.style.backgroundColor = "";
 		}
@@ -275,7 +275,7 @@ dojo.lang.extend(dojo.widget.validate.ValidationTextbox, {
 		this.textbox.isMissing = function() { this.isMissing.call(this); };
 		this.textbox.isInRange = function() { this.isInRange.call(this); };
 		this.filter();
-		this.update(); 
+		this.update();
 	}
 });
 
@@ -303,7 +303,7 @@ dojo.inherits(dojo.widget.validate.IntegerTextbox, dojo.widget.validate.Validati
 
 dojo.lang.extend(dojo.widget.validate.IntegerTextbox, {
 	// new subclass properties
-	widgetType: "IntegerTextbox", 
+	widgetType: "IntegerTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
@@ -320,22 +320,22 @@ dojo.lang.extend(dojo.widget.validate.IntegerTextbox, {
 		}else{
 			this.flags.signed = [ true, false ]; // optional
 		}
-		if(localProperties.separator){ 
+		if(localProperties.separator){
 			this.flags.separator = localProperties.separator;
 		}
-		if(localProperties.min){ 
+		if(localProperties.min){
 			this.flags.min = parseInt(localProperties.min);
 		}
-		if(localProperties.max){ 
+		if(localProperties.max){
 			this.flags.max = parseInt(localProperties.max);
 		}
 	},
 
 	// Over-ride for integer validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isInteger(this.textbox.value, this.flags);
 	},
-	isInRange: function() { 
+	isInRange: function() {
 		return dojo.validate.isInRange(this.textbox.value, this.flags);
 	}
 
@@ -365,14 +365,14 @@ dojo.inherits(dojo.widget.validate.RealNumberTextbox, dojo.widget.validate.Integ
 
 dojo.lang.extend(dojo.widget.validate.RealNumberTextbox, {
 	// new subclass properties
-	widgetType: "RealNumberTextbox", 
+	widgetType: "RealNumberTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.RealNumberTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.places ) { 
+		if ( localProperties.places ) {
 			this.flags.places = Number( localProperties.places );
 		}
 		if((localProperties.exponent == "true")||
@@ -390,19 +390,19 @@ dojo.lang.extend(dojo.widget.validate.RealNumberTextbox, {
 		}else{
 			this.flags.eSigned = [ true, false ]; // optional
 		}
-		if(localProperties.min){ 
+		if(localProperties.min){
 			this.flags.min = parseFloat(localProperties.min);
 		}
-		if(localProperties.max){ 
+		if(localProperties.max){
 			this.flags.max = parseFloat(localProperties.max);
 		}
 	},
 
 	// Over-ride for real number validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isRealNumber(this.textbox.value, this.flags);
 	},
-	isInRange: function() { 
+	isInRange: function() {
 		return dojo.validate.isInRange(this.textbox.value, this.flags);
 	}
 
@@ -432,32 +432,32 @@ dojo.inherits(dojo.widget.validate.CurrencyTextbox, dojo.widget.validate.Integer
 
 dojo.lang.extend(dojo.widget.validate.CurrencyTextbox, {
 	// new subclass properties
-	widgetType: "CurrencyTextbox", 
+	widgetType: "CurrencyTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.CurrencyTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.cents ) { 
+		if ( localProperties.cents ) {
 			this.flags.cents = ( localProperties.cents == "true" );
 		}
-		if ( localProperties.symbol ) { 
+		if ( localProperties.symbol ) {
 			this.flags.symbol = localProperties.symbol;
 		}
-		if(localProperties.min){ 
+		if(localProperties.min){
 			this.flags.min = parseFloat(localProperties.min);
 		}
-		if(localProperties.max){ 
+		if(localProperties.max){
 			this.flags.max = parseFloat(localProperties.max);
 		}
 	},
 
 	// Over-ride for currency validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isCurrency(this.textbox.value, this.flags);
 	},
-	isInRange: function() { 
+	isInRange: function() {
 		return dojo.validate.isInRange(this.textbox.value, this.flags);
 	}
 
@@ -489,38 +489,38 @@ dojo.inherits(dojo.widget.validate.IpAddressTextbox, dojo.widget.validate.Valida
 
 dojo.lang.extend(dojo.widget.validate.IpAddressTextbox, {
 	// new subclass properties
-	widgetType: "IpAddressTextbox", 
+	widgetType: "IpAddressTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.IpAddressTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.allowdotteddecimal ) { 
+		if ( localProperties.allowdotteddecimal ) {
 			this.flags.allowDottedDecimal = ( localProperties.allowdotteddecimal == "true" );
 		}
-		if ( localProperties.allowdottedhex ) { 
+		if ( localProperties.allowdottedhex ) {
 			this.flags.allowDottedHex = ( localProperties.allowdottedhex == "true" );
 		}
-		if ( localProperties.allowdottedoctal ) { 
+		if ( localProperties.allowdottedoctal ) {
 			this.flags.allowDottedOctal = ( localProperties.allowdottedoctal == "true" );
 		}
-		if ( localProperties.allowdecimal ) { 
+		if ( localProperties.allowdecimal ) {
 			this.flags.allowDecimal = ( localProperties.allowdecimal == "true" );
 		}
-		if ( localProperties.allowhex ) { 
+		if ( localProperties.allowhex ) {
 			this.flags.allowHex = ( localProperties.allowhex == "true" );
 		}
-		if ( localProperties.allowipv6 ) { 
+		if ( localProperties.allowipv6 ) {
 			this.flags.allowIPv6 = ( localProperties.allowipv6 == "true" );
 		}
-		if ( localProperties.allowhybrid ) { 
+		if ( localProperties.allowhybrid ) {
 			this.flags.allowHybrid = ( localProperties.allowhybrid == "true" );
 		}
 	},
 
 	// Over-ride for IP address validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isIpAddress(this.textbox.value, this.flags);
 	}
 });
@@ -549,32 +549,32 @@ dojo.inherits(dojo.widget.validate.UrlTextbox, dojo.widget.validate.IpAddressTex
 
 dojo.lang.extend(dojo.widget.validate.UrlTextbox, {
 	// new subclass properties
-	widgetType: "UrlTextbox", 
+	widgetType: "UrlTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.UrlTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.scheme ) { 
+		if ( localProperties.scheme ) {
 			this.flags.scheme = ( localProperties.scheme == "true" );
 		}
-		if ( localProperties.allowip ) { 
+		if ( localProperties.allowip ) {
 			this.flags.allowIP = ( localProperties.allowip == "true" );
 		}
-		if ( localProperties.allowlocal ) { 
+		if ( localProperties.allowlocal ) {
 			this.flags.allowLocal = ( localProperties.allowlocal == "true" );
 		}
-		if ( localProperties.allowcc ) { 
+		if ( localProperties.allowcc ) {
 			this.flags.allowCC = ( localProperties.allowcc == "true" );
 		}
-		if ( localProperties.allowgeneric ) { 
+		if ( localProperties.allowgeneric ) {
 			this.flags.allowGeneric = ( localProperties.allowgeneric == "true" );
 		}
 	},
 
 	// Over-ride for URL validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isUrl(this.textbox.value, this.flags);
 	}
 
@@ -601,20 +601,20 @@ dojo.inherits(dojo.widget.validate.EmailTextbox, dojo.widget.validate.UrlTextbox
 
 dojo.lang.extend(dojo.widget.validate.EmailTextbox, {
 	// new subclass properties
-	widgetType: "EmailTextbox", 
+	widgetType: "EmailTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.EmailTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.allowcruft ) { 
+		if ( localProperties.allowcruft ) {
 			this.flags.allowCruft = ( localProperties.allowcruft == "true" );
 		}
 	},
 
 	// Over-ride for email address validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isEmailAddress(this.textbox.value, this.flags);
 	}
 
@@ -630,7 +630,7 @@ dojo.widget.tags.addParseTreeHandler("dojo:EmailTextbox");
   Over-rides isValid to test for a list of email addresses.
   Can use all markup attributes/properties of EmailTextbox and ...
 
-  @attr listSeparator  The character used to separate email addresses.  
+  @attr listSeparator  The character used to separate email addresses.
     Default is ";", ",", "\n" or " ".
 */
 dojo.widget.validate.EmailListTextbox = function(node) {
@@ -641,20 +641,20 @@ dojo.inherits(dojo.widget.validate.EmailListTextbox, dojo.widget.validate.EmailT
 
 dojo.lang.extend(dojo.widget.validate.EmailListTextbox, {
 	// new subclass properties
-	widgetType: "EmailListTextbox", 
+	widgetType: "EmailListTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.EmailListTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.listseparator ) { 
+		if ( localProperties.listseparator ) {
 			this.flags.listSeparator = localProperties.listseparator;
 		}
 	},
 
 	// Over-ride for email address list validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isEmailAddressList(this.textbox.value, this.flags);
 	}
 
@@ -679,20 +679,20 @@ dojo.inherits(dojo.widget.validate.DateTextbox, dojo.widget.validate.ValidationT
 
 dojo.lang.extend(dojo.widget.validate.DateTextbox, {
 	// new subclass properties
-	widgetType: "DateTextbox", 
+	widgetType: "DateTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.DateTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.format ) { 
+		if ( localProperties.format ) {
 			this.flags.format = localProperties.format;
 		}
 	},
 
 	// Over-ride for date validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isValidDate(this.textbox.value, this.flags.format);
 	}
 
@@ -719,26 +719,26 @@ dojo.inherits(dojo.widget.validate.TimeTextbox, dojo.widget.validate.ValidationT
 
 dojo.lang.extend(dojo.widget.validate.TimeTextbox, {
 	// new subclass properties
-	widgetType: "TimeTextbox", 
+	widgetType: "TimeTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// First initialize properties in super-class.
 		dojo.widget.validate.TimeTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.format ) { 
+		if ( localProperties.format ) {
 			this.flags.format = localProperties.format;
 		}
-		if ( localProperties.amsymbol ) { 
+		if ( localProperties.amsymbol ) {
 			this.flags.amSymbol = localProperties.amsymbol;
 		}
-		if ( localProperties.pmsymbol ) { 
+		if ( localProperties.pmsymbol ) {
 			this.flags.pmSymbol = localProperties.pmsymbol;
 		}
 	},
 
 	// Over-ride for time validation
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.isValidTime(this.textbox.value, this.flags);
 	}
 
@@ -764,22 +764,22 @@ dojo.inherits(dojo.widget.validate.UsStateTextbox, dojo.widget.validate.Validati
 
 dojo.lang.extend(dojo.widget.validate.UsStateTextbox, {
 	// new subclass properties
-	widgetType: "UsStateTextbox", 
+	widgetType: "UsStateTextbox",
 
 	mixInProperties: function(localProperties, frag) {
 		// Initialize properties in super-class.
 		dojo.widget.validate.UsStateTextbox.superclass.mixInProperties.apply(this, arguments);
 
 		// Get properties from markup attibutes, and assign to flags object.
-		if ( localProperties.allowterritories ) { 
+		if ( localProperties.allowterritories ) {
 			this.flags.allowTerritories = ( localProperties.allowterritories == "true" );
 		}
-		if ( localProperties.allowmilitary ) { 
+		if ( localProperties.allowmilitary ) {
 			this.flags.allowMilitary = ( localProperties.allowmilitary == "true" );
 		}
 	},
 
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.us.isState(this.textbox.value, this.flags);
 	}
 
@@ -801,9 +801,9 @@ dojo.inherits(dojo.widget.validate.UsZipTextbox, dojo.widget.validate.Validation
 
 dojo.lang.extend(dojo.widget.validate.UsZipTextbox, {
 	// new subclass properties
-	widgetType: "UsZipTextbox", 
+	widgetType: "UsZipTextbox",
 
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.us.isZipCode(this.textbox.value);
 	}
 
@@ -824,9 +824,9 @@ dojo.inherits(dojo.widget.validate.UsSocialSecurityNumberTextbox, dojo.widget.va
 
 dojo.lang.extend(dojo.widget.validate.UsSocialSecurityNumberTextbox, {
 	// new subclass properties
-	widgetType: "UsSocialSecurityNumberTextbox", 
+	widgetType: "UsSocialSecurityNumberTextbox",
 
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.us.isSocialSecurityNumber(this.textbox.value);
 	}
 
@@ -847,9 +847,9 @@ dojo.inherits(dojo.widget.validate.UsPhoneNumberTextbox, dojo.widget.validate.Va
 
 dojo.lang.extend(dojo.widget.validate.UsPhoneNumberTextbox, {
 	// new subclass properties
-	widgetType: "UsPhoneNumberTextbox", 
+	widgetType: "UsPhoneNumberTextbox",
 
-	isValid: function() { 
+	isValid: function() {
 		return dojo.validate.us.isPhoneNumber(this.textbox.value);
 	}
 

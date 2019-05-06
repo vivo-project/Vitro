@@ -34,7 +34,7 @@ ${userAccount.firstName} ${userAccount.lastName}
 
 Contraseña creado con éxito.
 
-Su nueva contraseña asociada con ${userAccount.emailAddress} 
+Su nueva contraseña asociada con ${userAccount.emailAddress}
 se ha creado.
 
 Gracias.

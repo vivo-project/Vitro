@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 
 /**
  * Test the I18N functionality.
- * 
+ *
  * Start by checking the logic that finds approximate matches for
  * language-specific property files.
  */

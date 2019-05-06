@@ -12,25 +12,25 @@ import org.apache.jena.rdf.model.Statement;
 public class BlankNodeStatementListener extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(BlankNodeStatementListener.class);
-	private Model bnodeModel;          
-	
-	public BlankNodeStatementListener(Model bnodeModel) { 
+	private Model bnodeModel;
+
+	public BlankNodeStatementListener(Model bnodeModel) {
 		this.bnodeModel = bnodeModel;
 	}
-		
+
 	@Override
 	public void addedStatement(Statement stmt) {
-        
+
 		if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
 			bnodeModel.add(stmt);
-        } 
+        }
 	}
-	
+
 	@Override
 	public void removedStatement(Statement stmt) {
 
 		if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
 			bnodeModel.remove(stmt);
-        } 
+        }
 	}
 }

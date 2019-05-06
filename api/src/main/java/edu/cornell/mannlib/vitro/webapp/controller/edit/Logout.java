@@ -33,7 +33,7 @@ public class Logout extends HttpServlet {
 
 			Authenticator.getInstance(request).recordUserIsLoggedOut();
 			DisplayMessage.setMessage(request, I18n.bundle(request).text("logged_out"));
-			
+
 			response.sendRedirect(redirectUrl);
 		} catch (Exception ex) {
 			log.error(ex, ex);

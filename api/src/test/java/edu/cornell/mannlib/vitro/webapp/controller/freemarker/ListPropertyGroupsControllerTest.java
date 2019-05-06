@@ -24,35 +24,35 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 /**
  * Not a well-formed set of unit tests. But it's a pretty good exercise of the
  * different possibilities in the output stage.
- * 
+ *
  * Test plan:
- * 
+ *
  * <pre>
  * No data - roots is null -- NONSENSICAL
  * No data - roots is empty
- * 
+ *
  * name
  * no name - (unnamed group)
- * 
+ *
  * display rank
  * no display rank
- * 
+ *
  * no child properties
  * child property is data property
  * child properti is object property
- * 
+ *
  * child data property has no name
  * child data property has name
  * child object property has no domainPublic
  * child object property has domainPublic
- * 
+ *
  * G1 no name, displayRank, no classes
  * G2 name, no displayRank, classes
  * G2DP1 no name, no shortDef
- * G2DP2 name, shortdef 
+ * G2DP2 name, shortdef
  * G2OP1 no domainPublic, no shortDef
- * G2OP2 domainPublic, shortdef 
- * 
+ * G2OP2 domainPublic, shortdef
+ *
  * Try once with no data
  * Try with all data
  * </pre>

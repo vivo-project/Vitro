@@ -42,15 +42,15 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractPr
 /**
  * Test the function of PolicyHelper in authorizing models of additions and
  * retractions.
- * 
+ *
  * It is vital that these methods work even if the statements are presented in
  * the "wrong" order: one statement being authorized by a statement that appears
  * later in the list.
- * 
+ *
  * In order to test that, we need to create a Model that will list the
  * statements in an order that we can predict, vis. the order in which they were
  * added.
- * 
+ *
  * To avoid creating a SortedModel that implements dozens of methods, we instead
  * create a Proxy class that keeps the statements in order and lists them on
  * demand.
@@ -258,7 +258,7 @@ public class PolicyHelper_ModelsTest extends AbstractTestClass {
 	/**
 	 * A model Proxy object built around this will list statements in the order
 	 * they were added.
-	 * 
+	 *
 	 * This only works if the statements were added by a call to
 	 * add(Statement[]), and if they are listed by a call to listStatements().
 	 * If the test used other methods to add statements, or if the PolicyHelper

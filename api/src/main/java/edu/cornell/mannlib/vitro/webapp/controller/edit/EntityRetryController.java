@@ -54,7 +54,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.listener.impl.IndividualDataPropert
 
 @WebServlet(name = "EntityRetryController", urlPatterns = {"/entity_retry"} )
 public class EntityRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(EntityRetryController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
@@ -62,13 +62,13 @@ public class EntityRetryController extends BaseEditController {
 				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
         	return;
         }
-		
+
         VitroRequest vreq = new VitroRequest(request);
         String siteAdminUrl = vreq.getContextPath() + Controllers.SITE_ADMIN;
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-        
+
         epo.setBeanClass(Individual.class);
         epo.setImplementationClass(IndividualImpl.class);
 
@@ -79,7 +79,7 @@ public class EntityRetryController extends BaseEditController {
         } else {
             action = epo.getAction();
         }
-        
+
         LoginStatusBean loginBean = LoginStatusBean.getBean(request);
         WebappDaoFactory myWebappDaoFactory = getWebappDaoFactory(loginBean.getUserURI());
 
@@ -142,7 +142,7 @@ public class EntityRetryController extends BaseEditController {
         epo.setIdFieldClass(String.class);
 
         HashMap hash = new HashMap();
-        
+
         if (individualForEditing.getVClassURI() == null) {
 	        // we need to do a special thing here to make an option list with option groups for the classgroups.
 	        List classGroups = cgDao.getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
@@ -169,10 +169,10 @@ public class EntityRetryController extends BaseEditController {
     		optList.add(opt);
 			hash.put("VClassURI", optList);
         }
-        
-        hash.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(individualForEditing));    
+
+        hash.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(individualForEditing));
         hash.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(individualForEditing));
-        hash.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(individualForEditing));    
+        hash.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(individualForEditing));
 
         FormObject foo = new FormObject();
         foo.setOptionLists(hash);
@@ -209,7 +209,7 @@ public class EntityRetryController extends BaseEditController {
         	}
         }
         Collections.sort(allApplicableDataprops);
-        
+
         if (allApplicableDataprops != null) {
 
             for (DataProperty d : allApplicableDataprops) {
@@ -279,12 +279,12 @@ public class EntityRetryController extends BaseEditController {
         cList.add(new IndividualDataPropertyStatementProcessor());
         //cList.add(new SearchReindexer()); // handled for now by SearchReindexingListener on model
         epo.setChangeListenerList(cList);
-        
+
         epo.getAdditionalDaoMap().put("DataPropertyStatement",myWebappDaoFactory.getDataPropertyStatementDao()); // EntityDatapropProcessor will look for this
         epo.getAdditionalDaoMap().put("DataProperty",myWebappDaoFactory.getDataPropertyDao()); // EntityDatapropProcessor will look for this
 
         ApplicationBean appBean = vreq.getAppBean();
-        
+
         request.setAttribute("formJsp","/templates/edit/specific/entity_retry.jsp");
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("title","Individual Editing Form");

@@ -18,11 +18,11 @@ import freemarker.template.utility.DeepUnwrap;
  * A Freemarker representation of a text string. Because it implements
  * TemplateScalarModel, you can use it as a string value. And because it
  * implements TemplateMethodModel, you can pass arguments to it for formatting.
- * 
+ *
  * So if the string is "His name is {0}!", then these references could be used:
  * {@code
  * ${string} ==> "His name is {0}!"
- * 
+ *
  * ${string("Bozo")} ==> "His name is Bozo!"
  * }
  * Note that the format of the message is determined by java.text.MessageFormat,

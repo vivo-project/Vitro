@@ -8,8 +8,8 @@
 <list-view-config>
     <query-select>
         PREFIX display: &lt;http://vitro.mannlib.cornell.edu/ontologies/display/1.1#&gt;
-        
-        
+
+
         SELECT ?menuItem
                (REPLACE(STR(?menuItem),"^.*(#)(.*)$", "$2") AS ?menuItemName)
                ?linkText

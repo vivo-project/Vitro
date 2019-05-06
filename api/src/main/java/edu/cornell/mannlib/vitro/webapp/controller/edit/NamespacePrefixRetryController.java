@@ -14,9 +14,9 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 
 public class NamespacePrefixRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(NamespacePrefixRetryController.class.getName());
-	
+
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
@@ -25,7 +25,7 @@ public class NamespacePrefixRetryController extends BaseEditController {
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-        
+
         if (request.getParameter("prefix") != null) {
         	epo.setAction("update");
         	request.setAttribute("_action","update");
@@ -33,7 +33,7 @@ public class NamespacePrefixRetryController extends BaseEditController {
         	epo.setAction("insert");
         	request.setAttribute("_action","insert");
         }
-				
+
 	       request.setAttribute("editAction","namespacePrefixOp");
 	        request.setAttribute("scripts","/templates/edit/formBasic.js");
         	request.setAttribute("formJsp","/templates/edit/specific/namespacePrefix_retry.jsp");
@@ -49,7 +49,7 @@ public class NamespacePrefixRetryController extends BaseEditController {
 	        }
 
 	}
-	
+
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		// shouldn't be posting to this controller
 	}

@@ -11,7 +11,7 @@ The list of JARs should be created by running the jarlist target of the build fi
 That will use JarJar to create a list of JAR file that are not directly referenced
 by the classes in the build. But what about JARs that are needed by a call using
 reflection? Like Class.forName("this.that.theOther"). We know this is how the MySQL
-driver is loaded (so we need mysql-connector-java-5.1.16-bin.jar). Are there any 
+driver is loaded (so we need mysql-connector-java-5.1.16-bin.jar). Are there any
 others? This script will try to find them.
 
 The jarlist target includes a list of JARs that we know are needed, such as the MySQL
@@ -20,7 +20,7 @@ list, and the target run again, in case they depend on other JARs in turn.
 
 --------------------------------------------------------------------------------
 
-One of the tricks that this script uses is to prune the list of packages to 
+One of the tricks that this script uses is to prune the list of packages to
 search for. If a JAR contains both "this.that.other" and "this.that", then we
 only need to search for "this.that", since it will reveal uses of "this.that.other"
 as well.
@@ -28,24 +28,24 @@ as well.
 --------------------------------------------------------------------------------
 
 pass the name of the file that contains the JAR names
-pass the root directory of the combined vitro/vivo distro 
+pass the root directory of the combined vitro/vivo distro
 	(appbase)
-	
+
 --------------------------------------------------------------------------------
 
 Search all of the *.java, *.jsp, *.js, *.tld, *.xml files for mention of these package names
 	For each hit, print the file path, line number, the package name and the JAR name.
-	
+
 To search files:
 	find -X . -name \*.db -or -name \*pot | xargs grep 'org\.package\.name'
 	grep -H -n -f file_with_package_patterns
-	
+
 	or can we do this all with grep on each string?
 		grep -r --include=*.jsp
-		
+
 	grep -H -n -r --include=*.javaxd --include=*.jsp org\.package\.name .
 		and precede the output with a header that lists the package
-	
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 =end
@@ -121,7 +121,7 @@ def print_package_names_for_jars
 		package_array.each do |package_name|
 			puts "      #{package_name}"
 		end
-		puts 
+		puts
 	end
 end
 
@@ -172,9 +172,9 @@ if File.expand_path($0) == File.expand_path(__FILE__)
 	if ARGV.length != 2
 		raise("usage is: ruby jarUsageScanner.rb <jar_names_file> <scan_base_directory>")
 	end
-  
+
 	@jar_names_file, @scan_base_directory = ARGV
-  
+
 	if !File.file?(@jar_names_file)
 		raise "File does not exist: '#{@jar_names_file}'."
 	end
@@ -184,9 +184,9 @@ if File.expand_path($0) == File.expand_path(__FILE__)
 	end
 
 	print_args
-	
+
 	figure_package_names_from_jars
 	print_package_names_for_jars
-	
+
 	show_packages_in_source_files
 end

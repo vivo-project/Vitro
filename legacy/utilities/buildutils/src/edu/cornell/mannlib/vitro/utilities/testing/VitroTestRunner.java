@@ -16,7 +16,7 @@ import org.junit.runner.JUnitCore;
  * It runs the tests with a variety of reporting detail, depending on the level
  * selected. If the level selector is absent or unrecognized, the medium level
  * is used.
- * 
+ *
  * @author jeb228
  */
 public class VitroTestRunner {

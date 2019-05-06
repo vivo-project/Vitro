@@ -20,7 +20,7 @@ dojo.require("dojo.event.*");
 
   The html form for tasks 3 and 4 is from a div with id="propertydiv" on
   the ents_edit.JSP ( <-- notice, it's on the JSP ).  See the js function
-  getForm().  
+  getForm().
 
   There was a problem where the DWR calls were throwing error messages
   for larger (but not unreasonably large) sets of entity data.  Updating to DWR
@@ -33,7 +33,7 @@ dojo.require("dojo.event.*");
   2006-11-21 bdc34: removing the 'new entity' button, added comments
  */
 
-var gEntityUri; //used to hold the URI of the entity being edited 
+var gEntityUri; //used to hold the URI of the entity being edited
 var gProperty; // used to hold property on form
 var gEntity; //entity that this page is editing
 var editingNewProp = false; //true when editing a new property
@@ -41,7 +41,7 @@ var editingNewProp = false; //true when editing a new property
 var gVClassUri = null;
 
 //hash: PropertyDWR.propertyId+"D" or "R" (for domain or range)  -->  obj: PropertyDWR
-var gPropertyHash; 
+var gPropertyHash;
 
 //holds the xhtmlrequest so we can do an abort
 var gEntRequest = null;
@@ -49,8 +49,8 @@ var gEntRequest = null;
 var justwritenProp = null;
 var justwritenTr   = null;
 
-if( vitroJsLoaded === undefined || vitroJsLoaded === null ){ 
-  alert("ents_edit.js needs to have the code from vitro.js loaded first"); 
+if( vitroJsLoaded === undefined || vitroJsLoaded === null ){
+  alert("ents_edit.js needs to have the code from vitro.js loaded first");
 }
 
 var rowId = 1;
@@ -104,11 +104,11 @@ function updateEntityAndPropHash(){
     if( entityObj != null && 'URI' in entityObj )
         PropertyDWR.getAllPossiblePropInstForIndividual(entityObj.URI, { callback:setPropertyHash });
     //else
-        //alert("could not find an individual, usually this means that there is no type for the URI"); 
+        //alert("could not find an individual, usually this means that there is no type for the URI");
   };
-  
+
   /* This is the method that builds the gPropertyHash. It is called by setGEntity() */
-  var setPropertyHash = function(propArray) {  
+  var setPropertyHash = function(propArray) {
     if( propArray == null || propArray.length < 1  ) {
     	gPropertyHash = null; /* propArray might be null if we have no properties in the system */
     }else{
@@ -119,12 +119,12 @@ function updateEntityAndPropHash(){
             hashid = hashid + 'D';
           } else {
             hashid = hashid + 'R';
-          }            
+          }
           gPropertyHash[ hashid ] = propArray[i];
     	}
     }
   };
-  
+
   //get the gEntity and then build the gPropertyHash
   EntityDWR.entityByURI(gEntityURI, { callback:setGEntity });
 }
@@ -144,7 +144,7 @@ function doNoPropsWarning(){
 }
 
 /*****************************************************************
-because dwr calls are async we have a callback 
+because dwr calls are async we have a callback
 *****************************************************************/
 function updateTable(callback) {
   var cb = callback;
@@ -153,7 +153,7 @@ function updateTable(callback) {
      /* This makes the row that gets added to the ents_edit form for each ents2ents object.  */
      addRows(dwr.util.byId("propbody"), props,
              [getDomain, getProperty, getRange, getEdit, getDelete],
-             makeTr);  
+             makeTr);
      var newPropTr = dwr.util.byId("justwritenTr");
      if( newPropTr != null ){
        Fat.fade_element( "justwritenTr" );
@@ -184,7 +184,7 @@ var getDelete = function(prop)  {
   var quote = new RegExp('\'','g');
   var dquote = new RegExp('"','g');
   return '<input type="button" value="Delete" class="form-button" ' +
-  'onclick="deleteProp(' + 
+  'onclick="deleteProp(' +
   '\'' + cleanForString(prop.subjectEntURI) + '\', ' +
   '\'' + cleanForString(prop.propertyURI)    + '\', ' +
   '\'' + cleanForString(prop.objectEntURI)   + '\', ' +
@@ -215,7 +215,7 @@ This makeTr is a function with access to a closure that
    includes the vars previousPropName and currentClass.
    All of this work is to get the table row color to change when
    we start drawing a row for a property that is different than the
-   previous row.  
+   previous row.
 *****************************************************************/
 var makeTr = (function(){ /* outer func */
     // the reason for the outer func is to capture these values in a closure
@@ -278,7 +278,7 @@ function deleteProp( subjectURI, predicateURI, objectURI, objectName, predicateN
 }
 
 /*****************************************************************
- adds the editing form <tr> to the propeties table 
+ adds the editing form <tr> to the propeties table
 *****************************************************************/
 function appendPropForm(tr, colspan ){
   var form = getForm();
@@ -288,27 +288,27 @@ function appendPropForm(tr, colspan ){
   var td = tr.insertCell(-1);
   td.appendChild( form );
 
-  if( colspan !== undefined && colspan > 0){ 
-      td.colSpan=colspan; 
+  if( colspan !== undefined && colspan > 0){
+      td.colSpan=colspan;
   }
   form.style.display="block";
 }
 
 /*****************************************************************
-This gets called when the button to make a new property 
-for the entity is pressed. 
+This gets called when the button to make a new property
+for the entity is pressed.
 *****************************************************************/
 function newProp() {
   if( gPropertyHash == null || gPropertyHash.length < 1 ) {
     	/* propArray might be null if we have no properties in the system */
-    	doNoPropsWarning();    	
+    	doNoPropsWarning();
     }else{
   	var innerNew = function (){
       var newP = {};
     	newP.domainClass = gEntity.vClassId;
     	newP.subjectName = gEntity.name;
     	newP.subjectEntURI = gEntity.URI;
-        
+
     	fillForm( newP );
     	editingNewProp = true;
     	fillRangeVClassList();
@@ -316,7 +316,7 @@ function newProp() {
         var tr = table.insertRow(0);
     	tr.id = "newrow";
     	appendPropForm( tr, tableMaxColspan( table ) );
- 
+
       //table.insertBefore(tr, table.rows[0]);
   	};
   	updateTable( innerNew );
@@ -324,26 +324,26 @@ function newProp() {
 }
 
 /****************************************************************
- Fills out the property edit form with the given property 
+ Fills out the property edit form with the given property
 *****************************************************************/
 function fillForm(aprop)  {
   clearProp();
   gProperty = aprop;
   var vclass = gProperty.domainClass;
-  
+
   dwr.util.setValues(gProperty);
 
   toggleDisabled("newPropButton");
-  
-  fillPropList(vclass); // this will also fill the vclass and ents lists      
+
+  fillPropList(vclass); // this will also fill the vclass and ents lists
 }
 
 /****************************************************************
  This will fill the select list will all of the properties found
- in  the gPropertyHash and then trigger a update of the vClasList 
+ in  the gPropertyHash and then trigger a update of the vClasList
 ******************************************************************/
-function fillPropList(classId) {  
-  /* This function fills up the form's select list with options 
+function fillPropList(classId) {
+  /* This function fills up the form's select list with options
      Notice that the option id is the propertyid + 'D' or 'R'
      so that domain and range properties can be distinguished  */
   var propList = dwr.util.byId("propertyList");
@@ -369,7 +369,7 @@ function fillPropList(classId) {
     }
     var opt = new Option(text, value);
     if( gProperty.propertyURI == prop.propertyURI ){
-      opt.selected = true; 
+      opt.selected = true;
     }
     propList.options[propList.options.length] = opt;
   }
@@ -378,29 +378,29 @@ function fillPropList(classId) {
 }
 
 /*****************************************************************
- Fill up the range VClass list on the property editing form. 
+ Fill up the range VClass list on the property editing form.
  If propId is null then the one on the property select list will be used
 *****************************************************************/
 function fillRangeVClassList( propId ){
   //If propId is null then the one on the property select list will be used
   if( propId == null ) { propId = dwr.util.getValue("propertyList");}
-	
+
   //clear the list and put the loading message up
   var vclassListEle = dwr.util.byId("vClassList");
   clear(vclassListEle);
   vclassListEle.options[vclassListEle.options.length] = new Option("Loading...",-10);
   //vclassListEle.options[0].selected = true;
   //vclassListEle.options[vclassListEle.options.length] = new Option("Crapping...",-15);
-	
-  var prop = gPropertyHash[propId];	
-	
+
+  var prop = gPropertyHash[propId];
+
   VClassDWR.getVClasses(prop.domainClassURI, prop.propertyURI, prop.subjectSide,
                           function(vclasses){
                               addVClassOptions( vclasses );
                           }
                     );
-}		
-	
+}
+
 /****************************************************************
  Adds vClasses to the vClassList and trigger an update of
  the entitiesList.
@@ -424,15 +424,15 @@ function addVClassOptions( vclassArray  ){
 
   addOptions("vClassList", vclassArray,
              function(vclass){ return vclass.URI; },
-             function(vclass){ 
+             function(vclass){
                var count = "";
-               if( vclass.entityCount != null && 
+               if( vclass.entityCount != null &&
                    vclass.entityCount >= 0){
                  count = " ("+vclass.entityCount+")";
                }
                return vclass.name+count;
              });
-               
+
   //attempt to set the selected option to the current vclass
   var vclassURI = null;
   var prop = gPropertyHash[ dwr.util.getValue("propertyList") ];
@@ -456,8 +456,8 @@ function addVClassOptions( vclassArray  ){
 
 /*****************************************************************
   Fill up the entity list in a property editing form.
-  The propId should have the id + 'D' or 'R' to 
-  indicate domain or range. 
+  The propId should have the id + 'D' or 'R' to
+  indicate domain or range.
 *****************************************************************/
 function fillEntsList( vclassEle ){
   if( vclassEle == null )
@@ -468,11 +468,11 @@ function fillEntsList( vclassEle ){
     return;
   else
     gVClassUri = vclassUri;
-    
+
   var entsListEle = dwr.util.byId("entitiesList");
   clear(entsListEle);
   entityOptToSelect = null;
-    
+
   entsListEle.disabled = true;
   entsListEle.options[entsListEle.options.length] = new Option("Loading...",-12);
   entsListEle.options[entsListEle.options.length-1].selected = true;
@@ -487,7 +487,7 @@ function fillEntsList( vclassEle ){
     error: function(type, data, evt){
        if( type == null ){ type = "none" ; }
        if( data == null ){ data = "none" ; }
-       if( evt == null ){ evt = "none" ; }       
+       if( evt == null ){ evt = "none" ; }
        alert("An error occurred while attempting to get the individuals of vclass "
                + vclassUri + "\ntype: " + type +"\ndata: "+
                data +"\nevt: " + evt );
@@ -501,7 +501,7 @@ function fillEntsList( vclassEle ){
     mimetype: "text/json"
    };
    abortExistingEntRequest();
-   gEntRequest = dojo.io.bind(bindArgs);   
+   gEntRequest = dojo.io.bind(bindArgs);
   } else {
     clear(entsListEle);
   }
@@ -523,7 +523,7 @@ function addEntOptions( entArray ){
   if( entArray != null && entArray[entArray.length-1].nextUrl != null ){
     contObj = entArray.pop();
   }
-  
+
   var CUTOFF = 110; //shorten entity names longer then this value.
   var foundEntity = false;
   var text;
@@ -543,7 +543,7 @@ function addEntOptions( entArray ){
   if( contObj != null ){
     entsListEle.item(0).text = entsListEle.item(0).text + ".";
     addMoreEntOptions( contObj );
-  } else {    
+  } else {
     gEntRequests = [];
     entsListEle.disabled = false;
     if( entsListEle.length > 0 && entsListEle.item(0).value == -12){
@@ -557,7 +557,7 @@ function addEntOptions( entArray ){
 var entityOptToSelect =null;
 
 /*
- * Add more entity options to the list if there are more on the request 
+ * Add more entity options to the list if there are more on the request
  *
 example of a continueObj
 {"nextUrl":"http://localhost:8080/vivo/dataService?getEntitiesByVClass=1&vclassId=318",
@@ -570,7 +570,7 @@ function addMoreEntOptions( continueObj ){
     error: function(type, data, evt){
         if( type == null ){ type = "none" ; }
         if( data == null ){ data = "none" ; }
-        if( evt == null ){ evt = "none" ; }       
+        if( evt == null ){ evt = "none" ; }
         alert("An error addMoreEntOptions()"+"\ntype: " + type +"\ndata: "+
               data +"\nevt: " + evt );
       },
@@ -578,9 +578,9 @@ function addMoreEntOptions( continueObj ){
         addEntOptions( data );
       },
     mimetype: "text/json"
-    };    
+    };
     abortExistingEntRequest();
-    gEntRequest = dojo.io.bind(bindArgs);    
+    gEntRequest = dojo.io.bind(bindArgs);
   }
 }
 
@@ -596,7 +596,7 @@ If the last item in the JSON array has an id then you don't have to go back
 for more results.
 
 Example:
-[ ... 
+[ ...
  {"moniker":"recent journal article", "name":"{beta}2 and {beta}4
      Subunits of BK Channels Confer Differential Sensitivity to Acute
      Modulation by Steroid Hormones.", "vClassId":318, "id":18120},
@@ -606,11 +606,11 @@ Example:
 */
 
 /****************************************************************
-Check to see if property edit form is valid 
+Check to see if property edit form is valid
 *****************************************************************/
 function validateForm(){
   var dateEx = "\nDates should be in the format YYYY-MM-DD";
-  /* used to check dates here */ 
+  /* used to check dates here */
   return true;
 }
 
@@ -631,13 +631,13 @@ function writeProp()  {
   var selected = dwr.util.getValue("entitiesList");
   newP.subjectEntURI= gEntity.URI;
   newP.objectEntURI = selected ;
-  
+
   var callback = function(result){
     editingNewProp = false;
     justwritenProp = newP;
     update();  };
 
-  if( editingNewProp ){    
+  if( editingNewProp ){
     newP.ents2entsId = -1;
     PropertyDWR.insertProp(newP, { callback:callback } );
   } else {
@@ -665,7 +665,7 @@ function disy( obj, note ){ alert( (note!==null?note:"") + dwr.util.toDescriptiv
 
 /* attempts to get the URI of the entity being edited */
 function getEntityUriFromPage(){
-  return document.getElementById("entityUriForDwr").nodeValue;      
+  return document.getElementById("entityUriForDwr").nodeValue;
 }
 
 function abortExistingEntRequest(){
@@ -676,5 +676,5 @@ function abortExistingEntRequest(){
         alert("No abort function found on gEntRequest");
     }
     gEntRequest = null;
- }    
+ }
 }

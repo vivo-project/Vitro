@@ -15,4 +15,4 @@ var i18nStrings = {
 <script type="text/javascript" src="${urls.base}/js/html5.js"></script>
 <![endif]-->
 
-${headScripts.list()} 
+${headScripts.list()}

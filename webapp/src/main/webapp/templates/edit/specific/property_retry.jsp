@@ -91,7 +91,7 @@
     <td valign="top" style="vertical-align:top;" colspan="1">
         <b>Inverse label</b><br/>
         <input type="text" class="fullWidthInput" name="RangePublic" value="<form:value name="RangePublic"/>" maxlength="80" /><br/>
-        <br/> 
+        <br/>
         <c:set var="RangePublicError"><form:error name="RangePublic"/></c:set>
         <c:if test="${!empty RangePublicError}">
             <span class="notice"><c:out value="${RangePublicError}"/></span>
@@ -122,7 +122,7 @@
                 <input name="Transitive" type="checkbox" value="TRUE"/>transitive
             </c:otherwise>
         </c:choose>
-        <span class="checkboxSpacer">&nbsp;</span>   
+        <span class="checkboxSpacer">&nbsp;</span>
             <c:choose>
                <c:when test="${symmetric}">
                    <input name="Symmetric" type="checkbox" value="TRUE" checked="checked"/> symmetric
@@ -142,7 +142,7 @@
                 <input name="Functional" type="checkbox" value="TRUE"/> functional
             </c:otherwise>
         </c:choose>
-        <span class="checkboxSpacer">&nbsp;</span> 
+        <span class="checkboxSpacer">&nbsp;</span>
         <c:choose>
             <c:when test="${inverseFunctional}">
                 <input name="InverseFunctional" type="checkbox" value="TRUE" checked="checked"/> inverse functional
@@ -236,8 +236,8 @@
             </c:when>
             <c:otherwise>
                 <input name="CollateBySubclass" type="checkbox" value="TRUE"/>collate by subclass
-            </c:otherwise>            
-        </c:choose>            
+            </c:otherwise>
+        </c:choose>
     </td>
 </tr>
 <tr class="editformcell" >
@@ -267,12 +267,12 @@
 <tr class="editformcell">
     <td valign="top" colspan="2">
         <%-- Removed "Number of individuals to display" control per NIHVIVO-3921 --%>
-    </td>    
+    </td>
     <td valign="top" colspan="3">
         <b>Sort direction</b> for related individuals, alphabetically by their name (rdfs:label)<br/>
         <input type="text" class="shortInput" name="DomainEntitySortDirection" value="<form:value name="DomainEntitySortDirection"/>" /><br/>
         <i>blank for ascending, &quot;desc&quot; for descending</i><br/>
-        <i><b>Note:</b> will be ignored if a custom list view has been configured for this property</i><br/> 
+        <i><b>Note:</b> will be ignored if a custom list view has been configured for this property</i><br/>
         <c:set var="DomainEntitySortDirectionError"><form:error name="DomainEntitySortDirection"/></c:set>
         <c:if test="${!empty DomainEntitySortDirectionError}">
             <span class="notice"><c:out value="${DomainEntitySortDirectionError}"/></span>

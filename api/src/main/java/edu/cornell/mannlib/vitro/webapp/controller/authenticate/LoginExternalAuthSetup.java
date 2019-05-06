@@ -17,9 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
  * Set up the external authorization process.
- * 
+ *
  * Write down the page that triggered the request, so we can get back to it.
- * 
+ *
  * Send a request to the external authorization server that will return us to
  * the LoginExternalAuthReturn servlet for further processing.
  */

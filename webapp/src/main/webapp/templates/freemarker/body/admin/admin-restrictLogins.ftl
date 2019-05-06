@@ -6,11 +6,11 @@
     <#if messageAlreadyRestricted??>
         <#assign errorMessage = "${i18n().logins_already_restricted}" />
     </#if>
-    
+
     <#if messageAlreadyOpen??>
         <#assign errorMessage = "${i18n().logins_not_already_restricted}" />
     </#if>
-    
+
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
             <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
@@ -21,7 +21,7 @@
     <#if messageRestricting??>
         <#assign successMessage = "${i18n().logins_restricted}" />
     </#if>
-    
+
     <#if messageOpening??>
         <#assign successMessage = "${i18n().logins_not_restricted}" />
     </#if>

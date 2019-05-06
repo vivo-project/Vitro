@@ -109,8 +109,8 @@ public class SimplePermission extends Permission {
 			NAMESPACE + "PageViewableEditor");
 		public static final SimplePermission PAGE_VIEWABLE_PUBLIC = new SimplePermission(
 			NAMESPACE + "PageViewablePublic");
-	
-	
+
+
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());
 	}
@@ -120,7 +120,7 @@ public class SimplePermission extends Permission {
 
 	public SimplePermission(String uri) {
 		super(uri);
-		
+
 		if (uri == null) {
 			throw new NullPointerException("uri may not be null.");
 		}

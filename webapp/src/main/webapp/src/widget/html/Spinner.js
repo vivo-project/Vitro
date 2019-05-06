@@ -313,7 +313,7 @@ dojo.lang.extend(dojo.widget.html.Spinner, {
 		}
 
 		if(typeof this.inputWidget != 'object'){
-			dojo.lang.setTimeout(this, "postCreate", 100); 
+			dojo.lang.setTimeout(this, "postCreate", 100);
 			return;
 		}
 		var widgetNode = this.inputWidget.domNode;

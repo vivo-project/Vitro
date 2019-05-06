@@ -1,8 +1,8 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-if( vitroJsLoaded == null ){ 
+if( vitroJsLoaded == null ){
 
-  alert("seminar.js needs to have the code from vitro.js loaded first"); 
+  alert("seminar.js needs to have the code from vitro.js loaded first");
 
 }
 
@@ -20,7 +20,7 @@ function init(){
 //      $('monikerSelectAlt').disabled = true;
 //   }
 
-  $('monikerSelect').onchange = checkMonikers;  
+  $('monikerSelect').onchange = checkMonikers;
 
   update();
 
@@ -33,7 +33,7 @@ function update(){ //updates moniker list when type is changed
   dwr.util.useLoadingMessage();
 
   EntityDWR.monikers(createList,  document.getElementById("field2Value").value );
-  
+
 }
 
 
@@ -59,16 +59,16 @@ function createList(data) { //puts options in moniker select list
 
 function checkMonikers(){ //checks if monikers is on [new moniker] and enables alt field
 
-  var sel = $('monikerSelect');  
+  var sel = $('monikerSelect');
 
   if( sel.value == "" || sel.options.length <= 1){
     $('monikerSelectAlt').disabled = false;
 
   }else{
 
-    $('monikerSelectAlt').disabled = true; 
+    $('monikerSelectAlt').disabled = true;
 
-  }        
+  }
 
 }
 

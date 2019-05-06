@@ -56,26 +56,26 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * For each category of data structure, the pattern is the same:
- * 
+ *
  * Build a key from the supplied options. If the cache contains a structure with
  * that key, return it.
- * 
+ *
  * Otherwise, create the requested structure, often from a simplified version.
  * For example, if the request was for a LANGUAGE_AWARE RDFService, get the
  * LANGUAGE_NEUTRAL RDFService and wrap it with langauge awareness.
- * 
+ *
  * This second step is a recursive call, so we check again to see if the cache
  * contains the new requested structure based on a modified key. If it does
  * contain the structure, use it. Otherwise, create it. Eventually, we reach a
  * request for the simplest structure, which we fetch from the
  * ShortTermDataStructuresFactory.
- * 
+ *
  * If the request includes language-awareness, the structure can be created from
  * the language-neutral version. If language-awareness is disabled, the
  * language-neutral structure will be cached under two different keys.
- * 
+ *
  * ----------------------------------------
- * 
+ *
  * There are two hacks here to support model switching: one in the OntModels and
  * one in the WebappDaoFactories. These are hacks for several reasons, not the
  * least of which is that the model switching will not be available on

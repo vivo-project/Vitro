@@ -11,13 +11,13 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.
 
 public class JspToGeneratorMapping {
     static Log log = LogFactory.getLog( JspToGeneratorMapping.class );
-    
+
     public static Map<String,String> jspsToGenerators;
-    
+
     static{
         jspsToGenerators = new HashMap<String,String>();
-        Map<String, String> map = jspsToGenerators;        
-        
+        Map<String, String> map = jspsToGenerators;
+
         // vitro forms:
 //        map.put("autoCompleteDatapropForm.jsp",
 //                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AutoCompleteDatapropFormGenerator.class.getName());
@@ -41,20 +41,20 @@ public class JspToGeneratorMapping {
                 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator.class.getName());
         map.put("rdfsLabelForm.jsp",
                 RDFSLabelGenerator.class.getName());
-        
+
         //add in the vivo mappings if they exist
         Object object = null;
         try {
-            Class classDefinition = 
+            Class classDefinition =
                 Class.forName("edu.cornell.mannlib.vitro.webapp.edit.n3editing.N3TransitionToV2Mapping");
             object = classDefinition.newInstance();
             Map<String,String> vivoJspsToGenerators = (Map) object;
             if( vivoJspsToGenerators != null )
             map.putAll( vivoJspsToGenerators );
-           
+
         } catch (Throwable th){
             log.error( "could not load VIVO jsp mappings",th );
-        }                                       
+        }
     }
 
     public static <T> T createFor(String jsp, Class<T> clazz) {

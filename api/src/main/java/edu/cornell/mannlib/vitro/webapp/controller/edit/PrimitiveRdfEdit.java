@@ -41,31 +41,31 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTION;
     }
-    
+
     @Override
     protected void doRequest(VitroRequest vreq,
             HttpServletResponse response) throws ServletException, IOException {
-        
+
         //Test error case
         /*
         if (1==1) {
             doError(response, "Test error", 500);
             return;
         } */
-        
-        /* Predefined values for RdfFormat are "RDF/XML", 
-         * "N-TRIPLE", "TURTLE" (or "TTL") and "N3". null represents 
+
+        /* Predefined values for RdfFormat are "RDF/XML",
+         * "N-TRIPLE", "TURTLE" (or "TTL") and "N3". null represents
          * the default language, "RDF/XML". "RDF/XML-ABBREV" is a synonym for "RDF/XML" */
-        String format = vreq.getParameter("RdfFormat");      
-        if( format == null )            
-            format = "N3";      
+        String format = vreq.getParameter("RdfFormat");
+        if( format == null )
+            format = "N3";
         if ( ! ("N-TRIPLE".equals(format) || "TURTLE".equals(format) || "TTL".equals(format)
                 || "N3".equals(format)|| "RDF/XML-ABBREV".equals(format) || "RDF/XML".equals(format) )){
             doError(response,"RdfFormat was not recognized.",500);
             return;
         }
-        
-        //parse RDF 
+
+        //parse RDF
         Set<Model> additions= null;
         try {
             additions = parseRdfParam(vreq.getParameterValues("additions"),format);
@@ -73,7 +73,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
             doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",SC_BAD_REQUEST);
             return;
         }
-                        
+
         Set<Model> retractions = null;
         try {
             retractions = parseRdfParam(vreq.getParameterValues("retractions"),format);
@@ -82,7 +82,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
             return;
         }
 
-        String editorUri = N3EditUtils.getEditorUri(vreq);           
+        String editorUri = N3EditUtils.getEditorUri(vreq);
         try {
 			Model a = mergeModels(additions);
 			Model r = mergeModels(retractions);
@@ -97,10 +97,10 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         	processChanges(editorUri, getWriteModel(vreq), toBeAdded, toBeRetracted);
         } catch (Exception e) {
             doError(response,e.getMessage(),SC_INTERNAL_SERVER_ERROR);
-        }           
-        
+        }
+
     }
-    
+
 	/** Package access to allow for unit testing. */
 	void processChanges(String editorUri, Model writeModel,
 			Model toBeAdded, Model toBeRetracted) throws Exception {
@@ -129,14 +129,14 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 
     /**
      * Convert the values from a parameters into RDF models.
-     * 
+     *
      * Package access to allow for unit testing.
-     * 
+     *
      * @param parameters - the result of request.getParameters(String)
      * @param format - a valid format string for Jena's Model.read()
      */
     Set<Model> parseRdfParam(String[] parameters, String format) throws Exception{
-        Set<Model> models = new HashSet<Model>();               
+        Set<Model> models = new HashSet<Model>();
         for( String param : parameters){
             try{
                 StringReader reader = new StringReader(param);
@@ -152,7 +152,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
     }
 
     private Model getWriteModel(VitroRequest vreq){
-    	return StandardModelSelector.selector.getModel(vreq,getServletContext());  
+    	return StandardModelSelector.selector.getModel(vreq,getServletContext());
     }
 
 	/** Package access to allow for unit testing. */

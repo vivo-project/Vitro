@@ -49,7 +49,7 @@ public abstract class AbstractDataPropertyStatementAction extends
 	public Property getPredicate() {
 	    return predicate;
 	}
-	
+
 	@Override
 	public String getPredicateUri() {
 		return predicateUri;
@@ -59,7 +59,7 @@ public abstract class AbstractDataPropertyStatementAction extends
 	public String[] getResourceUris() {
 		return new String[] {subjectUri};
 	}
-	
+
 	public String dataValue() {
 		return dataValue;
 	}

@@ -31,7 +31,7 @@ dojo.lang.setTimeout = function(func, delay){
 	if(dojo.lang.isString(func)){
 		func = context[func];
 	}
-	
+
 	var args = [];
 	for (var i = argsStart; i < arguments.length; i++) {
 		args.push(arguments[i]);
@@ -75,7 +75,7 @@ dojo.lang.firstValued = function(/* ... */) {
 /**
  * Get a value from a reference specified as a string descriptor,
  * (e.g. "A.B") in the given context.
- * 
+ *
  * getObjPathValue(String objpath [, Object context, Boolean create])
  *
  * If context is not specified, dj_global is used
@@ -88,9 +88,9 @@ dojo.lang.getObjPathValue = function(objpath, context, create){
 }
 
 /**
- * Set a value on a reference specified as a string descriptor. 
+ * Set a value on a reference specified as a string descriptor.
  * (e.g. "A.B") in the given context.
- * 
+ *
  * setObjPathValue(String objpath, value [, Object context, Boolean create])
  *
  * If context is not specified, dj_global is used

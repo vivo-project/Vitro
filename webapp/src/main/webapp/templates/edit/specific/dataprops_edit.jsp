@@ -10,7 +10,7 @@
 
 <jsp:include page="/templates/edit/fetch/vertical.jsp"/>
 
-<!--    
+<!--
 /**
  *
  * @version 0.8
@@ -35,7 +35,7 @@
 			<input type="hidden" name="propertyName" value="${datatypeProperty.publicName}"/>
 			<input type="hidden" name="propertyType" value="data"/>
 			<input type="submit" class="form-button" value="Show Classes With a Restriction on This Property"/>
-		</form>		
+		</form>
         <form action="listDataPropertyStatements" method="get">
         	<input type="hidden" name="propertyURI" value="${datatypeProperty.URI}"/>
         	from <input type="text" name="startAt" value="1" size="2"/>
@@ -89,7 +89,7 @@
             </ul>
             <input type="hidden" name="SubpropertyURI" value="${datatypeProperty.URI}"/>
             <input type="hidden" name="operation" value="remove"/>
-            <input type="hidden" name="_epoKey" value="${epoKey}"/> 
+            <input type="hidden" name="_epoKey" value="${epoKey}"/>
             <input type="submit" class="form-button" value="Remove Checked Superproperty Links"/>
         </form>
         </c:if>
@@ -104,7 +104,7 @@
         </form>
     </td>
 </tr>
-<tr><td colspan="3"><hr/></td></tr>         
+<tr><td colspan="3"><hr/></td></tr>
 <!-- _______________________________________________ subproperties _____________________________________________ -->
 <tr valign="bottom" align="center">
     <td colspan="2" valign="bottom" align="left">
@@ -117,8 +117,8 @@
                 </c:url>
                 <li><input type="checkbox" name="SubpropertyURI" value="${subproperty.URI}" class="form-item"/>
                      <a href="${subpropertyURL}"> ${subproperty.pickListName} </a>
-                </li>                       
-            </c:forEach>    
+                </li>
+            </c:forEach>
             </ul>
             <input type="hidden" name="SuperpropertyURI" value="${datatypeProperty.URI}"/>
             <input type="submit" class="form-button" value="Remove Checked Subproperty Links"/>
@@ -150,8 +150,8 @@
                 </c:url>
                 <li><input type="checkbox" name="SubpropertyURI" value="${eqproperty.URI}" class="form-item"/>
                      <a href="${eqpropertyURL}"> ${eqproperty.pickListName} </a>
-                </li>                       
-            </c:forEach>    
+                </li>
+            </c:forEach>
             </ul>
             <input type="hidden" name="SuperpropertyURI" value="${datatypeProperty.URI}"/>
             <input type="submit" class="form-button" value="Remove Checked Equivalent Property Links"/>

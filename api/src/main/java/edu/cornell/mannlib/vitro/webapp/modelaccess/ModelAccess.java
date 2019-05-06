@@ -15,33 +15,33 @@ import edu.cornell.mannlib.vitro.webapp.triplesource.CombinedTripleSource;
 /**
  * The root access point for the RDF data structures: RDFServices, Datasets,
  * ModelMakers, OntModels, OntModelSelectors and WebappDaoFactories.
- * 
+ *
  * Get a long-term data structure by accessing from the context. Get a
  * short-term data structure by accessing from the request.
- * 
+ *
  * <pre>
  * ModelAccess.on(ctx).getRDFService(CONFIGURATION);
  * ModelAccess.on(req).getOntModel(ModelNames.DISPLAY);
  * </pre>
- * 
+ *
  * ------------------------------------
- * 
+ *
  * The elaborate structure of options enums allows us to specify method
  * signatures like this on RequestModelAccess:
- * 
+ *
  * <pre>
  * getOntModelSelector(OntModelSelectorOption... options);
  * </pre>
- * 
+ *
  * Which can be invoked in any of these ways:
- * 
+ *
  * <pre>
  * ModelAccess.on(req).getOntModelSelector();
  * ModelAccess.on(req).getOntModelSelector(LANGUAGE_NEUTRAL);
  * ModelAccess.on(req).getOntModelSelector(INFERENCES_ONLY);
  * ModelAccess.on(req).getOntModelSelector(ASSERTIONS_ONLY, LANGUAGE_NEUTRAL);
  * </pre>
- * 
+ *
  * The compiler insures that only appropriate options are specified. However, if
  * conflicting options are supplied, it will only be caught at runtime.
  */

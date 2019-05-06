@@ -21,9 +21,9 @@ import org.apache.jena.util.iterator.WrappedIterator;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class BlankNodeFilteringGraph implements Graph {
-	
+
     private Graph graph;
-    
+
 	public BlankNodeFilteringGraph(Graph graph) {
         this.graph = graph;
     }
@@ -65,18 +65,18 @@ public class BlankNodeFilteringGraph implements Graph {
 
 	@Override
 	public ExtendedIterator<Triple> find(Node subject, Node predicate, Node object) {
-		
+
         List<Triple> nbTripList = new ArrayList<Triple>();
 		ExtendedIterator<Triple> triples = graph.find(subject, predicate, object);
-		
+
 		while (triples.hasNext()) {
 			Triple triple = triples.next();
-			
+
 			if (!triple.getSubject().isBlank() && !triple.getObject().isBlank()) {
 				nbTripList.add(triple);
 			}
 		}
-		
+
         return WrappedIterator.create(nbTripList.iterator());
 	}
 

@@ -1,8 +1,8 @@
 #
-# A list of files and directories that are known exceptions to the 
+# A list of files and directories that are known exceptions to the
 # license-insertion process.
 #
-# Files will only be altered if they contain a "magic" license place-holder, 
+# Files will only be altered if they contain a "magic" license place-holder,
 # but if they match one of the file-matchers and don't contain a place-holder,
 # the process will write a warning.
 #
@@ -96,7 +96,7 @@ webapp/web/src/rpc/*
 webapp/web/src/selection/*
 webapp/web/src/storage/*
 webapp/web/src/storage.js
-webapp/web/src/string/* 
+webapp/web/src/string/*
 webapp/web/src/string.js
 webapp/web/src/style.js
 webapp/web/src/svg.js

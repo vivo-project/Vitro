@@ -68,7 +68,7 @@ return - returns empty string if no value found-->
 	<#local returnValue = getEditSubmissionUriValue(submission, varName) />
 	<#if (returnValue?length = 0)>
 		<#local returnValue = getEditSubmissionLiteralValue(submission, varName) />
-	</#if> 
+	</#if>
 	<#return returnValue>
 </#function>
 

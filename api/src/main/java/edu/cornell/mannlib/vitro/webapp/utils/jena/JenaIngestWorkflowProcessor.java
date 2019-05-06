@@ -30,7 +30,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.Lock;
 
 public class JenaIngestWorkflowProcessor {
-    
+
     private static final Log log = LogFactory.getLog(JenaIngestWorkflowProcessor.class.getName());
 
 	private Individual workflowInd;
@@ -38,7 +38,7 @@ public class JenaIngestWorkflowProcessor {
 	private Map<String,Literal> varMap;
 	private List<ActionHandler> actionHandlerList;
 	private JenaIngestUtils utils;
-	
+
 	public JenaIngestWorkflowProcessor(Individual workflowInd, ModelMaker modelMaker) {
 		this.varMap = new HashMap<String,Literal>();
 		this.workflowInd = workflowInd;
@@ -54,11 +54,11 @@ public class JenaIngestWorkflowProcessor {
 		actionHandlerList.add(new NameBlankNodesAction());
 		this.utils = new JenaIngestUtils();
 	}
-	
+
 	public void run() {
 		run(null);
 	}
-	
+
 	/**
 	 * Runs the workflow
 	 */
@@ -74,7 +74,7 @@ public class JenaIngestWorkflowProcessor {
 			}
 		}
 	}
-	
+
 	/*
 	 * returns the Action related to the supplied WorkflowStep
 	 */
@@ -86,7 +86,7 @@ public class JenaIngestWorkflowProcessor {
 		}
 		return null;
 	}
-	
+
 	public List<Individual> getWorkflowSteps(Individual startingWorkflowStep) {
 		List<Individual> workflowSteps = new LinkedList<Individual>();
 		Individual currentInd = (startingWorkflowStep == null) ? getWorkflowStep(workflowInd.getPropertyValue(WorkflowOntology.firstStep)) : startingWorkflowStep;
@@ -96,7 +96,7 @@ public class JenaIngestWorkflowProcessor {
 		}
 		return workflowSteps;
 	}
-	
+
 	private Individual getWorkflowStep(RDFNode stepNode) {
 		if (stepNode == null) {
 			return null;
@@ -105,11 +105,11 @@ public class JenaIngestWorkflowProcessor {
 			Individual nextStepInd = (Individual) stepNode.as(Individual.class);
 			if (instanceOf(nextStepInd,WorkflowOntology.WorkflowStep)) {
 				return nextStepInd;
-			} 
+			}
 		}
 		return null;
 	}
-	
+
 	private boolean instanceOf(Individual ind, Resource type) {
 		for ( Resource typeRes : (List<Resource>) ind.listRDFTypes(false).toList() ) {
 			if (!typeRes.isAnon() && typeRes.getURI().equals(type.getURI())) {
@@ -118,11 +118,11 @@ public class JenaIngestWorkflowProcessor {
 		}
 		return false;
 	}
-	
+
 	/*
 	 * gets the appropriate Jena Literal for a Value individual in the model,
 	 * depending on whether the Value is a Variable or a Literal
-	 * At some point 
+	 * At some point
 	 */
 	private Literal getValue(RDFNode valueIndNode) {
 		Individual valueInd = (Individual) valueIndNode.as(Individual.class);
@@ -139,7 +139,7 @@ public class JenaIngestWorkflowProcessor {
 		}
 		return null;
 	}
-	
+
 	/*
 	 * returns the model represented by the given Node, which is expected to be an Individual of type Model
 	 */
@@ -149,24 +149,24 @@ public class JenaIngestWorkflowProcessor {
 	    }
 		Individual modelInd = (Individual) modelNode.as(Individual.class);
 		String modelNameStr = ((Literal)modelInd.getPropertyValue(WorkflowOntology.modelName).as(Literal.class)).getLexicalForm();
-		// false = strict mode off, i.e., 
+		// false = strict mode off, i.e.,
 		// if a model already exists of the given name, return it.  Otherwise, create a new one.
 		return modelMaker.createModel(modelNameStr,false);
 	}
-	
+
 	private interface ActionResult {}
 	private class ActionResultImpl implements ActionResult {}
-	
+
 	private interface ActionHandler {
 		public ActionResult handleAction(Individual actionInd);
 	}
-	
+
 	// ALL THE DIFFERENT ACTION HANDLERS
-	
-	private class ClearModelAction implements ActionHandler { 
+
+	private class ClearModelAction implements ActionHandler {
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.ClearModelAction)) {
-				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel)); 
+				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel));
 				sourceModel.enterCriticalSection(Lock.WRITE);
 				try{
 					// this method is used so that any listeners can see each statement removed
@@ -177,16 +177,16 @@ public class JenaIngestWorkflowProcessor {
 				return new ActionResultImpl();
 			} else {
 				return null;
-			}		
+			}
 		}
 	}
-	
-	private class AddModelsAction implements ActionHandler { 
+
+	private class AddModelsAction implements ActionHandler {
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.AddModelAction)) {
-				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel)); 
+				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel));
 				Model modelToAdd = getModel(actionInd.getPropertyValue(WorkflowOntology.modelToAdd));
-				Model destinationModel = getModel(actionInd.getPropertyValue(WorkflowOntology.destinationModel)); 
+				Model destinationModel = getModel(actionInd.getPropertyValue(WorkflowOntology.destinationModel));
 				Boolean applyChangesDirectlyToSource = false;
 				RDFNode valueNode = actionInd.getPropertyValue(WorkflowOntology.applyChangesDirectlyToSource);
 				if ((valueNode != null) && (valueNode.isLiteral())) {
@@ -217,16 +217,16 @@ public class JenaIngestWorkflowProcessor {
 				return new ActionResultImpl();
 			} else {
 				return null;
-			}		
+			}
 		}
 	}
-	
-	private class SubtractModelsAction implements ActionHandler { 
+
+	private class SubtractModelsAction implements ActionHandler {
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.SubtractModelAction)) {
-				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel)); 
+				Model sourceModel = getModel(actionInd.getPropertyValue(WorkflowOntology.sourceModel));
 				Model modelToSubtract = getModel(actionInd.getPropertyValue(WorkflowOntology.modelToSubtract));
-				Model destinationModel = getModel(actionInd.getPropertyValue(WorkflowOntology.destinationModel)); 
+				Model destinationModel = getModel(actionInd.getPropertyValue(WorkflowOntology.destinationModel));
 				Boolean applyChangesDirectlyToSource = false;
 				RDFNode valueNode = actionInd.getPropertyValue(WorkflowOntology.applyChangesDirectlyToSource);
 				if ((valueNode != null) && (valueNode.isLiteral())) {
@@ -256,14 +256,14 @@ public class JenaIngestWorkflowProcessor {
 				return new ActionResultImpl();
 			} else {
 				return null;
-			}		
+			}
 		}
 	}
-	
+
 	private class ExecuteSparqlConstructAction implements ActionHandler {
-		
+
 		private static final String QUERY_STR_PROPERTY = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
-			
+
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.SPARQLCONSTRUCTAction)) {
 				OntModel sourceModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
@@ -289,7 +289,7 @@ public class JenaIngestWorkflowProcessor {
 			return null;
 		}
 	}
-	
+
 	private class SmushResourcesAction implements ActionHandler {
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.SmushResourcesAction)) {
@@ -310,7 +310,7 @@ public class JenaIngestWorkflowProcessor {
 			return null;
 		}
 	}
-	
+
 	private class NameBlankNodesAction implements ActionHandler {
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.NameBlankNodesAction)) {
@@ -326,8 +326,8 @@ public class JenaIngestWorkflowProcessor {
 			return null;
 		}
 	}
-	
-	private class SplitPropertyValuesAction implements ActionHandler { 
+
+	private class SplitPropertyValuesAction implements ActionHandler {
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.SplitPropertyValuesAction)) {
 				// We use an OntModel here because this API supports submodels
@@ -352,11 +352,11 @@ public class JenaIngestWorkflowProcessor {
 				return new ActionResultImpl();
 			} else {
 				return null;
-			}		
+			}
 		}
-	}	
-	
-	private class ProcessPropertyValueStringsAction implements ActionHandler { 
+	}
+
+	private class ProcessPropertyValueStringsAction implements ActionHandler {
 		public ActionResult handleAction(Individual actionInd) {
 			if (instanceOf(actionInd,WorkflowOntology.ProcessPropertyValueStringsAction)) {
 				// We use an OntModel here because this API supports submodels
@@ -392,9 +392,9 @@ public class JenaIngestWorkflowProcessor {
 				return new ActionResultImpl();
 			} else {
 				return null;
-			}		
+			}
 		}
-	}	
-	
-	
+	}
+
+
 }

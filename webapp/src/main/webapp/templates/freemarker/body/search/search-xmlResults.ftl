@@ -6,17 +6,17 @@
     <str name="q">${querytext?xml}</str>
     <#if nextPage??>
       <str name="nextPage">${nextPage?xml}</str>
-    </#if>   
+    </#if>
   </lst>
-  
+
   <result name="response" numFound="${hitCount}" start="${startIndex}" >
-    <#list individuals as individual>                 
+    <#list individuals as individual>
         <doc>
-          <str name="uri">${individual.uri?xml}</str>                      
+          <str name="uri">${individual.uri?xml}</str>
           <str name="name">${individual.name?xml}</str>
           <str name="vivo-url">${individual.profileUrl?xml}"</str>
         </doc>
     </#list>
   </result>
-  
+
 </response>

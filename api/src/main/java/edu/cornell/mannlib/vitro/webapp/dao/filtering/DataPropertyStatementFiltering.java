@@ -9,12 +9,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 public class DataPropertyStatementFiltering implements DataPropertyStatement {
     final DataPropertyStatement innerStmt;
     final VitroFilters filters;
-    
+
     public DataPropertyStatementFiltering( DataPropertyStatement stmt, VitroFilters filters){
         this.innerStmt = stmt;
         this.filters = filters;
     }
-    
+
     /***** methods that return wrapped objects *****/
     /*
     public String getIndividual() {
@@ -30,7 +30,7 @@ public class DataPropertyStatementFiltering implements DataPropertyStatement {
     public Individual getIndividual() {
         return innerStmt.getIndividual();
     }
-    
+
     public String getIndividualURI() {
         return innerStmt.getIndividualURI();
     }
@@ -42,7 +42,7 @@ public class DataPropertyStatementFiltering implements DataPropertyStatement {
     public String getData() {
         return innerStmt.getData();
     }
-    
+
     public String getDatatypeURI() {
         return innerStmt.getDatatypeURI();
     }
@@ -50,19 +50,19 @@ public class DataPropertyStatementFiltering implements DataPropertyStatement {
     public String getDatapropURI() {
         return innerStmt.getDatapropURI();
     }
-    
+
     public String getString() {
         return innerStmt.getString();
     }
-    
+
     public void setIndividual(Individual individual) {
         innerStmt.setIndividual(individual);
     }
-    
+
     public void setIndividualURI(String individualURI) {
         innerStmt.setIndividualURI(individualURI);
     }
-    
+
     public void setData(String data) {
         innerStmt.setData(data);
     }
@@ -78,5 +78,5 @@ public class DataPropertyStatementFiltering implements DataPropertyStatement {
     public void setDatapropURI(String datapropURI) {
         innerStmt.setDatapropURI(datapropURI);
     }
-    
+
 }

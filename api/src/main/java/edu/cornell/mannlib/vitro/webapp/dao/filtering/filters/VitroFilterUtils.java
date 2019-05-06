@@ -38,7 +38,7 @@ public class VitroFilterUtils {
         UnaryFunctor<Individual,Boolean> onlyNamesThatStartWithG =
                 new ChainUnary<Individual,String,Boolean>(startsWithG,getName);
         return getNoOpFilter().setIndividualFilter(onlyNamesThatStartWithG);
-    }  
+    }
 
     public static UnaryFunctor<Individual,String> FirstLetterOfIndividuals(){
         return new UnaryFunctor<Individual,String>(){
@@ -109,6 +109,6 @@ public class VitroFilterUtils {
 					public String toString(){ return "nameCompDesc"; }
                 };
 
-    }   
+    }
 
 }

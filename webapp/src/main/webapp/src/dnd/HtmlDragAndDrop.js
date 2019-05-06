@@ -69,7 +69,7 @@ dojo.lang.extend(dojo.dnd.HtmlDragSource, {
 			this.constrainingContainer = container;
 		}
 	},
-	
+
 	/*
 	*
 	* see dojo.dnd.DragSource.onSelected
@@ -166,7 +166,7 @@ dojo.lang.extend(dojo.dnd.HtmlDragObject, {
 
 		this.dragClone = this.createDragNode();
 
-		this.containingBlockPosition = this.domNode.offsetParent ? 
+		this.containingBlockPosition = this.domNode.offsetParent ?
 			dojo.style.getAbsolutePosition(this.domNode.offsetParent) : {x:0, y:0};
 
 		if (this.constrainToContainer) {

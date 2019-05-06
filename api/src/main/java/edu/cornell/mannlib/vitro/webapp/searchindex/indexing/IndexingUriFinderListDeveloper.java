@@ -19,7 +19,7 @@ import org.apache.jena.rdf.model.Statement;
 /**
  * An implementation that accumulates timing figures for each finder and writes
  * them to the log.
- * 
+ *
  * Note that this must be thread-safe.
  */
 public class IndexingUriFinderListDeveloper implements IndexingUriFinderList {

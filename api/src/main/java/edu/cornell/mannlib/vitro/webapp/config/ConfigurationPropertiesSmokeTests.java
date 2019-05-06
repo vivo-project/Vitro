@@ -199,7 +199,7 @@ public class ConfigurationPropertiesSmokeTests implements
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to find language files", e);
 		}
-	}  
+	}
 
 	/**
 	 * Fail if there are no config properties for the Argon2 encryption.

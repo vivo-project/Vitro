@@ -32,15 +32,15 @@
 .individualList a.externalLink {
     font-weight: normal;
 }
-.individualList ul { 
+.individualList ul {
     margin-left: 0;
 }
-.individualList li { 
+.individualList li {
     list-style-type: none;
     margin-bottom: .5em;
 }
-.individualList li a { 
-    font-weight: normal; 
+.individualList li a {
+    font-weight: normal;
     margin-right: .4em;
 }
 .individualList .display-title {

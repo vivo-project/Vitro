@@ -37,7 +37,7 @@ public class Option implements Serializable {
     //default constructor
     public Option() {
     }
-    
+
     public Option (String value, String body, boolean selected) {
         this.value = value;
         this.body = body;

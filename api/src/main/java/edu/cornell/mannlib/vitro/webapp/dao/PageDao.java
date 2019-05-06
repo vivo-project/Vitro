@@ -7,23 +7,23 @@ import java.util.List;
 public interface PageDao {
 
     Map<String, Object> getPage(String pageUri);
-    
+
     /**
      * Returns a list of urlMappings to URIs.
      */
     Map<String, String> getPageMappings();
-    
+
     /**
      * Returns URI of home page.
      */
     String getHomePageUri();
-   
+
     String getClassGroupPage(String pageUri);
-        
+
     Map<String, Object> getClassesAndRestrictionsForPage(String pageUri);
 
     Map<String, Object> getClassesAndCheckInternal(String pageUri);
-    
+
     List<String> getDataGetterClass(String pageUri);
 
     /**

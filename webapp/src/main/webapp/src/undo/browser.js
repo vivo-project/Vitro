@@ -22,7 +22,7 @@ if(dojo.render.html.opera){
 }
 
 /* NOTES:
- *  Safari 1.2: 
+ *  Safari 1.2:
  *	back button "works" fine, however it's not possible to actually
  *	DETECT that you've moved backwards by inspecting window.location.
  *	Unless there is some other means of locating.
@@ -36,10 +36,10 @@ if(dojo.render.html.opera){
  *	previous hash value, but to the last full page load. This suggests
  *	that the iframe is the correct way to capture the back button in
  *	these cases.
- *	Don't test this page using local disk for MSIE. MSIE will not create 
- *	a history list for iframe_history.html if served from a file: URL. 
- *	The XML served back from the XHR tests will also not be properly 
- *	created if served from local disk. Serve the test pages from a web 
+ *	Don't test this page using local disk for MSIE. MSIE will not create
+ *	a history list for iframe_history.html if served from a file: URL.
+ *	The XML served back from the XHR tests will also not be properly
+ *	created if served from local disk. Serve the test pages from a web
  *	server to test in that browser.
  *  IE 6.0:
  *	same behavior as IE 5.5 SP2
@@ -84,9 +84,9 @@ dojo.undo.browser = {
 	 *   identifier (http://some.domain.com/path#uniquenumber). If it is any other value that does
 	 *   not evaluate to false, that value will be used as the fragment identifier. For example,
 	 *   if changeUrl: 'page1', then the URL will look like: http://some.domain.com/path#page1
-	 *   
+	 *
 	 * Full example:
-	 * 
+	 *
 	 * dojo.undo.browser.addToHistory({
 	 *   back: function() { alert('back pressed'); },
 	 *   forward: function() { alert('forward pressed'); },
@@ -113,7 +113,7 @@ dojo.undo.browser = {
 			hash = "#"+ ((args["changeUrl"]!==true) ? args["changeUrl"] : (new Date()).getTime());
 			setTimeout("window.location.href = '"+hash+"'; dojo.undo.browser.changingUrl = false;", 1);
 			this.bookmarkAnchor.href = hash;
-			
+
 			if(dojo.render.html.ie){
 				var oldCB = args["back"]||args["backButton"]||args["handle"];
 
@@ -127,7 +127,7 @@ dojo.undo.browser = {
 					//Use apply to set "this" to args, and to try to avoid memory leaks.
 					oldCB.apply(this, [handleName]);
 				}
-		
+
 				//Set interceptor function in the right place.
 				if(args["back"]){
 					args.back = tcb;
@@ -136,13 +136,13 @@ dojo.undo.browser = {
 				}else if(args["handle"]){
 					args.handle = tcb;
 				}
-		
+
 				//If addToHistory is called, then that means we prune the
 				//forward stack -- the user went back, then wanted to
 				//start a new forward path.
-				this.forwardStack = []; 
+				this.forwardStack = [];
 				var oldFW = args["forward"]||args["forwardButton"]||args["handle"];
-		
+
 				//The function takes handleName as a parameter, in case the
 				//callback we are overriding was "handle". In that case,
 				//we will need to pass the handle name to handle.
@@ -195,7 +195,7 @@ dojo.undo.browser = {
 					return;
 				}
 			}
-	
+
 			// ok, that didn't work, try someplace back in the history stack
 			if((hsl >= 2)&&(this.historyStack[hsl-2])){
 				if(this.historyStack[hsl-2].urlHash==window.location.hash){
@@ -209,7 +209,7 @@ dojo.undo.browser = {
 	iframeLoaded: function(evt, ifrLoc){
 		if(!dojo.render.html.opera){
 			var query = this._getUrlQuery(ifrLoc.href);
-			if(query == null){ 
+			if(query == null){
 				// alert("iframeLoaded");
 				// we hit the end of the history, so we should go back
 				if(this.historyStack.length == 1){
@@ -222,7 +222,7 @@ dojo.undo.browser = {
 				this.moveForward = false;
 				return;
 			}
-	
+
 			//Check the back stack first, since it is more likely.
 			//Note that only one step back or forward is supported.
 			if(this.historyStack.length >= 2 && query == this._getUrlQuery(this.historyStack[this.historyStack.length-2].url)){

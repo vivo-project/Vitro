@@ -14,7 +14,7 @@ dojo.require("dojo.lang.extras");
 
 /******************************************************************************
  *	Notes about dojo.io design:
- *	
+ *
  *	The dojo.io.* package has the unenviable task of making a lot of different
  *	types of I/O feel natural, despite a universal lack of good (or even
  *	reasonable!) I/O capability in the host environment. So lets pin this down
@@ -58,7 +58,7 @@ dojo.require("dojo.lang.extras");
  *	A discussion between Dylan, Mark, Tom, and Alex helped to lay down a lot
  *	the IO API interface. A transcript of it can be found at:
  *		http://dojotoolkit.org/viewcvs/viewcvs.py/documents/irc/irc_io_api_log.txt?rev=307&view=auto
- *	
+ *
  *	Also referenced in the design of the API was the DOM 3 L&S spec:
  *		http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html
  ******************************************************************************/
@@ -83,28 +83,28 @@ dojo.lang.extend(dojo.io.Request, {
 
 	/** The URL to hit */
 	url: "",
-	
+
 	/** The mime type used to interrpret the response body */
 	mimetype: "text/plain",
-	
+
 	/** The HTTP method to use */
 	method: "GET",
-	
+
 	/** An Object containing key-value pairs to be included with the request */
 	content: undefined, // Object
-	
+
 	/** The transport medium to use */
 	transport: undefined, // String
-	
+
 	/** If defined the URL of the page is physically changed */
 	changeUrl: undefined, // String
-	
+
 	/** A form node to use in the request */
 	formNode: undefined, // HTMLFormElement
-	
+
 	/** Whether the request should be made synchronously */
 	sync: false,
-	
+
 	bindSuccess: false,
 
 	/** Cache/look for the request in the cache before attempting to request?
@@ -114,7 +114,7 @@ dojo.lang.extend(dojo.io.Request, {
 
 	/** Prevent the browser from caching this by adding a query string argument to the URL */
 	preventCache: false,
-	
+
 	// events stuff
 	load: function(type, data, evt){ },
 	error: function(type, error){ },
@@ -125,11 +125,11 @@ dojo.lang.extend(dojo.io.Request, {
 	// The number of seconds to wait until firing a timeout callback.
 	// If it is zero, that means, don't do a timeout check.
 	timeoutSeconds: 0,
-	
+
 	// the abort method needs to be filled in by the transport that accepts the
 	// bind() request
 	abort: function(){ },
-	
+
 	// backButton: function(){ },
 	// forwardButton: function(){ },
 
@@ -140,7 +140,7 @@ dojo.lang.extend(dojo.io.Request, {
 		if(!kwArgs["method"] && kwArgs["formNode"] && kwArgs["formNode"].method) {
 			kwArgs.method = kwArgs["formNode"].method;
 		}
-		
+
 		// backwards compatibility
 		if(!kwArgs["handle"] && kwArgs["handler"]){ kwArgs.handle = kwArgs.handler; }
 		if(!kwArgs["load"] && kwArgs["loaded"]){ kwArgs.load = kwArgs.loaded; }
@@ -201,7 +201,7 @@ dojo.io.bind = function(request){
 		if(!this[tsName]){ return request; }
 	}else{
 		// otherwise we do our best to auto-detect what available transports
-		// will handle 
+		// will handle
 		for(var x=0; x<dojo.io.transports.length; x++){
 			var tmp = dojo.io.transports[x];
 			if((this[tmp])&&(this[tmp].canHandle(request))){
@@ -311,9 +311,9 @@ dojo.io.setIFrameSrc = function(iframe, src, replace){
 				idoc.location.replace(src);
 			}
 		}
-	}catch(e){ 
-		dojo.debug(e); 
-		dojo.debug("setIFrameSrc: "+e); 
+	}catch(e){
+		dojo.debug(e);
+		dojo.debug("setIFrameSrc: "+e);
 	}
 }
 
@@ -322,7 +322,7 @@ dojo.io.sampleTranport = new function(){
 	this.canHandle = function(kwArgs){
 		// canHandle just tells dojo.io.bind() if this is a good transport to
 		// use for the particular type of request.
-		if(	
+		if(
 			(
 				(kwArgs["mimetype"] == "text/plain") ||
 				(kwArgs["mimetype"] == "text/html") ||

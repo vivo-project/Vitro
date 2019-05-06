@@ -3,7 +3,7 @@
 <script language="JavaScript" type="text/javascript">
 <!--
      var bypassValidateUF = false;
-     
+
      function forceCancel(theForm) {           // we don't want validation to stop us if we're canceling
          theForm.Md5password.value = "CANCEL"; // a dummy string to force validation to succeed
          theForm.passwordConfirmation.value = theForm.Md5password.value;
@@ -35,7 +35,7 @@
              theForm.LastName.focus();
              return false;
          }
-		 else {    
+		 else {
              return true;
          }
      }
@@ -56,11 +56,11 @@
              return false;
          }
          if (theForm.Md5password.value.length < 6 || theForm.Md5password.value.length > 12) {
-             alert("Please enter a password between 6 and 12 characters long."); 
+             alert("Please enter a password between 6 and 12 characters long.");
              theForm.Md5password.focus();
              return false;
-         } 
- 		 else {    
+         }
+ 		 else {
              return true;
          }
      }
@@ -69,7 +69,7 @@
         bypassValidateUF = true;
         var msg="Are you SURE you want to delete this user? If in doubt, CANCEL."
         var answer = confirm(msg)
-        if ( answer ) 
+        if ( answer )
                 return true;
         else
                 bypassValidateUF = false;

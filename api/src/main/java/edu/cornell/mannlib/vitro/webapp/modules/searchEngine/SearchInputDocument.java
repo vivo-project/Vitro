@@ -31,7 +31,7 @@ public interface SearchInputDocument {
 
 	/**
 	 * Create a field with this name and values, and put it into the document.
-	 * 
+	 *
 	 * If a field with this name already exists in the document, these values
 	 * will be added to the existing values on the field.
 	 */
@@ -39,8 +39,8 @@ public interface SearchInputDocument {
 
 	/**
 	 * Create a field with this name, boost level and values, and put it into
-	 * the document. 
-	 * 
+	 * the document.
+	 *
 	 * If a field with this name already exists in the document,
 	 * these values will be added to the existing values on the field, and the
 	 * existing boost will be multipled by this boost.
@@ -49,8 +49,8 @@ public interface SearchInputDocument {
 
 	/**
 	 * Create a field with this name, boost level and values, and put it into
-	 * the document. 
-	 * 
+	 * the document.
+	 *
 	 * If a field with this name already exists in the document,
 	 * these values will be added to the existing values on the field, and the
 	 * existing boost will be multipled by this boost.

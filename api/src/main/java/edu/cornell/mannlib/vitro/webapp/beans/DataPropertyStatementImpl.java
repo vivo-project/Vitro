@@ -14,7 +14,7 @@ public class DataPropertyStatementImpl implements DataPropertyStatement
     private String datapropURI = null;
     private String datatypeURI = null;
     private String language = null;
-    
+
     public DataPropertyStatementImpl(){
     }
 
@@ -23,7 +23,7 @@ public class DataPropertyStatementImpl implements DataPropertyStatement
             this.individualURI = individual.getURI();
         }
     }
-    
+
     public DataPropertyStatementImpl(String individualUri, String propertyUri, String data){
         individualURI = individualUri;
         datapropURI = propertyUri;
@@ -33,11 +33,11 @@ public class DataPropertyStatementImpl implements DataPropertyStatement
     public Individual getIndividual() {
         return this.individual;
     }
-    
+
     public void setIndividual(Individual individual) {
         this.individual = individual;
     }
-    
+
     public String getIndividualURI() {
         return individualURI;
     }

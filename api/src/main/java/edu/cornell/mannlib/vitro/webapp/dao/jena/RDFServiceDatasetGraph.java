@@ -36,7 +36,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     private Context context = new Context() ;
     private Map<String, RDFServiceGraph> graphCache = new ConcurrentHashMap<String, RDFServiceGraph>();
     private ReadWrite transactionMode;
-    
+
     public RDFServiceDatasetGraph(RDFService rdfService) {
         this.rdfService = rdfService;
         this.defaultGraph = new RDFServiceGraph(rdfService);
@@ -94,17 +94,17 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     public void end() {
         this.transactionMode = null;
     }
-    
+
     private Graph getGraphFor(Quad q) {
         return getGraphFor(q.getGraph());
     }
-    
+
     private Graph getGraphFor(Node g) {
-        return (g == Node.ANY) 
+        return (g == Node.ANY)
                 ? defaultGraph
                 : getGraph(g);
     }
-    
+
     @Override
     public void add(Quad arg0) {
         getGraphFor(arg0).add(new Triple(arg0.getSubject(), arg0.getPredicate(), arg0.getObject()));
@@ -164,7 +164,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 	public void delete(Node g, Node s, Node p, Node o) {
 		delete(new Quad(g, s, p, o));
 	}
-    
+
     @Override
     public void deleteAny(Node arg0, Node arg1, Node arg2, Node arg3) {
         // TODO check this
@@ -206,9 +206,9 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         .append(SparqlGraph.sparqlNode(object, "?o"));
         findQuery.append("  } ");
         findQuery.append("\n}");
-        
+
         //log.info(findQuery.toString());
-        
+
         final List<Quad> quadlist = new ArrayList<Quad>();
         try {
             rdfService.sparqlSelectQuery(findQuery.toString(), new ResultSetConsumer() {
@@ -244,7 +244,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     public RDFServiceGraph getDefaultGraph() {
         return defaultGraph;
     }
-    
+
     @Override
     public RDFServiceGraph getGraph(Node arg0) {
         String graphURI = arg0.getURI();
@@ -266,7 +266,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     }
 
     private boolean supportsTransactions(Graph graph) {
-        return (graph.getTransactionHandler() != null 
+        return (graph.getTransactionHandler() != null
                 && graph.getTransactionHandler().transactionsSupported());
     }
 
@@ -286,7 +286,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         List<Node> graphNodeList = new ArrayList<Node>();
         try {
             for (String graphURI : rdfService.getGraphURIs()) {
-                graphNodeList.add(NodeFactory.createURI(graphURI));   
+                graphNodeList.add(NodeFactory.createURI(graphURI));
             }
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
@@ -309,7 +309,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         // TODO Auto-generated method stub
         return 0;
     }
-    
+
     private boolean isVar(Node node) {
         return (node == null || node.isVariable() || node == Node.ANY);
     }
@@ -319,5 +319,5 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 		return "RDFServiceDatasetGraph[" + ToString.hashHex(this)
 				+ ", " + rdfService + "]";
 	}
-	
+
 }

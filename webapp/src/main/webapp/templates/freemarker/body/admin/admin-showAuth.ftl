@@ -23,7 +23,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
         <tr><th>${i18n().not_logged_in}</th></tr>
     </#if>
     </table>
-   
+
     <h4>${i18n().identifiers}:</h4>
     <table summary="Identifiers">
         <#list identifiers as identifier>
@@ -34,7 +34,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
     </table>
 
     <h4>
-        ${i18n().associated_individuals}: 
+        ${i18n().associated_individuals}:
         <#if matchingProperty??>
             (${i18n().match_by(matchingProperty)})
         <#else>

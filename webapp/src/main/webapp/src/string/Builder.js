@@ -29,7 +29,7 @@ dojo.string.Builder = function(str){
 		b = "";
 	}
 
-	this.toString = this.valueOf = function(){ 
+	this.toString = this.valueOf = function(){
 		return (this.arrConcat) ? a.join("") : b;
 	};
 
@@ -52,16 +52,16 @@ dojo.string.Builder = function(str){
 	};
 
 	this.remove = function(f,l){
-		var s = ""; 
+		var s = "";
 		if(this.arrConcat){
-			b = a.join(""); 
+			b = a.join("");
 		}
 		a=[];
 		if(f>0){
 			s = b.substring(0, (f-1));
 		}
-		b = s + b.substring(f + l); 
-		length = this.length = b.length; 
+		b = s + b.substring(f + l);
+		length = this.length = b.length;
 		if(this.arrConcat){
 			a.push(b);
 			b="";
@@ -71,11 +71,11 @@ dojo.string.Builder = function(str){
 
 	this.replace = function(o,n){
 		if(this.arrConcat){
-			b = a.join(""); 
+			b = a.join("");
 		}
-		a = []; 
-		b = b.replace(o,n); 
-		length = this.length = b.length; 
+		a = [];
+		b = b.replace(o,n);
+		length = this.length = b.length;
 		if(this.arrConcat){
 			a.push(b);
 			b="";
@@ -85,7 +85,7 @@ dojo.string.Builder = function(str){
 
 	this.insert = function(idx,s){
 		if(this.arrConcat){
-			b = a.join(""); 
+			b = a.join("");
 		}
 		a=[];
 		if(idx == 0){
@@ -95,9 +95,9 @@ dojo.string.Builder = function(str){
 			t.splice(idx,0,s);
 			b = t.join("")
 		}
-		length = this.length = b.length; 
+		length = this.length = b.length;
 		if(this.arrConcat){
-			a.push(b); 
+			a.push(b);
 			b="";
 		}
 		return this;

@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 public class SimpleReasonerTBoxListener extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasonerTBoxListener.class);
-	
+
     private SimpleReasoner simpleReasoner;
     private Thread workerThread;
     private boolean stopRequested;
@@ -46,69 +46,69 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 		this.modelUpdates = new ConcurrentLinkedQueue<ModelUpdate>();
 		this.processingUpdates = false;
 	}
-	
+
 	@Override
 	public void addedStatement(Statement statement) {
-		
+
 		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.ADD, ModelNames.TBOX_ASSERTIONS);
 		processUpdate(mu);
 	}
 
 	@Override
 	public void removedStatement(Statement statement) {
-		
-		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.RETRACT, ModelNames.TBOX_ASSERTIONS);	
+
+		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.RETRACT, ModelNames.TBOX_ASSERTIONS);
 		processUpdate(mu);
 	}
-	
+
 	private synchronized void processUpdate(ModelUpdate mu) {
 		if (!processingUpdates && (modelUpdates.peek() != null)) {
 			log.warn("TBoxProcessor thread was not running and work queue is not empty. size = " + modelUpdates.size() + " The work will be processed now.");
 		}
-		
+
 		modelUpdates.add(mu);
-		
+
 		if (!processingUpdates) {
 			processingUpdates = true;
 			workerThread = new TBoxUpdateProcessor("TBoxUpdateProcessor (" + getName() + ")");
 			workerThread.start();
 		}
 	}
-	      
+
    private synchronized ModelUpdate nextUpdate() {
 	    ModelUpdate mu = modelUpdates.poll();
 	    processingUpdates = (mu != null);
 	    return mu;
    }
-   	
+
    public String getName() {
-		return (name == null) ? "SimpleReasonerTBoxListener" : name;	
+		return (name == null) ? "SimpleReasonerTBoxListener" : name;
    }
 
    public void setStopRequested() {
 	    this.stopRequested = true;
    }
-	
-   private class TBoxUpdateProcessor extends VitroBackgroundThread {      
+
+   private class TBoxUpdateProcessor extends VitroBackgroundThread {
         public TBoxUpdateProcessor(String name) {
         	super(name);
         }
-        
+
         @Override
-        public void run() {  
+        public void run() {
             try {
 	        	 log.debug("starting thread");
 	        	 ModelUpdate mu = nextUpdate();
-	        	 while (mu != null && !stopRequested) {       	   
+	        	 while (mu != null && !stopRequested) {
 	    		    if (mu.getOperation() == ModelUpdate.Operation.ADD) {
-	    				simpleReasoner.addedTBoxStatement(mu.getStatement());	
+	    				simpleReasoner.addedTBoxStatement(mu.getStatement());
 	    		    } else if (mu.getOperation() == ModelUpdate.Operation.RETRACT) {
 	    			    simpleReasoner.removedTBoxStatement(mu.getStatement());
 	    		    } else {
 	    			    log.error("unexpected operation value in ModelUpdate object: " + mu.getOperation());
 	    		    }
 	    		    mu = nextUpdate();
-	        	 }	        	
+	        	 }
             }  finally {
         	     processingUpdates = false;
         	     log.debug("ending thread");

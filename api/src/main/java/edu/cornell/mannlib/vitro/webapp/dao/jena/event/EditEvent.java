@@ -13,7 +13,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class EditEvent {
-	
+
     private static final String EDIT_EVENT = VitroVocabulary.EDIT_EVENT;
     private static final String EDIT_EVENT_AGENT = VitroVocabulary.EDIT_EVENT_AGENT;
 
@@ -21,12 +21,12 @@ public class EditEvent {
 	private String userURI;
     protected List<String> eventTypeURIList;
     protected Map<String,List<RDFNode>> propertyMap;
-	
+
 	public EditEvent (String userURI, boolean begin) {
 		this.begin = begin;
 		this.userURI = userURI;
 	}
-	
+
 	public Map<String,List<RDFNode>> getPropertyMap() {
 		this.propertyMap = new HashMap<String,List<RDFNode>>();
 		List<RDFNode> agentValueList = new LinkedList<RDFNode>();
@@ -34,13 +34,13 @@ public class EditEvent {
 		this.propertyMap.put(EDIT_EVENT_AGENT, agentValueList);
 		return propertyMap;
 	}
-	
+
 	public Boolean getBegin() {
 		return this.begin;
 	}
-	
+
 	public List<String> getEventTypeURIList() {
 		return eventTypeURIList;
 	}
-	
+
 }

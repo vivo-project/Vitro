@@ -31,10 +31,10 @@
 
 <#assign requiredHint = "<span class='requiredHint'> *</span>" />
 
-<section id="newIndividual" role="region">        
-    
+<section id="newIndividual" role="region">
+
     <form id="newIndividual" class="customForm noIE67" action="${submitUrl}"  role="add new individual">
- 
+
       <p>
           <label for="name">${i18n().name} ${requiredHint}</label>
           <input size="30"  type="text" id="label" name="label" value="" />

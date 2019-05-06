@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /**
  * A mock instance of RequestModelAccess for use in unit tests.
- * 
+ *
  * I have only implemented the methods that I needed for my tests. Feel free to
  * implement the rest, as needed.
  */

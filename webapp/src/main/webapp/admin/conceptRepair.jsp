@@ -15,14 +15,14 @@
 <%
     String conceptIdStr = request.getParameter("conceptId");
     if (conceptIdStr != null) {
-    	
-    	String describeQueryStr = 
+
+    	String describeQueryStr =
     		"PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
     		"DESCRIBE ?bnode \n" +
     	    "WHERE { \n" +
     		"    FILTER(afn:bnode(?bnode) = \"" + conceptIdStr + "\")\n" +
     	    "}";
-    	    
+
     	OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.FULL_ASSERTIONS);
     	Model conceptDescription = ModelFactory.createDefaultModel();
     	try {
@@ -30,15 +30,15 @@
     		Query describeQuery = QueryFactory.create(describeQueryStr, Syntax.syntaxARQ);
     		QueryExecution qe = QueryExecutionFactory.create(describeQuery, ontModel);
     		qe.execDescribe(conceptDescription);
-    		
+
     		conceptDescription.add(ontModel.listStatements((Resource) null, (Property) null, ontModel.createResource(new AnonId(conceptIdStr))));
-    		
+
     	} finally {
     		ontModel.leaveCriticalSection();
     	}
-    	
-    	
-    	
+
+
+
     	List<String> actionStrList = (request.getParameterValues("action") != null)
     	   ? Arrays.asList(request.getParameterValues("action"))
     	   : new ArrayList<String>();
@@ -54,7 +54,7 @@
     		conceptDescription.write(response.getOutputStream(), "TTL");
     		return;
     	}
-    	
+
     }
 
 %>
@@ -83,7 +83,7 @@
     <form action="" method="post">
         <p>Concept bnode id: <input name="conceptId"/></p>
         <p><input type="checkbox" name="action" value="describe"/> describe concept</p>
-        <p><input type="checkbox" name="action" value="remove"/> remove concept</p> 
+        <p><input type="checkbox" name="action" value="remove"/> remove concept</p>
         <p><input type="submit" value="Perform action"/></p>
     </form>
-</body></html>    
+</body></html>

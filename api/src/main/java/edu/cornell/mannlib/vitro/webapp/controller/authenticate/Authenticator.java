@@ -23,11 +23,11 @@ import java.util.List;
 /**
  * The tool that a login process will use to interface with the user records in
  * the model (or wherever).
- * 
+ *
  * This needs to be based on a HttpSession, because things like the UserDAO are
  * tied to the session. It seemed easier to base it on a HttpServletRequest,
  * which we can use to get the session.
- * 
+ *
  * TODO: Wouldn't it be cool if we could remove the LoginNotPermitted exception?
  * Perhaps we could have a sub-object called an Authenticator.ForUser, and you
  * call a getAuthenticatorForUser() method which returns null if your login has
@@ -54,7 +54,7 @@ public abstract class Authenticator {
 	/**
 	 * Ask the currently configured AuthenticatorFactory to give us an
 	 * Authenticator for this request.
-	 * 
+	 *
 	 * If there is no factory, configure a Basic one.
 	 */
 
@@ -98,11 +98,11 @@ public abstract class Authenticator {
 	/**
 	 * Is this user permitted to login? Some Authenticators might disable logins
 	 * for certain users.
-	 * 
+	 *
 	 * Behavior when userAccount is null depends on the particular
 	 * Authenticator. An answer of "true" presumably means that the user will be
 	 * permitted to login and create an account on the fly.
-	 * 
+	 *
 	 * Note that this method may rely on the HttpServletRequest object that was
 	 * provided to the factory when this instance was created.
 	 */
@@ -152,7 +152,7 @@ public abstract class Authenticator {
 
 	/**
 	 * <pre>
-	 * Record that the user has logged in, with all of the housekeeping that 
+	 * Record that the user has logged in, with all of the housekeeping that
 	 * goes with it:
 	 * - update the user record
 	 * - set login status and timeout limit in the session
@@ -160,7 +160,7 @@ public abstract class Authenticator {
 	 * - record the user in the session map
 	 * - notify other users of the model
 	 * </pre>
-	 * 
+	 *
 	 * @throws LoginNotPermitted
 	 *             if the Authenticator denies this user the ability to login.
 	 *             This should be thrown if and only if isUserPermittedToLogin()
@@ -172,7 +172,7 @@ public abstract class Authenticator {
 	/**
 	 * <pre>
 	 * Record that the current user has logged out: - notify other users of the
-	 * model. 
+	 * model.
 	 * - invalidate the session.
 	 * </pre>
 	 */
@@ -243,7 +243,7 @@ public abstract class Authenticator {
 	 * Check whether the form of the emailAddress is syntactically correct. Does
 	 * not allow multiple addresses. Does not allow local addresses (without a
 	 * hostname).
-	 * 
+	 *
 	 * Does not confirm that the host actually exists, or has a mailbox by that
 	 * name.
 	 */

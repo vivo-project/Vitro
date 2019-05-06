@@ -15,7 +15,7 @@ public interface DumpParser extends AutoCloseable, Iterable<DumpQuad> {
 		public BadInputException(String message) {
 			super(message);
 		}
-		
+
 		public BadInputException(String message, Throwable cause) {
 			super(message, cause);
 		}

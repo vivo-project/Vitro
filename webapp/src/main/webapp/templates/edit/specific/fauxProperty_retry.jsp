@@ -108,8 +108,8 @@
             </c:when>
             <c:otherwise>
                 <input name="CollateBySubclass" type="checkbox" value="TRUE"/>collate by subclass
-            </c:otherwise>            
-        </c:choose>            
+            </c:otherwise>
+        </c:choose>
     </td>
 </tr>
 

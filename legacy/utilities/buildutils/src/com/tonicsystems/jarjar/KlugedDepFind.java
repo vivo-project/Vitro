@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** 
+/**
  * This class is created to work around a known bug in JarJar which did not get fixed in release 1.1.
  * See the comments in edu.cornell.mannlib.vitro.utilities.jarlist.JarLister
  */

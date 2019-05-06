@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
 	private static final Log log = LogFactory
 			.getLog(HideFromDisplayByPolicyFilter.class);
-	
+
 	private final IdentifierBundle idBundle;
 	private final PolicyIface policy;
 
@@ -53,7 +53,7 @@ public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
 	boolean checkAuthorization(RequestedAction whatToAuth) {
 		PolicyDecision decision = policy.isAuthorized(idBundle, whatToAuth);
 		log.debug("decision is " + decision);
-		
+
 		if (decision != null) {
 			if (decision.getAuthorized() == Authorization.AUTHORIZED) {
 				return true;

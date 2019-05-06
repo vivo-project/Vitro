@@ -7,13 +7,13 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Keys for the DeveloperSettings. Each key holds these values:
- * 
+ *
  * A property name, which specifies the key in developer.properties, like
  * "this.thatThing"
- * 
+ *
  * A flag to say whether this key controls a boolean value. If false, then the
  * value is a string.
- * 
+ *
  * We can derive the element ID for each key by replacing the periods in the
  * property name with underscores.
  */

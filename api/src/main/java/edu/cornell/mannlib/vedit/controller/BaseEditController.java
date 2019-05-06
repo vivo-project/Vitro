@@ -37,9 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class BaseEditController extends VitroHttpServlet {
 
 	public static final boolean FORCE_NEW = true; // when you know you're starting a new edit process
-    
+
     public static final String JSP_PREFIX = "/templates/edit/specific/";
-	
+
     protected static DateFormat DISPLAY_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
     protected static final int BASE_10 = 10;
 
@@ -57,7 +57,7 @@ public class BaseEditController extends VitroHttpServlet {
     protected EditProcessObject createEpo(HttpServletRequest request) {
     	return createEpo(request, false);
     }
-    
+
     protected EditProcessObject createEpo(HttpServletRequest request, boolean forceNew) {
         /* this is actually a bit of a misnomer, because we will reuse an epo
         if an epoKey parameter is passed */
@@ -156,22 +156,22 @@ public class BaseEditController extends VitroHttpServlet {
             }
         }
     }
-    
+
     public List<Option> getSortedList(HashMap<String,Option> hashMap, List<Option> optionList, VitroRequest vreq){
-        
+
         class ListComparator implements Comparator<String>{
-            
+
             Collator collator;
-            
+
             public ListComparator(Collator collator) {
                 this.collator = collator;
             }
-            
+
             @Override
             public int compare(String str1, String str2) {
                 return collator.compare(str1, str2);
             }
-            
+
         }
 
        List<String> bodyVal = new ArrayList<String>();
@@ -180,23 +180,23 @@ public class BaseEditController extends VitroHttpServlet {
             hashMap.put(option.getBody(), option);
             bodyVal.add(option.getBody());
         }
-        
-                
+
+
        bodyVal.sort(new ListComparator(vreq.getCollator()));
         for (String aBodyVal : bodyVal) {
             options.add(hashMap.get(aBodyVal));
         }
        return options;
    }
-    
+
     protected WebappDaoFactory getWebappDaoFactory() {
     	return ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY);
     }
-    
+
     protected WebappDaoFactory getWebappDaoFactory(String userURI) {
         return getWebappDaoFactory().getUserAwareDaoFactory(userURI);
     }
-    
+
     public String getDefaultLandingPage(HttpServletRequest request) {
     	return(request.getContextPath() + DEFAULT_LANDING_PAGE);
     }

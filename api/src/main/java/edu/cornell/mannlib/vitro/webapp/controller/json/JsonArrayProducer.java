@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 /**
  * A base for classes that produce a JSON array based on the parameters in the
  * VitroRequest.
- * 
+ *
  * Catches any exceptions. Logs the error and returns an empty JSON array.
  */
 public abstract class JsonArrayProducer extends JsonProducer {

@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 
 public class DatapropRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(DatapropRetryController.class.getName());
 
     @Override
@@ -51,11 +51,11 @@ public class DatapropRetryController extends BaseEditController {
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
         epo.setBeanClass(DataProperty.class);
-        
+
         VitroRequest vreq = new VitroRequest(request);
 
         WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
-        
+
         DatatypeDao dDao = wadf.getDatatypeDao();
         DataPropertyDao dpDao = wadf.getDataPropertyDao();
         epo.setDataAccessObject(dpDao);
@@ -129,49 +129,49 @@ public class DatapropRetryController extends BaseEditController {
 
         FormObject foo = new FormObject();
         foo.setErrorMap(epo.getErrMsgMap()); // retain error messages from previous time through the form
-        
+
         epo.setFormObject(foo);
         FormUtils.populateFormFromBean(objectForEditing,action,foo);
         //for now, this is also making the value hash - need to separate this out
-        
+
         HashMap optionMap = new HashMap();
         List namespaceList = FormUtils.makeOptionListFromBeans(ontDao.getAllOntologies(),"URI","Name", ((objectForEditing.getNamespace()==null) ? "" : objectForEditing.getNamespace()), null, (objectForEditing.getNamespace()!=null));
 	    namespaceList.add(0, new Option(vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace(),"default"));
         optionMap.put("Namespace", namespaceList);
-        
+
         List<Option> domainOptionList = FormUtils.makeVClassOptionList(vreq.getUnfilteredWebappDaoFactory(), objectForEditing.getDomainClassURI());
         if (objectForEditing.getDomainClassURI() != null) {
         	VClass domain = vreq.getWebappDaoFactory().getVClassDao()
         	        .getVClassByURI(objectForEditing.getDomainClassURI());
         	if (domain != null && domain.isAnonymous()) {
         		domainOptionList.add(0, new Option(
-        			    domain.getURI(), 
-        			    domain.getName(), 
+        			    domain.getURI(),
+        			    domain.getName(),
         			    true));
         	}
         }
         domainOptionList.add(0, new Option("","(none specified)"));
         optionMap.put("DomainClassURI", domainOptionList);
-        
+
         List datatypeOptionList = FormUtils.makeOptionListFromBeans(dDao.getAllDatatypes(),"Uri","Name",objectForEditing.getRangeDatatypeURI(),null);
         datatypeOptionList.add(0,new Option("http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral","XML literal (allows XHTML markup)"));
         datatypeOptionList.add(0,new Option(null,"untyped (use if language tags desired)"));
         optionMap.put("RangeDatatypeURI", datatypeOptionList);
-        
+
         List groupOptList = FormUtils.makeOptionListFromBeans(vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((objectForEditing.getGroupURI()==null) ? "" : objectForEditing.getGroupURI()), null, (objectForEditing.getGroupURI()!=null));
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
         groupOptList = getSortedList(hashMap,groupOptList,vreq);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
 
-        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(objectForEditing));    
+        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(objectForEditing));
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(objectForEditing));
-        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(objectForEditing));    
+        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(objectForEditing));
 
         foo.setOptionLists(optionMap);
-        
+
         request.setAttribute("functional",objectForEditing.getFunctional());
-        
+
         //checkboxes are pretty annoying : we don't know if someone *unchecked* a box, so we have to default to false on updates.
         if (objectForEditing.getURI() != null) {
         	objectForEditing.setFunctional(false);
@@ -202,7 +202,7 @@ public class DatapropRetryController extends BaseEditController {
     }
 
     class DataPropertyInsertPageForwarder implements PageForwarder {
-    	
+
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
             String newPropertyUrl = "datapropEdit?uri=";
             DataProperty p = (DataProperty) epo.getNewBean();

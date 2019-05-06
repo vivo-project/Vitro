@@ -33,7 +33,7 @@ public class ManagePagePreprocessor extends
 	protected static final Log log = LogFactory
 			.getLog(ManagePagePreprocessor.class.getName());
 
-	
+
 	private static MultiValueEditSubmission submission = null;
 	private static EditConfigurationVTwo editConfiguration = null;
 	private static Map<String, List<String>> transformedLiteralsFromForm = null;
@@ -58,15 +58,15 @@ public class ManagePagePreprocessor extends
 		processDataGetters();
 		//In case of edit, need to force deletion of existing values where necessary
 		//In our case, values that already exist and will be overwritten will be in submission already
-		//just as new values will 
+		//just as new values will
 		//Anything left over should be replaced with blank value sentinel as that would
 		//no longer be on the form and have a value submitted and we can delete that statement
 		//if it exists
 		processExistingValues();
-		
+
 
 	}
-	
+
 	//Since we will change the uris and literals from form, we should make copies
 	//of the original values and store them, this will also make iterations
 	//and updates to the submission independent from accessing the values
@@ -83,7 +83,7 @@ public class ManagePagePreprocessor extends
 		copyMap.putAll(originalMap);
 		return copyMap;
 	}
-	
+
 	private void processExistingValues() {
 		//For all literals that were originally in scope that don't have values on the form
 		//anymore, replace with null value
@@ -93,40 +93,40 @@ public class ManagePagePreprocessor extends
 			Map<String, List<Literal>> literalsInScope = this.editConfiguration.getLiteralsInScope();
 			Map<String, List<String>> urisInScope = this.editConfiguration.getUrisInScope();
 			List<String> literalKeys = new ArrayList<String>(literalsInScope.keySet());
-	
-			
+
+
 			List<String> uriKeys = new ArrayList<String>(urisInScope.keySet());
 			for(String literalName: literalKeys) {
-				
+
 				//if submission already has value for this, then leave be
 				//otherwise replace with null which will not be valid N3
 				//TODO: Replace with better solution for forcing literal deletion
 				boolean haslv = submission.hasLiteralValue(literalName);
 				if(!submission.hasLiteralValue(literalName)) {
-					submission.addLiteralToForm(editConfiguration, 
-							 editConfiguration.getField(literalName), 
-							 literalName, 
+					submission.addLiteralToForm(editConfiguration,
+							 editConfiguration.getField(literalName),
+							 literalName,
 							 (new String[] {null}));
 				}
 			}
-			
-			
+
+
 			for(String uriName: uriKeys) {
 				//these values should never be overwritten or deleted
 				//if(uriName != "page" && uriName != "menuItem" && !uriName.startsWith("dataGetter")) {
 				if(!"page".equals(uriName)) {
 					boolean hasuv = submission.hasUriValue(uriName);
 					if(!submission.hasUriValue(uriName)) {
-						submission.addUriToForm(editConfiguration, 
-								 uriName, 
+						submission.addUriToForm(editConfiguration,
+								 uriName,
 								 (new String[] {EditConfigurationConstants.BLANK_SENTINEL}));
-					}	
+					}
 				}
 			}
 		}
-		
+
 	}
-	
+
 
 	private void processDataGetters() {
 		convertToJson();
@@ -134,7 +134,7 @@ public class ManagePagePreprocessor extends
 		for(ObjectNode jsonObject:pageContentUnitsJSON) {
 			String dataGetterClass = getDataGetterClass(jsonObject);
 			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass, jsonObject);
-			//UPDATE: using class type to indicate class type/ could also get it from 
+			//UPDATE: using class type to indicate class type/ could also get it from
 			//processor but already have it here
 			jsonObject.put("classType", pn.getClassType());
 			//Removing n3 required b/c retracts in edit case depend on both n3 required and n3 optional
@@ -155,22 +155,22 @@ public class ManagePagePreprocessor extends
 			counter++;
 		}
 	}
-	
-	
+
+
 
 	private void addNewResources(ProcessDataGetterN3 pn, int counter) {
 		// TODO Auto-generated method stub
 		List<String> newResources = pn.getNewResources(counter);
 		for(String newResource:newResources) {
 			//Will null get us display vocabulary or something else?
-			
+
 			editConfiguration.addNewResource(newResource, null);
 			//Weirdly enough, the defaultDisplayNS doesn't act as a namespace REALLY
 			//as it first gets assigned as the URI itself and this lead to an error
 			//instead of repetitively trying to get another URI
 			//editConfiguration.addNewResource(newResource, ManagePageGenerator.defaultDisplayNs );
 		}
-		
+
 	}
 
 	private void convertToJson() {
@@ -193,7 +193,7 @@ public class ManagePagePreprocessor extends
 	private void addInputsToSubmission(ProcessDataGetterN3 pn, int counter, ObjectNode jsonObject) {
 		 List<String> literalLabels = pn.getLiteralVarNamesBase();
 		 List<String> uriLabels = pn.getUriVarNamesBase();
-		 
+
 		 for(String literalLabel:literalLabels) {
 			 List<String> literalValues = new ArrayList<String>();
 			 JsonNode jsonValue = jsonObject.get(literalLabel);
@@ -218,13 +218,13 @@ public class ManagePagePreprocessor extends
 			 }
 			 String[] literalValuesSubmission = new String[literalValues.size()];
 			 literalValuesSubmission = literalValues.toArray(literalValuesSubmission);
-			 //This adds literal, connecting the field with 
-			 submission.addLiteralToForm(editConfiguration, 
-					 editConfiguration.getField(submissionLiteralName), 
-					 submissionLiteralName, 
+			 //This adds literal, connecting the field with
+			 submission.addLiteralToForm(editConfiguration,
+					 editConfiguration.getField(submissionLiteralName),
+					 submissionLiteralName,
 					 literalValuesSubmission);
 		 }
-		 
+
 		 for(String uriLabel:uriLabels) {
 			 List<String> uriValues = new ArrayList<String>();
 			 JsonNode jsonValue = jsonObject.get(uriLabel);
@@ -240,7 +240,7 @@ public class ManagePagePreprocessor extends
 				 //multiple values
 				 ArrayNode values = (ArrayNode) jsonObject.get(uriLabel);
 				 uriValues = JacksonUtils.jsonArrayToStrings(values);
-				
+
 			 } else {
 				 //This may include JSON Objects but no way to deal with these right now
 			 }
@@ -249,9 +249,9 @@ public class ManagePagePreprocessor extends
 			 uriValuesSubmission = uriValues.toArray(uriValuesSubmission);
 			 //This adds literal, connecting the field with the value
 			 submission.addUriToForm(editConfiguration, submissionUriName, uriValuesSubmission);
-			 
+
 		 }
-		
+
 		 //To get data getter uris, check if editing an existing set and include those as form inputs
 		 if(editConfiguration.isParamUpdate()) {
 			 //Although this is editing an existing page, new content might have been added which would not include
@@ -270,7 +270,7 @@ public class ManagePagePreprocessor extends
 
 			 }
 		 }
-		
+
 	}
 
 	private void replaceEncodedQuotesInList(ProcessDataGetterN3 pn, List<String> values) {
@@ -305,8 +305,8 @@ public class ManagePagePreprocessor extends
 			}
 		}
 	}
-	
-	
+
+
 
 	//original literals on form: label, uris on form: conceptNode and conceptSource
 	//This will overwrite the original values in the edit configuration
@@ -339,11 +339,11 @@ public class ManagePagePreprocessor extends
 		//Put this method in the generator but can be put elsewhere
 		String pageToDataGetterN3 = ManagePageGenerator.getDataGetterN3(dataGetterVar);
 		return Arrays.asList(pageToDataGetterN3);
-		
+
 	}
 
 	//Add n3 optional
-	
+
 	private void addN3Optional(ProcessDataGetterN3 pn, int counter) {
 		List<String> addList = new ArrayList<String>();
 		//Get required list
@@ -355,28 +355,28 @@ public class ManagePagePreprocessor extends
 		if(requiredList != null) {
 			addList.addAll(requiredList);
 		}
-		
+
 		if(optionalList != null) {
 			addList.addAll(optionalList);
 		}
-		
+
 		editConfiguration.addN3Optional(addList);
 
 	}
-	
-	
+
+
 	//Each JSON Object will indicate the type of the data getter within it
 	private String getDataGetterClass(ObjectNode jsonObject) {
 		String javaURI = jsonObject.get("dataGetterClass").asText();
 		return getQualifiedDataGetterName(javaURI);
-		
-		
+
+
 	}
-	
+
 	//Get rid of java: in front of class name
 	private String getQualifiedDataGetterName(String dataGetterTypeURI) {
 		String javaURI = "java:";
-		
+
 		if(dataGetterTypeURI.startsWith(javaURI)) {
 			int beginIndex = javaURI.length();
 			return dataGetterTypeURI.substring(beginIndex);

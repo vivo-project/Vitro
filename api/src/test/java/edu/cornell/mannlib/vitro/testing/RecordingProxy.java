@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * The create() method creates a dynamic Proxy that wraps your inner object, and
  * implements your interfaze.
- * 
+ *
  * It also implements the MethodCallRecorder interface (although you will need
  * to cast it), so you can find out what methods were called on the proxy.
  */

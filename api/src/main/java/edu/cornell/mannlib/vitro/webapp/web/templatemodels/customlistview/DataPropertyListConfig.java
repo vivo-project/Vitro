@@ -19,20 +19,20 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataProper
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyTemplateModel.ConfigError;
 import freemarker.cache.TemplateLoader;
 
-public class DataPropertyListConfig {  
+public class DataPropertyListConfig {
     private static final Log log = LogFactory.getLog(DataPropertyListConfig.class);
-	
-	
+
+
     private static final String CONFIG_FILE_PATH = "/config/";
     private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-dataDefault.xml";
-    
+
     /* NB The default post-processor is not the same as the post-processor for the default view. The latter
      * actually defines its own post-processor, whereas the default post-processor is used for custom views
      * that don't define a post-processor, to ensure that the standard post-processing applies.
-     * 
+     *
      * edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor
      */
-    
+
     // TODO Lump these together into the PropertyListConfigContext
     private final DataPropertyTemplateModel dptm;
     private final VitroRequest vreq;
@@ -43,8 +43,8 @@ public class DataPropertyListConfig {
     private String selectQuery;
     private String templateName;
 
-    public DataPropertyListConfig(DataPropertyTemplateModel dptm, TemplateLoader templateLoader, VitroRequest vreq, 
-    		DataProperty dp, boolean editing) 
+    public DataPropertyListConfig(DataPropertyTemplateModel dptm, TemplateLoader templateLoader, VitroRequest vreq,
+    		DataProperty dp, boolean editing)
         throws InvalidConfigurationException {
     	this.dptm = dptm;
     	this.vreq = vreq;
@@ -57,42 +57,42 @@ public class DataPropertyListConfig {
             configFileName = DEFAULT_CONFIG_FILE_NAME;
         }
         log.debug("Using list view config file " + configFileName + " for data property " + dp.getURI());
-        
+
         String configFilePath = getConfigFilePath(configFileName);
-        
+
         try {
-            File config = new File(configFilePath);            
+            File config = new File(configFilePath);
             if ( ! isDefaultConfig(configFileName) && ! config.exists() ) {
                 log.warn("Can't find config file " + configFilePath + " for data property " + dp.getURI() + "\n" +
                         ". Using default config file instead.");
                 configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                 // Should we test for the existence of the default, and throw an error if it doesn't exist?
-            }                   
-            setValuesFromConfigFile(configFilePath, wadf, editing);           
+            }
+            setValuesFromConfigFile(configFilePath, wadf, editing);
 
         } catch (Exception e) {
             log.error("Error processing config file " + configFilePath + " for data property " + dp.getURI(), e);
             // What should we do here?
         }
-        
+
         if ( ! isDefaultConfig(configFileName) ) {
             ConfigError configError = checkConfiguration();
             if ( configError != null ) { // the configuration contains an error
-                log.warn("Invalid list view config for data property " + dp.getURI() + 
-                        " in " + configFilePath + ":\n" +                            
+                log.warn("Invalid list view config for data property " + dp.getURI() +
+                        " in " + configFilePath + ":\n" +
                         configError + " Using default config instead.");
                 configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                setValuesFromConfigFile(configFilePath, wadf, editing);                    
+                setValuesFromConfigFile(configFilePath, wadf, editing);
             }
         }
-        
+
         isDefaultConfig = isDefaultConfig(configFileName);
     }
-    
+
     private boolean isDefaultConfig(String configFileName) {
         return configFileName.equals(DEFAULT_CONFIG_FILE_NAME);
     }
-    
+
     private ConfigError checkConfiguration() {
 
         ConfigError error = dptm.checkQuery(selectQuery);
@@ -118,13 +118,13 @@ public class DataPropertyListConfig {
 
         return null;
     }
-    
-    private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf, 
+
+    private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf,
             boolean editing) {
 		try {
 			FileReader reader = new FileReader(configFilePath);
 			CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
-			
+
 			selectQuery = configFileContents.getSelectQuery(false, editing, ListConfigUtils.getUsePreciseSubquery(vreq));
 			templateName = configFileContents.getTemplateName();
 			constructQueries = configFileContents.getConstructQueries();
@@ -133,7 +133,7 @@ public class DataPropertyListConfig {
 			log.error("Error processing config file " + configFilePath, e);
 		}
     }
-    
+
     private String getConfigFilePath(String filename) {
         return vreq.getSession().getServletContext().getRealPath(CONFIG_FILE_PATH + filename);
     }

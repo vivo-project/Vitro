@@ -7,7 +7,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * An immutable key for storing and retrieving OntModels.
- * 
+ *
  * In addition to the usual options, it has a name, which adds to the
  * uniqueness.
  */
@@ -44,5 +44,5 @@ public final class OntModelKey extends ModelAccessKey {
 	public String toString() {
 		return super.toString() + " " + ToString.modelName(name);
 	}
-	
+
 }

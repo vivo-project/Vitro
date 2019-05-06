@@ -37,7 +37,7 @@
     overflow: hidden;
 }
 #individual-intro h1 {
-    padding-bottom: 8px;  
+    padding-bottom: 8px;
 }
 #individual-intro span.display-title {
     padding-left: 10px;
@@ -151,7 +151,7 @@ h1.fn .display-title {
     border: 1px solid #dfebe5;
 }
 .scroll-up {
-   position: absolute; 
+   position: absolute;
    width: 21px;
    height: 30px;
    top: 0;
@@ -275,7 +275,7 @@ input#uriLink {
 a.manageLinks {
     display:none;
 }
-a#manageLabels { 
+a#manageLabels {
     margin-left:20px;
     font-size:0.7em;
 }
@@ -291,7 +291,7 @@ ul.tinyMCEDisc {
 ol.tinyMCENumeric {
     list-style-type: decimal;
 }
-ul.tinyMCEDisc li, 
+ul.tinyMCEDisc li,
 ol.tinyMCENumeric li {
     padding: 0 !important;
     margin-left: 30px;

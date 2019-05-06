@@ -31,7 +31,7 @@ public class Csv2Rdf {
 	private String propertyNameBase;
 	private char separatorChar;
     private char quoteChar;
-	
+
     public Csv2Rdf(char quoteChar, String namespace, String tboxNamespace, String typeName) {
     	this.separatorChar = ',';
 		this.quoteChar = quoteChar;
@@ -41,7 +41,7 @@ public class Csv2Rdf {
 		this.individualNameBase = typeName.toLowerCase();
 		this.propertyNameBase = individualNameBase+"_";
 	}
-    
+
 	public Csv2Rdf(char separatorChar, char quoteChar, String namespace, String tboxNamespace, String typeName) {
 		this.separatorChar = separatorChar;
 		this.quoteChar = quoteChar;
@@ -51,11 +51,11 @@ public class Csv2Rdf {
 		this.individualNameBase = typeName.toLowerCase();
 		this.propertyNameBase = individualNameBase+"_";
 	}
-	
+
 	public Model[] convertToRdf(InputStream fis) throws IOException {
 		return convertToRdf(fis, null, null);
 	}
-	
+
 	public Model[] convertToRdf(InputStream fis, WebappDaoFactory wadf, Model destination) throws IOException {
 		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		OntModel tboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
@@ -99,28 +99,28 @@ public class Csv2Rdf {
 
 		cReader.close();
         ontModel.removeSubModel(tboxOntModel);
-		
+
 		Model[] resultModels = new Model[2];
 		resultModels[0] = ontModel;
 		resultModels[1] = tboxOntModel;
 		return resultModels;
 	}
-	
+
 	private interface URIGenerator {
 		public String getNextURI();
 	}
-	
+
 	private class RandomURIGenerator implements URIGenerator {
-		
+
 		private WebappDaoFactory wadf;
 		private Model destination;
 		private Random random = new Random(System.currentTimeMillis());
-		
+
 		public RandomURIGenerator(WebappDaoFactory webappDaoFactory, Model destination) {
 			this.wadf = webappDaoFactory;
 			this.destination = destination;
 		}
-		
+
 		public String getNextURI() {
 			boolean uriIsGood = false;
 			boolean inDestination = false;
@@ -135,22 +135,22 @@ public class Csv2Rdf {
         			if( errMsg != null && !inDestination)
         				uri = null;
         			else
-        				uriIsGood = true;				
+        				uriIsGood = true;
         			attempts++;
         		}
         	}
         	return uri;
 		}
-		
+
 	}
-	
+
 	private class SequentialURIGenerator implements URIGenerator {
 		private int index = 0;
-		
+
 		public String getNextURI() {
 			index++;
-			return namespace + individualNameBase + Integer.toString(index); 
+			return namespace + individualNameBase + Integer.toString(index);
 		}
 	}
-	
+
 }

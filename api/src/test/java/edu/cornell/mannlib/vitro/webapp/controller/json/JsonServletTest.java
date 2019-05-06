@@ -44,14 +44,14 @@ public class JsonServletTest extends AbstractTestClass {
 
 	/**
 	 * Test plan
-	 * 
+	 *
 	 * <pre>
-	 * 
+	 *
 	 * GetEntitiesByVClass, GetEntitiesByVClassContinuation
 	 * 	from ents_edit.js
 	 * 		ents_edit_head.jsp
 	 *  (there is an ents_edit.jsp, invoked from EntityEditController, which does not seem to invoke ents_edit.js)
-	 * 
+	 *
 	 * GetSearchIndividualsByVClass
 	 * 	Mock out search engine and IndividualDao
 	 *  invoked by BrowseDataGetter.java
@@ -59,7 +59,7 @@ public class JsonServletTest extends AbstractTestClass {
 	 *  invoked by ClassGroupPageData.java
 	 *  	>>>> Bring up "People" tab.
 	 *  invoked by BrowseWidget.java
-	 * 
+	 *
 	 * GetSearchIndividualsByVClasses
 	 * 	Mock out search engine and IndividualDao
 	 *  invoked by IndividualsForClassesDataGetter.java
@@ -70,7 +70,7 @@ public class JsonServletTest extends AbstractTestClass {
 	 *  		MenuManagementEdit.java
 	 *  		MenuManagementController.java
 	 *  	extended in vivo by InternalClassesDataGetter, also invoked by SelectDataGetterUtils
-	 * 
+	 *
 	 * GetDataForPage
 	 * 	Mock out PageDao
 	 * </pre>
@@ -142,7 +142,7 @@ public class JsonServletTest extends AbstractTestClass {
 	 * concrete class instead of an interface, so we can't replace the instance
 	 * with one we like better. Furthermore, VClassGroupCache has a private
 	 * constructor, so we can't change its behavior at all.
-	 * 
+	 *
 	 * Also test: success but no VClasses found, success with one VClass,
 	 * success with multiple VClasses. In each case, confirm proper status,
 	 * character encoding, and content type on the response.

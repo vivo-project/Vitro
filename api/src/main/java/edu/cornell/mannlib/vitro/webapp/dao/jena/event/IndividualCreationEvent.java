@@ -12,13 +12,13 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 
 public class IndividualCreationEvent extends IndividualEditEvent {
-	
-	private static final String INDIVIDUAL_CREATION_EVENT = VitroVocabulary.INDIVIDUAL_CREATION_EVENT; 
-	
+
+	private static final String INDIVIDUAL_CREATION_EVENT = VitroVocabulary.INDIVIDUAL_CREATION_EVENT;
+
 	public IndividualCreationEvent(String userURI, boolean begin, String individualURI) {
 		super(userURI,begin,individualURI);
 	}
-	
+
     public Map<String,List<RDFNode>> getPropertyMap() {
 		Map<String,List<RDFNode>> map = super.getPropertyMap();
 		List<RDFNode> typeValueList = map.get(RDF.type.getURI());
@@ -27,6 +27,6 @@ public class IndividualCreationEvent extends IndividualEditEvent {
 		}
 		typeValueList.add(ResourceFactory.createResource(INDIVIDUAL_CREATION_EVENT));
 		map.put(RDF.type.getURI(),typeValueList);
-		return map;	
+		return map;
 	}
 }

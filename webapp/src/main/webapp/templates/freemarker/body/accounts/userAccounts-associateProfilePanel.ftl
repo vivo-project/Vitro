@@ -10,12 +10,12 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
     <div id="associateProfileBackgroundOne">
         <div id="alignExternalAuthId">
         <#if showAssociation??>
-             <label for="externalAuthId">${strings.auth_matching_id_label}</label> 
+             <label for="externalAuthId">${strings.auth_matching_id_label}</label>
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
             <span id="externalAuthIdInUse" >${strings.auth_id_in_use}</span>
             <p class="explanatoryText">${strings.auth_id_explanation}</p>
         <#else>
-            <label for="externalAuthId">${strings.auth_id_label}</label> 
+            <label for="externalAuthId">${strings.auth_id_label}</label>
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
             <span id="externalAuthIdInUse" >${strings.auth_id_in_use}</span>
         </#if>
@@ -34,7 +34,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
             <input type="hidden" id="associatedProfileUri" name="associatedProfileUri" value="" />
         </div>
     </section>
-            
+
     <#-- If we haven't selected one, show these instead -->
     <section id="associationOptions">
         <div id="associateProfileBackgroundThree">
@@ -45,14 +45,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
         </div>
         <div id="associateProfileBackgroundFour">
             <p> - ${strings.or} - </p>
-            <p> 
-                <label for="">${strings.create_associated_profile}</label> 
+            <p>
+                <label for="">${strings.create_associated_profile}</label>
                 <select name="newProfileClassUri" id="newProfileClassUri" >
                     <option value="" selected="selected">${strings.select_one}</option>
                     <#list profileTypes?keys as key>
-                        <option value="${key}" <#if newProfileClassUri = key> selected </#if> >${profileTypes[key]}</option>           
-                    </#list>    
-                </select>    
+                        <option value="${key}" <#if newProfileClassUri = key> selected </#if> >${profileTypes[key]}</option>
+                    </#list>
+                </select>
             </p>
         </div>
     </section>
@@ -61,14 +61,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
 var associateProfileFieldsData = {
     <#if userUri??>
         userUri: '${userUri}' ,
-    <#else>    
+    <#else>
         userUri: '' ,
     </#if>
-    
+
     <#if associationIsReset??>
         associationIsReset: 'true' ,
     </#if>
-    
+
     <#if associatedProfileInfo??>
         associatedProfileInfo: {
             label: '${associatedProfileInfo.label}',
@@ -76,7 +76,7 @@ var associateProfileFieldsData = {
             url: '${associatedProfileInfo.url}'
         },
     </#if>
-    
+
     <#if showAssociation??>
         associationEnabled: true ,
     </#if>
@@ -86,5 +86,5 @@ var associateProfileFieldsData = {
 </script>
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/account/accountAssociateProfile.js"></script>')}   
+              '<script type="text/javascript" src="${urls.base}/js/account/accountAssociateProfile.js"></script>')}
 

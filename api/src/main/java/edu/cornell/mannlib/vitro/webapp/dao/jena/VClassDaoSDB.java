@@ -29,29 +29,29 @@ public class VClassDaoSDB extends VClassDaoJena {
 
 	private DatasetWrapperFactory dwf;
 	private SDBDatasetMode datasetMode;
-	
-    public VClassDaoSDB(DatasetWrapperFactory datasetWrapperFactory, 
+
+    public VClassDaoSDB(DatasetWrapperFactory datasetWrapperFactory,
                         SDBDatasetMode datasetMode,
                         WebappDaoFactoryJena wadf, boolean isUnderlyingStoreReasoned) {
         super(wadf, isUnderlyingStoreReasoned);
         this.dwf = datasetWrapperFactory;
         this.datasetMode = datasetMode;
     }
-    
+
     protected DatasetWrapper getDatasetWrapper() {
     	return dwf.getDatasetWrapper();
     }
-    
+
     @Deprecated
     public void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses, boolean getIndividualCount) {
-        
+
         if (getIndividualCount) {
             group.setIndividualCount( getClassGroupInstanceCount(group));
-        } 
-        
+        }
+
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            if ((group != null) && (group.getURI() != null)) {                                
+            if ((group != null) && (group.getURI() != null)) {
                 Resource groupRes = ResourceFactory.createResource(group.getURI());
                 Property inClassGroup = ResourceFactory.createProperty(VitroVocabulary.IN_CLASSGROUP);
                 if (inClassGroup != null) {
@@ -64,8 +64,8 @@ public class VClassDaoSDB extends VClassDaoJena {
                                 VClass vcw = getVClassByURI(cls.getURI());
                                 if (vcw != null) {
                                     boolean classIsInstantiated = false;
-                                    if (getIndividualCount) {                                                                            
-                                    	int count = 0;                                    	
+                                    if (getIndividualCount) {
+                                    	int count = 0;
                                 	    String[] graphVars = { "?g" };
                                 		String countQueryStr = "SELECT COUNT(DISTINCT ?s) WHERE \n" +
                                 		                       "{ GRAPH ?g { ?s a <" + cls.getURI() + "> } \n" +
@@ -74,7 +74,7 @@ public class VClassDaoSDB extends VClassDaoJena {
                                 		Query countQuery = QueryFactory.create(countQueryStr, Syntax.syntaxARQ);
                                 		DatasetWrapper w = getDatasetWrapper();
                                 		Dataset dataset = w.getDataset();
-                                		dataset.getLock().enterCriticalSection(Lock.READ);                                    		
+                                		dataset.getLock().enterCriticalSection(Lock.READ);
                                 		try {
                                     		QueryExecution qe = QueryExecutionFactory.create(countQuery, dataset);
                                     		ResultSet rs = qe.execSelect();
@@ -86,7 +86,7 @@ public class VClassDaoSDB extends VClassDaoJena {
                                     	vcw.setEntityCount(count);
                                     	classIsInstantiated = (count > 0);
                                     } else if (!includeUninstantiatedClasses) {
-                                        // Note: to support SDB models, may want to do this with 
+                                        // Note: to support SDB models, may want to do this with
                                         // SPARQL and LIMIT 1 if SDB can take advantage of it
                                     	Model aboxModel = getOntModelSelector().getABoxModel();
                                     	aboxModel.enterCriticalSection(Lock.READ);
@@ -103,7 +103,7 @@ public class VClassDaoSDB extends VClassDaoJena {
                                     		aboxModel.leaveCriticalSection();
                                     	}
                                     }
-                                    
+
                                     if (includeUninstantiatedClasses || classIsInstantiated) {
                                         group.add(vcw);
                                     }
@@ -122,23 +122,23 @@ public class VClassDaoSDB extends VClassDaoJena {
             getOntModel().leaveCriticalSection();
         }
     }
-        
+
 //    protected void addIndividualCountToGroups( List<VClassGroup> cgList ){
-//        for( VClassGroup cg : cgList){           
+//        for( VClassGroup cg : cgList){
 //            cg.setIndividualCount(getClassGroupInstanceCount(cg));
-//        }        
+//        }
 //    }
-    
+
     @Override
     int getClassGroupInstanceCount(VClassGroup vcg){
-        int count = 0;               
+        int count = 0;
         try {
-            String queryText =              
+            String queryText =
                 "SELECT COUNT( DISTINCT ?instance ) WHERE { \n" +
-                "      ?class <"+VitroVocabulary.IN_CLASSGROUP+"> <"+vcg.getURI() +"> .\n" +                
+                "      ?class <"+VitroVocabulary.IN_CLASSGROUP+"> <"+vcg.getURI() +"> .\n" +
                 "      ?instance a ?class .  \n" +
                 "} \n" ;
-            
+
             Query countQuery = QueryFactory.create(queryText, Syntax.syntaxARQ);
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
@@ -153,10 +153,10 @@ public class VClassDaoSDB extends VClassDaoJena {
             }
         }catch(Exception ex){
             log.error("error in getClassGroupInstanceCount()", ex);
-        }    
-        
+        }
+
         return count;
     }
 
-    
+
 }

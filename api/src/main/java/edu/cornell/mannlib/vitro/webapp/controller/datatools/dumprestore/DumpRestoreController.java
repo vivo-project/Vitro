@@ -26,11 +26,11 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 /**
  * Allow the user to dump the knowledge base from either RDFService, or restore
  * it.
- * 
+ *
  * Show the user the selection page. If they select "dump" parameters, redirect
  * to an appropriate filename-based URL, so they will receive a nicely named
  * file. If they chose to "restore", just do it.
- * 
+ *
  * The first request, the selection and the redirected dump should all be GET
  * requests. A restore should be a POST request.
  */

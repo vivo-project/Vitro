@@ -18,16 +18,16 @@ public class ObjectPropertyStatementDaoJenaTest {
      */
     @Test
     public void testN3WithSameAs() {
-        
+
         String n3WithSameAs = " <http://example.com/bob> = <http://example.com/robert> .";
-        
+
         try{
             Model m = ModelFactory.createDefaultModel();
             m.read(n3WithSameAs, null, "N3");
             fail( "If this test fails it means that jena now correctly parses = when reading N3.");
         }catch(Exception ex ){
-            
-            
+
+
         }
     }
 

@@ -106,16 +106,16 @@ dojo.lang.extend(dojo.widget.html.DocPane, {
 				appends.push(this.vParent.appendChild(this.vSave.cloneNode(true)));
 			}
 		}
-		
+
 		this.sParams.innerHTML = "";
 		for(var param in parameters){
 			var paramType = parameters[param][0];
 			var paramName = parameters[param][1];
-			this.parameters.style.display = "block";		
+			this.parameters.style.display = "block";
 			this.pLink.innerHTML = paramName;
 			this.pOpt.style.display = "none";
 			if(parameters[param].opt){
-				this.pOpt.style.display = "inline";				
+				this.pOpt.style.display = "inline";
 			}
 			this.pType.parentNode.style.display = "none";
 			if(parameters[param][0]){
@@ -128,7 +128,7 @@ dojo.lang.extend(dojo.widget.html.DocPane, {
 				this.pDesc.innerHTML = doc.parameters[paramName].description;
 			}
 			appends.push(this.pParent.appendChild(this.pSave.cloneNode(true)));
-			
+
 			if(param > 0) {
 				this.sParams.appendChild(document.createTextNode(", "));
 			}
@@ -148,14 +148,14 @@ dojo.lang.extend(dojo.widget.html.DocPane, {
 		}else{
 			this.sType.innerHTML = "void";
 		}
-		
+
 		this.sName.innerHTML = message.name;
-		
+
 		dojo.dom.removeChildren(this.source);
                 this.source.appendChild(document.createTextNode("\n\r"));
 		this.source.appendChild(document.createTextNode(message.src.replace(/\n/g, "\r\n\t")));
                 this.source.appendChild(document.createTextNode("\n\r"));
-		
+
 		this.domNode.appendChild(this.selectSave.cloneNode(true));
 
 		for(var i = 0, append; append = appends[i]; i++){
@@ -165,7 +165,7 @@ dojo.lang.extend(dojo.widget.html.DocPane, {
 
 	onDocResults: function(message){
 		var results = message.docResults;
-		
+
 		if(results.length == 1){
 			dojo.event.topic.publish("/doc/selectFunction", results[0]);
 			return;
@@ -179,16 +179,16 @@ dojo.lang.extend(dojo.widget.html.DocPane, {
 			this.fnLink.innerHTML = row.name;
 			this.fnLink.href = "#" + row.name;
 			if(row.id){
-				this.fnLink.href = this.fnLink.href + "," + row.id;	
+				this.fnLink.href = this.fnLink.href + "," + row.id;
 			}
 			this.summary.parentNode.style.display = "none";
 			if(row.summary){
-				this.summary.parentNode.style.display = "inline";				
+				this.summary.parentNode.style.display = "inline";
 				this.summary.innerHTML = row.summary;
 			}
 			appends.push(this.rowParent.appendChild(this.rowSave.cloneNode(true)));
 		}
-		
+
 		function makeSelect(x){
 			return function(e) {
 				dojo.event.topic.publish("/doc/selectFunction", x);
@@ -200,7 +200,7 @@ dojo.lang.extend(dojo.widget.html.DocPane, {
 		for(var i = 0, a; a = as[i]; i++){
 			dojo.event.connect(a, "onclick", makeSelect(results[i]));
 		}
-		
+
 		for(var i = 0, append; append = appends[i]; i++){
 			this.rowParent.removeChild(append);
 		}

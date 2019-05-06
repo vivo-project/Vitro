@@ -4,7 +4,7 @@
 
 <section role="region">
     <h2>${i18n().unrecognized_user}</h2>
-    
+
     <p>
       ${i18n().no_individual_associated_with_id(siteName!)}
     </p>

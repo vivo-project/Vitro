@@ -10,7 +10,7 @@ public interface TBoxReasonerStatus {
 	 * Is reasoning in progress based on changes to the TBox?
 	 */
 	boolean isReasoning();
-	
+
 	/**
 	 * Is the TBox free of inconsistency?
 	 */

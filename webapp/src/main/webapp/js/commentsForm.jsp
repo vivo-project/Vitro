@@ -1,4 +1,4 @@
-<%-- $This file is distributed under the terms of the license in LICENSE$ --%> 
+<%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <%
     String contextPath = request.getContextPath();

@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExclud
 /**
  * Get the URIs of all individuals in the model. Update each of their search
  * documents.
- * 
+ *
  * Delete all search documents that have not been updated since this rebuild
  * began. That removes all obsolete documents from the index.
  */

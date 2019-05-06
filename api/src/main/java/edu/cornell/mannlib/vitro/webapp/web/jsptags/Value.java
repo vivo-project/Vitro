@@ -26,7 +26,7 @@ public class Value extends TagSupport {
 
 
     public int doStartTag() {
-    
+
             throw new Error("Value tag is no longer supported, Use InputElementFormating ");
 
 

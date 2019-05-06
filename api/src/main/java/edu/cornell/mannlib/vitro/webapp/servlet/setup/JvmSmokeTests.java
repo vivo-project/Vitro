@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Test that the JVM is properly configured.
- * 
+ *
  * For now, we just test the temp directory. Other
  */
 public class JvmSmokeTests implements ServletContextListener {
@@ -45,7 +45,7 @@ public class JvmSmokeTests implements ServletContextListener {
 	/**
 	 * Check the Java temp directory. Make sure that it exists, it is a
 	 * directory, we can read it, we can write to it.
-	 * 
+	 *
 	 * Create a temp file, and delete it.
 	 */
 	private void checkTempDirectory(StartupStatus ss) {

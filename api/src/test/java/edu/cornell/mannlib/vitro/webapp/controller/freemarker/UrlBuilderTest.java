@@ -20,26 +20,26 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class UrlBuilderTest extends AbstractTestClass {
-    
+
     @Test
     public void testGetUrl() {
         UrlBuilder.contextPath = "/vivo";
-        
+
         String path1 = "/individual";
         Assert.assertEquals("/vivo/individual", UrlBuilder.getUrl(path1));
-        
+
         int portalId = 1;
         String path2 = "/individual?home=" + portalId;
         Assert.assertEquals("/vivo/individual?home=1", UrlBuilder.getUrl(path2));
     }
-    
+
     @Test
     public void testGetUrlWithEmptyContext() {
         UrlBuilder.contextPath = "";
         String path = "/individual";
         Assert.assertEquals(path, UrlBuilder.getUrl(path));
     }
-    
+
     @Test
     public void testGetUrlWithParams() {
         UrlBuilder.contextPath = "/vivo";
@@ -58,16 +58,16 @@ public class UrlBuilderTest extends AbstractTestClass {
         ParamMap params = new ParamMap();
         String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember";
         params.put("vclassId", vClassUri);
-        Assert.assertEquals("/vivo/individuallist?vclassId=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember", UrlBuilder.getUrl(path, params));    
+        Assert.assertEquals("/vivo/individuallist?vclassId=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember", UrlBuilder.getUrl(path, params));
     }
-    
+
     @Test
     public void testDecodeUrl() {
         String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember";
         String vClassUriEncoded = "http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember";
-        Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
+        Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));
     }
-    
+
 
     @Test
     public void testUtf8Encode(){
@@ -83,43 +83,43 @@ public class UrlBuilderTest extends AbstractTestClass {
     public void testDecodeUtf8Url() {
         String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember\u2605"; // \u2605 is Unicode for a five-pointed star.
         String vClassUriEncoded = "http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember%E2%98%85";
-        Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
+        Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));
     }
 
-    
-    @Test 
+
+    @Test
     public void testGetIndividualProfileURI(){
         VitroRequest vreq = makeMockVitroRequest( "http://example.com/individual/");
         UrlBuilder.contextPath = "http://example.com";
-        
+
         String uri = "http://example.com/individual/n2343";
         String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
         Assert.assertEquals("http://example.com/display/n2343", url);
-                
-        uri = "http://example.com/individual/bob";                
+
+        uri = "http://example.com/individual/bob";
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
         Assert.assertEquals("http://example.com/display/bob",url);
-        
-        uri = "http://nondefaultNS.com/individual/n2343";                
+
+        uri = "http://nondefaultNS.com/individual/n2343";
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
         Assert.assertEquals("http://example.com/individual?uri=" + URLEncoder.encode(uri), url);
-        
-        uri = "http://example.com/individual#n2343";                
+
+        uri = "http://example.com/individual#n2343";
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
         Assert.assertEquals("http://example.com/individual?uri=" + URLEncoder.encode(uri), url);
-        
-        uri = "http://example.com/individual/5LNCannotStartWithNumber";                
+
+        uri = "http://example.com/individual/5LNCannotStartWithNumber";
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
-        Assert.assertEquals("http://example.com/individual?uri=" + URLEncoder.encode(uri), url);        
+        Assert.assertEquals("http://example.com/individual?uri=" + URLEncoder.encode(uri), url);
     }
-    
-    protected VitroRequest makeMockVitroRequest( final String defaultNS){        
-        HttpServletRequest req = createMock( HttpServletRequest.class );        
+
+    protected VitroRequest makeMockVitroRequest( final String defaultNS){
+        HttpServletRequest req = createMock( HttpServletRequest.class );
         return new VitroRequest(req){
-            
+
             @Override
             public String getParameter(String key){ return null; }
-            
+
             @Override
             public WebappDaoFactory getWebappDaoFactory(){
                 return makeMockWDF(defaultNS);
@@ -131,34 +131,34 @@ public class UrlBuilderTest extends AbstractTestClass {
         wdf.setDefaultNamespace("http://example.com/individual/");
         ApplicationDaoStub aDao = new ApplicationDaoStub(){
             @Override
-            public boolean isExternallyLinkedNamespace(String ns){                
+            public boolean isExternallyLinkedNamespace(String ns){
                 return false;
             }
-        };        
+        };
         wdf.setApplicationDao( aDao );
         return wdf;
     }
-    
+
     @Test
-    public void testIsUriInDefaultNamespace(){        
+    public void testIsUriInDefaultNamespace(){
         String[][] examples = {
                 { "http://example.com/individual/n3234", "http://example.com/individual/"},
                 { "http://example.com/individual#n3234", "http://example.com/individual#"},
                 { "http://example.com:8080/individual/n3234", "http://example.com:8080/individual/"},
-                { "http://example.com:8080/individual#n3234", "http://example.com:8080/individual#"}                
+                { "http://example.com:8080/individual#n3234", "http://example.com:8080/individual#"}
         };
 
         for( String[] example : examples ){
             Assert.assertTrue("expected '"+ example[0] + "' to be in the default NS of '"+example[1]+"'",
-                    UrlBuilder.isUriInDefaultNamespace(example[0], example[1]));    
-        }            
-        
-        String[][] counterExamples = {                
+                    UrlBuilder.isUriInDefaultNamespace(example[0], example[1]));
+        }
+
+        String[][] counterExamples = {
                 { "http://example.com/individual/5LNCannotStartWithNumber", "http://example.com/individual/" }
         };
         for( String[] example : counterExamples ){
             Assert.assertFalse("expected '"+ example[0] + "' to NOT be in the default NS of '"+example[1]+"'",
-                    UrlBuilder.isUriInDefaultNamespace(example[0], example[1]));    
+                    UrlBuilder.isUriInDefaultNamespace(example[0], example[1]));
         }
     }
 

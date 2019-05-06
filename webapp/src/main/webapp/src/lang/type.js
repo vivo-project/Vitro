@@ -60,30 +60,30 @@ dojo.lang.isNumeric = function(wh){
 }
 
 /**
- * Returns true for any literal, and for any object that is an 
- * instance of a built-in type like String, Number, Boolean, 
+ * Returns true for any literal, and for any object that is an
+ * instance of a built-in type like String, Number, Boolean,
  * Array, Function, or Error.
  */
 dojo.lang.isBuiltIn = function(wh){
-	return (dojo.lang.isArray(wh)		|| 
-			dojo.lang.isFunction(wh)	|| 
-			dojo.lang.isString(wh)		|| 
-			dojo.lang.isNumber(wh)		|| 
-			dojo.lang.isBoolean(wh)		|| 
-			(wh == null)				|| 
-			(wh instanceof Error)		|| 
+	return (dojo.lang.isArray(wh)		||
+			dojo.lang.isFunction(wh)	||
+			dojo.lang.isString(wh)		||
+			dojo.lang.isNumber(wh)		||
+			dojo.lang.isBoolean(wh)		||
+			(wh == null)				||
+			(wh instanceof Error)		||
 			(typeof wh == "error") );
 }
 
 /**
- * Returns true for any object where the value of the 
- * property 'constructor' is 'Object'.  
- * 
+ * Returns true for any object where the value of the
+ * property 'constructor' is 'Object'.
+ *
  * Examples:
  * <pre>
  *   dojo.lang.isPureObject(new Object()); // returns true
  *   dojo.lang.isPureObject({a: 1, b: 2}); // returns true
- * 
+ *
  *   dojo.lang.isPureObject(new Date());   // returns false
  *   dojo.lang.isPureObject([11, 2, 3]);   // returns false
  * </pre>
@@ -208,19 +208,19 @@ dojo.lang.isOfType = function(value, type) {
 dojo.lang.getObject=function(/* String */ str){
 	//	summary
 	//	Will return an object, if it exists, based on the name in the passed string.
-	var parts=str.split("."), i=0, obj=dj_global; 
-	do{ 
-		obj=obj[parts[i++]]; 
-	}while(i<parts.length&&obj); 
+	var parts=str.split("."), i=0, obj=dj_global;
+	do{
+		obj=obj[parts[i++]];
+	}while(i<parts.length&&obj);
 	return (obj!=dj_global)?obj:null;	//	Object
 }
 
 dojo.lang.doesObjectExist=function(/* String */ str){
 	//	summary
 	//	Check to see if object [str] exists, based on the passed string.
-	var parts=str.split("."), i=0, obj=dj_global; 
-	do{ 
-		obj=obj[parts[i++]]; 
-	}while(i<parts.length&&obj); 
+	var parts=str.split("."), i=0, obj=dj_global;
+	do{
+		obj=obj[parts[i++]];
+	}while(i<parts.length&&obj);
 	return (obj&&obj!=dj_global);	//	boolean
 }

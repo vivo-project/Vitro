@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 
 /**
  * Get more information (class label and image URL) about a selected proxy.
- * 
+ *
  * If there is no image URL, just omit it from the result. The proxy already has
  * a placeholder image.
  */

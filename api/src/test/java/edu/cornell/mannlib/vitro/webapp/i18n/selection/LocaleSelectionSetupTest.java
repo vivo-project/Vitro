@@ -146,7 +146,7 @@ public class LocaleSelectionSetupTest extends AbstractTestClass {
 		expectForced("es");
 		expectMessages(1, 0, 0);
 	}
-	
+
 	@Test
 	public void forceSuccessL_C() {
 		props.setProperty(PROPERTY_FORCE_LOCALE, "es_ES");
@@ -154,7 +154,7 @@ public class LocaleSelectionSetupTest extends AbstractTestClass {
 		expectForced("es_ES");
 		expectMessages(1, 0, 0);
 	}
-	
+
 	@Test
 	public void forceSuccessL_C_V() {
 		props.setProperty(PROPERTY_FORCE_LOCALE, "no_NO_NY");

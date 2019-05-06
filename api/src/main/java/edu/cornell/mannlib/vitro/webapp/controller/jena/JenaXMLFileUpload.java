@@ -42,14 +42,14 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 	Log log = LogFactory.getLog(JenaXMLFileUpload.class);
 	private String baseDirectoryForFiles;
 	private int maxFileSize = 1024 * 1024 * 500;
-	
+
 	private XsltExecutable xsltExec;
 	private Processor processor;
-	
+
 	public void init() throws ServletException {
 		super.init();
 		File baseDir = new File( getServletContext().getRealPath("/xmlFileUpload"));
-		
+
 		if( baseDir.exists() && baseDir.isDirectory() ){
 			System.out.println("JenaXMLFileUpload, found upload directory of " + baseDir.getAbsolutePath());
 		}else{
@@ -62,9 +62,9 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 			}
 		}
 		baseDirectoryForFiles = baseDir.getAbsolutePath();
-				
+
 		File xslt = new File(getServletContext().getRealPath("/xslt/xml2rdf.xsl"));
-		System.out.println("JenaXMLFileUpload, attempting to load xslt " + xslt.getAbsolutePath()); 				
+		System.out.println("JenaXMLFileUpload, attempting to load xslt " + xslt.getAbsolutePath());
 		processor = new Processor(false);
 		XsltCompiler compiler  = processor.newXsltCompiler();
 		try {
@@ -73,7 +73,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		} catch (SaxonApiException e) {
 			System.out.println("could not compile xslt/xml2rdf.xsl" );
 			System.out.println(e.getMessage());
-		}		
+		}
 	}
 
 	@Override
@@ -89,16 +89,16 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 	/**
 	 * Each file will be converted to RDF/XML and loaded to the target model.
 	 * If any of the files fail, no data will be loaded.
-	 * 
+	 *
 	 * parameters:
 	 * targetModel - model to save to
 	 * defaultNamespace - namespace to use for elements in xml that lack a namespace
-	 * 
+	 *
 	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse resp)
 	throws ServletException, IOException {
-		VitroRequest vreq = new VitroRequest(request);        
+		VitroRequest vreq = new VitroRequest(request);
 		if (vreq.hasFileSizeException()) {
 			throw new ServletException("Size limit exceeded: "
 					+ vreq.getFileSizeException().getLocalizedMessage());
@@ -116,35 +116,35 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         }
 
         ModelMaker modelMaker = getModelMaker(vreq);
-        String targetModel = request.getParameter("targetModel");               
+        String targetModel = request.getParameter("targetModel");
 		if (targetModel == null) {
 			throw new ServletException("targetModel not specified.");
 		}
-        
+
         Model m = modelMaker.getModel(targetModel);
         if( m == null )
         	throw new ServletException("targetModel '" + targetModel + "' was not found.");
         request.setAttribute("targetModel", targetModel);
-        
-        List<File> filesToLoad = saveFiles( vreq.getFiles() );    
+
+        List<File> filesToLoad = saveFiles( vreq.getFiles() );
         List<File> rdfxmlToLoad = convertFiles( filesToLoad);
         List<Model> modelsToLoad = loadRdfXml( rdfxmlToLoad );
-    
-        try{        
+
+        try{
         	m.enterCriticalSection(Lock.WRITE);
 			for(Model model : modelsToLoad ){
 				m.add(model);
 			}
-        } finally { 
+        } finally {
         	m.leaveCriticalSection();
         }
-        
+
         long count = countOfStatements(modelsToLoad);
-        request.setAttribute("statementCount", count);        	
-		
+        request.setAttribute("statementCount", count);
+
 		request.setAttribute("title","Uploaded files and converted to RDF");
 
-		request.setAttribute("fileItems",vreq.getFiles());				
+		request.setAttribute("fileItems",vreq.getFiles());
 
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
@@ -156,22 +156,22 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
             e.printStackTrace(System.out);
         }
 	}
-	
-	@Override	
+
+	@Override
 	public void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {		
+			HttpServletResponse response) throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
         	return;
         }
 
 		VitroRequest vreq = new VitroRequest(request);
-		
+
 		//make a form for uploading a file
 		request.setAttribute("title","Upload file and convert to RDF");
 
 		request.setAttribute("modelNames", getModelMaker(vreq).listModels().toList());
-		request.setAttribute("models", null);				
+		request.setAttribute("models", null);
 
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
@@ -182,13 +182,13 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
             System.out.println(e.getMessage());
 			e.printStackTrace(System.out);
         }
-		
+
 	}
 
 	private List<Model> loadRdfXml(List<File> rdfxmlToLoad) throws ServletException {
 		List<Model> models = new ArrayList<Model>(rdfxmlToLoad.size());
 		for( File file: rdfxmlToLoad){
-			Model tempModel = ModelFactory.createDefaultModel();		
+			Model tempModel = ModelFactory.createDefaultModel();
 			try {
 				tempModel.read(new FileInputStream(file), null);
 				models.add(tempModel);
@@ -203,10 +203,10 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		List<File> rdfxmlFiles = new ArrayList<File>(filesToLoad.size());
 		for( File file: filesToLoad){
 			try {
-				//look for an example of this in S9APIExamples.java from saxon he 9 
+				//look for an example of this in S9APIExamples.java from saxon he 9
 				XsltTransformer t = xsltExec.load();
 				//this is how to set parameters:
-				//t.setParameter(new QName("someparametername"), new XdmAtomicValue(10));				
+				//t.setParameter(new QName("someparametername"), new XdmAtomicValue(10));
 				Serializer out = new Processor(false).newSerializer();
 				out.setOutputProperty(Serializer.Property.METHOD, "xml");
 				out.setOutputProperty(Serializer.Property.INDENT, "yes");
@@ -219,7 +219,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 			} catch (SaxonApiException e) {
 				log.error("could not convert " + file.getAbsolutePath() + " to RDF/XML: " + e.getMessage());
 				throw new ServletException("could not convert " + file.getAbsolutePath() + " to RDF/XML: " + e.getMessage());
-			}			
+			}
 		}
 		return rdfxmlFiles;
 	}
@@ -231,8 +231,8 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 	 */
 	private List<File> saveFiles( Map<String, List<FileItem>> fileStreams ) throws ServletException{
 	    // save files to disk
-        List<File> filesToLoad = new ArrayList<File>();                
-        for(String fileItemKey : fileStreams.keySet()){        	
+        List<File> filesToLoad = new ArrayList<File>();
+        for(String fileItemKey : fileStreams.keySet()){
         	for( FileItem fileItem : fileStreams.get(fileItemKey)){
         		String originalName = fileItem.getName();
         		String name = originalName.replaceAll("[,+\\\\/$%^&*#@!<>'\"~;]", "_");
@@ -267,16 +267,16 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         			throw new ServletException("No file was uploaded or file was empty.");
         		}else{
         			filesToLoad.add( uploadedFile );
-        		}        		
+        		}
         	}
         }
         return filesToLoad;
 	}
 
 	private long countOfStatements( List<Model> models){
-		
+
 		long count =0;
-		for( Model m : models){			
+		for( Model m : models){
 			StmtIterator it = m.listStatements();
 			while( it.hasNext()){
 				it.next();
@@ -285,7 +285,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 			it.close();
 		}
 		return count;
-		
+
 	}
-	
+
 }

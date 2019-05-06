@@ -37,9 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 /**
  * This servlet is for servicing Google Refine's
  * "Add columns from VIVO" requests.
- * 
+ *
  * @author Eliza Chan (elc2013@med.cornell.edu)
- * 
+ *
  */
 @WebServlet(name = "Google Refine Property List Service", urlPatterns = {"/get_properties_of_type"} )
 public class GrefinePropertyListServlet extends VitroHttpServlet {
@@ -48,7 +48,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 	public static final int MAX_QUERY_LENGTH = 500;
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory.getLog(GrefinePropertyListServlet.class.getName());
-	
+
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -63,22 +63,22 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 		super.doGet(req, resp);
 		resp.setContentType("application/json");
 		VitroRequest vreq = new VitroRequest(req);
-  
+
 		try {
 
 				String callbackStr = (vreq.getParameter("callback") == null) ? ""
 						: vreq.getParameter("callback");
 				ServletOutputStream out = resp.getOutputStream();
 
-		
+
 				VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 				DataPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
 				String topUri = vreq.getParameter("type");
 				VClass topClass = vcDao.getVClassByURI(topUri);
 				HashSet<String> propURIs = new HashSet<String>();
-				HashMap<VClass, List<DataProperty>> classPropertiesMap = 
+				HashMap<VClass, List<DataProperty>> classPropertiesMap =
 					populateClassPropertiesMap(vcDao, dao, topUri, propURIs);
-				
+
 
 				// Construct json String
 				ObjectNode completeJson = JsonNodeFactory.instance.objectNode();
@@ -86,7 +86,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 				if (classPropertiesMap.size() > 0) {
 					for (VClass vc : classPropertiesMap.keySet()) { // add results to schema
 						//System.out.println("vc uri: " + vc.getURI());
-						//System.out.println("vc name: " + vc.getName());	
+						//System.out.println("vc name: " + vc.getName());
 
 						ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>) classPropertiesMap.get(vc);
 						for (DataProperty prop : vcProps) {
@@ -115,7 +115,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 						}
 					}
 				}
-	            
+
 
 				// get data properties from subclasses
 				List<VClass> lvl2Classes = new ArrayList<VClass>();
@@ -141,11 +141,11 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 			            }
 			        }
 				}
-				
+
 
 				for (VClass lvl2Class: lvl2Classes) {
-					HashMap<VClass, List<DataProperty>> lvl2ClassPropertiesMap = 
-						populateClassPropertiesMap(vcDao, dao, lvl2Class.getURI(), propURIs);	
+					HashMap<VClass, List<DataProperty>> lvl2ClassPropertiesMap =
+						populateClassPropertiesMap(vcDao, dao, lvl2Class.getURI(), propURIs);
 					if (lvl2ClassPropertiesMap.size() > 0) {
 						for (VClass vc : lvl2ClassPropertiesMap.keySet()) { // add results to schema
 							ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>) lvl2ClassPropertiesMap.get(vc);
@@ -178,25 +178,25 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 								propertiesJsonArr.add(propertiesItemJson);
 							}
 						}
-						
+
 					}
 				}
 
 				completeJson.put("properties", propertiesJsonArr);
 				out.print(callbackStr + "(" + completeJson.toString() + ")");
-				
+
 
 
 		} catch (Exception ex) {
 			log.warn(ex, ex);
 		}
 	}
-	
+
 
 	private HashMap<VClass, List<DataProperty>> populateClassPropertiesMap (
-			VClassDao vcDao, 
-			DataPropertyDao dao, 
-			String uri, 
+			VClassDao vcDao,
+			DataPropertyDao dao,
+			String uri,
 			HashSet<String> propURIs) {
 
 		HashMap<VClass, List<DataProperty>> classPropertiesMap = new HashMap<VClass, List<DataProperty>>();
@@ -212,8 +212,8 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 				}
 			}
 		}
-        
-    	
+
+
         if (props.size() > 0) {
 
         	Collections.sort(props);
@@ -240,7 +240,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
             				newList.add(prop);
             				classPropertiesMap.put(topVc, newList);
             			}
-            		}							
+            		}
 				}
         	}
         }
@@ -249,7 +249,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 
 	    private void addChildren(VClassDao vcDao, WebappDaoFactory wadf, VClass parent, List<VClass> list, int position, String ontologyUri) {
 	    	List<VClass> rowElts = addVClassDataToResultsList(wadf, parent, position, ontologyUri);
-	    	int childShift = (rowElts.size() > 0) ? 1 : 0;  // if addVClassDataToResultsList filtered out the result, don't shift the children over 
+	    	int childShift = (rowElts.size() > 0) ? 1 : 0;  // if addVClassDataToResultsList filtered out the result, don't shift the children over
 	    	list.addAll(rowElts);
 	        List childURIstrs = vcDao.getSubClassURIs(parent.getURI());
 	        if ((childURIstrs.size()>0) && position<MAXDEPTH) {
@@ -294,20 +294,20 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 	            }
 	            numCols = addColToResults(((vcw.getShortDef() == null) ? "" : vcw.getShortDef()), results, numCols); // column 3
 	            numCols = addColToResults(((vcw.getExample() == null) ? "" : vcw.getExample()), results, numCols); // column 4
-	            
+
 	            // Get group name if it exists
 	            VClassGroupDao groupDao= wadf.getVClassGroupDao();
 	            String groupURI = vcw.getGroupURI();
 	            String groupName = null;
 	            VClassGroup classGroup = null;
-	            if(groupURI != null) { 
+	            if(groupURI != null) {
 	            	classGroup = groupDao.getGroupByURI(groupURI);
 	            	if (classGroup != null) {
 	            		groupName = classGroup.getPublicName();
 	            	}
 	            }
 	            numCols = addColToResults(((groupName == null) ? "" : groupName), results, numCols); // column 5
-	      
+
 	            // Get ontology name
 				String ontName = null;
 				try {
@@ -316,7 +316,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 	            	ontName = ont.getName();
 				} catch (Exception e) {}
 	            numCols = addColToResults(((ontName == null) ? "" : ontName), results, numCols); // column 6
-	            
+
 	            numCols = addColToResults(vcw.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : vcw.getHiddenFromDisplayBelowRoleLevel().getShorthand(), results, numCols); // column 7
 	            numCols = addColToResults(vcw.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : vcw.getProhibitedFromUpdateBelowRoleLevel().getShorthand(), results, numCols); // column 8
 

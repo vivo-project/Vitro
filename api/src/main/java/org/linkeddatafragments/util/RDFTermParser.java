@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parses strings (as obtained from HTTP request parameters) into RDF terms. 
+ * Parses strings (as obtained from HTTP request parameters) into RDF terms.
  *
  * @param <TermType> type for representing RDF terms
  *

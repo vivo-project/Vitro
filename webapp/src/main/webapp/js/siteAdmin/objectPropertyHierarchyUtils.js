@@ -1,5 +1,5 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
-  
+
     var objectPropHierarchyUtils = {
     onLoad: function(urlBase,displayOption,type) {
         $.extend(this, i18nStrings);
@@ -23,7 +23,7 @@
             this.buildPropertyHierarchyHtml();
             this.wireExpandLink();
         }
-        
+
         if ( displayOption == "hierarchy" || displayOption == "group") {
             this.expandAll.show();
         }
@@ -33,8 +33,8 @@
         this.bindEventListeners();
     },
 
-    initObjects: function() { 
-        this.expandAll = $('span#expandAll').find('a');   
+    initObjects: function() {
+        this.expandAll = $('span#expandAll').find('a');
         this.classCounter = 1;
         this.expandCounter = 1;
         this.classHtml = "";
@@ -69,7 +69,7 @@
                 }
                 objectPropHierarchyUtils.form.submit();
             });
-         
+
             this.addProperty.click(function() {
                 objectPropHierarchyUtils.form.attr("action", "editForm?controller=Property");
                 objectPropHierarchyUtils.form.submit();
@@ -88,7 +88,7 @@
                 }
                 objectPropHierarchyUtils.form.submit();
             });
-         
+
             this.addProperty.click(function() {
                 objectPropHierarchyUtils.form.attr("action", "editForm?controller=Dataprop");
                 objectPropHierarchyUtils.form.submit();
@@ -96,8 +96,8 @@
         }
         if ( this.propType == "group" ) {
             this.expandAll.click(function() {
-            
-                if ( objectPropHierarchyUtils.expandAll.text() == i18nStrings.hideProperties ) { 
+
+                if ( objectPropHierarchyUtils.expandAll.text() == i18nStrings.hideProperties ) {
                     $('td.subclassCell').parent('tr').hide();
                     objectPropHierarchyUtils.expandAll.text(i18nStrings.showProperties);
                 }
@@ -109,7 +109,7 @@
         }
     },
 
-    checkJsonTree: function() { 
+    checkJsonTree: function() {
         if ( json.length == 1 ) {
             $.each(json, function() {
                 // check to see whether we have a 'no properties' message or an actual json tree
@@ -135,33 +135,33 @@
             var descendants = "";
             var headerSpan = "";
             var closingTable = "</table>";
-            
+
             if ( this.children.length ) {
                 descendants = objectPropHierarchyUtils.getTheChildren(this);
                 closingTable = "";
-                headerSpan = "<span class='headerSpanPlus' id='headerSpan" + objectPropHierarchyUtils.classCounter 
+                headerSpan = "<span class='headerSpanPlus' id='headerSpan" + objectPropHierarchyUtils.classCounter
                               + "' view='less'>&nbsp;</span>";
             }
 
-            objectPropHierarchyUtils.classHtml += "<div>" + this.name + headerSpan + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
+            objectPropHierarchyUtils.classHtml += "<div>" + this.name + headerSpan + "</div>" + "<table class='classHierarchy' id='classHierarchy"
                                       + objectPropHierarchyUtils.classCounter + "'>" ;
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>"
                                                + (this.data.internalName.length > 0 ? this.data.internalName : "none" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>"
                                                + (this.data.group.length > 0 ? this.data.group : "unspecified" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>"
                                                + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>" 
+            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>"
                                                + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             if ( descendants.length > 1 ) {
                descendants = descendants.substring(0, descendants.length - 10);
             }
- 
+
             objectPropHierarchyUtils.classHtml += descendants;
 
             objectPropHierarchyUtils.classHtml += closingTable;
@@ -190,33 +190,33 @@
             }
 
             if ( this.children.length == 1 ) {
-                subclassString += "<span style='font-size:0.8em'> (1 " + i18nStrings.subProperty + ")</span>"; 
+                subclassString += "<span style='font-size:0.8em'> (1 " + i18nStrings.subProperty + ")</span>";
             }
             else if ( this.children.length > 1 ) {
                 subclassString += "<span style='font-size:0.8em'> (" + this.children.length + " " + i18nStrings.subProperties + ")</span>";
             }
 
-            childDetails += "<td class='subclassCell' colspan='2'><span class='subclassExpandPlus' id='subclassExpand" 
-                            + objectPropHierarchyUtils.expandCounter + "'>&nbsp;</span>" 
-                            + this.name + subclassString + "</td></tr><tr><td></td><td colspan='2'><table id='subclassTable" 
+            childDetails += "<td class='subclassCell' colspan='2'><span class='subclassExpandPlus' id='subclassExpand"
+                            + objectPropHierarchyUtils.expandCounter + "'>&nbsp;</span>"
+                            + this.name + subclassString + "</td></tr><tr><td></td><td colspan='2'><table id='subclassTable"
                             + objectPropHierarchyUtils.expandCounter + "' class='subclassTable'>";
 
             subclassString = " ";
 
             objectPropHierarchyUtils.clickableSpans.push('subclassExpand' + objectPropHierarchyUtils.expandCounter);
-            
+
             objectPropHierarchyUtils.expandCounter += 1;
-            
-            childDetails += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>" 
+
+            childDetails += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>"
                                                + (this.data.internalName.length > 0 ? this.data.internalName : "none" ) + "</td></tr>";
 
-            childDetails += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>" 
+            childDetails += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>"
                                                + (this.data.group.length > 0 ? this.data.group : "unspecified" ) + "</td></tr>";
 
-            childDetails += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
+            childDetails += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>"
                                                + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            childDetails += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>" 
+            childDetails += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>"
                                                + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             if ( this.children ) {
@@ -227,7 +227,7 @@
         childDetails += "</table></td></tr>";
         return childDetails;
     },
-    
+
     makeHeaderSpansClickable: function(ctr) {
 
         var $clickableHeader = $('section#classContainer' + ctr).find('span.headerSpanPlus');
@@ -247,7 +247,7 @@
             }
         });
     },//    $('myOjbect').css('background-image', 'url(' + imageUrl + ')');
-    
+
     makeSubpropertySpansClickable: function() {
         $.each(objectPropHierarchyUtils.clickableSpans, function() {
             var currentSpan = this;
@@ -268,7 +268,7 @@
             });
         });
     },
-    
+
     wireExpandLink: function() {
         this.expandAll.click(function() {
             if ( objectPropHierarchyUtils.expandAll.text() == i18nStrings.expandAll ) {
@@ -287,27 +287,27 @@
             }
         });
     },
-     
+
     buildAllPropsHtml: function() {
 
         $.each(json, function() {
             $newClassSection = jQuery("<section></section>", {
                 id: "classContainer" + objectPropHierarchyUtils.classCounter
             });
-            
-            objectPropHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
+
+            objectPropHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy"
                                       + objectPropHierarchyUtils.classCounter + "'>" ;
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>"
                                          + (this.data.internalName.length > 0 ? this.data.internalName : "none" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>"
                                          + (this.data.group.length > 0 ? this.data.group : "unspecified" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>"
                                          + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>" 
+            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>"
                                          + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             objectPropHierarchyUtils.classHtml += "</table>";
@@ -325,7 +325,7 @@
             $newClassSection = jQuery("<section></section>", {
                 id: "classContainer" + objectPropHierarchyUtils.classCounter
             });
-            
+
             objectPropHierarchyUtils.classHtml = "<h4>" + this.name + "</h4>";
             $newClassSection.html(objectPropHierarchyUtils.classHtml);
             $newClassSection.appendTo($('section#container'));
@@ -359,13 +359,13 @@
                 descendants += "</table></td></tr>";
             }
 
-            objectPropHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
+            objectPropHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy"
                                                + objectPropHierarchyUtils.classCounter + "'>" ;
 
             if ( this.data.displayRank.length > 0 ) {
                 objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.displayRank + ":</td><td>" + this.data.displayRank + "</td></tr>"
             }
-            
+
             objectPropHierarchyUtils.classHtml += descendants;
 
             objectPropHierarchyUtils.classHtml += "</table>";
@@ -376,5 +376,5 @@
             objectPropHierarchyUtils.classCounter += 1;
         });
     }
-    
+
 }

@@ -29,46 +29,46 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 /**
  * Not a well-formed set of unit tests. But it's a pretty good exercise of the
  * different possibilities in the output stage.
- * 
+ *
  * Test plan:
- * 
+ *
  * <pre>
  * No data - roots is null -- NONSENSICAL
  * No data - roots is empty
- * 
+ *
  * Ontology is not specified
  * Ontology is specified and matches
  * Ontology is specified and does not match
  * DataProperty does not match Ontology, but has child properties that do.
- * 
+ *
  * Name from picklistName
  * Name from getName
  * Name from getUri
  * Name no URL? -- NONSENSICAL
- * 
+ *
  * InternalName from picklistName
  * InternalName missing.
- * 
+ *
  * Domain class no class URI
  * Domain class no class for URI
  * Domain class get picklistName from Language Aware DAO
  * Domain class use picklistName from Language Neutral DAO
- * 
+ *
  * Range no range URI
  * Range no datatype for URI
  * Range datatype has no name
  * Range has a name
- * 
+ *
  * Group no group URI
  * Group no group for URI
  * Group no name
  * Group has a name
- * 
+ *
  * DP1 Ont1, no name, no picklistName, no domainClass, no RangeClass, no GroupURI
  * DP2 Ont2, name, no picklistName, no domain class for URI, no range datatype for URI, no group for GroupURI
  * DP3 Ont1, picklistname, domainclass no picklistname, range datatype with no name, group has no name
  * DP4 Ont1, picklistname, domainclass w/picklistname, range datatype with name, group with name
- * 
+ *
  * Try once with no data
  * Try with all data and no ontology specified
  * Try with all data and Ont1, Ont2, Ont3

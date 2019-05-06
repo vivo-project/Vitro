@@ -43,7 +43,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     protected OntModel getOntModel() {
     	return getOntModelSelector().getApplicationMetadataModel();
     }
-    
+
     public void deleteVClassGroup(VClassGroup vcg) {
     	deleteVClassGroup(vcg,getOntModel());
     }
@@ -61,7 +61,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         OntModel tboxModel = getOntModelSelector().getTBoxModel();
         tboxModel.enterCriticalSection(Lock.WRITE);
         try {
-            Resource groupRes = ResourceFactory.createResource(vcg.getURI());            
+            Resource groupRes = ResourceFactory.createResource(vcg.getURI());
             tboxModel.removeAll(groupRes, null, null);
             tboxModel.removeAll(null, null, groupRes);
         } finally {
@@ -138,7 +138,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                     if (vgrp != null) {
                         groups.add(vgrp);
                     }
-                }    
+                }
                 java.util.Collections.sort(groups);
             } finally {
                 groupIt.close();
@@ -149,21 +149,21 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         for (VClassGroup vgrp : groups) {
             classDao.addVClassesToGroup(vgrp, includeUninstantiatedClasses, getIndividualCount);
         }
-        if (groups.size()>0) {                
+        if (groups.size()>0) {
             return groups;
         } else {
-            /* bdc34: the effect of the following code is that 
+            /* bdc34: the effect of the following code is that
              * classgroups will get empty vclasses added to them
              * when includeUninstantiatedClasses == false and all
              * the vclasses are empty.
-             * This may not be the desired behavior. 
+             * This may not be the desired behavior.
              */
-            classDao.addVClassesToGroups(groups);                
+            classDao.addVClassesToGroups(groups);
                 return groups;
         }
     }
-    
-    
+
+
     public VClassGroup groupFromGroupIndividual(Individual groupInd) {
         if (groupInd==null) {
             return null;
@@ -173,7 +173,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         group.setURI(groupInd.getURI());
         group.setNamespace(groupInd.getNameSpace());
         group.setLocalName(groupInd.getLocalName());
-        group.setDisplayRank(getPropertyNonNegativeIntValue(groupInd, DISPLAY_RANK));       
+        group.setDisplayRank(getPropertyNonNegativeIntValue(groupInd, DISPLAY_RANK));
         return group;
     }
 
@@ -183,25 +183,25 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     }
 
     public int insertNewVClassGroup(VClassGroup vcg, OntModel ontModel) {
-    	
+
     	// VitroClassGroups should really inherit from Individual objects now,
     	// but they don't (yet).
     	// I'm going to make an Individual so I can avoid duplicating URI code.
-    	
-    	edu.cornell.mannlib.vitro.webapp.beans.Individual groupInd = 
+
+    	edu.cornell.mannlib.vitro.webapp.beans.Individual groupInd =
     		new IndividualImpl(); // We should make a factory for these
     	groupInd.setURI(vcg.getURI());
     	groupInd.setNamespace(DEFAULT_NAMESPACE+"vitroClassGroup");
     	groupInd.setName(vcg.getPublicName());
     	groupInd.setVClassURI(CLASSGROUP.getURI());
-    	
+
     	String groupURI = null;
-    	
+
     	OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
     	        OntModelSpec.OWL_MEM, ModelFactory.createUnion(
-    	                getOntModelSelector().getApplicationMetadataModel(), 
+    	                getOntModelSelector().getApplicationMetadataModel(),
     	                getOntModelSelector().getFullModel()));
-    	
+
     	WebappDaoFactory wadfForURIGeneration = null;
     	try {
     	    wadfForURIGeneration = new WebappDaoFactoryJena(
@@ -213,7 +213,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     	} finally {
     	    wadfForURIGeneration.close();
     	}
-    	
+
     	if (groupURI != null) {
 	        ontModel.enterCriticalSection(Lock.WRITE);
 	        try {
@@ -231,7 +231,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     		log.error("Unable to insert class group " + vcg.getPublicName());
     		return 1;
     	}
-        
+
     }
 
     public int removeUnpopulatedGroups(List<VClassGroup> groups) {

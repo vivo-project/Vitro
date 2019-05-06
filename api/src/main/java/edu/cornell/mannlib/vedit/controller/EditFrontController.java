@@ -44,13 +44,13 @@ public class EditFrontController extends VitroHttpServlet {
                 ((HttpServlet)controllerInstance).init(getServletConfig());
             } catch (Exception e) {
             	String errMsg = "doPost() could not instantiate specific " +
-        		        "controller " + controllerName; 
+        		        "controller " + controllerName;
                 log.error(errMsg, e);
                 throw new RuntimeException(errMsg, e);
             }
         } catch (ClassNotFoundException e){
         	String errMsg = "doPost() could not find controller " +
-        	        CONTROLLER_PKG + "." + controllerName; 
+        	        CONTROLLER_PKG + "." + controllerName;
             log.error(errMsg);
             throw new RuntimeException(errMsg);
         }
@@ -74,11 +74,11 @@ public class EditFrontController extends VitroHttpServlet {
         		        "while invoking " + controllerName;
                 log.error(errMsg, e);
                 throw new RuntimeException(errMsg, e);
-            }	
+            }
         } catch (NoSuchMethodException e){
             log.error("could not find doPost() method in " + controllerName);
             throw new RuntimeException("could not find doPost() method in " +
-            		controllerName); 
+            		controllerName);
         }
     }
 

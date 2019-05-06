@@ -13,18 +13,18 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
 /**
- * Exclude individuals based on the namespaces of their types. 
+ * Exclude individuals based on the namespaces of their types.
  */
 public class ExcludeBasedOnTypeNamespace implements SearchIndexExcluder {
 
     private final List<String> namespaces = new ArrayList<>();
-    Pattern nsRegexPattern; 
-    
+    Pattern nsRegexPattern;
+
 	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#excludes")
 	public void addExcludedNamespace(String uri) {
 		namespaces.add(uri);
 	}
-	
+
 	@Validation
 	public void compileRegexPattern() {
         StringBuilder nsOrPattern = new StringBuilder();
@@ -62,5 +62,5 @@ public class ExcludeBasedOnTypeNamespace implements SearchIndexExcluder {
 	@Override
 	public String toString() {
 		return "ExcludeBasedOnTypeNamespace[namespaces=" + namespaces + "]";
-	}    
+	}
 }

@@ -35,26 +35,26 @@ import javax.servlet.annotation.WebServlet;
 public class ShowClassHierarchyController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ShowClassHierarchyController.class.getName());
-    
+
     private static final String TEMPLATE_NAME = "siteAdmin-classHierarchy.ftl";
 	private int MAXDEPTH = 7;
 
     private VClassDao vcDao = null;
-    
+
     private int previous_posn = 0;
-    
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
         Map<String, Object> body = new HashMap<String, Object>();
-        
+
         String displayOption = "";
-        
+
         if ( vreq.getParameter("displayOption") != null ) {
             displayOption = vreq.getParameter("displayOption");
         }
@@ -88,7 +88,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         } else if (startClassUri != null) {
         	roots = new LinkedList<VClass>();
         	roots.add(vcDao.getVClassByURI(startClassUri));
-        } else {    	
+        } else {
        		roots = vcDao.getRootClasses();
         }
 
@@ -120,14 +120,14 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             }
         }
         body.put("jsonTree", json.toString());
-        
+
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
 
-    private String addChildren(WebappDaoFactory wadf, VClass parent, int position, 
+    private String addChildren(WebappDaoFactory wadf, VClass parent, int position,
             String ontologyUri, int counter, VitroRequest vreq) {
         String rowElts = addVClassDataToResultsList(wadf, parent, position, ontologyUri, counter);
-    	int childShift = (rowElts.length() > 0) ? 1 : 0;  // if addVClassDataToResultsList filtered out the result, don't shift the children over 
+    	int childShift = (rowElts.length() > 0) ? 1 : 0;  // if addVClassDataToResultsList filtered out the result, don't shift the children over
         int length = rowElts.length();
         StringBuilder leaves = new StringBuilder();
         leaves.append(rowElts);
@@ -190,7 +190,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             }
             else if ( position == previous_posn ) {
                         tempString += "}, { \"name\": ";
-            } 
+            }
             else if ( position > previous_posn ) {
                 tempString += " { \"name\": ";
             }
@@ -198,11 +198,11 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
                 tempString += "}, { \"name\": ";
             }
             try {
-                tempString += JacksonUtils.quote("<a href='vclassEdit?uri=" + 
-                        URLEncoder.encode(vcw.getURI(),"UTF-8") + "'>" + 
+                tempString += JacksonUtils.quote("<a href='vclassEdit?uri=" +
+                        URLEncoder.encode(vcw.getURI(),"UTF-8") + "'>" +
                         vcw.getPickListName() + "</a>") +", ";
             } catch (Exception e) {
-                 tempString += JacksonUtils.quote(((vcw.getPickListName() == null) 
+                 tempString += JacksonUtils.quote(((vcw.getPickListName() == null)
                          ? "" : vcw.getPickListName())) + ", ";
             }
 
@@ -214,7 +214,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             String groupURI = vcw.getGroupURI();
             String groupName = null;
             VClassGroup classGroup = null;
-            if(groupURI != null) { 
+            if(groupURI != null) {
             	classGroup = groupDao.getGroupByURI(groupURI);
             	if (classGroup != null) {
             		groupName = classGroup.getPublicName();

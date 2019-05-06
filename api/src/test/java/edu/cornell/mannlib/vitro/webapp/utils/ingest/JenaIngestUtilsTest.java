@@ -23,18 +23,18 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceMod
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 public class JenaIngestUtilsTest {
-    
+
     private final Log log = LogFactory.getLog(JenaIngestUtilsTest.class);
-    
+
     protected JenaIngestUtils utils = new JenaIngestUtils();
-    
+
     protected Model makeModel() {
         Model base = ModelFactory.createDefaultModel();
         RDFService rdfService = new RDFServiceModel(base);
         return RDFServiceGraph.createRDFServiceModel(
                 new RDFServiceGraph(rdfService));
     }
-    
+
     @Test
     public void testSmush() {
         Model model = makeModel();
@@ -60,7 +60,7 @@ public class JenaIngestUtilsTest {
             		s.toString());
         }
     }
-    
+
     @Test
     public void testRenameBNodes() {
         Model initialState = ModelFactory.createDefaultModel();
@@ -68,7 +68,7 @@ public class JenaIngestUtilsTest {
                 "renameBlank.n3"), null, "N3");
         Model renamedState = utils.renameBNodes(
                 initialState, "http://example.org/node/n");
-        Assert.assertEquals("Post-rename model is not the same size as the " + 
+        Assert.assertEquals("Post-rename model is not the same size as the " +
                 "initial model", initialState.size(), renamedState.size());
         StmtIterator sit = renamedState.listStatements();
         boolean lingeringBNodes = false;
@@ -80,12 +80,12 @@ public class JenaIngestUtilsTest {
         }
         if(lingeringBNodes) {
             StringWriter s = new StringWriter();
-            renamedState.write(s, "N3");            
-            Assert.fail("Renamed model still contains blank nodes \n" + 
+            renamedState.write(s, "N3");
+            Assert.fail("Renamed model still contains blank nodes \n" +
                     s.toString());
         }
     }
-    
+
     @Test
     public void testGenerateTBox() {
         Model abox = ModelFactory.createDefaultModel();
@@ -96,11 +96,11 @@ public class JenaIngestUtilsTest {
                 "tbox.n3"), null, "N3");
         Model generatedTBox = utils.generateTBox(abox);
         //log.warn(tbox.toString());
-        Assert.assertTrue("Generated TBox does not match expected result", 
+        Assert.assertTrue("Generated TBox does not match expected result",
                 tbox.isIsomorphicWith(generatedTBox));
     }
-    
-    @Test 
+
+    @Test
     public void testDoMerge() {
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, makeModel());
         OntModel tbox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, makeModel());
@@ -113,7 +113,7 @@ public class JenaIngestUtilsTest {
         utils.doMerge("http://example.com/ns/n1", "http://example.com/ns/n1", model, tbox, false);
         Assert.assertTrue("Merged model with multiple labels does not match " +
                 "expected result", expectedMergeMultipleLabels.isIsomorphicWith(model));
-        
+
         model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, makeModel());
         model.read(JenaIngestUtilsTest.class.getResourceAsStream(
                 "merge.n3"), null, "N3");

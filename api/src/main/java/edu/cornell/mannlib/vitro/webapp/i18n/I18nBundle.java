@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A wrapper for a ResourceBundle that will not throw an exception, no matter
  * what string you request.
- * 
+ *
  * If the ResourceBundle was not found, or if it doesn't contain the requested
  * key, an error message string is returned, to help the developer diagnose the
  * problem.

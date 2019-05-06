@@ -32,8 +32,8 @@
     <h3>Select Destination Model for Generated TBox</h3>
 
     <select name="destinationModelName">
-        <option value="vitro:baseOntModel"/>webapp assertions</option>   
-        <option value="vitro:jenaOntModel"/>webapp model</option>   
+        <option value="vitro:baseOntModel"/>webapp assertions</option>
+        <option value="vitro:jenaOntModel"/>webapp model</option>
         <c:forEach var="modelName" items="${modelNames}">
           <option value="${modelName}"/>${modelName}</option>
         </c:forEach>

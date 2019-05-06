@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 
 /**
  * Get the basic auto-complete info for the profile selection.
- * 
+ *
  */
 public class BasicProfilesGetter extends AbstractAjaxResponder {
 	private static final Log log = LogFactory.getLog(BasicProfilesGetter.class);

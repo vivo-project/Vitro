@@ -23,11 +23,11 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
 public class RDFServiceModel extends RDFServiceJena implements RDFService {
 
     private final static Log log = LogFactory.getLog(RDFServiceModel.class);
-    
+
     private Model model;
     private Dataset dataset;
     private String modelName;
-    
+
     /**
      * Create an RDFService to access a single default graph
      * @param model Jena Model
@@ -35,7 +35,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     public RDFServiceModel(Model model) {
         this.model = model;
     }
-    
+
     /**
      * Create an RDFService to access a Jena Dataset
      * @param dataset Jena Dataset
@@ -43,12 +43,12 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     public RDFServiceModel(Dataset dataset) {
         this.dataset = dataset;
     }
-    
+
     @Override
     protected DatasetWrapper getDatasetWrapper() {
       Dataset d = null;
       if (dataset != null)  {
-          d = dataset; 
+          d = dataset;
       } else {
           d = DatasetFactory.createMem();
           if (modelName == null) {
@@ -60,21 +60,21 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
       DatasetWrapper datasetWrapper = new DatasetWrapper(d);
       return datasetWrapper;
     }
-    
+
     @Override
     public boolean changeSetUpdate(ChangeSet changeSet)
             throws RDFServiceException {
-             
-        if (changeSet.getPreconditionQuery() != null 
+
+        if (changeSet.getPreconditionQuery() != null
                 && !isPreconditionSatisfied(
-                        changeSet.getPreconditionQuery(), 
+                        changeSet.getPreconditionQuery(),
                                 changeSet.getPreconditionQueryType())) {
             return false;
         }
-            
+
         //Dataset dataset = getDatasetWrapper().getDataset();
-        		        
-        try {                   
+
+        try {
             for (Object o : changeSet.getPreChangeEvents()) {
                 this.notifyListenersOfEvent(o);
             }
@@ -96,7 +96,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
                 }
                 operateOnModel(m, modelChange, null);
             }
-                        
+
             // notify listeners of triple changes
             notifyListenersOfChanges(changeSet);
 //            csIt = changeSet.getModelChanges().iterator();
@@ -107,16 +107,16 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
 //                        new ListeningGraph(modelChange.getGraphURI(), this));
 //                operateOnModel(model, modelChange, null);
 //            }
-            
+
             for (Object o : changeSet.getPostChangeEvents()) {
                 this.notifyListenersOfEvent(o);
             }
-            
+
         } catch (Exception e) {
             log.error(e, e);
             throw new RDFServiceException(e);
-        } 
-        
+        }
+
         return true;
-    }    
+    }
 }

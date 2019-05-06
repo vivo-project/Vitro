@@ -34,7 +34,7 @@ import freemarker.template.TemplateException;
  * No matter what URL is requested, check to see whether the StartupStatus
  * contains errors or warnings. If it does, hijack the request to show the
  * StartupStatus display page.
- * 
+ *
  * If the status only contains warnings, this only happens once. Subsequent
  * requests will display normally. However, if the status contains a fatal
  * error, this filter will hijack every request, and will not let you proceed.

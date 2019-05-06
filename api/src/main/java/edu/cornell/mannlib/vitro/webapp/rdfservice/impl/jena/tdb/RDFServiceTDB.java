@@ -81,7 +81,7 @@ public class RDFServiceTDB extends RDFServiceJena {
 			} finally {
 				dataset.end();
 			}
-			
+
 			notifyListenersOfChanges(changeSet);
 			notifyListenersOfPostChangeEvents(changeSet);
 			return true;
@@ -93,7 +93,7 @@ public class RDFServiceTDB extends RDFServiceJena {
 		}
 	}
 
-	
+
 	@Override
 	public void close() {
 		if (this.dataset != null) {
@@ -200,7 +200,7 @@ public class RDFServiceTDB extends RDFServiceJena {
 	/**
 	 * TDB has a bug: if given a literal of type xsd:nonNegativeInteger, it
 	 * stores a literal of type xsd:integer.
-	 * 
+	 *
 	 * To determine whether this serialized graph is equivalent to what's in
 	 * TDB, we need to do the same.
 	 */

@@ -11,9 +11,9 @@ import org.apache.jena.shared.Lock;
  * Makes it easy to use a Jena Model in a try-with-resources block. At the end
  * of the block, the close() method will not close the model, but will merely
  * release the lock.
- * 
+ *
  * Wraps around a bare Model. Cannot be used without locking.
- * 
+ *
  * <pre>
  * try (LockedModel m = new LockableModel(model).read()) {
  *    ...

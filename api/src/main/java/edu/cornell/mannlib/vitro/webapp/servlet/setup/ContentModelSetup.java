@@ -32,31 +32,31 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Sets up the content models, OntModelSelectors and webapp DAO factories.
- * 
+ *
  * Why the firstTimeStartup flag? Because you can't ask a large SDB model
  * whether it is empty. SDB translates  this into a call to size(), which
  * in turn becomes find(null, null, null) and a count, and this gives an
  * OutOfMemoryError because it tries to read the entire model into memory.
  */
-public class ContentModelSetup extends JenaDataSourceSetupBase 
+public class ContentModelSetup extends JenaDataSourceSetupBase
         implements javax.servlet.ServletContextListener {
-    
+
     private static final Log log = LogFactory.getLog(ContentModelSetup.class);
-    
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
-        
+
         long begin = System.currentTimeMillis();
         setUpJenaDataSource(ctx);
-        ss.info(this, secondsSince(begin) + " seconds to set up models and DAO factories");  
-    } 
+        ss.info(this, secondsSince(begin) + " seconds to set up models and DAO factories");
+    }
 
     private void setUpJenaDataSource(ServletContext ctx) {
         ContextModelAccess models = ModelAccess.on(ctx);
         boolean firstTimeStartup = false;
-    	
+
     	Model applicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
 		if (applicationMetadataModel.isEmpty()) {
 			firstTimeStartup = true;
@@ -70,7 +70,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         	RDFFilesLoader.loadFirstTimeFiles("abox", baseABoxModel, true);
         }
         RDFFilesLoader.loadEveryTimeFiles("abox", baseABoxModel);
-        
+
         OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
         if (firstTimeStartup) {
         	RDFFilesLoader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
@@ -87,7 +87,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 	/**
 	 * We need to read the RDF files and change the Portal from a blank node to
 	 * one with a URI in the default namespace.
-	 * 
+	 *
 	 * Do this before adding the data to the RDFService-backed model, to avoid
 	 * warnings about editing a blank node.
 	 */
@@ -119,13 +119,13 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 		} finally {
 			portalResIt.close();
 		}
-		
+
 		if (portalResource != null) {
 			ResourceUtils.renameResource(portalResource, getDefaultNamespace(ctx) + "portal1");
 		}
 	}
 
-	
+
     /**
      * If we find a "portal1" portal (and we should), its URI should use the
      * default namespace.
@@ -137,24 +137,24 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
         if(!portals.isEmpty() && noPortalForNamespace(
                 portals, expectedNamespace)) {
-            // There really should be only one portal 1, but if there happen to 
+            // There really should be only one portal 1, but if there happen to
             // be multiple, just arbitrarily pick the first in the list.
-            Resource portal = portals.get(0); 
+            Resource portal = portals.get(0);
             String oldNamespace = portal.getNameSpace();
             renamePortal(portal, expectedNamespace, model);
             StartupStatus ss = StartupStatus.getBean(ctx);
-            ss.warning(this, "\nThe default namespace has been changed \n" +  
-                             "from " + oldNamespace + 
+            ss.warning(this, "\nThe default namespace has been changed \n" +
+                             "from " + oldNamespace +
                              "\nto " + expectedNamespace + ".\n" +
                              "The application will function normally, but " +
-                             "any individuals in the \n" + oldNamespace + " " + 
+                             "any individuals in the \n" + oldNamespace + " " +
                              "namespace will need to have their URIs \n" +
                              "changed in order to be served as linked data. " +
                              "You can use the Ingest Tools \nto change the " +
                              "URIs for a batch of resources.");
         }
     }
-    
+
     private List<Resource> getPortal1s(Model model) {
         List<Resource> portals = new ArrayList<Resource>();
         try {
@@ -172,7 +172,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         }
         return portals;
     }
-    
+
     private boolean noPortalForNamespace(List<Resource> portals, String expectedNamespace) {
         for (Resource portal : portals) {
             if(expectedNamespace.equals(portal.getNameSpace())) {
@@ -190,13 +190,13 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             model.leaveCriticalSection();
         }
     }
-    
+
     /* ===================================================================== */
-    
+
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         // Nothing to do.
-    }    
- 
+    }
+
  }
 

@@ -12,7 +12,7 @@ public interface PropertyInstanceDao {
     void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI);
 
     Collection<PropertyInstance> getAllPossiblePropInstForIndividual(String individualURI);
-    
+
     Collection<PropertyInstance> getAllPropInstByVClass(String classURI);
 
     Collection<PropertyInstance> getExistingProperties(String entityURI, String propertyURI);

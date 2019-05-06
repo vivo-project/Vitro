@@ -54,7 +54,7 @@
 			// Remove serialized styles when selecting a layer since it might be changed by a drag operation
 			ed.onMouseUp.add(function(ed, e) {
 				var layer = findParentLayer(e.target);
-	
+
 				if (layer) {
 					ed.dom.setAttrib(layer, 'data-mce-style', '');
 				}
@@ -139,7 +139,7 @@
 			nl = [];
 			tinymce.walk(ed.getBody(), function(n) {
 				if (n.nodeType == 1 && /^(absolute|relative|static)$/i.test(n.style.position))
-					nl.push(n); 
+					nl.push(n);
 			}, 'childNodes');
 
 			// Find z-indexes

@@ -42,19 +42,19 @@ import static org.semanticweb.owlapi.vocab.OWLRDFVocabulary.OWL_AXIOM;
 
 /**
  * An implementation of the JFact reasoner for the TBox.
- * 
+ *
  * It maintains a model of all the assertions it has been given, adding or
  * removing statements as change sets are received.
- * 
+ *
  * Each time a change is received, it will create a fresh ontology from the
  * assertions model, and apply a reasoner to that ontology. A model of
  * inferences is built by querying the reasoner.
- * 
+ *
  * The assertions and inferences are combined into an OntModel, which is kept to
  * answer queries.
- * 
+ *
  * -----------------
- * 
+ *
  * This class it not thread-safe.
  */
 public class JFactTBoxReasoner implements
@@ -84,7 +84,7 @@ public class JFactTBoxReasoner implements
 		filteredAssertionsModel.remove(changes.getRemovedStatements());
 		clearEmptyAxiomStatements();
 	}
-	
+
 	/*Adding this method in case axiom statements are read into the model where the statements
 	are not fully qualified.
 	N3 of the following format [ rdf:type owl:Axiom ;
@@ -95,14 +95,14 @@ public class JFactTBoxReasoner implements
 	] . results in the model containing empty axiom statements = [ rdf:type owl:Axiom .]
 	which causes the OWLManager to return an error.
 	*/
-	
+
 	private void clearEmptyAxiomStatements() {
 		//Check and see if the model has any empty axiom statements and if so, remove them
 		StmtIterator axiomStatements = filteredAssertionsModel.listStatements(null, RDF.type, ResourceFactory.createResource(OWL_AXIOM.toString()));
 		List<Statement> removeStatements = new ArrayList<Statement>();
 		while(axiomStatements.hasNext()) {
 			Statement axiomStatement = axiomStatements.nextStatement();
-			
+
 			List<Statement> axiomSubjectStatements = filteredAssertionsModel.listStatements(
 					axiomStatement.getSubject(), null, (RDFNode) null).toList();
 			//if no statements associated with axiom, then add for removal
@@ -111,7 +111,7 @@ public class JFactTBoxReasoner implements
 				removeStatements.add(axiomStatement);
 			}
 		}
-		
+
 		if(removeStatements.size() > 0) {
 			log.warn("The following statements are empty axiom statements and have been removed" + removeStatements.toString());
 			//Remove the statements from the filtered model
@@ -119,9 +119,9 @@ public class JFactTBoxReasoner implements
 		} else {
 			log.debug("No empty axiom statements were found");
 		}
-		
+
 	}
-	
+
 
 	@Override
 	public Status performReasoning() {
