@@ -305,27 +305,27 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	}
 
 	@Override
-	public PrefixMapping setNsPrefix(String prefix, String uri) {
+	public Model setNsPrefix(String prefix, String uri) {
 		return inner.setNsPrefix(prefix, uri);
 	}
 
 	@Override
-	public PrefixMapping removeNsPrefix(String prefix) {
+	public Model removeNsPrefix(String prefix) {
 		return inner.removeNsPrefix(prefix);
 	}
 
 	@Override
-	public PrefixMapping setNsPrefixes(PrefixMapping other) {
+	public Model setNsPrefixes(PrefixMapping other) {
 		return inner.setNsPrefixes(other);
 	}
 
 	@Override
-	public PrefixMapping setNsPrefixes(Map<String, String> map) {
+	public Model setNsPrefixes(Map<String, String> map) {
 		return inner.setNsPrefixes(map);
 	}
 
 	@Override
-	public PrefixMapping withDefaultMappings(PrefixMapping map) {
+	public Model withDefaultMappings(PrefixMapping map) {
 		return inner.withDefaultMappings(map);
 	}
 
@@ -400,16 +400,19 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	}
 
 	@Override
+	@Deprecated
 	public String setReaderClassName(String lang, String className) {
 		return inner.setReaderClassName(lang, className);
 	}
 
 	@Override
+	@Deprecated
 	public void resetRDFReaderF() {
 		inner.resetRDFReaderF();
 	}
 
 	@Override
+	@Deprecated
 	public String removeReader(String s) throws IllegalArgumentException {
 		return inner.removeReader(s);
 	}
@@ -425,16 +428,19 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	}
 
 	@Override
+	@Deprecated
 	public String setWriterClassName(String lang, String className) {
 		return inner.setWriterClassName(lang, className);
 	}
 
 	@Override
+	@Deprecated
 	public void resetRDFWriterF() {
 		inner.resetRDFWriterF();
 	}
 
 	@Override
+	@Deprecated
 	public String removeWriter(String s) throws IllegalArgumentException {
 		return inner.removeWriter(s);
 	}
@@ -1054,6 +1060,7 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	}
 
 	@Override
+	@Deprecated
 	public Object executeInTransaction(Command cmd) {
 		return inner.executeInTransaction(cmd);
 	}
@@ -1798,7 +1805,7 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	}
 
 	@Override
-	public PrefixMapping clearNsPrefixMap() {
+	public Model clearNsPrefixMap() {
 		return inner.clearNsPrefixMap();
 	}
 
@@ -1806,4 +1813,10 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	public int numPrefixes() {
 		return inner.numPrefixes();
 	}
+
+	@Override
+	public RDFList getList(String s) { return inner.getList(s); }
+
+	@Override
+	public RDFList getList(Resource resource) { return inner.getList(resource); }
 }

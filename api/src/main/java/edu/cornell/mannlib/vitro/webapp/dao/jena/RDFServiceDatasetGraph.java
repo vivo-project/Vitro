@@ -15,6 +15,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.TxnType;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.shared.LockMRSW;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -36,6 +37,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     private Context context = new Context() ;
     private Map<String, RDFServiceGraph> graphCache = new ConcurrentHashMap<String, RDFServiceGraph>();
     private ReadWrite transactionMode;
+    private TxnType transactionType;
 
     public RDFServiceDatasetGraph(RDFService rdfService) {
         this.rdfService = rdfService;
@@ -53,8 +55,15 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     }
 
     @Override
+    public void begin(TxnType txnType) {
+        this.transactionType = txnType;
+        graphCache.clear();
+    }
+
+    @Override
     public synchronized void commit() {
         this.transactionMode = null;
+        this.transactionType = null;
         if (supportsTransactions(defaultGraph)) {
             defaultGraph.getTransactionHandler().commit();
         }
@@ -88,6 +97,21 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 
     @Override
     public boolean isInTransaction() {
+        return transactionMode != null || transactionType != null;
+    }
+
+    @Override
+    public TxnType transactionType() {
+        return transactionType;
+    }
+
+    @Override
+    public ReadWrite transactionMode() {
+        return transactionMode;
+    }
+
+    @Override
+    public boolean promote(Promote promote) {
         return false;
     }
 
@@ -253,8 +277,10 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         } else {
             RDFServiceGraph graph = new RDFServiceGraph(rdfService, arg0.getURI());
             graphCache.put(graphURI, graph);
-            if(transactionMode != null && supportsTransactions(graph)) {
-                graph.getTransactionHandler().begin();
+            if (supportsTransactions(graph)) {
+                if(transactionMode != null || transactionType != null) {
+                    graph.getTransactionHandler().begin();
+                }
             }
             return graph;
         }

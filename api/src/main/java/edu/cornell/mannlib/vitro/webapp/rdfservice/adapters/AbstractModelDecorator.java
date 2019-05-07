@@ -266,27 +266,27 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
-	public PrefixMapping setNsPrefix(String prefix, String uri) {
+	public Model setNsPrefix(String prefix, String uri) {
 		return inner.setNsPrefix(prefix, uri);
 	}
 
 	@Override
-	public PrefixMapping removeNsPrefix(String prefix) {
+	public Model removeNsPrefix(String prefix) {
 		return inner.removeNsPrefix(prefix);
 	}
 
 	@Override
-	public PrefixMapping setNsPrefixes(PrefixMapping other) {
+	public Model setNsPrefixes(PrefixMapping other) {
 		return inner.setNsPrefixes(other);
 	}
 
 	@Override
-	public PrefixMapping setNsPrefixes(Map<String, String> map) {
+	public Model setNsPrefixes(Map<String, String> map) {
 		return inner.setNsPrefixes(map);
 	}
 
 	@Override
-	public PrefixMapping withDefaultMappings(PrefixMapping map) {
+	public Model withDefaultMappings(PrefixMapping map) {
 		return inner.withDefaultMappings(map);
 	}
 
@@ -1100,12 +1100,22 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
-	public PrefixMapping clearNsPrefixMap() {
+	public Model clearNsPrefixMap() {
 		return inner.clearNsPrefixMap();
 	}
 
 	@Override
 	public int numPrefixes() {
 		return inner.numPrefixes();
+	}
+
+	@Override
+	public RDFList getList(String s) {
+		return inner.getList(s);
+	}
+
+	@Override
+	public RDFList getList(Resource resource) {
+		return inner.getList(resource);
 	}
 }
