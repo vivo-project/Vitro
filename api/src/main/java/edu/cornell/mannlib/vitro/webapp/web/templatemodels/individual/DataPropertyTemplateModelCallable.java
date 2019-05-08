@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.List;
@@ -7,7 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-public class DataPropertyTemplateModelCallable implements Callable<DataPropertyTemplateModel> {
+public class DataPropertyTemplateModelCallable implements Callable<PropertyTemplateModel> {
 
     private final DataProperty dp;
     private Individual subject;

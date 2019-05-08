@@ -71,7 +71,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private List<PropertyGroupTemplateModel> groups;
 
     GroupedPropertyList(Individual subject, VitroRequest vreq,
-            boolean editing) throws Exception {
+            boolean editing) {
         this.vreq = vreq;
         this.subject = subject;
         this.wdf = vreq.getWebappDaoFactory();
@@ -149,7 +149,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         // wait all
         for (PropertyGroupTemplateModel pgtm : groups) {
-            List<Future<?>> futures = pgtm.getFutures();
+            List<Future<PropertyTemplateModel>> futures = pgtm.getFutures();
             List<PropertyTemplateModel> properties = pgtm.getProperties();
             for (Future<?> f : futures) {
                 try {
@@ -165,7 +165,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
                         log.error("unexpected class " + f.get().getClass());
                     }
                 } catch (InterruptedException | ExecutionException e) {
-                    throw e;
+                    log.error("InvalidConfigurationException: "+e.getMessage());
+                    throw new RuntimeException(e);
                 } finally {
                     executor.shutdown();
                 }

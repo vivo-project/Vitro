@@ -35,9 +35,9 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     private final String name;
     private final List<PropertyTemplateModel> properties;
 
-    private List<Future<?>> futures = null;
+    private List<Future<PropertyTemplateModel>> futures = null;
     
-    List<Future<?>> getFutures() {
+    List<Future<PropertyTemplateModel>> getFutures() {
 		return futures;
 	}
 

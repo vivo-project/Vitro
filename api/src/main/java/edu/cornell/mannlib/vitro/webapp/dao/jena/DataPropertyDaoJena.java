@@ -768,7 +768,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     Map<DataProperty, String> customListViewConfigFileMap = null;
 
     @Override
-    public String getCustomListViewConfigFileName(DataProperty dp) {
+    public synchronized String getCustomListViewConfigFileName(DataProperty dp) {
         if (customListViewConfigFileMap == null) {
             customListViewConfigFileMap = new HashMap<DataProperty, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();

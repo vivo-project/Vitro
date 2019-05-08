@@ -104,7 +104,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         }
     }
 
-    public GroupedPropertyList getPropertyList() throws Exception {
+    public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
             propertyList = new GroupedPropertyList(individual, vreq, editing);
         }
