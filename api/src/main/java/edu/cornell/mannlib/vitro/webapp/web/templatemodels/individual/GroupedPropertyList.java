@@ -141,7 +141,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
         groups = new ArrayList<PropertyGroupTemplateModel>(
                 propertyGroupList.size());
         // submit parallel
-        ExecutorService executor = Executors.newCachedThreadPool();
+        ExecutorService executor = ExecutorFactory.getExecutor();
+        
         for (PropertyGroup propertyGroup : propertyGroupList) {
             groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, editing,
                     populatedDataPropertyList, populatedObjectPropertyList, executor));
@@ -167,8 +168,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 } catch (InterruptedException | ExecutionException e) {
                     log.error("InvalidConfigurationException: "+e.getMessage());
                     throw new RuntimeException(e);
-                } finally {
-                    executor.shutdown();
                 }
             }
         }
