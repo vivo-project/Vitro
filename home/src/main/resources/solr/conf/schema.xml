@@ -186,6 +186,11 @@
   <dynamicField name="*_tdate" type="tdate" indexed="true" stored="true" multiValued="true"/>
   <dynamicField name="*_tint" type="tint" indexed="true" stored="true" multiValued="true"/>
 
+  <dynamicField name="*_facets" type="string"  indexed="true"  stored="true" multiValued="true"/>
+  <dynamicField name="*_facetsCount" type="int"  indexed="true"  stored="true" multiValued="false"/>
+  <dynamicField name="*_facetsOrder" type="string"  indexed="true"  stored="true" multiValued="false"/>
+
+
    <!-- ****************************  End Dynamic Fields *************************** -->
 
 

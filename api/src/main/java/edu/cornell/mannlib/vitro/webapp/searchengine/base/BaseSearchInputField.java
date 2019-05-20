@@ -42,6 +42,14 @@ public class BaseSearchInputField implements SearchInputField {
 		valueList.addAll(values);
 	}
 
+	public void setValue(Object value) {
+		if(valueList.size()==1) {
+			valueList.set(0, value);
+		}else if(valueList.size()==0) {
+			valueList.add(value);
+		}
+	}
+	
 	@Override
 	public void setBoost(float boost) {
 		this.boost = boost;

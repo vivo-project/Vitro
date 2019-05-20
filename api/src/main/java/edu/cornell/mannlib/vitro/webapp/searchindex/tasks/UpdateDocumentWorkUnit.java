@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerUtils;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.JsonFacetsModifier;
 
 public class UpdateDocumentWorkUnit implements Runnable {
 	private static final Log log = LogFactory
@@ -95,7 +96,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 			this.list = Arrays.asList(new DocumentModifier[] {
 					new IdUriLabel(), new AddClasses(),
 					new AddMostSpecificTypes(), new AddObjectPropertyText(),
-					new AddDataPropertyText(), new AddEntityBoost() });
+					new AddDataPropertyText(), new AddEntityBoost(), new JsonFacetsModifier() });
 		}
 
 		public List<DocumentModifier> getList() {

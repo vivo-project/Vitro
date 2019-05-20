@@ -1,0 +1,72 @@
+
+{
+
+
+"pivotsIndexProperty": [
+		
+		{	
+			"solr":"author",
+			"qualifiedByDomain": "http://purl.org/ontology/bibo/Document",
+			"configContextFor": "http://vivoweb.org/ontology/core#relatedBy",
+			"qualifiedBy": "http://vivoweb.org/ontology/core#Authorship",
+				
+				"pivotsIndexProperty":{
+					"configContextFor": "http://vivoweb.org/ontology/core#relates",
+					    "qualifiedBy": "http://xmlns.com/foaf/0.1/Person",
+					    	"pivotsIndexProperty":{
+				            "configContextFor": "http://www.w3.org/2000/01/rdf-schema#label",
+				         },
+				},
+				
+	    },
+		
+		
+		{	
+			"solr":"authorContinent",
+			"qualifiedByDomain": "http://purl.org/ontology/bibo/Document",
+			"configContextFor": "http://vivoweb.org/ontology/core#relatedBy",
+			"qualifiedBy": "http://vivoweb.org/ontology/core#Authorship",
+				"pivotsIndexProperty":{
+					"configContextFor": "http://vivoweb.org/ontology/core#relates",
+					"qualifiedBy": "http://xmlns.com/foaf/0.1/Person",
+						"pivotsIndexProperty":{
+				             "configContextFor": "http://vivoweb.org/ontology/core#geographicFocus",
+				             "qualifiedBy": "http://vivoweb.org/ontology/core#Country",
+				                  "pivotsIndexProperty":{
+				                      "configContextFor": "http://aims.fao.org/aos/geopolitical.owl#isInGroup",
+				                      "qualifiedBy": "http://vivoweb.org/ontology/core#Continent",
+				                           "pivotsIndexProperty":{
+				                                "configContextFor": "http://www.w3.org/2000/01/rdf-schema#label",
+				                            }
+						          }
+				         },
+		        },		
+		},
+		
+		{	
+			"solr":"withStatus",
+			"qualifiedByDomain": "http://purl.org/ontology/bibo/Document",
+			"configContextFor": "http://purl.org/ontology/bibo/status",
+				"pivotsIndexProperty":{
+					"regexp":"^http://([a-zA-Z\\.]{1,50})/([a-zA-Z]{1,20})/([a-zA-Z]{1,20})/([a-zA-Z]{1,20})$",
+					"regexpreplace":"$4",
+				},
+		},
+		
+		
+		{
+			"solr":"articleYear",
+			"qualifiedByDomain": "http://purl.org/ontology/bibo/AcademicArticle",
+			"configContextFor": "http://vivoweb.org/ontology/core#dateTimeValue",
+			"qualifiedBy": "http://vivoweb.org/ontology/core#DateTimeValue",
+				"pivotsIndexProperty":{
+				 "configContextFor": "http://vivoweb.org/ontology/core#dateTime",
+				 "regexp":"^([0-9]{4,4})-.*$",
+				 "regexpreplace":"$1",
+				},
+		},
+		
+],
+
+
+}

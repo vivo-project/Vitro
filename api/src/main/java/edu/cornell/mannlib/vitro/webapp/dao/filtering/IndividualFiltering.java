@@ -565,5 +565,9 @@ public class IndividualFiltering implements Individual {
 	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		_innerIndividual.resolveAsFauxPropertyStatements(list);
 	}
+	
+    public Individual get_innerIndividual() {
+		return _innerIndividual;
+	}
 
 }
