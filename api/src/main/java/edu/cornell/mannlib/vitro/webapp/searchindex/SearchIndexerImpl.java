@@ -102,6 +102,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private boolean rebuildOnUnpause = false;
 
 	private volatile int paused = 0;
+	private static volatile boolean enabled = true;
 
 	private List<Statement> pendingStatements = new ArrayList<Statement>();
 	private Collection<String> pendingUris = new ArrayList<String>();
@@ -168,6 +169,14 @@ public class SearchIndexerImpl implements SearchIndexer {
 		modifiers.addAll(new UpdateDocumentWorkUnit.MinimalDocumentModifiers()
 				.getList());
 		modifiers.addAll(beanLoader.loadAll(DocumentModifier.class));
+	}
+	
+	public static synchronized void enablePendingStatements() {
+		enabled = true;
+	}
+	
+	public static synchronized void disablePendingStatements() {
+		enabled = false;
 	}
 
 	@Override
@@ -280,7 +289,9 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 	private synchronized boolean addToPendingStatements(List<Statement> changes) {
 		if (paused > 0) {
-			pendingStatements.addAll(changes);
+			if(enabled) {
+			    pendingStatements.addAll(changes);
+			}
 			return true;
 		}
 

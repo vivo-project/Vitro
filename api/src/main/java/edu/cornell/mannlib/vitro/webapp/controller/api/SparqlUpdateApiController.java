@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl;
 
 /**
  * Process SPARQL Updates, as an API.
@@ -60,9 +61,17 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 			throws ServletException, IOException {
 		log.debug("Starting update");
 		try {
+			if("s".equals(req.getParameter("firstime"))) {
+				log.info("disablePendingStatements");
+				SearchIndexerImpl.disablePendingStatements();
+			}
 			confirmAuthorization(req, REQUIRED_ACTIONS);
 			UpdateRequest parsed = parseUpdateString(req);
 			executeUpdate(req, parsed);
+			if("s".equals(req.getParameter("firstime"))) {
+				log.info("enablePendingStatements");
+				SearchIndexerImpl.enablePendingStatements();
+			}
 			do200response(resp);
 		} catch (AuthException e) {
 			do403response(resp, e);

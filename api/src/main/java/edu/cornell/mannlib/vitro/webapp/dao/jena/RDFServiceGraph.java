@@ -96,104 +96,60 @@ public class RDFServiceGraph implements GraphWithPerform {
         return sb;
     }
     
-    private String serialize(Triple t) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(sparqlNodeUpdate(t.getSubject(), "")).append(" ") 
-               .append(sparqlNodeUpdate(t.getPredicate(), "")).append(" ") 
-               .append(sparqlNodeUpdate(t.getObject(), "")).append(" .");
-        return sb.toString();
-    }
-
     private synchronized void flush() {
-        ChangeSet changeSet = rdfService.manufactureChangeSet();
         try {
             if(!removalsGraph.isEmpty()) {
-                flushGraph(removalsGraph,graphURI,changeSet,rdfService,false);
+                flushGraph(removalsGraph,rdfService,false);
             }
             if(!additionsGraph.isEmpty()) {
-                flushGraph(additionsGraph,graphURI,changeSet,rdfService,true);
+                flushGraph(additionsGraph,rdfService,true);
             }
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
         }
     }
     
-    
-    private static int maxStringSize = 10000000;
-    
-    private synchronized void flushGraph(Graph graph,String graphURI,ChangeSet changeSet,RDFService rdfService,boolean add) throws RDFServiceException {
+    private synchronized void flushGraph(Graph graph, RDFService rdfService,boolean add) throws RDFServiceException {
         
-        Runtime runtime = Runtime.getRuntime();
-
-        StringBuilder sb = new StringBuilder(maxStringSize+(10000000/10));
+        int maxStringSize = 10000000;
+        StringBuilder sb = new StringBuilder(maxStringSize);
         Iterator<Triple> tripIt = graph.find(null, null, null);
         
         while(tripIt.hasNext()) {
-
-            sb.append(" \n").append(serialize(tripIt.next()));
-           
+            sb.append(" \n");
+            serialize(sb,tripIt.next());
             if(sb.length()>maxStringSize) {
-               
-               String triples = sb.toString();
-               
-              InputStream tripleInputStream = RDFServiceUtils.toInputStream(triples);
-               
-              if(add) {
-                   changeSet.addAddition(tripleInputStream,RDFService.ModelSerializationFormat.N3, graphURI);
-              }else {
-                  changeSet.addRemoval(tripleInputStream,RDFService.ModelSerializationFormat.N3, graphURI);
-              }
-              
-               triples = null;
-               
-               rdfService.changeSetUpdate(changeSet);
-                
-               changeSet = rdfService.manufactureChangeSet();
-
-               if(tripleInputStream!=null) {
-                    try {
-                        tripleInputStream.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException();
-                    }
-               }
-               
-               runtime.gc();
-               
-               sb = new StringBuilder(maxStringSize+(10000000/10));
-               
+            	flushTriples(sb, rdfService, add);
+                sb = new StringBuilder(maxStringSize);
            }
         }
-        
-        String triples = sb.toString();
-        sb = null;
-        
-        InputStream tripleInputStream = RDFServiceUtils.toInputStream(triples);
-       
-        if(add) {
-            changeSet.addAddition(tripleInputStream, RDFService.ModelSerializationFormat.N3, graphURI);
-        }else {
-        changeSet.addRemoval(tripleInputStream,RDFService.ModelSerializationFormat.N3, graphURI);
-      }
-        
-        triples = null;
+        flushTriples(sb, rdfService, add);
         graph.clear();
-        
-        rdfService.changeSetUpdate(changeSet);
-        
-        if(tripleInputStream!=null) {
-                try {
-                    tripleInputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException();
-                }
-        }
-        
-        changeSet = null;
-        runtime.gc();
-       
     }    
     
+    
+    private synchronized void flushTriples(StringBuilder sbTriples,RDFService rdfService,boolean add) throws RDFServiceException {
+    
+        String triples = sbTriples.toString();
+        sbTriples = null;
+        ChangeSet changeSet = rdfService.manufactureChangeSet();
+    
+        try (InputStream tripleInputStream = RDFServiceUtils.toInputStream(triples)) {
+            if(add) {
+                changeSet.addAddition(tripleInputStream, RDFService.ModelSerializationFormat.N3, graphURI);
+            }else {
+                changeSet.addRemoval(tripleInputStream,RDFService.ModelSerializationFormat.N3, graphURI);
+            }
+            triples = null;
+            rdfService.changeSetUpdate(changeSet);
+            tripleInputStream.close();
+            changeSet = null;
+        } catch (IOException e) {
+            throw new RuntimeException();
+        } 
+    }
+    
+   
     @Override
     public void performAdd(Triple t) {
         if(inTransaction) {
@@ -570,12 +526,12 @@ public class RDFServiceGraph implements GraphWithPerform {
 	};
 
 	private final TransactionHandler transactionHandler = new TransactionHandler() {
-    @Override
-    public synchronized void abort() {
-        inTransaction = false;
-        removalsGraph.clear();
-        additionsGraph.clear();
-    }
+        @Override
+	    public synchronized void abort() {
+	        inTransaction = false;
+	        removalsGraph.clear();
+	        additionsGraph.clear();
+	    }
 
         @Override
         public synchronized void begin() {
