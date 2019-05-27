@@ -17,6 +17,8 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ExecutorFactory;
+
 /**
  * Instantiate and run the ServletContextListeners for Vitro, while accumulating
  * messages in StartupStatus.
@@ -223,6 +225,9 @@ public class StartupManager implements ServletContextListener {
 			}
 		}
 		log.info("Called 'contextDestroyed' on all listeners.");
+		
+        ExecutorFactory.destroyExecutor();
+        log.info("Called 'destroyExecutor' on ExecutorFactory.");
 	}
 
 }

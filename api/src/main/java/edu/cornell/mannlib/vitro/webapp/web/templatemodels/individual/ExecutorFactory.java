@@ -12,4 +12,9 @@ public final class ExecutorFactory {
         return executor;
     }
     
+    public static void destroyExecutor() {
+        executor.shutdown();
+    }
+    
 }
+ 
