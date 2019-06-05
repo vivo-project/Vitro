@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.searchindex.IndexingChangeListener;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl;
 
 /**
@@ -61,17 +62,9 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 			throws ServletException, IOException {
 		log.debug("Starting update");
 		try {
-			if("s".equals(req.getParameter("firstime"))) {
-				log.info("disablePendingStatements");
-				SearchIndexerImpl.disablePendingStatements();
-			}
 			confirmAuthorization(req, REQUIRED_ACTIONS);
 			UpdateRequest parsed = parseUpdateString(req);
 			executeUpdate(req, parsed);
-			if("s".equals(req.getParameter("firstime"))) {
-				log.info("enablePendingStatements");
-				SearchIndexerImpl.enablePendingStatements();
-			}
 			do200response(resp);
 		} catch (AuthException e) {
 			do403response(resp, e);
@@ -114,6 +107,9 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	    try {
 	        if(indexer != null) {
 	            indexer.pause();
+	            if("s".equals(req.getParameter("firstime"))) {
+					IndexingChangeListener.enabled = false;
+				}
 	        }
 	        if(ds.supportsTransactions()) {
 			    ds.begin(ReadWrite.WRITE);
@@ -126,6 +122,10 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		    }
 			if(indexer != null) {
 			    indexer.unpause();
+				if("s".equals(req.getParameter("firstime"))) {
+					IndexingChangeListener.enabled = true;
+					indexer.rebuildIndex();
+				}
 			}
 		}
 	}
