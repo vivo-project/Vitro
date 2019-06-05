@@ -205,14 +205,14 @@ public class IndividualRdfAssembler {
 				String value = stmt.getObject().asLiteral().getString();
 				DataPropertyStatement dps = new DataPropertyStatementImpl(
 						subjectUri, predicateUri, value);
-				RequestedAction pdps = new PublishDataPropertyStatement(o, dps);
+				RequestedAction pdps = new PublishDataPropertyStatement(vreq, o, dps);
 				if (!PolicyHelper.isAuthorizedForActions(vreq, pdps)) {
 					log.debug("not authorized: " + pdps);
 					stmts.remove();
 				}
 			} else if (stmt.getObject().isURIResource()) {
 				String objectUri = stmt.getObject().asResource().getURI();
-				RequestedAction pops = new PublishObjectPropertyStatement(o,
+				RequestedAction pops = new PublishObjectPropertyStatement(vreq, o,
 						subjectUri, predicateUri, objectUri);
 				if (!PolicyHelper.isAuthorizedForActions(vreq, pops)) {
 					log.debug("not authorized: " + pops);

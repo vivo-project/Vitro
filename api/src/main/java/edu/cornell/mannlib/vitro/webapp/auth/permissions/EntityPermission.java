@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
-import edu.cornell.mannlib.vitro.webapp.utils.RelationshipCheckerRegistry;
+import edu.cornell.mannlib.vitro.webapp.utils.RelationshipChecker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.ontology.OntModel;
@@ -257,7 +257,7 @@ public abstract class EntityPermission extends Permission {
             }
         }
 
-        return RelationshipCheckerRegistry.anyRelated(action.getOntModel(), Arrays.asList(action.getResourceUris()), personUris);
+        return RelationshipChecker.anyRelated(action.getRequest(), action.getOntModel(), Arrays.asList(action.getResourceUris()), personUris);
     }
 
     protected boolean isAuthorizedFor(Property prop) {

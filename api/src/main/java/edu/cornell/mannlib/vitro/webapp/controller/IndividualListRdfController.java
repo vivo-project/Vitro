@@ -96,7 +96,7 @@ public class IndividualListRdfController extends VitroApiServlet {
 	private boolean isVclassRestricted(String vclassUri, HttpServletRequest req) {
 		ObjectProperty property = new ObjectProperty();
 		property.setURI(RDF_TYPE);
-		RequestedAction dops = new PublishObjectPropertyStatement(ModelAccess
+		RequestedAction dops = new PublishObjectPropertyStatement(req, ModelAccess
 				.on(req).getOntModel(FULL_ASSERTIONS), RequestedAction.SOME_URI, property,
 				vclassUri);
 		return !PolicyHelper.isAuthorizedForActions(req, dops);

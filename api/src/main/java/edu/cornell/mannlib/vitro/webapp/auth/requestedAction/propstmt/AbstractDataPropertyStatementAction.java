@@ -7,6 +7,8 @@ import org.apache.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * A base class for requested actions that involve adding, editing, or dropping
  * data property statements from a model.
@@ -18,9 +20,9 @@ public abstract class AbstractDataPropertyStatementAction extends
 	private final Property predicate;
 	private final String dataValue;
 
-	public AbstractDataPropertyStatementAction(OntModel ontModel,
-			String subjectUri, String predicateUri, String dataValue) {
-		super(ontModel);
+	public AbstractDataPropertyStatementAction(HttpServletRequest request, OntModel ontModel,
+											   String subjectUri, String predicateUri, String dataValue) {
+		super(request, ontModel);
 		this.subjectUri = subjectUri;
 		this.predicateUri = predicateUri;
 		Property dataProperty = new Property();
@@ -29,9 +31,9 @@ public abstract class AbstractDataPropertyStatementAction extends
 		this.dataValue = dataValue;
 	}
 
-	public AbstractDataPropertyStatementAction(OntModel ontModel,
+	public AbstractDataPropertyStatementAction(HttpServletRequest request, OntModel ontModel,
 			DataPropertyStatement dps) {
-		super(ontModel);
+		super(request, ontModel);
 		this.subjectUri = (dps.getIndividual() == null) ? dps
 				.getIndividualURI() : dps.getIndividual().getURI();
 		this.predicateUri = dps.getDatapropURI();
