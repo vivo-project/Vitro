@@ -60,15 +60,15 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 public class UpdateKnowledgeBase {
     public static final String KBM_REQURIED_AT_STARTUP = "KNOWLEDGE_BASE_MIGRATION_REQUIRED_AT_STARTUP";
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
-	
+
 	private final String dataDir;
 	private final ServletContextListener parent;
-	
+
 	public UpdateKnowledgeBase(String dataDir, ServletContextListener parent) {
 		this.dataDir = dataDir;
 		this.parent = parent;
 	}
-	
+
 	private String diffFile() { return dataDir + "diff.tab.txt"; }
 	private String askQueryFile() { return dataDir + "askUpdated.sparql"; }
 	private String successAssertionsFile() { return dataDir + "success.n3"; }
@@ -88,7 +88,7 @@ public class UpdateKnowledgeBase {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
         boolean migrationChangesMade = false;
-		
+
 		try {
 			UpdateSettings settings = new UpdateSettings();
 			putReportingPathsIntoSettings(ctx, settings);
@@ -99,13 +99,13 @@ public class UpdateKnowledgeBase {
 			} catch (Exception e) {
 				// Should mean that the reasoner is not even started yet.
 			}
-			
+
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getOntModelSelector(ASSERTIONS_ONLY));
 			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getOntModelSelector(INFERENCES_ONLY));
 			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getOntModelSelector());
-			
+
 		    Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
 			settings.setDisplayModel(ModelAccess.on(ctx).getOntModel(DISPLAY));
 			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxModelDir()));
@@ -120,7 +120,7 @@ public class UpdateKnowledgeBase {
 
 			boolean tryMigrateDisplay = true;
 			try {
-			    //Display model tbox and display metadata 
+			    //Display model tbox and display metadata
 			    //old display model tbox model
 			    OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(oldDisplayModelTBoxPath()));
 			    settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
@@ -164,35 +164,35 @@ public class UpdateKnowledgeBase {
     			            log.warn("unable to successfully update display model: " + e.getMessage());
     			        }
     			    }
-    			    // reload the display model since the TBoxUpdater may have 
+    			    // reload the display model since the TBoxUpdater may have
     			    // modified it
-    			    new ConfigurationModelsSetup().contextInitialized(sce);				  
+    			    new ConfigurationModelsSetup().contextInitialized(sce);
     			} catch (Exception ioe) {
     			    ss.fatal(parent, "Exception updating knowledge base for ontology changes: ", ioe);
-    			}	
+    			}
 			}
-			
+
 			removeBadRestrictions(settings.getAssertionOntModelSelector().getTBoxModel());
-			
+
             log.info("Simple reasoner connected for the ABox");
-            if(JenaDataSourceSetupBase.isFirstStartup() 
+            if(JenaDataSourceSetupBase.isFirstStartup()
                     || (migrationChangesMade && requiredUpdate)) {
                 SimpleReasonerSetup.setRecomputeRequired(
-                        ctx, SimpleReasonerSetup.RecomputeMode.FOREGROUND);    
+                        ctx, SimpleReasonerSetup.RecomputeMode.FOREGROUND);
             } else if (migrationChangesMade) {
                 SimpleReasonerSetup.setRecomputeRequired(
-                        ctx, SimpleReasonerSetup.RecomputeMode.BACKGROUND);  
+                        ctx, SimpleReasonerSetup.RecomputeMode.BACKGROUND);
             }
-	
+
 		} catch (Throwable t){
 		    ss.fatal(parent, "Exception updating knowledge base for ontology changes: ", t);
 		}
-		
-	}	
+
+	}
 
 
 
-	
+
 	/**
 	 * Set the paths for the files that specify how to perform the update
 	 */
@@ -204,14 +204,14 @@ public class UpdateKnowledgeBase {
         settings.setSuccessAssertionsFile(ctx.getRealPath(successAssertionsFile()));
         settings.setSuccessRDFFormat("N3");
 	}
-	
+
 	/**
-	 * Create the directories where we will report on the update. 
+	 * Create the directories where we will report on the update.
 	 * Put the paths for the directories and files into the settings object.
 	 */
 	private void putReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) throws IOException {
 	    Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
-		
+
 		Path dataDir = createDirectory(homeDir, "upgrade", "knowledgeBase");
 		settings.setDataDir(dataDir.toString());
 		StartupStatus.getBean(ctx).info(parent, "Updating knowledge base: reports are in '" + dataDir + "'");
@@ -219,11 +219,11 @@ public class UpdateKnowledgeBase {
 		Path changedDir = createDirectory(dataDir, "changedData");
 		settings.setAddedDataFile(changedDir.resolve(timestampedFileName("addedData", "n3")).toString());
 		settings.setRemovedDataFile(changedDir.resolve(timestampedFileName("removedData", "n3")).toString());
-		
+
 		Path logDir = createDirectory(dataDir, "logs");
 		settings.setLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate", "log")).toString());
 		settings.setErrorLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate.error", "log")).toString());
-		
+
 		Path qualifiedPropertyConfigFile = getFilePath(homeDir, "rdf", "display", "firsttime", "PropertyConfig.n3");
 		settings.setQualifiedPropertyConfigFile(qualifiedPropertyConfigFile.toString());
 	}
@@ -233,9 +233,9 @@ public class UpdateKnowledgeBase {
         for (String child : children) {
             path = path.resolve(child);
         }
-        return path;	    
+        return path;
 	}
-	
+
 	private Path createDirectory(Path parent, String... children) throws IOException {
 		Path dir = parent;
 		for (String child : children) {
@@ -245,7 +245,7 @@ public class UpdateKnowledgeBase {
 		return dir;
 	}
 
-	
+
 	//Multiple changes from 1.4 to 1.5 will occur
 	//update migration model
 	public void migrateDisplayModel(UpdateSettings settings) throws Exception {
@@ -255,7 +255,7 @@ public class UpdateKnowledgeBase {
 		Model removeStatements = ModelFactory.createDefaultModel();
 		//remove old tbox and display metadata statements and add statements from new versions
 		replaceTboxAndDisplayMetadata(displayModel, addStatements, removeStatements,settings);
-		//Update statements for data getter class types that have changed in 1.5 
+		//Update statements for data getter class types that have changed in 1.5
 		updateDataGetterClassNames(displayModel, addStatements, removeStatements);
 		//add cannot delete flags to pages that shouldn't allow deletion on page list
 		addCannotDeleteFlagDisplayModel(displayModel, addStatements, removeStatements);
@@ -265,7 +265,7 @@ public class UpdateKnowledgeBase {
 		addPageListDisplayModel(displayModel, addStatements, removeStatements,settings);
 		//update data getter labels
 		updateDataGetterLabels(displayModel, addStatements, removeStatements,settings);
-		
+
 		displayModel.enterCriticalSection(Lock.WRITE);
 		try {
 			if(log.isDebugEnabled()) {
@@ -286,14 +286,14 @@ public class UpdateKnowledgeBase {
 			displayModel.leaveCriticalSection();
 		}
 	}
-	
-	//replace 
+
+	//replace
 	private void replaceTboxAndDisplayMetadata(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
-		
+
 		OntModel oldDisplayModelTboxModel = settings.getOldDisplayModelTboxModel();
 		OntModel oldDisplayModelDisplayMetadataModel = settings.getOldDisplayModelDisplayMetadataModel();
 		OntModel newDisplayModelTboxModel = settings.getNewDisplayModelTboxModel();
-		OntModel newDisplayModelDisplayMetadataModel = settings.getNewDisplayModelDisplayMetadataModel();	
+		OntModel newDisplayModelDisplayMetadataModel = settings.getNewDisplayModelDisplayMetadataModel();
 		OntModel loadedAtStartup = settings.getLoadedAtStartupDisplayModel();
 		OntModel oldVivoListView = settings.getVivoListViewConfigDisplayModel();
 		//Remove old display model tbox and display metadata statements from display model
@@ -307,12 +307,12 @@ public class UpdateKnowledgeBase {
 			log.debug("Adding old display tbox model, display metadata model, and oldVivoListView to remove statements.  Remove statements now include:");
 			removeStatements.write(sw, "N3");
 			log.debug(sw.toString());
-			sw.close(); 
+			sw.close();
 		}
 		catch(Exception ex) {
 			log.error("Exception occurred", ex);
 		}
-		//Add statements from new tbox and display metadata 
+		//Add statements from new tbox and display metadata
 		addStatements.add(newDisplayModelTboxModel);
 		addStatements.add(newDisplayModelDisplayMetadataModel);
 		//this should include the list view in addition to other files
@@ -322,13 +322,13 @@ public class UpdateKnowledgeBase {
 			log.debug("Adding new display tbox model, display metadata model, and loaded at startup to add statements.  Add statements now include:");
 			addStatements.write(sw, "N3");
 			log.debug(sw.toString());
-			sw.close(); 	
+			sw.close();
 		} catch(Exception ex) {
 			log.error("Exception occurred in adding new display model tbox/metadata info to add statements ", ex);
 		}
 		log.debug("Adding new display tbox model, display metadata model, and all models loaded at startup");
 	}
-	
+
 	//update statements for data getter classes
 	private void updateDataGetterClassNames(OntModel displayModel, Model addStatements, Model removeStatements) {
 		Resource classGroupOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData");
@@ -339,7 +339,7 @@ public class UpdateKnowledgeBase {
 		Resource browseNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter");
 		Resource individualsForClassesNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter");
 		Resource internalClassesNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.InternalClassesDataGetter");
-		
+
 		//Find statements where type is ClassGroupData
 		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, classGroupOldType, classGroupNewType);
 		//Find statements where type is BrowseDataGetter
@@ -349,8 +349,8 @@ public class UpdateKnowledgeBase {
 		//Find statements where type is internal class
 		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, internalClassesOldType, internalClassesNewType);
 	}
-	
-	private void updateAddRemoveDataGetterStatements(OntModel displayModel, 
+
+	private void updateAddRemoveDataGetterStatements(OntModel displayModel,
 			Model removeStatements, Model addStatements,
 			Resource oldType, Resource newType) {
 		log.debug("Old type: " + oldType.getURI() + " - newType: " + newType.getURI());
@@ -376,15 +376,15 @@ public class UpdateKnowledgeBase {
 			log.error("Error occurred in writing out remove and statements for data getter types", ex);
 		}
 	}
-	
+
 	//add cannotDeleteFlag to display model
 	private void addCannotDeleteFlagDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements) {
 		Resource homePage = displayModel.getResource(DisplayVocabulary.HOME_PAGE_URI);
-		addStatements.add(homePage, 
+		addStatements.add(homePage,
 				ResourceFactory.createProperty(DisplayVocabulary.DISPLAY_NS + "cannotDeletePage"),
 				ResourceFactory.createPlainLiteral("true"));
 	}
-		
+
 	//remove requires template
 	private void updatePeoplePageDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements) {
 		Resource peoplePage = displayModel.getResource(DisplayVocabulary.DISPLAY_NS + "People");
@@ -394,7 +394,7 @@ public class UpdateKnowledgeBase {
 		}
 		log.debug("Will remove body template from people page so added that to remove statements ");
 	}
-	
+
 	//add page list sparql query
 	private void addPageListDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
 		OntModel newDisplayModel = settings.getNewDisplayModelFromFile();
@@ -423,19 +423,19 @@ public class UpdateKnowledgeBase {
 		}catch(Exception ex) {
 			log.error("Exception occurred in writing out new display model", ex);
 		}
-		
+
 		log.debug("Checking: AFTER adding pageList resource, what do we have for pageList page");
 		Resource testResource = ResourceFactory.createResource(DisplayVocabulary.DISPLAY_NS + "pageListPage");
 		StmtIterator testIt = addStatements.listStatements(testResource, null, (RDFNode) null);
 		if(!testIt.hasNext()) {
 			log.debug("Add statements does not have the page list page resource " + testResource.getURI());
 		}
-		
+
 		while(testIt.hasNext()) {
 			log.debug("Statement for page list resource: " + testIt.nextStatement().toString());
 		}
 	}
-	
+
 	//update any new labels
 	private void updateDataGetterLabels(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
 		log.debug("Checking: BEFORE adding any statements, what do we have for pageList page");
@@ -444,23 +444,23 @@ public class UpdateKnowledgeBase {
 		if(!testIt.hasNext()) {
 			log.debug("Add statements does not have the page list page resource " + testResource.getURI());
 		}
-		
+
 		while(testIt.hasNext()) {
 			log.debug("Statement for page list resource: " + testIt.nextStatement().toString());
 		}
-		
+
 		log.debug("Triple checking -- before this method, the add statements model contains");
 		StringWriter sw = new StringWriter();
 		try {
 			addStatements.write(sw, "N3");
 			log.debug(sw.toString());
 			sw.close();
-		}catch(Exception ex) 
+		}catch(Exception ex)
 		{
 			log.error("Error occurred in adding resource labels ", ex);
 		}
-		
-		
+
+
 		OntModel newDisplayModel = settings.getNewDisplayModelFromFile();
 		List<Resource> resourcesForLabels = new ArrayList<Resource>();
 		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData"));
@@ -478,11 +478,11 @@ public class UpdateKnowledgeBase {
 				addStatements.write(sw, "N3");
 				log.debug(sw.toString());
 				sw.close();
-			}catch(Exception ex) 
+			}catch(Exception ex)
 			{
 				log.error("Error occurred in adding resource labels ", ex);
 			}
-			
+
 		}
 		//Add statements now includes
 		log.debug("AFTER all resources added, Add statements now includes ");
@@ -491,14 +491,14 @@ public class UpdateKnowledgeBase {
 			addStatements.write(sw, "N3");
 			log.debug(sw.toString());
 			sw.close();
-		}catch(Exception ex) 
+		}catch(Exception ex)
 		{
 			log.error("Error occurred in adding resource labels ", ex);
 		}
-		
+
 	}
-	
-  					
+
+
 	private OntModel loadModelFromDirectory(String directoryPath) {
 		log.debug("Loading model from directory " + directoryPath);
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
@@ -513,7 +513,7 @@ public class UpdateKnowledgeBase {
 		}
 		return om;
 	}
-	
+
 	//load file from file path
 	private OntModel loadModelFromFile(String filePath) {
 		log.debug("Load model from file " + filePath);
@@ -526,12 +526,12 @@ public class UpdateKnowledgeBase {
 		readFile(file, om, filePath);
 		return om;
 	}
-	
-	
+
+
 	private void readFile(File f, OntModel om, String path) {
 		try {
 			FileInputStream fis = new FileInputStream(f);
-			try {	
+			try {
 				if (f.getName().endsWith(".md")) {
 					// Markdown files are documentation - skip.
 				} else if (f.getName().endsWith(".n3")) {
@@ -540,14 +540,14 @@ public class UpdateKnowledgeBase {
 					om.read(fis, null, "RDF/XML");
 				}
 			} catch (Exception e) {
-				log.error("Unable to load RDF from " + f.getName(), e); 
+				log.error("Unable to load RDF from " + f.getName(), e);
 			}
 		} catch (FileNotFoundException fnfe) {
 			log.error(f.getName() + " not found. Unable to load" +
 					" RDF from this location: " + path);
-		}	
+		}
 	}
-	
+
 	/**
 	 *  Remove restrictions with missing owl:onProperty or obsolete core class
 	 *  This should be worked into the main migration later.
@@ -558,7 +558,7 @@ public class UpdateKnowledgeBase {
 	            "    ?rest ?p ?o . \n" +
 	            "    ?oo ?pp ?rest \n" +
 	            "} WHERE { \n" +
-	            "    ?rest a owl:Restriction . \n" + 
+	            "    ?rest a owl:Restriction . \n" +
 	            "    FILTER NOT EXISTS { ?rest owl:onProperty ?x } \n" +
 	            "    ?rest ?p ?o . \n" +
 	            "    ?oo ?pp ?rest \n" +
@@ -582,7 +582,7 @@ public class UpdateKnowledgeBase {
                 Model bad = qe.execConstruct();
                 tboxModel.remove(bad);
                 if (bad.size() > 0) {
-                    log.info("Deleted " + bad.size() + 
+                    log.info("Deleted " + bad.size() +
                             " triples of syntactically invalid restrictions");
                 }
             } finally {
@@ -592,18 +592,18 @@ public class UpdateKnowledgeBase {
             }
 	    }
 	}
-	
+
 	private static String timestampedFileName(String prefix, String suffix) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");
 		return prefix + "." + sdf.format(new Date()) + "." + suffix;
 	}
-	
+
 	private class ModelDirectoryNotFoundException extends RuntimeException {
 		public ModelDirectoryNotFoundException(String msg) {
 			super(msg);
 		}
 	}
-	
+
 	private class ModelFileNotFoundException extends RuntimeException {
 		public ModelFileNotFoundException(String msg) {
 			super(msg);

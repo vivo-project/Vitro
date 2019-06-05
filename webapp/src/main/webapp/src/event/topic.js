@@ -66,8 +66,8 @@ dojo.event.topic.TopicImpl = function(topicName){
 		var tf = listenerMethod||listenerObject;
 		var to = (!listenerMethod) ? dj_global : listenerObject;
 		dojo.event.kwConnect({
-			srcObj:		this, 
-			srcFunc:	"sendMessage", 
+			srcObj:		this,
+			srcFunc:	"sendMessage",
 			adviceObj:	to,
 			adviceFunc: tf
 		});
@@ -77,8 +77,8 @@ dojo.event.topic.TopicImpl = function(topicName){
 		var tf = (!listenerMethod) ? listenerObject : listenerMethod;
 		var to = (!listenerMethod) ? null : listenerObject;
 		dojo.event.kwDisconnect({
-			srcObj:		this, 
-			srcFunc:	"sendMessage", 
+			srcObj:		this,
+			srcFunc:	"sendMessage",
 			adviceObj:	to,
 			adviceFunc: tf
 		});

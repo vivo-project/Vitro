@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * The simple implementation of ShortTermCombinedTripleSource.
- * 
+ *
  * The short-term RDFServices are cached, lest we somehow create duplicates for
  * the same request. Similarly with the short-term OntModels.
  */

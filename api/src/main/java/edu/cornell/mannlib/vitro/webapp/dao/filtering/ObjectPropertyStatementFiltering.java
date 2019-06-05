@@ -11,12 +11,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 public class ObjectPropertyStatementFiltering implements ObjectPropertyStatement {
     final ObjectPropertyStatement innerStmt;
     final VitroFilters filters;
-    
+
     public ObjectPropertyStatementFiltering( ObjectPropertyStatement stmt, VitroFilters filters){
         this.innerStmt = stmt;
         this.filters = filters;
     }
-    
+
      /* methods that return wrapped objects */
 
     public Individual getObject() {

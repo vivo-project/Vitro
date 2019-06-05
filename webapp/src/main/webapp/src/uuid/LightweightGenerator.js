@@ -13,17 +13,17 @@ dojo.provide("dojo.uuid.LightweightGenerator");
 /**
  * The LightweightGenerator is intended to be small and fast,
  * but not necessarily good.
- * 
- * Small: The LightweightGenerator has a small footprint. 
- * Once comments are stripped, it's only about 25 lines of 
+ *
+ * Small: The LightweightGenerator has a small footprint.
+ * Once comments are stripped, it's only about 25 lines of
  * code, and it doesn't dojo.require() any other packages.
  *
- * Fast: The LightweightGenerator can generate lots of new 
- * UUIDs fairly quickly (at least, more quickly than the other 
+ * Fast: The LightweightGenerator can generate lots of new
+ * UUIDs fairly quickly (at least, more quickly than the other
  * dojo UUID generators).
  *
  * Not necessarily good: We use Math.random() as our source
- * of randomness, which may or may not provide much randomness. 
+ * of randomness, which may or may not provide much randomness.
  */
 dojo.uuid.LightweightGenerator = new function() {
 

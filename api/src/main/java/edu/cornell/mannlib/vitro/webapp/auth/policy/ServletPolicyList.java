@@ -44,7 +44,7 @@ public class ServletPolicyList {
 		if (policy == null) {
 			return;
 		}
-		
+
 		PolicyList policies = getPolicyList(sc);
 		if (!policies.contains(policy)) {
 			policies.add(policy);
@@ -62,7 +62,7 @@ public class ServletPolicyList {
 		if (policy == null) {
 			return;
 		}
-		
+
 		PolicyList policies = getPolicyList(sc);
 		if (!policies.contains(policy)) {
 			policies.add(0, policy);

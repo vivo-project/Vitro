@@ -19,7 +19,7 @@ public class BaseSearchResultDocument implements SearchResultDocument {
 
 	public BaseSearchResultDocument(String uniqueId, Map<String, Collection<Object>> fieldValuesMap) {
 		this.uniqueId = uniqueId;
-		
+
 		Map<String, Collection<Object>> map = new HashMap<>();
 		for (String name : fieldValuesMap.keySet()) {
 			map.put(name, Collections.unmodifiableList(new ArrayList<>(

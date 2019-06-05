@@ -19,7 +19,7 @@ public class FileServingHelper {
 	private static final Log log = LogFactory.getLog(FileServingHelper.class);
 
 	public static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
-	
+
 	private static final String DEFAULT_PATH = "/individual/";
 	private static final String FILE_PATH = "/file/";
 	private static boolean warned; // Only issue the warning once.
@@ -59,7 +59,7 @@ public class FileServingHelper {
 	 * URL, replacing it with the file prefix, and adding the filename to the
 	 * end.
 	 * </p>
-	 * 
+	 *
 	 * @return <ul>
 	 *         <li>the translated URL, if the URI was in the default namespace,</li>
 	 *         <li>the original URI, if it wasn't in the default namespace,</li>
@@ -105,7 +105,7 @@ public class FileServingHelper {
 	 * This should involve removing the filename from the end of the URL, and
 	 * replacing the file prefix with the default namespace.
 	 * </p>
-	 * 
+	 *
 	 * @return the URI, or {@code null} if the URL couldn't be translated.
 	 */
 	public static String getBytestreamUri(String path, ServletContext ctx) {

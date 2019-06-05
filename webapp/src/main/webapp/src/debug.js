@@ -9,7 +9,7 @@
 */
 
 /**
- * Produce a line of debug output. 
+ * Produce a line of debug output.
  * Does nothing unless djConfig.isDebug is true.
  * varargs, joined with ''.
  * Caller should not supply a trailing "\n".
@@ -48,7 +48,7 @@ dojo.debug = function(){
 }
 
 /**
- * this is really hacky for now - just 
+ * this is really hacky for now - just
  * display the properties of the object
 **/
 

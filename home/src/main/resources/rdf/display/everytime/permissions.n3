@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
@@ -143,15 +143,15 @@ action:UseMiscellaneousPages
     rdfs:label "USE_MISCELLANEOUS_PAGES" .
 
 ##Page specific permissions
-action:PageViewableAdmin 
+action:PageViewableAdmin
 	a display:RequiredAction ;
     rdfs:label "PAGE_VIEWABLE_ADMIN" .
-    
+
 action:PageViewableCurator
 	a display:RequiredAction ;
 	rdfs:label "PAGE_VIEWABLE_CURATOR" .
 
-action:PageViewableEditor 
+action:PageViewableEditor
 	a display:RequiredAction ;
 	rdfs:label "PAGE_VIEWABLE_EDITOR" .
 
@@ -159,6 +159,6 @@ action:PageViewableLoggedIn
 	a display:RequiredAction ;
 	rdfs:label "PAGE_VIEWABLE_LOGGEDIN" .
 
-action:PageViewablePublic 
+action:PageViewablePublic
 	a display:RequiredAction ;
 	rdfs:label "PAGE_VIEWABLE_PUBLIC" .

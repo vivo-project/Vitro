@@ -5,16 +5,16 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 
 /**
- * Interface for an object that returns a new, unused URI, 
- * in the default namespace or in a specified namespace. 
+ * Interface for an object that returns a new, unused URI,
+ * in the default namespace or in a specified namespace.
  *
  */
 public interface NewURIMaker {
     /**
-     * @param prefixURI - may be null, the use the default namespace. If it is 
-     * not null, then it is used as prefix of the new URI, a random integer may be added. 
+     * @param prefixURI - may be null, the use the default namespace. If it is
+     * not null, then it is used as prefix of the new URI, a random integer may be added.
      * @return a URI that is not currently in use by the system.
-     * @throws InsertException 
+     * @throws InsertException
      */
-    String getUnusedNewURI( String prefixURI ) throws InsertException;    
+    String getUnusedNewURI( String prefixURI ) throws InsertException;
 }

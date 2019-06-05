@@ -53,15 +53,15 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
 	public static final boolean KEEP_ONLY_IF_TRUE = true; //used for updatePropertyBooleanValue()
     public static final boolean KEEP_ONLY_IF_FALSE = false; //used for updatePropertyBooleanValue()
-    
+
     private static final String SWRL_IMP = "http://www.w3.org/2003/11/swrl#Imp";
-    
+
     protected static final Log log = LogFactory.getLog(JenaBaseDao.class.getName());
-    
+
     /* ******************* static constants ****************** */
-    
+
     protected String PSEUDO_BNODE_NS = VitroVocabulary.PSEUDO_BNODE_NS;
-    
+
     protected String XSD = "http://www.w3.org/2001/XMLSchema#";
     protected DateFormat xsdDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     protected DateFormat xsdDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -79,14 +79,14 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected List<String> PREFERRED_LANGUAGES;
 
     /* ******************* constructor ************************* */
-    
+
     public JenaBaseDao(WebappDaoFactoryJena wadf) {
     	this.ontModelSelector = wadf.getOntModelSelector();
     	this.DEFAULT_NAMESPACE = wadf.getDefaultNamespace();
     	this.NONUSER_NAMESPACES = wadf.getNonuserNamespaces();
     	this.PREFERRED_LANGUAGES = wadf.getPreferredLanguages();
     	this.webappDaoFactory = wadf;
-    	
+
     }
 
     /* ******************** accessors ************************** */
@@ -94,7 +94,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected OntModel getOntModel() {
         return ontModelSelector.getFullModel();
     }
-    
+
     protected OntModelSelector getOntModelSelector() {
     	return ontModelSelector;
     }
@@ -140,7 +140,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             model.add(res, dataprop, value, XSDDatatype.XSDstring);
         }
     }
-    
+
     /**
      * convenience method
      */
@@ -163,7 +163,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             return null;
         }
     }
-    
+
     /**
      * convenience method
      */
@@ -172,7 +172,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             model.add(res, prop, model.createTypedLiteral(value));
         }
     }
-    
+
     /**
      * convenience method for use with functional datatype properties
      */
@@ -186,22 +186,22 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     existingValue = ((Literal)object).getString();
                 }
             }
-            
+
             if (value == null  || value.length() == 0) {
                  model.removeAll(res, dataprop, null);
             } else if (existingValue == null ) {
-                 model.add(res, dataprop, value, XSDDatatype.XSDstring);	
+                 model.add(res, dataprop, value, XSDDatatype.XSDstring);
             } else if (!existingValue.equals(value)) {
          		 model.removeAll(res, dataprop, null);
            		 model.add(res, dataprop, value, XSDDatatype.XSDstring);
             }
         }
     }
-    
+
     /**
      * Convenience method for use with functional datatype properties.
-     * 
-     * Pass keepOnlyIfTrue if a lack of a value in the model indicates false.  
+     *
+     * Pass keepOnlyIfTrue if a lack of a value in the model indicates false.
      * See ObjectPropertyDaoJena and PROPERTY_OFFERCREATENEWOPTIONANNOT for an
      * example.
      */
@@ -261,7 +261,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             return null;
         }
     }
-    
+
     /**
      * convenience method
      */
@@ -280,13 +280,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 			model.add(res, dataprop, Long.toString(value), XSDDatatype.XSDlong);
 		}
 	}
-	
+
     /**
      * convenience method for use with functional datatype properties
      */
     protected void updatePropertyIntValue(Resource res, Property dataprop, int value, Model model) {
-        
-    	if (dataprop != null) {	
+
+    	if (dataprop != null) {
             Integer existingValue = null;
             Statement stmt = res.getProperty(dataprop);
             if (stmt != null) {
@@ -295,13 +295,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     existingValue = ((Literal)object).getInt();
                 }
             }
-        	
+
             if (existingValue == null ) {
-                  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);	
+                  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
             } else if (existingValue.intValue() != value) {
         		  model.removeAll(res, dataprop, null);
         		  model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
-            }            
+            }
         }
     }
 
@@ -342,7 +342,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		updatePropertyIntValue(res,dataprop,value,model);
     	}
     }
-    
+
     /**
      * convenience method for use with functional datatype properties
      */
@@ -360,7 +360,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	 */
 	protected void updatePropertyLongValue(Resource res, Property dataprop,
 			Long value, Model model) {
-		
+
 		if (dataprop != null) {
 			Long existingValue = null;
 			Statement stmt = res.getProperty(dataprop);
@@ -370,7 +370,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 					existingValue = ((Literal) object).getLong();
 				}
 			}
-			
+
 			if (existingValue == null) {
 				model.add(res, dataprop, value.toString(),
 						XSDDatatype.XSDlong);
@@ -381,7 +381,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 			}
 		}
 	}
-	
+
     /**
      * convenience method
      */
@@ -405,13 +405,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);
         }
     }
-    
+
     /**
      * convenience method for use with functional properties
      */
     protected void updatePropertyFloatValue(Resource res, Property dataprop, Float value, Model model) {
 
-    	if (dataprop != null) {	
+    	if (dataprop != null) {
             Float existingValue = null;
             Statement stmt = res.getProperty(dataprop);
             if (stmt != null) {
@@ -424,14 +424,14 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             if (value == null) {
                  model.removeAll(res, dataprop, null);
             } else if (existingValue == null ) {
-                 model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);	
+                 model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);
             } else if (existingValue.compareTo(value) != 0) {
          		 model.removeAll(res, dataprop, null);
           		 model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);
             }
         }
     }
-    
+
     protected Float getPropertyFloatValue(OntResource res, Property prop){
         if( prop != null ){
             try{
@@ -442,7 +442,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }else
             return null;
     }
-    
+
     /**
      * convenience method
      */
@@ -488,9 +488,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	                        existingValue = (Date)((Literal)object).getValue();
 	                    }
 	                }
-		                
+
 	                if (existingValue == null ) {
-	                     model.add(res, dataprop, xsdDateFormat.format(value), XSDDatatype.XSDdate);	
+	                     model.add(res, dataprop, xsdDateFormat.format(value), XSDDatatype.XSDdate);
 	                } else if (existingValue != value) {
 	             		 model.removeAll(res, dataprop, null);
 	              		 model.add(res, dataprop, xsdDateFormat.format(value), XSDDatatype.XSDdate);
@@ -501,7 +501,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             log.error("Error in updatePropertyDateValue", e);
         }
     }
-    
+
     /**
      * convenience method
      */
@@ -574,7 +574,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	}
     	return list;
     }
-    
+
 	protected RoleLevel getMostRestrictiveRoleLevel(Resource res, Property prop) {
 		RoleLevel level = RoleLevel.getRoleByUri(null);
 		for (Statement stmt : res.listProperties(prop).toList()) {
@@ -588,7 +588,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 		}
 		return level;
 	}
-    
+
     /**
      * convenience method for use with functional object properties
      */
@@ -605,10 +605,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected void updatePropertyResourceURIValue(Resource res, Property prop, String objectURI) {
 
     	Model model = res.getModel();
-    	
+
     	if (model != null) {
     		updatePropertyResourceURIValue(res, prop, objectURI, model);
-    	}    	           
+    	}
     }
 
     /**
@@ -620,7 +620,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 				+ (prop == null ? "null" : prop.getURI()) + ", uri=" + uri);
 
         if (prop != null) {
-            if (uri == null || uri.length() == 0) { 
+            if (uri == null || uri.length() == 0) {
             	// the empty string test is due to a deficiency in the
             	// backend editing where empty strings are treated as nulls
                 model.removeAll(res, prop, null);
@@ -639,9 +639,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                         existingValue = (Resource)object;
                     }
                 }
-	                
+
                 if (existingValue == null ) {
-                     model.add(res, prop, model.createResource(uri));	
+                     model.add(res, prop, model.createResource(uri));
                 } else if (!(existingValue.getURI()).equals(uri)) {
              		 model.removeAll(res, prop, null);
               		 model.add(res, prop, model.createResource(uri));
@@ -663,20 +663,20 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional properties
      */
     protected void updatePropertyResourceValue(Resource res, Property prop, Resource objectRes) {
-        
+
     	Model model = res.getModel();
-    	
+
     	if (model != null) {
     		updatePropertyResourceValue(res, prop, objectRes, model);
         }
-    	
+
     }
 
     /**
      * convenience method for use with functional properties
      */
     protected void updatePropertyResourceValue(Resource res, Property prop, Resource objectRes, Model model) {
-    	
+
         if (prop != null) {
             if (objectRes == null) {
                 model.removeAll(res, prop, null);
@@ -689,9 +689,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                         existingValue = (Resource)object;
                     }
                 }
-	                
+
                 if (existingValue == null ) {
-                     model.add(res, prop, objectRes);	
+                     model.add(res, prop, objectRes);
                 } else if (!existingValue.equals(objectRes)) {
              		 model.removeAll(res, prop, null);
               		 model.add(res, prop, objectRes);
@@ -699,11 +699,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             }
         }
     }
-    
+
 	/**
 	 * convenience method to update the value(s) of a one-to-many object
 	 * property
-	 * 
+	 *
 	 * NOTE: this should be run from within a CriticalSection(WRITE)
 	 */
 	protected void updatePropertyResourceURIValues(Resource res, Property prop,
@@ -757,19 +757,19 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for updating the RDFS label
      */
     protected void updateRDFSLabel(OntResource ontRes, String label) {
-    	
+
     	if (label != null && label.length() > 0) {
-    		
+
     		String existingValue = ontRes.getLabel(getDefaultLanguage());
-    	    
+
     		if (existingValue == null || !existingValue.equals(label)) {
-    			ontRes.setLabel(label, getDefaultLanguage());	
+    			ontRes.setLabel(label, getDefaultLanguage());
     	    }
     	} else {
     		ontRes.removeAll(RDFS.label);
     	}
     }
-    
+
     private Literal getLabel(String lang, List<RDFNode>labelList) {
         for (RDFNode label : labelList) {
             if (label.isLiteral()) {
@@ -785,9 +785,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     	return null;
     }
-    
+
     private final boolean ALSO_TRY_NO_LANG = true;
-    
+
     /**
      * Get the rdfs:label or vitro:label, working through PERFERED_LANGUAGES,
      * or get local name, bnode Id, or full URI if no labels found.
@@ -804,7 +804,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	}
         return label;
     }
-    
+
     protected String getLabel(OntResource r){
         String label = null;
         Literal labelLiteral = getLabelLiteral(r);
@@ -813,40 +813,40 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
         return label;
     }
-    
+
     protected Literal getLabelLiteral(String individualUri) {
         OntResource resource = webappDaoFactory.getOntModel().createOntResource(individualUri);
         return getLabelLiteral(resource);
     }
 
     /**
-     * works through list of PREFERRED_LANGUAGES to find an appropriate 
-     * label, or NULL if not found.  
+     * works through list of PREFERRED_LANGUAGES to find an appropriate
+     * label, or NULL if not found.
      */
     protected Literal getLabelLiteral(OntResource r) {
         Literal labelLiteral = null;
         r.getOntModel().enterCriticalSection(Lock.READ);
-        try {            
+        try {
             // try rdfs:label with preferred languages
             labelLiteral = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
             // try vitro:label with preferred languages
             // Commenting out for NIHVIVO-1962
            /* if ( label == null ) {
                 labelLiteral = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
-            }   */          
+            }   */
         } finally {
             r.getOntModel().leaveCriticalSection();
         }
-        return labelLiteral;        
+        return labelLiteral;
     }
-    
+
     /**
-     * Get the local name, bnode or URI of the resource. 
+     * Get the local name, bnode or URI of the resource.
      */
     protected String getLocalNameOrId(OntResource r){
         String label = null;
         r.getOntModel().enterCriticalSection(Lock.READ);
-        try {                       
+        try {
             String localName = r.getLocalName();
             if (localName != null) {
                 if(localName.trim().length() > 0) {
@@ -857,23 +857,23 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             } else if (r.isAnon()) {
                 label = r.getId().toString();
             } else {
-                label = r.getURI();                
-            }                       
+                label = r.getURI();
+            }
         } finally {
             r.getOntModel().leaveCriticalSection();
         }
         return label;
     }
-    
+
     /**
      * Searches for literal in preferred language.
      * @param labels
      * 				the literals to search; must not be null
-     * @return the literal in preferred language if its containing in given list; 
-     * otherwise the first entry will returned; returns null if an empty list was given 
+     * @return the literal in preferred language if its containing in given list;
+     * otherwise the first entry will returned; returns null if an empty list was given
      */
     protected Literal tryLiteralForPreferredLanguages(List<Literal> labels) {
-    	
+
     	// search for literal of preferred language
     	for (Literal literal : labels) {
 	    	for (String lang : PREFERRED_LANGUAGES) {
@@ -886,11 +886,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	// return first literal as last resort
     	return 0 == labels.size() ? null : labels.get(0);
     }
-    
+
     private Literal tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
     	Literal label = null;
 	    List<RDFNode> labels = r.listPropertyValues(p).toList();
-	    
+
 	    if (labels.size() == 0) {
 	        return null;
 	    }
@@ -908,7 +908,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                 return 0;
             }
         });
-	    
+
 	    for (String lang : PREFERRED_LANGUAGES) {
 	    	label = getLabel(lang,labels);
 	    	if (label != null) {
@@ -933,7 +933,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected String getDefaultLanguage() {
         return PREFERRED_LANGUAGES.get(0);
     }
-    
+
     /**
      * Checks a URI for validity.  Jena models can store invalid URIs, but this causes RDF/XML output serialization to fail.
      * @param uri URI
@@ -951,13 +951,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         	return null;
         }
     }
-    
+
     /* *********************************************************** */
-    
+
     public synchronized boolean isBooleanClassExpression(OntClass cls) {
     	return (cls.isComplementClass() || cls.isIntersectionClass() || cls.isUnionClass());
     }
-    
+
     protected OntClass getOntClass(OntModel ontModel, String vitroURIStr) {
     	ontModel.enterCriticalSection(Lock.READ);
     	try {
@@ -984,7 +984,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		ontModel.leaveCriticalSection();
     	}
     }
-    
+
     protected String getClassURIStr(Resource cls) {
     	if (cls.isAnon()) {
     		return PSEUDO_BNODE_NS+cls.getId().toString();
@@ -1000,7 +1000,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		return NodeFactory.createURI(vitroURIStr);
     	}
     }
-    
+
     protected List<Resource> listDirectObjectPropertyValues(Resource subj, Property prop) {
     	// This is a quick and dirty algorithm for getting direct property values.
     	// It will only work properly if the full transitive closure is present in the graph;
@@ -1033,7 +1033,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     	return directValueList;
     }
-    
+
     // the same thing as the previous method but going the other direction
     protected List<Resource> listDirectObjectPropertySubjects(Resource value, Property prop) {
     	Set<Resource> possibleSubjectSet = new HashSet<Resource>();
@@ -1042,7 +1042,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	while (stmtIt.hasNext()) {
     		Statement stmt = stmtIt.nextStatement();
     		possibleSubjectSet.add(stmt.getSubject());
-    		
+
     	}
         for (Resource possibleRes : possibleSubjectSet) {
             StmtIterator pStmtIt = getOntModel().listStatements(possibleRes, prop, (RDFNode) null);
@@ -1060,7 +1060,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     	return directSubjectList;
     }
-    
+
     /**
      * Returns additions and retractions to perform
      * @param ontRes Ontology resource
@@ -1074,14 +1074,14 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         changeSet[0].add(stmtForDependentRes);
         return changeSet;
     }
-    
+
     protected void smartRemove(OntResource ontRes, OntModel ontModel) {
         Model[] changes = getSmartRemoval(ontRes, ontModel);
     	ontModel.remove(changes[0]);
     	ontModel.add(changes[1]);
-    	
+
     }
- 
+
     /**
      * Removes a resource from any rdf:Lists in which it is a member
      */
@@ -1120,7 +1120,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	}
     	return changeSet;
     }
-    
+
     public void removeRulesMentioningResource(Resource res, OntModel ontModel) {
     	Iterator<Resource> impIt = ontModel.listSubjectsWithProperty(RDF.type, SWRL_IMP);
     	while (impIt.hasNext()) {
@@ -1140,41 +1140,34 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		}
     		if (removeMe) {
     			ontModel.remove(description);
-    		}	
+    		}
     	}
     }
-    
-    // removes a resource and its bnode closure using ARQ's DESCRIBE semantics 
+
+    // removes a resource and its bnode closure using ARQ's DESCRIBE semantics
     // plus any incoming properties
     private Model removeUsingDescribe(OntResource ontRes, OntModel ontModel) {
     	Model temp = describeResource(ontRes, ontModel);
 		temp.add(ontModel.listStatements((Resource) null, (Property) null, ontRes));
 		return temp;
     }
-    
-    private Model describeResource(Resource res, OntModel ontModel) {    	
+
+    private Model describeResource(Resource res, OntModel ontModel) {
     	Model temp = ModelFactory.createDefaultModel();
-    	
+
     	// For now, not using DESCRIBE on blank nodes unless I can figure out
     	// how to keep it from doing a full kb scan.
     	if (res.isAnon()) {
     		temp.add(ontModel.listStatements(res, (Property) null, (RDFNode) null));
     		return temp;
     	}
-    	
+
     	String describeQueryStr =    "DESCRIBE <" + res.getURI() + ">" ;
-    	
-//    	?	"PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
-//    		"DESCRIBE ?bnode \n" +
-//    	    "WHERE { \n" +
-//    		"    FILTER(afn:bnode(?bnode) = \"" + res.getId().toString() + "\")\n" +
-//    		"    ?bnode ?p ?o \n" +
-//    	    "}"
-    	 
+
 	    Query describeQuery = QueryFactory.create(describeQueryStr, Syntax.syntaxARQ);
 		QueryExecution qe = QueryExecutionFactory.create(describeQuery, ontModel);
 		qe.execDescribe(temp);
-		
+
 		return temp;
     }
 

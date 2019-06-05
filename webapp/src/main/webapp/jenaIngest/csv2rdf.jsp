@@ -20,34 +20,34 @@
     <form action="csv2rdf" method="post" enctype="multipart/form-data">
         <input type="hidden" name="action" value="csv2rdf"/>
 
-	<p><input type="radio" name="separatorChar" value="comma" checked="checked"/> comma separated 
+	<p><input type="radio" name="separatorChar" value="comma" checked="checked"/> comma separated
 	<input type="radio" name="separatorChar" value="tab"/> tab separated </p>
 
     <input type="text" style="width:80%;" name="csvUrl"/>
     <p>CSV file URL (e.g. "file:///")</p>
-    
+
     <p>Or upload a file from your computer:</p>
     <p><input type="file" name="filePath" /></p>
 
     <p/>
-    <p>This tool will automatically generate a mini ontology to represent the 
-    data in the CSV file.  A property will be produced for each column in the 
-    spreadsheet, based on the text in the header for that column.</p><p>In what 
+    <p>This tool will automatically generate a mini ontology to represent the
+    data in the CSV file.  A property will be produced for each column in the
+    spreadsheet, based on the text in the header for that column.</p><p>In what
     namespace should these properties be created?</p>
 	<input type="text" name="tboxNamespace"/>
     <p>Namespace in which to generate properties</p>
 
-<!-- 
+<!--
  <input type="checkbox" name="discardTbox"/> do not add TBox or RBox to result model
 -->
 
     <p>
     <p>Each row in the spreadsheet will produce a resource.  Each of these
-    resources will be a member of a class in the namespace selected above.</p>  
-    <p>What should the local name of this class be? This is normally a word or two 
-    in "camel case" starting with an uppercase letter.  (For example, if the 
-    spreadsheet represents a list of faculty members, you might enter 
-    "FacultyMember" on the next line.)</p> 
+    resources will be a member of a class in the namespace selected above.</p>
+    <p>What should the local name of this class be? This is normally a word or two
+    in "camel case" starting with an uppercase letter.  (For example, if the
+    spreadsheet represents a list of faculty members, you might enter
+    "FacultyMember" on the next line.)</p>
     <input type="text" name="typeName"/>
     <p>Class Local Name for Resources</p>
 

@@ -15,10 +15,10 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 /**
- * if a class's classgroup changes, reindex all individuals in that class.  
+ * if a class's classgroup changes, reindex all individuals in that class.
  */
 public class URIsForClassGroupChange  implements IndexingUriFinder, ContextModelsUser {
-    
+
     IndividualDao indDao;
 
     @Override
@@ -28,20 +28,20 @@ public class URIsForClassGroupChange  implements IndexingUriFinder, ContextModel
 
 	@Override
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
-        if( stmt == null || stmt.getPredicate() == null) 
+        if( stmt == null || stmt.getPredicate() == null)
             return Collections.emptyList();
-        
+
         //if it is a change in classgroup of a class
         if( VitroVocabulary.IN_CLASSGROUP.equals( stmt.getPredicate().getURI() ) &&
-            stmt.getSubject() != null && 
+            stmt.getSubject() != null &&
             stmt.getSubject().isURIResource() ){
-            
+
             //get individuals in class
-            List<Individual>indsInClass = 
+            List<Individual>indsInClass =
                 indDao.getIndividualsByVClassURI(stmt.getSubject().getURI());
             if( indsInClass == null )
                 return Collections.emptyList();
-            
+
             //convert individuals to list of uris
             List<String> uris = new ArrayList<String>();
             for( Individual ind : indsInClass){
@@ -56,13 +56,13 @@ public class URIsForClassGroupChange  implements IndexingUriFinder, ContextModel
     @Override
     public void startIndexing() {
         // Do nothing
-        
+
     }
 
     @Override
     public void endIndexing() {
         // Do nothing
-        
+
     }
 
 	@Override

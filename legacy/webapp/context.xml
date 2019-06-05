@@ -1,7 +1,7 @@
 <Context>
   <!-- $This file is distributed under the terms of the license in LICENSE$ -->
     <!--
-        Disable the attempt to persist sessions when Tomcat shuts down. 
+        Disable the attempt to persist sessions when Tomcat shuts down.
     -->
     <Manager pathname="" />
 </Context>

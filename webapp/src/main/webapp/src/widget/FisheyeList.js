@@ -49,9 +49,9 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 
 	isContainer: true,
 	snarfChildDomOutput: true,
-	
+
 	pos: {x: -1, y: -1},		// current cursor position, relative to the grid
-	
+
 	// for conservative trigger mode, when triggered, timerScale is gradually increased from 0 to 1
 	timerScale: 1.0,
 
@@ -67,7 +67,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 	itemMaxHeight: 150,
 
 	orientation: 'horizontal',
-	
+
 	conservativeTrigger: false,		// don't active menu until mouse is over an image (macintosh style)
 
 	effectUnits: 2,
@@ -145,7 +145,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 			this.proximityBottom /= 2;
 		}
 	},
-	
+
 	postCreate: function(args, frag) {
 		this.initializePositioning();
 
@@ -155,7 +155,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 		if( !this.conservativeTrigger ){
 			dojo.event.connect(document.documentElement, "onmousemove", this, "mouseHandler");
 		}
-		
+
 		// Deactivate the menu if mouse is moved off screen (doesn't work for FF?)
 		dojo.event.connect(document.documentElement, "onmouseout", this, "onBodyOut");
 		dojo.event.connect(this, "addChild", this, "initializePositioning");
@@ -220,7 +220,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 			elm.style.top    = itm.posY + 'px';
 			elm.style.width  = this.itemWidth + 'px';
 			elm.style.height = this.itemHeight + 'px';
-			
+
 			if ( itm.svgNode ) {
 				itm.svgNode.style.position = 'absolute';
 				itm.svgNode.style.left = this.itemPadding+'%';
@@ -228,7 +228,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 				itm.svgNode.style.width = (100 - 2 * this.itemPadding) + '%';
 				itm.svgNode.style.height = (100 - 2 * this.itemPadding) + '%';
 				itm.svgNode.style.zIndex = 1;
-	
+
 				itm.svgNode.setSize(this.itemWidth, this.itemHeight);
 			} else {
 				itm.imgNode.style.left = this.itemPadding+'%';
@@ -309,7 +309,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 		this.pos = {x:x, y:y};
 		this.paint();
 	},
-	
+
 	paint: function(){
 		var x=this.pos.x;
 		var y=this.pos.y;
@@ -323,7 +323,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 		var pos = this.isHorizontal ? x : y;
 		var prx = this.isHorizontal ? this.proximityLeft : this.proximityTop;
 		var siz = this.isHorizontal ? this.itemWidth : this.itemHeight;
-		var sim = this.isHorizontal ? 
+		var sim = this.isHorizontal ?
 			(1.0-this.timerScale)*this.itemWidth + this.timerScale*this.itemMaxWidth :
 			(1.0-this.timerScale)*this.itemHeight + this.timerScale*this.itemMaxHeight ;
 
@@ -465,7 +465,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 			}
 
 			this.children[p].usualX = Math.round(this.children[p].cenX - (w / 2));
-			
+
 			this.children[p].domNode.style.top  = y + 'px';
 
 			this.children[p].domNode.style.left  = this.children[p].usualX + 'px';
@@ -562,7 +562,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 
 		var x = 0;
 		var y = 0;
-		
+
 		var labelW = dojo.style.getOuterWidth(itm.lblNode);
 		var labelH = dojo.style.getOuterHeight(itm.lblNode);
 
@@ -605,7 +605,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeList, {
 	toEdge: function(inp, def){
 		return this.EDGE[inp.toUpperCase()] || def;
 	},
-	
+
 	// slowly expand the image to user specified max size
 	expandSlowly: function(){
 		if( !this.isOver ){ return; }
@@ -631,7 +631,7 @@ dojo.inherits(dojo.widget.html.FisheyeListItem, dojo.widget.HtmlWidget);
 
 dojo.lang.extend(dojo.widget.html.FisheyeListItem, {
 	widgetType: "FisheyeListItem",
-	
+
 	// Constructor arguments
 	iconSrc: "",
 	svgSrc: "",
@@ -644,7 +644,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeListItem, {
 		'  <img class="dojoHtmlFisheyeListItemImage" dojoAttachPoint="imgNode" dojoAttachEvent="onMouseOver;onMouseOut;onClick">' +
 		'  <div class="dojoHtmlFisheyeListItemLabel" dojoAttachPoint="lblNode"></div>' +
 		'</div>',
-	
+
 	imgNode: null,
 
 	fillInTemplate: function() {
@@ -672,7 +672,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeListItem, {
 		}
 		dojo.html.disableSelection(this.domNode);
 	},
-	
+
 	createSvgNode: function(src){
 
 		var elm = document.createElement('embed');
@@ -732,7 +732,7 @@ dojo.lang.extend(dojo.widget.html.FisheyeListItem, {
 			this.parent.positionLabel(this);
 		}
 	},
-	
+
 	onMouseOut: function() {
 		dojo.html.removeClass(this.lblNode, "selected");
 	},

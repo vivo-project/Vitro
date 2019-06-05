@@ -5,5 +5,5 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 public interface DatasetWrapperFactory {
 
     public DatasetWrapper getDatasetWrapper();
-    
+
 }

@@ -19,9 +19,9 @@ package edu.cornell.mannlib.vitro.webapp.web;
  * THIS CODE HAS BEEN MODIFIED:
  * The members of the Vitro/VIVO project have modified this code.  It has
  * been modified from the version produced by Google Inc.
- * 
+ *
  * The code in this file is from the Google data API project 1.40.3 on 2010-03-08.
- * See full license from gdata at bottom of this file.  
+ * See full license from gdata at bottom of this file.
  */
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 * Simple class for parsing and generating Content-Type header values, per
 * RFC 2045 (MIME) and 2616 (HTTP 1.1).
 *
-* 
+*
 */
 public class ContentType implements Serializable {
 
@@ -129,7 +129,7 @@ public class ContentType implements Serializable {
  public static ContentType getAtomFeed() {
    // Use the unqualified type for v1, the qualified one for later versions
    //return Service.getVersion().isCompatible(Service.Versions.V1) ?
-   //    ATOM : ATOM_FEED;	 
+   //    ATOM : ATOM_FEED;
 	 return ATOM_FEED;
  }
 
@@ -156,7 +156,7 @@ public class ContentType implements Serializable {
   */
  public static final ContentType JSON_LD =
 		 new ContentType("application/ld+json;" + DEFAULT_CHARSET).lock();
- 
+
  /**
   * A ContentType constant that describes the Javascript content type.
   */
@@ -192,7 +192,7 @@ public class ContentType implements Serializable {
   */
  public static final ContentType OPENSEARCH =
      new ContentType("application/opensearchdescription+xml").lock();
- 
+
 
  /**
   * A ContentType constant that describes the MIME multipart/related content
@@ -200,45 +200,45 @@ public class ContentType implements Serializable {
   */
  public static final ContentType MULTIPART_RELATED =
      new ContentType("multipart/related").lock();
- 
+
  /**
   * A ContentType constant that describes the application/xml content
   * type.
   */
  public static final ContentType APPLICATION_XML =
      new ContentType("application/xml").lock();
- 
+
  /**
   * A ContentType constant that indicates that the body contains an
   * encapsulated message, with the syntax of an RFC 822 email message.
   */
  public static final ContentType MESSAGE_RFC822 =
      new ContentType("message/rfc822").lock();
- 
+
  /**
   * Wildcard content type that will match any MIME type
   */
  public static final ContentType ANY = new ContentType("*/*").lock();
 
- 
+
 
  /**
   * A ContetType that describes RDF/XML.
   * Added by Brian Caruso for VIVO.
   */
  public final static ContentType RDFXML = new ContentType("application/rdf+xml").lock();
- 
+
  /**
   * A ContetType that describes N3 RDF, this is unofficial and unregistered
   * Added by Brian Caruso for VIVO.
   */
- public final static ContentType N3 = new ContentType("text/n3").lock(); 
- 
+ public final static ContentType N3 = new ContentType("text/n3").lock();
+
  /**
   * A ContetType that describes turtle RDF, this is unofficial and unregistered
   * Added by Brian Caruso for VIVO.
   */
- public final static ContentType TURTLE = new ContentType("text/turtle").lock(); 
+ public final static ContentType TURTLE = new ContentType("text/turtle").lock();
 
  /**
   * Determines the best "Content-Type" header to use in a servlet response
@@ -327,11 +327,11 @@ public class ContentType implements Serializable {
  }
 
 /**
- * Gets the best content type based weighted q from client accept header and 
+ * Gets the best content type based weighted q from client accept header and
  * the server weighted q of the extent that the type conveys the resource.
- * 
+ *
  * From suggestions by Tim Berners-Lee at http://www.w3.org/DesignIssues/Conneg
- * 
+ *
  * @param clientAcceptsTypes types the client can accept with Q weights.
  * @param serverTypes types the server can provide with Q weights.
  * @return returns content type of best match or null if no match.
@@ -348,13 +348,13 @@ public class ContentType implements Serializable {
              maxQ = (serverQ * clientQ);
              type = serverType;
          }
-     }     
+     }
      return type;
  }
- 
+
  /**
   * This method was added by Brian Caruso of the VIVO project. March 15 2011.
-  * 
+  *
   * @param acceptHeader Accept header
   * @return the types and the q values from the accept header
   */
@@ -392,15 +392,15 @@ public class ContentType implements Serializable {
          // ignore exception
          continue;
        }
-       
+
        if( acceptedContentType != null ){
            qcMap.put(acceptedContentType.getMediaType(), curQ);
        }
      }
-     
+
      return qcMap;
  }
- 
+
 /**
   * Constructs a new instance with default media type
   */
@@ -482,17 +482,17 @@ public class ContentType implements Serializable {
 
  private String type;
  public String getType() { return type; }
- public void setType(String type) { 
+ public void setType(String type) {
    assertNotLocked();
-   this.type = type; 
+   this.type = type;
  }
 
 
  private String subType;
  public String getSubType() { return subType; }
- public void setSubType(String subType) { 
+ public void setSubType(String subType) {
    assertNotLocked();
-   this.subType = subType; 
+   this.subType = subType;
  }
 
  /** Returns the full media type */
@@ -508,7 +508,7 @@ public class ContentType implements Serializable {
  }
 
  private Float q=1.0f;
- 
+
  private HashMap<String, String> attributes = new HashMap<String, String>();
 
  /**
@@ -531,11 +531,11 @@ public class ContentType implements Serializable {
  /**
   * Returns the additional attributes of the content type.
   */
- public Map<String, String> getAttributes() { 
+ public Map<String, String> getAttributes() {
    if (locked) {
      return Collections.unmodifiableMap(attributes);
-   } 
-   return attributes; 
+   }
+   return attributes;
  }
 
  /**
@@ -548,16 +548,16 @@ public class ContentType implements Serializable {
  }
 
  /**
-  * returns q associated with content type. 
+  * returns q associated with content type.
   */
  public float getQ(){
      return q;
  }
- 
+
  public void setQ(float q){
      this.q = q;
  }
- 
+
  /*
   * Returns the charset attribute of the content type or null if the
   * attribute has not been set.
@@ -584,8 +584,8 @@ public class ContentType implements Serializable {
  public boolean match(ContentType acceptedContentType) {
    String acceptedType = acceptedContentType.getType();
    String acceptedSubType = acceptedContentType.getSubType();
-   return STAR.equals(acceptedType) || type.equals(acceptedType) 
-       && (STAR.equals(acceptedSubType) || subType.equals(acceptedSubType)) 
+   return STAR.equals(acceptedType) || type.equals(acceptedType)
+       && (STAR.equals(acceptedSubType) || subType.equals(acceptedSubType))
        && (!isAtom() || matchAtom(acceptedContentType));
  }
 
@@ -594,7 +594,7 @@ public class ContentType implements Serializable {
    return "application".equals(type) && "atom+xml".equals(subType);
  }
 
- /** 
+ /**
   * Compares the optional 'type' attribute of two content types.
   *
   * <p>This method accepts atom content type without the 'type' attribute

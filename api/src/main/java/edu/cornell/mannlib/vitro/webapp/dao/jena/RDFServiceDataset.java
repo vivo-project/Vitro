@@ -14,6 +14,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.LabelExistsException;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.TxnType;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -26,15 +27,15 @@ public class RDFServiceDataset implements Dataset {
 
     private RDFServiceDatasetGraph g;
     private ReadWrite transactionMode;
-    
+
     public RDFServiceDataset(RDFServiceDatasetGraph g) {
         this.g = g;
     }
-    
+
     public RDFServiceDataset(RDFService rdfService) {
         this.g = new RDFServiceDatasetGraph(rdfService);
     }
-    
+
     @Override
     public DatasetGraph asDatasetGraph() {
         return g;
@@ -66,7 +67,7 @@ public class RDFServiceDataset implements Dataset {
     }
 
     private final static Log log = LogFactory.getLog(RDFServiceDataset.class);
-    
+
     @Override
     public Model getNamedModel(String arg0) {
         Model model = RDFServiceGraph.createRDFServiceModel(
@@ -86,7 +87,7 @@ public class RDFServiceDataset implements Dataset {
     }
 
 	@Override
-	public void addNamedModel(String uri, Model model)
+	public Dataset addNamedModel(String uri, Model model)
 			throws LabelExistsException {
 		Iterator<Node> graphNodes = g.listGraphNodes();
 		while (graphNodes.hasNext()) {
@@ -97,6 +98,7 @@ public class RDFServiceDataset implements Dataset {
 			}
 		}
 		g.addGraph(NodeFactory.createURI(uri), model.getGraph());
+		return this;
 	}
 
 	@Override
@@ -105,19 +107,22 @@ public class RDFServiceDataset implements Dataset {
 	}
 
 	@Override
-	public void removeNamedModel(String uri) {
+	public Dataset removeNamedModel(String uri) {
 		g.removeGraph(NodeFactory.createURI(uri));
+		return this;
 	}
 
 	@Override
-	public void replaceNamedModel(String uri, Model model) {
+	public Dataset replaceNamedModel(String uri, Model model) {
 		removeNamedModel(uri);
 		addNamedModel(uri, model);
+		return this;
 	}
 
 	@Override
-	public void setDefaultModel(Model model) {
+	public Dataset setDefaultModel(Model model) {
 		g.setDefaultGraph(model.getGraph());
+		return this;
 	}
 
 	@Override
@@ -134,9 +139,9 @@ public class RDFServiceDataset implements Dataset {
 	public boolean isInTransaction() {
 		return (transactionMode != null);
 	}
-	
+
     private boolean supportsTransactions(Graph graph) {
-        return (graph.getTransactionHandler() != null 
+        return (graph.getTransactionHandler() != null
                 && graph.getTransactionHandler().transactionsSupported());
     }
 
@@ -173,4 +178,23 @@ public class RDFServiceDataset implements Dataset {
 		return g.isEmpty();
 	}
 
+	@Override
+	public TxnType transactionType() {
+		return g.transactionType();
+	}
+
+	@Override
+	public boolean promote(Promote promote) {
+		return g.promote(promote);
+	}
+
+	@Override
+	public ReadWrite transactionMode() {
+		return g.transactionMode();
+	}
+
+	@Override
+	public void begin(TxnType txnType) {
+		g.begin(txnType);
+	}
 }

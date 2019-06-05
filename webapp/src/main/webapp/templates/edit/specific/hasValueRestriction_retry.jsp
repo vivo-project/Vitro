@@ -7,16 +7,16 @@
     <td>
 
         <b>has value</b><br/>
-        <c:choose>    
-            <c:when test="${requestScope.propertyType eq 'object'}">    
+        <c:choose>
+            <c:when test="${requestScope.propertyType eq 'object'}">
                 <p><input name="ValueIndividual"/> <em>enter complete URI</em> </p> <!-- TODO: make nice way of dealing with picklists -->
             </c:when>
             <c:otherwise>
                 <p>
                     <input name="ValueLexicalForm"/>
-                    datatype <select name="ValueDatatype"> 
+                    datatype <select name="ValueDatatype">
                         <form:option name="ValueDatatype"/>
-                    </select> 
+                    </select>
                 </p>
             </c:otherwise>
         </c:choose>

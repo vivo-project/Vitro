@@ -19,20 +19,20 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 
 /**
  * Still not sure why this is needed, but...
- * 
+ *
  * Let's assume that there are some model operations that are implemented by
  * multiple SPARQL queries against the RDFService. Those multiple queries might
  * return different values for the same blank node, so when the results of the
  * queries were combined, the relationships would be lost.
- * 
+ *
  * To avoid this, we assume that all of the statements involving blank nodes
  * will fit nicely into memory, and we fetch them all at once. After that, all
  * of our operations are against the union of the actual model minus blank nodes
  * and the memory model.
- * 
+ *
  * The models do retain the same ID for each blank node on successive
  * operations, so we can execute repeated queries and it will work fine.
- * 
+ *
  * Writing blank nodes is probably a different matter, unless unrelated to
  * existing blank nodes.
  */

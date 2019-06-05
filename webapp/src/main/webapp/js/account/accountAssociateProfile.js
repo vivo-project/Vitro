@@ -4,17 +4,17 @@ var associateProfileFields = {
     onLoad: function() {
         if (this.disableFormInUnsupportedBrowsers()) {
             return;
-        }        
+        }
 
         this.mixIn();
-        this.initObjectReferences();                 
+        this.initObjectReferences();
         this.bindEventListeners();
-        this.setInitialState();       
+        this.setInitialState();
     },
 
-    disableFormInUnsupportedBrowsers: function() {       
+    disableFormInUnsupportedBrowsers: function() {
         var disableWrapper = $('#ie67DisableWrapper');
-        
+
         // Check for unsupported browsers only if the element exists on the page
         if (disableWrapper.length) {
             if (vitro.browserUtils.isIELessThan8()) {
@@ -22,17 +22,17 @@ var associateProfileFields = {
                 $('.noIE67').hide();
                 return true;
             }
-        }            
-        return false;      
+        }
+        return false;
     },
 
     mixIn: function() {
         $.extend(this, associateProfileFieldsData);
     },
-    
+
     initObjectReferences: function() {
         this.form = $('#userAccountForm');
-        
+
         // The external auth ID field and messages
         this.externalAuthIdField = $('#externalAuthId');
         this.externalAuthIdInUseMessage = $('#externalAuthIdInUse');
@@ -43,12 +43,12 @@ var associateProfileFields = {
         this.verifyAssociatedProfileLink = $('#verifyProfileLink');
         this.changeAssociatedProfileLink = $('#changeProfileLink');
         this.associatedProfileUriField = $('#associatedProfileUri')
-        
+
         // We want to associate a profile
         this.associationOptionsArea = $('#associationOptions');
         this.associateProfileNameField = $('#associateProfileName');
         this.newProfileClassSelector = $('#newProfileClassUri');
-        
+
         // Container <div> elements to provide background shading -- tlw72
         this.associateProfileBackgroundOneArea = $('#associateProfileBackgroundOne');
     },
@@ -57,32 +57,32 @@ var associateProfileFields = {
         this.idCache = {};
         this.externalAuthIdField.change(function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
-        }); 
+        });
         this.externalAuthIdField.keyup(function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
-        }); 
+        });
         this.externalAuthIdField.bind("propertychange", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
-        });  
+        });
         this.externalAuthIdField.bind("input", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
-              
+
         this.verifyAssociatedProfileLink.click(function() {
             associateProfileFields.openVerifyWindow();
             return false;
-        });   
-        
+        });
+
         this.changeAssociatedProfileLink.click(function() {
             associateProfileFields.showAssociatingOptionsArea();
             return false;
-        });   
-        
+        });
+
         this.newProfileClassSelector.change(function() {
             associateProfileFields.newProfileClassHasChanged();
         });
-        
-        this.acCache = {};  
+
+        this.acCache = {};
         this.associateProfileNameField.autocomplete({
             minLength: 3,
             source: function(request, response) {
@@ -97,22 +97,22 @@ var associateProfileFields = {
                         action: "autoCompleteProfile",
                         term: request.term,
                         externalAuthId: associateProfileFields.externalAuthIdField.val()
-                    }, 
+                    },
                     complete: function(xhr, status) {
                         var results = jQuery.parseJSON(xhr.responseText);
-                        associateProfileFields.acCache[request.term] = results;  
+                        associateProfileFields.acCache[request.term] = results;
                         response(results);
                     }
                 });
             },
             select: function(event, ui) {
-                associateProfileFields.showAssociatedProfileArea(ui.item.label, ui.item.uri, ui.item.url); 
+                associateProfileFields.showAssociatedProfileArea(ui.item.label, ui.item.uri, ui.item.url);
             }
         });
 
-        
+
     },
-    
+
     setInitialState: function() {
         if (this.externalAuthIdField.val().length == 0) {
             this.hideAllOptionals();
@@ -122,15 +122,15 @@ var associateProfileFields = {
             this.showAssociatingOptionsArea();
         }
     },
-    
+
     externalAuthIdFieldHasChanged: function() {
         var externalAuthId = this.externalAuthIdField.val();
-        
+
         if (externalAuthId.length == 0) {
             this.hideAllOptionals();
             return;
         }
-        
+
         if (externalAuthId in this.idCache) {
             var results = this.idCache[externalAuthId];
             this.applyAjaxResultsForExternalAuthIdField(results)
@@ -147,7 +147,7 @@ var associateProfileFields = {
             },
             complete: function(xhr, status) {
                 var results = $.parseJSON(xhr.responseText);
-                associateProfileFields.idCache[externalAuthId] = results;  
+                associateProfileFields.idCache[externalAuthId] = results;
                 associateProfileFields.applyAjaxResultsForExternalAuthIdField(results);
             }
         });
@@ -162,11 +162,11 @@ var associateProfileFields = {
             this.showAssociatingOptionsArea();
         }
     },
-        
+
     openVerifyWindow: function() {
         window.open(this.verifyUrl, 'verifyMatchWindow', 'width=640,height=640,scrollbars=yes,resizable=yes,status=yes,toolbar=no,menubar=no,location=no');
     },
-    
+
     newProfileClassHasChanged: function() {
         if (this.newProfileClassSelector.val().length == 0) {
             this.associateProfileNameField.attr("disabled",false);
@@ -175,24 +175,24 @@ var associateProfileFields = {
             this.associateProfileNameField.attr("disabled","disabled");
         }
     },
-    
+
     hideAllOptionals: function() {
         this.hideExternalAuthInUseMessage();
         this.hideAssociatedProfileArea();
         this.hideAssociatingOptionsArea();
     },
-    
+
     hideExternalAuthInUseMessage: function() {
         this.externalAuthIdInUseMessage.hide();
     },
-    
+
     hideAssociatedProfileArea: function() {
         this.associatedArea.hide();
         this.associateProfileBackgroundOneArea.css("background-color","#fff");
         this.associateProfileBackgroundOneArea.css("border","none");
         this.associatedProfileUriField.val('');
     },
-    
+
     hideAssociatingOptionsArea: function() {
         this.associationOptionsArea.hide();
         this.associateProfileBackgroundOneArea.css("background-color","#fff");
@@ -200,14 +200,14 @@ var associateProfileFields = {
         this.associateProfileNameField.val('');
         this.newProfileClassSelector.get(0).selectedIndex = 0;
     },
-    
+
     showExternalAuthInUseMessage: function() {
         this.hideAssociatedProfileArea();
         this.hideAssociatingOptionsArea();
 
         this.externalAuthIdInUseMessage.show();
     },
-    
+
     showAssociatedProfileArea: function(name, uri, url) {
         this.hideExternalAuthInUseMessage();
         this.hideAssociatingOptionsArea();
@@ -221,7 +221,7 @@ var associateProfileFields = {
             this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         }
     },
-    
+
     showAssociatingOptionsArea: function() {
         this.hideExternalAuthInUseMessage();
         this.hideAssociatedProfileArea();
@@ -233,10 +233,10 @@ var associateProfileFields = {
             this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         }
     }
-    
+
 }
- 
-$(document).ready(function() {   
+
+$(document).ready(function() {
     associateProfileFields.onLoad();
-}); 
-        
+});
+

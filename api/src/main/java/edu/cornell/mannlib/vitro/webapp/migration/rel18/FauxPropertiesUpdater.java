@@ -29,12 +29,12 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedOntMode
 /**
  * PropertyConfig.n3 has moved to rdf/display/firsttime, so it is only pulled in
  * if the display model is empty.
- * 
+ *
  * Let's pull it in one time, anyway.
- * 
+ *
  * Check askUpdated.sparql for an example of how we know that it is necessary.
  * Also check success.n3
- * 
+ *
  * If a special triple is not found in the display model, read the file from
  * firsttime. If we can't find the file, warn
  */

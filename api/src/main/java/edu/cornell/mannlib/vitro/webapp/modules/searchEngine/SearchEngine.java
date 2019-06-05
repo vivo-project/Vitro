@@ -9,7 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 /**
  * The principle interface for the SearchEngine. All search-related objects are
  * created by these methods.
- * 
+ *
  * All methods that throw SearchEngineException should attempt to distinguish
  * whether the exception is caused because the SearchEngine is not responding.
  * In that case, they should throw a SearchEngineNotRespondingException, so the
@@ -19,7 +19,7 @@ public interface SearchEngine extends Application.Module {
 
 	/**
 	 * Check to see whether the SearchEngine is alive.
-	 * 
+	 *
 	 * @throws SearchEngineException
 	 *             if the SearchEngine does not respond.
 	 */

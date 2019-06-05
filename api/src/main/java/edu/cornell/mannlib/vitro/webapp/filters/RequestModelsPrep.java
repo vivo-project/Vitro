@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  * This used to set up a lot of request-based objects. Now, most of them are
  * obtained through ModelAccess, which does not require setup here. However, it
  * does require teardown.
- * 
+ *
  * This is done in a filter, so it applies to both Servlets and JSPs.
  */
 @WebFilter(filterName = "RequestModelsPrep", urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD})

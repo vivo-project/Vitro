@@ -19,49 +19,49 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(BaseListedIndividual.class);
 
-    protected final Individual individual;  
+    protected final Individual individual;
     protected final VitroRequest vreq;
-    
+
     public BaseListedIndividual(Individual individual, VitroRequest vreq) {
         this.vreq = vreq;
         this.individual = individual;
     }
-    
+
     public static List<ListedIndividual> getIndividualTemplateModels(List<Individual> individuals, VitroRequest vreq) {
         List<ListedIndividual> models = new ArrayList<ListedIndividual>(individuals.size());
         for (Individual individual : individuals) {
           models.add(ListedIndividualBuilder.build(individual, vreq));
-        }  
+        }
         return models;
     }
-    
+
     /* Template properties */
-    
+
     public String getProfileUrl() {
         return cleanURIForDisplay( UrlBuilder.getIndividualProfileUrl(individual, vreq) );
-    }    
+    }
 
     public String getImageUrl() {
         String imageUrl = individual.getImageUrl();
         return imageUrl == null ? null : getUrl(imageUrl);
     }
-    
+
     public String getThumbUrl() {
         String thumbUrl = individual.getThumbUrl();
         return thumbUrl == null ? null : getUrl(thumbUrl);
-    } 
-    
-    public String getName() {           
+    }
+
+    public String getName() {
         return cleanTextForDisplay( individual.getName() );
     }
 
     public String getUri() {
         return cleanURIForDisplay( individual.getURI() );
-    }  
-    
+    }
+
     public List<String> getMostSpecificTypes() {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        Map<String, String> types = opsDao.getMostSpecificTypesInClassgroupsForIndividual(individual.getURI()); 
+        Map<String, String> types = opsDao.getMostSpecificTypesInClassgroupsForIndividual(individual.getURI());
         List<String> typeLabels = new ArrayList<String>(types.size());
         String displayedType = (String) vreq.getAttribute("displayType");
         for (String type : types.keySet()) {
@@ -73,5 +73,5 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
         return typeLabels;
     }
 
-    
+
 }

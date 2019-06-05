@@ -20,7 +20,7 @@ public class EditConfigurationConstants {
     	Map<String, String> constants = new HashMap<String, String>();
     	java.lang.reflect.Field[] fields = EditConfigurationConstants.class.getDeclaredFields();
     	for(java.lang.reflect.Field f: fields) {
-    		if(Modifier.isStatic(f.getModifiers()) && 
+    		if(Modifier.isStatic(f.getModifiers()) &&
     			Modifier.isPublic(f.getModifiers())) {
     			try {
     				constants.put(f.getName(), f.get(null).toString());

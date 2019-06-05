@@ -23,17 +23,17 @@ import org.apache.jena.util.iterator.WrappedIterator;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPerform {
-    
+
     private static final Log log = LogFactory.getLog(SparqlGraphMultilingual.class);
-    
+
     protected List<String> langs;
-    
-    
+
+
     public SparqlGraphMultilingual(String endpointURI, List<String> languages) {
         super(endpointURI);
         this.langs = languages;
     }
-    
+
     @Override
     public void add(Triple arg0) throws AddDeniedException {
         performAdd(arg0);
@@ -48,10 +48,10 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
         if (langs == null || langs.size() == 0) {
             log.info("No language configured - adding original triple " + t);
             super.performAdd(t);
-        } else if (t.getObject().isLiteral() 
+        } else if (t.getObject().isLiteral()
                 && t.getObject().getLiteral().getDatatypeURI() == null) {
             log.info("adding language tag");
-            super.performAdd(Triple.create(t.getSubject(), 
+            super.performAdd(Triple.create(t.getSubject(),
                     t.getPredicate(), NodeFactory.createLiteral(
                             t.getObject().getLiteralLexicalForm(), langs.get(0), null)));
         } else {
@@ -59,15 +59,15 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
             super.performAdd(t);
         }
     }
-    
+
     @Override
     public ExtendedIterator<Triple> find(Node subject, Node predicate, Node object) {
-               
+
         long startTime = System.currentTimeMillis();
-        
+
         ExtendedIterator<Triple> rawResults = super.find(subject, predicate, object);
         long rawTime = System.currentTimeMillis() - startTime;
-        
+
         List<Triple> tripList = new ArrayList<Triple>();
         while (rawResults.hasNext()) {
             tripList.add(rawResults.next());
@@ -97,7 +97,7 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
                 log.info("raw time " + rawTime + " ; filter time " + filterTime);
             }
             return WrappedIterator.create(tripl.iterator());
-        } else { 
+        } else {
             if (rawTime > 9) {
                 log.info("raw time " + rawTime);
                 log.info("^ " + subject + " : " + predicate + " : " + object);
@@ -105,40 +105,40 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
             return WrappedIterator.create(tripList.iterator());
         }
     }
-    
+
     private class TripleSortByLang implements Comparator<Triple> {
-        
+
         public int compare(Triple t1, Triple t2) {
             if (t1 == null || t2 == null) {
                 return 0;
             } else if (!t1.getObject().isLiteral() || !t2.getObject().isLiteral()) {
                 return 0;
             }
-            
+
             String t1lang = t1.getObject().getLiteral().language();
             String t2lang = t2.getObject().getLiteral().language();
-                    
+
             if ( t1lang == null && t2lang == null) {
                 return 0;
-            } else if (t1lang == null) { 
+            } else if (t1lang == null) {
                 return 1;
             } else if (t2lang == null) {
                 return -1;
             } else {
                 int t1langPref = langs.indexOf(t1.getObject().getLiteral().language());
                 if (t1langPref == -1) {
-                    t1langPref = Integer.MAX_VALUE; 
+                    t1langPref = Integer.MAX_VALUE;
                 }
                 int t2langPref = langs.indexOf(t2.getObject().getLiteral().language());
                 if (t2langPref == -1) {
-                    t2langPref = Integer.MAX_VALUE; 
+                    t2langPref = Integer.MAX_VALUE;
                 }
                 return t1langPref - t2langPref;
-            }           
+            }
         }
-        
+
     }
-    
+
 	@Override
 	public String toString() {
 		return "SparqlGraphMultilingual[" + ToString.hashHex(this)

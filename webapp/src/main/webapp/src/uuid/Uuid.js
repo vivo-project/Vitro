@@ -84,10 +84,10 @@ dojo.uuid.Uuid.HEX_RADIX = 16;
  * Given two UUIDs to compare, this method returns 0, 1, or -1.
  * This method is designed to be used by sorting routines, like
  * the JavaScript built-in Array sort() method.
- * This implementation is intended to match the sample 
- * implementation in IETF RFC 4122: 
+ * This implementation is intended to match the sample
+ * implementation in IETF RFC 4122:
  * http://www.ietf.org/rfc/rfc4122.txt
- * 
+ *
  * Example:
  * <pre>
  *   var generator = dojo.uuid.TimeBasedGenerator;
@@ -111,7 +111,7 @@ dojo.uuid.Uuid.compare = function(uuidOne, uuidTwo) {
 };
 
 /**
- * Sets the default generator, which will be used by the 
+ * Sets the default generator, which will be used by the
  * "new dojo.uuid.Uuid()" constructor if no parameters
  * are passed in.
  *
@@ -136,9 +136,9 @@ dojo.uuid.Uuid.getGenerator = function(generator) {
 // Public instance methods
 // -------------------------------------------------------------------
 /**
- * Returns a 36-character string representing the UUID, such 
+ * Returns a 36-character string representing the UUID, such
  * as "3b12f1df-5232-4804-897e-917bf397618a".
- * 
+ *
  * Examples:
  * <pre>
  *   var uuid = new dojo.uuid.Uuid(dojo.uuid.TimeBasedGenerator);
@@ -153,7 +153,7 @@ dojo.uuid.Uuid.getGenerator = function(generator) {
  * </pre>
  *
  * @param	uuidOne	A dojo.uuid.Uuid instance, or a string representing a UUID.
- * @return   Returns a standard 36-character UUID string, or something similar. 
+ * @return   Returns a standard 36-character UUID string, or something similar.
  */
 dojo.uuid.Uuid.prototype.toString = function(format) {
 	if (format) {
@@ -187,8 +187,8 @@ dojo.uuid.Uuid.prototype.toString = function(format) {
 
 /**
  * Compares this UUID to another UUID, and returns 0, 1, or -1.
- * This implementation is intended to match the sample 
- * implementation in IETF RFC 4122: 
+ * This implementation is intended to match the sample
+ * implementation in IETF RFC 4122:
  * http://www.ietf.org/rfc/rfc4122.txt
  *
  * @param	otherUuid	A dojo.uuid.Uuid instance, or a string representing a UUID.
@@ -280,7 +280,7 @@ dojo.uuid.Uuid.prototype.getVariant = function() {
 		lookupTable[0xD] = Variant.MICROSOFT; // 1101
 		lookupTable[0xE] = Variant.UNKNOWN;   // 1110
 		lookupTable[0xF] = Variant.UNKNOWN;   // 1111
-		
+
 		dojo.uuid.Uuid._ourVariantLookupTable = lookupTable;
 	}
 
@@ -303,7 +303,7 @@ dojo.uuid.Uuid.prototype.getVersion = function() {
 	if (!this._versionNumber) {
 		var errorMessage = "Called getVersion() on a dojo.uuid.Uuid that was not a DCE Variant UUID.";
 		dojo.lang.assert(this.getVariant() == dojo.uuid.Uuid.Variant.DCE, errorMessage);
-	
+
 		// "b4308fb0-86cd-11da-a72b-0800200c9a66"
 		//                ^
 		//                |
@@ -315,9 +315,9 @@ dojo.uuid.Uuid.prototype.getVersion = function() {
 };
 
 /**
- * If this is a version 1 UUID (a time-based UUID), this method returns a 
- * 12-character string with the "node" or "pseudonode" portion of the UUID, 
- * which is the rightmost 12 characters.  
+ * If this is a version 1 UUID (a time-based UUID), this method returns a
+ * 12-character string with the "node" or "pseudonode" portion of the UUID,
+ * which is the rightmost 12 characters.
  * Throws an Error if this is not a version 1 UUID.
  *
  * @return   Returns a 12-character string, which will look something like "917bf397618a".
@@ -335,9 +335,9 @@ dojo.uuid.Uuid.prototype.getNode = function() {
 };
 
 /**
- * If this is a version 1 UUID (a time-based UUID), this method returns 
+ * If this is a version 1 UUID (a time-based UUID), this method returns
  * the timestamp value encoded in the UUID.  The caller can ask for the
- * timestamp to be returned either as a JavaScript Date object or as a 
+ * timestamp to be returned either as a JavaScript Date object or as a
  * 15-character string of hex digits.
  * Throws an Error if this is not a version 1 UUID.
  *
@@ -346,7 +346,7 @@ dojo.uuid.Uuid.prototype.getNode = function() {
  *   var uuid = new dojo.uuid.Uuid("b4308fb0-86cd-11da-a72b-0800200c9a66");
  *   var date, string, hexString;
  *   date   = uuid.getTimestamp();         // returns a JavaScript Date
- *   date   = uuid.getTimestamp(Date);     // 
+ *   date   = uuid.getTimestamp(Date);     //
  *   string = uuid.getTimestamp(String);   // "Mon, 16 Jan 2006 20:21:41 GMT"
  *   hexString = uuid.getTimestamp("hex"); // "1da86cdb4308fb0"
  * </pre>
@@ -357,7 +357,7 @@ dojo.uuid.Uuid.prototype.getNode = function() {
 dojo.uuid.Uuid.prototype.getTimestamp = function(returnType) {
 	var errorMessage = "Called getTimestamp() on a dojo.uuid.Uuid that was not a TIME_BASED UUID.";
 	dojo.lang.assert(this.getVersion() == dojo.uuid.Uuid.Version.TIME_BASED, errorMessage);
-	
+
 	if (!returnType) {returnType = null};
 	switch (returnType) {
 		case "string":
@@ -365,18 +365,18 @@ dojo.uuid.Uuid.prototype.getTimestamp = function(returnType) {
 			return this.getTimestamp(Date).toUTCString();
 			break;
 		case "hex":
-			// Return a 15-character string of hex digits containing the 
+			// Return a 15-character string of hex digits containing the
 			// timestamp for this UUID, with the high-order bits first.
 			if (!this._timestampAsHexString) {
 				var arrayOfStrings = this._uuidString.split('-');
 				var hexTimeLow = arrayOfStrings[0];
 				var hexTimeMid = arrayOfStrings[1];
 				var hexTimeHigh = arrayOfStrings[2];
-			
-				// Chop off the leading "1" character, which is the UUID 
+
+				// Chop off the leading "1" character, which is the UUID
 				// version number for time-based UUIDs.
 				hexTimeHigh = hexTimeHigh.slice(1);
-			
+
 				this._timestampAsHexString = hexTimeHigh + hexTimeMid + hexTimeLow;
 				dojo.lang.assert(this._timestampAsHexString.length == 15);
 			}
@@ -385,10 +385,10 @@ dojo.uuid.Uuid.prototype.getTimestamp = function(returnType) {
 		case null: // no returnType was specified, so default to Date
 		case "date":
 		case Date:
-			// Return a JavaScript Date object. 
+			// Return a JavaScript Date object.
 			if (!this._timestampAsDate) {
 				var GREGORIAN_CHANGE_OFFSET_IN_HOURS = 3394248;
-			
+
 				var arrayOfParts = this._uuidString.split('-');
 				var timeLow = parseInt(arrayOfParts[0], dojo.uuid.Uuid.HEX_RADIX);
 				var timeMid = parseInt(arrayOfParts[1], dojo.uuid.Uuid.HEX_RADIX);
@@ -396,13 +396,13 @@ dojo.uuid.Uuid.prototype.getTimestamp = function(returnType) {
 				var hundredNanosecondIntervalsSince1582 = timeHigh & 0x0FFF;
 				hundredNanosecondIntervalsSince1582 <<= 16;
 				hundredNanosecondIntervalsSince1582 += timeMid;
-				// What we really want to do next is shift left 32 bits, but the 
+				// What we really want to do next is shift left 32 bits, but the
 				// result will be too big to fit in an int, so we'll multiply by 2^32,
 				// and the result will be a floating point approximation.
 				hundredNanosecondIntervalsSince1582 *= 0x100000000;
 				hundredNanosecondIntervalsSince1582 += timeLow;
 				var millisecondsSince1582 = hundredNanosecondIntervalsSince1582 / 10000;
-			
+
 				// Again, this will be a floating point approximation.
 				// We can make things exact later if we need to.
 				var secondsPerHour = 60 * 60;
@@ -410,7 +410,7 @@ dojo.uuid.Uuid.prototype.getTimestamp = function(returnType) {
 				var secondsBetween1582and1970 = hoursBetween1582and1970 * secondsPerHour;
 				var millisecondsBetween1582and1970 = secondsBetween1582and1970 * 1000;
 				var millisecondsSince1970 = millisecondsSince1582 - millisecondsBetween1582and1970;
-			
+
 				this._timestampAsDate = new Date(millisecondsSince1970);
 			}
 			return this._timestampAsDate;

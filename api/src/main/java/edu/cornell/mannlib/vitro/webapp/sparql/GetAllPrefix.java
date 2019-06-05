@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * This servlet gets all the prefix for initizing the sparql query builder.
- * 
+ *
  * @author yuysun
  */
 
@@ -44,9 +44,9 @@ public class GetAllPrefix extends BaseEditController {
 
 	/**
 	 * The doGet method of the servlet. <br>
-	 * 
+	 *
 	 * This method is called when a form has its tag value method equals to get.
-	 * 
+	 *
 	 * @param request
 	 *            the request send by the client to the server
 	 * @param response
@@ -63,9 +63,9 @@ public class GetAllPrefix extends BaseEditController {
         	return;
 		}
 
-		VitroRequest vreq = new VitroRequest(request);	
-		Map<String, String> prefixMap = getPrefixMap(vreq.getUnfilteredWebappDaoFactory());		
-		
+		VitroRequest vreq = new VitroRequest(request);
+		Map<String, String> prefixMap = getPrefixMap(vreq.getUnfilteredWebappDaoFactory());
+
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
@@ -82,24 +82,24 @@ public class GetAllPrefix extends BaseEditController {
 		out.flush();
 		out.close();
 	}
-	
+
 	/**
-	 * Returns a map of prefixes for use in building queries.  Will manufacture a 
+	 * Returns a map of prefixes for use in building queries.  Will manufacture a
 	 * prefix for any namespace that doesn't have an associated owl:Ontology resource
-	 * with a prefix annotation  
+	 * with a prefix annotation
 	 * @param wadf DAO Factory
 	 * @return map of prefix strings to namespace URIs
 	 */
 	private Map<String, String> getPrefixMap(WebappDaoFactory wadf) {
 	    Map<String, String> prefixMap = new HashMap<String, String>();
-	    
+
 	    OntologyDao oDao = wadf.getOntologyDao();
 	    for(Ontology o : oDao.getAllOntologies()) {
 	        if (o.getPrefix() != null) {
 	            prefixMap.put(o.getPrefix(), o.getURI());
 	        }
 	    }
-	    
+
 	    // add standard namespaces
 	    addPrefixIfNecessary("owl", OWL.getURI(), prefixMap);
 	    addPrefixIfNecessary("rdf", RDF.getURI(), prefixMap);
@@ -109,7 +109,7 @@ public class GetAllPrefix extends BaseEditController {
 	    addPrefixIfNecessary("xsd", XSD.getURI(), prefixMap);
 	    addPrefixIfNecessary("vitro", VitroVocabulary.vitroURI, prefixMap);
 
-	    // we also need to manufacture prefixes for namespaces used by any class or 
+	    // we also need to manufacture prefixes for namespaces used by any class or
 	    // property, regardless of whether there's an associated owl:Ontology.
 	    int newPrefixCount = 0;
 	    List<BaseResourceBean> ontEntityList = new ArrayList<BaseResourceBean>();
@@ -117,24 +117,24 @@ public class GetAllPrefix extends BaseEditController {
 	    ontEntityList.addAll(wadf.getObjectPropertyDao().getAllObjectProperties());
 	    ontEntityList.addAll(wadf.getDataPropertyDao().getAllDataProperties());
 	    for (BaseResourceBean ontEntity : ontEntityList) {
-	        if (!ontEntity.isAnonymous() 
+	        if (!ontEntity.isAnonymous()
 	                && !prefixMap.containsValue(ontEntity.getNamespace())) {
 	            newPrefixCount++;
 	            prefixMap.put("p."  + Integer.toString(
 	                    newPrefixCount), ontEntity.getNamespace());
 	        }
 	    }
-	    
+
 	    return prefixMap;
 	}
-	
-	private void addPrefixIfNecessary(String prefix, String namespace, 
+
+	private void addPrefixIfNecessary(String prefix, String namespace,
 	        Map<String, String> prefixMap) {
 	    if (!prefixMap.containsValue(namespace)) {
 	        prefixMap.put(prefix, namespace);
 	    }
 	}
-	
+
 	/**
 	 * Makes the markup for a prefix option
 	 * @param prefix Prefix
@@ -146,14 +146,14 @@ public class GetAllPrefix extends BaseEditController {
                 + "<value>" + URI + "</value>"
                 + "</option>";
 	}
-	
+
 
 	/**
 	 * The doPost method of the servlet. <br>
-	 * 
+	 *
 	 * This method is called when a form has its tag value method equals to
 	 * post.
-	 * 
+	 *
 	 * @param request
 	 *            the request send by the client to the server
 	 * @param response

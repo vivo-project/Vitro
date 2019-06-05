@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  *  Serializes an {@link ILinkedDataFragment} to an RDF format
- * 
+ *
  * @author Miel Vander Sande
  */
 public class RdfWriterImpl extends LinkedDataFragmentWriterBase implements ILinkedDataFragmentWriter {

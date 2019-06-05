@@ -3,7 +3,7 @@
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <!--
-	postprocessor tag refers to a non-existent class.  
+	postprocessor tag refers to a non-existent class.
 -->
 
 <list-view-config>
@@ -15,18 +15,18 @@
             <collated>
             ?object a ?subclass.
             </collated>
-        }  
+        }
     </query-select>
 
     <query-construct>
         CONSTRUCT {
             ?subject ?property ?object .
         } WHERE {
-            ?subject ?property ?object 
+            ?subject ?property ?object
         }
     </query-construct>
-    
+
     <template>propStatement-default.ftl</template>
-    
+
     <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel_PropertyListConfigTest$NoSuchClass</postprocessor>
 </list-view-config>

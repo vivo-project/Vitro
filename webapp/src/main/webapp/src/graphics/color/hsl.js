@@ -74,7 +74,7 @@ dojo.graphics.color.rgb2hsl = function(r, g, b){
 }
 
 dojo.graphics.color.hsl2rgb = function(h, s, l){
- 
+
 	if (dojo.lang.isArray(h)) {
 		l = h[2] || 0;
 		s = h[1] || 0;

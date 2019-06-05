@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumen
 
 /**
  * Parse this search response, creating a map of values for each document.
- * 
+ *
  * The search response field names in the document are replaced by json field
  * names in the parsed results, according to the fieldMap.
  */

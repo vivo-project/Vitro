@@ -13,9 +13,9 @@
 
 // TODOC: HOW TO DOC THE BELOW?
 // @global: djConfig
-// summary:  
+// summary:
 //		Application code can set the global 'djConfig' prior to loading
-//		the library to override certain global settings for how dojo works.  
+//		the library to override certain global settings for how dojo works.
 // description:  The variables that can be set are as follows:
 //			- isDebug: false
 //			- allowQueryConfig: false
@@ -30,10 +30,10 @@
 // TODOC: HOW TO DOC THESE VARIABLES?
 // TODOC: IS THIS A COMPLETE LIST?
 // note:
-//		'djConfig' does not exist under 'dojo.*' so that it can be set before the 
-//		'dojo' variable exists.  
+//		'djConfig' does not exist under 'dojo.*' so that it can be set before the
+//		'dojo' variable exists.
 // note:
-//		Setting any of these variables *after* the library has loaded does nothing at all. 
+//		Setting any of these variables *after* the library has loaded does nothing at all.
 // TODOC: is this still true?  Release notes for 0.3 indicated they could be set after load.
 //
 
@@ -41,10 +41,10 @@
 
 //TODOC:  HOW TO DOC THIS?
 // @global: dj_global
-// summary: 
+// summary:
 //		an alias for the top-level global object in the host environment
 //		(e.g., the window object in a browser).
-// description:  
+// description:
 //		Refer to 'dj_global' rather than referring to window to ensure your
 //		code runs correctly in contexts other than web browsers (eg: Rhino on a server).
 var dj_global = this;
@@ -61,15 +61,15 @@ function dj_undef(/*String*/ name, /*Object?*/ object){
 
 
 // make sure djConfig is defined
-if(dj_undef("djConfig")){ 
-	var djConfig = {}; 
+if(dj_undef("djConfig")){
+	var djConfig = {};
 }
 
 
 //TODOC:  HOW TO DOC THIS?
 // dojo is the root variable of (almost all) our public symbols -- make sure it is defined.
-if(dj_undef("dojo")){ 
-	var dojo = {}; 
+if(dj_undef("dojo")){
+	var dojo = {};
 }
 
 //TODOC:  HOW TO DOC THIS?
@@ -86,17 +86,17 @@ dojo.version = {
 
 dojo.evalProp = function(/*String*/ name, /*Object*/ object, /*Boolean?*/ create){
 	// summary: Returns 'object[name]'.  If not defined and 'create' is true, will return a new Object.
-	// description: 
+	// description:
 	//		Returns null if 'object[name]' is not defined and 'create' is not true.
-	// 		Note: 'defined' and 'exists' are not the same concept.	
+	// 		Note: 'defined' and 'exists' are not the same concept.
 	return (object && !dj_undef(name, object) ? object[name] : (create ? (object[name]={}) : undefined));	// mixed
 }
 
 
 dojo.parseObjPath = function(/*String*/ path, /*Object?*/ context, /*Boolean?*/ create){
 	// summary: Parse string path to an object, and return corresponding object reference and property name.
-	// description: 
-	//		Returns an object with two properties, 'obj' and 'prop'.  
+	// description:
+	//		Returns an object with two properties, 'obj' and 'prop'.
 	//		'obj[prop]' is the reference indicated by 'path'.
 	// path: Path to an object, in the form "A.B.C".
 	// context: Object to use as root of path.  Defaults to 'dj_global'.
@@ -115,8 +115,8 @@ dojo.evalObjPath = function(/*String*/ path, /*Boolean?*/ create){
 	// summary: Return the value of object at 'path' in the global scope, without using 'eval()'.
 	// path: Path to an object, in the form "A.B.C".
 	// create: If true, Objects will be created at any point along the 'path' that is undefined.
-	if(typeof path != "string"){ 
-		return dj_global; 
+	if(typeof path != "string"){
+		return dj_global;
 	}
 	// fast path for no periods
 	if(path.indexOf('.') == -1){
@@ -171,7 +171,7 @@ dojo.debugShallow = function(obj){}
 dojo.profile = { start: function(){}, end: function(){}, stop: function(){}, dump: function(){} };
 
 
-function dj_eval(/*String*/ scriptFragment){ 
+function dj_eval(/*String*/ scriptFragment){
 	// summary: Perform an evaluation in the global scope.  Use this rather than calling 'eval()' directly.
 	// description: Placed in a separate function to minimize size of trapped evaluation context.
 	// note:
@@ -206,7 +206,7 @@ dojo.deprecated = function(/*String*/ behaviour, /*String?*/ extra, /*String?*/ 
 
 dojo.inherits = function(/*Function*/ subclass, /*Function*/ superclass){
 	// summary: Set up inheritance between two classes.
-	if(typeof superclass != 'function'){ 
+	if(typeof superclass != 'function'){
 		dojo.raise("dojo.inherits: superclass argument ["+superclass+"] must be a function (subclass: [" + subclass + "']");
 	}
 	subclass.prototype = new superclass();
@@ -261,11 +261,11 @@ dojo.render = (function(){
  */
 dojo.hostenv = (function(){
 	// TODOC:  HOW TO DOC THIS?
-	// summary: Provides encapsulation of behavior that changes across different 'host environments' 
+	// summary: Provides encapsulation of behavior that changes across different 'host environments'
 	//			(different browsers, server via Rhino, etc).
 	// description: None of these methods should ever be called directly by library users.
 	//				Use public methods such as 'loadModule' instead.
-	
+
 	// default configuration options
 	var config = {
 		isDebug: false,
@@ -294,21 +294,21 @@ dojo.hostenv = (function(){
 		version_: '(unset)',
 
 
-		getName: function(){ 
+		getName: function(){
 			// sumary: Return the name of the host environment.
 			return this.name_; 	// String
 		},
 
 
-		getVersion: function(){ 
+		getVersion: function(){
 			// summary: Return the version of the hostenv.
 			return this.version_; // String
 		},
 
 		getText: function(/*String*/ uri){
 			// summary:	Read the plain/text contents at the specified 'uri'.
-			// description: 
-			//			If 'getText()' is not implemented, then it is necessary to override 
+			// description:
+			//			If 'getText()' is not implemented, then it is necessary to override
 			//			'loadUri()' with an implementation that doesn't rely on it.
 
 			dojo.unimplemented('getText', "uri=" + uri);
@@ -322,7 +322,7 @@ dojo.hostenv.getBaseScriptUri = function(){
 	// TODOC: HUH?  This comment means nothing to me.  What other scripts? Is this the path to other dojo libraries?
 	//		MAYBE:  Return the base uri to scripts in the dojo library.	 ???
 	// return: Empty string or a path ending in '/'.
-	if(djConfig.baseScriptUri.length){ 
+	if(djConfig.baseScriptUri.length){
 		return djConfig.baseScriptUri;
 	}
 

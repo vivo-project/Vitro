@@ -37,14 +37,14 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 	@Before
 	public void setup() throws Exception {
 		ApplicationStub.setup(new ServletContextStub(), new SearchEngineStub());
-		
+
 		request = new HttpServletRequestStub();
 		request.setRequestUrl(new URL("http://vivo.this.that/reconcile"));
 		request.setMethod("POST");
 		response = new HttpServletResponseStub();
 		reconcile = new JSONReconcileServlet();
 	}
-	
+
 	@Test
 	public void getMetadata() {
 		int serverPort = 8080;
@@ -62,7 +62,7 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 		Assert.assertNotNull("output should not be null", jsonResult);
 		Assert.assertEquals("schemaSpaceOutput", defaultNamespace, schemaSpaceOutput);
 	}
-	
+
 	@Test
 	public void getQuery() {
 		// contruct query
@@ -85,7 +85,7 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 		testAssertTrue(messagePrefix + orgType, orgType, searchQuery.toString());
 		testAssertTrue(messagePrefix + nameType, orgType, searchQuery.toString());
 	}
-	
+
 	private void testAssertTrue(String message, String inputStr, String resultStr) {
 		try {
 		    Pattern regex = Pattern.compile(inputStr, Pattern.CASE_INSENSITIVE);

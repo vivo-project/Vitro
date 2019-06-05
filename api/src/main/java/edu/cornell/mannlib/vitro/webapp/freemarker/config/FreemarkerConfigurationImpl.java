@@ -39,26 +39,26 @@ import freemarker.template.utility.DeepUnwrap;
 /**
  * Extend the Freemarker Configuration class to include some information that is
  * particular to the current request.
- * 
+ *
  * A reference to the current request is not always available to the Freemarker
  * Configuration, so we take advantage of the fact that each request runs in a
  * separate thread, and store a reference to that request in a ThreadLocal
  * object.
- * 
+ *
  * Then, we override any methods that should return that request-based
  * information instead of (or in addition to) the common info.
- * 
+ *
  * Only the getters are overridden, not the setters. So if you call
  * setAllSharedVariables(), for example, it will have no effect on the
  * request-based information.
- * 
+ *
  * Notice that the reference to the current request is actually stored through a
  * WeakReference. This is because the ThreadLocal will not be cleared when the
  * webapp is stopped, so none of the references from that ThreadLocal are
  * eligible for garbage collection. If any of those references is an instance of
  * a class that is loaded by the webapp, then the webapp ClassLoader is not
  * eligible for garbage collection. This would be a huge memory leak.
- * 
+ *
  * Thanks to the WeakReference, the request is eligible for garbage collection
  * if nothing else refers to it. In theory, this means that the WeakReference
  * could return a null, but if the garbage collector has taken the request, then
@@ -141,7 +141,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	/**
 	 * Override getTemplate(), so we can apply DataGetters to all included
 	 * templates.
-	 * 
+	 *
 	 * This won't work for top-level Templates, since the Environment hasn't
 	 * been created yet. When TemplateProcessingHelper creates the Environment,
 	 * it must call retrieveAndRunDataGetters() for the top-level Template.

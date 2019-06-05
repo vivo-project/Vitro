@@ -39,12 +39,12 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
     public PropertyGroupDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
-	
+
     @Override
     protected OntModel getOntModel() {
     	return getOntModelSelector().getApplicationMetadataModel();
     }
-    
+
 	public void deletePropertyGroup(PropertyGroup group) {
         getOntModel().enterCriticalSection(Lock.WRITE);
         try {
@@ -58,14 +58,14 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         OntModel tboxModel = getOntModelSelector().getTBoxModel();
         tboxModel.enterCriticalSection(Lock.WRITE);
         try {
-            Resource groupRes = ResourceFactory.createResource(group.getURI());            
+            Resource groupRes = ResourceFactory.createResource(group.getURI());
             tboxModel.removeAll(groupRes, null, null);
             tboxModel.removeAll(null, null, groupRes);
         } finally {
             tboxModel.leaveCriticalSection();
         }
 	}
-	
+
 	public PropertyGroup getGroupByURI(String uri) {
 	    if (uri == null) {
 	        return null;
@@ -81,7 +81,7 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         }
 	}
 
-	
+
 	public List<PropertyGroup> getPublicGroups(boolean withProperties) {
         ObjectPropertyDao opDao = getWebappDaoFactory().getObjectPropertyDao();
         DataPropertyDao dpDao = getWebappDaoFactory().getDataPropertyDao();
@@ -107,8 +107,8 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         	Model tboxModel = getOntModelSelector().getTBoxModel();
         	tboxModel.enterCriticalSection(Lock.READ);
         	try {
-	        	for (PropertyGroup pgrp : groups) {	
-		            List<Property> properties = new ArrayList<Property>();            
+	        	for (PropertyGroup pgrp : groups) {
+		            List<Property> properties = new ArrayList<Property>();
 		            ClosableIterator closeIt = tboxModel.listStatements(
 		            		null, PROPERTY_INPROPERTYGROUPANNOT, tboxModel.getResource(pgrp.getURI()));
 		            try {
@@ -133,27 +133,27 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         Collections.sort(groups);
         return groups;
 	}
-	
+
 	public String insertNewPropertyGroup(PropertyGroup group) {
-		
+
 	 	// VitroPropertyGroups should really inherit from Individual objects now,
     	// but they don't (yet).
     	// I'm going to make an Individual so I can avoid duplicating URI code.
-    	
-    	edu.cornell.mannlib.vitro.webapp.beans.Individual groupInd = 
+
+    	edu.cornell.mannlib.vitro.webapp.beans.Individual groupInd =
     		new IndividualImpl(); // We should make a factory for these
     	groupInd.setNamespace(DEFAULT_NAMESPACE+"vitroPropertyGroup");
     	groupInd.setName(group.getName());
     	groupInd.setVClassURI(PROPERTYGROUP.getURI());
     	groupInd.setURI(group.getURI());
-    	
+
     	String groupURI = null;
-    	
+
         OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
                 OntModelSpec.OWL_MEM, ModelFactory.createUnion(
-                        getOntModelSelector().getApplicationMetadataModel(), 
+                        getOntModelSelector().getApplicationMetadataModel(),
                         getOntModelSelector().getFullModel()));
-        
+
         WebappDaoFactory wadfForURIGeneration = null;
         try {
             wadfForURIGeneration = new WebappDaoFactoryJena(
@@ -161,12 +161,12 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
             groupURI = wadfForURIGeneration
                     .getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
-    		throw new RuntimeException(InsertException.class.getName() + 
+    		throw new RuntimeException(InsertException.class.getName() +
     		        "Unable to insert property group " + groupURI, ie);
     	} finally {
     	    wadfForURIGeneration.close();
     	}
-    	
+
     	if (groupURI != null) {
 	        getOntModel().enterCriticalSection(Lock.WRITE);
 	        try {
@@ -177,15 +177,15 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	                        group.getDisplayRank()), XSDDatatype.XSDint);
 	            } catch (Exception e) {
 	                log.error(
-	                        "error setting displayRank for " 
+	                        "error setting displayRank for "
 	                                + groupInd.getURI());
 	            }
-	            if (group.getPublicDescription() != null 
+	            if (group.getPublicDescription() != null
 	                    && group.getPublicDescription().length()>0) {
-		            try {   
+		            try {
 		                groupJenaInd.addProperty(
-		                        PUBLIC_DESCRIPTION_ANNOT, 
-		                        group.getPublicDescription(), 
+		                        PUBLIC_DESCRIPTION_ANNOT,
+		                        group.getPublicDescription(),
 		                        XSDDatatype.XSDstring);
 		            } catch (Exception ex) {
 		                log.error(
@@ -199,10 +199,10 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
     	} else {
     		log.error("Unable to insert property group " + group.getName());
     	}
-    
+
 	    return groupURI;
 	}
-	
+
 	public int removeUnpopulatedGroups(List<PropertyGroup> groups) {
         if (groups==null || groups.size()==0)
             return 0;
@@ -247,7 +247,7 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	        ontModel.leaveCriticalSection();
 	    }
 	}
-	
+
 	public PropertyGroup createDummyPropertyGroup(String name, int rank) {
 	    PropertyGroup newGroup = new PropertyGroup();
 	    newGroup.setName(name);
@@ -269,8 +269,8 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         group.setLocalName(groupInd.getLocalName());
         group.setPublicDescription(getPropertyStringValue(
                 groupInd, PUBLIC_DESCRIPTION_ANNOT));
-        group.setDisplayRank(getPropertyNonNegativeIntValue(groupInd, DISPLAY_RANK));    
+        group.setDisplayRank(getPropertyNonNegativeIntValue(groupInd, DISPLAY_RANK));
         return group;
     }
-	
+
 }

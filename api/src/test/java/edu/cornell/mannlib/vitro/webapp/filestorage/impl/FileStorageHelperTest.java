@@ -12,7 +12,7 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class FileStorageHelperTest {
 	private static String RAW_NAME_1 = "simpleName";

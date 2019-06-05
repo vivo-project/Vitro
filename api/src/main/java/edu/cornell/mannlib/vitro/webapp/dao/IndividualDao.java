@@ -26,14 +26,14 @@ public interface IndividualDao {
      * @param vclassURI URI for VClass
      */
     public abstract void addVClass(String individualURI, String vclassURI);
-    
+
     /**
      * Removes the specified Individual from the specificed VClass (i.e. retracts rdf:type)
      * @param individualURI Individual URI
      * @param vclassURI URI for VCLass
      */
     public abstract void removeVClass(String individualURI, String vclassURI);
-    
+
     /**
      * Returns a list of all the Individuals in the specified VClass.
      * @param vclass VClass
@@ -44,7 +44,7 @@ public interface IndividualDao {
      * Returns a list of Individuals in a given VClass.
      */
     public abstract List <Individual> getIndividualsByVClassURI(String vclassURI);
-    
+
     /**
      * Returns a list of Individuals in a given VClass.
      */
@@ -93,7 +93,7 @@ public interface IndividualDao {
     public abstract Iterator<String> getUpdatedSinceIterator(long updatedSince);
 
     public boolean isIndividualOfClass(String vclassURI, String indURI);
-    
+
     /**
      * Returns a list of individuals with the given value for the given dataProperty.  If
      * there are no Indiviuals that fit the criteria then an empty list is returned.
@@ -101,7 +101,7 @@ public interface IndividualDao {
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value);
 
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value, String datatypeUri, String lang);
-    
+
 	void fillVClassForIndividual(Individual individual);
 
 	/**
@@ -111,7 +111,7 @@ public interface IndividualDao {
 	 * @throws InsertException Could not create a URI
 	 */
 	String getUnusedURI(Individual individual) throws InsertException;
-	
+
 	EditLiteral getLabelEditLiteral(String individualUri);
-	
+
 }

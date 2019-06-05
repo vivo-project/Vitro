@@ -27,10 +27,10 @@
     display: block;
     padding-bottom: 10px;
 }
-#photoUploadForm label span {    
+#photoUploadForm label span {
     font-size: .7em;
 }
-#photoUploadForm input {    
+#photoUploadForm input {
     margin-bottom: 10px;
 }
 /* <------ CROP PICTURE*/

@@ -52,13 +52,13 @@ public class RequestPolicyList extends PolicyList {
 		if (request == null) {
 			throw new NullPointerException("request may not be null.");
 		}
-		
+
 		Object obj = request.getAttribute(ATTRIBUTE_POLICY_ADDITIONS);
 		if (obj == null) {
 			obj = new PolicyList();
 			request.setAttribute(ATTRIBUTE_POLICY_ADDITIONS, obj);
 		}
-		
+
 		if (!(obj instanceof PolicyList)) {
 			throw new IllegalStateException("Expected to find an instance of "
 					+ PolicyList.class.getName()

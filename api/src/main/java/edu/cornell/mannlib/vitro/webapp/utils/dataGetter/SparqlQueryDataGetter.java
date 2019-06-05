@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 
 public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 	private final static Log log = LogFactory.getLog(SparqlQueryDataGetter.class);
-	
+
     private static final String queryPropertyURI = "<" + DisplayVocabulary.QUERY + ">";
     private static final String saveToVarPropertyURI= "<" + DisplayVocabulary.SAVE_TO_VAR+ ">";
     private static final String queryModelPropertyURI= "<" + DisplayVocabulary.QUERY_MODEL+ ">";
@@ -47,72 +47,72 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     String modelURI;
     VitroRequest vreq;
     ServletContext context;
-    
+
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
     public SparqlQueryDataGetter(VitroRequest vreq, Model displayModel, String dataGetterURI){
         this.configure(vreq, displayModel,dataGetterURI);
-    }        
-    
+    }
+
 	/**
      * Configure this instance based on the URI and display model.
      */
     @SuppressWarnings("hiding")
 	protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
-    	if( vreq == null ) 
+    	if( vreq == null )
     		throw new IllegalArgumentException("VitroRequest  may not be null.");
-        if( displayModel == null ) 
+        if( displayModel == null )
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
-                
+
         this.vreq = vreq;
         this.context = vreq.getSession().getServletContext();
-        this.dataGetterURI = dataGetterURI;        
-        
+        this.dataGetterURI = dataGetterURI;
+
         QuerySolutionMap initBindings = new QuerySolutionMap();
         initBindings.add("dataGetterURI", ResourceFactory.createResource(this.dataGetterURI));
-        
-        Query dataGetterConfigurationQuery = QueryFactory.create(dataGetterQuery) ;               
+
+        Query dataGetterConfigurationQuery = QueryFactory.create(dataGetterQuery) ;
         displayModel.enterCriticalSection(Lock.READ);
         try{
             QueryExecution qexec = QueryExecutionFactory.create(
-                    dataGetterConfigurationQuery, displayModel, initBindings) ;        
+                    dataGetterConfigurationQuery, displayModel, initBindings) ;
             ResultSet res = qexec.execSelect();
-            try{                
+            try{
                 while( res.hasNext() ){
                     QuerySolution soln = res.next();
-                    
+
                     //query is NOT OPTIONAL
                     Literal value = soln.getLiteral("query");
                     if( dataGetterConfigurationQuery == null )
                         log.error("no query defined for page " + this.dataGetterURI);
                     else
-                        this.queryText = value.getLexicalForm();                    
-                    
-                    //model is OPTIONAL                    
+                        this.queryText = value.getLexicalForm();
+
+                    //model is OPTIONAL
                     RDFNode node = soln.get("queryModel");
                     if( node != null && node.isURIResource() ){
-                        this.modelURI = node.asResource().getURI();                        
+                        this.modelURI = node.asResource().getURI();
                     }else if( node != null && node.isLiteral() ){
-                        this.modelURI = node.asLiteral().getLexicalForm();                        
+                        this.modelURI = node.asLiteral().getLexicalForm();
                     }else{
                         this.modelURI = null;
                     }
-                        
+
                     //saveToVar is OPTIONAL
                     Literal saveTo = soln.getLiteral("saveToVar");
                     if( saveTo != null && saveTo.isLiteral() ){
-                        this.saveToVar = saveTo.asLiteral().getLexicalForm();                        
+                        this.saveToVar = saveTo.asLiteral().getLexicalForm();
                     }else{
                         this.saveToVar = defaultVarNameForResults;
                     }
                 }
             }finally{ qexec.close(); }
-        }finally{ displayModel.leaveCriticalSection(); }                
+        }finally{ displayModel.leaveCriticalSection(); }
     }
-    
+
     /**
      * Query to get the definition of the SparqlDataGetter for a given URI.
      */
@@ -122,13 +122,13 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         "  ?dataGetterURI "+queryPropertyURI+" ?query . \n" +
         "  OPTIONAL{ ?dataGetterURI "+saveToVarPropertyURI+" ?saveToVar } \n " +
         "  OPTIONAL{ ?dataGetterURI "+queryModelPropertyURI+" ?queryModel } \n" +
-        "}";      
+        "}";
 
-   
+
     @Override
-    public Map<String, Object> getData(Map<String, Object> pageData) { 
+    public Map<String, Object> getData(Map<String, Object> pageData) {
     	Map<String, String> merged = mergeParameters(vreq.getParameterMap(), pageData);
-    	
+
     	String boundQueryText = bindParameters(queryText, merged);
 
     	if (modelURI != null) {
@@ -158,7 +158,7 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 	/**
 	 * InitialBindings don't always work, and besides, RDFService doesn't accept
 	 * them. So do a text-based substitution.
-	 * 
+	 *
 	 * This assumes that every parameter is a URI. What if we want to substitute
 	 * a string value?
 	 */
@@ -199,10 +199,10 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     	if (query == null) {
             return Collections.emptyMap();
         }
-        
+
         return assembleMap(executeQuery( query, queryModel));
     }
-    
+
 	private Query makeQuery(String q) {
 		try {
 			return QueryFactory.create(q);
@@ -213,11 +213,11 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 	}
 
 	private List<Map<String, String>> executeQuery(Query query, Model model) {
-        model.enterCriticalSection(Lock.READ);        
-        try{            
+        model.enterCriticalSection(Lock.READ);
+        try{
             QueryExecution qexec= QueryExecutionFactory.create(query, model );
             ResultSet results = qexec.execSelect();
-            try{                
+            try{
             	return parseResults(results);
             }finally{ qexec.close(); }
         }finally{ model.leaveCriticalSection(); }
@@ -231,23 +231,23 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
             rows.add( toRow( soln ) );
-        }                   
-        return rows;        
+        }
+        return rows;
 	}
 
 	/**
-     * Converts a row from a QuerySolution to a Map<String,String> 
+     * Converts a row from a QuerySolution to a Map<String,String>
      */
     private Map<String, String> toRow(QuerySolution soln) {
-        HashMap<String,String> row = new HashMap<String,String>();        
+        HashMap<String,String> row = new HashMap<String,String>();
         Iterator<String> varNames = soln.varNames();
         while( varNames.hasNext()){
-            String varname = varNames.next();            
-            row.put(varname, toCell( soln.get(varname)));            
+            String varname = varNames.next();
+            row.put(varname, toCell( soln.get(varname)));
         }
         return row;
     }
-    
+
     private String toCell(RDFNode rdfNode) {
         if( rdfNode == null){
             return "";
@@ -259,23 +259,23 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
                 return resource.getURI();
             }else{
                 return resource.getId().getLabelString();
-            }                
+            }
         }else{
             return rdfNode.toString();
-        }   
+        }
     }
 
 	private Map<String, Object> assembleMap(List<Map<String, String>> results) {
 		Map<String, Object> rmap = new HashMap<String,Object>();
-        
+
         //put results in page data
-        rmap.put(this.saveToVar, results);  
+        rmap.put(this.saveToVar, results);
         //also store the variable name within which results will be returned
         rmap.put("variableName", this.saveToVar);
         //This will be overridden at page level in display model if template specified there
         rmap.put("bodyTemplate", defaultTemplate);
-        
-        return rmap;        
+
+        return rmap;
 	}
-	
+
 }

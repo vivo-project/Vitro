@@ -28,21 +28,21 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
    destructive.
 */
 public class PropertyDWR {
-	
+
 	private static final Log log = LogFactory.getLog(PropertyDWR.class.getName());
-	
+
     public static boolean debug = true;
 
-    public PropertyDWR(){               
+    public PropertyDWR(){
     }
-    
+
     public Object test(){
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-        
-        Collection c = 
+
+        Collection c =
             wdf.getPropertyInstanceDao().getExistingProperties("http://example.org/property", null);
         return c.iterator().next();
     }
@@ -56,19 +56,19 @@ public class PropertyDWR {
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
         WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
-        
-        Collection c = 
+
+        Collection c =
             wdf.getPropertyInstanceDao().getAllPropInstByVClass(classURI);
         return c;
     }
-    
+
     public Collection getAllPossiblePropInstForIndividual(String individualURI) {
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
         WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
 
-        Collection c = 
+        Collection c =
             wdf.getPropertyInstanceDao().getAllPossiblePropInstForIndividual(individualURI);
     	return c;
     }
@@ -78,7 +78,7 @@ public class PropertyDWR {
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
         WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
-        
+
        return wdf.getPropertyInstanceDao().getProperty(subjectURI, predicateURI, objectURI);
     }
 
@@ -86,7 +86,7 @@ public class PropertyDWR {
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
-        return vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao().insertProp(prop);                
+        return vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao().insertProp(prop);
     }
 
     public int deleteProp(String subjectUri, String predicateUri, String objectUri){
@@ -118,18 +118,18 @@ public class PropertyDWR {
        HttpServletRequest req = ctx.getHttpServletRequest();
        VitroRequest vreq = new VitroRequest(req);
        WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
-       
-       return wdf.getPropertyInstanceDao().getExistingProperties(entityURI, null);       
+
+       return wdf.getPropertyInstanceDao().getExistingProperties(entityURI, null);
    }
-   
+
 //   private PropertyInstance prepare(PropertyInstance in){
 //       return in;
 //   }
-//   
+//
 //   public Collection prepare(Collection properties){
 //       if( properties == null || properties.size() == 0 )
 //           return Collections.EMPTY_LIST;
-//       
+//
 //       ArrayList outProps = new ArrayList(properties.size());
 //       for( Object prop : properties){
 //           if( prop instanceof PropertyIn

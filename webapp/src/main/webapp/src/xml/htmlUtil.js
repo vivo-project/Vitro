@@ -17,13 +17,13 @@ dojo.deprecated("dojo.xml.htmlUtil", "use dojo.html instead", "0.4");
 
 dojo.xml.htmlUtil = new function(){
 	this.styleSheet = dojo.style.styleSheet;
-	
+
 	this._clobberSelection = function(){return dojo.html.clearSelection.apply(dojo.html, arguments);}
 	this.disableSelect = function(){return dojo.html.disableSelection.apply(dojo.html, arguments);}
 	this.enableSelect = function(){return dojo.html.enableSelection.apply(dojo.html, arguments);}
-	
+
 	this.getInnerWidth = function(){return dojo.style.getInnerWidth.apply(dojo.style, arguments);}
-	
+
 	this.getOuterWidth = function(node){
 		dojo.unimplemented("dojo.xml.htmlUtil.getOuterWidth");
 	}
@@ -40,7 +40,7 @@ dojo.xml.htmlUtil = new function(){
 	this.getAbsoluteX = this.totalOffsetLeft;
 
 	this.totalOffsetTop = function(){return dojo.style.totalOffsetTop.apply(dojo.style, arguments);}
-	
+
 	this.getAbsoluteY = this.totalOffsetTop;
 
 	this.getEventTarget = function(){return dojo.html.getEventTarget.apply(dojo.html, arguments);}
@@ -61,7 +61,7 @@ dojo.xml.htmlUtil = new function(){
 		dojo.deprecated("dojo.xml.htmlUtil.hasAttr", "use dojo.xml.htmlUtil.hasAttribute instead", "0.4");
 		return dojo.xml.htmlUtil.hasAttribute(node, attr);
 	}
-	
+
 	this.getClass = function(){return dojo.html.getClass.apply(dojo.html, arguments)}
 	this.hasClass = function(){return dojo.html.hasClass.apply(dojo.html, arguments)}
 	this.prependClass = function(){return dojo.html.prependClass.apply(dojo.html, arguments)}
@@ -78,27 +78,27 @@ dojo.xml.htmlUtil = new function(){
 
 	this.getElementsByClass = function() {return dojo.html.getElementsByClass.apply(dojo.html, arguments)}
 	this.getElementsByClassName = this.getElementsByClass;
-	
+
 	this.setOpacity = function() {return dojo.style.setOpacity.apply(dojo.style, arguments)}
 	this.getOpacity = function() {return dojo.style.getOpacity.apply(dojo.style, arguments)}
 	this.clearOpacity = function() {return dojo.style.clearOpacity.apply(dojo.style, arguments)}
-	
+
 	this.gravity = function(){return dojo.html.gravity.apply(dojo.html, arguments)}
-	
+
 	this.gravity.NORTH = 1;
 	this.gravity.SOUTH = 1 << 1;
 	this.gravity.EAST = 1 << 2;
 	this.gravity.WEST = 1 << 3;
-	
+
 	this.overElement = function(){return dojo.html.overElement.apply(dojo.html, arguments)}
 
 	this.insertCssRule = function(){return dojo.style.insertCssRule.apply(dojo.style, arguments)}
-	
+
 	this.insertCSSRule = function(selector, declaration, index){
 		dojo.deprecated("dojo.xml.htmlUtil.insertCSSRule", "use dojo.style.insertCssRule instead", "0.4");
 		return dojo.xml.htmlUtil.insertCssRule(selector, declaration, index);
 	}
-	
+
 	this.removeCssRule = function(){return dojo.style.removeCssRule.apply(dojo.style, arguments)}
 
 	this.removeCSSRule = function(index){

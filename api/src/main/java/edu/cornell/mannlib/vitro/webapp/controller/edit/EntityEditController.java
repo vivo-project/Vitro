@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 
 @WebServlet(name = "EntityEditController", urlPatterns = {"/entityEdit"} )
 public class EntityEditController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(EntityEditController.class.getName());
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
@@ -48,7 +48,7 @@ public class EntityEditController extends BaseEditController {
         String entURI = request.getParameter("uri");
         VitroRequest vreq = (new VitroRequest(request));
         ApplicationBean application = vreq.getAppBean();
-        
+
         //Individual ent = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         Individual ent = vreq.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (ent == null) {
@@ -62,12 +62,12 @@ public class EntityEditController extends BaseEditController {
                 log.error(e.getStackTrace());
             }
         }
-        
+
         Individual inferredEnt = vreq.getUnfilteredWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (inferredEnt == null) {
         	inferredEnt = new IndividualImpl(entURI);
         }
-        
+
         request.setAttribute("entity",ent);
 
         ArrayList<String> results = new ArrayList<String>();
@@ -82,7 +82,7 @@ public class EntityEditController extends BaseEditController {
         colCount++;
         results.add("publish level");
         colCount++;
-        
+
         String rName = null;
         if (ent.getName() != null && ent.getName().length() > 0) {
         	rName = ent.getName();
@@ -94,7 +94,7 @@ public class EntityEditController extends BaseEditController {
         	rName = "[resource]";
         }
         results.add(rName);
-        
+
         StringBuilder classStr = new StringBuilder();
         List<VClass> classList = inferredEnt.getVClasses(false);
         sortForPickList(classList, vreq);
@@ -104,7 +104,7 @@ public class EntityEditController extends BaseEditController {
 	        	String rClassName = "";
 	            try {
 	                rClassName = "<a href=\"vclassEdit?uri=" +
-	                		URLEncoder.encode(vc.getURI(),"UTF-8")+"\">" + 
+	                		URLEncoder.encode(vc.getURI(),"UTF-8")+"\">" +
 	                		vc.getPickListName()+"</a>";
 	            } catch (Exception e) {
 	                rClassName = vc.getLocalNameWithPrefix();
@@ -116,7 +116,7 @@ public class EntityEditController extends BaseEditController {
 	        }
         }
         results.add(classStr.toString());
-                
+
 		results.add(ent.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified"
 				: ent.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
 		results.add(ent.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified"
@@ -130,17 +130,17 @@ public class EntityEditController extends BaseEditController {
         request.setAttribute("results",results);
         request.setAttribute("columncount", colCount);
         request.setAttribute("suppressquery","true");
-        
+
         EditProcessObject epo = super.createEpo(request,FORCE_NEW);
         request.setAttribute("epo", epo);
 
         FormObject foo = new FormObject();
         HashMap<String, List<Option>> OptionMap = new HashMap<String, List<Option>>();
-        
+
         List<VClass> types = ent.getVClasses(false);
         sortForPickList(types, vreq);
         request.setAttribute("types", types); // we're displaying all assertions, including indirect types
-        
+
         try {
             List<Option> externalIdOptionList = new LinkedList<Option>();
             if (ent.getExternalIds() != null) {
@@ -153,15 +153,15 @@ public class EntityEditController extends BaseEditController {
         } catch (Exception e) {
             log.error(e, e);
         }
-                
+
         try{
             OptionMap.put("VClassURI", FormUtils.makeOptionListFromBeans(
                     vreq.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),
-                            "URI", "PickListName", ent.getVClassURI(), null, false));        
+                            "URI", "PickListName", ent.getVClassURI(), null, false));
         } catch (Exception e) {
             log.error(e, e);
         }
-        
+
         PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();
         // existing property statements
         try {

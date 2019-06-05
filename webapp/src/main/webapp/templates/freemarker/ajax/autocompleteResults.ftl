@@ -7,11 +7,11 @@
 <@json.array results />
 -->
 
-[ 
+[
 <#if results??>
     <#list results as result>
         <#-- result.jsonLabel and result.jsonUri are already quoted -->
-        { "label": ${result.jsonLabel}, "uri": ${result.jsonUri} }<#if result_has_next>,</#if>       
+        { "label": ${result.jsonLabel}, "uri": ${result.jsonUri} }<#if result_has_next>,</#if>
     </#list>
 </#if>
 ]

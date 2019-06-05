@@ -31,7 +31,7 @@ The Solr Home directory typically contains the following subdirectories...
 
    conf/
         This directory is mandatory and must contain your solrconfig.xml
-        and schema.xml.  Any other optional configuration files would also 
+        and schema.xml.  Any other optional configuration files would also
         be kept here.
 
    data/

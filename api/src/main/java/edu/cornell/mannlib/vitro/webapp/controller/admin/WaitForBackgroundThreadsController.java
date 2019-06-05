@@ -28,18 +28,18 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.Work
 
 /**
  * Wait for background threads to complete. Used in Selenium testing.
- * 
+ *
  * This servlet will poll background threads (instances of
  * VitroBackgroundThread) until all living threads are idle, or until a maximum
  * wait time has been met. The wait time can be specified with a "waitLimit"
  * parameter on the request (in seconds), or the default value will be used.
- * 
+ *
  * If the maximum time expires before all threads become idle, the result will
  * be 503 (Service Unavailable)
- * 
+ *
  * Else if a "return" parameter exists, and a "referer" header exists, the
  * result will be a 307 (Temporary Redirect) back to the referer URL.
- * 
+ *
  * Otherwise, the result will be 200 (OK), with a brief message.
  */
 @WebServlet(name = "WaitForBackgroundThreads", urlPatterns = {"/admin/wait"} )

@@ -40,7 +40,7 @@ public class UpdateSettings {
 	private OntModel loadedAtStartupDisplayModel;
 	private OntModel oldDisplayModelVivoListViewConfig;
 	private RDFService rdfService;
-	
+
 	public String getDataDir() {
 		return dataDir;
 	}
@@ -167,32 +167,32 @@ public class UpdateSettings {
 	public void setNewTBoxAnnotationsModel(OntModel newTBoxAnnotationsModel) {
 		this.newTBoxAnnotationsModel = newTBoxAnnotationsModel;
 	}
-	
+
 	//Old and new display model methods
 	public void setOldDisplayModelTboxModel(OntModel oldDisplayModelTboxModel) {
 		this.oldDisplayModelTboxModel = oldDisplayModelTboxModel;
 	}
-	
+
 	public void setNewDisplayModelTboxModel(OntModel newDisplayModelTboxModel) {
 		this.newDisplayModelTboxModel = newDisplayModelTboxModel;
 	}
-	
+
 	public void setOldDisplayModelDisplayMetadataModel(OntModel oldDisplayModelDisplayMetadataModel) {
 		this.oldDisplayModelDisplayMetadataModel = oldDisplayModelDisplayMetadataModel;
 	}
-	
+
 	public void setNewDisplayModelDisplayMetadataModel(OntModel newDisplayModelDisplayMetadataModel) {
 		this.newDisplayModelDisplayMetadataModel = newDisplayModelDisplayMetadataModel;
 	}
-	
+
 	public void setDisplayModel(OntModel displayModel) {
 		this.displayModel = displayModel;
 	}
-	
+
 	public OntModel getOldDisplayModelTboxModel() {
 		return this.oldDisplayModelTboxModel;
 	}
-	
+
 	public OntModel getNewDisplayModelTboxModel() {
 		return this.newDisplayModelTboxModel;
 	}
@@ -200,46 +200,46 @@ public class UpdateSettings {
 	public OntModel getOldDisplayModelDisplayMetadataModel() {
 		return this.oldDisplayModelDisplayMetadataModel;
 	}
-	
+
 	public OntModel getNewDisplayModelDisplayMetadataModel() {
 		return this.newDisplayModelDisplayMetadataModel;
 	}
-	
+
 	public OntModel getDisplayModel() {
 		return this.displayModel;
 	}
-	
+
 	public void setNewDisplayModelFromFile(OntModel newDisplayModel) {
 		this.newDisplayModelFromFile = newDisplayModel;
 	}
-	
+
 	public OntModel getNewDisplayModelFromFile() {
 		return this.newDisplayModelFromFile;
 	}
-	
+
 	public void setLoadedAtStartupDisplayModel(OntModel loadedModel) {
 		this.loadedAtStartupDisplayModel = loadedModel;
 	}
-	
+
 	public OntModel getLoadedAtStartupDisplayModel() {
 		return this.loadedAtStartupDisplayModel;
 	}
-	
+
 	public void setVivoListViewConfigDisplayModel(OntModel loadedModel) {
 		this.oldDisplayModelVivoListViewConfig = loadedModel;
 	}
-	
+
 	public OntModel getVivoListViewConfigDisplayModel() {
 		return this.oldDisplayModelVivoListViewConfig;
 	}
-	
+
 	public RDFService getRDFService() {
 	    return this.rdfService;
 	}
-	
+
 	public void setRDFService(RDFService rdfService) {
 	    this.rdfService = rdfService;
 	}
-	
-	
+
+
 }

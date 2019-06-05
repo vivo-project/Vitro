@@ -23,7 +23,7 @@ public class SparqlQueryApiAskExecutor extends SparqlQueryApiResultSetProducer {
 	/**
 	 * The RDFService returns a boolean from an ASK query, without regard to a
 	 * requested format.
-	 * 
+	 *
 	 * For TEXT, CSV and TSV, we can simple return the String value of the
 	 * boolean as an InputStream. For XML and JSON, however, the W3C documents
 	 * require something a bit more fancy.

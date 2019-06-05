@@ -29,7 +29,7 @@ public class ShowBackgroundThreadsController extends FreemarkerHttpServlet {
 	private static final String TEMPLATE_NAME = "admin-showThreads.ftl";
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-	
+
 	@Override
 	protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
 

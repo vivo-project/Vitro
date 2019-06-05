@@ -17,7 +17,7 @@ public interface IndividualRequestAnalysisContext {
 
 	/**
 	 * Use the IndividualDao to get this individual.
-	 * 
+	 *
 	 * If the URI is null, or if no such Individual exists, return null.
 	 */
 	Individual getIndividualByURI(String individualUri);

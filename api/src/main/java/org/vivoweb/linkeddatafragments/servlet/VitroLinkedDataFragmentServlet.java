@@ -117,7 +117,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             catch( Exception e ) {
                 // ignore
             }
-        }   
+        }
     }
 
     private IDataSource getDataSource(HttpServletRequest request) throws DataSourceNotFoundException {
@@ -170,12 +170,12 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             response.setHeader("Server", "Linked Data Fragments Server");
             response.setContentType(bestMatch);
             response.setCharacterEncoding("utf-8");
-            
+
             // create a writer depending on the best matching mimeType
             ILinkedDataFragmentWriter writer = LinkedDataFragmentWriterFactory.create(config.getPrefixes(), dataSources, bestMatch);
-            
+
             try {
-            
+
                 final IDataSource dataSource = getDataSource( request );
 
                 final ILinkedDataFragmentRequest ldfRequest =
@@ -187,7 +187,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
 
                 response.setHeader("Access-Control-Allow-Origin", "*");
                 writer.writeFragment(response.getOutputStream(), dataSource, fragment, ldfRequest);
-            
+
             } catch (DataSourceNotFoundException ex) {
                 try {
                     response.setStatus(404);
@@ -199,7 +199,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
                 response.setStatus(500);
                 writer.writeError(response.getOutputStream(), e);
             }
-          
+
         } catch (Exception e) {
             throw new ServletException(e);
         }

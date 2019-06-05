@@ -28,14 +28,14 @@ import javax.servlet.http.HttpServletResponse;
 public class URLRewriterFilter implements Filter {
 
 	private ServletContext _context;
-	
+
 	public void destroy() {
 		// Nothing to do here
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
-		
+
 		if (response instanceof HttpServletResponse) {
 			chain.doFilter(request, new URLRewritingHttpServletResponse((HttpServletResponse)response,(HttpServletRequest)request,_context));
 		} else {

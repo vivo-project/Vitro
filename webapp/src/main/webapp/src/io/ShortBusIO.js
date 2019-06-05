@@ -32,7 +32,7 @@ dojo.require("dojo.event.*");
  * 			// ...
  *		}
  * 	}
- * 
+ *
  * Packets bound for the event router (not one of it's clients) or generated
  * from it are prefixed with the special "/meta" topic. Meta-topic events
  * either inform the client to take an action or inform the server of a system
@@ -53,7 +53,7 @@ dojo.require("dojo.event.*");
  * 	}
  *
  * The client may then respond with a confirmation:
- * 
+ *
  *	// client --> server
  *	{
  *	 	topic: "/meta",

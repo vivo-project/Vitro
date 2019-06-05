@@ -30,44 +30,44 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 /**
  * Not a well-formed set of unit tests. But it's a pretty good exercise of the
  * different possibilities in the output stage.
- * 
+ *
  * Test plan:
- * 
+ *
  * <pre>
  * No data - roots is null -- NONSENSICAL
  * No data - roots is empty
- * 
+ *
  * Ontology is not specified
  * Ontology is specified and matches
  * Ontology is specified and does not match
  * DataProperty does not match Ontology, but has child properties that do.
- * 
+ *
  * Name from picklistName
  * Name from getUri
  * Name no URL? -- NONSENSICAL
- * 
+ *
  * InternalName from localNameWithPrefix
  * InternalName from localName
  * InternalName from URI
- * 
+ *
  * Domain class no class URI
  * Domain class no class for URI
  * Domain class use picklistName
- * 
+ *
  * Range class no class URI
  * Range class no class for URI
  * Range class use picklistName
- * 
+ *
  * Group no group URI
  * Group no group for URI
  * Group no name
  * Group has a name
- * 
+ *
  * OP1 Ont1, no picklistName, no localNameWithPrefix, no domainClass, no rangeClass, no GroupURI
  * OP2 Ont2, picklistName, no localNameWithPrefix, no domain class for URI, no range class for URI, no group for GroupURI
  * OP3 Ont1, picklistName, localNameWithPrefix, domainclass no picklistname, range class no picklistname, group has no name
  * OP4 Ont1, picklistName, localNameWithPrefix, domainclass w/picklistname, range class w/picklistname, group with name
- * 
+ *
  * Try once with no data
  * Try with all data and no ontology specified
  * Try with all data and Ont1, Ont2, Ont3

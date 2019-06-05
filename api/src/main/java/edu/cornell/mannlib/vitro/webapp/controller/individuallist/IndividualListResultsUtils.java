@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListCont
 
 /**
  * Utility methods for procesing the paged results of a query for a list of Individuals.
- * 
+ *
  * Right now, there is only a method to wrap the results in Json.
  */
 public class IndividualListResultsUtils {
@@ -47,7 +47,7 @@ public class IndividualListResultsUtils {
 			List<VClass> vclasses = buildListOfRequestedVClasses(vreq);
 
 			VClass vclass = null;
-			// if single vclass expected, then include vclass. 
+			// if single vclass expected, then include vclass.
 			// This relates to what the expected behavior is, not size of list
 			if (!multipleVclasses) {
 				vclass = vclasses.get(0);

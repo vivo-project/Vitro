@@ -23,27 +23,27 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
 public class ExtendedLinkedDataUtils {
-	
+
 	private static final Log log = LogFactory.getLog(ExtendedLinkedDataUtils.class.getName());
-	
+
 	public static Model createModelFromQueries(ServletContext sc, String rootDir, OntModel sourceModel, String subject) {
 		log.debug("Exploring queries in directory '" + rootDir + "'");
-		
-		Model model = ModelFactory.createDefaultModel(); 
-		
+
+		Model model = ModelFactory.createDefaultModel();
+
 		@SuppressWarnings("unchecked")
 		Set<String> pathSet = sc.getResourcePaths(rootDir);
-		
+
 		if (pathSet == null) {
 		  log.warn(rootDir + " not found.");
 		  return model;
 		}
-		
+
 		for ( String path : pathSet ) {
-            File file = new File(sc.getRealPath(path));	
-            if (file.isDirectory()) {           	
+            File file = new File(sc.getRealPath(path));
+            if (file.isDirectory()) {
             	model.add(createModelFromQueries(sc, path, sourceModel, subject));
-            } else if (file.isFile()) { 
+            } else if (file.isFile()) {
     			if (!path.endsWith(".sparql")) {
     				log.warn("Ignoring file " + path + " because the file extension is not sparql.");
     				continue;
@@ -55,30 +55,30 @@ public class ExtendedLinkedDataUtils {
             	log.warn("path is neither a directory nor a file " + path);
             }
 		} // end - for
-				
+
 		return model;
-	}	
-	
+	}
+
 	public static Model createModelFromQuery(File sparqlFile, OntModel sourceModel, String subject) {
-		
-		Model model = ModelFactory.createDefaultModel(); 
-						
+
+		Model model = ModelFactory.createDefaultModel();
+
 		BufferedReader reader = null;
-		
+
 		try {
 			try {
 				reader = new BufferedReader(new FileReader(sparqlFile));
 				StringBuilder fileContents = new StringBuilder();
 				String ln;
-			
+
 				while ( (ln = reader.readLine()) != null) {
 					fileContents.append(ln).append('\n');
-				}		
-						
+				}
+
 				String query = fileContents.toString();
 				String subjectString = "<" + subject + ">";
 				query = query.replaceAll("PERSON_URI", subjectString);
-				
+
 				Query q = QueryFactory.create(query, Syntax.syntaxARQ);
 				QueryExecution qe = QueryExecutionFactory.create(q, sourceModel);
 				qe.execConstruct(model);
@@ -92,8 +92,8 @@ public class ExtendedLinkedDataUtils {
 		} catch (IOException ioe) {
 			// this is for the reader.close above
 			log.warn("Exception while trying to close file: " + sparqlFile.getAbsolutePath(), ioe);
-		}			
-				
+		}
+
 		return model;
-	}	
+	}
 }

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class VClass extends BaseResourceBean implements Comparable<VClass>
 {
-	
+
     /**
      * What this VClass is called
      */
@@ -44,11 +44,11 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     // this type in the database.  Is this the case?
     // [bjl23 2007-08-12] Yep.  A count of individuals in the class.
     protected int  myEntityCount = -1;
-    
+
     // rjy7 Removing deprecation since currently we have no other means to get this value.
     // @Deprecated
     public  int  getEntityCount()         { return myEntityCount; }
-    
+
     public  void setEntityCount( int ec ) { myEntityCount = ec; }
 
     protected Integer  displayLimit = null;
@@ -74,26 +74,26 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     protected String customEntryForm = null;
     public  String getCustomEntryForm()         { return customEntryForm; }
     public  void   setCustomEntryForm(String s) { this.customEntryForm = s; }
-    
+
     protected String customDisplayView = null;
     public  String getCustomDisplayView()         { return customDisplayView; }
     public  void   setCustomDisplayView(String s) { this.customDisplayView = s; }
-    
+
     protected String customShortView = null;
     public  String getCustomShortView()         { return customShortView; }
     public  void   setCustomShortView(String s) { this.customShortView = s; }
-    
+
     protected String customSearchView = null;
     public  String getCustomSearchView()         { return customSearchView; }
-    public  void   setCustomSearchView(String s) { this.customSearchView = s; }    
+    public  void   setCustomSearchView(String s) { this.customSearchView = s; }
 
     protected Float searchBoost = null;
     public Float getSearchBoost() { return searchBoost; }
     public void setSearchBoost( Float boost ){ searchBoost = boost;}
-    
+
     public boolean isUnion() { return false; }
     public List<VClass> getUnionComponents() { return new ArrayList<VClass>(); }
-    
+
     /**
      * Default constructor
      */
@@ -125,16 +125,16 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
         super(uriString);
         myName = getLocalName();
     }
-    
+
     /**
-	 * Constructs the VClass as a deep copy of an existing VClass. 
+	 * Constructs the VClass as a deep copy of an existing VClass.
 	 */
     public VClass copy() {
     	VClass that = new VClass();
     	copyFields(that);
     	return that;
     }
-    
+
 	protected void copyFields(VClass that) {
 		that.myName = this.myName;
     	that.namespace = this.namespace;
@@ -154,7 +154,7 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     	that.customShortView = this.customShortView;
     	that.customSearchView = this.customSearchView;
 	}
-    
+
     /**
      * Sorts alphabetically by name
      */

@@ -9,13 +9,13 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUti
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 
 public class MultiValueEditSubmissionTemplateModel {
-    
+
     private final MultiValueEditSubmission editSub;
 
     public MultiValueEditSubmissionTemplateModel(MultiValueEditSubmission editSub){
         this.editSub = editSub;
     }
-    
+
     public Map<String, List<String>> getLiteralsFromForm() {
     	if(editSub == null)
     		return null;
@@ -23,7 +23,7 @@ public class MultiValueEditSubmissionTemplateModel {
         return EditConfigurationUtils.transformLiteralMap(editSub.getLiteralsFromForm());
     }
 
-   
+
     public Map<String, String> getValidationErrors() {
     	if(editSub ==  null)
     		return null;
@@ -35,7 +35,7 @@ public class MultiValueEditSubmissionTemplateModel {
     		return null;
         return editSub.getUrisFromForm();
     }
-    
+
     public boolean getSubmissionExists() {
     	return (this.editSub != null);
     }

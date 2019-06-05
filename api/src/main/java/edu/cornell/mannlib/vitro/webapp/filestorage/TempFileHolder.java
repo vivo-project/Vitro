@@ -33,7 +33,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 	/**
 	 * Create a  holding the given {@link FileInfo}, and
 	 * attach it to the session with the given attribute name.
-	 * 
+	 *
 	 * If an attribute with this name already exists, it is replaced.
 	 */
 	public static void attach(HttpSession session, String attributeName,
@@ -55,7 +55,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 	 * Get the  which is stored as an attribute on this
 	 * session, extract the {@link FileInfo} from it, and remove it from the
 	 * session.
-	 * 
+	 *
 	 * If there is no such attribute, of if it is not a ,
 	 * return null.
 	 */
@@ -126,7 +126,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 			return;
 		}
 
-		FileStorage fs = ApplicationUtils.instance().getFileStorage(); 
+		FileStorage fs = ApplicationUtils.instance().getFileStorage();
 		try {
 			fs.deleteFile(fileInfo.getBytestreamUri());
 			log.debug("Deleted file " + fileInfo);

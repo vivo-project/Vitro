@@ -24,37 +24,37 @@ public class URLRewritingHttpServletResponseTest {
      */
     protected void urlEncodingStyleA(String urlToEncode, String expectedUrlResult ){
         URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse(new stubs.javax.servlet.http.HttpServletResponseStub());
-        
+
         List<String>externalNamespaces = new ArrayList();
-        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");        
-                
-        String actual = urhsr.encodeForVitro(urlToEncode, "UTF-8",  
-                true, 1, 
-                getMockNamespaceMapper(), 
-                "http://vivo.cornell.edu/individual/", 
+        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");
+
+        String actual = urhsr.encodeForVitro(urlToEncode, "UTF-8",
+                true, 1,
+                getMockNamespaceMapper(),
+                "http://vivo.cornell.edu/individual/",
                 externalNamespaces);
         Assert.assertEquals(expectedUrlResult, actual);
-    }      
-    
+    }
+
     /*
-     * Style A is for sites that are running behind apache httpd at a 
+     * Style A is for sites that are running behind apache httpd at a
      * URL like http://caruso.mannlib.cornell.edu/ with no portals.
      */
     protected void urlEncodingStyleB(String urlToEncode, String expectedUrlResult){
         URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse(new stubs.javax.servlet.http.HttpServletResponseStub());
-        
+
         List<String>externalNamespaces = new ArrayList();
-        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");        
-                
-        String actual = urhsr.encodeForVitro(urlToEncode, "UTF-8", 
-                true, 0, 
-                getMockNamespaceMapper(), 
-                "http://vivo.cornell.edu/individual/", 
+        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");
+
+        String actual = urhsr.encodeForVitro(urlToEncode, "UTF-8",
+                true, 0,
+                getMockNamespaceMapper(),
+                "http://vivo.cornell.edu/individual/",
                 externalNamespaces);
         Assert.assertEquals(expectedUrlResult, actual);
     }
-    
-    
+
+
     @Test
     public void test40984(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
     "/vivo/js/jquery-1.12.4.min.js"); }
@@ -593,8 +593,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/jquery_plugins/ui.datepicker.js",
     "/vivo/js/jquery_plugins/ui.datepicker.js"); }
 
-    
-    
+
+
 
     @Test
     public void test35560(){ urlEncodingStyleB( "/js/jquery-1.12.4.min.js",
@@ -783,85 +783,85 @@ public class URLRewritingHttpServletResponseTest {
 
     public NamespaceMapper getMockNamespaceMapper(){
         return new NamespaceMapper() {
-            
+
             @Override
             public void removedStatements(Model arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void removedStatements(StmtIterator arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void removedStatements(List<Statement> arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void removedStatements(Statement[] arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void removedStatement(Statement arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void notifyEvent(Model arg0, Object arg1) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void addedStatements(Model arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void addedStatements(StmtIterator arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void addedStatements(List<Statement> arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void addedStatements(Statement[] arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void addedStatement(Statement arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public List<String> getPrefixesForNamespace(String namespace) {
                 // TODO Auto-generated method stub
                 return null;
             }
-            
+
             @Override
             public String getPrefixForNamespace(String namespace) {
                 // TODO Auto-generated method stub
                 return null;
             }
-            
+
             @Override
             public String getNamespaceForPrefix(String prefix) {
                 // TODO Auto-generated method stub

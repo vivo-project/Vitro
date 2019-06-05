@@ -116,14 +116,14 @@ dojo.data.provider.FlatFile.prototype.getAttributes = function() {
 dojo.data.provider.FlatFile.prototype.fetchArray = function(query) {
 	/**
 	 * summary: Returns an Array containing all of the Items.
-	 */ 
+	 */
 	return this._arrayOfItems; // Array
 };
 
 dojo.data.provider.FlatFile.prototype.fetchResultSet = function(query) {
 	/**
 	 * summary: Returns a ResultSet containing all of the Items.
-	 */ 
+	 */
 	if (!this._resultSet) {
 		this._resultSet = new dojo.data.ResultSet(this, this.fetchArray(query));
 	}

@@ -34,10 +34,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
  */
 @WebServlet(name = "DeletePageController", urlPatterns = {"/deletePageController"} )
 public class DeletePageController extends VitroHttpServlet {
-   
+
    private final static String REDIRECT_URL = "/pageList";
-   private static Model removeStatements = null; 
-    
+   private static Model removeStatements = null;
+
     @Override
     protected void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -56,21 +56,21 @@ public class DeletePageController extends VitroHttpServlet {
     protected void doGet(HttpServletRequest rawRequest, HttpServletResponse resp)  throws ServletException, IOException {
     	doPost(rawRequest, resp);
     }
-    
-    
+
+
     //Parameter retrieval is identical, but in one case an entirey new menu item needs to be created
     //along with a new page
     public void doDeletePage(String pageUri, VitroRequest vreq, HttpServletResponse resp) {
-    	
+
     	OntModel displayModel = getDisplayModel(vreq);
     	if(displayModel == null) {
     		//Throw some kind of exception
     		log.error("Display model not being retrieved correctly");
     	}
-    	
+
     	String errorMessage = "";
     		processDelete(pageUri, displayModel, vreq);
-    	
+
     	//Edits to model occur here
     	displayModel.enterCriticalSection(Lock.WRITE);
     	try {
@@ -80,7 +80,7 @@ public class DeletePageController extends VitroHttpServlet {
     		log.debug(r.toString());
     		r.close();
     		displayModel.remove(removeStatements);
-    	
+
     	} catch(Exception ex) {
     		log.error("An error occurred in processing command", ex);
     		errorMessage += "An error occurred and the operation could not be completed successfully.";
@@ -88,30 +88,30 @@ public class DeletePageController extends VitroHttpServlet {
     		displayModel.leaveCriticalSection();
     	}
     }
-    
-   
-	
-		
+
+
+
+
 
 	private void processDelete(String pageUri, OntModel displayModel, VitroRequest vreq) {
 		//get the page resource
 		Resource pageResource = getExistingPage(pageUri, displayModel);
-		//if the page is related to a menu item, get the menu item information 
+		//if the page is related to a menu item, get the menu item information
     	Resource menuItemResource = getExistingMenuItem(pageResource, displayModel);
-    	
+
 		//What statements should be added and removed
    		removeStatements.add(getStatementsToRemove(displayModel, menuItemResource, pageResource));
    		//No statements to add
 	}
 
-	
-	
 
-	
+
+
+
 	//What statements need to be removed
 	private Model getStatementsToRemove(OntModel displayModel,
 			Resource menuItemResource, Resource pageResource) {
-		Model removeModel = ModelFactory.createDefaultModel();		
+		Model removeModel = ModelFactory.createDefaultModel();
 		removeModel.add(displayModel.listStatements(pageResource, null, (RDFNode) null));
 		//if menu item exists for this page, get all statements related to menu item and page
 		if(menuItemResource != null) {
@@ -127,12 +127,12 @@ public class DeletePageController extends VitroHttpServlet {
 
 	//Get all data getters associated with page
 	private Model getDataGettersStatements(Resource pageResource, OntModel displayModel) {
-		Model dataGettersModel = ModelFactory.createDefaultModel();		
+		Model dataGettersModel = ModelFactory.createDefaultModel();
 		//To iterate through to get all data getters and then all their statements
 		//PAge to data getter statements have already been added when all page statements were added
 		StmtIterator dataGetterIt = displayModel.listStatements(
-				pageResource, 
-				ResourceFactory.createProperty(DisplayVocabulary.HAS_DATA_GETTER), 
+				pageResource,
+				ResourceFactory.createProperty(DisplayVocabulary.HAS_DATA_GETTER),
 				(RDFNode) null);
 		while(dataGetterIt.hasNext()) {
 			Statement dataGetterStmt = dataGetterIt.nextStatement();
@@ -151,8 +151,8 @@ public class DeletePageController extends VitroHttpServlet {
 
 	private Resource getExistingMenuItem(Resource pageResource,  OntModel displayModel) {
 		Resource menuItemResource = null;
-		StmtIterator menuItemIt = displayModel.listStatements(null, 
-				DisplayVocabulary.TO_PAGE, 
+		StmtIterator menuItemIt = displayModel.listStatements(null,
+				DisplayVocabulary.TO_PAGE,
 				pageResource);
 		while(menuItemIt.hasNext()) {
 			Statement menuStmt = menuItemIt.nextStatement();
@@ -164,8 +164,8 @@ public class DeletePageController extends VitroHttpServlet {
 	//This code is called without model switching, so in this case
 	//we just want the regular model
     private OntModel getDisplayModel(VitroRequest vreq) {
-    	return vreq.getDisplayModel();    
+    	return vreq.getDisplayModel();
     }
-    
+
     Log log = LogFactory.getLog(MenuManagementEdit.class);
 }

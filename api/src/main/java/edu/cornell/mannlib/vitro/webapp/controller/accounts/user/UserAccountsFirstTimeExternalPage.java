@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 /**
  * Handle the first-time login of an Externally Authenticated user who has no
  * UserAccount - let's create one!
- * 
+ *
  * If they get here from the login, there should be an ExternalLoginInfo waiting
  * in the session. Otherwise, they should get here by submitting the form, which
  * will have the info in hidden fields.

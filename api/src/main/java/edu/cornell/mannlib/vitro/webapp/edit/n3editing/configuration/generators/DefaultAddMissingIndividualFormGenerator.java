@@ -50,10 +50,10 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
 		//This method also looks at domain and range uris and so is different than just getting the
 		//object property based on predicate uri alone
-		ObjectProperty objProp = EditConfigurationUtils.getObjectPropertyForPredicate(vreq, 
+		ObjectProperty objProp = EditConfigurationUtils.getObjectPropertyForPredicate(vreq,
 	            predicateUri);
 		if(objProp != null) {
-			return(objProp.getOfferCreateNewOption() && 
+			return(objProp.getOfferCreateNewOption() &&
 					(
 							(command != null && command.equals(createCommand)) ||
 									!objProp.getSelectFromExisting()
@@ -65,29 +65,29 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
-    	
+
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
-    	
+
       	//Assumes this is a simple case of subject predicate var
     	editConfiguration.setN3Required(this.generateN3Required(vreq));
-    	    	
+
     	//n3 optional
     	editConfiguration.setN3Optional(this.generateN3Optional(vreq));
-    	
-    
+
+
     	editConfiguration.setNewResources(this.generateNewResources(vreq));
     	//In scope
     	this.setUrisAndLiteralsInScope(editConfiguration);
-    	
+
     	//on Form
     	this.setUrisAndLiteralsOnForm(editConfiguration, vreq);
-    	
+
     	editConfiguration.setFilesOnForm(new ArrayList<String>());
-    	
+
     	//Sparql queries
     	this.setSparqlQueries(editConfiguration);
-    	
+
     	//set fields
     	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq));
 
@@ -98,20 +98,20 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	addPreprocessors(vreq, editConfiguration);
 
     	prepareForUpdate(vreq, session, editConfiguration);
-    	
+
     	//Form title and submit label now moved to edit configuration template
     	//TODO: check if edit configuration template correct place to set those or whether
     	//additional methods here should be used and reference instead, e.g. edit configuration template could call
     	//default obj property form.populateTemplate or some such method
     	//Select from existing also set within template itself
     	setTemplate(editConfiguration, vreq);
-    	
+
     	editConfiguration.addValidator(new AntiXssValidation());
-    	
+
     	//edit key now set in the edit request dispatch controller
     	return editConfiguration;
     }
-    
+
     protected Map<String, String> generateNewResources(VitroRequest vreq) {
 		HashMap<String, String> newResources = new HashMap<String, String>();
 		//Null triggers default namespace
@@ -127,11 +127,11 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	String editKey = EditConfigurationVTwo.newEditKey(session);
     	editConfiguration.setEditKey(editKey);
     }
-    
+
 	private void setTemplate(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq) {
     	editConfiguration.setTemplate(template);
-		
+
 	}
 
 	//Initialize setup: process parameters
@@ -141,19 +141,19 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 
     	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-    
+
     	editConfiguration.setFormUrl(formUrl);
-    	
-    	
+
+
     	editConfiguration.setUrlPatternToReturnTo("/individual");
-    	
+
     	editConfiguration.setVarNameForSubject("subject");
     	editConfiguration.setSubjectUri(subjectUri);
     	editConfiguration.setEntityToReturnTo(subjectUri);
     	editConfiguration.setVarNameForPredicate("predicate");
     	editConfiguration.setPredicateUri(predicateUri);
-    	
-    	
+
+
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
     	//"object"       : [ "newIndividual" ,  "${objectUriJson}" , "URI"],
@@ -166,11 +166,11 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     		log.error("Add missing individual called for a data property instead of object property");
     	}
     }
-    
-    
 
 
-    
+
+
+
 	private void initObjectParameters(VitroRequest vreq) {
 		//in case of object property
 		String thisObjectUri = EditConfigurationUtils.getObjectUri(vreq);
@@ -182,7 +182,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 
 	//this particular form uses a different var name for object "newIndividual"
 	private void processObjectPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	editConfiguration.setVarNameForObject(objectVarName);    	
+    	editConfiguration.setVarNameForObject(objectVarName);
     	//If is replace with new, set Object resource to null
     	if(isReplaceWithNew(vreq)) {
     		editConfiguration.setObject(null);
@@ -191,13 +191,13 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	}
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
-    	//TODO: Check if null in case no object uri exists but this is still an object property    	
+    	//TODO: Check if null in case no object uri exists but this is still an object property
     }
-    
-    
-    
-    //Get N3 required 
-    //Handles both object and data property    
+
+
+
+    //Get N3 required
+    //Handles both object and data property
     private List<String> generateN3Required(VitroRequest vreq) {
     	List<String> n3ForEdit = new ArrayList<String>();
     	n3ForEdit.add(getN3PrefixesAsString() + "\n" + getN3ForName());
@@ -205,23 +205,23 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	n3ForEdit.add(getN3PrefixesAsString() + "\n" + "?" + objectVarName + " rdf:type <" + getRangeClassUri(vreq) + "> . ");
     	return n3ForEdit;
     }
-    
+
     protected List<String> getN3Prefixes() {
     	List<String> prefixStrings = new ArrayList<String>();
     	prefixStrings.add("@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .");
     	prefixStrings.add("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .");
     	return prefixStrings;
     }
-    
+
     protected String getN3PrefixesAsString() {
     	String prefixes = StringUtils.join(getN3Prefixes(), "\n");
     	return prefixes;
     }
-    
+
     protected String getN3ForName() {
     	return "?" + objectVarName + " rdfs:label ?name .";
     }
-    
+
     protected List<String> generateN3Optional(VitroRequest vreq) {
     	//flag uri and asserted types need to be added here
     	List<String> n3Optional = new ArrayList<String>();
@@ -231,12 +231,12 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	//n3Optional.add(getN3AssertedTypes(vreq));
     	n3Optional.add(getN3PrefixesAsString() + "\n" + "?" + objectVarName + " rdf:type <" + getFlagURI(vreq) + "> . ");
     	return n3Optional;
-    	
+
     }
-    
+
     private String getFlagURI(VitroRequest vreq) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	String flagURI = wdf.getVClassDao().getTopConcept().getURI(); 
+    	String flagURI = wdf.getVClassDao().getTopConcept().getURI();
     	return flagURI;
 	}
 	private String getN3AssertedTypes(VitroRequest vreq) {
@@ -249,21 +249,21 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 			+ "    WHERE { ?inverse_property owl:inverseOf ?predicate } ";
     	return queryForInverse;
     }
-    
+
     private void setUrisAndLiteralsInScope(EditConfigurationVTwo editConfiguration) {
     	HashMap<String, List<String>> urisInScope = new HashMap<String, List<String>>();
     	//Add subject uri and predicate turo to uris in scope
-    	urisInScope.put(editConfiguration.getVarNameForSubject(), 
+    	urisInScope.put(editConfiguration.getVarNameForSubject(),
     			Arrays.asList(new String[]{editConfiguration.getSubjectUri()}));
-    	urisInScope.put(editConfiguration.getVarNameForPredicate(), 
+    	urisInScope.put(editConfiguration.getVarNameForPredicate(),
     			Arrays.asList(new String[]{editConfiguration.getPredicateUri()}));
-    	editConfiguration.setUrisInScope(urisInScope);    	
+    	editConfiguration.setUrisInScope(urisInScope);
     	editConfiguration.setLiteralsInScope(new HashMap<String, List<Literal>>());
     }
-    
+
     //n3 should look as follows
-    //?subject ?predicate ?objectVar 
-    
+    //?subject ?predicate ?objectVar
+
     protected void setUrisAndLiteralsOnForm(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	List<String> urisOnForm = new ArrayList<String>();
     	List<String> literalsOnForm = new ArrayList<String>();
@@ -271,30 +271,30 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	editConfiguration.setUrisOnform(urisOnForm);
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
     }
-   
-    
+
+
     //This is for various items
     private void setSparqlQueries(EditConfigurationVTwo editConfiguration) {
     	//Sparql queries defining retrieval of literals etc.
     	editConfiguration.setSparqlForAdditionalLiteralsInScope(new HashMap<String, String>());
-    	
+
     	Map<String, String> urisInScope = new HashMap<String, String>();
     	urisInScope.put("inverseProp", this.retrieveQueryForInverse());
     	editConfiguration.setSparqlForAdditionalUrisInScope(urisInScope);
-    	
+
     	editConfiguration.setSparqlForExistingLiterals(generateSparqlForExistingLiterals());
     	editConfiguration.setSparqlForExistingUris(generateSparqlForExistingUris());
     }
-    
-    
+
+
     //Sparql queries
-   
-    
+
+
     private HashMap<String, String> generateSparqlForExistingUris() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	return map;
     }
-    
+
     private HashMap<String, String> generateSparqlForExistingLiterals() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	String query = "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ";
@@ -303,32 +303,32 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return map;
     }
 
-    
+
     protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
-    		    			      
+
     	    //make name field
     	    FieldVTwo field = new FieldVTwo();
-	        field.setName("name");      	        
-	        
+	        field.setName("name");
+
 	        List<String> validators = new ArrayList<String>();
 	        validators.add("nonempty");
-	        field.setValidators(validators);   
-	                            
+	        field.setValidators(validators);
+
 	        fields.put(field.getName(), field);
-    	        
+
     	} else {
     		log.error("Is not object property so fields not set");
     	}
-    	
+
     	editConfiguration.setFields(fields);
     }
 
 	private String getRangeClassUri(VitroRequest vreq) {
 		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
 		ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
-		
+
 	    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 	    if( prop.getRangeVClassURI() == null ) {
 	        // If property has no explicit range, we will use e.g. owl:Thing.
@@ -343,19 +343,19 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	    	rangeClass = wdf.getVClassDao().getVClassByURI( typeOfNew );
 	    if( rangeClass == null ){
 	    	rangeClass = wdf.getVClassDao().getVClassByURI(prop.getRangeVClassURI());
-	    	if( rangeClass == null ) throw new Error ("Cannot find class for range for property.  Looking for " + prop.getRangeVClassURI() );    
+	    	if( rangeClass == null ) throw new Error ("Cannot find class for range for property.  Looking for " + prop.getRangeVClassURI() );
 	    }
 		return rangeClass.getURI();
 	}
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
-    	//Here, retrieve model from 
+    	//Here, retrieve model from
 		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
-	    	if(!isReplaceWithNew(vreq) && 
-	    			(isForwardToCreateButEdit(vreq) || 
+	    	if(!isReplaceWithNew(vreq) &&
+	    			(isForwardToCreateButEdit(vreq) ||
 	    			objectIndividual != null)
 	    		) {
 	    		editConfiguration.prepareForObjPropUpdate(model);
@@ -365,10 +365,10 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	        }
     	} else {
     		log.error("Data property not object property so update can't be done correctly");
-    		
+
     	}
     }
-    
+
 	private void addPreprocessors(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
 		if(isReplaceWithNew(vreq)) {
 			//String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
@@ -377,16 +377,16 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 			editConfiguration.addModelChangePreprocessor(
 					new DefaultAddMissingIndividualFormModelPreprocessor(
 							subjectUri, predicateUri, objectUri));
-			
+
 		}
 	}
-	
+
     //Command processing
     private boolean isTypeOfNew(VitroRequest vreq) {
     	String typeOfNew = getTypeOfNew(vreq);
     	return (typeOfNew != null && !typeOfNew.isEmpty());
     }
-    
+
     protected String getTypeOfNew(VitroRequest vreq) {
     	return  vreq.getParameter("typeOfNew");
     }
@@ -402,45 +402,45 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	if(hasCustomForm(objectProp)) {
     		return false;
     	}
-    	
-       boolean isForwardToCreateNew = 
+
+       boolean isForwardToCreateNew =
            ( objectProp != null && objectProp.getOfferCreateNewOption() )
            && ( objectProp.getSelectFromExisting() == false
            ||   "create".equals(command));
 
        return isForwardToCreateNew;
-	   
+
     }
-    
+
     private boolean hasCustomForm(ObjectProperty objectProp) {
-    	return( objectProp != null && 
-    			objectProp.getCustomEntryForm() != null && 
+    	return( objectProp != null &&
+    			objectProp.getCustomEntryForm() != null &&
     			!objectProp.getCustomEntryForm().isEmpty());
-	     
+
     }*/
-    
+
     private boolean isReplaceWithNew(VitroRequest vreq) {
     	ObjectProperty objectProp = EditConfigurationUtils.getObjectProperty(vreq);
     	boolean isEditOfExistingStmt = isEditOfExistingStatement(vreq);
     	String command = vreq.getParameter("cmd");
-    	return (isEditOfExistingStmt 
-    			&& "create".equals(command)) 
+    	return (isEditOfExistingStmt
+    			&& "create".equals(command))
     	       && (objectProp != null)
     	       && (objectProp.getOfferCreateNewOption());
     }
-    
+
     private boolean isForwardToCreateButEdit(VitroRequest vreq) {
     	boolean isEditOfExistingStmt = isEditOfExistingStatement(vreq);
     	ObjectProperty objectProp = EditConfigurationUtils.getObjectProperty(vreq);
     	String command = vreq.getParameter("cmd");
-    	return (isEditOfExistingStmt 
+    	return (isEditOfExistingStmt
     			&& (! "create".equals(command))
-    			&& (objectProp != null) 
+    			&& (objectProp != null)
     	       && (objectProp.getOfferCreateNewOption())
     	       && (!objectProp.getSelectFromExisting())
     	     );
     }
-    
+
     //Is edit of existing statement only applicable to object properties
     private boolean isEditOfExistingStatement(VitroRequest vreq) {
     	//TODO: Check if also applicable to data property, currently returning false

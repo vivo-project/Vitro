@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.BasicTBoxReasonerDrive
 
 /**
  * Configure a JFact reasoner on the TBox.
- * 
+ *
  * Create a JFactTBoxReasoner and pass it as the strategy to a
  * BasicTBoxReasonerDriver.
  */

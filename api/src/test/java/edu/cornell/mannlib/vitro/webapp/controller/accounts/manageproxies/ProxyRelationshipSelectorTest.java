@@ -220,13 +220,13 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 
 	/**
 	 * test plan:
-	 * 
+	 *
 	 * <pre>
 	 * search tests: (repeat both views)
 	 *   some results
 	 *   no results
 	 *   special REGEX characters
-	 *   
+	 *
 	 *   profile w/no proxies
 	 * profile w/proxies
 	 * 	no associated profile
@@ -234,7 +234,7 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 	 * 	profile w/no imageUrl
 	 * 	profile w/neither
 	 * 	profile w/both
-	 * 	
+	 *
 	 * proxy w/no profiles
 	 * proxy w profiles:
 	 * 	no classLabel

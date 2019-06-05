@@ -7,5 +7,5 @@ import java.sql.Connection;
 public interface SQLGraphGenerator extends GraphGenerator {
 
 	public Connection getConnection();
-	
+
 }

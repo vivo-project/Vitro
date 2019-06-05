@@ -69,10 +69,10 @@ public class IsBlacklisted extends AbstractCommonIdentifier implements
 
 	/**
 	 * Runs through .sparql files in the BLACKLIST_SPARQL_DIR.
-	 * 
+	 *
 	 * The first that returns one or more rows will be cause the user to be
 	 * blacklisted.
-	 * 
+	 *
 	 * The first variable from the first solution set will be returned.
 	 */
 	private static String checkForBlacklisted(Individual ind,
@@ -113,10 +113,10 @@ public class IsBlacklisted extends AbstractCommonIdentifier implements
 	/**
 	 * Runs the SPARQL query in the file with the uri of the individual
 	 * substituted in.
-	 * 
+	 *
 	 * The URI of ind will be substituted into the query where ever the token
 	 * "?individualURI" is found.
-	 * 
+	 *
 	 * If there are any solution sets, then the URI of the variable named
 	 * "cause" will be returned. Make sure that it is a resource with a URI.
 	 * Otherwise null will be returned.

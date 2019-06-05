@@ -24,7 +24,7 @@ dojo.lfx.Line = function(start, end){
 		dojo.lang.forEach(this.start, function(s,i){
 			diff[i] = this.end[i] - s;
 		}, this);
-		
+
 		this.getValue = function(/*float*/ n){
 			var res = [];
 			dojo.lang.forEach(this.start, function(s, i){
@@ -34,7 +34,7 @@ dojo.lfx.Line = function(start, end){
 		}
 	}else{
 		var diff = end - start;
-			
+
 		this.getValue = function(/*float*/ n){
 			//	summary: returns the point on the line
 			//	n: a floating point number greater than 0 and less than 1
@@ -69,7 +69,7 @@ dojo.lang.extend(dojo.lfx.IAnimation, {
 	easing: null,
 	repeatCount: 0,
 	rate: 25,
-	
+
 	// events
 	handler: null,
 	beforeBegin: null,
@@ -79,18 +79,18 @@ dojo.lang.extend(dojo.lfx.IAnimation, {
 	onPlay: null,
 	onPause: null,
 	onStop: null,
-	
+
 	// public methods
 	play: null,
 	pause: null,
 	stop: null,
-	
+
 	fire: function(evt, args){
 		if(this[evt]){
 			this[evt].apply(this, (args||[]));
 		}
 	},
-	
+
 	// private properties
 	_active: false,
 	_paused: false
@@ -101,10 +101,10 @@ dojo.lfx.Animation = function(/*Object*/ handlers, /*int*/ duration, /*Array*/ c
 	//		a generic animation object that fires callbacks into it's handlers
 	//		object at various states
 	//	handlers
-	//		object { 
-	//			handler: function(){}, 
-	//			onstart: function(){}, 
-	//			onstop: function(){}, 
+	//		object {
+	//			handler: function(){},
+	//			onstart: function(){},
+	//			onstop: function(){},
 	//			onanimate: function(){}
 	//		}
 	dojo.lfx.IAnimation.call(this);
@@ -166,7 +166,7 @@ dojo.lang.extend(dojo.lfx.Animation, {
 		}else if(this._active && !this._paused){
 			return this;
 		}
-		
+
 		this.fire("handler", ["beforeBegin"]);
 		this.fire("beforeBegin");
 
@@ -174,7 +174,7 @@ dojo.lang.extend(dojo.lfx.Animation, {
 			setTimeout(dojo.lang.hitch(this, function(){ this.play(null, gotoStart); }), delay);
 			return this;
 		}
-		
+
 		this._startTime = new Date().valueOf();
 		if(this._paused){
 			this._startTime -= (this.duration * this._percent / 100);
@@ -183,7 +183,7 @@ dojo.lang.extend(dojo.lfx.Animation, {
 
 		this._active = true;
 		this._paused = false;
-		
+
 		var step = this._percent / 100;
 		var value = this.curve.getValue(step);
 		if( this._percent == 0 ) {
@@ -254,7 +254,7 @@ dojo.lang.extend(dojo.lfx.Animation, {
 			}else{
 				this._percent = step * 100;
 			}
-			
+
 			// Perform easing
 			if((this.easing)&&(dojo.lang.isFunction(this.easing))){
 				step = this.easing(step);
@@ -292,12 +292,12 @@ dojo.lfx.Combine = function(){
 	dojo.lfx.IAnimation.call(this);
 	this._anims = [];
 	this._animsEnded = 0;
-	
+
 	var anims = arguments;
 	if(anims.length == 1 && (dojo.lang.isArray(anims[0]) || dojo.lang.isArrayLike(anims[0]))){
 		anims = anims[0];
 	}
-	
+
 	var _this = this;
 	dojo.lang.forEach(anims, function(anim){
 		_this._anims.push(anim);
@@ -309,7 +309,7 @@ dojo.inherits(dojo.lfx.Combine, dojo.lfx.IAnimation);
 dojo.lang.extend(dojo.lfx.Combine, {
 	// private members
 	_animsEnded: 0,
-	
+
 	// public methods
 	play: function(delay, gotoStart){
 		if( !this._anims.length ){ return this; }
@@ -320,7 +320,7 @@ dojo.lang.extend(dojo.lfx.Combine, {
 			setTimeout(dojo.lang.hitch(this, function(){ this.play(null, gotoStart); }), delay);
 			return this;
 		}
-		
+
 		if(gotoStart || this._anims[0].percent == 0){
 			this.fire("onBegin");
 		}
@@ -328,19 +328,19 @@ dojo.lang.extend(dojo.lfx.Combine, {
 		this._animsCall("play", null, gotoStart);
 		return this;
 	},
-	
+
 	pause: function(){
 		this.fire("onPause");
-		this._animsCall("pause"); 
+		this._animsCall("pause");
 		return this;
 	},
-	
+
 	stop: function(gotoEnd){
 		this.fire("onStop");
 		this._animsCall("stop", gotoEnd);
 		return this;
 	},
-	
+
 	// private methods
 	_onAnimsEnded: function(){
 		this._animsEnded++;
@@ -349,7 +349,7 @@ dojo.lang.extend(dojo.lfx.Combine, {
 		}
 		return this;
 	},
-	
+
 	_animsCall: function(funcName){
 		var args = [];
 		if(arguments.length > 1){
@@ -369,12 +369,12 @@ dojo.lfx.Chain = function() {
 	dojo.lfx.IAnimation.call(this);
 	this._anims = [];
 	this._currAnim = -1;
-	
+
 	var anims = arguments;
 	if(anims.length == 1 && (dojo.lang.isArray(anims[0]) || dojo.lang.isArrayLike(anims[0]))){
 		anims = anims[0];
 	}
-	
+
 	var _this = this;
 	dojo.lang.forEach(anims, function(anim, i, anims_arr){
 		_this._anims.push(anim);
@@ -390,7 +390,7 @@ dojo.inherits(dojo.lfx.Chain, dojo.lfx.IAnimation);
 dojo.lang.extend(dojo.lfx.Chain, {
 	// private members
 	_currAnim: -1,
-	
+
 	// public methods
 	play: function(delay, gotoStart){
 		if( !this._anims.length ) { return this; }
@@ -405,7 +405,7 @@ dojo.lang.extend(dojo.lfx.Chain, {
 			setTimeout(dojo.lang.hitch(this, function(){ this.play(null, gotoStart); }), delay);
 			return this;
 		}
-		
+
 		if(currentAnimation){
 			if(this._currAnim == 0){
 				this.fire("handler", ["begin", this._currAnim]);
@@ -416,7 +416,7 @@ dojo.lang.extend(dojo.lfx.Chain, {
 		}
 		return this;
 	},
-	
+
 	pause: function(){
 		if( this._anims[this._currAnim] ) {
 			this._anims[this._currAnim].pause();
@@ -424,7 +424,7 @@ dojo.lang.extend(dojo.lfx.Chain, {
 		}
 		return this;
 	},
-	
+
 	playPause: function(){
 		if(this._anims.length == 0){ return this; }
 		if(this._currAnim == -1){ this._currAnim = 0; }
@@ -438,7 +438,7 @@ dojo.lang.extend(dojo.lfx.Chain, {
 		}
 		return this;
 	},
-	
+
 	stop: function(){
 		var currAnim = this._anims[this._currAnim];
 		if(currAnim){
@@ -447,7 +447,7 @@ dojo.lang.extend(dojo.lfx.Chain, {
 		}
 		return currAnim;
 	},
-	
+
 	// private methods
 	_playNext: function(){
 		if( this._currAnim == -1 || this._anims.length == 0 ) { return this; }

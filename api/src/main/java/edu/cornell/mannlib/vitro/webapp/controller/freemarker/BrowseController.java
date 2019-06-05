@@ -23,22 +23,22 @@ import javax.servlet.annotation.WebServlet;
 @WebServlet(name = "browsecontroller", urlPatterns = {"/browse"}, loadOnStartup = 5)
 public class BrowseController extends FreemarkerHttpServlet {
     static final long serialVersionUID=2006030721126L;
-    
+
     private static final Log log = LogFactory.getLog(BrowseController.class);
-    
+
     private static final String TEMPLATE_DEFAULT = "classGroups.ftl";
-     
+
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return "Index of Contents";
     }
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        
+
         Map<String, Object> body = new HashMap<String, Object>();
         String templateName = TEMPLATE_DEFAULT;
-                       
+
         List<VClassGroup> groups = null;
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         groups =vcgc.getGroups();
@@ -47,7 +47,7 @@ public class BrowseController extends FreemarkerHttpServlet {
             vcgroups.add(new VClassGroupTemplateModel(group));
         }
         body.put("classGroups", vcgroups);
-        
+
         return new TemplateResponseValues(templateName, body);
     }
 }

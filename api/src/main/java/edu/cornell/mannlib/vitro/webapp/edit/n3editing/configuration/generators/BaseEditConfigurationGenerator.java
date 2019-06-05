@@ -21,57 +21,57 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
 
     /* constants */
     public static final String DEFAULT_NS_FOR_NEW_RESOURCE= "";
-    
+
     /* Utility Methods */
-    
+
     /**
      * Sets up the things that should be done for just about every form.
      */
-    void initBasics(EditConfigurationVTwo editConf, VitroRequest vreq){                        
-        String editKey = EditConfigurationUtils.getEditKey(vreq);   
-        editConf.setEditKey(editKey);        
-        
-        String formUrl = EditConfigurationUtils.getFormUrlWithoutContext(vreq);  
-        editConf.setFormUrl(formUrl);                                   
+    void initBasics(EditConfigurationVTwo editConf, VitroRequest vreq){
+        String editKey = EditConfigurationUtils.getEditKey(vreq);
+        editConf.setEditKey(editKey);
+
+        String formUrl = EditConfigurationUtils.getFormUrlWithoutContext(vreq);
+        editConf.setFormUrl(formUrl);
     }
-    
-    /** 
-     * Method that setups up a form for basic object or data property editing. 
+
+    /**
+     * Method that setups up a form for basic object or data property editing.
      */
     void  initPropertyParameters(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
         //set up the subject URI based on request
         String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
         editConfiguration.setSubjectUri(subjectUri);
-        
+
         //set up predicate URI based on request
-        String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);                           
+        String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
         editConfiguration.setPredicateUri(predicateUri);
-        
-        editConfiguration.setUrlPatternToReturnTo("/individual");        
+
+        editConfiguration.setUrlPatternToReturnTo("/individual");
         editConfiguration.setEntityToReturnTo(subjectUri);
     }
-        
-    void initObjectPropForm(EditConfigurationVTwo editConfiguration,VitroRequest vreq) {                      
-        editConfiguration.setObject( EditConfigurationUtils.getObjectUri(vreq) );        
-    }    
-    
+
+    void initObjectPropForm(EditConfigurationVTwo editConfiguration,VitroRequest vreq) {
+        editConfiguration.setObject( EditConfigurationUtils.getObjectUri(vreq) );
+    }
+
     //Prepare for update or non-update
     //Originally included in edit request dispatch controller but moved here due to
     //exceptions such as default add missing individual form
     void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
         //setup the model selectors for query, write and display models on editConfig
-        setupModelSelectorsFromVitroRequest(vreq, editConfig);        
-        
+        setupModelSelectorsFromVitroRequest(vreq, editConfig);
+
         OntModel queryModel = ModelAccess.on(vreq).getOntModel();
-        
+
         if( editConfig.getSubjectUri() == null)
             editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));
         if( editConfig.getPredicateUri() == null )
             editConfig.setPredicateUri( EditConfigurationUtils.getPredicateUri(vreq));
-        
+
         String objectUri = EditConfigurationUtils.getObjectUri(vreq);
         Integer dataKey = EditConfigurationUtils.getDataHash(vreq);
-        if (objectUri != null && ! objectUri.trim().isEmpty()) { 
+        if (objectUri != null && ! objectUri.trim().isEmpty()) {
             // editing existing object
             if( editConfig.getObject() == null)
                 editConfig.setObject( EditConfigurationUtils.getObjectUri(vreq));
@@ -83,7 +83,7 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
             //this might be a create new or a form
             editConfig.prepareForNonUpdate(queryModel);
         }
-    }     
+    }
 
     /**
      * Setup the model selectors using the models set in the VitroRequest. Call this
@@ -98,27 +98,27 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
         }else{
             editConfig.setWriteModelSelector( StandardModelSelector.selector );
         }
-        
+
         if( ! StringUtils.isEmpty( vreq.getNameForABOXModel() )){
             editConfig.setQueryModelSelector( new IdModelSelector(vreq.getNameForABOXModel() ));
             editConfig.setResourceModelSelector( new IdModelSelector(vreq.getNameForABOXModel() ));
-            editConfig.setAboxModelId(vreq.getNameForABOXModel());            
+            editConfig.setAboxModelId(vreq.getNameForABOXModel());
         }else{
             editConfig.setQueryModelSelector( StandardModelSelector.selector );
             editConfig.setResourceModelSelector( StandardModelSelector.selector );
         }
-        
+
         if( ! StringUtils.isEmpty( vreq.getNameForTBOXModel() )){
-            editConfig.setTboxModelId(vreq.getNameForTBOXModel());    
-        }                
+            editConfig.setTboxModelId(vreq.getNameForTBOXModel());
+        }
     }
-    
+
     /**
-     * Method to turn Strings or multiple List<String> to List<String>. 
-     * Only accepts String and List<String> as multi args.  
+     * Method to turn Strings or multiple List<String> to List<String>.
+     * Only accepts String and List<String> as multi args.
      */
     static List<String> list( Object ... objs){
-        List<String> rv = new ArrayList<String>();        
+        List<String> rv = new ArrayList<String>();
         for( Object obj: objs){
             if( obj instanceof String)
                 rv.add((String)obj);
@@ -128,14 +128,14 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
                         rv.add((String)innerObj);
                     }else{
                         throw new Error("list may only take String " +
-                        		"and List<String>. It does not accept List<" 
+                        		"and List<String>. It does not accept List<"
                                 + innerObj.getClass().getName() + ">");
                     }
-                }                
+                }
             }else{
                 throw new Error("list may only take String " +
-                        "and List<String>. It does not accept " 
-                        + obj.getClass().getName() );            
+                        "and List<String>. It does not accept "
+                        + obj.getClass().getName() );
             }
         }
         return rv;

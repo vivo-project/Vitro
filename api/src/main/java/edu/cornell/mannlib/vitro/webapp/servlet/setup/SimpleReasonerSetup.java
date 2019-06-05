@@ -37,9 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 public class SimpleReasonerSetup implements ServletContextListener {
 
     private static final Log log = LogFactory.getLog(SimpleReasonerSetup.class.getName());
-    
+
     public static final String FILE_OF_PLUGINS = "/WEB-INF/resources/reasoner_plugins.txt";
-    
+
     // Models used during a full recompute of the ABox
     public static final String JENA_INF_MODEL_REBUILD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-rebuild";
     public static final String JENA_INF_MODEL_SCRATCHPAD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-scratchpad";
@@ -48,17 +48,17 @@ public class SimpleReasonerSetup implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
     	ServletContext ctx = sce.getServletContext();
     	SearchIndexer searchIndexer = ApplicationUtils.instance().getSearchIndexer();
-        
-        try {    
+
+        try {
         	OntModel tboxAssertionsModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
         	OntModel tboxInferencesModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_INFERENCES);
         	OntModel tboxUnionModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_UNION);
 
             // set up simple reasoning for the ABox
-                                
-            RDFService rdfService = ModelAccess.on(ctx).getRDFService();            
+
+            RDFService rdfService = ModelAccess.on(ctx).getRDFService();
             Dataset dataset = ModelAccess.on(ctx).getDataset();
-            
+
             Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD);
             if(rebuildModel.contains(null, null, (RDFNode) null)) {
                 log.info("Clearing obsolete data from inference rebuild model");
@@ -75,7 +75,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             SimpleReasoner simpleReasoner = new SimpleReasoner(
                     tboxUnionModel, rdfService, inferenceModel, rebuildModel, scratchModel, searchIndexer);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
-            
+
             StartupStatus ss = StartupStatus.getBean(ctx);
             List<ReasonerPlugin> pluginList = new ArrayList<ReasonerPlugin>();
             List<String> pluginClassnameList = this.readFileOfListeners(ctx);
@@ -88,17 +88,17 @@ public class SimpleReasonerSetup implements ServletContextListener {
                         pluginList.add(plugin);
                         log.info("adding reasoner plugin " + plugin.getClass().getName());
                     }
-                } catch(Throwable t) {              
+                } catch(Throwable t) {
                     ss.info(this, "Could not instantiate reasoner plugin " + classname);
                 }
             }
             simpleReasoner.setPluginList(pluginList);
-            
+
             SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
             sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
             tboxAssertionsModel.register(simpleReasonerTBoxListener);
             tboxInferencesModel.register(simpleReasonerTBoxListener);
-            
+
             RecomputeMode mode = getRecomputeRequired(ctx);
             if (RecomputeMode.FOREGROUND.equals(mode)) {
                 log.info("ABox inference recompute required.");
@@ -108,76 +108,76 @@ public class SimpleReasonerSetup implements ServletContextListener {
                 new VitroBackgroundThread(
                         new ABoxRecomputer(
                                 simpleReasoner),"ABoxRecomputer").start();
-            }    
-            
+            }
+
         } catch (Throwable t) {
             t.printStackTrace();
-        }        
+        }
     }
-    
+
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         log.info("received contextDestroyed notification");
-   
-        SimpleReasoner simpleReasoner = getSimpleReasonerFromServletContext(sce.getServletContext());   
+
+        SimpleReasoner simpleReasoner = getSimpleReasonerFromServletContext(sce.getServletContext());
         if (simpleReasoner != null) {
             log.info("sending stop request to SimpleReasoner");
             simpleReasoner.setStopRequested();
-        } 
-    
-        SimpleReasonerTBoxListener simpleReasonerTBoxListener = getSimpleReasonerTBoxListenerFromContext(sce.getServletContext());   
+        }
+
+        SimpleReasonerTBoxListener simpleReasonerTBoxListener = getSimpleReasonerTBoxListenerFromContext(sce.getServletContext());
         if (simpleReasonerTBoxListener != null) {
             log.info("sending stop request to simpleReasonerTBoxListener");
             simpleReasonerTBoxListener.setStopRequested();
-        } 
-        
+        }
+
     }
-    
+
     public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
         Object simpleReasoner = ctx.getAttribute(SimpleReasoner.class.getName());
-        
+
         if (simpleReasoner instanceof SimpleReasoner) {
             return (SimpleReasoner) simpleReasoner;
         } else {
             return null;
         }
     }
-    
+
     public static SimpleReasonerTBoxListener getSimpleReasonerTBoxListenerFromContext(ServletContext ctx) {
         Object simpleReasonerTBoxListener = ctx.getAttribute(SimpleReasonerTBoxListener.class.getName());
-        
+
         if (simpleReasonerTBoxListener instanceof SimpleReasonerTBoxListener) {
             return (SimpleReasonerTBoxListener) simpleReasonerTBoxListener;
         } else {
             return null;
         }
     }
-    
+
     public enum RecomputeMode {
         FOREGROUND, BACKGROUND
     }
-    
-    private static final String RECOMPUTE_REQUIRED_ATTR = 
+
+    private static final String RECOMPUTE_REQUIRED_ATTR =
             SimpleReasonerSetup.class.getName() + ".recomputeRequired";
-    
+
     public static void setRecomputeRequired(ServletContext ctx, RecomputeMode mode) {
         ctx.setAttribute(RECOMPUTE_REQUIRED_ATTR, mode);
     }
-    
+
     public static RecomputeMode getRecomputeRequired(ServletContext ctx) {
         return (RecomputeMode) ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR);
     }
-  
+
     /**
      * Read the names of the plugin classes classes.
-     * 
+     *
      * If there is a problem, set a fatal error, and return an empty list.
      */
     private List<String> readFileOfListeners(ServletContext ctx) {
         List<String> list = new ArrayList<String>();
 
         StartupStatus ss = StartupStatus.getBean(ctx);
-        
+
         InputStream is = null;
         BufferedReader br = null;
         try {
@@ -213,11 +213,11 @@ public class SimpleReasonerSetup implements ServletContextListener {
                 }
             }
         }
-        
+
         log.debug("Classnames of reasoner plugins = " + list);
         return list;
     }
-    
+
     private class ABoxRecomputer implements Runnable {
 
         private SimpleReasoner simpleReasoner;

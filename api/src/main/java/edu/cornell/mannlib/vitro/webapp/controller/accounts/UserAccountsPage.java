@@ -71,7 +71,7 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 
 	/**
 	 * Create a list of possible profile types.
-	 * 
+	 *
 	 * TODO Right now, these are foaf:Person and it's sub-classes. What will it
 	 * be for Vitro?
 	 */

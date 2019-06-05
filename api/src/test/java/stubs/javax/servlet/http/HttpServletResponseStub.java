@@ -160,7 +160,7 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	@Override
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
-		
+
 		Pattern p = Pattern.compile(";\\scharset=([^;]+)");
 		Matcher m = p.matcher(contentType);
 		if (m.find()) {

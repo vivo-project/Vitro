@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * A utility for finding the URL of the correct Placeholder image.
- * 
+ *
  * The mapping of image URLs to classes is created at startup, and stored in the
  * ServletContext.
  */

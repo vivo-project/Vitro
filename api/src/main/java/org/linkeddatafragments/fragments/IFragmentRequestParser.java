@@ -17,10 +17,10 @@ public interface IFragmentRequestParser
      *
      * @param httpRequest
      * @param config
-     * @return 
+     * @return
      * @throws IllegalArgumentException
      *         If the given HTTP request cannot be interpreted (perhaps due to
-     *         missing request parameters).  
+     *         missing request parameters).
      */
     ILinkedDataFragmentRequest parseIntoFragmentRequest(
             final HttpServletRequest httpRequest,

@@ -12,9 +12,9 @@ public abstract class BaseResponseValues implements ResponseValues {
 
     private int statusCode = 0;
     private ContentType contentType = null;
-    
+
     BaseResponseValues() { }
-    
+
     BaseResponseValues(int statusCode) {
         this.statusCode = statusCode;
     }
@@ -27,12 +27,12 @@ public abstract class BaseResponseValues implements ResponseValues {
         this.contentType = contentType;
         this.statusCode = statusCode;
     }
-    
+
     @Override
     public int getStatusCode() {
         return statusCode;
     }
-    
+
     @Override
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
@@ -65,19 +65,19 @@ public abstract class BaseResponseValues implements ResponseValues {
         throw new UnsupportedOperationException(
                 "This is not a redirect response.");
     }
-    
+
     @Override
     public Map<String, String> getHeader() {
         throw new UnsupportedOperationException(
                 "This is not a header response.");
     }
-    
+
     @Override
     public String getForwardUrl() {
         throw new UnsupportedOperationException(
                 "This is not a forwarding response.");
     }
-    
+
     @Override
     public Throwable getException() {
         throw new UnsupportedOperationException(

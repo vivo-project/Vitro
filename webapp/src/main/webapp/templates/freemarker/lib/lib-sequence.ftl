@@ -6,7 +6,7 @@
 
 <#macro join arr glue=", ">
     <#assign count = 0>
-    <#-- Freemarker is very finicky about whitespace here. The compress directives and formatting 
+    <#-- Freemarker is very finicky about whitespace here. The compress directives and formatting
     here work; do not alter them. -->
     <#list arr as el>
         <#if el?has_content>

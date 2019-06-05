@@ -6,9 +6,9 @@
     </div>
 
 
-<#if pages?has_content >  
+<#if pages?has_content >
 <table id="table-listing" style="margin-bottom:2px">  <caption>${i18n().page_management}</caption>
-  
+
     <thead>
       <tr>
         <th scope="col">${i18n().title_capitalized}</th>
@@ -19,22 +19,22 @@
         <th id="iconColumns" scope="col">${i18n().controls}</th>
       </tr>
     </thead>
-    
+
     <tbody>
-    <#list pages as pagex>      
-    	 <tr>                
-            <td> 
-            	<#if pagex.listedPageUri?has_content> 
+    <#list pages as pagex>
+    	 <tr>
+            <td>
+            	<#if pagex.listedPageUri?has_content>
             	    <#if pagex.listedPageTitle == "Home" >
             	        ${pagex.listedPageTitle!}
             	    <#else>
             		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" title="${i18n().listed_page_title}">${(pagex.listedPageTitle)!i18n().untitled}</a>
             		</#if>
-            		
+
             	<#else>
-            		${i18n().uri_not_defined} 
+            		${i18n().uri_not_defined}
             	</#if>
-            </td>                  
+            </td>
             <!--td> {pagex.dataGetterLabel}</td-->
             <td>${pagex.listedPageUrlMapping}</td>
             <td>${(pagex.listedPageTemplate)!''}</td>
@@ -52,19 +52,19 @@
                     <a cmd="deletePage" pageTitle=" ${pagex.listedPageTitle!}"  href="${urls.base}/deletePageController?pageURI=${pagex.listedPageUri?url}" title="${i18n().delete_page}"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().delete_page}"></a>
                 </#if>
             </td>
-        </tr>    
-    
- 
-    </#list>   
-    </tbody> 
+        </tr>
+
+
+    </#list>
+    </tbody>
   </table>
-  
+
 <#else>
     <p>${i18n().no_pages_defined}</p>
 </#if>
-  
+
   <form id="pageListForm" action="${urls.base}/editRequestDispatch" method="get">
-      <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">              
+      <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">
       <input type="hidden" name="switchToDisplayModel" value="1">
       <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
  	<input id="submit" value="${i18n().add_page}" role="button" type="submit" >

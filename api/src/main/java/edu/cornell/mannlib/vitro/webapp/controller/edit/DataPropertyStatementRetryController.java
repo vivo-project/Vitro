@@ -29,9 +29,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
 public class DataPropertyStatementRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(DataPropertyStatementRetryController.class.getName());
-	
+
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
@@ -44,8 +44,8 @@ public class DataPropertyStatementRetryController extends BaseEditController {
         String action = "insert";
 
         VitroRequest vreq = new VitroRequest(request);
-        
-        DataPropertyStatementDao dataPropertyStatementDao = 
+
+        DataPropertyStatementDao dataPropertyStatementDao =
         		vreq.getUnfilteredWebappDaoFactory().getDataPropertyStatementDao();
         epo.setDataAccessObject(dataPropertyStatementDao);
         DataPropertyDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();

@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 
 /**
  * A minimal implementation of the ObjectPropertyDao.
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */

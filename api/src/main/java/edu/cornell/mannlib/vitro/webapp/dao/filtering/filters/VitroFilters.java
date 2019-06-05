@@ -29,7 +29,7 @@ public interface VitroFilters {
     public UnaryFunctor<VClass, Boolean> getClassFilter();
 
     public UnaryFunctor<VClassGroup, Boolean> getVClassGroupFilter();
-    
+
     public UnaryFunctor<PropertyGroup, Boolean> getPropertyGroupFilter();
 
 }

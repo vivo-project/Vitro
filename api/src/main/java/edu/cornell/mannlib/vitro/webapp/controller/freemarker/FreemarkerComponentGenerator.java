@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessing
 /**
  * TEMPORARY for transition from JSP to FreeMarker. Once transition
  * is complete and no more pages are generated in JSP, this can be removed.
- * 
+ *
  * @author rjy7
  *
  */
@@ -25,15 +25,15 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerComponentGenerator.class);
-    
+
     private static ServletContext context = null;
-    
+
     FreemarkerComponentGenerator(HttpServletRequest request) {
-   
+
         // Mimic what FreemarkerHttpServlet does for a new request
-        VitroRequest vreq = new VitroRequest(request);       
+        VitroRequest vreq = new VitroRequest(request);
         Map<String, Object> map = getPageTemplateValues(vreq);
-        
+
         request.setAttribute("ftl_head", getHead("head", map, vreq));
         request.setAttribute("ftl_identity", get("identity", map, vreq));
         request.setAttribute("ftl_menu", get("menu", map, vreq));
@@ -51,16 +51,16 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
             return null;
         }
     }
-    
+
     private String getHead(String templateName, Map<String, Object> root, HttpServletRequest request) {
         // The Freemarker head template displays the page title in the <title> tag. Get the value out of the request.
         String title = (String) request.getAttribute("title");
         if (!StringUtils.isEmpty(title)) {
             root.put("title", title);
         }
-        return get(templateName, root, request);        
+        return get(templateName, root, request);
     }
-    
+
     // JB Because this is pretending to be a servlet, but the init method has not been called, providing the context.
     // Do that in the constructor, and we should be fine. VIVO-251
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from
@@ -69,7 +69,7 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
     public ServletContext getServletContext() {
         return context;
     }
-    
+
     protected static void setServletContext(ServletContext sc) {
         context = sc;
     }

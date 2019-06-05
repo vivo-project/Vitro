@@ -53,7 +53,7 @@ dojo.lang.extend(dojo.widget.html.ResizeHandle, {
 		this.startSize  = {'w':dojo.style.getOuterWidth(this.targetDomNode), 'h':dojo.style.getOuterHeight(this.targetDomNode)};
 
 		dojo.event.kwConnect({
-			srcObj: document.body, 
+			srcObj: document.body,
 			srcFunc: "onmousemove",
 			targetObj: this,
 			targetFunc: "changeSizing",
@@ -75,7 +75,7 @@ dojo.lang.extend(dojo.widget.html.ResizeHandle, {
 		}
 		var dx = this.startPoint.x - e.clientX;
 		var dy = this.startPoint.y - e.clientY;
-		
+
 		var newW = this.startSize.w - dx;
 		var newH = this.startSize.h - dy;
 
@@ -88,14 +88,14 @@ dojo.lang.extend(dojo.widget.html.ResizeHandle, {
 				newH = dojo.style.getOuterHeight(this.targetDomNode);
 			}
 		}
-		
+
 		if(this.targetWidget){
 			this.targetWidget.resizeTo(newW, newH);
 		}else{
 			dojo.style.setOuterWidth(this.targetDomNode, newW);
 			dojo.style.setOuterHeight(this.targetDomNode, newH);
 		}
-		
+
 		e.preventDefault();
 	},
 

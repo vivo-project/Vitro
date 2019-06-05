@@ -92,7 +92,7 @@ public class SparqlEvaluateVTwo {
         Map<String,List<Literal>> varToLiterals = new HashMap<String,List<Literal>>();
         for(String var : varToSparql.keySet()){
             String query = varToSparql.get(var);
-            log.debug("Var name " + var + " and query = " + query);           
+            log.debug("Var name " + var + " and query = " + query);
             /* skip if var set to use a system generated value */
             if( query == null || EditConfigurationVTwo.USE_SYSTEM_VALUE.equals( query )) {
             	log.debug("Query is null or using system value so will not continue with rest of method");
@@ -118,7 +118,7 @@ public class SparqlEvaluateVTwo {
 
         for(String var : varToSparql.keySet()){
             String query = varToSparql.get(var);
-            log.debug("Var name " + var + " and query = " + query);           
+            log.debug("Var name " + var + " and query = " + query);
             /* skip if var set to use a system generated value */
             if( query == null || EditConfigurationVTwo.USE_SYSTEM_VALUE.equals( query )) {
             	log.debug("Query is null or using system value so will not continue with rest of method");
@@ -132,13 +132,13 @@ public class SparqlEvaluateVTwo {
             log.debug("Query after substituting literals in scope: " + queryStrings.toString());
             List<String> uriFromQuery = queryToUri(  queryStrings.get(0) );
             if( uriFromQuery != null )
-            {    
+            {
             	//Added parens and output
             	varToUris.put(var, uriFromQuery);
             }
-            else 
-                log.debug("sparqlEvaluateForUris(): for var " + var 
-                        + " the following query evaluated to null:\n"+queryStrings.get(0)+"\n(end of query)\n");                            
+            else
+                log.debug("sparqlEvaluateForUris(): for var " + var
+                        + " the following query evaluated to null:\n"+queryStrings.get(0)+"\n(end of query)\n");
         }
 
         return varToUris;
@@ -160,13 +160,13 @@ public class SparqlEvaluateVTwo {
 //            if( literalFromQuery != null )
 //                varToLiterals.put(var, literalFromQuery );
 //            else
-//                log.debug("sparqlEvaluateForAdditionalLiterals(): for var " + var 
+//                log.debug("sparqlEvaluateForAdditionalLiterals(): for var " + var
 //                        + "query evaluated to null. query: '" + queryStrings.get(0) +"'");
 //        }
 //
 //        return varToLiterals;
 //    }
-    
+
     //now can return multiple uris
     public  List<String> queryToUri(String querystr){
         log.debug("Query string in queryToUri():" + querystr);
@@ -189,9 +189,9 @@ public class SparqlEvaluateVTwo {
                         value =  resource.getURI();
                         values.add(value);
                     }
-                    
-                    
-                   
+
+
+
                 }else{
                 	log.debug("Query had no results");
                     return null;

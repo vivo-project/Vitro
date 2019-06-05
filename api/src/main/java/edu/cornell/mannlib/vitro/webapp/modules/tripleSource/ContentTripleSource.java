@@ -26,13 +26,13 @@ public abstract class ContentTripleSource implements TripleSource {
 	 */
 	protected static final String[] MEMORY_MAPPED_CONTENT_MODELS = {
 		APPLICATION_METADATA, TBOX_ASSERTIONS, TBOX_INFERENCES };
-	
+
 	private static final String CONTENT_DEFAULT_MODEL_NAME = FULL_UNION;
 
 	/**
 	 * These decorations are added to a Content ModelMaker, regardless of the
 	 * source.
-	 * 
+	 *
 	 * Use the default model as the full union.
 	 */
 	protected static ModelMaker addContentDecorators(ModelMaker sourceMM) {

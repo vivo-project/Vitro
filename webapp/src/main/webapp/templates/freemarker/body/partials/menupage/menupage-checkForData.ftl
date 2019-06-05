@@ -30,11 +30,11 @@
             <p>${i18n().please} <a href="${urls.login}" title="${i18n().login_to_manage_site}">${i18n().log_in}</a> ${i18n().to_manage_content}</p>
         </span>
     </#if>
-    
+
     <h3>${i18n().no_content_in_system(page.title)}</h3>
     <#if user.loggedIn && user.hasSiteAdminAccess>
         <p>${i18n().you_can} <a href="${urls.siteAdmin}" title="Manage content">${i18n().add_content_manage_site}</a> ${i18n().from_site_admin_page}</p>
     </#if>
-    
+
     <p>${i18n().browse_all_public_content} <a href="${urls.index}" title="${i18n().browse_all_content}">${i18n().index_page}</a>.</p>
 </#assign>

@@ -32,16 +32,16 @@ import org.apache.jena.rdf.model.Literal;
  * This servlet is for servicing Google Refine's
  * "Add columns from VIVO"'s search for individual properties.
  * e.g. search for Joe Smith's email in VIVO and download to Google Refine under a new email column.
- * 
+ *
  * @author Eliza Chan (elc2013@med.cornell.edu)
- * 
+ *
  */
 @WebServlet(name = "Google Refine Mqlread Service", urlPatterns = {"/grefineMqlread"} )
 public class GrefineMqlreadServlet extends VitroHttpServlet {
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory.getLog(GrefineMqlreadServlet.class.getName());
-	
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -57,7 +57,7 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 		VitroRequest vreq = new VitroRequest(req);
 		try {
 			if (vreq.getParameter("query") != null) {
-				
+
 				ObjectNode qJson = getResult(vreq, req, resp);
 				log.debug("result: " + qJson.toString());
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
@@ -75,7 +75,7 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 
 	private ObjectNode getResult(VitroRequest vreq, HttpServletRequest req,
 								 HttpServletResponse resp) throws ServletException {
-		
+
 		ObjectNode resultAllJson = JsonNodeFactory.instance.objectNode();
 
 		// parse query

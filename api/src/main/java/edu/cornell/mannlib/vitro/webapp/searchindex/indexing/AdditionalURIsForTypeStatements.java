@@ -11,12 +11,12 @@ import org.apache.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
 
 /**
- * Adds URIs to index for type statement changes on individuals. 
+ * Adds URIs to index for type statement changes on individuals.
  */
 public class AdditionalURIsForTypeStatements implements IndexingUriFinder {
 
     @Override
-    public List<String> findAdditionalURIsToIndex(Statement stmt) {        
+    public List<String> findAdditionalURIsToIndex(Statement stmt) {
         if( stmt != null && RDF.type.getURI().equals( stmt.getPredicate().getURI() )){
             return Collections.singletonList( stmt.getSubject().getURI() );
         }else{
@@ -34,5 +34,5 @@ public class AdditionalURIsForTypeStatements implements IndexingUriFinder {
 	public String toString() {
 		return this.getClass().getSimpleName();
 	}
-    
+
 }

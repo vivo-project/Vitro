@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * A utility class for storing and retrieving Locale information.
- * 
+ *
  * The static methods create beans and store them in the ServletContext or the
  * session, where the information can be found later.
  */

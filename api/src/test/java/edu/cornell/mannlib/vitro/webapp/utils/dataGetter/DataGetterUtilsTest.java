@@ -23,24 +23,24 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 public class DataGetterUtilsTest extends AbstractTestClass{
-    
+
     OntModel displayModel;
     VitroRequest vreq;
     String testDataGetterURI_1 = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#query1data";
     String pageURI_1 = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#SPARQLPage";
     String pageX = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#pageX";
     String dataGetterX = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#pageDataGetterX";
-    
+
     @Before
-    public void setUp() throws Exception {    
+    public void setUp() throws Exception {
         // Suppress error logging.
         setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
-        
-        Model model = ModelFactory.createDefaultModel();        
+
+        Model model = ModelFactory.createDefaultModel();
         InputStream in = DataGetterUtilsTest.class.getResourceAsStream("resources/dataGetterTest.n3");
-        model.read(in,"","N3");        
+        model.read(in,"","N3");
         displayModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM,model);
-        
+
         vreq = new VitroRequest(new HttpServletRequestStub());
     }
 
@@ -57,16 +57,16 @@ public class DataGetterUtilsTest extends AbstractTestClass{
         DataGetter dg = DataGetterUtils.dataGetterForURI(vreq, displayModel, testDataGetterURI_1);
         Assert.assertNotNull(dg);
     }
-    
+
     @Test
     public void testGetDataGettersForPage() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
-        List<DataGetter> dgList = 
+        List<DataGetter> dgList =
             DataGetterUtils.getDataGettersForPage(vreq, displayModel, pageURI_1);
         Assert.assertNotNull(dgList);
         Assert.assertTrue("List of DataGetters was empty, it should not be.", dgList.size() > 0);
     }
 
 
-    
+
 
 }

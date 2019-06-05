@@ -10,24 +10,24 @@
     	<#assign property = editConfiguration.objectPropertyStatementDisplayPropertyModel />
     </#if>
 <#else>
-	<#assign statement = editConfiguration.dataLiteralValuesAsString />   
+	<#assign statement = editConfiguration.dataLiteralValuesAsString />
 </#if>
 
 <#assign deletionTemplateName = editConfiguration.deleteTemplate/>
 
 <form action="${editConfiguration.deleteProcessingUrl}" method="get">
     <h2>${i18n().confirm_entry_deletion_from} <em>${editConfiguration.propertyName}</em>?</h2>
-    
+
     <p class="toBeDeleted ${toBeDeletedClass}">
         <#if editConfiguration.objectProperty = true>
             <#if statement?has_content>
                 <#include deletionTemplateName />
             </#if>
         <#else>
-            ${statement}  
+            ${statement}
         </#if>
     </p>
-    
+
     <input type="hidden" name="subjectUri"   value="${editConfiguration.subjectUri}" role="input" />
     <input type="hidden" name="predicateUri" value="${editConfiguration.predicateUri}" role="input" />
     <input type="hidden" name="domainUri" value="${editConfiguration.domainUri!}" role="input" />
@@ -39,13 +39,13 @@
     <#else>
         <input type="hidden" name="objectUri"    value="${editConfiguration.objectUri}" role="input" />
     </#if>
-    
+
    <br />
     <#if editConfiguration.objectProperty = true>
     <p class="submit">
     </#if>
         <input type="submit" id="submit" value="${i18n().delete_button}" role="button"/>
-        or 
+        or
         <a class="cancel" title="${i18n().cancel_title}" href="${editConfiguration.cancelUrl}">${i18n().cancel_link}</a>
     <#if editConfiguration.objectProperty = true>
     </p>

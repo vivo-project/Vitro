@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 /**
  * An implementation that accumulates timing figures for each excluder and
  * writes them to the log.
- * 
+ *
  * Note that this must be thread-safe.
  */
 public class SearchIndexExcluderListDeveloper implements

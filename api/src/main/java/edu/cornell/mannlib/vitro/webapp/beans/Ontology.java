@@ -14,9 +14,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Ontology implements Comparable<Ontology>
 {
-	
+
 	private static final Log log = LogFactory.getLog(Ontology.class.getName());
-	
+
     private int myID = -1;
     public int getId()          { return myID; }
     public void setId( int id ) { myID = id; }
@@ -28,7 +28,7 @@ public class Ontology implements Comparable<Ontology>
     private String myType = null;
     public String getType()             { return myType; }
     public void setType( String type )  { myType = type; }
-    
+
     private String myPrefix = null;
     public String getPrefix()               { return myPrefix; }
     public void setPrefix( String prefix )  { myPrefix = prefix; }
@@ -52,7 +52,7 @@ public class Ontology implements Comparable<Ontology>
     private List myEntitiesList = null;
     public List getEntsList()                  { return myEntitiesList; }
     public void setEntsList( List entsList )   { myEntitiesList = entsList; }
-    
+
     public int compareTo(Ontology o2) {
     	Collator collator = Collator.getInstance();
         if (o2 == null) {
@@ -61,7 +61,7 @@ public class Ontology implements Comparable<Ontology>
         }
         return collator.compare(this.getName(), o2.getName());
     }
-    
+
 	@Override
 	public String toString() {
 		return "Ontology[myID=" + myID + ", myName=" + myName + ", myType="
@@ -70,5 +70,5 @@ public class Ontology implements Comparable<Ontology>
 				+ myVClassesList + ", myPropsList=" + myPropsList
 				+ ", myEntitiesList=" + myEntitiesList + "]";
 	}
-    
+
 }

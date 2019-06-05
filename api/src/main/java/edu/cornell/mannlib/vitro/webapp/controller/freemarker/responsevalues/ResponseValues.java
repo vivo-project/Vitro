@@ -17,19 +17,19 @@ public interface ResponseValues {
     public void setStatusCode(int statusCode);
 
     public Map<String, Object> getMap();
-    
+
     public String getRedirectUrl();
 
     public Map<String, String> getHeader();
-    
+
     public String getForwardUrl();
 
     public Throwable getException();
-    
+
     public ContentType getContentType();
-    
+
     public void setContentType(ContentType contentType);
-    
+
     public Model getModel();
 
 }

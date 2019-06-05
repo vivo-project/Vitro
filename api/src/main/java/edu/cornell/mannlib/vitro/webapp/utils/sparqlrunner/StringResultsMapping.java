@@ -79,7 +79,7 @@ public class StringResultsMapping {
 		}
 		return list;
 	}
-	
+
 	public List<String> flatten() {
 		List<String> flat = new ArrayList<>();
 		for (Map<String, String> map : listOfMaps) {

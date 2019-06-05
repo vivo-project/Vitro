@@ -170,7 +170,7 @@ public class PropertyInstance implements PropertyInstanceIface, Comparable<Prope
         }
         return out;
     }
-    
+
     public int compareTo(PropertyInstance pi) {
 
         try {

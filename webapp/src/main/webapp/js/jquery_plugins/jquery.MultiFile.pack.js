@@ -1,7 +1,7 @@
 /*
  ### jQuery Multiple File Upload Plugin v1.28 - 2008-05-02 ###
  By Diego A., http://www.fyneworks.com, diego@fyneworks.com
- 
+
  Project: http://jquery.com/plugins/project/MultiFile/
  Website: http://www.fyneworks.com/jquery/multiple-file-upload/
  Forums:  http://www.nabble.com/jQuery-Multiple-File-Upload-f20931.html

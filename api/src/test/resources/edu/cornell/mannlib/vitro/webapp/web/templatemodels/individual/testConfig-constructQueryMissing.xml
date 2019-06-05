@@ -3,7 +3,7 @@
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <!--
-	No construct query. Should throw an error.  
+	No construct query. Should throw an error.
 -->
 
 <list-view-config>
@@ -15,7 +15,7 @@
             <collated>
             ?object a ?subclass.
             </collated>
-        }  
+        }
     </query-select>
 
     <template>propStatement-default.ftl</template>

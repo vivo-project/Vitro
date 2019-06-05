@@ -12,11 +12,11 @@ import org.apache.jena.rdf.model.ModelSource;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
-/** 
+/**
  * ModelSource that will handle specially named Vitro models such
  * as display and t-box. Any other models will be retrieved from
- * the inner ModelSource. 
- * 
+ * the inner ModelSource.
+ *
  * None of these models will be retrieved
  * from the attributes of a ServletRequest.
  */
@@ -24,9 +24,9 @@ public class VitroModelSource implements ModelSource {
 
     private ModelSource innerSource;
     private ServletContext context;
-    
-    /** 
-     * Each of these values identifies a model in the system.     
+
+    /**
+     * Each of these values identifies a model in the system.
      */
     public enum ModelName {
         /** Name for default assertion model. */
@@ -38,18 +38,18 @@ public class VitroModelSource implements ModelSource {
         /** Name for t-box for DISPLAY. */
         DISPLAY_TBOX,
         /** Name for display model related to DISPLAY and DISPLAY_TBOX. */
-        DISPLAY_DISPLAY, 
+        DISPLAY_DISPLAY,
         /** Name for user accounts model. */
         USER_ACCOUNTS
-        
-        //may need a way to specify unions of these models and unions of URI models 
+
+        //may need a way to specify unions of these models and unions of URI models
     }
-    
+
     public VitroModelSource(ModelSource innerSource, ServletContext context){
         this.innerSource = innerSource;
         this.context = context;
     }
-    
+
     @Override
     public Model getModel(String arg0) {
         ModelName pn = getModelName( arg0 );
@@ -101,12 +101,12 @@ public class VitroModelSource implements ModelSource {
     }
 
     /**
-     * This should not return null for any value of pmn in 
+     * This should not return null for any value of pmn in
      * the enum PrivilegedModelName.
      */
     private Model getNamedModel( ModelName pmn ){
         switch( pmn ){
-            case ABOX: 
+            case ABOX:
             	return ModelAccess.on(context).getOntModel();
             case TBOX:
                 return (Model) context.getAttribute("tboxmodel???");
@@ -122,16 +122,16 @@ public class VitroModelSource implements ModelSource {
                 throw new IllegalArgumentException("getNamedModel() should handle all values for enum PrivilegedModelName");
         }
     }
-    
-    
+
+
     /**
      * Returns null if the string is not a ModelName.
      */
     public static ModelName getModelName( String string ){
         if( StringUtils.isEmpty(string))
             return null;
-        
-        try{ 
+
+        try{
             return ModelName.valueOf( string.trim().toUpperCase());
         }catch(IllegalArgumentException ex){
             //Did not find value in enum ModelName for the string, no problem.

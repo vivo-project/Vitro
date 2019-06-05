@@ -2631,7 +2631,7 @@ report on the &lt;a target="_new" href="http://www.ifla.org/VII/s13/frbr/frbr.ht
 &lt;li>Sentinel Node&lt;/li>
 &lt;li>Skin Sparing Mastectomy&lt;/li>&lt;/ul>&lt;/p>
 
-&lt;p>Dr. Alexander Swistel is one of the department's most well known breast surgeons. He specializes in all types of breast cancer, surgery and 
+&lt;p>Dr. Alexander Swistel is one of the department's most well known breast surgeons. He specializes in all types of breast cancer, surgery and
 diseases.&lt;/p></vitro:description>
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >Swistel, Alexander J.</rdfs:label>
@@ -5072,8 +5072,8 @@ Please use the &lt;a href="comments.jsp?home=6">Contact Us&lt;/a> link to submit
     <vitro:imageThumb rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >people/talman_richard_thumb.gif</vitro:imageThumb>
   </mann:CornellFaculty>
-  
-  
+
+
   <mann:CornellFaculty rdf:about="http://vivo.library.cornell.edu/abox#entity11821">
     <vitro:sunrise rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime"
     >2007-07-17T14:55:12</vitro:sunrise>
@@ -5104,6 +5104,6 @@ Please use the &lt;a href="comments.jsp?home=6">Contact Us&lt;/a> link to submit
     <vitro:imageThumb rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >people/Suthanthiran_Manikkam_thumb.gif</vitro:imageThumb>
   </mann:CornellFaculty>
-    
+
 
 </rdf:RDF>

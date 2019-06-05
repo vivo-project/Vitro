@@ -34,7 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * Time: 12:16:29 PM
  */
 public class OptionsForPropertyTag extends TagSupport {
-	
+
 	private static final Log log = LogFactory.getLog(OptionsForPropertyTag.class.getName());
     private String subjectUri, predicateUri, selectedUri;
 

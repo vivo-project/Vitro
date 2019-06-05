@@ -6,8 +6,8 @@
 
 //This will need to be overridden or extended, what have you.. in VIVO
 var processDataGetterUtils = {
-		dataGetterProcessorMap:{"browseClassGroup": processClassGroupDataGetterContent, 
-								"sparqlQuery": processSparqlDataGetterContent, 
+		dataGetterProcessorMap:{"browseClassGroup": processClassGroupDataGetterContent,
+								"sparqlQuery": processSparqlDataGetterContent,
 								"fixedHtml":processFixedHTMLDataGetterContent,
 								"individualsForClasses":processIndividualsForClassesDataGetterContent,
 								"searchIndividuals":processSearchDataGetterContent},
@@ -23,8 +23,8 @@ var processDataGetterUtils = {
 				if(allClassesSelected.length == 0) {
 					contentType = "individualsForClasses";
 				}
-			} 
-			
+			}
+
 			return contentType;
 	    },
 	    isRelatedToBrowseClassGroup:function(contentType) {
@@ -33,7 +33,7 @@ var processDataGetterUtils = {
 	    getContentTypeForCloning:function(contentType) {
 	    	if(contentType == "browseClassGroup" || contentType == "individualsForClasses") {
 	    		return "browseClassGroup";
-	    	} 
+	    	}
 	    	return contentType;
 	    }
 };

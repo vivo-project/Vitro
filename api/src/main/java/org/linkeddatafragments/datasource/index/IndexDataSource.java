@@ -18,7 +18,7 @@ public class IndexDataSource extends DataSourceBase {
 
     /**
      * The request processor
-     * 
+     *
      */
     protected final IndexRequestProcessorForTPFs requestProcessor;
 

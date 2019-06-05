@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import java.io.IOException;
 
 /**
- * This controller receives Ajax requests for reordering a list of individuals. 
+ * This controller receives Ajax requests for reordering a list of individuals.
  * Parameters:
  * predicate: the data property used for ranking
  * individuals: an ordered list of individuals to be ranked
@@ -56,7 +56,7 @@ public class ReorderController extends VitroAjaxController {
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTION;
     }
-    
+
    @Override
     protected void doRequest(VitroRequest vreq, HttpServletResponse response) {
 
@@ -73,30 +73,30 @@ public class ReorderController extends VitroAjaxController {
         if (individualUris == null || individualUris.length == 0) {
             errorMsg = "No individuals specified";
             log.error(errorMsg);
-            doError(response, errorMsg, SC_BAD_REQUEST);  
+            doError(response, errorMsg, SC_BAD_REQUEST);
             return;
         }
 
-        WebappDaoFactory wadf = vreq.getWebappDaoFactory();        
+        WebappDaoFactory wadf = vreq.getWebappDaoFactory();
         if( vreq.getWebappDaoFactory() == null) {
             errorMsg = "No WebappDaoFactory available";
             log.error(errorMsg);
             doError(response, errorMsg, SC_INTERNAL_SERVER_ERROR);
             return;
-        }  
+        }
 
-        DataPropertyStatementDao dpsDao = wadf.getDataPropertyStatementDao();  
+        DataPropertyStatementDao dpsDao = wadf.getDataPropertyStatementDao();
         if( dpsDao == null) {
             errorMsg = "No DataPropertyStatementDao available";
             log.error(errorMsg);
             doError(response, errorMsg, SC_INTERNAL_SERVER_ERROR);
             return;
-        }  
+        }
 
-        //check permissions     
+        //check permissions
         //TODO: (bdc34)This is not yet implemented, must check the IDs against the policies for permissons before doing an edit!
         // rjy7 This should be inherited from the superclass
-        boolean hasPermission = true;        
+        boolean hasPermission = true;
         if( !hasPermission ){
             //if not okay, send error message
             doError(response,"Insufficent permissions", SC_UNAUTHORIZED);
@@ -114,7 +114,7 @@ public class ReorderController extends VitroAjaxController {
            e.printStackTrace();
        }
     }
-    
+
     private void reorderIndividuals(String[] individualUris, VitroRequest vreq, String rankPredicate) {
     	//Testing new mechanism
     	OntModel writeModel = vreq.getOntModelSelector().getABoxModel();
@@ -124,7 +124,7 @@ public class ReorderController extends VitroAjaxController {
     	DataProperty dp = vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI(rankPredicate);
     	String datapropURI = dp.getRangeDatatypeURI();
     	int counter = 1;
-        for (String individualUri : individualUris) {           
+        for (String individualUri : individualUris) {
         	Resource individualResource = ResourceFactory.createResource(individualUri);
         	//Deletions are all old statements with rank predicate
         	retractions.add(writeModel.listStatements(individualResource, rankPredicateProperty, (RDFNode) null));
@@ -141,12 +141,12 @@ public class ReorderController extends VitroAjaxController {
         	log.debug("additions = " + additions);
         	counter++;
         }
-        
+
         Lock lock = null;
         try{
             lock =  writeModel.getLock();
             lock.enterCriticalSection(Lock.WRITE);
-            writeModel.getBaseModel().notifyEvent(new EditEvent(null,true));   
+            writeModel.getBaseModel().notifyEvent(new EditEvent(null,true));
             writeModel.remove( retractions );
             writeModel.add( additions );
         }catch(Throwable t){
@@ -154,29 +154,29 @@ public class ReorderController extends VitroAjaxController {
         }finally{
             writeModel.getBaseModel().notifyEvent(new EditEvent(null,false));
             lock.leaveCriticalSection();
-        }       
-        
-        
+        }
+
+
     	//old code that for some reason doesn't seem to actually commit the changes
     	/*
     	 * int counter = 1;
-        for (String individualUri : individualUris) {           
+        for (String individualUri : individualUris) {
             // Retract all existing rank statements for this individual
             dpsDao.deleteDataPropertyStatementsForIndividualByDataProperty(individualUri, rankPredicate);
-        
+
             // Then add the new rank statement for this individual
             // insertNewDataPropertyStatement will insert the rangeDatatype of the property, so we don't need to set that here.
             dpsDao.insertNewDataPropertyStatement(new DataPropertyStatementImpl(individualUri, rankPredicate, String.valueOf(counter)));
-            
+
             counter++;
         }
-        
+
     	 */
-	
+
     }
 
 	protected void doError(HttpServletResponse response, String errorMsg, int httpstatus) {
         super.doError(response, "Error: " + errorMsg, httpstatus);
     }
-    
+
 }

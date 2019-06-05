@@ -283,9 +283,9 @@ public class FileStorageHelper {
 	private static String excludeWindowsWordsFromPath(String rawPath) {
 		String path = rawPath.replace(File.separatorChar, '/');
 		String[] parts = path.split("/");
-		
+
 		StringBuilder newPath = new StringBuilder();
-		
+
 		for (int i = 0; i < parts.length; i++) {
 			String part = excludeWindowsReservedNames(parts[i]);
 			if (i > 0) {

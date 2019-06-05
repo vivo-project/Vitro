@@ -9,7 +9,7 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
-    <h2>${title!} 
+    <h2>${title!}
         <#if rdfUrl?has_content>
             <span class="rdfLink"><a class="icon-rdf" href="${rdfUrl}" title="${i18n().view_list_in_rdf(title)}">${i18n().rdf}</a></span>
         </#if>
@@ -17,7 +17,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
     <#if subtitle?has_content>
         <h4>${subtitle}</h4>
     </#if>
-    
+
     <#if (!noData)>
         <#if errorMessage?has_content>
             <p>${errorMessage}</p>
@@ -37,17 +37,17 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
                     </ul>
                 </#if>
             </#assign>
-            
+
             ${pagination}
-            
+
             <ul>
                 <#list individuals as individual>
-                    <li>       
+                    <li>
                         <@shortView uri=individual.uri viewContext="index" />
                     </li>
                 </#list>
             </ul>
-            
+
             ${pagination}
         </#if>
     <#else>

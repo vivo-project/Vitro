@@ -1,5 +1,5 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
-<#--This is an example of including multiple content types in the same template, 
+<#--This is an example of including multiple content types in the same template,
     this combines the default templates for Fixed HTML, Class groups and Search Individuals in one template-->
 <#include "menupage-checkForData.ftl">
 <#--Fixed HTML portion-->
@@ -15,7 +15,7 @@ variableName is used below.-->
 <#if htmlExists>
 	${.globals[variableName]}
 <#else>
-	${i18n().no_html_specified}  
+	${i18n().no_html_specified}
 </#if>
 
 <#--Class grou section-->
@@ -23,11 +23,11 @@ variableName is used below.-->
     <section id="menupage-intro" role="region">
         <h2>${page.title}</h2>
     </section>
-    
+
     <#include "menupage-browse.ftl">
-    
+
     ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menupage.css" />')}
-    
+
     <#include "menupage-scripts.ftl">
 <#else>
     ${noDataNotification}
@@ -41,12 +41,12 @@ variableName is used below.-->
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
-    <h2>${title!} 
+    <h2>${title!}
     </h2>
     <#if subtitle?has_content>
         <h4>${subtitle}</h4>
     </#if>
-    
+
     <#if (!noData)>
         <#if errorMessage?has_content>
             <p>${errorMessage}</p>
@@ -66,17 +66,17 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
                     </ul>
                 </#if>
             </#assign>
-            
+
             ${pagination}
-            
+
             <ul>
                 <#list individuals as individual>
-                    <li>       
+                    <li>
                         <@shortView uri=individual.uri viewContext="index" />
                     </li>
                 </#list>
             </ul>
-            
+
             ${pagination}
         </#if>
     <#else>

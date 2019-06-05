@@ -19,12 +19,12 @@ import org.apache.jena.util.iterator.WrappedIterator;
 /**
  * A ModelMaker stub, but is it strict or relaxed? Choose one of the
  * sub-classes.
- * 
+ *
  * The only difference between strict and relaxed is on a call to
  * openModel(name), when no such model exists. The relaxed ModelMaker will
  * create a fresh model and associate it with the name. The strict modelMaker
  * will throw a DoesNotExistException.
- * 
+ *
  * Warning: the "fresh model" is the same every time, so calling
  * createFreshModel() more than once during a test will give illusory results.
  */
@@ -137,7 +137,7 @@ public abstract class ModelMakerStub implements ModelMaker {
 	/**
 	 * "Relaxed" means that if they ask for a model that doesn't exist, we
 	 * create one.
-	 * 
+	 *
 	 * Note: should return a new model, instead of the "fresh" model.
 	 */
 	private static class ModelMakerRelaxedStub extends ModelMakerStub {

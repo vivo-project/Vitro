@@ -14,9 +14,9 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 /**
  * Provides the long-term data structures, and a way to obtain the short-term
  * data structures.
- * 
+ *
  * Repeated calls for the same data structure should yield the same instance.
- * 
+ *
  * Repeated calls for the ShortTermCombinedTripleSource need not yield the
  * same instance, but must yield an instance that will return the same
  * structures as any other instance for the same request.

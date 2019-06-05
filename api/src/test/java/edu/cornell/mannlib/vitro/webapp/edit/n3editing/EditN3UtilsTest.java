@@ -20,25 +20,25 @@ public class EditN3UtilsTest {
     public void testStripInvalidXMLChars() {
         Model m = ModelFactory.createDefaultModel();
         String containsInvalidXMLChars = "Blah \u0001blah \u0002blah\uDDDD";
-        String clean = "Blah blah blah"; 
-        
+        String clean = "Blah blah blah";
+
         // add a statement with the literal incompatible with XML to model m
         m.add(m.createResource(), RDFS.label, containsInvalidXMLChars);
-        
+
         Assert.assertFalse(isSerializableAsXML(m));
-        
+
         String stripped = N3EditUtils.stripInvalidXMLChars(
                                 containsInvalidXMLChars);
         Assert.assertEquals(clean, stripped);
-        
+
         // clear the model of any statements
         m.removeAll();
         // add a statement with a literal that has been stripped of bad chars
         m.add(m.createResource(), RDFS.label, stripped);
-        
-        Assert.assertTrue(isSerializableAsXML(m));      
+
+        Assert.assertTrue(isSerializableAsXML(m));
     }
-    
+
     private boolean isSerializableAsXML(Model m) {
         try {
             NullOutputStream nullStream = new NullOutputStream();
@@ -48,5 +48,5 @@ public class EditN3UtilsTest {
             return false;
         }
     }
-    
+
 }

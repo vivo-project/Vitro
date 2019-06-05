@@ -46,7 +46,7 @@ Raphael.fn.g.barchart = function (x, y, width, height, values, opts) {
         }
         total = Math.max.apply(Math, opts.stacked ? stacktotal : total);
     }
-    
+
     total = (opts.to) || total;
     var barwidth = width / (len * (100 + gutter) + gutter) * 100,
         barhgutter = barwidth * gutter / 100,
@@ -251,7 +251,7 @@ Raphael.fn.g.hbarchart = function (x, y, width, height, values, opts) {
         }
         total = Math.max.apply(Math, opts.stacked ? stacktotal : total);
     }
-    
+
     total = (opts.to) || total;
     var barheight = Math.floor(height / (len * (100 + gutter) + gutter) * 100),
         bargutter = Math.floor(barheight * gutter / 100),

@@ -2,8 +2,8 @@
 
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" 
-          xmlns:c="http://java.sun.com/jsp/jstl/core" 
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+          xmlns:c="http://java.sun.com/jsp/jstl/core"
           xmlns:form="http://vitro.mannlib.cornell.edu/edit/tags"
           version="2.0">
 <jsp:directive.page import="edu.cornell.mannlib.vitro.webapp.beans.VClass"/>
@@ -123,7 +123,7 @@
 		</form>
 	</td>
 </tr>
-<tr><td colspan="3"><hr/></td></tr>			
+<tr><td colspan="3"><hr/></td></tr>
 <!-- _______________________________________________ subclasses _____________________________________________ -->
 <tr valign="bottom" align="center">
 	<td colspan="2" valign="bottom" align="left">
@@ -143,8 +143,8 @@
 						${subclass.pickListName}
 					    </c:otherwise>
 				        </c:choose>
-				</li>						
-			</c:forEach>	
+				</li>
+			</c:forEach>
 			</ul>
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Subclass Links"/>
@@ -188,7 +188,7 @@
 					    </c:otherwise>
                     </c:choose>
 				</li>
-			</c:forEach>	
+			</c:forEach>
 			</ul>
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Equivalent Classes"/>
@@ -230,7 +230,7 @@
 					</c:otherwise>
 				    </c:choose>
 				</li>
-			</c:forEach>	
+			</c:forEach>
 			</ul>
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Disjoint Classes"/>
@@ -287,11 +287,11 @@
                     </select>
                     <input type="submit" class="form-button" value="Apply Restriction"/>
                     <input type="hidden" name="VClassURI" value="${VClass.URI}"/>
-                    <p>Restrict: 
+                    <p>Restrict:
                         <input type="radio" name="propertyType" value="object" checked="checked"/> object property
                         <input type="radio" name="propertyType" value="data"/> data property
                     </p>
-                </form>       
+                </form>
         </td>
 </tr>
 </table>

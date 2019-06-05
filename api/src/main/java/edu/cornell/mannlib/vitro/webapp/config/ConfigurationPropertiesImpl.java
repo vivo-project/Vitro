@@ -19,9 +19,9 @@ import org.apache.commons.logging.LogFactory;
  * also permits the caller to supply a map of "preemptive" properties that will
  * be included and will override any matching properties from the file, and a
  * map of "build" properties that may be overridden by the file.
- * 
+ *
  * Leading and trailing white space are trimmed from the property values.
- * 
+ *
  * Once the properties have been parsed and stored, they are immutable.
  */
 public class ConfigurationPropertiesImpl extends ConfigurationProperties {
@@ -34,7 +34,7 @@ public class ConfigurationPropertiesImpl extends ConfigurationProperties {
 			Map<String, String> preemptiveProperties,
 			Map<String, String> buildProperties) throws IOException {
 		Map<String, String> map = new HashMap<>(buildProperties);
-		
+
 		Properties props = loadFromPropertiesFile(stream);
 		for (String key: props.stringPropertyNames()) {
 			map.put(key, props.getProperty(key));

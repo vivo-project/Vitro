@@ -24,7 +24,7 @@ abstract public class DataSourceException extends Exception {
     public DataSourceException(String datasourceName, String message) {
         super("Error for datasource '" + datasourceName + "': " + message);
     }
-    
+
     /**
      *
      * @param datasource
@@ -33,5 +33,5 @@ abstract public class DataSourceException extends Exception {
     public DataSourceException(IDataSource datasource, String message) {
         this(datasource.getTitle(), message);
     }
-    
+
 }

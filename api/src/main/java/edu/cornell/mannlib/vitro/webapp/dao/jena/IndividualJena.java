@@ -48,7 +48,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     private WebappDaoFactoryJena webappDaoFactory = null;
     private Float _searchBoostJena = null;
     private boolean retrievedNullRdfsLabel = false;
-    
+
     public IndividualJena(OntResource ind, WebappDaoFactoryJena wadf) {
         this.ind = ind;
         if (ind.isAnon()) {
@@ -78,7 +78,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             }
         }
     }
-    
+
     public String getLabel() {
         return getRdfsLabel();
     }
@@ -88,7 +88,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return rdfsLabel;
         } else if( this.rdfsLabel == null && retrievedNullRdfsLabel ){
         	return null;
-        } else { 
+        } else {
             ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 this.rdfsLabel = webappDaoFactory.getJenaBaseDao().getLabel(ind);
@@ -99,7 +99,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             }
         }
     }
-    
+
     public String getVClassURI() {
         if (this.vClassURI != null) {
             return vClassURI;
@@ -175,17 +175,17 @@ public class IndividualJena extends IndividualImpl implements Individual {
             ind.getOntModel().enterCriticalSection(Lock.READ);
             try{
                 try {
-                    searchBoost = 
+                    searchBoost =
                         ((Literal)ind.getPropertyValue(webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT)).getFloat();
                 } catch (Exception e) {
                     searchBoost = null;
-                }                
+                }
                 return searchBoost;
             }finally{
                 ind.getOntModel().leaveCriticalSection();
             }
         }
-    }    
+    }
 
 	@Override
 	public String getMainImageUri() {
@@ -243,7 +243,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return this.objectPropertyStatements;
         }
     }
-    
+
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyURI) {
     	if (propertyURI == null) {
@@ -256,7 +256,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     		while (sit.hasNext()) {
     			Statement s = sit.nextStatement();
     			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
-    			    continue;	
+    			    continue;
     			}
     			Individual subj = new IndividualJena(s.getSubject().as(OntResource.class), webappDaoFactory);
     			Individual obj = new IndividualJena(s.getObject().as(OntResource.class), webappDaoFactory);
@@ -291,15 +291,15 @@ public class IndividualJena extends IndividualImpl implements Individual {
     	    	RDFNode value = values.nextNode();
     	    	if (value.canAs(OntResource.class)) {
         	    	relatedIndividuals.add(
-        	    		new IndividualJena(value.as(OntResource.class), webappDaoFactory) );  
-        	    } 
+        	    		new IndividualJena(value.as(OntResource.class), webappDaoFactory) );
+        	    }
     	    }
     	} finally {
     		ind.getOntModel().leaveCriticalSection();
     	}
     	return relatedIndividuals;
     }
-    
+
     @Override
     public Individual getRelatedIndividual(String propertyURI) {
     	if (propertyURI == null) {
@@ -309,7 +309,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     	try {
     	    RDFNode value = ind.getPropertyValue(ind.getModel().getProperty(propertyURI));
     	    if (value != null && value.canAs(OntResource.class)) {
-    	    	return new IndividualJena(value.as(OntResource.class), webappDaoFactory);  
+    	    	return new IndividualJena(value.as(OntResource.class), webappDaoFactory);
     	    } else {
     	    	return null;
     	    }
@@ -317,7 +317,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     		ind.getOntModel().leaveCriticalSection();
     	}
     }
-    
+
     public List<ObjectProperty> getObjectPropertyList() {
         if (this.propertyList != null) {
             return this.propertyList;
@@ -331,14 +331,14 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
-    @Override 
+    @Override
     public List<ObjectProperty> getPopulatedObjectPropertyList() {
         if (populatedObjectPropertyList == null) {
             populatedObjectPropertyList = webappDaoFactory.getObjectPropertyDao().getObjectPropertyList(this);
         }
-        return populatedObjectPropertyList;       
+        return populatedObjectPropertyList;
     }
-    
+
     @Override
     public Map<String,ObjectProperty> getObjectPropertyMap() {
     	if (this.objectPropertyMap != null) {
@@ -354,7 +354,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 				}
 			}
     		this.objectPropertyMap = map;
-    		return map;    		
+    		return map;
     	}
     }
 
@@ -383,15 +383,15 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return this.datatypePropertyList;
         }
     }
-    
-    @Override 
+
+    @Override
     public List<DataProperty> getPopulatedDataPropertyList() {
         if (populatedDataPropertyList == null) {
             populatedDataPropertyList = webappDaoFactory.getDataPropertyDao().getDataPropertyList(this);
         }
-        return populatedDataPropertyList;       
+        return populatedDataPropertyList;
     }
-    
+
     @Override
     public Map<String,DataProperty> getDataPropertyMap() {
     	if (this.dataPropertyMap != null) {
@@ -407,7 +407,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 				}
 			}
     		this.dataPropertyMap = map;
-    		return map;    		
+    		return map;
     	}
     }
 
@@ -426,12 +426,12 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return this.externalIds;
         }
     }
-    
+
     @Override
     public List<VClass> getVClasses() {
     	return getVClasses(false);
     }
-    
+
     @Override
     public List<VClass> getVClasses(boolean direct) {
     	if (direct) {
@@ -450,13 +450,13 @@ public class IndividualJena extends IndividualImpl implements Individual {
     		}
     	}
     }
-    
+
     private List<VClass> getMyVClasses(boolean direct) {
-		List<VClass> vClassList = new ArrayList<VClass>(); 
+		List<VClass> vClassList = new ArrayList<VClass>();
 		OntModel ontModel = ind.getOntModel();
 		ontModel.enterCriticalSection(Lock.READ);
 		try {
-			ClosableIterator typeIt = ind.listRDFTypes(direct); 
+			ClosableIterator typeIt = ind.listRDFTypes(direct);
 			try {
 				for (Iterator it = typeIt; it.hasNext();) {
 					Resource type = (Resource) typeIt.next();
@@ -467,7 +467,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 							vClassList.add(vc);
 						}
 					}
-					
+
 				}
 			} finally {
 				typeIt.close();
@@ -480,11 +480,11 @@ public class IndividualJena extends IndividualImpl implements Individual {
 		} catch (Exception e) {}
 		return vClassList;
 	}
-    
+
 	/**
 	 * The base method in {@link IndividualImpl} is adequate if the reasoner is
-	 * up to date. 
-	 * 
+	 * up to date.
+	 *
 	 * If the base method returns false, check directly to see if
 	 * any of the super classes of the direct classes will satisfy this request.
 	 */
@@ -525,9 +525,9 @@ public class IndividualJena extends IndividualImpl implements Individual {
         /*  }*/
 		}
     }
-    
+
     private Collator collator = Collator.getInstance();
-    
+
     private void sortObjectPropertyStatementsForDisplay(ObjectProperty prop) {
     	try {
     		log.info("Doing special sort for "+prop.getDomainPublic());
@@ -607,7 +607,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
                 log.error("Exception sorting object property statements for object property "+this.getURI());
             }
 
-    		
+
     	} catch (Exception e) {
     		log.error(e, e);
     	}
@@ -617,5 +617,5 @@ public class IndividualJena extends IndividualImpl implements Individual {
 	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatements(list);
 	}
-    
+
 }

@@ -51,7 +51,7 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * If this is set at any point in the process, store it as the post-login
 	 * destination.
-	 * 
+	 *
 	 * NOTE: we expect URL-encoding on this parameter, and will decode it when
 	 * we read it.
 	 */
@@ -174,12 +174,12 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * If they supply an after-login page, record it and use the Login page for
 	 * the process. Note that we expect it to be URL-encoded.
-	 * 
+	 *
 	 * If they supply a return flag, record the current page as the after-login
 	 * page and use the Login page for the process.
-	 * 
+	 *
 	 * Otherwise, use the current page for the process.
-	 * 
+	 *
 	 * The "current page" is the referrer, unless there is no referrer for some
 	 * reason. In that case, pretend it's the login page.
 	 */
@@ -379,10 +379,10 @@ public class Authenticate extends VitroHttpServlet {
 
 	/**
 	 * <pre>
-	 * They are changing passwords. 
-	 * - If they cancel, let them out without checking for problems. 
-	 * - Otherwise, 
-	 *   - If they get it wrong, let them know. 
+	 * They are changing passwords.
+	 * - If they cancel, let them out without checking for problems.
+	 * - Otherwise,
+	 *   - If they get it wrong, let them know.
 	 *   - If they get it right, record it.
 	 * </pre>
 	 */

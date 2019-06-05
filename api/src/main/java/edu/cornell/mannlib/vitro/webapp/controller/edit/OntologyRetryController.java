@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 public class OntologyRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(OntologyRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
@@ -74,7 +74,7 @@ public class OntologyRetryController extends BaseEditController {
         } else {
             ontologyForEditing = (Ontology) epo.getNewBean();
         }
-        
+
         //validators
         List<Validator> validatorList = new ArrayList<Validator>();
         validatorList.add(new RequiredFieldValidator());

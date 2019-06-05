@@ -20,17 +20,17 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 /**
  * Create a new relationship, or set of relationships, between zero or more
  * proxies and zero or more profiles.
- * 
+ *
  * Note that this is additive, so if a proxy already has some profiles, they
  * will be preserved, even if they are not listed here.
- * 
+ *
  * It is possible that one or more profiles might be the "self" pages of one or
  * more proxies, so as we do each proxy, we exclude any profile which is the
  * "self" for that proxy.
- * 
+ *
  * If there are zero proxies here, or zero profiles, it doesn't hurt anything,
  * it just doesn't accomplish anything either.
- * 
+ *
  * This is not really a page, in that it doesn't display anything. It's just a
  * way to separate out some of the logic of the ManageProxies list page.
  */

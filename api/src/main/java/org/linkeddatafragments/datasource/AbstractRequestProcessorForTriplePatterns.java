@@ -67,7 +67,7 @@ public abstract class
      */
     abstract static protected class Worker<CTT,NVT,AVT>
         extends AbstractRequestProcessor.Worker
-    {        
+    {
 
         /**
          *

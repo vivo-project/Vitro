@@ -177,7 +177,7 @@ dojo.lang.extend(dojo.animation.Animation, {
 			} else {
 				this._percent = step * 100;
 			}
-			
+
 			// Perform accelleration
 			if(this.accel && this.accel.getValue) {
 				step = this.accel.getValue(step);

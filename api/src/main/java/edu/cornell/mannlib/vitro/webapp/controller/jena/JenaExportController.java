@@ -47,9 +47,9 @@ public class JenaExportController extends BaseEditController {
 	private static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION
 			.or(SimplePermission.EDIT_ONTOLOGY.ACTION);
 
-	
+
 	private static final Log log = LogFactory.getLog(JenaExportController.class);
-	
+
 	@Override
 	public void doGet( HttpServletRequest request, HttpServletResponse response ) {
 		if (!isAuthorizedToDisplayPage(request, response, REQUIRED_ACTIONS)) {
@@ -57,22 +57,22 @@ public class JenaExportController extends BaseEditController {
 		}
 
 		VitroRequest vreq = new VitroRequest(request);
-		
-		if ( vreq.getRequestURL().indexOf("/download/") > -1 ) { 
+
+		if ( vreq.getRequestURL().indexOf("/download/") > -1 ) {
 			outputRDF( vreq, response );
 			return;
 		}
-		
+
 		String formatParam = vreq.getParameter("format");
-		
+
 		if (formatParam != null) {
 			redirectToDownload( vreq, response );
 		} else {
 			prepareExportSelectionPage( vreq, response );
 		}
-		
+
 	}
-	
+
 	private void redirectToDownload( VitroRequest vreq, HttpServletResponse response ) {
 		String formatStr = vreq.getParameter("format");
 		String subgraphParam = vreq.getParameter("subgraph");
@@ -85,7 +85,7 @@ public class JenaExportController extends BaseEditController {
 			filename = "export";
 		}
 		String extension =
-			( (formatStr != null) && formatStr.startsWith("RDF/XML") && "tbox".equals(subgraphParam) ) 
+			( (formatStr != null) && formatStr.startsWith("RDF/XML") && "tbox".equals(subgraphParam) )
 			? ".owl"
 			: formatToExtension.get(formatStr);
 		if (extension == null) {
@@ -99,7 +99,7 @@ public class JenaExportController extends BaseEditController {
 			throw new RuntimeException(ioe);
 		}
 	}
-	
+
 	private void outputRDF( VitroRequest vreq, HttpServletResponse response ) {
 		Dataset dataset = vreq.getDataset();
 		JenaModelUtils xutil = new JenaModelUtils();
@@ -110,12 +110,12 @@ public class JenaExportController extends BaseEditController {
 		if (vreq.getParameter("ontologyURI") != null) {
 			ontologyURI.append(vreq.getParameter("ontologyURI"));
 		}
-		
+
 		Model model = null;
 		OntModel ontModel = ModelFactory.createOntologyModel();
-		
-		if(!subgraphParam.equalsIgnoreCase("tbox") 
-				&& !subgraphParam.equalsIgnoreCase("abox") 
+
+		if(!subgraphParam.equalsIgnoreCase("tbox")
+				&& !subgraphParam.equalsIgnoreCase("abox")
 				&& !subgraphParam.equalsIgnoreCase("full")){
 			ontologyURI = new StringBuilder(subgraphParam);
 			subgraphParam = "tbox";
@@ -125,7 +125,7 @@ public class JenaExportController extends BaseEditController {
 				ontologyURI.append(uri[i]);
 			}
 		}
-	
+
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){
@@ -161,7 +161,7 @@ public class JenaExportController extends BaseEditController {
                 model = xutil.extractTBox(
                         ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS), ontologyURI.toString());
 		    }
-			
+
 		}
 		else if("full".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
@@ -176,9 +176,9 @@ public class JenaExportController extends BaseEditController {
 			else{
 			    outputSparqlConstruct(FULL_ASSERTED_CONSTRUCT, formatParam, response);
 			}
-			
+
 		}
-		
+
 		JenaOutputUtils.setNameSpacePrefixes(model,vreq.getWebappDaoFactory());
 		setHeaders(response, formatParam);
 
@@ -187,7 +187,7 @@ public class JenaExportController extends BaseEditController {
 			if ( formatParam.startsWith("RDF/XML") ) {
 				outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
 			}
-			// 2010-11-02 workaround for the fact that ARP now always seems to 
+			// 2010-11-02 workaround for the fact that ARP now always seems to
 			// try to parse N3 using strict Turtle rules.  Avoiding headaches
 			// by always serializing out as Turtle instead of using N3 sugar.
 			try {
@@ -205,7 +205,7 @@ public class JenaExportController extends BaseEditController {
 				} else {
 					ontModel.writeAll(outStream, "N-TRIPLE", null );
 				}
-				
+
 				log.info("exported model in N-TRIPLE format instead of N3 because there was a problem exporting in N3 format");
 			}
 
@@ -214,9 +214,9 @@ public class JenaExportController extends BaseEditController {
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
-		
+
 	}
-	
+
 	private void setHeaders(HttpServletResponse response, String formatParam) {
 		if ( formatParam == null ) {
 			formatParam = "RDF/XML-ABBREV";  // default
@@ -244,8 +244,8 @@ public class JenaExportController extends BaseEditController {
 				break;
 		}
 	}
-	
-	private void outputSparqlConstruct(String queryStr, String formatParam, 
+
+	private void outputSparqlConstruct(String queryStr, String formatParam,
 	        HttpServletResponse response) {
 	    RDFService rdfService = ModelAccess.on(getServletContext()).getRDFService();
 	    try {
@@ -264,9 +264,9 @@ public class JenaExportController extends BaseEditController {
 	        throw new RuntimeException(e);
 	    } finally {
 	        rdfService.close();
-	    }	    
+	    }
 	}
-	
+
 	private void prepareExportSelectionPage( VitroRequest vreq, HttpServletResponse response ) {
 		try {
 			JSPPageHandler.renderBasicPage(vreq, response, Controllers.EXPORT_SELECTION_JSP );
@@ -274,44 +274,44 @@ public class JenaExportController extends BaseEditController {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	static final String FULL_GRAPH = "?g";
 	static Map<String,String> formatToExtension;
 	static Map<String,String> formatToMimetype;
-	
+
 	static {
-		
+
 		formatToExtension = new HashMap<String,String>();
 		formatToExtension.put("RDF/XML",".rdf");
 		formatToExtension.put("RDF/XML-ABBREV",".rdf");
 		formatToExtension.put("N3",".n3");
 		formatToExtension.put("N-TRIPLE",".nt");
 		formatToExtension.put("TURTLE",".ttl");
-		
+
 		formatToMimetype = new HashMap<String,String>();
 		formatToMimetype.put("RDF/XML","application/rdf+xml");
 		formatToMimetype.put("RDF/XML-ABBREV","application/rdf+xml");
 		formatToMimetype.put("N3","text/n3");
 		formatToMimetype.put("N-TRIPLE", "text/plain");
 		formatToMimetype.put("TURTLE", "application/x-turtle");
-		
+
 	}
-	
+
 	private static final String ABOX_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
 	        "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " +
             "FILTER (?g != <" + APPLICATION_METADATA + ">) }";
-	
+
 	private static final String ABOX_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
-            "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " + 
+            "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " +
 	        "FILTER (?g != <" + ABOX_INFERENCES + ">) " +
 	        "FILTER (?g != <" + APPLICATION_METADATA + ">) }";
-	
+
 	private static final String FULL_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { ?s ?p ?o }";
 
     private static final String FULL_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
-            "WHERE { GRAPH ?g { ?s ?p ?o } " + 
+            "WHERE { GRAPH ?g { ?s ?p ?o } " +
             "FILTER (?g != <" + ABOX_INFERENCES + ">) " +
             "FILTER (?g != <" + TBOX_INFERENCES + ">) }";
-    
+
 }

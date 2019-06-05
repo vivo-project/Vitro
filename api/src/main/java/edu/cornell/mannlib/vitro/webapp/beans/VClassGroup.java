@@ -14,20 +14,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class VClassGroup extends LinkedList <VClass> implements Comparable<VClassGroup> {
-	
+
 	private static final Log log = LogFactory.getLog(VClassGroup.class.getName());
-	
+
     private String URI          = null;
     private String namespace    = null;
     private String localName    = null;
     private String publicName   = null;
     private int    displayRank  = -1;
     private int individualCount = -1;
-    
+
     public boolean isIndividualCountSet(){
         return individualCount >= 0;
     }
-    
+
     public int getIndividualCount() {
         return individualCount;
     }
@@ -61,7 +61,7 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
         this.displayRank = rank;
         this.publicName = name;
     }
-    
+
     public VClassGroup(VClassGroup vcg) {
     	this.URI = vcg.URI;
     	this.namespace = vcg.namespace;
@@ -149,12 +149,12 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
             groups.remove(it.next());
         }
     }
-    
+
     /**
      * Sorts VClassGroup objects by group rank, then alphanumeric.
      * @return a negative integer, zero, or a positive integer as the
      *         first argument is less than, equal to, or greater than the
-     *         second. 
+     *         second.
      */
     public int compareTo(VClassGroup o2) {
     	Collator collator = Collator.getInstance();
@@ -164,7 +164,7 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
         }
         int diff = (this.getDisplayRank() - o2.getDisplayRank());
         if (diff == 0 ) {
-            
+
             //put null public name classgrups at end of list
             if( this.getPublicName() == null ){
                 if( o2.getPublicName() == null )
@@ -179,5 +179,5 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
         }
         return diff;
     }
-    
+
 }

@@ -10,7 +10,7 @@
 <#assign pageName = "" />
 <#assign selectedTemplateType = "default" />
 <#assign prettyUrl = ""/>
-<#assign menuItem = ""/>    	
+<#assign menuItem = ""/>
 <#assign menuLinkText = "" />
 <#assign action = "" />
 <#assign menuPosition = pageData.highestMenuPosition />
@@ -23,7 +23,7 @@
 <#--Existing Values For Editing condition-->
 <#assign literalValues = editConfiguration.existingLiteralValues />
 <#assign uriValues = editConfiguration.existingUriValues />
-<#if menuAction = "Edit"> 
+<#if menuAction = "Edit">
 	<#assign pageName = lvf.getFormFieldValue(editSubmission, editConfiguration, "pageName")/>
 	<#assign prettyUrl = lvf.getFormFieldValue(editSubmission, editConfiguration, "prettyUrl")/>
 	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
@@ -31,7 +31,7 @@
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
 	<#assign selfContainedTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "isSelfContainedTemplate")/>
 	<#assign action = lvf.getFormFieldValue(editSubmission, editConfiguration, "action")/>
-	
+
 	<#assign pageHeading = "${i18n().edit_page(pageName)}" />
     <#assign saveBtnText = "${i18n().save_changes}" />
 	<#if customTemplate?has_content>
@@ -45,7 +45,7 @@
 	<#--if menu position exists for a menu item, then use that, otherwise use the highest available menu position number from page data-->
 	<#if editMenuPosition?has_content && editMenuPosition != "">
 		<#assign menuPosition = editMenuPosition/>
-	</#if>	
+	</#if>
 </#if>
 <#--If edit submission exists, then retrieve validation errors if they exist-->
 <#if editSubmission?has_content && editSubmission.submissionExists = true && editSubmission.validationErrors?has_content>
@@ -75,23 +75,23 @@
     <section id="floatRight">
         <div id="rightSide" <#if selectedTemplateType="selfContained">style="display:none;"</#if>>
             <section id="addPageOne" role="region" >
-            <label for="contentType">${i18n().content_type}<span class="requiredHint"> *</span></label> 
+            <label for="contentType">${i18n().content_type}<span class="requiredHint"> *</span></label>
             <select id="typeSelect"  name="typeSelect" >
                 <option value="" selected="selected">${i18n().select_type}</option>
-                <option value="browseClassGroup">${i18n().browse_class_group}</option>           
-                <option value="fixedHtml">${i18n().fixed_html}</option>           
-                <option value="sparqlQuery">${i18n().sparql_query_results}</option>   
-                <option value="searchIndividuals">${i18n().search_individual_results}</option>                   
+                <option value="browseClassGroup">${i18n().browse_class_group}</option>
+                <option value="fixedHtml">${i18n().fixed_html}</option>
+                <option value="sparqlQuery">${i18n().sparql_query_results}</option>
+                <option value="searchIndividuals">${i18n().search_individual_results}</option>
              </select>&nbsp;<span class="note">${i18n().add_types}</span>
             </section>
             <section id="contentDivs"></section>
             <section id="headerBar" >
             </section>
-            
+
             <#--This include file contains links to the templates that will be cloned and used for the different content types-->
 			 <!--This content will be copied/shown for these particular content types, so any fields for n3 editing need to be included
             here that correspond to a specific content type.  These are related to specific "data getters" on the server side.  -->
-			<#include "pageManagement--contentTemplates.ftl">                    
+			<#include "pageManagement--contentTemplates.ftl">
         </div>
     </section>
     <!--Information for page or menu item level-->
@@ -99,7 +99,7 @@
         <section id="pageDetails" role="region" >
             <label for="page-name">${i18n().title_capitalized}<span class="requiredHint"> *</span></label>
             <input id="pageName" type="text" name="pageName" value="${pageName!''}" role="input" />
-            <label for="pretty-url">${i18n().pretty_url}<span class="requiredHint"> *</span></label> 
+            <label for="pretty-url">${i18n().pretty_url}<span class="requiredHint"> *</span></label>
             <input type="text" name="prettyUrl" value="${prettyUrl!''}" role="input" />
             <p class="note">${i18n().begin_with_slash_no_example} <br />${i18n().slash_example}</p>
             <p id="templatePTag">${i18n().template_capitalized}<span class="requiredHint"> *</span></p>
@@ -118,7 +118,7 @@
             <p id="menuCheckboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
             <#if (menuAction="Edit" && menuItem?has_content) || (menuAction="Add" && addMenuItem = "true")>checked="checked"</#if>
             > ${i18n().a_menu_page}</p>
-            <section id="menu" role="region" 
+            <section id="menu" role="region"
             <#--Do not display menu section unless editing an existing menu item-->
             <#if (menuAction = "Add" && addMenuItem != "true")  || (menuAction="Edit" && (!menuItem?has_content || menuItem = "")) >
             class="hideMenuSection"
@@ -127,20 +127,20 @@
             </#if>
             >
                 <label for="default">${i18n().menu_item_name}</label>
-           
+
                 <input type="hidden" id="menuItem" name="menuItem" value="${menuItem!''}" />
                 <input type="text" id="menuLinkText" name="menuLinkText" value="${menuLinkText!''}" size="28" role="input" />
                 <input type="hidden" id="menuPosition" name="menuPosition" value="${menuPosition!''}" />
-                
-                
+
+
                 <p class="note">${i18n().if_blank_page_title_used}</p>
-              
-                
+
+
             </section>
             <section id="pagePermissions">
             <br/>
               <label for="action">${i18n().page_select_permission}</label>
-              
+
                 <select id="action" name="action">
                 	<option value="">${i18n().page_select_permission_option}</option>
                 <#list pageAvailablePermissionsURIsList as permissionURI>
@@ -152,7 +152,7 @@
         </section>
     </div>
     <section >
-        <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="${saveBtnText}" class="submit" role="input" /> or </span> 
+        <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="${saveBtnText}" class="submit" role="input" /> or </span>
         <a class="cancel" href="${cancelUrl!}"  id="cancelPage" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
         <br />
         <p class="requiredHint">* ${i18n().required_fields}</p>

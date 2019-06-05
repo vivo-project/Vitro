@@ -10,16 +10,16 @@ import java.util.Map;
 
 /**
  * A factory for {@link ILinkedDataFragmentWriter}s.
- * 
+ *
  * @author Miel Vander Sande
  */
 public class LinkedDataFragmentWriterFactory {
-    
+
     private final static String HTML = "text/html";
-    
+
     /**
      * Creates {@link ILinkedDataFragmentWriter} for a given mimeType
-     * 
+     *
      * @param prefixes Configured prefixes to be used in serialization
      * @param datasources Configured datasources
      * @param mimeType mimeType to create writer for
