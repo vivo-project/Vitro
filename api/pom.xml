@@ -78,6 +78,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.seaborne.rdf-delta</groupId>
+            <artifactId>rdf-delta-server</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>

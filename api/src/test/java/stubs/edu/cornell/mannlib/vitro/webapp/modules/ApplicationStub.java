@@ -12,6 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
@@ -96,9 +98,15 @@ public class ApplicationStub implements Application {
 	}
 
 	@Override
-	public void shutdown() {
+	public EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer() {
 		throw new RuntimeException(
-				"ApplicationStub.shutdown() not implemented.");
+				"ApplicationStub.getEmbeddedRDFDeltaServer() not implemented.");
+	}
+
+	@Override
+	public RDFDeltaDatasetFactory getRDFDeltaClientFactory() {
+		throw new RuntimeException(
+				"ApplicationStub.getRDFDeltaClientFactory() not implemented.");
 	}
 
 	@Override
@@ -117,6 +125,12 @@ public class ApplicationStub implements Application {
 	public TBoxReasonerModule getTBoxReasonerModule() {
 		throw new RuntimeException(
 				"ApplicationStub.getTBoxReasonerModule() not implemented.");
+	}
+
+	@Override
+	public void shutdown() {
+		throw new RuntimeException(
+				"ApplicationStub.shutdown() not implemented.");
 	}
 
 }
