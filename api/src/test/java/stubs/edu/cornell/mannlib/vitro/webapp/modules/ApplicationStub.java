@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 
 import javax.servlet.ServletContext;
 
-import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStub;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
@@ -19,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStub;
 
 /**
  * TODO
@@ -104,9 +104,9 @@ public class ApplicationStub implements Application {
 	}
 
 	@Override
-	public RDFDeltaDatasetFactory getRDFDeltaClientFactory() {
+	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {
 		throw new RuntimeException(
-				"ApplicationStub.getRDFDeltaClientFactory() not implemented.");
+				"ApplicationStub.getRDFDeltaDatasetFactory() not implemented.");
 	}
 
 	@Override
