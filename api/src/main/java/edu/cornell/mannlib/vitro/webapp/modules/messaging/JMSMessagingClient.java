@@ -85,20 +85,14 @@ public class JMSMessagingClient {
 
         try {
             InitialContext ic = new InitialContext(properties);
-
             ConnectionFactory cf = (ConnectionFactory) ic.lookup(connectionFactory);
 
             destination = (Destination) ic.lookup(brokerDestination);
-
             connection = cf.createConnection(brokerUsername, brokerPassword);
-
             session = connection.createSession(Session.AUTO_ACKNOWLEDGE);
-
             producer = session.createProducer(destination);
 
-            System.out.println(String.format("\nMessage producer connected to %s at %s\n", brokerDestination, providerURL));
             log.info(String.format("Message producer connected to %s at %s", brokerDestination, providerURL));
-
         } catch (NamingException | JMSException e) {
             log.error(e, e);
         }
@@ -106,8 +100,7 @@ public class JMSMessagingClient {
     }
 
     public void send(String payload) throws JMSException {
-        System.out.println(String.format("\nAttempting to send message to %s:\n%s\n", brokerDestination, payload));
-        log.debug(String.format("Attempting to send message to %s:\n%s", brokerDestination, payload));
+        log.debug(String.format("Sending message to %s:\n%s", brokerDestination, payload));
         TextMessage message = session.createTextMessage(payload);
         producer.send(message);
     }

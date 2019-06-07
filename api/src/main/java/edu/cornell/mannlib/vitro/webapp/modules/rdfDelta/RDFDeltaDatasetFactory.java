@@ -31,6 +31,8 @@ public class RDFDeltaDatasetFactory {
 
     private String deltaClientZone;
 
+    private boolean shouldEmitMessage = false;
+
     private Zone zone;
 
     private DeltaLink deltaLink;
@@ -49,6 +51,11 @@ public class RDFDeltaDatasetFactory {
         this.deltaClientZone = zone;
     }
 
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#shouldEmitMessage", minOccurs = 0, maxOccurs = 1)
+    public void setShouldEmitMessage(String shouldEmitMessage) {
+        this.shouldEmitMessage = Boolean.parseBoolean(shouldEmitMessage);
+    }
+
     public void startup(Application application, ComponentStartupStatus ss) {
         FileOps.ensureDir(deltaClientZone);
         FileOps.clearAll(deltaClientZone);
@@ -56,17 +63,16 @@ public class RDFDeltaDatasetFactory {
         deltaLink = DeltaLinkHTTP.connect(deltaServerURL);
         deltaClient = DeltaClient.create(zone, deltaLink);
         messageProducer = application.getJMSMessagingClient();
-        System.out.println(String.format("\nDeltaClient connected to DeltaServer at %s with zone %s\n", deltaServerURL, deltaClientZone));
         log.info(String.format("DeltaClient connected to DeltaServer at %s with zone %s", deltaServerURL, deltaClientZone));
     }
 
-    public Dataset wrap(String datasourceName, boolean emit, Dataset dataset) {
+    public Dataset wrap(String datasourceName, Dataset dataset) {
         String datasourceURI = String.format("%s/%s", deltaServerURL, datasourceName);
         Id dsRef = deltaLink.newDataSource(datasourceName, datasourceURI);
         deltaClient.attachExternal(dsRef, dataset.asDatasetGraph());
         deltaClient.connect(dsRef, SyncPolicy.TXN_W);
         try (DeltaConnection dConn = deltaClient.get(dsRef)) {
-            if (emit && messageProducer != null) {
+            if (shouldEmitMessage && messageProducer != null) {
                 dConn.addListener(new DeltaLinkListener() {
                     @Override
                     public void append(Id dsRef, Version version, RDFPatch patch) {
@@ -78,7 +84,6 @@ public class RDFDeltaDatasetFactory {
                     }
                 });
             }
-            System.out.println(String.format("\nWrapped dataset using datasource %s with reference %s\n", datasourceName, dsRef));
             log.info(String.format("Wrapped dataset using datasource %s with reference %s", datasourceName, dsRef));
             return dConn.getDataset();
         } catch (Exception e) {

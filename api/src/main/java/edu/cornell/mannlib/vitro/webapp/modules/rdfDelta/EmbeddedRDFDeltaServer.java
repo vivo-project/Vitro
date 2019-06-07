@@ -36,7 +36,6 @@ public class EmbeddedRDFDeltaServer {
         DeltaServer server = DeltaServer.server(deltaServerPort, deltaServerBase);
         try {
             server.start();
-            System.out.println(String.format("\n\nDelta server with base %s started on port %s\n\n", deltaServerBase, deltaServerPort));
             log.info(String.format("Delta server with base %s started on port %s", deltaServerBase, deltaServerPort));
         } catch (BindException be) {
             log.error(String.format("Can't start the patch log server: %s", be.getMessage()));
