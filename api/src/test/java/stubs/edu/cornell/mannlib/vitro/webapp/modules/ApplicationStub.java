@@ -89,7 +89,6 @@ public class ApplicationStub implements Application {
 	public ImageProcessor getImageProcessor() {
 		throw new RuntimeException(
 				"ApplicationStub.getImageProcessor() not implemented.");
-
 	}
 
 	@Override
@@ -105,10 +104,10 @@ public class ApplicationStub implements Application {
 	}
 
 	@Override
-    public JMSMessagingClient getJMSMessagingClient() {
-	    throw new RuntimeException(
-                "ApplicationStub.getJMSMessagingClient() not implemented.");
-    }
+	public JMSMessagingClient getJMSMessagingClient() {
+		throw new RuntimeException(
+				"ApplicationStub.getJMSMessagingClient() not implemented.");
+}	
 
 	@Override
 	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {

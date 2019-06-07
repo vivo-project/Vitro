@@ -69,14 +69,14 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
 		try {
-		    String tdbPath = resolveTdbPath();
-		    Dataset dataset = TDBFactory.createDataset(tdbPath);
-		    if (rdfDeltaDatasource != null) {
-		        RDFDeltaDatasetFactory rdfDeltaDatasetFactory = application.getRDFDeltaDatasetFactory();
-		        if (rdfDeltaDatasetFactory != null) {
-		            dataset = rdfDeltaDatasetFactory.wrap(rdfDeltaDatasource, dataset);
-		        }
-		    }
+			String tdbPath = resolveTdbPath();
+			Dataset dataset = TDBFactory.createDataset(tdbPath);
+			if (rdfDeltaDatasource != null) {
+				RDFDeltaDatasetFactory rdfDeltaDatasetFactory = application.getRDFDeltaDatasetFactory();
+				if (rdfDeltaDatasetFactory != null) {
+					dataset = rdfDeltaDatasetFactory.wrap(rdfDeltaDatasource, dataset);
+				}
+			}
 			this.rdfService = new RDFServiceTDB(dataset);
 			this.rdfServiceFactory = createRDFServiceFactory();
 			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
@@ -94,11 +94,11 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 		TDB.getContext().setTrue(TDB.symUnionDefaultGraph);
 	}
 
-    private String resolveTdbPath() throws IOException {
-        Path tdbPath = ApplicationUtils.instance().getHomeDirectory().getPath().resolve(this.tdbPath);
-        Files.createDirectories(tdbPath);
-        return tdbPath.toString();
-    }
+	private String resolveTdbPath() throws IOException {
+		Path tdbPath = ApplicationUtils.instance().getHomeDirectory().getPath().resolve(this.tdbPath);
+		Files.createDirectories(tdbPath);
+		return tdbPath.toString();
+	}
 
 	private RDFServiceFactory createRDFServiceFactory() {
 		return new LoggingRDFServiceFactory(new RDFServiceFactorySingle(

@@ -121,15 +121,15 @@ public class ApplicationImpl implements Application {
 
 	@Override
 	public JMSMessagingClient getJMSMessagingClient() {
-        return jmsMessagingClient;
-    }
+		return jmsMessagingClient;
+	}
 
 	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasJMSMessagingClient", minOccurs = 0, maxOccurs = 1)
-    public void setJMSMessagingClient(JMSMessagingClient jmsMessagingClient) {
-        this.jmsMessagingClient = jmsMessagingClient;
-    }
+	public void setJMSMessagingClient(JMSMessagingClient jmsMessagingClient) {
+		this.jmsMessagingClient = jmsMessagingClient;
+	}
 
-    @Override
+	@Override
 	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {
 		return rdfDeltaDatasetFactory;
 	}
@@ -202,7 +202,7 @@ public class ApplicationImpl implements Application {
 			ss.info(this, "Started the FileStorage system: " + fileStorage);
 
 			EmbeddedRDFDeltaServer embeddedRDFDeltaServer = app
-                    .getEmbeddedRDFDeltaServer();
+					.getEmbeddedRDFDeltaServer();
 			if (embeddedRDFDeltaServer != null) {
 				embeddedRDFDeltaServer.startup(app, css);
 				ss.info(this, "Started the EmbeddedRDFDeltaServer: "
@@ -210,15 +210,15 @@ public class ApplicationImpl implements Application {
 			}
 
 			JMSMessagingClient jmsMessagingClient = app
-                    .getJMSMessagingClient();
-            if (jmsMessagingClient != null) {
-                jmsMessagingClient.startup(app, css);
-                ss.info(this, "Started the JMSMessagingClient: "
-                        + jmsMessagingClient);
-            }
+					.getJMSMessagingClient();
+			if (jmsMessagingClient != null) {
+					jmsMessagingClient.startup(app, css);
+					ss.info(this, "Started the JMSMessagingClient: "
+						+ jmsMessagingClient);
+			}
 
 			RDFDeltaDatasetFactory rdfDeltaDatasetFactory = app
-                    .getRDFDeltaDatasetFactory();
+					.getRDFDeltaDatasetFactory();
 			if (rdfDeltaDatasetFactory != null) {
 				rdfDeltaDatasetFactory.startup(app, css);
 				ss.info(this, "Started the RDFDeltaDatasetFactory: "

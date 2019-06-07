@@ -53,7 +53,7 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
 		try {
-		    String tdbPath = resolveTdbPath();
+			String tdbPath = resolveTdbPath();
 			this.rdfService = new RDFServiceTDB(TDBFactory.createDataset(tdbPath));
 			this.rdfServiceFactory = createRDFServiceFactory();
 			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
@@ -71,9 +71,9 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 	}
 	
 	private String resolveTdbPath() throws IOException {
-	    Path tdbPath = ApplicationUtils.instance().getHomeDirectory().getPath().resolve(DIRECTORY_TDB);
-	    Files.createDirectories(tdbPath);
-	    return tdbPath.toString();
+		Path tdbPath = ApplicationUtils.instance().getHomeDirectory().getPath().resolve(DIRECTORY_TDB);
+		Files.createDirectories(tdbPath);
+		return tdbPath.toString();
 	}
 
 	private RDFServiceFactory createRDFServiceFactory() {

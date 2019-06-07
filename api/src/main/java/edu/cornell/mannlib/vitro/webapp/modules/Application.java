@@ -33,7 +33,7 @@ public interface Application {
 	FileStorage getFileStorage();
 
 	EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer();
-	
+
 	JMSMessagingClient getJMSMessagingClient();
 
 	RDFDeltaDatasetFactory getRDFDeltaDatasetFactory();
