@@ -78,7 +78,7 @@ public class RDFDeltaDatasetFactory {
                 });
             } else {
                 if (jmsMessagingClient == null) {
-                    log.warn(String.format("Can not emit messaged without message client", datasourceName, dsRef));
+                    log.warn("Can not emit messaged without message client");
                 }
             }
             log.info(String.format("Wrapped dataset using datasource %s with reference %s", datasourceName, dsRef));
