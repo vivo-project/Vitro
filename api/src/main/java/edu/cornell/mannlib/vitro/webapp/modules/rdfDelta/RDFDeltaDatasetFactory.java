@@ -31,15 +31,13 @@ public class RDFDeltaDatasetFactory {
 
     private String deltaClientZone;
 
-    private boolean shouldEmitMessage = false;
-
     private Zone zone;
 
     private DeltaLink deltaLink;
 
     private DeltaClient deltaClient;
 
-    private JMSMessagingClient messageProducer;
+    private JMSMessagingClient jmsMessagingClient;
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasDeltaServerURL", minOccurs = 1, maxOccurs = 1)
     public void setDeltaServerURL(String url) {
@@ -51,38 +49,37 @@ public class RDFDeltaDatasetFactory {
         this.deltaClientZone = zone;
     }
 
-    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#shouldEmitMessage", minOccurs = 0, maxOccurs = 1)
-    public void setShouldEmitMessage(String shouldEmitMessage) {
-        this.shouldEmitMessage = Boolean.parseBoolean(shouldEmitMessage);
-    }
-
     public void startup(Application application, ComponentStartupStatus ss) {
         FileOps.ensureDir(deltaClientZone);
         FileOps.clearAll(deltaClientZone);
         zone = Zone.connect(deltaClientZone);
         deltaLink = DeltaLinkHTTP.connect(deltaServerURL);
         deltaClient = DeltaClient.create(zone, deltaLink);
-        messageProducer = application.getJMSMessagingClient();
+        jmsMessagingClient = application.getJMSMessagingClient();
         log.info(String.format("DeltaClient connected to DeltaServer at %s with zone %s", deltaServerURL, deltaClientZone));
     }
 
-    public Dataset wrap(String datasourceName, Dataset dataset) {
+    public Dataset wrap(String datasourceName, boolean shouldEmitMessage, Dataset dataset) {
         String datasourceURI = String.format("%s/%s", deltaServerURL, datasourceName);
         Id dsRef = deltaLink.newDataSource(datasourceName, datasourceURI);
         deltaClient.attachExternal(dsRef, dataset.asDatasetGraph());
         deltaClient.connect(dsRef, SyncPolicy.TXN_W);
         try (DeltaConnection dConn = deltaClient.get(dsRef)) {
-            if (shouldEmitMessage && messageProducer != null) {
+            if (shouldEmitMessage && jmsMessagingClient != null) {
                 dConn.addListener(new DeltaLinkListener() {
                     @Override
                     public void append(Id dsRef, Version version, RDFPatch patch) {
                         try {
-                            messageProducer.send(RDFPatchOps.str(patch));
+                            jmsMessagingClient.send(RDFPatchOps.str(patch));
                         } catch (JMSException e) {
                             log.error(e, e);
                         }
                     }
                 });
+            } else {
+                if (jmsMessagingClient == null) {
+                    log.warn(String.format("Can not emit messaged without message client", datasourceName, dsRef));
+                }
             }
             log.info(String.format("Wrapped dataset using datasource %s with reference %s", datasourceName, dsRef));
             return dConn.getDataset();

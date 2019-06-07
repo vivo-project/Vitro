@@ -48,6 +48,8 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	private String tdbPath;
 	
 	private String rdfDeltaDatasource;
+	
+	private boolean emitPatches = false;
 
 	private volatile RDFService rdfService;
 	private RDFServiceFactory rdfServiceFactory;
@@ -59,11 +61,16 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	public void setTdbPath(String path) {
 		tdbPath = path;
 	}
-	
+
 	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasRDFDeltaDatasource", minOccurs = 0, maxOccurs = 1)
-    public void setRDFDeltaDatasource(String deltaDatasource) {
-	    rdfDeltaDatasource = deltaDatasource;
-    }
+	public void setRDFDeltaDatasource(String deltaDatasource) {
+		rdfDeltaDatasource = deltaDatasource;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#shouldEmitPatches", minOccurs = 0, maxOccurs = 1)
+	public void setShouldEmitPatches(String emitPatches) {
+		this.emitPatches = Boolean.parseBoolean(emitPatches);
+	}
 
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
@@ -74,7 +81,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 			if (rdfDeltaDatasource != null) {
 				RDFDeltaDatasetFactory rdfDeltaDatasetFactory = application.getRDFDeltaDatasetFactory();
 				if (rdfDeltaDatasetFactory != null) {
-					dataset = rdfDeltaDatasetFactory.wrap(rdfDeltaDatasource, dataset);
+					dataset = rdfDeltaDatasetFactory.wrap(rdfDeltaDatasource, emitPatches, dataset);
 				}
 			}
 			this.rdfService = new RDFServiceTDB(dataset);
