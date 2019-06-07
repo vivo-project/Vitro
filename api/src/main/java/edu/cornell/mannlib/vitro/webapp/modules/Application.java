@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
 import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
 import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -32,6 +33,8 @@ public interface Application {
 	FileStorage getFileStorage();
 
 	EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer();
+	
+	JMSMessagingClient getJMSMessagingClient();
 
 	RDFDeltaDatasetFactory getRDFDeltaDatasetFactory();
 

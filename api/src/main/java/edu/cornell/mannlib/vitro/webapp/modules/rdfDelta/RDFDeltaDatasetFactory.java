@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.modules.rdfDelta;
 
+import javax.jms.JMSException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.atlas.lib.FileOps;
@@ -18,6 +20,7 @@ import org.seaborne.patch.RDFPatchOps;
 
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class RDFDeltaDatasetFactory {
@@ -34,14 +37,16 @@ public class RDFDeltaDatasetFactory {
 
     private DeltaClient deltaClient;
 
+    private JMSMessagingClient messageProducer;
+
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasDeltaServerURL", minOccurs = 1, maxOccurs = 1)
     public void setDeltaServerURL(String url) {
-        deltaServerURL = url;
+        this.deltaServerURL = url;
     }
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasDeltaClientZone", minOccurs = 1, maxOccurs = 1)
     public void setDeltaClientZone(String zone) {
-        deltaClientZone = zone;
+        this.deltaClientZone = zone;
     }
 
     public void startup(Application application, ComponentStartupStatus ss) {
@@ -50,25 +55,29 @@ public class RDFDeltaDatasetFactory {
         zone = Zone.connect(deltaClientZone);
         deltaLink = DeltaLinkHTTP.connect(deltaServerURL);
         deltaClient = DeltaClient.create(zone, deltaLink);
+        messageProducer = application.getJMSMessagingClient();
+        System.out.println(String.format("\nDeltaClient connected to DeltaServer at %s with zone %s\n", deltaServerURL, deltaClientZone));
         log.info(String.format("DeltaClient connected to DeltaServer at %s with zone %s", deltaServerURL, deltaClientZone));
     }
 
-    public Dataset wrap(String datasourceName, Dataset dataset) {
+    public Dataset wrap(String datasourceName, boolean emit, Dataset dataset) {
         String datasourceURI = String.format("%s/%s", deltaServerURL, datasourceName);
         Id dsRef = deltaLink.newDataSource(datasourceName, datasourceURI);
         deltaClient.attachExternal(dsRef, dataset.asDatasetGraph());
-        deltaClient.connect(dsRef, SyncPolicy.TXN_RW);
+        deltaClient.connect(dsRef, SyncPolicy.TXN_W);
         try (DeltaConnection dConn = deltaClient.get(dsRef)) {
-            dConn.addListener(new DeltaLinkListener() {
-                @Override
-                public void append(Id dsRef, Version version, RDFPatch patch) {
-                    if (patch == null) {
-                        System.out.println("\n\nPatch is null!!\n\n");
-                    } else {
-                        RDFPatchOps.write(System.out, patch);
+            if (emit && messageProducer != null) {
+                dConn.addListener(new DeltaLinkListener() {
+                    @Override
+                    public void append(Id dsRef, Version version, RDFPatch patch) {
+                        try {
+                            messageProducer.send(RDFPatchOps.str(patch));
+                        } catch (JMSException e) {
+                            log.error(e, e);
+                        }
                     }
-                }
-            });
+                });
+            }
             System.out.println(String.format("\nWrapped dataset using datasource %s with reference %s\n", datasourceName, dsRef));
             log.info(String.format("Wrapped dataset using datasource %s with reference %s", datasourceName, dsRef));
             return dConn.getDataset();

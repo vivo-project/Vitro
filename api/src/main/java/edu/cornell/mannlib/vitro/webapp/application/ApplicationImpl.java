@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
 import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
 import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -45,6 +46,7 @@ public class ApplicationImpl implements Application {
 	private FileStorage fileStorage;
 	private EmbeddedRDFDeltaServer embeddedRDFDeltaServer;
 	private RDFDeltaDatasetFactory rdfDeltaDatasetFactory;
+	private JMSMessagingClient jmsMessagingClient;
 	private ContentTripleSource contentTripleSource;
 	private ConfigurationTripleSource configurationTripleSource;
 	private TBoxReasonerModule tboxReasonerModule;
@@ -118,6 +120,16 @@ public class ApplicationImpl implements Application {
 	}
 
 	@Override
+	public JMSMessagingClient getJMSMessagingClient() {
+        return jmsMessagingClient;
+    }
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasJMSMessagingClient", minOccurs = 0, maxOccurs = 1)
+    public void setJMSMessagingClient(JMSMessagingClient jmsMessagingClient) {
+        this.jmsMessagingClient = jmsMessagingClient;
+    }
+
+    @Override
 	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {
 		return rdfDeltaDatasetFactory;
 	}
@@ -189,17 +201,25 @@ public class ApplicationImpl implements Application {
 			fileStorage.startup(app, css);
 			ss.info(this, "Started the FileStorage system: " + fileStorage);
 
-			if (app.getEmbeddedRDFDeltaServer() != null) {
-				EmbeddedRDFDeltaServer embeddedRDFDeltaServer = app
-						.getEmbeddedRDFDeltaServer();
+			EmbeddedRDFDeltaServer embeddedRDFDeltaServer = app
+                    .getEmbeddedRDFDeltaServer();
+			if (embeddedRDFDeltaServer != null) {
 				embeddedRDFDeltaServer.startup(app, css);
 				ss.info(this, "Started the EmbeddedRDFDeltaServer: "
 						+ embeddedRDFDeltaServer);
 			}
 
-			if (app.getRDFDeltaDatasetFactory() != null) {
-				RDFDeltaDatasetFactory rdfDeltaDatasetFactory = app
-						.getRDFDeltaDatasetFactory();
+			JMSMessagingClient jmsMessagingClient = app
+                    .getJMSMessagingClient();
+            if (jmsMessagingClient != null) {
+                jmsMessagingClient.startup(app, css);
+                ss.info(this, "Started the JMSMessagingClient: "
+                        + jmsMessagingClient);
+            }
+
+			RDFDeltaDatasetFactory rdfDeltaDatasetFactory = app
+                    .getRDFDeltaDatasetFactory();
+			if (rdfDeltaDatasetFactory != null) {
 				rdfDeltaDatasetFactory.startup(app, css);
 				ss.info(this, "Started the RDFDeltaDatasetFactory: "
 						+ rdfDeltaDatasetFactory);

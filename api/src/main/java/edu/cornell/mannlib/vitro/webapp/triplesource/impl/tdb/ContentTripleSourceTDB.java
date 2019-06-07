@@ -74,7 +74,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 		    if (rdfDeltaDatasource != null) {
 		        RDFDeltaDatasetFactory rdfDeltaDatasetFactory = application.getRDFDeltaDatasetFactory();
 		        if (rdfDeltaDatasetFactory != null) {
-		            dataset = rdfDeltaDatasetFactory.wrap(rdfDeltaDatasource, dataset);
+		            dataset = rdfDeltaDatasetFactory.wrap(rdfDeltaDatasource, true, dataset);
 		        }
 		    }
 			this.rdfService = new RDFServiceTDB(dataset);

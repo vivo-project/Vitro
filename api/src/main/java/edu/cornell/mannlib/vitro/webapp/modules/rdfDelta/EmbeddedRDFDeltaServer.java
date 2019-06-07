@@ -21,12 +21,12 @@ public class EmbeddedRDFDeltaServer {
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasDeltaServerBase", minOccurs = 1, maxOccurs = 1)
     public void setDeltaServerBase(String base) {
-        deltaServerBase = base;
+        this.deltaServerBase = base;
     }
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasDeltaServerPort", minOccurs = 1, maxOccurs = 1)
     public void setDeltaServerPort(String port) {
-        deltaServerPort = Integer.parseInt(port);
+        this.deltaServerPort = Integer.parseInt(port);
     }
 
     public void startup(Application application, ComponentStartupStatus ss) {
