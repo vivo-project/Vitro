@@ -107,7 +107,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	    try {
 	        if(indexer != null) {
 	            indexer.pause();
-	            if("s".equals(req.getParameter("firstime"))) {
+	            if("s".equals(req.getParameter("firsttime"))) {
 					IndexingChangeListener.enabled = false;
 				}
 	        }
@@ -122,7 +122,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		    }
 			if(indexer != null) {
 			    indexer.unpause();
-				if("s".equals(req.getParameter("firstime"))) {
+				if("s".equals(req.getParameter("firsttime"))) {
 					IndexingChangeListener.enabled = true;
 					indexer.rebuildIndex();
 				}
