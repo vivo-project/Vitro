@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
@@ -205,6 +204,8 @@ public class SolrSmokeTest {
 	 */
 	private static class SolrHomePager {
 		private static final long SLEEP_INTERVAL = 20000; // 20 seconds
+        private static final long SLEEP_MAX = 300000; // maximum sleep time: 5 minutes
+        private static long SLEEP_DURATION = 0; // how long have we been sleeping?
 
 		private final URL solrUrl;
 		private final HttpClient httpClient = HttpClientFactory.getHttpClient();
@@ -218,12 +219,7 @@ public class SolrSmokeTest {
 		public void connect() throws SolrProblemException {
 			tryToConnect();
 
-			if (!isDone()) {
-				sleep();
-				tryToConnect();
-			}
-
-			if (!isDone()) {
+            while (!isDone() && SLEEP_DURATION < SLEEP_MAX) {
 				sleep();
 				tryToConnect();
 			}
@@ -234,17 +230,19 @@ public class SolrSmokeTest {
 		}
 
 		private void tryToConnect() throws SolrProblemException {
+            SolrSmokeTest.log.debug("Trying to connect to Solr, wait up to " + SLEEP_MAX / 60000 + " minutes - " +
+                    (int)(SLEEP_DURATION * 100.0 / SLEEP_MAX) + "%");
+
 			try {
 				HttpGet method = new HttpGet(solrUrl.toExternalForm() + "/select");
-				SolrSmokeTest.log.debug("Trying to connect to Solr");
-				HttpResponse response = httpClient.execute(method);
+                HttpResponse response = httpClient.execute(method);
 				try {
 					statusCode = response.getStatusLine().getStatusCode();
 					SolrSmokeTest.log.debug("HTTP status was " + statusCode);
 				} finally {
 					EntityUtils.consume(response.getEntity());
 				}
-			} catch (SocketTimeoutException e) {
+            } catch (IOException e) {
 				// Catch the exception so we can retry this.
 				// Save the status so we know why we failed.
 				statusCode = SolrSmokeTest.SOCKET_TIMEOUT_STATUS;
@@ -264,6 +262,7 @@ public class SolrSmokeTest {
 
 		private void sleep() {
 			try {
+                SLEEP_DURATION += SLEEP_INTERVAL;
 				Thread.sleep(SLEEP_INTERVAL);
 			} catch (InterruptedException e) {
 				e.printStackTrace(); // Should never happen
