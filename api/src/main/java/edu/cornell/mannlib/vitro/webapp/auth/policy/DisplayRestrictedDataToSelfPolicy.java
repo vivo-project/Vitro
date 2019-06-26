@@ -27,7 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 /**
  * Permit display of various data if it relates to the user's associated
  * individual.
- * 
+ *
  * This policy is only to handle the case where a user would not be able to see
  * data except for their self-editing status. If the data would be visible
  * without that status, we assume that some other policy will grant access.

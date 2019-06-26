@@ -16,9 +16,9 @@ function confirmDelete() {
 
 <script language="javascript" type="text/javascript">
 
-if( vitroJsLoaded == null ){ 
+if( vitroJsLoaded == null ){
 
-  alert("seminar.js needs to have the code from vitro.js loaded first"); 
+  alert("seminar.js needs to have the code from vitro.js loaded first");
 
 }
 
@@ -32,7 +32,7 @@ function monikerInit(){
 //      $('monikerSelectAlt').disabled = true;
 //   }
 
-  $('Moniker').onchange = checkMonikers;  
+  $('Moniker').onchange = checkMonikers;
 
   update();
 
@@ -45,7 +45,7 @@ function update(){ //updates moniker list when type is changed
   dwr.util.useLoadingMessage();
 
   EntityDWR.monikers(createList,  document.getElementById("VClassURI").value );
-  
+
 }
 
 
@@ -74,16 +74,16 @@ function getCurrentMoniker() {
 
 function checkMonikers(){ //checks if monikers is on [new moniker] and enables alt field
 
-  var sel = $('Moniker');  
+  var sel = $('Moniker');
 
   if( sel.value == "" || sel.options.length <= 1){
     $('MonikerSelectAlt').disabled = false;
 
   }else{
 
-    $('MonikerSelectAlt').disabled = true; 
+    $('MonikerSelectAlt').disabled = true;
 
-  }        
+  }
 
 }
 
@@ -137,7 +137,7 @@ function fillList(id, data, selectedtext) {
 <script language="javascript" type="text/javascript" src="js/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript">
 	// Notice: The simple theme does not use all options some of them are limited to the advanced theme
-	
+
 	tinyMCE.init({
 		theme : "advanced",
 		mode : "exact",
@@ -152,7 +152,7 @@ function fillList(id, data, selectedtext) {
 		width : "95%",
 		valid_elements : "a[href|target|name|title],br,p,i,em,cite,strong/b,u,sub,sup,ul,ol,li,h2,h3,h4,h5,h6",
 		forced_root_block: false
-		
+
 		// elements : "elm1,elm2",
 		// save_callback : "customSave",
 		// content_css : "example_advanced.css",
@@ -162,7 +162,7 @@ function fillList(id, data, selectedtext) {
 		// invalid_elements : "li",
 		// theme_advanced_styles : "Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1", // Theme specific setting CSS classes
 	});
-	
+
 </script>
 
 <script type="text/javascript">
@@ -171,10 +171,10 @@ function fillList(id, data, selectedtext) {
 	/*
 	dojo.require("dojo.dom.*");
 	*/
-	
+
 	nextId=99999;
 	// fix this with separate values per type
-	
+
 	function getAllChildren(theNode, childArray) {
 		var ImmediateChildren = theNode.childNodes;
 		if (ImmediateChildren) {
@@ -184,10 +184,10 @@ function fillList(id, data, selectedtext) {
 			}
 		}
 	}
-	
+
 	function addLine(baseNode, typeStr)
 	{
-		baseId = baseNode.id.substr(0,baseNode.id.length-7);	
+		baseId = baseNode.id.substr(0,baseNode.id.length-7);
 		newTaName = document.getElementById(baseId+"genTaName").firstChild.nodeValue;
 		theList = document.getElementById(baseId+"ul");
 		nextId++;
@@ -214,28 +214,28 @@ function fillList(id, data, selectedtext) {
 		theTaTa.style.display="block";
 		theTa = document.getElementById(TrId+"ta");
 		theTa.style.display="block";
-		
+
 		// scroll the window to make sure the user sees our new textarea
 		var coors = findPos(theTaTa);
 		window.scrollTo(coors[0]-150,coors[1]-150);
-		
+
 		// switch the textarea to a TinyMCE instance
-		tinyMCE.execCommand('mceAddControl',false,TrId+"tata");			
-		
+		tinyMCE.execCommand('mceAddControl',false,TrId+"tata");
+
 		return false;
 	}
-	
+
 	function deleteLine(deleteLinkNode, typeStr) {
-	
+
 		TrId = deleteLinkNode.id.substr(0,deleteLinkNode.id.length-10);
 		clickedRowContentValue = document.getElementById(TrId+"contentValue");
 		clickedRowContentValue.style.textDecoration="line-through";
-		
+
 		//tinyMCE.execCommand('mceAddControl',false,TrId+'tata');
 		//tinyMCE.activeEditor.setContent('', {format : 'raw'});
 		//tinyMCE.execCommand('mceSetContent',false,'');
 		//tinyMCE.execCommand('mceRemoveControl',false,TrId+'tata');
-		
+
 		document.getElementById(TrId+'tata').innerHTML = '';
 		clickedRowEditLink = document.getElementById(TrId+"editLink");
 		clickedRowEditLink.style.display="none";
@@ -243,9 +243,9 @@ function fillList(id, data, selectedtext) {
 		clickedRowDeleteLink.style.display="none";
 		clickedRowUndeleteLink = document.getElementById(TrId+"undeleteLink");
 		clickedRowUndeleteLink.style.display="inline";
-	
+
 	}
-	
+
 	function undeleteLine(undeleteLinkNode, typeStr) {
 		index = undeleteLinkNode.id.substr(0,undeleteLinkNode.id.length-12);
 		theContentValue=document.getElementById(index+"contentValue");
@@ -261,7 +261,7 @@ function fillList(id, data, selectedtext) {
 		clickedRowUndeleteLink = document.getElementById(TrId+"undeleteLink");
 		clickedRowUndeleteLink.style.display="none";
 	}
-	
+
 	function convertLiToTextarea(linkNode, typeStr) {
 		LiId = linkNode.id.substr(0,linkNode.id.length-8);
 		theLic = document.getElementById(LiId+"content");
@@ -271,8 +271,8 @@ function fillList(id, data, selectedtext) {
 		tinyMCE.execCommand('mceAddControl',false,LiId+'tata');
 		return false;
 	}
-	
-	function backToLi(okLinkNode) { 
+
+	function backToLi(okLinkNode) {
 		index = okLinkNode.id.substr(0,okLinkNode.id.length-6);
 		textareaDivId = index+"ta";
 		liDivId = index+"contentValue";
@@ -286,7 +286,7 @@ function fillList(id, data, selectedtext) {
 		theLi.parentNode.style.display = 'block';
 		return false;
 	}
-	
+
 	function cancelBackToLi(cancelLinkNode) {
 		index = cancelLinkNode.id.substr(0,cancelLinkNode.id.length-10);
 		textareaDivId = index+"ta";
@@ -305,7 +305,7 @@ function fillList(id, data, selectedtext) {
 		}
 		return false;
 	}
-	
+
 	function submitPage() {
 		theForm = document.getElementById("editForm");
 		theButtonWeWantToClick = document.getElementById("primaryAction");
@@ -316,7 +316,7 @@ function fillList(id, data, selectedtext) {
 		theForm.appendChild(theHiddenInput);
 		theForm.submit();
 	}
-		
+
 	function findPos(obj)
 	{
 		var curleft = curtop = 0;

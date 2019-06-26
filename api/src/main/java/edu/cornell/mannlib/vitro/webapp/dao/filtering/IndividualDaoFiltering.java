@@ -36,31 +36,31 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
 
         ArrayList<Individual>  filteredList = new ArrayList<Individual>();
         Filter.filter(cin,filters.getIndividualFilter(),filteredList);
-        
+
         ArrayList<Individual> cout  = new ArrayList<Individual>();
         for(Individual ind : filteredList){
             cout.add( new IndividualFiltering(ind,filters));
-        }        
+        }
         return cout;
     }
 
     protected Iterator<Individual> filterAndWrap(Iterator<Individual> it, VitroFilters filters){
         if( it == null ) return null;
         if( filters == null ) return it;
-        return Transform.transform(    
+        return Transform.transform(
                 Filter.filter(it,filters.getIndividualFilter()),
-                new ToFilteredIndividual(filters));        
+                new ToFilteredIndividual(filters));
     }
-    
+
     /* **************** methods that filter ****************** */
     public Individual getIndividualByURI(String individualURI) {
         Individual ind = innerIndividualDao.getIndividualByURI(individualURI);
-        if( ind != null && filters.getIndividualFilter().fn(ind))           
+        if( ind != null && filters.getIndividualFilter().fn(ind))
             return new IndividualFiltering(ind, filters);
         else
-            return null;        
+            return null;
     }
-    
+
     public void fillVClassForIndividual(Individual individual) {
         innerIndividualDao.fillVClassForIndividual(individual);
     }
@@ -76,7 +76,7 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         return filterAndWrap(innerIndividualDao.getIndividualsByDataProperty(dataPropertyUri,value,datatypeUri,lang),
                 filters);
     }
-        
+
     public List getIndividualsByVClass(VClass vclass) {
         List<Individual> list = innerIndividualDao.getIndividualsByVClass(vclass);
         if( list == null )
@@ -84,28 +84,28 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         else
             return filterAndWrap(list, filters);
     }
-    
-    public List getIndividualsByVClassURI(String vclassURI) {    
+
+    public List getIndividualsByVClassURI(String vclassURI) {
         List<Individual> list = innerIndividualDao.getIndividualsByVClassURI(vclassURI);
-        if( list == null ) 
+        if( list == null )
             return Collections.EMPTY_LIST;
         else
             return filterAndWrap(list,filters);
     }
-    
-    public List getIndividualsByVClassURI(String vclassURI, int offset, int quantity) {    
+
+    public List getIndividualsByVClassURI(String vclassURI, int offset, int quantity) {
         List<Individual> list = innerIndividualDao.getIndividualsByVClassURI(vclassURI,offset,quantity);
-        if( list == null ) 
+        if( list == null )
             return Collections.EMPTY_LIST;
         else
             return filterAndWrap(list,filters);
-    }  
-    
+    }
+
     /* All of the methods that return iterator don't wrap the Individual in
      * a IndividualFiltering so they might cause problems */
-    
 
-    
+
+
     private class ToFilteredIndividual extends UnaryFunctor<Individual, Individual>{
         private final VitroFilters filters;
         public ToFilteredIndividual(VitroFilters vf){
@@ -114,22 +114,22 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         @Override
         public Individual fn(Individual arg) {
             return new IndividualFiltering(arg,filters);
-        }        
-    }              
-
-    
-    /* ******************* unfiltered methods ****************** */
-    
-    public Collection<String> getAllIndividualUris() {        
-        return innerIndividualDao.getAllIndividualUris(); 
-                       
+        }
     }
-    
+
+
+    /* ******************* unfiltered methods ****************** */
+
+    public Collection<String> getAllIndividualUris() {
+        return innerIndividualDao.getAllIndividualUris();
+
+    }
+
     public Iterator<String> getUpdatedSinceIterator(long updatedSince) {
         return  innerIndividualDao.getUpdatedSinceIterator(updatedSince);
-                       
+
     }
-    
+
     public Collection<DataPropertyStatement> getExternalIds(String individualURI) {
         return innerIndividualDao.getExternalIds(individualURI);
     }
@@ -150,11 +150,11 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
     public int getCountOfIndividualsInVClass(int vclassId) {
         throw new Error("IndividualDaoFiltering.getCountOfIndividualsInVClass is not supported");
     }
-    
+
     public void addVClass(String individualURI, String vclassURI) {
         innerIndividualDao.addVClass(individualURI, vclassURI);
     }
-    
+
     public void removeVClass(String individualURI, String vclassURI) {
         innerIndividualDao.removeVClass(individualURI, vclassURI);
     }

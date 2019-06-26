@@ -2,7 +2,7 @@
 
 .pageContent {
     padding-left:6px;
-    padding-top:2px;   
+    padding-top:2px;
 }
 
 .pageContentContainer {
@@ -40,8 +40,8 @@
     border-color:#ccc;
 }
 .arrow {
-	width:13px; 
-	height:9px; 
+	width:13px;
+	height:9px;
 	display:block;
 }
 .expandArrow {
@@ -107,7 +107,7 @@ input.doneWithContent {
     padding: 5px 18px 7px;
     color: #fff;
     text-decoration: none;
-    border-radius: 4px; 
+    border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     position: relative;
@@ -138,7 +138,7 @@ form#managePage textarea {
     width:98.5%;
 }
 #internal-class {
-    padding: 10px 0 2px 10px; 
+    padding: 10px 0 2px 10px;
     background: #f0f0f0;
     margin-right: .4em;
     margin-bottom: .8em;

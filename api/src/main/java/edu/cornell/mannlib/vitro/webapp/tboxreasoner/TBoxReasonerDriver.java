@@ -12,6 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerStatus;
 public interface TBoxReasonerDriver {
 
 	void runSynchronizer(TBoxChanges changeSet);
-	
+
 	TBoxReasonerStatus getStatus();
 }

@@ -6,7 +6,7 @@ package edu.cornell.mannlib.vitro.webapp.modules.searchIndexer;
  * Some handy methods for dealing with the search index.
  */
 public class SearchIndexerUtils {
-	
+
 	/**
 	 * The document ID in the search index is derived from the individual's URI.
 	 */

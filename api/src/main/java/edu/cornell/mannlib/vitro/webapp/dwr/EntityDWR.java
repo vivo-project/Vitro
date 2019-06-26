@@ -52,7 +52,7 @@ public class EntityDWR {
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
-        
+
         Individual ind = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(entityURI);
         return ind;
     }
@@ -67,7 +67,7 @@ public class EntityDWR {
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
         IndividualDao entityWADao = vreq.getWebappDaoFactory().getIndividualDao();
-        
+
         return entityWADao.getIndividualsByVClass( vc );
     }
 }

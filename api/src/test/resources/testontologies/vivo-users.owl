@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
          xmlns:owl="http://www.w3.org/2002/07/owl#"
          xmlns:vitro="http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#"
@@ -20,7 +20,7 @@
     <vitro:modTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2007-07-17T14:54:14</vitro:modTime>
     <vitro:firstTime rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2004-11-16T16:05:07</vitro:firstTime>
     <vitro:loginCount rdf:datatype="http://www.w3.org/2001/XMLSchema#int">410</vitro:loginCount>
-    <vitro:roleURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string">role:/50</vitro:roleURI>    
+    <vitro:roleURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string">role:/50</vitro:roleURI>
 </vitro:User>
 
 <vitro:User rdf:about="#bdc34">

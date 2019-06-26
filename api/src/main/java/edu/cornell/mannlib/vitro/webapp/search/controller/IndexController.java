@@ -37,11 +37,11 @@ import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessing
 /**
  * Accepts requests to display the current status of the search index, or to
  * initiate a rebuild.
- * 
+ *
  * A DISPLAY or REBUILD request is handled like any other FreemarkerHttpServlet.
  * A STATUS is an AJAX request, we override doGet() so we can format the
  * template without enclosing it in a body template.
- * 
+ *
  * When initialized, this servlet adds a listener to the SearchIndexer, so it
  * can maintain a history of activity. This will provide the contents of the
  * display.
@@ -53,7 +53,7 @@ public class IndexController extends FreemarkerHttpServlet {
 	/**
 	 * <pre>
 	 * This request might be:
-	 * DISPLAY (default) -- Send the template that will contain the status display. 
+	 * DISPLAY (default) -- Send the template that will contain the status display.
 	 * STATUS  -- Send the current status and history.
 	 * REBUILD -- Initiate a rebuild. Then act like DISPLAY.
 	 * </pre>

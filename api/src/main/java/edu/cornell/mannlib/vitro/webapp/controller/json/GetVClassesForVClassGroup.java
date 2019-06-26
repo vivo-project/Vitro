@@ -32,12 +32,12 @@ public class GetVClassesForVClassGroup extends JsonObjectProducer {
         if( vcgUri == null ){
             throw new Exception("no URI passed for classgroupUri");
         }
-        
+
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         VClassGroup vcg = vcgc.getGroup(vcgUri);
         if( vcg == null ){
             throw new Exception("Could not find vclassgroup: " + vcgUri);
-        }        
+        }
 
         ArrayNode classes = JsonNodeFactory.instance.arrayNode();
         for( VClass vc : vcg){
@@ -47,7 +47,7 @@ public class GetVClassesForVClassGroup extends JsonObjectProducer {
             vcObj.put("entityCount", vc.getEntityCount());
             classes.add(vcObj);
         }
-        map.put("classes", classes);                
+        map.put("classes", classes);
         map.put("classGroupName", vcg.getPublicName());
         map.put("classGroupUri", vcg.getURI());
 

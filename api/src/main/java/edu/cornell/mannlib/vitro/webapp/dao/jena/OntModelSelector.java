@@ -15,27 +15,27 @@ public interface OntModelSelector {
 	 * @return OntModel containing all RDF statements available to the application
 	 */
 	public OntModel getFullModel();
-		
+
 	/**
 	 * @return OntModel containing Portals, Tabs, etc. but not Users
 	 */
 	public OntModel getApplicationMetadataModel();
-	
+
 	/**
 	 * @return OntModel containing Users
 	 */
 	public OntModel getUserAccountsModel();
-	
+
 	/**
 	 * @return OntModel containing all ABox assertions
 	 */
 	public OntModel getABoxModel();
-	
+
 	/**
 	 * @return OntModel containing all TBox axioms
 	 */
 	public OntModel getTBoxModel();
-	
+
 	/**
 	 * @return OntModel containing all RDF statements in the Display model.
 	 */

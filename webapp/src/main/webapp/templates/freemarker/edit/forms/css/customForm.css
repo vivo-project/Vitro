@@ -16,7 +16,7 @@ form.customForm div.addNewLink {
     border: 1px solid #9c9c9c;
     display: none; /* Hide if Javascript disabled. Javascript will show. */
 }
-form.customForm .existing span.requiredHint, 
+form.customForm .existing span.requiredHint,
 form.customForm .new span.requiredHint,
 #ie67DisableWrapper {
     display: none; /* Hide if Javascript disabled. Javascript will show. */
@@ -44,7 +44,7 @@ form.customForm p.inline.year input {
     margin-top: -1.75em;
 }
 input,
-select, 
+select,
 form.customForm p {
     margin-top: 0;
     padding-top: 0;
@@ -78,9 +78,9 @@ form.customForm p.validationError {
 form.customForm a.close {
     float: right;
     margin-right: 1em;
-    font-size: 90%;    
+    font-size: 90%;
 }
-form.customForm a.close:link, 
+form.customForm a.close:link,
 form.customForm a.close:visited {
     border-color: #ff7700;
     color: #ff7700;
@@ -105,7 +105,7 @@ form.customForm p.inline-search #searchTerm{
     margin-top: 6px;
 }
 /* <------ DATE TIME*/
-form.customForm fieldset, 
+form.customForm fieldset,
 fieldset.dateTime label,
 form.customForm label.dateTime {
     display: inline;
@@ -144,14 +144,14 @@ img#indicator {
 }
 /* for placeholder text */
 ::-webkit-input-placeholder { /* WebKit browsers */
-   opacity:  .25; 
+   opacity:  .25;
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   opacity:  .25; 
+   opacity:  .25;
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-   opacity:  .25; 
+   opacity:  .25;
 }
 :-ms-input-placeholder { /* Internet Explorer 10+ */
-   opacity:  .25; 
+   opacity:  .25;
 }

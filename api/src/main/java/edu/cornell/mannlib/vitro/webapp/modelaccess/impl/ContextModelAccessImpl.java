@@ -51,10 +51,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 /**
  * The context-based model access is simpler than the request-based model
  * access.
- * 
+ *
  * There is no "current user", so there can be no preferred language or
  * policy-based filtering.
- * 
+ *
  * We are confident that each of these structures will be used at some point, so
  * there is no need for lazy initialization.
  */
@@ -79,7 +79,7 @@ public class ContextModelAccessImpl implements ContextModelAccess {
 	 * Pull all of the items into maps, instead of fetching them from the
 	 * factory on demand. We don't know that the factory wouldn't create fresh
 	 * ones.
-	 * 
+	 *
 	 * The exception is the OntModels, for two reasons: first, because the
 	 * OntModelCache assures us that it won't create fresh copies, and second
 	 * because we may not know the names of all of the models that will be

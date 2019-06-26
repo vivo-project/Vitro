@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 public class VClassWebappWithInstancesListingController extends BaseEditController {
 
     private int NUM_COLS = 6;
-    
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;

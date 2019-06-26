@@ -45,8 +45,8 @@
                 <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
             </a>
         </nav>
-    
-        <#-- Display the group heading --> 
+
+        <#-- Display the group heading -->
         <#if groupName?has_content>
 		    <#--the function replaces spaces in the name with underscores, also called for the property group menu-->
     	    <#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >

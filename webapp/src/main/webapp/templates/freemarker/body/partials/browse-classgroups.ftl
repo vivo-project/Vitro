@@ -28,19 +28,19 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
             </#if>
         </#list>
     </#assign>
-    
+
     <#-- Display the class group browse only if we have at least one populated class group -->
     <#if firstPopulatedClassGroup??>
         <section id="browse" role="region">
             <h4>${i18n().browse_by}</h4>
-            
+
             <ul id="browse-classgroups" role="list">
                 ${classGroupList}
             </ul>
-            
+
             <#-- If requesting the home page without any additional URL parameters, select the first populated class group-->
             <#assign defaultSelectedClassGroup = firstPopulatedClassGroup />
-            
+
             <section id="browse-classes" role="navigation">
                 <nav>
                     <ul id="classes-in-classgroup" class="vis" role="list">
@@ -62,7 +62,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
                 </#if>
             </section> <!-- #browse-classes -->
         </section> <!-- #browse -->
-        
+
         <#-- For v1.3: The controller should pass in the dataservice url. -->
         <script type="text/javascript">
             var browseData = {
@@ -75,7 +75,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
                 browseAllString: '${i18n().browse_all}',
                 contentString: '${i18n().content}'
             };
-            
+
         </script>
         ${scripts.add('<script type="text/javascript" src="${urls.base}/js/browseClassGroups.js"></script>')}
 
@@ -83,7 +83,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
         <#-- Would be nice to update classgroups-checkForData.ftl with macro so it could be used here as well -->
         <#-- <#include "classgroups-checkForData.ftl"> -->
         <h3>${i18n().no_content_create_groups_classes}</h3>
-        
+
         <#if user.loggedIn>
             <#if user.hasSiteAdminAccess>
                 <p>${i18n().you_can} <a href="${urls.siteAdmin}" title="${i18n().add_content_manage_site}">${i18n().add_content_manage_site}</a> ${i18n().from_site_admin_page}</p>
@@ -108,7 +108,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
     <section id="visual-graph" class="barchart" role="region">
         <#-- Will be populated dynamically via AJAX request -->
     </section>
-    
+
     ${scripts.add('<script type="text/javascript" src="${urls.base}/js/raphael/raphael.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/raphael/g.raphael.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/raphael/g.bar.js"></script>')}

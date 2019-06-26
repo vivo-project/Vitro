@@ -10,7 +10,7 @@ var processSparqlDataGetterContent = {
 		this.dataGetterClass =dataGetterClass;
 	},
 	processPageContentSection:function(pageContentSection) {
-		
+
 		var variableValue = pageContentSection.find("input[name='saveToVar']").val();
 		var queryValue = pageContentSection.find("textarea[name='query']").val();
 		queryValue = processSparqlDataGetterContent.encodeQuotes(queryValue);
@@ -21,15 +21,15 @@ var processSparqlDataGetterContent = {
 		var returnObject = {saveToVar:variableValue, query:queryValue, dataGetterClass:this.dataGetterClass, queryModel:queryModel};
 		return returnObject;
 	},
-	//For an existing set of content where form is already set, fill in the values 
+	//For an existing set of content where form is already set, fill in the values
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		var queryValue = existingContentObject["query"];
 		//replace any encoded quotes with escaped quotes that will show up as quotes in the textarea
 		queryValue = processSparqlDataGetterContent.replaceEncodedWithEscapedQuotes(queryValue);
 		var queryModelValue = existingContentObject["queryModel"];
-		
-		
+
+
 		//Now find and set value
 		pageContentSection.find("input[name='saveToVar']").val(saveToVarValue);
 		pageContentSection.find("textarea[name='query']").val(queryValue);
@@ -44,7 +44,7 @@ var processSparqlDataGetterContent = {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		return saveToVarValue;
 	},
-    //Validation on form submit: Check to see that class group has been selected 
+    //Validation on form submit: Check to see that class group has been selected
     validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
     	var validationError = "";
     	//Check that query and saveToVar have been input
@@ -68,9 +68,9 @@ var processSparqlDataGetterContent = {
     	}
     	if(processSparqlDataGetterContent.stringHasDoubleQuote(queryModelValue)) {
     		validationError += pageContentSectionLabel + ": The query model should not have a double quote . <br />";
-	
+
     	}*/
-    	
+
 		var queryValue = pageContentSection.find("textarea[name='query']").val();
 		if(queryValue == "") {
 			validationError += pageContentSectionLabel + ": " + i18nStringsSparqlQuery.supplyQuery + " <br />";
@@ -92,6 +92,6 @@ var processSparqlDataGetterContent = {
 
     	return inputStr.replace(/&#39;/g, "\'").replace(/&quot;/g, "\"");
     }
-		
-		
+
+
 };

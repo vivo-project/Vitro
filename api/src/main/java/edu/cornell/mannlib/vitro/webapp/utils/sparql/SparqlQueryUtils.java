@@ -21,20 +21,20 @@ public class SparqlQueryUtils {
 	 */
 	private static final char[] REGEX_SPECIAL_CHARACTERS = "[\\^$.|?*+()]"
 			.toCharArray();
-	
+
 	/**
 	 * A list of SPARQL syntaxes to try when parsing queries
 	 */
-    public static final List<Syntax> SUPPORTED_SYNTAXES = Arrays.asList( 
+    public static final List<Syntax> SUPPORTED_SYNTAXES = Arrays.asList(
             Syntax.syntaxARQ , Syntax.syntaxSPARQL_11);
 
 	/**
 	 * Escape any regex special characters in the string.
-	 * 
+	 *
 	 * Note that the SPARQL parser requires two backslashes, in order to pass a
 	 * single backslash to the REGEX function.
-	 * 
-	 * Also escape a single quote ('), but only with a single backslash, since 
+	 *
+	 * Also escape a single quote ('), but only with a single backslash, since
 	 * this one is for the SPARQL parser itself (single quote is not a special
 	 * character to REGEX).
 	 */
@@ -45,7 +45,7 @@ public class SparqlQueryUtils {
 				if (c == special) {
 					clean.append('\\').append('\\').append(c);
 					continue outer;
-				} 
+				}
 			}
 			if (c == '\'') {
 				clean.append('\\').append(c);
@@ -55,7 +55,7 @@ public class SparqlQueryUtils {
 		}
 		return clean.toString();
 	}
-	
+
 	/**
 	 * A convenience method to attempt parsing a query string with various syntaxes
 	 * @param queryString Query String

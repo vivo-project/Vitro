@@ -42,20 +42,20 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
 
 public class DataGetterUtils {
-    
+
     final static Log log = LogFactory.getLog(DataGetterUtils.class);
-    
+
     /**
      * Attribute name in request for DataGetters
      */
     public final static String DATA_GETTERS_FOR_PAGE = "data_getters_for_page";
-    
+
     /**
      * Get a list of DataGetter objects that are associated with a page.
-     * This should not return PageDataGetters and should not throw an 
-     * exception if a page has PageDataGetters.  
+     * This should not return PageDataGetters and should not throw an
+     * exception if a page has PageDataGetters.
      */
-	public static List<DataGetter> getDataGettersForPage(VitroRequest vreq, Model displayModel, String pageURI) 
+	public static List<DataGetter> getDataGettersForPage(VitroRequest vreq, Model displayModel, String pageURI)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException {
 
 	    if( vreq.getAttribute(DATA_GETTERS_FOR_PAGE) != null){
@@ -68,12 +68,12 @@ public class DataGetterUtils {
     		return dgList;
 	    }
 	}
-    
+
     /**
      * Get a list of DataGetter objects that are associated with a Vitro VClass.
-     * This allows the individual profile for an individual of a specific class to be returned .  
+     * This allows the individual profile for an individual of a specific class to be returned .
      */
-    public static List<DataGetter> getDataGettersForClass( VitroRequest vreq, Model displayModel, String classURI) 
+    public static List<DataGetter> getDataGettersForClass( VitroRequest vreq, Model displayModel, String classURI)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException {
         List<String> dgUris = getDataGetterURIsForAssociatedURI( displayModel, classURI);
         List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
@@ -85,7 +85,7 @@ public class DataGetterUtils {
      * Get a list of DataGetter objects that are associated with a Freemarker template.
      * @param templateName a filename like "index.ftl", which will be used as a URI like "freemarker:index.ftl".
      */
-    public static List<DataGetter> getDataGettersForTemplate( VitroRequest vreq, Model displayModel, String templateName) 
+    public static List<DataGetter> getDataGettersForTemplate( VitroRequest vreq, Model displayModel, String templateName)
     		throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException {
     	String templateUri = "freemarker:" + templateName;
     	List<String> dgUris = getDataGetterURIsForAssociatedURI( displayModel, templateUri);
@@ -93,14 +93,14 @@ public class DataGetterUtils {
     	log.debug("getDataGettersForTemplate '" + templateName + "': " + dgList);
     	return dgList;
     }
-    
+
 	/**
 	 * Return a list of DataGetters from the list of URIs. Each DataGetter will be configured from information
 	 * in the displayModel.
-	 * 
+	 *
 	 * Problems instantiating and configuring a particular DataGetter may result in an exception,
 	 * or may just mean that there will be no entry in the result for that URI.
-	 * 
+	 *
 	 * May return an empty list, but will not return null.
 	 */
 	private static List<DataGetter> dataGettersForURIs(VitroRequest vreq, Model displayModel, List<String> dgUris)
@@ -109,41 +109,41 @@ public class DataGetterUtils {
 		for( String dgURI: dgUris){
 		    DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
 		    if( dg != null )
-		        dgList.add(dg); 
+		        dgList.add(dg);
 		}
 		return dgList;
 	}
 
     /**
-     * Returns a DataGetter using information in the 
+     * Returns a DataGetter using information in the
      * displayModel for the individual with the URI given by dataGetterURI
-     * to configure it. 
-     * 
+     * to configure it.
+     *
      * May return null.
      * This should not throw an exception if the URI exists and has a type
      * that does not implement the DataGetter interface.
      */
-    public static DataGetter dataGetterForURI(VitroRequest vreq, Model displayModel, String dataGetterURI) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException 
+    public static DataGetter dataGetterForURI(VitroRequest vreq, Model displayModel, String dataGetterURI)
+    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException
     {
         //get java class for dataGetterURI
         String dgClassName = getJClassForDataGetterURI(displayModel, dataGetterURI);
-        
+
         //figure out if it implements interface DataGetter
         Class<?> clz = Class.forName(dgClassName);
         if( ! DataGetter.class.isAssignableFrom(clz) ){
     		log.debug("Class doesn't implement DataGetter: '" + dgClassName + "'");
             return null;
         }
-        
+
         // we want a constructor that will work for one of these argument lists (in this order)
         Object[][] argLists = new Object[][] {
-        		{ vreq, displayModel, dataGetterURI }, 
-        		{ displayModel, dataGetterURI }, 
-        		{ vreq }, 
+        		{ vreq, displayModel, dataGetterURI },
+        		{ displayModel, dataGetterURI },
+        		{ vreq },
         		{}
         	};
-        
+
         // look through the available constructors for the best fit
         for (Object[] argList: argLists) {
         	for (Constructor<?> ct: clz.getConstructors()) {
@@ -153,11 +153,11 @@ public class DataGetterUtils {
         		}
         	}
         }
-        
+
 		log.debug("Didn't find a suitable constructor for '" + dgClassName + "'");
         return null;
     }
-    
+
     private static boolean isConstructorSuitableForArguments(Constructor<?> ct, Object[] args) {
 		Class<?>[] parameterTypes = ct.getParameterTypes();
 		if (args.length != parameterTypes.length) {
@@ -176,16 +176,16 @@ public class DataGetterUtils {
         String query = prefixes +
         "SELECT ?type WHERE { ?dgURI rdf:type ?type } ";
         Query dgTypeQuery = QueryFactory.create(query);
-        
+
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("dgURI", ResourceFactory.createResource( dataGetterURI ));
-        
-        List<String> types = new ArrayList<String>();         
+
+        List<String> types = new ArrayList<String>();
         displayModel.enterCriticalSection(false);
         try{
             QueryExecution qexec = QueryExecutionFactory.create(dgTypeQuery,displayModel,initialBindings );
-            try{                                                    
-                ResultSet results = qexec.execSelect();                
+            try{
+                ResultSet results = qexec.execSelect();
                 while (results.hasNext()) {
                     QuerySolution soln = results.nextSolution();
                     Resource type = soln.getResource("type");
@@ -195,26 +195,26 @@ public class DataGetterUtils {
                 }
             }finally{ qexec.close(); }
         }finally{ displayModel.leaveCriticalSection(); }
-        
-        
+
+
         return chooseType( types, dataGetterURI);
     }
-    
-    
+
+
     private static List<String> getDataGetterURIsForAssociatedURI(Model displayModel, String associatedURI) {
-        String query = prefixes + 
+        String query = prefixes +
              "SELECT ?dataGetter WHERE { ?associatedURI display:hasDataGetter ?dataGetter }";
         Query dgForUriQuery = QueryFactory.create(query);
-        
+
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("associatedURI", ResourceFactory.createResource( associatedURI ));
-        
+
         List<String> dgURIs = new ArrayList<String>();
         displayModel.enterCriticalSection(false);
         try{
             QueryExecution qexec = QueryExecutionFactory.create(dgForUriQuery,displayModel,initialBindings );
-            try{                                                    
-                ResultSet results = qexec.execSelect();                
+            try{
+                ResultSet results = qexec.execSelect();
                 while (results.hasNext()) {
                     QuerySolution soln = results.nextSolution();
                     Resource dg = soln.getResource("dataGetter");
@@ -224,18 +224,18 @@ public class DataGetterUtils {
                 }
             }finally{ qexec.close(); }
         }finally{ displayModel.leaveCriticalSection(); }
-                
+
 		log.debug("Found " + dgURIs.size() +" DataGetter URIs for '" + associatedURI + "': " + dgURIs);
         return dgURIs;
     }
-    
+
     private static String chooseType(List<String> types, String dataGetterURI) throws IllegalAccessException {
         //currently just get the first one that is not owl:Thing
         for(String type : types){
             if( ! StringUtils.isEmpty( type ) && !type.equals( OWL.Thing.getURI() ))
                 return type;
         }
-        throw new IllegalAccessException("No useful type defined for <" + dataGetterURI + ">");        
+        throw new IllegalAccessException("No useful type defined for <" + dataGetterURI + ">");
     }
     //Copied from PageDaoJena
     static protected String nodeToString( RDFNode node ){
@@ -247,17 +247,17 @@ public class DataGetterUtils {
         }else if( node.isURIResource() ){
             Resource resource = node.asResource();
             return resource.getURI();
-        }else if( node.isAnon() ){  
+        }else if( node.isAnon() ){
             Resource resource = node.asResource();
             return resource.getId().getLabelString(); //get b-node id
         }else{
             return "";
         }
     }
-    
-    static final String prefixes = 
+
+    static final String prefixes =
         "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
-        "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" + 
+        "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" +
         "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#> \n" +
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n";
 
@@ -265,52 +265,52 @@ public class DataGetterUtils {
     public static String generateDataGetterTypeURI(String dataGetterClassName) {
     	return "java:" + dataGetterClassName;
     }
-    
+
     public static final String getClassGroupForDataGetter(Model displayModel, String dataGetterURI) {
-    	String classGroupUri = null; 
+    	String classGroupUri = null;
     	QuerySolutionMap initBindings = new QuerySolutionMap();
          initBindings.add("dataGetterURI", ResourceFactory.createResource(dataGetterURI));
-         
+
          int count = 0;
          //Get the class group
-         Query dataGetterConfigurationQuery = QueryFactory.create(classGroupForDataGetterQuery) ;               
+         Query dataGetterConfigurationQuery = QueryFactory.create(classGroupForDataGetterQuery) ;
          displayModel.enterCriticalSection(Lock.READ);
          try{
              QueryExecution qexec = QueryExecutionFactory.create(
-                     dataGetterConfigurationQuery, displayModel, initBindings) ;        
+                     dataGetterConfigurationQuery, displayModel, initBindings) ;
              ResultSet res = qexec.execSelect();
-             try{                
+             try{
                  while( res.hasNext() ){
                      count++;
                      QuerySolution soln = res.next();
-                     
-                      
-                     
+
+
+
                      //model is OPTIONAL
                      RDFNode node = soln.getResource("classGroupUri");
                      if( node != null && node.isURIResource() ){
-                         classGroupUri = node.asResource().getURI();                        
+                         classGroupUri = node.asResource().getURI();
                      }else{
                          classGroupUri = null;
                      }
-                       
+
                  }
              }finally{ qexec.close(); }
          }finally{ displayModel.leaveCriticalSection(); }
          return classGroupUri;
     }
-    
+
     private static final String forClassGroupURI = "<" + DisplayVocabulary.FOR_CLASSGROUP + ">";
 
     private static final String classGroupForDataGetterQuery =
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
         "SELECT ?classGroupUri WHERE { \n" +
         "  ?dataGetterURI "+forClassGroupURI+" ?classGroupUri . \n" +
-        "}";      
-    
-    
+        "}";
+
+
     /**
-     * 
+     *
      * Convert data to JSON for page uri based on type and related datagetters
      * TODO: How to handle different data getters?  Will this replace json fields or add to them?
      */
@@ -326,7 +326,7 @@ public class DataGetterUtils {
 	            	 /*
 	                 typeObj = getter.convertToJSON(data, vreq);
 	                 if( typeObj != null) {
-	                     //Copy over everything from this type Obj to 
+	                     //Copy over everything from this type Obj to
 	                     //TODO: Review how to handle duplicate keys, etc.
 	                     if(rObj != null) {
 	                         //For now, just nests as separate entry
@@ -334,47 +334,47 @@ public class DataGetterUtils {
 	                     } else {
 	                         rObj = typeObj;
 	                     }
-	                 } */     
-	        	
+	                 } */
+
 	            } catch(Throwable th){
 	                log.error(th,th);
 	            }
-	        }     
+	        }
         } catch(Throwable th) {
         	log.error(th, th);
         }
         return rObj;
     }
-    
-    
+
+
     /***
      * For the page, get the actual Data Getters to be employed.
      */
     /*
     public static List<PageDataGetter> DataGetterObjects(VitroRequest vreq, String pageUri) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
     	List<PageDataGetter> dataGetterObjects = new ArrayList<PageDataGetter>();
-    	
+
     	List<String> dataGetterClassNames = vreq.getWebappDaoFactory().getPageDao().getDataGetterClass(pageUri);
     	if( dataGetterClassNames == null )
     	    return Collections.emptyList();
-    	
+
     	for(String dgClassName: dataGetterClassNames) {
     		String className = getClassNameFromUri(dgClassName);
     		Class clz =  Class.forName(className);
-    		
-    		if( DataGetterUtils.isInstanceOfInterface(clz, PageDataGetter.class)){    		        		
+
+    		if( DataGetterUtils.isInstanceOfInterface(clz, PageDataGetter.class)){
     		    Object obj = clz.newInstance();
     		    if(obj != null && obj instanceof PageDataGetter) {
     		        PageDataGetter pg = (PageDataGetter) obj;
     		        dataGetterObjects.add(pg);
-    		    }	    		
+    		    }
     		}// else skip if class does not implement PageDataGetter
-    	} 
-	        
+    	}
+
     	return dataGetterObjects;
     }
     */
-    
+
     //Class URIs returned include "java:" and to instantiate object need to remove java: portion
     public static String getClassNameFromUri(String dataGetterClassUri) {
     	if( !StringUtils.isEmpty(dataGetterClassUri) && dataGetterClassUri.contains("java:")) {
@@ -385,9 +385,9 @@ public class DataGetterUtils {
     	}
     	return dataGetterClassUri;
     }
-    
 
-    
+
+
     /*
      * Copied from JSONServlet as expect this to be related to VitroClassGroup
      */
@@ -402,22 +402,22 @@ public class DataGetterUtils {
                 vcObj.put("entityCount", vc.getEntityCount());
                 classes.add(vcObj);
             }
-            map.put("classes", classes);                
+            map.put("classes", classes);
             map.put("classGroupName", vcg.getPublicName());
             map.put("classGroupUri", vcg.getURI());
-        
+
         } catch(Exception ex) {
             log.error("Error occurred in processing VClass group ", ex);
         }
-        return map;        
+        return map;
     }
-    
-	
+
+
     //Get All VClass Groups information
     //Used within menu management and processing
     //TODO: Check if more appropriate location possible
     public static List<HashMap<String, String>> getClassGroups(HttpServletRequest req) {
-    	//Wanted this to be 
+    	//Wanted this to be
     	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(req);
         List<VClassGroup> vcgList = vcgc.getGroups();
         //For now encoding as hashmap with label and URI as trying to retrieve class group
@@ -431,8 +431,8 @@ public class DataGetterUtils {
         }
         return classGroups;
     }
-    
-    
+
+
    //TODO: Check whether this needs to be put here or elsewhere, as this is data getter specific
     //with respect to class groups
   //Need to use VClassGroupCache to retrieve class group information - this is the information returned from "for class group"
@@ -447,8 +447,8 @@ public class DataGetterUtils {
 		templateData.put("associatedPage", group.getPublicName());
 		templateData.put("associatedPageURI", group.getURI());
     }
-    
-	
-	
-    
+
+
+
+
 }

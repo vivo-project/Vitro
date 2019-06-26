@@ -9,55 +9,55 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class PropertyGroup extends BaseResourceBean implements Comparable<PropertyGroup> {
-    
+
     private static final Log log = LogFactory.getLog(PropertyGroup.class.getName());
-    
+
 	private int displayRank;
 	private String name;
 	private List<Property> propertyList;
 	private int statementCount;
 	private String publicDescription;
-	
+
 	public int getDisplayRank() {
 		return this.displayRank;
 	}
-	
+
 	public void setDisplayRank(int in) {
 		this.displayRank = in;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public void setName(String in) {
 		this.name = in;
 	}
-	
+
 	public List<Property> getPropertyList() {
 		return this.propertyList;
 	}
-	
+
 	public void setPropertyList(List<Property> in) {
 		this.propertyList = in;
 	}
-	
+
 	public int getStatementCount() {
 	    return statementCount;
 	}
-	
+
 	public void setStatementCount(int count) {
 	    statementCount = count;
 	}
-	
+
 	public String getPublicDescription() {
 	    return publicDescription;
 	}
-	
+
 	public void setPublicDescription(String s) {
 	    publicDescription = s;
 	}
-			
+
 
 
     /**
@@ -75,5 +75,5 @@ public class PropertyGroup extends BaseResourceBean implements Comparable<Proper
         }
         return diff;
     }
-	
+
 }

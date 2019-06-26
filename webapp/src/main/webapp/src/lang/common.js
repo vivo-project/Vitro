@@ -57,7 +57,7 @@ dojo.lang.extend = function(ctor /*function*/, props /*, props, ..., props */){
  *  find(array, value, identity) // recommended
  *  find(value, array, identity)
 **/
-dojo.lang.find = function(	/*Array*/	arr, 
+dojo.lang.find = function(	/*Array*/	arr,
 							/*Object*/	val,
 							/*boolean*/	identity,
 							/*boolean*/	findLast){

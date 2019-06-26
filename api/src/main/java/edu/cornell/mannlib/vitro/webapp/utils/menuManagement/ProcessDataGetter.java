@@ -15,6 +15,6 @@ public interface ProcessDataGetter{
     public void populateTemplate(HttpServletRequest req, Map<String, Object> pageData, Map<String, Object> templateData);
 
     public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource);
-    
-    
+
+
 }

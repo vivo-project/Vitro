@@ -25,14 +25,14 @@ import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 
 /**
  * Smoke tests for the database connection that SDB will use.
- * 
+ *
  * Confirm that the URL, Username and Password have been specified for the
  * Database connection.
- * 
+ *
  * Confirm that we can load the database driver.
- * 
+ *
  * Confirm that we can connect to the database using those properties.
- * 
+ *
  * Try to confirm that the database connection is configured to use UTF-8
  * encoding. Don't know how well this works.
  */
@@ -52,10 +52,10 @@ public class SDBConnectionSmokeTests {
 					+ PROPERTY_DB_URL + "'");
 			return;
 		}
-		
+
 		// Get the full URL, with options.
 		url = SDBDataSource.getJdbcUrl(props);
-		
+
 		String username = props.getProperty(PROPERTY_DB_USERNAME);
 		if (username == null || username.isEmpty()) {
 			ss.fatal("runtime.properties does not contain a value for '"

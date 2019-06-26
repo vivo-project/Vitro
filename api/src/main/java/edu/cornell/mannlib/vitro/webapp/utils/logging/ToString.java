@@ -94,9 +94,9 @@ public class ToString {
 
 	/**
 	 * If the string is found in ModelNames, return the name of the constant.
-	 * 
+	 *
 	 * If the name is a filegraph, convert it to filegraph:[suffix]
-	 * 
+	 *
 	 * Otherwise, return the string itself.
 	 */
 	public static String modelName(String name) {

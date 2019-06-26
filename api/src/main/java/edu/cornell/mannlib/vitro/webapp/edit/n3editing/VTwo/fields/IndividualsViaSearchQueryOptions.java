@@ -26,32 +26,32 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.utils.fields.FieldUtils;
 
 /*
- * This runs a search query to get individuals of a certain class instead of relying on the dao classes. 
+ * This runs a search query to get individuals of a certain class instead of relying on the dao classes.
  * Also it gets individuals that belong to the most specific type(s) specified.
  */
 public class IndividualsViaSearchQueryOptions extends IndividualsViaVClassOptions implements FieldOptions {
-	private Log log = LogFactory.getLog(IndividualsViaSearchQueryOptions.class);	
+	private Log log = LogFactory.getLog(IndividualsViaSearchQueryOptions.class);
 
     private String subjectUri;
     private String predicateUri;
     private String objectUri;
     public IndividualsViaSearchQueryOptions(String inputSubjectUri, String inputPredicateUri, String inputObjectUri, String ... vclassURIs) throws Exception {
-        super(vclassURIs);           
+        super(vclassURIs);
         this.subjectUri = inputSubjectUri;
         this.predicateUri  = inputPredicateUri;
         this.objectUri = inputObjectUri;
     }
-    
+
     @Override
     protected Map<String,Individual> getIndividualsForClass(String vclassURI, WebappDaoFactory wDaoFact ){
     	Map<String, Individual> individualMap = new HashMap<String, Individual>();
     	try {
 			SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
-	
-			//search query for type count.    		
+
+			//search query for type count.
 			SearchQuery query = searchEngine.createQuery();
 			if( VitroVocabulary.OWL_THING.equals( vclassURI )){
-				query.setQuery( "*:*" );    			
+				query.setQuery( "*:*" );
 			}else{
 				query.setQuery( VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS + ":" + vclassURI);
 			}
@@ -72,7 +72,7 @@ public class IndividualsViaSearchQueryOptions extends IndividualsViaVClassOption
 						} else {
 							individualMap.put(individual.getURI(), individual);
 							log.debug("Adding individual " + uri + " to individual list");
-						} 
+						}
 					}
 					catch(Exception ex) {
 						log.error("An error occurred retrieving the individual search resutls", ex);
@@ -83,54 +83,54 @@ public class IndividualsViaSearchQueryOptions extends IndividualsViaVClassOption
     	} catch(Exception ex) {
     		log.error("Error occurred in executing search query ", ex);
     	}
-        return individualMap;        
+        return individualMap;
     }
-    
+
     @Override
     public Map<String, String> getOptions(
-            EditConfigurationVTwo editConfig, 
-            String fieldName, 
-            WebappDaoFactory wDaoFact) throws Exception {              
-        
+            EditConfigurationVTwo editConfig,
+            String fieldName,
+            WebappDaoFactory wDaoFact) throws Exception {
+
     	 Map<String, Individual> individualMap = new HashMap<String, Individual>();
 
          for( String vclassURI : vclassURIs){
              individualMap.putAll(  getIndividualsForClass( vclassURI, wDaoFact) );
          }
 
-         //sort the individuals 
+         //sort the individuals
          List<Individual> individuals = new ArrayList<Individual>();
          individuals.addAll(individualMap.values());
-         
+
          //Here we will remove individuals already in the range
-         Individual subject = wDaoFact.getIndividualDao().getIndividualByURI(subjectUri);                   
+         Individual subject = wDaoFact.getIndividualDao().getIndividualByURI(subjectUri);
          List<ObjectPropertyStatement> stmts = subject.getObjectPropertyStatements();
 
          individuals = FieldUtils.removeIndividualsAlreadyInRange(
                  individuals, stmts, predicateUri, objectUri);
-         //Also remove subjectUri if it 
+         //Also remove subjectUri if it
          individuals = removeSubjectUri(individuals, subjectUri);
          //sort the list
          Collections.sort(individuals);
          //set up the options map
          Map<String, String> optionsMap = new HashMap<String,String>();
-         
+
          if (defaultOptionLabel != null) {
              optionsMap.put(LEFT_BLANK, defaultOptionLabel);
          }
 
-         if (individuals.size() == 0) {     
+         if (individuals.size() == 0) {
         	//return empty map, unlike individualsViaVclass
              return optionsMap ;
          } else {
-             for (Individual ind : individuals) {                
+             for (Individual ind : individuals) {
                  if (ind.getURI() != null) {
                      optionsMap.put(ind.getURI(), ind.getName().trim());
                  }
              }
          }
          return optionsMap;
-        
+
     }
 
     //TODO: Check if this can be done simply by reference
@@ -140,7 +140,7 @@ public class IndividualsViaSearchQueryOptions extends IndividualsViaVClassOption
 	        while(it.hasNext()){
 	            Individual ind = it.next();
 	            if( ind.getURI().equals(subjectUri)) {
-	                it.remove();   
+	                it.remove();
 	            }
 	        }
 	       return individuals;

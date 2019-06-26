@@ -32,7 +32,7 @@ public class Properties2PropertiesRetryController extends BaseEditController {
         }
 
     	VitroRequest request = new VitroRequest(req);
-        
+
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
 
@@ -47,42 +47,42 @@ public class Properties2PropertiesRetryController extends BaseEditController {
         ObjectPropertyDao opDao = request.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         DataPropertyDao dpDao = request.getUnfilteredWebappDaoFactory().getDataPropertyDao();
         epo.setDataAccessObject(opDao);
-        
-        List propList = ("data".equals(request.getParameter("propertyType"))) 
+
+        List propList = ("data".equals(request.getParameter("propertyType")))
     	? dpDao.getAllDataProperties()
     	: opDao.getAllObjectProperties();
-        
+
     	sortForPickList(propList, request);
-    	
+
     	 String superpropertyURIstr = request.getParameter("SuperpropertyURI");
          String subpropertyURIstr = request.getParameter("SubpropertyURI");
-       
+
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
         List<Option> optionList = FormUtils.makeOptionListFromBeans(propList,"URI","PickListName",superpropertyURIstr,null);
         List<Option> superPropertyOptions = getSortedList(hashMap, optionList, request);
         optionList = FormUtils.makeOptionListFromBeans(propList,"URI","PickListName",subpropertyURIstr,null);
         List<Option> subPropertyOptions = getSortedList(hashMap, optionList, request);
-        
+
         HashMap hash = new HashMap();
     	hash.put("SuperpropertyURI", superPropertyOptions);
         hash.put("SubpropertyURI", subPropertyOptions);
-        
+
         FormObject foo = new FormObject();
         foo.setOptionLists(hash);
 
         epo.setFormObject(foo);
-        
+
         request.setAttribute("operation","add");
-        
+
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         String modeStr = request.getParameter("opMode");
         if (modeStr != null && ( modeStr.equals("superproperty") || modeStr.equals("subproperty") || modeStr.equals("equivalentProperty") ) ) {
         	request.setAttribute("editAction","props2PropsOp");
         	request.setAttribute("formJsp","/templates/edit/specific/properties2properties_retry.jsp");
         	request.setAttribute("title", (modeStr.equals("superproperty") ? "Add Superproperty" : modeStr.equals("equivalentProperty") ? "Add Equivalent Property" : "Add Subproperty") );
-        } 
+        }
         request.setAttribute("opMode", modeStr);
-        
+
         request.setAttribute("_action",action);
         setRequestAttributes(request,epo);
 
@@ -95,5 +95,5 @@ public class Properties2PropertiesRetryController extends BaseEditController {
         }
 
     }
-    
+
 }

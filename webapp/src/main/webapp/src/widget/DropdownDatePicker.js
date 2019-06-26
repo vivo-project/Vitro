@@ -23,19 +23,19 @@ dojo.widget.defineWidget(
 		iconAlt: "Select a Date",
 		zIndex: "10",
 		datePicker: null,
-		
+
 		dateFormat: "%m/%d/%Y",
 		date: null,
-		
+
 		fillInTemplate: function(args, frag){
 			dojo.widget.DropdownDatePicker.superclass.fillInTemplate.call(this, args, frag);
 			var source = this.getFragNodeRef(frag);
-			
+
 			if(args.date){ this.date = new Date(args.date); }
-			
+
 			var dpNode = document.createElement("div");
 			this.containerNode.appendChild(dpNode);
-			
+
 			var dateProps = { widgetContainerId: this.widgetId };
 			if(this.date){
 				dateProps["date"] = this.date;
@@ -47,12 +47,12 @@ dojo.widget.defineWidget(
 			this.containerNode.style.zIndex = this.zIndex;
 			this.containerNode.style.backgroundColor = "transparent";
 		},
-		
+
 		onSetDate: function(){
 			this.inputNode.value = dojo.date.format(this.datePicker.date, this.dateFormat);
 			this.hideContainer();
 		},
-		
+
 		onInputChange: function(){
 			var tmp = new Date(this.inputNode.value);
 			this.datePicker.date = tmp;

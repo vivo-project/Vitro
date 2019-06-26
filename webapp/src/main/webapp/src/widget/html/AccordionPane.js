@@ -60,7 +60,7 @@ dojo.lang.extend(dojo.widget.html.AccordionPane, {
 		var height=dojo.style.getInnerHeight(this.domNode.parentNode)-this.getCollapsedHeight();
 
 		this.siblingWidgets = [];
-	
+
 		for (var x=0; x<siblings.length; x++) {
 			if (siblings[x].widgetType==this.widgetType) {
 				if (this.domNode != siblings[x]) {
@@ -70,7 +70,7 @@ dojo.lang.extend(dojo.widget.html.AccordionPane, {
 				}
 			}
 		}
-	
+
 		for (var x=0; x<this.siblingWidgets.length; x++) {
 			dojo.style.setOuterHeight(this.siblingWidgets[x].containerNode,height);
 		}
@@ -80,7 +80,7 @@ dojo.lang.extend(dojo.widget.html.AccordionPane, {
 
 	onLabelClick: function() {
 		this.setSizes();
-		if (!this.open) { 
+		if (!this.open) {
 			for (var x=0; x<this.siblingWidgets.length;x++) {
 				if (this.siblingWidgets[x].open) {
 					this.siblingWidgets[x].collapse();

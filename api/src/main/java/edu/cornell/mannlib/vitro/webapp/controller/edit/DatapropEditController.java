@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 @WebServlet(name = "DatapropEditController", urlPatterns = {"/datapropEdit"} )
 public class DatapropEditController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(DatapropEditController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
@@ -41,7 +41,7 @@ public class DatapropEditController extends BaseEditController {
         }
 
     	VitroRequest vreq = new VitroRequest(request);
-    	
+
         final int NUM_COLS=18;
 
         String datapropURI = request.getParameter("uri");
@@ -50,10 +50,10 @@ public class DatapropEditController extends BaseEditController {
         DataPropertyDao dpDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
         VClassDao vcDao = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
         VClassDao vcDaoWLang = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
-        
+
         DataProperty dp = dpDao.getDataPropertyByURI(datapropURI);
         DataProperty pLangNeut = dpDaoLangNeut.getDataPropertyByURI(request.getParameter("uri"));
-        
+
         PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
@@ -78,7 +78,7 @@ public class DatapropEditController extends BaseEditController {
 
         results.add(dp.getPickListName()); // column 1
         results.add(dp.getPublicName() == null ? "(no public label)" : dp.getPublicName()); // column 2
-        
+
         if (dp.getGroupURI() != null) {
             PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
             if (pGroup != null) {
@@ -89,7 +89,7 @@ public class DatapropEditController extends BaseEditController {
         } else {
             results.add("(unspecified)");
         }
-        
+
         String ontologyName = null;
         if (dp.getNamespace() != null) {
             Ontology ont = vreq.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(dp.getNamespace());
@@ -104,11 +104,11 @@ public class DatapropEditController extends BaseEditController {
         // we support parents now, but not the simple getParent() style method
         //String parentPropertyStr = "<i>(datatype properties are not yet modeled in a property hierarchy)</i>"; // TODO - need multiple inheritance
         //results.add(parentPropertyStr);
-        
-        String domainStr = ""; 
+
+        String domainStr = "";
         if (pLangNeut.getDomainVClassURI() != null) {
             VClass domainClass = vcDao.getVClassByURI(pLangNeut.getDomainVClassURI());
-            VClass domainWLang = vcDaoWLang.getVClassByURI(pLangNeut.getDomainVClassURI()); 
+            VClass domainWLang = vcDaoWLang.getVClassByURI(pLangNeut.getDomainVClassURI());
             if (domainClass != null && domainClass.getURI() != null && domainClass.getPickListName() != null) {
                 try {
                     if (domainClass.isAnonymous()) {
@@ -125,16 +125,16 @@ public class DatapropEditController extends BaseEditController {
 
         String rangeStr = (dp.getRangeDatatypeURI() == null) ? "<i>untyped</i> (rdfs:Literal)" : dp.getRangeDatatypeURI();
         results.add(rangeStr); // column 7
-        
+
         results.add(dp.getFunctional() ? "true" : "false"); // column 8
-        
+
         String publicDescriptionStr = (dp.getPublicDescription() == null) ? "" : dp.getPublicDescription(); // column 9
-        results.add(publicDescriptionStr);        
+        results.add(publicDescriptionStr);
         String exampleStr = (dp.getExample() == null) ? "" : dp.getExample();  // column 10
         results.add(exampleStr);
         String descriptionStr = (dp.getDescription() == null) ? "" : dp.getDescription();  // column 11
         results.add(descriptionStr);
-        
+
 		results.add(dp.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)"
 				: dp.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel()); // column 12
 		results.add(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)"
@@ -150,7 +150,7 @@ public class DatapropEditController extends BaseEditController {
         request.setAttribute("suppressquery","true");
 
         boolean FORCE_NEW = true;
-        
+
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         FormObject foo = new FormObject();
         HashMap OptionMap = new HashMap();
@@ -159,7 +159,7 @@ public class DatapropEditController extends BaseEditController {
         epo.setFormObject(foo);
 
         DataPropertyDao assertionsDpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
-        
+
         List<DataProperty> superProps = getDataPropertiesForURIList(
                 assertionsDpDao.getSuperPropertyURIs(dp.getURI(), false), assertionsDpDao);
         sortForPickList(superProps, vreq);
@@ -169,14 +169,14 @@ public class DatapropEditController extends BaseEditController {
                 assertionsDpDao.getSubPropertyURIs(dp.getURI()), assertionsDpDao);
         sortForPickList(subProps, vreq);
         request.setAttribute("subproperties", subProps);
-        
+
         List<DataProperty> eqProps = getDataPropertiesForURIList(
                 assertionsDpDao.getEquivalentPropertyURIs(dp.getURI()), assertionsDpDao);
         sortForPickList(eqProps, vreq);
         request.setAttribute("equivalentProperties", eqProps);
-        
+
         ApplicationBean appBean = vreq.getAppBean();
-        
+
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("datatypeProperty", dp);
         request.setAttribute("title","Data Property Control Panel");
@@ -195,8 +195,8 @@ public class DatapropEditController extends BaseEditController {
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
     }
-    
-    private List<DataProperty> getDataPropertiesForURIList(List<String> propertyURIs, 
+
+    private List<DataProperty> getDataPropertiesForURIList(List<String> propertyURIs,
             DataPropertyDao dpDao) {
         List<DataProperty> properties = new ArrayList<DataProperty>();
         for (String propertyURI : propertyURIs) {

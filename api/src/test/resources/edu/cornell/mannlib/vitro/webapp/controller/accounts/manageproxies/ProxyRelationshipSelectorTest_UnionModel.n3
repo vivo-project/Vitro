@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
@@ -21,7 +21,7 @@ mydomain:firstProfile
 	.
 mydomain:firstSelf
 	a foaf:Person ;
-	vitro:mostSpecificType mydomain:selfType ; 
+	vitro:mostSpecificType mydomain:selfType ;
 	public:mainImage mydomain:selfImage ;
 	mydomain:matching "firstSelf" ;
 	.
@@ -33,7 +33,7 @@ mydomain:firstSelf
 mydomain:bozo
 	a foaf:Person ;
 	rdfs:label "Bozo, Not Just Any" ;
-	vitro:mostSpecificType mydomain:profileType; 
+	vitro:mostSpecificType mydomain:profileType;
 	.
 
 
@@ -43,8 +43,8 @@ mydomain:bozo
 mydomain:popularProfile
 	a foaf:Person ;
 	rdfs:label "Profile, Popular" ;
-	vitro:mostSpecificType mydomain:profileType; 
-	public:mainImage mydomain:profileImage; 
+	vitro:mostSpecificType mydomain:profileType;
+	public:mainImage mydomain:profileImage;
 	.
 
 
@@ -55,13 +55,13 @@ mydomain:popularProfile
 mydomain:profileWithNoClassLabel
 	a foaf:Person ;
 	rdfs:label "NoClassLabel, Profile with" ;
-	public:mainImage mydomain:profileImage; 
+	public:mainImage mydomain:profileImage;
 	.
 
 mydomain:profileWithNoImageUrl
 	a foaf:Person ;
 	rdfs:label "NoImageUrl, Profile with" ;
-	vitro:mostSpecificType mydomain:profileType; 
+	vitro:mostSpecificType mydomain:profileType;
 	.
 
 mydomain:profileWithNeither
@@ -72,11 +72,11 @@ mydomain:profileWithNeither
 mydomain:profileWithBoth
 	a foaf:Person ;
 	rdfs:label "Both, Profile with" ;
-	vitro:mostSpecificType mydomain:profileType; 
-	public:mainImage mydomain:profileImage; 
+	vitro:mostSpecificType mydomain:profileType;
+	public:mainImage mydomain:profileImage;
 	.
-	
-	
+
+
 #
 # These Individiauls are each the "self" for a different proxy.
 # Each profile has a different combination of attributes.
@@ -84,14 +84,14 @@ mydomain:profileWithBoth
 mydomain:individualWithNoClassLabel
 	a foaf:Person ;
 	rdfs:label "Person, Bozo" ;
-	public:mainImage mydomain:selfImage; 
+	public:mainImage mydomain:selfImage;
 	mydomain:matching "individualWithNoClassLabel" ;
 	.
 
 mydomain:individualWithNoImageUrl
 	a foaf:Person ;
 	rdfs:label "Person, Bozo" ;
-	vitro:mostSpecificType mydomain:selfType; 
+	vitro:mostSpecificType mydomain:selfType;
 	mydomain:matching "individualWithNoImageUrl" ;
 	.
 
@@ -105,21 +105,21 @@ mydomain:individualWithBoth
 	a foaf:Person ;
 	rdfs:label "Person, Bozo" ;
 	vitro:mostSpecificType mydomain:selfType;
-	public:mainImage mydomain:selfImage; 
+	public:mainImage mydomain:selfImage;
 	mydomain:matching "individualWithBoth" ;
 	.
 
 #
 # Use this as a "most specific type" for Profiles.
 #
-mydomain:profileType 
+mydomain:profileType
 	rdfs:label "Profile";
 	.
 
 #
 # Use this as a "most specific type" for "selves".
 #
-mydomain:selfType 
+mydomain:selfType
 	rdfs:label "Self";
 	.
 

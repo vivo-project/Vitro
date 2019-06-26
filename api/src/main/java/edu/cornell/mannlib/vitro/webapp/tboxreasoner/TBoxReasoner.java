@@ -11,7 +11,7 @@ import org.apache.jena.rdf.model.Statement;
 
 /**
  * The functionality of a TBox reasoner.
- * 
+ *
  * The reasoner will maintain its own TBox model. It will receive updates to
  * that model and perform reasoning on it. It will answer queries about the
  * contents of the model, when reasoning is complete.
@@ -45,17 +45,17 @@ public interface TBoxReasoner {
 	 * reasoning.
 	 */
 	List<Restriction> listRestrictions();
-	
+
 	/**
 	 * List all of the statements that satisfy any of these patterns, after
 	 * updating and reasoning.
 	 */
 	List<Statement> filterResults(List<ReasonerStatementPattern> patternList);
-	
+
 	public static class Status {
 		public static final Status SUCCESS = new Status(true, false, "");
 		public static final Status ERROR = new Status(true, true, "");
-		
+
 		public static final Status inconsistent(String explanation) {
 			return new Status(false, false, explanation);
 		}

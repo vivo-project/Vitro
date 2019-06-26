@@ -17,12 +17,12 @@ public class AutocompleteObjectPropertyFormGenerator extends DefaultObjectProper
 	@Override
 	public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
 			HttpSession session) throws Exception {
-		//force auto complete 
+		//force auto complete
 		doAutoComplete = true;
-		
+
 		return super.getEditConfiguration(vreq, session);
 	}
 
 
-	
+
 }

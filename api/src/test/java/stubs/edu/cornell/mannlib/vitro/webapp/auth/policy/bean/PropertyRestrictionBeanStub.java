@@ -37,7 +37,7 @@ public class PropertyRestrictionBeanStub extends PropertyRestrictionBean {
 	/**
 	 * Prohibit some namespaces and restrict some properties from modification
 	 * by anybody. They may still be displayed or published.
-	 * 
+	 *
 	 * We can implement more granular control if we need it.
 	 */
 	public static PropertyRestrictionBeanStub getInstance(

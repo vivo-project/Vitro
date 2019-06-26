@@ -33,10 +33,10 @@ import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
-/**  
+/**
  * Performs knowledge base updates to the tbox to align with a new ontology version
- *   
- */ 
+ *
+ */
 public class TBoxUpdater {
 
     private static final Log log = LogFactory.getLog(TBoxUpdater.class);
@@ -45,7 +45,7 @@ public class TBoxUpdater {
     private OntModel oldTboxAnnotationsModel;
     private OntModel newTboxAnnotationsModel;
     private OntModel siteModel;
-    private ChangeLogger logger;  
+    private ChangeLogger logger;
     private ChangeRecord record;
     private boolean detailLogs = false;
 
@@ -55,15 +55,15 @@ public class TBoxUpdater {
     private Property inClassGroupProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createProperty(inClassGroupURI);
 
     /**
-     * 
-     * Constructor 
+     *
+     * Constructor
      *
      * @param   settings     - update settings
      * @param   logger       - for writing to the change log
      *                         and the error log.
-     * @param   record       - for writing to the additions model 
+     * @param   record       - for writing to the additions model
      *                         and the retractions model.
-     *                    
+     *
      */
     public TBoxUpdater(UpdateSettings settings,
             ChangeLogger logger,
@@ -81,35 +81,35 @@ public class TBoxUpdater {
      * to use any applicable settings from obsolete subproperties
      */
     public void modifyPropertyQualifications() throws IOException {
- 
+
     }
-    
+
     public void updateDefaultAnnotationValues() throws IOException {
         updateDefaultAnnotationValues(null);
     }
 
     /**
-     * 
-     * Update a knowledge base to align with changes to vitro annotation property default 
+     *
+     * Update a knowledge base to align with changes to vitro annotation property default
      * values in a new version of the ontology. The two versions of the ontology and the
      * knowledge base to be updated are provided in the class constructor and are
-     * referenced via class level variables. 
-     *                    
-     * If the default value (i.e. the value that is provided in the vivo-core 
+     * referenced via class level variables.
+     *
+     * If the default value (i.e. the value that is provided in the vivo-core
      * annotations files) of a vitro annotation property has been changed for a vivo
      * core class, and that default value has not been changed in the site knowledge
      * base, then update the value in the site knowledge base to be the new default.
-     * Also, if a new vitro annotation property setting (i.e. either an existing 
+     * Also, if a new vitro annotation property setting (i.e. either an existing
      * setting applied to an existing class where it wasn't applied before, or
      * an existing setting applied to a new class) has been applied to a vivo
      * core class then copy that new property statement into the site model.
      * If a property setting for a class exists in the old ontology but
      * not in the new one, then that statement will be removed from the
      * site knowledge base.
-     *                    
+     *
      *  Writes to the change log file, the error log file, and the incremental change
-     *  knowledge base.                  
-     *  
+     *  knowledge base.
+     *
      *  Note: as specified, this method for now assumes that no new vitro annotation
      *  properties have been introduced. This should be updated for future versions.
      */
@@ -123,14 +123,14 @@ public class TBoxUpdater {
             Model retractions = ModelFactory.createDefaultModel();
 
             //  Update defaults values for vitro annotation properties in the site model
-            //  if the default has changed in the new version of the ontology AND if 
+            //  if the default has changed in the new version of the ontology AND if
             //  the site hasn't overidden the previous default in their knowledge base.
 
             if(oldTboxAnnotationsModel == null) {
                 logger.log("oldTboxAnnotationModel is null; aborting update of annotation values");
                 return;
             }
-            
+
             Resource subj = (subjectURI == null) ? null : ResourceFactory.createResource(subjectURI);
 
             StmtIterator iter = oldTboxAnnotationsModel.listStatements(subj, null, (RDFNode) null);
@@ -142,8 +142,8 @@ public class TBoxUpdater {
                 Property predicate = stmt.getPredicate();
                 RDFNode oldObject = stmt.getObject();
 
-                if (! ( (RDFS.getURI().equals(predicate.getNameSpace())) || 
-                        (VitroVocabulary.vitroURI.equals(predicate.getNameSpace())) 
+                if (! ( (RDFS.getURI().equals(predicate.getNameSpace())) ||
+                        (VitroVocabulary.vitroURI.equals(predicate.getNameSpace()))
                         ) ) {
                     // this annotation updater is only concerned with properties
                     // such as rdfs:comment and properties in the vitro application
@@ -161,7 +161,7 @@ public class TBoxUpdater {
                     if (siteObjects.size() > 1) {
                         /*
 					 logger.log("WARNING: found " + siteObjects.size() +
-					 		 " statements with subject = " + subject.getURI() + 
+					 		 " statements with subject = " + subject.getURI() +
 							 " and property = " + predicate.getURI() +
 							 " in the site database (maximum of one is expected)");
                          */
@@ -170,11 +170,11 @@ public class TBoxUpdater {
                     if (siteObjects.size() > 0) {
                         RDFNode siteNode = siteObjects.get(0);
                         if (siteNode.equals(oldObject)) {
-                            retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));		 
+                            retractions.add(siteModel.listStatements(subject, predicate, (RDFNode) null));
                         }
                     }
 
-                    continue;				 			 
+                    continue;
                 }
 
                 RDFNode newObject = newObjects.next();
@@ -183,19 +183,19 @@ public class TBoxUpdater {
                 while (newObjects.hasNext()) {
                     i++;
                     newObjects.next();
-                } 
+                }
 
                 if (i > 1) {
                     /*
 				 logger.log("WARNING: found " + i +
-						 " statements with subject = " + subject.getURI() + 
+						 " statements with subject = " + subject.getURI() +
 						 " and property = " + predicate.getURI() +
 						 " in the new version of the annotations ontology (maximum of one is expected)");
-                     */		 
-                    continue; 
+                     */
+                    continue;
                 }
 
-                // If a subject-property pair occurs in the old annotation TBox and the new annotations 
+                // If a subject-property pair occurs in the old annotation TBox and the new annotations
                 // TBox, but not in the site model, then it is considered an erroneous deletion and
                 // the value from the new TBox is added into the site model.
                 // sjm: 7-16-2010. We want this here now to add back in annotations mistakenly dropped
@@ -211,13 +211,13 @@ public class TBoxUpdater {
                         if (detailLogs) {
                             logger.log( "adding Statement: subject = " + subject.getURI() +
                                     " property = " + predicate.getURI() +
-                                    " object = " + (newObject.isLiteral() ?  ((Literal)newObject).getLexicalForm() 
-                                            : ((Resource)newObject).getURI()));	
+                                    " object = " + (newObject.isLiteral() ?  ((Literal)newObject).getLexicalForm()
+                                            : ((Resource)newObject).getURI()));
                         }
                     } catch (Exception e) {
                         logger.logError("Error trying to add statement with property " + predicate.getURI() +
                                 " of class = " + subject.getURI() + " in the knowledge base:\n" + e.getMessage());
-                    }				 
+                    }
 
                     continue;
                 }
@@ -229,28 +229,28 @@ public class TBoxUpdater {
 
                     i = 1;
                     while (siteObjects.hasNext()) {
-                        i++; 
+                        i++;
                         siteObjects.next();
-                    } 
+                    }
 
                     if (i > 1) {
                         /*
 					 logger.log("WARNING: found " + i +
-							 " statements with subject = " + subject.getURI() + 
+							 " statements with subject = " + subject.getURI() +
 							 " and property = " + predicate.getURI() +
-							 " in the site annotations model (maximum of one is expected) "); 
+							 " in the site annotations model (maximum of one is expected) ");
                          */
-                        continue; 
+                        continue;
                     }
 
                     if (siteObject.equals(oldObject)) {
                         try {
                             StmtIterator it = siteModel.listStatements(subject, predicate, (RDFNode)null);
                             while (it.hasNext()) {
-                                retractions.add(it.next());	
+                                retractions.add(it.next());
                             }
                         } catch (Exception e) {
-                            logger.logError("Error removing statement for subject = " + subject.getURI() + 
+                            logger.logError("Error removing statement for subject = " + subject.getURI() +
                                     "and property = " + predicate.getURI() +
                                     "from the knowledge base:\n" + e.getMessage());
                         }
@@ -260,10 +260,10 @@ public class TBoxUpdater {
 
                             if (detailLogs) {
                                 logger.log("Changed the value of property "  + predicate.getURI() +
-                                        " of subject = " + subject.getURI() + 
+                                        " of subject = " + subject.getURI() +
                                         " from " +
-                                        (oldObject.isResource() ? ((Resource)oldObject).getURI() : ((Literal)oldObject).getLexicalForm()) +								
-                                        " to " + 
+                                        (oldObject.isResource() ? ((Resource)oldObject).getURI() : ((Literal)oldObject).getLexicalForm()) +
+                                        " to " +
                                         (newObject.isResource() ? ((Resource)newObject).getURI() : ((Literal)newObject).getLexicalForm()) +
                                         " in the knowledge base:\n");
                             }
@@ -272,7 +272,7 @@ public class TBoxUpdater {
                                     " of class = " + subject.getURI() + " in the knowledge base:\n" + e.getMessage());
                         }
                     }
-                }		  
+                }
             }
 
             Model actualAdditions = additions.difference(retractions);
@@ -287,7 +287,7 @@ public class TBoxUpdater {
 
             // log summary of changes
             if (numAdded > 0) {
-                logger.log("Updated the default vitro annotation value for " + 
+                logger.log("Updated the default vitro annotation value for " +
                         numAdded + " statements in the knowledge base");
             }
 
@@ -298,7 +298,7 @@ public class TBoxUpdater {
 
             //	   Copy annotation property settings that were introduced in the new ontology
             //     into the site model.
-            //		  
+            //
 
             Model newAnnotationSettings = newTboxAnnotationsModel.difference(oldTboxAnnotationsModel);
             Model newAnnotationSettingsToAdd = ModelFactory.createDefaultModel();
@@ -311,8 +311,8 @@ public class TBoxUpdater {
                     if (detailLogs) {
                         logger.log( "adding Statement: subject = " + stmt.getSubject().getURI() +
                                 " property = " + stmt.getPredicate().getURI() +
-                                " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm() 
-                                        : ((Resource)stmt.getObject()).getURI()));	
+                                " object = " + (stmt.getObject().isLiteral() ?  ((Literal)stmt.getObject()).getLexicalForm()
+                                        : ((Resource)stmt.getObject()).getURI()));
                     }
                 }
             }
@@ -334,34 +334,34 @@ public class TBoxUpdater {
     }
 
     /**
-     * 
-     * Update a knowledge base to align with changes to the vitro annotation model  
+     *
+     * Update a knowledge base to align with changes to the vitro annotation model
      * in a new version of the ontology. The two versions of the ontology and the
      * knowledge base to be updated are provided in the class constructor and are
-     * referenced via class level variables. 
-     *                    
+     * referenced via class level variables.
+     *
      * Currently, this method only handles deletions of a ClassGroup
-     *                    
+     *
      *  Writes to the change log file, the error log file, and the incremental change
-     *  knowledge base.                  
-     *  
-     */	
+     *  knowledge base.
+     *
+     */
     public void updateAnnotationModel() throws IOException {
 
-        // for each ClassGroup in the old vitro annotations model: if it is not in 
-        // the new vitro annotations model and the site has no classes asserted to 
+        // for each ClassGroup in the old vitro annotations model: if it is not in
+        // the new vitro annotations model and the site has no classes asserted to
         // be in that class group then delete it.
 
         removeObsoleteAnnotations();
 
         siteModel.enterCriticalSection(Lock.WRITE);
 
-        try {	
+        try {
             Model retractions = ModelFactory.createDefaultModel();
 
             StmtIterator iter = oldTboxAnnotationsModel.listStatements((Resource) null, RDF.type, classGroupClass);
 
-            while (iter.hasNext()) {  
+            while (iter.hasNext()) {
                 Statement stmt = iter.next();
 
                 if (!newTboxAnnotationsModel.contains(stmt) && !usesGroup(siteModel, stmt.getSubject())) {
@@ -370,22 +370,22 @@ public class TBoxUpdater {
                     long post = retractions.size();
                     if ((post - pre) > 0) {
                         logger.log("Removed the " + stmt.getSubject().getURI() + " ClassGroup from the annotations model");
-                    }  
+                    }
                 }
             }
 
             if (retractions.size() > 0) {
                 siteModel.remove(retractions);
                 record.recordRetractions(retractions);
-            }   
+            }
 
         } finally {
             siteModel.leaveCriticalSection();
         }
 
         // If we were going to handle add, this is the logic:
-        // for each ClassGroup in new old vitro annotations model: if it is not in 
-        // the old vitro annotations and it is not in the site model, then 
+        // for each ClassGroup in new old vitro annotations model: if it is not in
+        // the old vitro annotations and it is not in the site model, then
         // add it.
 
     }
@@ -394,7 +394,7 @@ public class TBoxUpdater {
 
         model.enterCriticalSection(Lock.READ);
 
-        try {	   
+        try {
             return (model.contains((Resource) null, inClassGroupProp, theClassGroup));
         } finally {
             model.leaveCriticalSection();
@@ -416,7 +416,7 @@ public class TBoxUpdater {
 
         siteModel.enterCriticalSection(Lock.WRITE);
 
-        try {	
+        try {
             Model retractions = ModelFactory.createDefaultModel();
 
             if (siteModel.contains(subj1, inClassGroupProp, obj1) ) {
@@ -437,29 +437,29 @@ public class TBoxUpdater {
             if (retractions.size() > 0) {
                 siteModel.remove(retractions);
                 record.recordRetractions(retractions);
-            }   
+            }
 
         } finally {
             siteModel.leaveCriticalSection();
         }
     }
-    
+
     public void renameProperty(AtomicOntologyChange changeObj) throws IOException {
         if(changeObj.getNotes() != null && changeObj.getNotes().startsWith("cc:")) {
             mergePropertyAnnotationsToPropertyConfig(changeObj, siteModel);
-        }        
+        }
         Resource renamedProperty = siteModel.getResource(changeObj.getSourceURI());
         siteModel.removeAll(renamedProperty, null, (RDFNode) null);
         siteModel.removeAll(null, null, renamedProperty);
     }
-    
+
     private void mergePropertyAnnotationsToPropertyConfig(AtomicOntologyChange changeObj,
             Model userAnnotationsModel) throws IOException {
         String contextURI = VitroVocabulary.PROPERTY_CONFIG_DATA + changeObj.getNotes().substring(3);
         String oldPropertyURI = changeObj.getSourceURI();
         Model oldAnnotationsModel = settings.getOldTBoxAnnotationsModel();
-        
-        String propertyAnnotationsQuery = 
+
+        String propertyAnnotationsQuery =
                 "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
                 "PREFIX vitro: <" + VitroVocabulary.vitroURI  + "> \n" +
                 "CONSTRUCT { \n" +
@@ -469,14 +469,14 @@ public class TBoxUpdater {
                 "    { <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label } \n" +
                 "    UNION { <" + oldPropertyURI + "> ?vitroProp ?vitroValue  \n" +
                 "    FILTER (regex(str(?vitroProp), \"" + VitroVocabulary.vitroURI + "\")) } \n" +
-                "} \n" ; 
-        
+                "} \n" ;
+
         Model userAnnotations = construct(
                 propertyAnnotationsQuery, userAnnotationsModel);
         Model oldAnnotations = construct(propertyAnnotationsQuery, oldAnnotationsModel);
-        
+
         Model diff = userAnnotations.difference(oldAnnotations);
-        
+
         // migrate all current values for any predicate that has been modified
         // from the default
         Model valuesToMigrate = ModelFactory.createDefaultModel();
@@ -485,16 +485,16 @@ public class TBoxUpdater {
             Statement stmt = sit.nextStatement();
             valuesToMigrate.add(userAnnotations.listStatements(
                     null, stmt.getPredicate(), (RDFNode) null));
-            
+
         }
-        
+
         if(valuesToMigrate.size() == 0) {
             return;
         } else {
             log.info("Updating PropertyConfig.n3 to include locally-changed " +
                     "settings from old property " + oldPropertyURI);
         }
-        
+
         String newQuery = "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
                 "PREFIX vitro: <" + VitroVocabulary.vitroURI  + "> \n" +
                 "CONSTRUCT { \n" +
@@ -508,13 +508,13 @@ public class TBoxUpdater {
                 "    OPTIONAL { <" + oldPropertyURI + "> ?vitroProp ?vitroValue  \n" +
                 "    FILTER (regex(str(?vitroProp), \"" + VitroVocabulary.vitroURI + "\")) } \n" +
                 "} \n" ;
-        
+
         String existingQuery = "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
                 "PREFIX vitro: <" + VitroVocabulary.vitroURI  + "> \n" +
                 "CONSTRUCT { \n" +
                 "    ?configuration config:propertyGroup ?group . \n" +
                 "    ?configuration config:displayName ?label . \n" +
-                "    ?configuration ?vitroProp ?vitroValue . \n" +                           
+                "    ?configuration ?vitroProp ?vitroValue . \n" +
                 "} WHERE { \n" +
                 "    <" + contextURI + "> config:hasConfiguration ?configuration . \n" +
                 "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
@@ -522,7 +522,7 @@ public class TBoxUpdater {
                 "    OPTIONAL { ?configuration ?vitroProp ?vitroValue  \n" +
                 "    FILTER (regex(str(?vitroProp), \"" + VitroVocabulary.vitroURI + "\")) } \n" +
                 "} \n" ;
-        
+
         Model configModel = ModelFactory.createDefaultModel();
         String configFileName = settings.getQualifiedPropertyConfigFile();
         File file = new File(configFileName);
@@ -532,11 +532,11 @@ public class TBoxUpdater {
         Model userChangesUnion = ModelFactory.createUnion(configModel, valuesToMigrate);
 
         Model userAnnotationsAsConfig = construct(newQuery, userChangesUnion);
-        Model currentDefaultConfig = construct(existingQuery, configModel); 
-        
+        Model currentDefaultConfig = construct(existingQuery, configModel);
+
         Model additions = userAnnotationsAsConfig.difference(currentDefaultConfig);
         Model retractions = currentDefaultConfig.difference(userAnnotationsAsConfig);
-        
+
         // filter the retractions so we won't remove a value for a given predicate
         // unless the additions model contains at least one value for the same predicate
         Model filteredRetractions = ModelFactory.createDefaultModel();
@@ -547,7 +547,7 @@ public class TBoxUpdater {
                 filteredRetractions.add(candidate);
             }
         }
-        
+
         if (additions.size() > 0 || filteredRetractions.size() > 0) {
             configModel.remove(filteredRetractions);
             log.debug("Removing " + filteredRetractions.size() + " statements from " + contextURI);
@@ -557,8 +557,8 @@ public class TBoxUpdater {
             configModel.write(fos, "N3");
         }
     }
-    
-    private Model construct(String queryStr, Model model) {    
+
+    private Model construct(String queryStr, Model model) {
         Query query = QueryFactory.create(queryStr);
         QueryExecution qe = QueryExecutionFactory.create(query, model);
         try {

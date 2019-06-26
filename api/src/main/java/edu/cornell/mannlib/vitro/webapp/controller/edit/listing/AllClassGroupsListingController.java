@@ -30,12 +30,12 @@ public class AllClassGroupsListingController extends BaseEditController {
     	if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
     		return;
     	}
-    	
+
         VitroRequest vreq = new VitroRequest(request);
 
         VClassGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getVClassGroupDao();
 
-        List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); 
+        List<VClassGroup> groups = dao.getPublicGroupsWithVClasses();
         // uses an unfiltered dao so will see all classes
 
         List<String> results = new ArrayList<String>();
@@ -51,7 +51,7 @@ public class AllClassGroupsListingController extends BaseEditController {
                 String publicName = vcg.getPublicName();
                 if ( StringUtils.isBlank(publicName) ) {
                     publicName = "(unnamed group)";
-                }           
+                }
                 try {
                     results.add("<a href=\"./editForm?uri="+URLEncoder.encode(vcg.getURI(),"UTF-8")+"&amp;controller=Classgroup\">"+publicName+"</a>");
                 } catch (Exception e) {

@@ -72,7 +72,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 			}
 		}
 	},
-	
+
 	fillInTemplate:function(args,frag){
 		this.initialize();
 		this.render();
@@ -81,21 +81,21 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 	},
 	initialize:function(){
 		this.parseData();
-	
+
 		//	begin by grabbing the table, and reading it in.
 		var table=this.domNode.getElementsByTagName("table")[0];
 		if (!table) return;
-		
+
 		var bRangeX=false;
 		var bRangeY=false;
-		
+
 		//	properties off the table
 		if (table.getAttribute("width")) this.properties.width=table.getAttribute("width");
 		if (table.getAttribute("height")) this.properties.height=table.getAttribute("height");
 		if (table.getAttribute("plotType")) this.properties.plotType=table.getAttribute("plotType");
 		if (table.getAttribute("padding")){
 			if (table.getAttribute("padding").indexOf(",") > -1)
-				var p=table.getAttribute("padding").split(","); 
+				var p=table.getAttribute("padding").split(",");
 			else var p=table.getAttribute("padding").split(" ");
 			if (p.length==1){
 				var pad=parseFloat(p[0]);
@@ -140,7 +140,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 
 		//	set up the series.
 		var columns=thead.getElementsByTagName("tr")[0].getElementsByTagName("th");	//	should be <tr><..>
-		
+
 		//	assume column 0 == X
 		for (var i=1; i<columns.length; i++){
 			var key="column"+i;
@@ -207,7 +207,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 			var p=table.getAttribute("axisAt");
 			if (p.indexOf(",")>-1) p=p.split(",");
 			else p=p.split(" ");
-			
+
 			//	x axis
 			if (!isNaN(parseFloat(p[0]))){
 				this.properties.axes.x.plotAt=parseFloat(p[0]);
@@ -238,7 +238,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 //		this.properties.height=dojo.html.getInnerHeight(this.domNode);
 
 		// ok, lets create the chart itself.
-		dojo.svg.g.suspend();		
+		dojo.svg.g.suspend();
 		if(this.vectorNode) this.destroy();
 		this.vectorNode=document.createElementNS(dojo.svg.xmlns.svg, "svg");
 		this.vectorNode.setAttribute("width", this.properties.width);
@@ -248,7 +248,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 		var defs = document.createElementNS(dojo.svg.xmlns.svg, "defs");
 		var clip = document.createElementNS(dojo.svg.xmlns.svg, "clipPath");
 		clip.setAttribute("id","plotClip"+this.widgetId);
-		var rect = document.createElementNS(dojo.svg.xmlns.svg, "rect");		
+		var rect = document.createElementNS(dojo.svg.xmlns.svg, "rect");
 		rect.setAttribute("x", this.properties.padding.left);
 		rect.setAttribute("y", this.properties.padding.top);
 		rect.setAttribute("width", this.properties.width-this.properties.padding.left-this.properties.padding.right);
@@ -260,7 +260,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 		//	the plot background.
 		this.plotArea = document.createElementNS(dojo.svg.xmlns.svg, "g");
 		this.vectorNode.appendChild(this.plotArea);
-		var rect = document.createElementNS(dojo.svg.xmlns.svg, "rect");		
+		var rect = document.createElementNS(dojo.svg.xmlns.svg, "rect");
 		rect.setAttribute("x", this.properties.padding.left);
 		rect.setAttribute("y", this.properties.padding.top);
 		rect.setAttribute("width", this.properties.width-this.properties.padding.left-this.properties.padding.right);
@@ -287,7 +287,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 		line.setAttribute("x2",this.properties.width-this.properties.padding.right);
 		line.setAttribute("style","stroke:#000;stroke-width:"+stroke+";");
 		this.axisGroup.appendChild(line);
-		
+
 		//	x axis units.
 		//	(min and max)
 		var textSize=10;
@@ -297,14 +297,14 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 		text.setAttribute("style", "text-anchor:middle;font-size:"+textSize+"px;fill:#000;");
 		text.appendChild(document.createTextNode(dojo.math.round(parseFloat(this.properties.axes.x.range.min),2)));
 		this.axisGroup.appendChild(text);
-		
+
 		var text = document.createElementNS(dojo.svg.xmlns.svg, "text");
 		text.setAttribute("x", this.properties.width-this.properties.padding.right-(textSize/2));
 		text.setAttribute("y", this.properties.height-this.properties.padding.bottom+textSize+2);
 		text.setAttribute("style", "text-anchor:middle;font-size:"+textSize+"px;fill:#000;");
 		text.appendChild(document.createTextNode(dojo.math.round(parseFloat(this.properties.axes.x.range.max),2)));
-		this.axisGroup.appendChild(text);	
-		
+		this.axisGroup.appendChild(text);
+
 		//	y axis
 		var line=document.createElementNS(dojo.svg.xmlns.svg, "line");
 		var x=dojo.widget.svg.Chart.Plotter.getX(this.properties.axes.y.plotAt, this);
@@ -322,13 +322,13 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 		text.setAttribute("style", "text-anchor:end;font-size:"+textSize+"px;fill:#000;");
 		text.appendChild(document.createTextNode(dojo.math.round(parseFloat(this.properties.axes.y.range.min),2)));
 		this.axisGroup.appendChild(text);
-		
+
 		var text = document.createElementNS(dojo.svg.xmlns.svg, "text");
 		text.setAttribute("x", this.properties.padding.left-4);
 		text.setAttribute("y", this.properties.padding.top+(textSize/2));
 		text.setAttribute("style", "text-anchor:end;font-size:"+textSize+"px;fill:#000;");
 		text.appendChild(document.createTextNode(dojo.math.round(parseFloat(this.properties.axes.y.range.max),2)));
-		this.axisGroup.appendChild(text);	
+		this.axisGroup.appendChild(text);
 
 		this.domNode.appendChild(this.vectorNode);
 		dojo.svg.g.resume();
@@ -345,7 +345,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 	},
 	render:function(){
 		dojo.svg.g.suspend();
-		
+
 		if (this.dataGroup){
 			while(this.dataGroup.childNodes.length>0){
 				this.dataGroup.removeChild(this.dataGroup.childNodes.item(0));
@@ -361,7 +361,7 @@ dojo.lang.extend(dojo.widget.svg.Chart, {
 			dojo.widget.svg.Chart.Plotter.plot(this.series[i], this);
 		}
 //		p.appendChild(this.dataGroup);
-		
+
 		dojo.svg.g.resume();
 	}
 });
@@ -370,7 +370,7 @@ dojo.widget.svg.Chart.Plotter=new function(){
 	var _this=this;
 	var plotters = {};
 	var types=dojo.widget.Chart.PlotTypes;
-	
+
 	this.getX=function(value, chart){
 		var v=parseFloat(value);
 		var min=chart.properties.axes.x.range.min;
@@ -390,7 +390,7 @@ dojo.widget.svg.Chart.Plotter=new function(){
 		var ofst=0;
 		if(min<0)ofst+=Math.abs(min);
 		min+=ofst; max+=ofst; v+=ofst;
-		
+
 		var ymin=chart.properties.height-chart.properties.padding.bottom;
 		var ymax=chart.properties.padding.top;
 		var y=(((ymin-ymax)/(max-min))*(max-v))+ymax;
@@ -467,7 +467,7 @@ dojo.widget.svg.Chart.Plotter=new function(){
 				dx=x-_this.getX(series.values[i-1].x, chart);
 				dy=_this.getY(series.values[i-1].value, chart);
 			}
-			
+
 			if (i==0) path.push("M");
 			else {
 				path.push("C");
@@ -503,7 +503,7 @@ dojo.widget.svg.Chart.Plotter=new function(){
 	plotters[types.Bubble]=function(series, chart){
 		//	added param for series[n].value: size
 		var minR=1;
-		
+
 		//	do this off the x axis?
 		var min=chart.properties.axes.x.range.min;
 		var max=chart.properties.axes.x.range.max;
@@ -513,7 +513,7 @@ dojo.widget.svg.Chart.Plotter=new function(){
 		var xmin=chart.properties.padding.left;
 		var xmax=chart.properties.width-chart.properties.padding.right;
 		var factor=(max-min)/(xmax-xmin)*25;
-		
+
 		for (var i=0; i<series.values.length; i++){
 			var size = series.values[i].size;
 			if (isNaN(parseFloat(size))) size=minR;

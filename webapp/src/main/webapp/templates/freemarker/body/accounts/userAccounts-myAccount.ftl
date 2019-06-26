@@ -36,11 +36,11 @@
     <#if confirmChange??>
         <#assign confirmMessage = strings.myAccount_confirm_changes />
     </#if>
-    
+
     <#if confirmEmailSent??>
         <#assign confirmMessage = strings.myAccount_confirm_changes_plus_note(emailAddress) />
     </#if>
-    
+
     <#if confirmMessage?has_content>
         <section  class="account-feedback" role="alert">
             <p><img class="middle" src="${urls.images}/iconConfirmation.png" alt="${strings.alt_confirmation}"/> ${confirmMessage}</p>
@@ -57,11 +57,11 @@
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
         <p class="note">${strings.email_change_will_be_confirmed}</p>
-        
-        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label> 
+
+        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label> 
+        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
         <#if !externalAuth??>
@@ -70,13 +70,13 @@
 
             <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}<br />${strings.leave_password_unchanged}</p>
 
-            <label for="confirm-password">${strings.confirm_password}</label> 
+            <label for="confirm-password">${strings.confirm_password}</label>
             <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
         </#if>
 
         <p>
-            <input type="submit" id="submitMyAccount" name="submitMyAccount" value="${strings.save_changes}" class="submit" disabled /> 
-            ${strings.or} 
+            <input type="submit" id="submitMyAccount" name="submitMyAccount" value="${strings.save_changes}" class="submit" disabled />
+            ${strings.or}
             <a class="cancel" href="${urls.referringPage}" title="${strings.cancel_title}">${strings.cancel_link}</a>
         </p>
 

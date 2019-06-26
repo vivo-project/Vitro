@@ -9,7 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 
 /**
  * A base class for RequestedAction that permits boolean operations on them.
- * 
+ *
  * A null request is ignored, so in "and" it is equivalent to true, while in
  * "or" it is equivalent to false.
  */

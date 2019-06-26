@@ -14,32 +14,32 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 public class DataPropertyFiltering extends DataProperty {
     private VitroFilters filters;
     private DataProperty innerDataProperty;
-    
+
     public DataPropertyFiltering(DataProperty innerDataProperty, VitroFilters filters){
         this.innerDataProperty = innerDataProperty;
         this.filters = filters;
     }
-    
+
     /**
      * Need to filter DataPropertyStatements and return DataPropertyStatements
-     * wrapped in DataPropertyStatementsFiltering. 
+     * wrapped in DataPropertyStatementsFiltering.
      */
     @Override
-    public List<DataPropertyStatement> getDataPropertyStatements() {        
+    public List<DataPropertyStatement> getDataPropertyStatements() {
         List<DataPropertyStatement> propStmts =  innerDataProperty.getDataPropertyStatements();
         if( propStmts == null ) return null;
-        
+
         List<DataPropertyStatement> filteredStmts = new LinkedList<DataPropertyStatement>();
         Filter.filter(propStmts, filters.getDataPropertyStatementFilter(), filteredStmts);
-        
+
         List<DataPropertyStatement> wrappedStmts = new LinkedList<DataPropertyStatement>();
         for( DataPropertyStatement stmt : filteredStmts){
             wrappedStmts.add( new DataPropertyStatementFiltering(stmt, filters) );
         }
-        return wrappedStmts;        
+        return wrappedStmts;
     }
-    
-           
+
+
     /* the rest of the methods are delegated with no filtering */
     @Override
     public int compareTo(DataProperty op) {
@@ -95,7 +95,7 @@ public class DataPropertyFiltering extends DataProperty {
     public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
         return innerDataProperty.getHiddenFromDisplayBelowRoleLevel();
     }
-    
+
     @Override
     public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
         return innerDataProperty.getProhibitedFromUpdateBelowRoleLevel();
@@ -105,17 +105,17 @@ public class DataPropertyFiltering extends DataProperty {
     public RoleLevel getHiddenFromPublishBelowRoleLevel() {
         return innerDataProperty.getHiddenFromPublishBelowRoleLevel();
     }
-    
+
     @Override
     public String getLocalName() {
         return innerDataProperty.getLocalName();
     }
-    
+
     @Override
     public String getLocalNameWithPrefix() {
         return innerDataProperty.getLocalNameWithPrefix();
     }
-    
+
     @Override
     public String getPickListName() {
         return innerDataProperty.getPickListName();
@@ -185,7 +185,7 @@ public class DataPropertyFiltering extends DataProperty {
     public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
         innerDataProperty.setHiddenFromDisplayBelowRoleLevel(eR);
     }
-    
+
     @Override
     public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
         innerDataProperty.setHiddenFromDisplayBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
@@ -195,7 +195,7 @@ public class DataPropertyFiltering extends DataProperty {
     public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
         innerDataProperty.setProhibitedFromUpdateBelowRoleLevel(eR);
     }
-    
+
     @Override
     public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
         innerDataProperty.setProhibitedFromUpdateBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
@@ -205,7 +205,7 @@ public class DataPropertyFiltering extends DataProperty {
     public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
         innerDataProperty.setHiddenFromPublishBelowRoleLevel(eR);
     }
-    
+
     @Override
     public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
         innerDataProperty.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
@@ -220,7 +220,7 @@ public class DataPropertyFiltering extends DataProperty {
     public void setLocalNameWithPrefix(String localNameWithPrefix) {
         innerDataProperty.setLocalNameWithPrefix(localNameWithPrefix);
     }
-    
+
     @Override
     public void setPickListName(String pickListName) {
         innerDataProperty.setPickListName(pickListName);

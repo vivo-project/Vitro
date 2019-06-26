@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 
 
 public class ClassgroupRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(ClassgroupRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
@@ -66,7 +66,7 @@ public class ClassgroupRetryController extends BaseEditController {
                 } catch (NullPointerException e) {
                     log.error("Need to implement 'record not found' error message.");
                 }
-                if (vclassGroupForEditing == null) {                    
+                if (vclassGroupForEditing == null) {
                     //UTF-8 expected due to URIEncoding on Connector in server.xml
                     String uriToFind = request.getParameter("uri");
                     vclassGroupForEditing = (VClassGroup)cgDao.getGroupByURI(uriToFind);
@@ -78,7 +78,7 @@ public class ClassgroupRetryController extends BaseEditController {
         } else {
             vclassGroupForEditing = (VClassGroup) epo.getNewBean();
         }
-        
+
         //validators
         List<Validator> validatorList = new ArrayList<Validator>();
         validatorList.add(new RequiredFieldValidator());

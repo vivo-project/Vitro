@@ -19,33 +19,33 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 /**
  * Set of static methods to create hashes for RDF literal statements
  * so they can be referenced in HTTP parameters.
- * This allows the creation of a URL to request the deletion of a 
+ * This allows the creation of a URL to request the deletion of a
  * RDF literal statement without including the whole literal in the parameters.
  *
  * ex.
  * {@code http://fake.com/delete?sub="http://bob"&pred="http://hasNickName"&stmtHash="23443434"}
  *
- * This could request the deletion of a the statement for Bob's nickname where the 
+ * This could request the deletion of a the statement for Bob's nickname where the
  * literal matched the hash 23443434.
- * 
+ *
  * The hash is for the whole statement, not just the literal part.  The has will only match
- * if the subject, predicate, datetype/language and literal match. 
- * 
+ * if the subject, predicate, datetype/language and literal match.
+ *
  */
 public class RdfLiteralHash {
-    
+
     private static final Log log = LogFactory.getLog(RdfLiteralHash.class.getName());
-    
+
     /**
      * Make a hash based on individual, property, literal and (lang or datatype).
-     * 
+     *
      * @param stmt Data statement
-     * @return a value between MIN_INTEGER and MAX_INTEGER 
+     * @return a value between MIN_INTEGER and MAX_INTEGER
      */
     public static int makeRdfLiteralHash( DataPropertyStatement stmt ){
         if( stmt.getIndividualURI() == null || stmt.getIndividualURI().trim().length() == 0 )
             throw new Error("Cannot make a hash for a statement with no subject URI");
-        
+
         if( stmt.getDatapropURI() == null || stmt.getDatapropURI().trim().length() == 0)
             throw new Error("Cannot make a hash for a statement with no predicate URI");
 
@@ -69,10 +69,10 @@ public class RdfLiteralHash {
      * @param stmt Data statement
      * @param hash Hash
      */
-    public static boolean doesStmtMatchHash( DataPropertyStatement stmt, int hash){ 
+    public static boolean doesStmtMatchHash( DataPropertyStatement stmt, int hash){
         if( stmt == null )
             return false;
-        
+
         int stmtHash;
         try{
             stmtHash = makeRdfLiteralHash(stmt);
@@ -82,7 +82,7 @@ public class RdfLiteralHash {
         }
         return stmtHash == hash;
     }
-    
+
     /**
      * Forward to either getDataPropertyStmtByHash or getRdfsLabelStatementByHash, depending on the property.
      * @param subjectUri  Subject URI
@@ -92,20 +92,20 @@ public class RdfLiteralHash {
      * @return a DataPropertyStatement if found or null if not found
      */
 
-    public static DataPropertyStatement getPropertyStmtByHash(String subjectUri, String predicateUri, int hash, Model model) {        
+    public static DataPropertyStatement getPropertyStmtByHash(String subjectUri, String predicateUri, int hash, Model model) {
         if (subjectUri == null || predicateUri == null ) return null;
-        
+
         model.enterCriticalSection(false);
-        StmtIterator stmts = model.listStatements(model.createResource(subjectUri),  
+        StmtIterator stmts = model.listStatements(model.createResource(subjectUri),
                                                   model.getProperty(predicateUri),
-                                                  (RDFNode)null);        
+                                                  (RDFNode)null);
         try {
             while (stmts.hasNext()) {
                 Statement stmt = stmts.nextStatement();
                 RDFNode node = stmt.getObject();
                 if ( node.isLiteral() ){
                     DataPropertyStatement dps =
-                        makeDataPropertyStatementFromStatement(stmt, node);          
+                        makeDataPropertyStatementFromStatement(stmt, node);
                     if (doesStmtMatchHash(dps, hash)) {
                         return dps;
                     }
@@ -115,22 +115,22 @@ public class RdfLiteralHash {
         } finally {
                 stmts.close();
                 model.leaveCriticalSection();
-        }    
-    }   
-    
-    
-    public static int makeRdfsLabelLiteralHash( Individual subject, String value, Model  model) { 
-        
+        }
+    }
+
+
+    public static int makeRdfsLabelLiteralHash( Individual subject, String value, Model  model) {
+
         String subjectUri = subject.getURI();
         String predicateUri = VitroVocabulary.LABEL;
-        
-        StmtIterator stmts = model.listStatements(model.createResource(subjectUri), 
-                                                  model.getProperty(predicateUri), 
-                                                  (RDFNode) null);                     
+
+        StmtIterator stmts = model.listStatements(model.createResource(subjectUri),
+                                                  model.getProperty(predicateUri),
+                                                  (RDFNode) null);
         DataPropertyStatement dps = null;
         int hash = 0;
         int count = 0;
-        try {           
+        try {
             while (stmts.hasNext()) {
                 Statement stmt = stmts.nextStatement();
                 RDFNode node = stmt.getObject();
@@ -143,20 +143,20 @@ public class RdfLiteralHash {
         } finally {
             stmts.close();
         }
-        
+
         if( count == 1 ) {
             return hash;
         } else if( count == 0 ){
             log.debug("No data property statement for " +
                     "subject:" + subjectUri + "\npredicate:" + predicateUri + "\nvalue: " + value);
             throw new IllegalArgumentException("Could not create RdfLiteralHash because " +
-                    "there was no data property statement with the given value.");      
+                    "there was no data property statement with the given value.");
         } else{
             log.debug("Multiple data property statements for " +
                     "subject:" + subjectUri + "\npredicate:" + predicateUri + "\nvalue: " + value);
             throw new IllegalArgumentException("Could not create RdfLiteralHash because " +
-                    "there were multiple data property statements with the given value.");                  
-        }       
+                    "there were multiple data property statements with the given value.");
+        }
     }
 
     private static DataPropertyStatement makeDataPropertyStatementFromStatement(Statement statement, RDFNode node) {
@@ -172,8 +172,8 @@ public class RdfLiteralHash {
         dps.setData(value);
         dps.setDatapropURI(statement.getPredicate().getURI());
         dps.setIndividualURI(statement.getSubject().getURI());
-         
+
         return dps;
     }
-    
+
 }

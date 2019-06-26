@@ -20,9 +20,9 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 /**
  * Check if the submitted text has potential XSS problems.
- * Error messages from this validator always start with XSS_ERROR_MESSAGE 
- * 
- * @author bdc34  
+ * Error messages from this validator always start with XSS_ERROR_MESSAGE
+ *
+ * @author bdc34
  */
 public class DefaultDataPropertyFormValidator implements N3ValidatorVTwo{
 	private Log log = LogFactory.getLog(DefaultDataPropertyFormValidator.class);
@@ -46,7 +46,7 @@ public class DefaultDataPropertyFormValidator implements N3ValidatorVTwo{
     private final Pattern floatPattern = Pattern.compile(floatRegex);
     private final String intRegex = "^-?\\d+$";
     private final Pattern intPattern = Pattern.compile(intRegex);
-    
+
     public DefaultDataPropertyFormValidator(String datatype, VitroRequest vreq) {
         this.datatype = datatype;
 		this.vreq = vreq;
@@ -59,8 +59,8 @@ public class DefaultDataPropertyFormValidator implements N3ValidatorVTwo{
 
         Map<String,List<Literal>> literalsFromForm = editSub.getLiteralsFromForm();
 
-        Map<String,String> errors = new HashMap<String,String>();   
-        
+        Map<String,String> errors = new HashMap<String,String>();
+
         List<Literal> formLiterals = literalsFromForm.get("literal");
         Literal literal = null;
         if(formLiterals != null && formLiterals.size() > 0) {
@@ -73,7 +73,7 @@ public class DefaultDataPropertyFormValidator implements N3ValidatorVTwo{
                 literal = null;
             }
         }
-		
+
 		if ( literal != null ) {
 
 	        if ( datatype.indexOf("#dateTime") > -1 ) {
@@ -114,8 +114,8 @@ public class DefaultDataPropertyFormValidator implements N3ValidatorVTwo{
 		}
         else {
             return null;
-        }               
-        
+        }
+
         return errors.size() != 0 ? errors : null;
     }
 }

@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmis
 
 /**
  * Editors have gotten into the habit of clearing the text from the
- * textarea and saving it to invoke a delete.  see Issue VITRO-432   
+ * textarea and saving it to invoke a delete.  see Issue VITRO-432
  *
  */
 public class DefaultDataPropEmptyField implements ModelChangePreprocessor{
@@ -25,28 +25,28 @@ public class DefaultDataPropEmptyField implements ModelChangePreprocessor{
     @Override
     public void preprocess(Model retractionsModel, Model additionsModel,
             HttpServletRequest request) {
-        
+
         EditConfigurationVTwo configuration = EditConfigurationUtils.getEditConfiguration(request);
-        
+
         HttpSession session = request.getSession();
         MultiValueEditSubmission submission = EditSubmissionUtils.getEditSubmissionFromSession(session,configuration);
-        
+
         //if data property, then check for empty string condition
         //which means only one value and it is an empty string
         if( checkForEmptyString(submission, configuration, new VitroRequest(request)) ) {
             additionsModel.removeAll();
-        }        
+        }
     }
-    
+
 
     protected boolean checkForEmptyString(
             MultiValueEditSubmission submission,
-            EditConfigurationVTwo configuration, 
+            EditConfigurationVTwo configuration,
             VitroRequest vreq) {
-        
+
         if(EditConfigurationUtils.isDataProperty(configuration.getPredicateUri(), vreq)) {
             // Our editors have gotten into the habit of clearing the text from the
-            // textarea and saving it to invoke a delete.  see Issue VITRO-432   
+            // textarea and saving it to invoke a delete.  see Issue VITRO-432
             if (configuration.getFields().size() == 1) {
                 String onlyField = configuration.getFields().keySet().iterator().next();
                 List<Literal> value = submission.getLiteralsFromForm().get(onlyField);
@@ -61,7 +61,7 @@ public class DefaultDataPropEmptyField implements ModelChangePreprocessor{
                 }
             }
         }
-        return false;    
+        return false;
     }
 
 }

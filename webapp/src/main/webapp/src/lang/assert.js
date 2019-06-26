@@ -22,7 +22,7 @@ dojo.require("dojo.lang.type");
  * Throws an exception if the assertion fails.
  *
  * If the asserted condition is true, this method does nothing. If the
- * condition is false, we throw an error with a error message.  
+ * condition is false, we throw an error with a error message.
  *
  * @param	booleanValue	A boolean value, which needs to be true for the assertion to succeed.
  * @param	message	Optional. A string describing the assertion.

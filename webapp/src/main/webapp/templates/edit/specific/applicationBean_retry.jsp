@@ -10,7 +10,7 @@
 <% request.setAttribute("requestedActions", SimplePermission.EDIT_SITE_INFORMATION.ACTION); %>
 <vitro:confirmAuthorization />
 
-<c:set var="appNameLabel" value="Site name"/> 
+<c:set var="appNameLabel" value="Site name"/>
 <label for="site-name">${appNameLabel}<span class="note"> (max 50 characters)</span></label>
 <input type="text" name="ApplicationName" value="<form:value name="ApplicationName"/>" ${longField} maxlength="50" />
 <c:set var="ApplicationNameError"><form:error name="ApplicationName"/></c:set>
@@ -18,7 +18,7 @@
     <span class="notice"><c:out value="${ApplicationNameError}"/></span>
 </c:if>
 
-<!-- With introduction of new logo that includes tagline as part of the image, hiding this field for now to reduce user confusion -->        
+<!-- With introduction of new logo that includes tagline as part of the image, hiding this field for now to reduce user confusion -->
 <!-- <tr class="editformcell">
     <td valign="top" colspan="2">
         <b>Tagline </b> <i>appears in header, just to the right of the logo (leave blank to have no tagline)</i><br />
@@ -74,7 +74,7 @@
         <label>Banner image</label>
         <input type="text" name="BannerImage" value="<form:value name="BannerImage"/>" style="width:90%" maxlength="255" />
         <font color="red"><form:error name="BannerImage"/></font>
-  
+
         <label>Banner image width</label>
         <input type="text" name="BannerWidth" value="<form:value name="BannerWidth"/>" ${smallCell} maxlength="11" />
         <font color="red"><form:error name="BannerWidth"/></font>
@@ -94,5 +94,5 @@
         <label>Logotype image height</label>
         <input type="text" name="LogotypeHeight" value="<form:value name="LogotypeHeight"/>" ${smallCell} maxlength="11" />
         <font color="red"><form:error name="LogotypeHeight"/></font>
- 
+
 -->

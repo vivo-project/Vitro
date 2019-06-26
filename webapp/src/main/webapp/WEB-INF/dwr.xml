@@ -11,30 +11,30 @@
     <!-- creator: "new" "scripted" "spring"  -->
     <!-- scope: "application" "session" "request" "page" -->
     <!-- that the "request" scope is only useful for static methods -->
-  
+
       <create creator="new" javascript="PropertyDWR" scope="page">
           <param name="class" value="edu.cornell.mannlib.vitro.webapp.dwr.PropertyDWR"/>
       </create>
-      
+
       <create creator="new" javascript="EntityDWR" scope="page">
           <param name="class" value="edu.cornell.mannlib.vitro.webapp.dwr.EntityDWR" />
-      </create>         
+      </create>
 
       <create creator="new" javascript="VClassDWR" scope="page">
           <param name="class" value="edu.cornell.mannlib.vitro.webapp.dwr.VClassDWR"/>
       </create>
-      
-    <!-- Convert blocks define how a types are moved between java 
-         land and java script land -->    
+
+    <!-- Convert blocks define how a types are moved between java
+         land and java script land -->
 
     <convert converter="bean" match="edu.cornell.mannlib.vitro.webapp.beans.VClass">
         <param name="include" value="name,URI,groupURI,hidden,shortDef,hiddenFromPublicDisplay,hiddenFromEditDisplay"/>
     </convert>
-                                           
+
     <convert converter="bean" match="edu.cornell.mannlib.vitro.webapp.beans.Individual">
         <param name="include" value="name,moniker,URI,vClassURI"/>
     </convert>
-    
+
     <convert converter="bean" match="edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance"/>
 
     <!--<convert converter="object" match="edu.cornell.mannlib.vitro.beans.Entity">-->

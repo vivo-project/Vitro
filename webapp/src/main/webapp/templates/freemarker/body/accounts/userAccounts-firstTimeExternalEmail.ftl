@@ -34,7 +34,7 @@ ${userAccount.firstName} ${userAccount.lastName}
 
 Congratulations!
 
-We have created your new VIVO account associated with 
+We have created your new VIVO account associated with
 ${userAccount.emailAddress}.
 
 Thanks!

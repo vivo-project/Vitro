@@ -59,10 +59,10 @@ public abstract class VitroAjaxController extends HttpServlet {
 			throws ServletException, IOException {
 		doGet(req, resp);
 	}
-	
+
     /**
      * By default, a controller requires authorization for no actions.
-     * Subclasses that require authorization to process their page will override 
+     * Subclasses that require authorization to process their page will override
 	 *    to return the actions that require authorization.
 	 * In some cases, the choice of actions will depend on the contents of the request.
      */

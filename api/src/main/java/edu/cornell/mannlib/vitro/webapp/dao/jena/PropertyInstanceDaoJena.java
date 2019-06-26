@@ -32,8 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 public class PropertyInstanceDaoJena extends PropertyDaoJena implements
         PropertyInstanceDao {
 
-    public PropertyInstanceDaoJena(RDFService rdfService, 
-                                   DatasetWrapperFactory dwf, 
+    public PropertyInstanceDaoJena(RDFService rdfService,
+                                   DatasetWrapperFactory dwf,
                                    WebappDaoFactoryJena wadf) {
         super(rdfService, dwf, wadf);
     }
@@ -42,7 +42,7 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
     	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector());
     }
 
-    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, 
+    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI,
                                               OntModelSelector ontModelSelector) {
         OntModel ontModel = ontModelSelector.getABoxModel();
         OntModel tboxModel = ontModelSelector.getTBoxModel();
@@ -50,22 +50,22 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
         try {
             Resource subjRes = ontModel.getResource(subjectURI);
             Property pred = tboxModel.getProperty(propertyURI);
-            OntProperty invPred = null;                        
+            OntProperty invPred = null;
             if (pred.canAs(OntProperty.class)) {
             	invPred = pred.as(OntProperty.class).getInverse();
             }
             Resource objRes = ontModel.getResource(objectURI);
             Model baseModel = getOntModel().getBaseModel();
             String userUri = getWebappDaoFactory().getUserURI();
-            if ( (subjRes != null) && (pred != null) && (objRes != null) ) {            	
+            if ( (subjRes != null) && (pred != null) && (objRes != null) ) {
             	baseModel.notifyEvent(new IndividualUpdateEvent(userUri,true,subjectURI));
             	try {
-            		ontModel.remove(subjRes,pred,objRes);            		
+            		ontModel.remove(subjRes,pred,objRes);
             	} finally {
             		baseModel.notifyEvent(new IndividualUpdateEvent(userUri,false,subjectURI));
             	}
-            	try{            		
-            		baseModel.notifyEvent(new IndividualDeletionEvent(userUri,true,objectURI));            		
+            	try{
+            		baseModel.notifyEvent(new IndividualDeletionEvent(userUri,true,objectURI));
             		List<Statement> depResStmts = DependentResourceDeleteJena
                         .getDependentResourceDeleteList(ResourceFactory.createStatement(subjRes, pred, objRes),ontModel);
             		ontModel.remove(depResStmts);
@@ -85,34 +85,34 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
             ontModel.leaveCriticalSection();
         }
     }
-    
-    @Override 
+
+    @Override
     public List<PropertyInstance> getAllPossiblePropInstForIndividual(String individualURI) {
-    	return filterAndSort(super.getAllPossiblePropInstForIndividual(individualURI));	
+    	return filterAndSort(super.getAllPossiblePropInstForIndividual(individualURI));
     }
-    
-    @Override 
+
+    @Override
     public List<PropertyInstance> getAllPropInstByVClass(String vclassURI) {
     	return filterAndSort(super.getAllPropInstByVClass(vclassURI));
     }
-    
+
     @Override
     public List<PropertyInstance> getAllPropInstByVClasses(List<VClass> vclasses) {
     	return filterAndSort(super.getAllPropInstByVClasses(vclasses));
     }
-    
+
     private List<PropertyInstance>filterAndSort(List<PropertyInstance> propList) {
     	ArrayList<PropertyInstance> propInsts = new ArrayList<PropertyInstance>();
     	for (PropertyInstance propInst : propList) {
     		OntModel tboxModel = getOntModel();
     		tboxModel.enterCriticalSection(Lock.READ);
     		boolean add = false;
-    		try { 
-    			add = (propInst.getPropertyURI() != null 
+    		try {
+    			add = (propInst.getPropertyURI() != null
     					&& tboxModel.contains(
     							tboxModel.getResource(
-    									propInst.getPropertyURI()), 
-    									RDF.type, 
+    									propInst.getPropertyURI()),
+    									RDF.type,
     									OWL.ObjectProperty));
 	    	} finally {
 	    		tboxModel.leaveCriticalSection();
@@ -202,7 +202,7 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
             tboxModel.enterCriticalSection(Lock.READ);
             try {
                 Resource subjRes = ontModel.getResource(prop.getSubjectEntURI());
-                OntProperty pred = tboxModel.getOntProperty(prop.getPropertyURI());            
+                OntProperty pred = tboxModel.getOntProperty(prop.getPropertyURI());
                 Resource objRes = ontModel.getResource(prop.getObjectEntURI());
                 if ( (subjRes != null) && (pred != null) && (objRes != null) ) {
                 	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getSubjectEntURI()));

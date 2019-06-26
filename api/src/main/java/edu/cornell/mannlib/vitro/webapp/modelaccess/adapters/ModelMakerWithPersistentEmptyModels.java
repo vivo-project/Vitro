@@ -16,17 +16,17 @@ import org.apache.jena.util.iterator.WrappedIterator;
  * This ModelMaker will remember the URIs of models you create, even if you
  * don't add triples to them. Of course, when VIVO is shut down, this ModelMaker
  * forgets.
- * 
+ *
  * This is a useful decorator for some triple stores which do not remember empty
  * models. SDB, for example. With this decorator, a GUI can offer to let you
  * create a model, and then offer to let you add triples to it. Without this
  * decorator, you would need to do that in a single step.
- * 
+ *
  * If you are dealing with a triple store where listModels() is a costly
  * operation, you might be better off using a ListCachingModelMaker instead. The
  * drawback is that ListCachingModelMaker will not see models that were created
  * at a lower level; perhaps by RDFServiceDataset.getNamedModel().
- * 
+ *
  * The methods that create a model must add its name to the list. The methods
  * that remove a model must remove its name from the list.
  */

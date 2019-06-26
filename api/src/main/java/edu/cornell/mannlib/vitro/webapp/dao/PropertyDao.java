@@ -52,10 +52,10 @@ public interface PropertyDao {
 
 	/**
 	 * An immutable key class for making maps of properties and faux properties.
-	 * 
+	 *
 	 * The property URI is a significant part of the key, of course, but the
 	 * range and domain URIs are significant also.
-	 * 
+	 *
 	 * If the range or domain URI is not provided, it is assumed to be
 	 * OWL:Thing.
 	 */

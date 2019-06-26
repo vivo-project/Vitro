@@ -37,14 +37,14 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExclud
 /**
  * Given a list of URIs, remove the ones that don't belong in the index and
  * update the ones that do belong.
- * 
+ *
  * A URI doesn't belong in the index if there is no individual with that URI, or
  * if the individual has no VClasses assigned to it, or if the individual is
  * excluded by one of the excluders.
- * 
+ *
  * Deletions are done synchronously, but updates are scheduled to run on the
  * thread pool.
- * 
+ *
  * Commit requests are issued to the SearchEngine at each progress event and
  * again at the end of the task.
  */

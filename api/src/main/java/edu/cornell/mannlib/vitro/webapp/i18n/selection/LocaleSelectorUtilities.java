@@ -23,14 +23,14 @@ public class LocaleSelectorUtilities {
 	/**
 	 * Look in the current theme directory to find a selection image for this
 	 * Locale.
-	 * 
+	 *
 	 * Images are expected at a resource path like
 	 * /[themeDir]/i18n/images/select_locale_[locale_code].*
-	 * 
+	 *
 	 * For example, /themes/wilma/i18n/images/select_locale_en.png
 	 * /themes/wilma/i18n/images/select_locale_en.JPEG
 	 * /themes/wilma/i18n/images/select_locale_en.gif
-	 * 
+	 *
 	 * To create a proper URL, prepend the context path.
 	 */
 	public static String getImageUrl(VitroRequest vreq, Locale locale)

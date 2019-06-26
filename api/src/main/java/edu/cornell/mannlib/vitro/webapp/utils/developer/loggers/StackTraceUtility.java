@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Records and process the stack trace so a developer's logger can (1) test
  * against it, and (2) display it.
- * 
+ *
  * If the "enabled" flag is not set, no processing is done, and the stack trace
  * is empty. That way, there is essentially no overhead in creating a disabled
  * instance.

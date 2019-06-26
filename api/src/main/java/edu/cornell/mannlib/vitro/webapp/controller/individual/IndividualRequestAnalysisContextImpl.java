@@ -17,13 +17,13 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
  */
 public class IndividualRequestAnalysisContextImpl implements
 		IndividualRequestAnalysisContext {
-		
-	private final VitroRequest vreq;	
+
+	private final VitroRequest vreq;
 	private final WebappDaoFactory wadf;
 	private final IndividualDao iDao;
 
 	public IndividualRequestAnalysisContextImpl(VitroRequest vreq) {
-		this.vreq = vreq;	
+		this.vreq = vreq;
 		this.wadf = vreq.getWebappDaoFactory();
 		this.iDao = wadf.getIndividualDao();
 	}

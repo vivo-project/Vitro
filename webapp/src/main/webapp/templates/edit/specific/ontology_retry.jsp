@@ -38,7 +38,7 @@
 		</td>
 	</tr>
 <script  type="text/javascript">
-$(document).ready(function() {   
+$(document).ready(function() {
       var source = "";
     $('input#primaryAction').click(function() {
         source = "submit";

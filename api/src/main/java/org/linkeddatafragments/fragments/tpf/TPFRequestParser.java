@@ -51,7 +51,7 @@ public class TPFRequestParser<ConstantTermType,NamedVarType,AnonVarType>
      *
      */
     protected class Worker extends FragmentRequestParserBase.Worker
-    {   
+    {
 
         /**
          *

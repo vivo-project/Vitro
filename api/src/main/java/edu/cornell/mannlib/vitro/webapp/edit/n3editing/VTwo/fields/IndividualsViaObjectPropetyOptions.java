@@ -27,29 +27,29 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.utils.fields.FieldUtils;
 
 public class IndividualsViaObjectPropetyOptions implements FieldOptions {
-    
+
     private static final Log log = LogFactory.getLog(IndividualsViaObjectPropetyOptions.class);
-    
+
     private static final String LEFT_BLANK = "";
     private String subjectUri;
-    private String predicateUri;    
+    private String predicateUri;
     private List<VClass> rangeTypes;
     private String objectUri;
     private VitroRequest vreq;
     private boolean hasSubclasses = true;
-    
+
     private String defaultOptionLabel;
-    
+
     public IndividualsViaObjectPropetyOptions(String subjectUri,
             String predicateUri, List<VClass> rangeTypes, String objectUri, VitroRequest vreq) throws Exception {
         super();
-        
+
         if (subjectUri == null || subjectUri.equals("")) {
             throw new Exception("no subjectUri found for field ");
         }
         if (predicateUri == null || predicateUri.equals("")) {
-            throw new Exception("no predicateUri found for field ");                    
-        } 
+            throw new Exception("no predicateUri found for field ");
+        }
 
         this.subjectUri = subjectUri;
         this.predicateUri = predicateUri;
@@ -57,7 +57,7 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         this.objectUri = objectUri;
 		this.vreq = vreq;
     }
-    
+
     public IndividualsViaObjectPropetyOptions(String subjectUri,
             String predicateUri, String objectUri) throws Exception {
         this (subjectUri, predicateUri, null, objectUri);
@@ -72,26 +72,26 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         this.defaultOptionLabel = label;
         return this;
     }
-    
+
     @Override
     public Map<String, String> getOptions(
-            EditConfigurationVTwo editConfig, 
-            String fieldName, 
+            EditConfigurationVTwo editConfig,
+            String fieldName,
             WebappDaoFactory wDaoFact) {
         HashMap<String, String> optionsMap = new LinkedHashMap<String, String>();
         int optionsCount = 0;
- 
+
         // first test to see whether there's a default "leave blank"
-        // value specified with the literal options                
+        // value specified with the literal options
         if ((defaultOptionLabel ) != null) {
             optionsMap.put(LEFT_BLANK, defaultOptionLabel);
         }
-        
-        Individual subject = wDaoFact.getIndividualDao().getIndividualByURI(subjectUri);                    
+
+        Individual subject = wDaoFact.getIndividualDao().getIndividualByURI(subjectUri);
 
         //get all vclasses applicable to the individual subject
         HashSet<String> vclassesURIs = getApplicableVClassURIs(subject, wDaoFact);
-        
+
         if (!rangeTypes.isEmpty()) {
             vclassesURIs = filterToSubclassesOfRange(vclassesURIs, rangeTypes, wDaoFact);
 	        // is there only one range class and does it have any subclasses? If not, there's no
@@ -100,13 +100,13 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 				hasSubclasses = rangeHasSubclasses(rangeTypes.get(0), vreq);
 			}
         }
-                
-        if (vclassesURIs.size() == 0) {           
+
+        if (vclassesURIs.size() == 0) {
             return optionsMap;
         }
-        
+
         List<Individual> individuals = new ArrayList<Individual>();
-        HashSet<String> uriSet = new HashSet<String>();        
+        HashSet<String> uriSet = new HashSet<String>();
         for (String vclassURI: vclassesURIs) {
             List<Individual> inds = wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclassURI, -1, -1);
             for (Individual ind : inds) {
@@ -126,10 +126,10 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         for (Individual ind : individuals) {
             String uri = ind.getURI();
             if (uri != null) {
-                // The picklist should only display individuals with rdfs labels. 
+                // The picklist should only display individuals with rdfs labels.
                 // SO changing the following line  -- tlw72
 				// String label = ind.getName().trim();
-				String label = ind.getRdfsLabel();				
+				String label = ind.getRdfsLabel();
 				if ( label != null ) {
 					List<String> msTypes = ind.getMostSpecificTypeURIs();
 					if ( hasSubclasses && msTypes.size() > 0 ) {
@@ -154,16 +154,16 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
                 vclassesURIs.add(rangeType.getURI());
                 rangeBuff.append(rangeType.getURI()).append(", ");
             }
-            log.debug("individualsViaObjectProperty using rangeUri " + rangeBuff.toString());            
+            log.debug("individualsViaObjectProperty using rangeUri " + rangeBuff.toString());
             return vclassesURIs;
-        } 
-        
+        }
+
         log.debug("individualsViaObjectProperty not using any rangeUri");
-        
+
         List<VClass> subjectVClasses = subject.getVClasses();
-        
+
         //using hashset to prevent duplicates
-        
+
         //Get the range vclasses applicable for the property and each vclass for the subject
         for(VClass subjectVClass: subjectVClasses) {
             List<VClass> vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subjectVClass.getURI(), predicateUri);
@@ -174,12 +174,12 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
                 }
             }
         }
-        
+
         return vclassesURIs;
     }
-    
-    private HashSet<String> filterToSubclassesOfRange(HashSet<String> vclassesURIs, 
-                                              List<VClass> rangeTypes, 
+
+    private HashSet<String> filterToSubclassesOfRange(HashSet<String> vclassesURIs,
+                                              List<VClass> rangeTypes,
                                               WebappDaoFactory wDaoFact) {
         HashSet<String> filteredVClassesURIs = new HashSet<String>();
         VClassDao vcDao = wDaoFact.getVClassDao();
@@ -192,13 +192,13 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         }
         return filteredVClassesURIs;
     }
-    
-   
-    
+
+
+
     public Comparator<String[]> getCustomComparator() {
     	return null;
     }
-    
+
 	private String getMsTypeLocalName(String theUri, WebappDaoFactory wDaoFact) {
 		VClassDao vcDao = wDaoFact.getVClassDao();
 		VClass vClass = vcDao.getVClassByURI(theUri);

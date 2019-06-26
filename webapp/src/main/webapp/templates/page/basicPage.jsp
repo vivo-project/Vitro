@@ -13,17 +13,17 @@
          The html <HEAD> is generated followed by the banners and menu.
          After that the result of the jsp in the attribute bodyJsp is inserted.
          Finally comes the footer.
-         
-         request.attributes:                    
+
+         request.attributes:
             "bodyJsp" - jsp of the body of this page.
             "title" - title of page
             "css" - optional additional css for page
             "scripts" - optional name of file containing <script> elements to be included in the page
             "bodyAttr" - optional attributes for the <body> tag, e.g. 'onload': use leading space
-            
+
           Consider sticking < % = MiscWebUtils.getReqInfo(request) % > in the html output
           for debugging info.
-                 
+
          bdc34 2006-02-03 created
         **********************************************/
         /*
@@ -52,17 +52,17 @@
 <html lang="en">
     <head>
         ${ftl_head}
-        
+
         <c:if test="${!empty scripts}"><jsp:include page="${scripts}"/></c:if>
     </head>
-    
+
     <body ${requestScope.bodyAttr}>
             ${ftl_identity}
             ${ftl_search}
             ${ftl_menu}
-            
+
                 <c:import url="${bodyJsp}"/>
-            
+
             ${ftl_footer}
 
     </body>

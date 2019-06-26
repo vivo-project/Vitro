@@ -47,7 +47,7 @@ public class RestrictedAuthenticator extends Authenticator {
 		if (userAccount == null) {
 			return false;
 		}
-		
+
 		ArrayIdentifierBundle ids = new ArrayIdentifierBundle();
 		ids.addAll(getIdsForUserAccount(req, userAccount));
 		ids.addAll(RequestIdentifiers.getIdBundleForRequest(req));

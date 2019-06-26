@@ -181,7 +181,7 @@ http://www.w3.org/TR/html401/struct/global.html
             <regexp-list>
                 <regexp value="[a-zA-Z0-9,\-\s]+"/>
             </regexp-list>
-            
+
             <literal-list>
                 <literal value="screen"/>
 

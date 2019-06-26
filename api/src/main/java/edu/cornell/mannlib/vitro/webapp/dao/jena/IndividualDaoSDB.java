@@ -54,25 +54,25 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 	private DatasetWrapperFactory dwf;
     private SDBDatasetMode datasetMode;
     private WebappDaoFactorySDB wadf;
-	
-    public IndividualDaoSDB(DatasetWrapperFactory dwf, 
-                            SDBDatasetMode datasetMode, 
+
+    public IndividualDaoSDB(DatasetWrapperFactory dwf,
+                            SDBDatasetMode datasetMode,
                             WebappDaoFactorySDB wadf) {
         super(wadf);
         this.dwf = dwf;
         this.datasetMode = datasetMode;
         this.wadf = wadf;
     }
-    
+
     protected DatasetWrapper getDatasetWrapper() {
     	return dwf.getDatasetWrapper();
     }
-    
+
     protected Individual makeIndividual(String individualURI) {
         try {
-            return new IndividualSDB(individualURI, 
+            return new IndividualSDB(individualURI,
             	                     this.dwf,
-            	                     datasetMode, 
+            	                     datasetMode,
             	                     wadf);
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
@@ -96,24 +96,24 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     protected OntModel getOntModel() {
     	return getOntModelSelector().getABoxModel();
     }
-    
+
     private static final boolean SKIP_INITIALIZATION = true;
-    
+
     @Override
-    public List getIndividualsByVClassURI(String vclassURI, 
-    		                              int offset, 
+    public List getIndividualsByVClassURI(String vclassURI,
+    		                              int offset,
     		                              int quantity ) {
 
     	if (vclassURI==null) {
             return null;
         }
-        
+
         List<Individual> ents = new ArrayList<Individual>();
-        
-        Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0) 
+
+        Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0)
             ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
             : ResourceFactory.createResource(vclassURI);
-    
+
         if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
         	UnionClass u = theClass.as(UnionClass.class);
         	for (OntClass operand : u.listOperands().toList()) {
@@ -121,13 +121,13 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		ents.addAll(getIndividualsByVClass(vc));
         	}
         } else {
-        	
+
         	List<Individual> individualList;
-        	
+
         	// Check if there is a graph filter.
         	// If so, we will use it in a slightly strange way.  Unfortunately,
-        	// performance is quite bad if we add several graph variables in 
-        	// order to account for the fact that an individual's type 
+        	// performance is quite bad if we add several graph variables in
+        	// order to account for the fact that an individual's type
         	// declaration may be in a different graph from its label.
         	// Thus, we will run two queries: one with a single
         	// graph variable to get the list of URIs, and a second against
@@ -135,32 +135,32 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	// We will then toss out any individual in the second
         	// list that is not also in the first list.
         	// Annoying, yes, but better than the alternative.
-        	// Note that both queries need to sort identically or 
+        	// Note that both queries need to sort identically or
         	// the results may be very strange.
         	String[] graphVars = {"?g"};
         	String filterStr = WebappDaoFactorySDB.getFilterBlock(
         			graphVars, datasetMode);
         	if (!StringUtils.isEmpty(filterStr)) {
-        		List<Individual> graphFilteredIndividualList = 
+        		List<Individual> graphFilteredIndividualList =
         			    getGraphFilteredIndividualList(theClass, filterStr);
         		List<Individual> unfilteredIndividualList = getIndividualList(
         				theClass);
         		Iterator<Individual> unfilteredIt  = unfilteredIndividualList
-        													.iterator(); 
+        													.iterator();
         		for (Individual filt : graphFilteredIndividualList) {
         			Individual unfilt = unfilteredIt.next();
         			while (!unfilt.getURI().equals(filt.getURI())) {
         				unfilt = unfilteredIt.next();
         			}
         			ents.add(unfilt);
-        		}	
+        		}
         	} else {
         		ents = getIndividualList(theClass);
         	}
         }
-        
+
         java.util.Collections.sort(ents);
-        
+
         if (quantity > 0 && offset > 0) {
             List<Individual> sublist = new ArrayList<Individual>();
             for (int i = offset - 1; i < ((offset - 1) + quantity); i++) {
@@ -168,11 +168,11 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             }
             return sublist;
         }
-        
+
         return ents;
 
     }
-        
+
     private List<Individual> getIndividualList(Resource theClass) {
     	final List<Individual> ents = new ArrayList<Individual>();
    	    DatasetWrapper w = getDatasetWrapper();
@@ -239,18 +239,18 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	} finally {
     		dataset.getLock().leaveCriticalSection();
     		w.close();
-    	} 
+    	}
         return ents;
     }
-    
-    private List<Individual> getGraphFilteredIndividualList(Resource theClass, 
+
+    private List<Individual> getGraphFilteredIndividualList(Resource theClass,
     		                                                String filterStr) {
 		final List<Individual> filteredIndividualList = new ArrayList<Individual>();
 		DatasetWrapper w = getDatasetWrapper();
    	    Dataset dataset = w.getDataset();
        	dataset.getLock().enterCriticalSection(Lock.READ);
        	try {
-    		String query = 
+    		String query =
     			"SELECT DISTINCT ?ind " +
     			"WHERE " +
     			"{ GRAPH ?g { \n" +
@@ -284,16 +284,16 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 		}
        	return filteredIndividualList;
     }
-    
+
     private Individual makeIndividual(String uri, String label) throws IndividualNotFoundException {
-        Individual ent = new IndividualSDB(uri, 
-                this.dwf, datasetMode, wadf, 
+        Individual ent = new IndividualSDB(uri,
+                this.dwf, datasetMode, wadf,
                 SKIP_INITIALIZATION);
         ent.setName(label);
 		ent.setRdfsLabel(label);
         return ent;
     }
-	
+
     @Override
     public Individual getIndividualByURI(String entityURI) {
         if( entityURI == null || entityURI.length() == 0 ) {
@@ -301,10 +301,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         } else {
         	return makeIndividual(entityURI);
         }
-    }  
-    
+    }
+
     /**
-     * fills in the Individual objects needed for any ObjectPropertyStatements 
+     * fills in the Individual objects needed for any ObjectPropertyStatements
      * attached to the specified individual.
      * @param entity An individual
      */
@@ -319,20 +319,20 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             getOntModel().leaveCriticalSection();
         }
     }
-    
+
     /**
      * In Jena it can be difficult to get an object with a given dataproperty if
      * you do not care about the datatype or lang of the literal.  Use this
-     * method if you would like to ignore the lang and datatype.  
-     * 
-     * Note: this method doesn't require that a property be declared in the 
+     * method if you would like to ignore the lang and datatype.
+     *
+     * Note: this method doesn't require that a property be declared in the
      * ontology as a data property -- only that it behaves as one.
      */
     @Override
-    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, 
-    	                                                 String value){  
+    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri,
+    	                                                 String value){
     	OntModel fullModel = getOntModelSelector().getFullModel();
-    	
+
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
@@ -340,7 +340,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             prop = fullModel.getProperty(dataPropertyUri);
         }
 
-        if( prop == null ) {            
+        if( prop == null ) {
             log.debug("Could not getIndividualsByDataProperty() " +
                     "because " + dataPropertyUri + "was not found in model.");
             return Collections.emptyList();
@@ -351,116 +351,116 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                     "because value was null");
             return Collections.emptyList();
         }
-        
-        Literal litv1 = fullModel.createLiteral(value);        
-        Literal litv2 = fullModel.createTypedLiteral(value);   
-        
+
+        Literal litv1 = fullModel.createLiteral(value);
+        Literal litv2 = fullModel.createTypedLiteral(value);
+
         //warning: this assumes that any language tags will be EN
-        Literal litv3 = fullModel.createLiteral(value,"EN");        
-        
-        HashMap<String,Individual> individualsMap = 
+        Literal litv3 = fullModel.createLiteral(value,"EN");
+
+        HashMap<String,Individual> individualsMap =
         		new HashMap<String, Individual>();
-                
+
         fullModel.enterCriticalSection(Lock.READ);
         int count = 0;
         try{
             StmtIterator stmts
-                = fullModel.listStatements((Resource)null, prop, litv1);                                           
+                = fullModel.listStatements((Resource)null, prop, litv1);
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
-                
+
                 RDFNode sub = stmt.getSubject();
-                if( sub == null || sub.isAnon() || sub.isLiteral() )                    
-                    continue;                
-                
+                if( sub == null || sub.isAnon() || sub.isLiteral() )
+                    continue;
+
                 RDFNode obj = stmt.getObject();
                 if( obj == null || !obj.isLiteral() )
                     continue;
-                
+
                 Literal literal = (Literal)obj;
                 Object v = literal.getValue();
-                if( v == null )                     
-                    continue;                
-                
+                if( v == null )
+                    continue;
+
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     individualsMap.put(subUri,makeIndividual(subUri));
                 }
             }
-            
-            stmts = fullModel.listStatements((Resource)null, prop, litv2);                                           
+
+            stmts = fullModel.listStatements((Resource)null, prop, litv2);
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
-                
+
                 RDFNode sub = stmt.getSubject();
-                if( sub == null || sub.isAnon() || sub.isLiteral() )                    
-                    continue;                
-                
+                if( sub == null || sub.isAnon() || sub.isLiteral() )
+                    continue;
+
                 RDFNode obj = stmt.getObject();
                 if( obj == null || !obj.isLiteral() )
                     continue;
-                
+
                 Literal literal = (Literal)obj;
                 Object v = literal.getValue();
-                if( v == null )                     
-                    continue;                
-                
+                if( v == null )
+                    continue;
+
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     individualsMap.put(subUri, makeIndividual(subUri));
-                }                
+                }
             }
-            
-            stmts = fullModel.listStatements((Resource)null, prop, litv3);                                           
+
+            stmts = fullModel.listStatements((Resource)null, prop, litv3);
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
-                
+
                 RDFNode sub = stmt.getSubject();
-                if( sub == null || sub.isAnon() || sub.isLiteral() )                    
-                    continue;                
-                
+                if( sub == null || sub.isAnon() || sub.isLiteral() )
+                    continue;
+
                 RDFNode obj = stmt.getObject();
                 if( obj == null || !obj.isLiteral() )
                     continue;
-                
+
                 Literal literal = (Literal)obj;
                 Object v = literal.getValue();
-                if( v == null )                     
-                    continue;                
-                
+                if( v == null )
+                    continue;
+
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     individualsMap.put(subUri, makeIndividual(subUri));
-                }                
+                }
             }
         } finally {
             fullModel.leaveCriticalSection();
         }
-        
+
         List<Individual> rv = new ArrayList(individualsMap.size());
         rv.addAll(individualsMap.values());
         return rv;
     }
-    
+
     @Override
     public Collection<String> getAllIndividualUris() {
         final List<String> list = new LinkedList<String>();
-        
+
         // get all labeled resources from any non-tbox and non-metadata graphs,
         // as well as the unnamed graph (first pattern below)
         String query = "SELECT DISTINCT ?ind WHERE { \n" +
                        " { ?ind <" + RDFS.label.getURI() + "> ?label } " +
-                       " UNION { " + 
+                       " UNION { " +
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() +
                                           "> ?label } \n" +
                        "  FILTER (?g != <" + ModelNames.APPLICATION_METADATA + "> " +
                        "          && !regex(str(?g),\"tbox\")) \n " +
                        " } " +
                        "}";
-              
+
 	    Query q = QueryFactory.create(query);
 	    DatasetWrapper w = getDatasetWrapper();
 	    Dataset dataset = w.getDataset();
@@ -481,17 +481,17 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         }
 
         return list;
-    }  
+    }
 
     private Iterator<Individual> getIndividualIterator(
     									final List<String> individualURIs) {
         if (individualURIs.size() >0){
-            log.info("Number of individuals from source: " 
+            log.info("Number of individuals from source: "
             		+ individualURIs.size());
             return new Iterator<Individual>(){
                 Iterator<String> innerIt = individualURIs.iterator();
-                public boolean hasNext() { 
-                    return innerIt.hasNext();                    
+                public boolean hasNext() {
+                    return innerIt.hasNext();
                 }
                 public Individual next() {
                     String indURI = innerIt.next();
@@ -504,12 +504,12 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 }
                 public void remove() {
                     //not used
-                }            
+                }
             };
         }
         else
             return null;
-    }       
+    }
 
     @Override
     public Iterator<String> getUpdatedSinceIterator(long updatedSince){
@@ -546,5 +546,5 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         }
         return individualURIs.iterator();
     }
-    
+
 }

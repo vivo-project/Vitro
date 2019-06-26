@@ -48,13 +48,13 @@ $(document).ready(function(){
 	      }
 	    });
 	    $( "#amount" ).val( $( "#slider-vertical" ).slider( "value" ) );
-	
+
 
     // Prevent close link for URI qTip from requesting bogus '#' href
     $('a.close').click(function() {
         $('#downloadIcon').qtip("hide");
         return false;
     });
-    
+
 
 });

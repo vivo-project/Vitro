@@ -41,92 +41,92 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 import javax.servlet.annotation.WebServlet;
 
 /**
- * This servlet will convert a request to an EditSubmission, 
- * find the EditConfiguration associated with the request, 
+ * This servlet will convert a request to an EditSubmission,
+ * find the EditConfiguration associated with the request,
  * use ProcessRdfForm to process these to a set of RDF additions and retractions,
- * the apply these to the models. 
+ * the apply these to the models.
  */
 @WebServlet(name = "ProcessRdfFormController", urlPatterns = {"/edit/process"} )
 public class ProcessRdfFormController extends FreemarkerHttpServlet{
-	
+
     private Log log = LogFactory.getLog(ProcessRdfFormController.class);
 
 
-    	
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.DO_FRONT_END_EDITING.ACTION;
 	}
 
-	@Override 
-	protected ResponseValues processRequest(VitroRequest vreq) {			
-		//get the EditConfiguration 
+	@Override
+	protected ResponseValues processRequest(VitroRequest vreq) {
+		//get the EditConfiguration
 		EditConfigurationVTwo configuration = EditConfigurationUtils.getEditConfiguration(vreq);
         if(configuration == null)
             return handleMissingConfiguration(vreq);
 
         //get the EditSubmission
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);        	
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);
         EditSubmissionUtils.putEditSubmissionInSession(vreq.getSession(), submission);
-       
+
         //if errors, return error response
 		ResponseValues errorResponse = doValidationErrors(vreq, configuration, submission);
 		if( errorResponse != null )
 		    return errorResponse;
 
-        // get the models to work with in case the write model and query model are not the defaults 
-		Model queryModel = configuration.getQueryModelSelector().getModel(vreq, getServletContext());		
-	    Model writeModel = configuration.getWriteModelSelector().getModel(vreq,getServletContext());  
-	    
+        // get the models to work with in case the write model and query model are not the defaults
+		Model queryModel = configuration.getQueryModelSelector().getModel(vreq, getServletContext());
+	    Model writeModel = configuration.getWriteModelSelector().getModel(vreq,getServletContext());
+
 	    //If data property check for back button confusion
 	    boolean isBackButton = checkForBackButtonConfusion(configuration, vreq, queryModel);
 	    if(isBackButton) {
 	    	//Process back button issues and do a return here
 	    	return doProcessBackButton(configuration, submission, vreq);
 	    }
-	    
+
 	    //Otherwise, process as usual
-	    
+
 	    AdditionsAndRetractions changes;
         try {
 
-            ProcessRdfForm prf = 
-                new ProcessRdfForm(configuration, new NewURIMakerVitro(vreq.getWebappDaoFactory()));        
-            changes = prf.process(configuration, submission, vreq);  
-            
+            ProcessRdfForm prf =
+                new ProcessRdfForm(configuration, new NewURIMakerVitro(vreq.getWebappDaoFactory()));
+            changes = prf.process(configuration, submission, vreq);
+
         } catch (Exception e) {
             throw new Error(e);
-        }	    
-		
+        }
+
 		if( configuration.isUseDependentResourceDelete() )
-		    changes = ProcessRdfForm.addDependentDeletes(changes, queryModel);		
-		
-		N3EditUtils.preprocessModels(changes, configuration, vreq);		
-		
+		    changes = ProcessRdfForm.addDependentDeletes(changes, queryModel);
+
+		N3EditUtils.preprocessModels(changes, configuration, vreq);
+
 		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, N3EditUtils.getEditorUri(vreq) );
-		
-		//Here we are trying to get the entity to return to URL,  
+
+		//Here we are trying to get the entity to return to URL,
 		//More involved processing for data property apparently
 		String entityToReturnTo = N3EditUtils.processEntityToReturnTo(configuration, submission, vreq);
-		
-        //For data property processing, need to update edit configuration for back button 
+
+        //For data property processing, need to update edit configuration for back button
 		N3EditUtils.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
         PostEditCleanupController.doPostEditCleanup(vreq);
         return PostEditCleanupController.doPostEditRedirect(vreq, entityToReturnTo);
 	}
 
 	//In case of back button confusion
-	//Currently returning an error message: 
+	//Currently returning an error message:
 	//Later TODO: Per Brian Caruso's instructions, replicate
 	//the logic in the original datapropertyBackButtonProblems.jsp
 	private ResponseValues doProcessBackButton(EditConfigurationVTwo configuration,
 			MultiValueEditSubmission submission, VitroRequest vreq) {
-		  
+
 		//The bulk of the processing should probably/already sits in ProcessRdfForm so that should remain there
 		//The issue is what then to do with the actual redirect? What do we redirect to?
 		HashMap<String,Object> map = new HashMap<String,Object>();
    	 	map.put("errorMessage", "Back button confusion has occurred");
-		ResponseValues values = new TemplateResponseValues("error-message.ftl", map);        
+		ResponseValues values = new TemplateResponseValues("error-message.ftl", map);
 		return values;
 	}
 
@@ -137,18 +137,18 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
 			return false;
 		}
-		
+
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 		 if ( ! editConfig.isDataPropertyUpdate())
 	            return false;
-	        
+
         Integer dpropHash = editConfig.getDatapropKey();
-        DataPropertyStatement dps = 
-            RdfLiteralHash.getPropertyStmtByHash(editConfig.getSubjectUri(), 
+        DataPropertyStatement dps =
+            RdfLiteralHash.getPropertyStmtByHash(editConfig.getSubjectUri(),
                     editConfig.getPredicateUri(), dpropHash, model);
         if (dps != null)
             return false;
-        
+
         DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(
                 editConfig.getPredicateUri());
         if (dp != null) {
@@ -157,16 +157,16 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         return false;
 
 	}
-	
+
 	private ResponseValues doValidationErrors(VitroRequest vreq,
 			EditConfigurationVTwo editConfiguration, MultiValueEditSubmission submission) {
-		
+
 		Map<String, String> errors = submission.getValidationErrors();
-		
+
 		if(errors != null && !errors.isEmpty()){
 			String form = editConfiguration.getFormUrl();
 			vreq.setAttribute("formUrl", form);
-			vreq.setAttribute("view", vreq.getParameter("view"));	
+			vreq.setAttribute("view", vreq.getParameter("view"));
 			//Need to ensure that edit key is set so that the correct
 			//edit configuration and edit submission are retrieved
 			//This can also be set as a parameter instead
@@ -174,7 +174,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 			formUrl += "&editKey=" + editConfiguration.getEditKey();
 	        return new RedirectResponseValues(formUrl);
 		}
-		return null; //no errors		
+		return null; //no errors
 	}
 
     /**
@@ -187,32 +187,32 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         map.put("params",vreq.getParameterMap());
         return new TemplateResponseValues( "missingEditConfig.ftl", map );
     }
-	
+
 	//Move to EditN3Utils but keep make new uris here
 	public static class Utilities {
-		
+
 		private static Log log = LogFactory.getLog(ProcessRdfFormController.class);
-	    
+
 		public static String assertionsType = "assertions";
 		public static String retractionsType = "retractions";
-		
+
 		public static boolean isDataProperty(EditConfigurationVTwo configuration, VitroRequest vreq) {
 			return EditConfigurationUtils.isDataProperty(configuration.getPredicateUri(), vreq);
 		}
-		
+
 		public static boolean isObjectProperty(EditConfigurationVTwo configuration, VitroRequest vreq) {
-			
+
 			return EditConfigurationUtils.isObjectProperty(configuration.getPredicateUri(), vreq);
 		}
-		
+
 	    public static List<String> makeListCopy(List<String> list) {
 	    	List<String> copyOfN3 = new ArrayList<String>();
 			copyOfN3.addAll(list);
             return copyOfN3;
 	    }
-	     
+
 	     //TODO: Check if this would be correct with multiple values and uris being passed back
-	     //First, need to order by uris in original and new values probably and 
+	     //First, need to order by uris in original and new values probably and
 	     //for literals, order by? Alphabetical or numeric value? Hard to say
 	     public static boolean hasFieldChanged(String fieldName,
 	             EditConfigurationVTwo editConfig, MultiValueEditSubmission submission) {
@@ -257,20 +257,20 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	                 + (fieldChanged ? "did Change" : "did NOT change"));
 	         return fieldChanged;
 	     }
-	     		
+
 		//Get predicate local anchor
 		public static String getPredicateLocalName(EditConfigurationVTwo editConfig) {
 			String predicateLocalName = null;
 	        if( editConfig != null ){
-                String predicateUri = editConfig.getPredicateUri();            
+                String predicateUri = editConfig.getPredicateUri();
                 if( predicateUri != null ){
                     try{
                         Property prop = ResourceFactory.createProperty(predicateUri);
                         predicateLocalName = prop.getLocalName();
-                    
+
                     }catch (org.apache.jena.shared.InvalidPropertyURIException e){
                         log.debug("could not convert predicateUri into a valid URI",e);
-                    }                               
+                    }
                 }
 	        }
 	        return predicateLocalName;
@@ -290,33 +290,33 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
             if (cancel != null && cancel.equals("true") && !StringUtils.isEmpty(urlPatternToCancelTo)) {
                 urlPattern = urlPatternToCancelTo;
             } else if (!StringUtils.isEmpty(urlPatternToReturnTo)) {
-                urlPattern = urlPatternToReturnTo;       
+                urlPattern = urlPatternToReturnTo;
             } else {
-                urlPattern = "/individual";         
+                urlPattern = "/individual";
             }
             return urlPattern;
 		}
-		
+
 		//Get resource to redirect to
 		public static String getResourceToRedirect(VitroRequest vreq, EditConfigurationVTwo editConfig, String entityToReturnTo ) {
 			String resourceToRedirectTo = null;
 			if( editConfig != null ){
 
-                if( editConfig.getEntityToReturnTo() != null && editConfig.getEntityToReturnTo().startsWith("?") ){             
-                    resourceToRedirectTo = entityToReturnTo;            
-                }else{            
+                if( editConfig.getEntityToReturnTo() != null && editConfig.getEntityToReturnTo().startsWith("?") ){
+                    resourceToRedirectTo = entityToReturnTo;
+                }else{
                     resourceToRedirectTo = editConfig.getEntityToReturnTo();
                 }
-                
+
                 //if there is no entity to return to it is likely a cancel
                 if( resourceToRedirectTo == null || resourceToRedirectTo.length() == 0 )
-                    resourceToRedirectTo = editConfig.getSubjectUri();                
+                    resourceToRedirectTo = editConfig.getSubjectUri();
             }
 			return resourceToRedirectTo;
 		}
-		
 
-			
+
+
 	}
 
 }

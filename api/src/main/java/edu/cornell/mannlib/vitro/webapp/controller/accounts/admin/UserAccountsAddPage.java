@@ -206,16 +206,16 @@ public class UserAccountsAddPage extends UserAccountsPage {
 			body.put(PARAMETER_LAST_NAME, "");
 			body.put("selectedRoles", getDefaultRolesForNewUsers());
 		}
-		
+
 		body.put("roles", buildListOfSelectableRoles());
 		body.put("profileTypes", buildProfileTypesList());
 		body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 		body.put("formUrls", buildUrlsMap());
-		
+
 		if (externalAuthOnly) {
 			body.put(PARAMETER_EXTERNAL_AUTH_ONLY, Boolean.TRUE);
 		}
-		
+
 		if (!associatedProfileUri.isEmpty()) {
 			body.put("associatedProfileInfo",
 					buildProfileInfo(associatedProfileUri));

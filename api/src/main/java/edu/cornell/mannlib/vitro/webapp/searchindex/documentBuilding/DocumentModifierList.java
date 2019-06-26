@@ -7,14 +7,14 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument
 
 /**
  * An ordered list of DocumentModifier objects, in a handy package.
- * 
+ *
  * Implementations should make a protective copy of the list of
  * DocumentModifiers. Implementations must be thread-safe.
- * 
+ *
  * The life-cycle is:
- * 
+ *
  * <pre>
- * startIndexing(), 
+ * startIndexing(),
  * 0 or more modifyDocument() by multiple threads,
  * stopIndexing().
  * </pre>

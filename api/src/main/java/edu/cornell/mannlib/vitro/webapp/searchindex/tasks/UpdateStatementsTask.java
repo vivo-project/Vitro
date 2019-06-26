@@ -34,18 +34,18 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderLi
 /**
  * Receive a collection of statements that have been added to the model, or
  * delete from it.
- * 
+ *
  * Find the URIs of search documents that may have been affected by these
  * changes, and update those documents.
- * 
+ *
  * -------------------
- * 
+ *
  * It would be nice to stream this whole thing, finding the URIs affected by
  * each statement and updating those documents before proceding. However, it is
  * very common for several statements within a group to affect the same
  * document, so that method would result in rebuilding the document several
  * times.
- * 
+ *
  * Instead, we final all of the URIs affected by all statements, store them in a
  * Set to remove duplicates, and then process the URIs in the set.
  */

@@ -28,11 +28,11 @@ import org.apache.http.util.EntityUtils;
 
 /**
  * Spin off a thread that will try to connect to Solr.
- * 
+ *
  * We need to do this in a separate thread because if Solr is in the same Tomcat
  * instance as Vitro, it may not be initialized until after Vitro is
  * initialized. Which is to say, after this Listener has run.
- * 
+ *
  * If we can't connect to Solr, add a Warning item to the StartupStatus.
  */
 public class SolrSmokeTest implements ServletContextListener {

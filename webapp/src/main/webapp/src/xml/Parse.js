@@ -41,16 +41,16 @@ dojo.xml.Parse = function(){
 	function getDojoTagName (node) {
 		var tagName = node.tagName;
 		if (tagName.substr(0,5).toLowerCase() != "dojo:") {
-			
+
 			if (tagName.substr(0,4).toLowerCase() == "dojo") {
 				// FIXME: this assuumes tag names are always lower case
 				return "dojo:" + tagName.substring(4).toLowerCase();
 			}
-		
+
 			// allow lower-casing
 			var djt = node.getAttribute("dojoType") || node.getAttribute("dojotype");
 			if (djt) { return "dojo:" + djt.toLowerCase(); }
-			
+
 			if (node.getAttributeNS && node.getAttributeNS(dojo.dom.dojoml,"type")) {
 				return "dojo:" + node.getAttributeNS(dojo.dom.dojoml,"type").toLowerCase();
 			}
@@ -61,7 +61,7 @@ dojo.xml.Parse = function(){
 			} catch (e) { /* FIXME: log? */ }
 
 			if (djt) { return "dojo:"+djt.toLowerCase(); }
-		
+
 			if (!dj_global["djConfig"] || !djConfig["ignoreClassNames"]) {
 				// FIXME: should we make this optionally enabled via djConfig?
 				var classes = node.className||node.getAttribute("class");
@@ -76,7 +76,7 @@ dojo.xml.Parse = function(){
 					}
 				}
 			}
-		
+
 		}
 		return tagName.toLowerCase();
 	}
@@ -101,7 +101,7 @@ dojo.xml.Parse = function(){
 				}
 				parsedNodeSet[tagName][attr].push(attributeSet[attr]);
 			}
-	
+
 			// FIXME: we might want to make this optional or provide cloning instead of
 			// referencing, but for now, we include a node reference to allow
 			// instantiated components to figure out their "roots"
@@ -109,7 +109,7 @@ dojo.xml.Parse = function(){
 			parsedNodeSet.tagName = tagName;
 			parsedNodeSet.index = thisIdx||0;
 		}
-	
+
 		var count = 0;
 		var tcn, i = 0, nodes = node.childNodes;
 		while(tcn = nodes[i++]){
@@ -143,7 +143,7 @@ dojo.xml.Parse = function(){
 					break;
 				case  dojo.dom.PROCESSING_INSTRUCTION_NODE: // processing instruction node... not meaningful here
 					break;
-				case  dojo.dom.COMMENT_NODE: // comment node... not not sure if this would ever be meaningful 
+				case  dojo.dom.COMMENT_NODE: // comment node... not not sure if this would ever be meaningful
 					break;
 				case  dojo.dom.DOCUMENT_NODE: // document node... not sure if this would ever be meaningful
 					break;
@@ -174,13 +174,13 @@ dojo.xml.Parse = function(){
 				if(	(typeof attnode == "object")&&
 					(typeof attnode.nodeValue == 'undefined')||
 					(attnode.nodeValue == null)||
-					(attnode.nodeValue == '')){ 
-					continue; 
+					(attnode.nodeValue == '')){
+					continue;
 				}
 			}
 			var nn = (attnode.nodeName.indexOf("dojo:") == -1) ? attnode.nodeName : attnode.nodeName.split("dojo:")[1];
-			parsedAttributeSet[nn] = { 
-				value: attnode.nodeValue 
+			parsedAttributeSet[nn] = {
+				value: attnode.nodeValue
 			};
 		}
 		return parsedAttributeSet;

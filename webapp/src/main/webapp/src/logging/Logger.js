@@ -368,13 +368,13 @@ dojo.logging.MemoryLogHandler = function(level, recordsToKeep, postType, postInt
 	this.postType = (typeof djConfig['loggingPostType'] != 'undefined') ? djConfig['loggingPostType'] : ( postType || -1);
 	// milliseconds for time, interger for number of records, -1 for non-posting,
 	this.postInterval = (typeof djConfig['loggingPostInterval'] != 'undefined') ? djConfig['loggingPostInterval'] : ( postType || -1);
-	
+
 }
 // prototype inheritance
 dojo.logging.MemoryLogHandler.prototype = new dojo.logging.LogHandler();
 
 // FIXME
-// dojo.inherits(dojo.logging.MemoryLogHandler, 
+// dojo.inherits(dojo.logging.MemoryLogHandler,
 
 // over-ride base-class
 dojo.logging.MemoryLogHandler.prototype.emit = function(record){

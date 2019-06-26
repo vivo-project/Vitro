@@ -25,7 +25,7 @@ public class StaticPageController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(StaticPageController.class);
-    
+
     @SuppressWarnings("serial")
     private static final Map<String, String> urlsToTemplates = new HashMap<String, String>(){
         {
@@ -42,14 +42,14 @@ public class StaticPageController extends FreemarkerHttpServlet {
         }
         return title;
     }
-    
+
     protected ResponseValues processRequest(VitroRequest vreq) {
         String requestedUrl = vreq.getServletPath();
         String templateName = urlsToTemplates.get(requestedUrl);
-        
+
 		log.debug("requestedUrl='" + requestedUrl + "', templateName='"
 				+ templateName + "'");
-		
+
         return new TemplateResponseValues(templateName);
-    }    
+    }
 }

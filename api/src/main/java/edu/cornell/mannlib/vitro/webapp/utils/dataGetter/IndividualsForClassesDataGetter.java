@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
 /**
  * This will pass these variables to the template:
  * classGroupUri: uri of the classgroup associated with this page.
- * vClassGroup: a data structure that is the classgroup associated with this page.     
+ * vClassGroup: a data structure that is the classgroup associated with this page.
  */
 public class IndividualsForClassesDataGetter extends DataGetterBase implements DataGetter{
     private static final Log log = LogFactory.getLog(IndividualsForClassesDataGetter.class);
@@ -56,26 +56,26 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
      */
     public IndividualsForClassesDataGetter(VitroRequest vreq, Model displayModel, String dataGetterURI){
         this.configure(vreq,displayModel,dataGetterURI);
-    }   
-    
+    }
+
     /**
      * Configure this instance based on the URI and display model.
      */
     protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
-    	if( vreq == null ) 
+    	if( vreq == null )
     		throw new IllegalArgumentException("VitroRequest  may not be null.");
-        if( displayModel == null ) 
+        if( displayModel == null )
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
-                
+
         this.vreq = vreq;
         this.context = vreq.getSession().getServletContext();
-        this.dataGetterURI = dataGetterURI;   
+        this.dataGetterURI = dataGetterURI;
         this.classGroupURI = DataGetterUtils.getClassGroupForDataGetter(displayModel, dataGetterURI);
         this.classIntersectionsMap = getClassIntersectionsMap(displayModel);
     }
-    
+
     /**
      * Get the classes and classes to restrict by - if any
      */
@@ -92,7 +92,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 	          try{
 	              List<String>  restrictClasses = new ArrayList<String>();
 	              HashMap<String, String> restrictClassesPresentMap = new HashMap<String, String>();
-	              ResultSet resultSet = qexec.execSelect();        
+	              ResultSet resultSet = qexec.execSelect();
 	              while(resultSet.hasNext()){
 	                  QuerySolution soln = resultSet.next();
 	                  classes.add(DataGetterUtils.nodeToString(soln.get("class")));
@@ -102,12 +102,12 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 	                  	restrictClassesPresentMap.put(restrictClass, "true");
 	                  }
 	              }
-	              
+
 	              if( classes.size() == 0 ){
 	                  log.debug("No classes  defined in display model for "+ this.dataGetterURI);
 	                  this.classIntersectionsMap =  null;
 	              }
-	              classesAndRestrictions.put("classes", classes);  
+	              classesAndRestrictions.put("classes", classes);
 	              classesAndRestrictions.put("restrictClasses", restrictClasses);
 	              return classesAndRestrictions;
 
@@ -117,14 +117,14 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 	      }finally{
 	          displayModel.leaveCriticalSection();
 	      }
-               
+
     }
-    
+
     @Override
-    public Map<String, Object> getData(Map<String, Object> pageData) { 
+    public Map<String, Object> getData(Map<String, Object> pageData) {
         this.setTemplateName();
     	HashMap<String, Object> data = new HashMap<String,Object>();
-        
+
         try{
         	List<String> classes = retrieveClasses(context, classIntersectionsMap);
         	List<String> restrictClasses = retrieveRestrictClasses(context, classIntersectionsMap);
@@ -140,35 +140,35 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
         } catch(Exception ex) {
         	log.error("An error occurred retrieving Vclass Intersection individuals", ex);
         }
-             
+
         return data;
-    }        
-   
+    }
+
     protected void setTemplateName() {
     	this.restrictClassesTemplateName = "restricted";
     }
-    
-    
+
+
     protected List<String> retrieveClasses(
 			ServletContext context, Map<String, Object> classIntersectionsMap) {
     	List<String> restrictClasses = (List<String>) classIntersectionsMap.get("classes");
 		return restrictClasses;
-	}    
-    
+	}
+
     protected List<String> retrieveRestrictClasses(
 			ServletContext context, Map<String, Object> classIntersectionsMap) {
     	List<String> restrictClasses = (List<String>) classIntersectionsMap.get("restrictClasses");
 		return restrictClasses;
-	}        
-    
-    protected void processClassesAndRestrictions(VitroRequest vreq, ServletContext context, 
+	}
+
+    protected void processClassesAndRestrictions(VitroRequest vreq, ServletContext context,
     		HashMap<String, Object> data, List<String> classes, List<String> restrictClasses ) {
     	processClassesForDisplay(vreq, context, data, classes);
     	processRestrictionClasses(vreq, data, restrictClasses);
     	processIntersections(vreq, context, data);
-    	
+
     }
-    
+
 
 
 	//At this point, data specifices whether or not intersections included
@@ -190,7 +190,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     			if(oldCount != count) {
     				log.debug("Old count was " + v.getEntityCount() + " and New count for " + v.getURI() + " is " + count);
     				copyVClass.setEntityCount(count);
-    			} 
+    			}
     			newVClassList.add(copyVClass);
     		}
     		classesGroup.setVitroClassList(newVClassList);
@@ -208,7 +208,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 		copyVClass.setEntityCount(v.getEntityCount());
 		return copyVClass;
     }
-    
+
     //update class count based on restrict classes
 	private int retrieveCount(VitroRequest vreq, ServletContext context, VClass v, List<VClass> restrictClasses) {
 		//Execute search query that returns only count of individuals
@@ -229,7 +229,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     	classesGroup.setURI("displayClasses");
     	log.debug("Processing classes that will be displayed");
     	List<VClass> vClasses = new ArrayList<VClass>();
-  
+
     	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
     	for(String classUri: classes) {
     		//Retrieve vclass from cache to get the count
@@ -254,16 +254,16 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     	log.debug("Returning vitro class list in data for template");
     	//Set vclass group
     	data.put("vClassGroup", classesGroup);
-    }	
-    
-    private void processRestrictionClasses(VitroRequest vreq, 
+    }
+
+    private void processRestrictionClasses(VitroRequest vreq,
     		HashMap<String, Object> data, List<String> restrictClasses) {
     	try {
 	    	VClassGroup restrictClassesGroup = new VClassGroup();
 	    	restrictClassesGroup.setURI("restrictClasses");
-	    	
+
 	    	List<VClass> restrictVClasses = new ArrayList<VClass>();
-	    	
+
 	    	List<String> urlEncodedRestrictClasses = new ArrayList<String>();
 	    	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
 
@@ -287,15 +287,15 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 	        		//Assuming utf-8?
 	        		urlEncodedRestrictClasses.add(URLEncoder.encode(restrictClassUri, "UTF-8"));
 	    		}
-	    	
+
 	    		restrictClassesGroup.setVitroClassList(restrictVClasses);
 	    		restrictClassesGroup.setIndividualCount(restrictVClasses.size());
 	    	} else {
-	    		
+
 	    	}
 	    	String[] restrictClassesArray = new String[urlEncodedRestrictClasses.size()];
 	    	restrictClassesArray = urlEncodedRestrictClasses.toArray(restrictClassesArray);
-	    	
+
 	    	//In case just want uris
 	    	log.debug("Variable name for including restriction classes " +  getRestrictClassesTemplateName());
 	    	data.put(getRestrictClassesTemplateName(), StringUtils.join(restrictClassesArray, ","));
@@ -306,9 +306,9 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     		log.error("An error occurred in processing restriction classes ", ex);
     	}
     }
-    
+
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, VitroRequest vreq){
-        
+
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
@@ -318,8 +318,8 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
                 break;
             }
         }
-        
-        if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){ 
+
+        if( classGroupUri != null && !classGroupUri.isEmpty() && group == null ){
             /*This could be for two reasons: one is that the classgroup doesn't exist
              * The other is that there are no individuals in any of the classgroup's classes */
             group = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(classGroupUri);
@@ -330,7 +330,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
                     if( classGroupUri.equals(vcg.getURI()) ){
                         group = vcg;
                         break;
-                    }                                
+                    }
                 }
                 if( group == null ){
                     log.error("Cannot get classgroup '" + classGroupUri + "'");
@@ -341,21 +341,21 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
             }else{
                 log.error("classgroup " + classGroupUri + " does not exist in the system");
                 return null;
-            }            
+            }
         }
-        
+
         return new VClassGroupTemplateModel(group);
     }
-    
+
     public String getType(){
         return DataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());
-    } 
-    
+    }
+
     //Get data servuice
     public String getDataServiceUrl() {
     	return UrlBuilder.getUrl("/dataservice?getRenderedSearchIndividualsByVClass=1&vclassId=");
     }
-    
+
     /**
      * For processig of JSONObject
      */
@@ -368,41 +368,41 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
             vc.setEntityCount(0);
         }
     }
-    
+
     protected static String getAlphaParameter(VitroRequest request){
         return request.getParameter("alpha");
     }
-    
+
     protected static int getPageParameter(VitroRequest request) {
         String pageStr = request.getParameter("page");
         if( pageStr != null ){
             try{
-                return Integer.parseInt(pageStr);                
+                return Integer.parseInt(pageStr);
             }catch(NumberFormatException nfe){
                 log.debug("could not parse page parameter");
                 return 1;
-            }                
-        }else{                   
+            }
+        }else{
             return 1;
         }
     }
-    
+
     //Get template parameter
     private static String getRestrictClassesTemplateName() {
     	return restrictClassesTemplateName;
 
     }
-    
-    private static final String prefixes = 
+
+    private static final String prefixes =
         "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
-        "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" + 
+        "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" +
         "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#> \n" +
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n";
-    
-    private static final String dataGetterQuery = 
-    	prefixes + "\n" + 
+
+    private static final String dataGetterQuery =
+    	prefixes + "\n" +
    	 "SELECT ?class ?restrictClass WHERE {\n" +
         " ?dataGetterUri <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
-        "    OPTIONAL {?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass } .\n" +    
+        "    OPTIONAL {?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass } .\n" +
         "} \n" ;
 }

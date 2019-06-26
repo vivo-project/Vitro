@@ -17,25 +17,25 @@ public class JenaIngestUtilsTest extends AbstractTestClass {
 
 	@Test
 	public void testRenameBNodes() {
-		
+
 		JenaIngestUtils jiu = new JenaIngestUtils();
-		
+
 		Model blankModel = ModelFactory.createDefaultModel();
 		for (int i = 0; i < 20; i++) {
 			blankModel.add(blankModel.createResource(), RDF.type, OWL.Thing);
 		}
 		Assert.assertTrue(blankModel.size() == 20);
-		
+
 		Model named = jiu.renameBNodes(blankModel, "http://example.org/resource");
 		Assert.assertTrue(named.size() == blankModel.size());
 		Assert.assertTrue(named.size() == 20);
-		
+
 		StmtIterator stmtIt = named.listStatements();
 		while (stmtIt.hasNext()) {
 			Statement stmt = stmtIt.nextStatement();
 			Assert.assertEquals("http://example.org/", stmt.getSubject().getNameSpace());
 		}
-		
+
 	}
-	
+
 }

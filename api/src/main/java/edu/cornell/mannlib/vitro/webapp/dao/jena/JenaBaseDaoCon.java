@@ -14,7 +14,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class JenaBaseDaoCon {
-    
+
     public JenaBaseDaoCon() {
         LINK.addProperty(PROPERTY_CUSTOMSHORTVIEWANNOT, _constModel.createTypedLiteral("linkShortView.jsp"));
         PRIMARY_LINK.setLabel("Primary Link", "en-US");
@@ -23,34 +23,36 @@ public class JenaBaseDaoCon {
         PRIMARY_LINK.setRange(LINK);
         PRIMARY_LINK.addProperty(PROPERTY_OFFERCREATENEWOPTIONANNOT, _constModel.createTypedLiteral(true));
         PRIMARY_LINK.addProperty(PROPERTY_SELECTFROMEXISTINGANNOT, _constModel.createTypedLiteral(false));
-        
-        ADDITIONAL_LINK.setLabel("Additional Link", "en-US");        
+
+        ADDITIONAL_LINK.setLabel("Additional Link", "en-US");
         ADDITIONAL_LINK.setRange(LINK); //apparently does not work to have prop.getRangeVClass() return a non-null VClass
         ADDITIONAL_LINK.addProperty(PROPERTY_STUBOBJECTPROPERTYANNOT,_constModel.createTypedLiteral(true));
         ADDITIONAL_LINK.addProperty(PROPERTY_CUSTOMENTRYFORMANNOT, _constModel.createTypedLiteral("defaultLinkForm.jsp"));
         ADDITIONAL_LINK.addProperty(PROPERTY_OFFERCREATENEWOPTIONANNOT, _constModel.createTypedLiteral(true));
         ADDITIONAL_LINK.addProperty(PROPERTY_SELECTFROMEXISTINGANNOT, _constModel.createTypedLiteral(false));
-        
+
         VITRO_PUBLIC_ONTOLOGY.setLabel("Vitro Public Ontology", null);
     }
 
-    
+
     private OntModel _constModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
-    
+
     /* ***************** Vitro ontology constants ***************** */
 
     protected AnnotationProperty DATAPROPERTY_ISEXTERNALID = _constModel.createAnnotationProperty(VitroVocabulary.DATAPROPERTY_ISEXTERNALID);
-        
-    protected AnnotationProperty HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);    
-    protected AnnotationProperty PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);    
-    protected AnnotationProperty HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);    
-    
+
+    protected AnnotationProperty HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
+    protected AnnotationProperty PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
+    protected AnnotationProperty HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
+
     protected AnnotationProperty SEARCH_BOOST_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.SEARCH_BOOST_ANNOT);
-    
+
     protected AnnotationProperty EXAMPLE = _constModel.createAnnotationProperty(VitroVocabulary.EXAMPLE_ANNOT);
     protected AnnotationProperty DESCRIPTION_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.DESCRIPTION_ANNOT);
     protected AnnotationProperty PUBLIC_DESCRIPTION_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PUBLIC_DESCRIPTION_ANNOT);
     protected AnnotationProperty SHORTDEF = _constModel.createAnnotationProperty(VitroVocabulary.SHORTDEF);
+
+    protected AnnotationProperty EDITING = _constModel.createAnnotationProperty(VitroVocabulary.EDITING);
 
     protected DatatypeProperty   MONIKER = _constModel.createDatatypeProperty(VitroVocabulary.MONIKER);
     protected OntClass           CLASSGROUP = _constModel.createClass(VitroVocabulary.CLASSGROUP);
@@ -79,7 +81,7 @@ public class JenaBaseDaoCon {
     protected AnnotationProperty PROPERTY_EDITLINKSUPPRESSED = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_EDITLINKSUPPRESSED);
     protected AnnotationProperty PROPERTY_ADDLINKSUPPRESSED = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_ADDLINKSUPPRESSED);
     protected AnnotationProperty PROPERTY_DELETELINKSUPPRESSED = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_DELETELINKSUPPRESSED);
-    
+
     protected OntClass 		     PROPERTYGROUP = _constModel.createClass(VitroVocabulary.PROPERTYGROUP);
 
     protected OntClass           LINK = _constModel.createClass(VitroVocabulary.LINK);
@@ -93,14 +95,14 @@ public class JenaBaseDaoCon {
     protected  OntClass           PORTAL = _constModel.createClass(VitroVocabulary.PORTAL);
     protected  DatatypeProperty   APPLICATION_THEMEDIR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEDIR);
     protected  DatatypeProperty   APPLICATION_CONTACTMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CONTACTMAIL);
-    protected  DatatypeProperty   APPLICATION_CORRECTIONMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CORRECTIONMAIL);   
+    protected  DatatypeProperty   APPLICATION_CORRECTIONMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CORRECTIONMAIL);
     protected  DatatypeProperty   APPLICATION_ABOUTTEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ABOUTTEXT);
-    protected  DatatypeProperty   APPLICATION_ACKNOWLEGETEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ACKNOWLEGETEXT);    
+    protected  DatatypeProperty   APPLICATION_ACKNOWLEGETEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ACKNOWLEGETEXT);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTURL);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTANCHOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTANCHOR);
-    
+
     protected AnnotationProperty  ONTOLOGY_PREFIX_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.ONTOLOGY_PREFIX_ANNOT);
-    
+
     protected  Ontology           VITRO_PUBLIC_ONTOLOGY = _constModel.createOntology(VitroVocabulary.VITRO_PUBLIC_ONTOLOGY);
 
     protected  ObjectProperty     IND_MAIN_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_MAIN_IMAGE);
@@ -131,7 +133,7 @@ public class JenaBaseDaoCon {
     protected  ObjectProperty     PERMISSIONSET_HAS_PERMISSION = _constModel.createObjectProperty(VitroVocabulary.PERMISSIONSET_HAS_PERMISSION);
 
     protected  OntClass           PERMISSION = _constModel.createClass(VitroVocabulary.PERMISSION);
-    
+
 
     public OntModel getConstModel() {
         return _constModel;

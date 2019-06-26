@@ -9,31 +9,31 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Represents a possible writer to serialize an {@link ILinkedDataFragment} object
- * 
+ *
  * @author Miel Vander Sande
  */
 public interface ILinkedDataFragmentWriter {
     /**
      * Writes a 404 Not Found error
-     * 
+     *
      * @param outputStream The response stream to write to
      * @param request Request that is unable to answer
      * @throws Exception Error that occurs while serializing
      */
     public void writeNotFound(ServletOutputStream outputStream, HttpServletRequest request) throws Exception;
-    
+
     /**
      * Writes a 5XX error
-     * 
+     *
      * @param outputStream The response stream to write to
      * @param ex Exception that occurred
      * @throws Exception Error that occurs while serializing
      */
     public void writeError(ServletOutputStream outputStream, Exception ex) throws Exception;
-    
+
     /**
      * Serializes and writes a {@link ILinkedDataFragment}
-     * 
+     *
      * @param outputStream The response stream to write to
      * @param datasource
      * @param fragment

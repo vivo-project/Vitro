@@ -22,14 +22,14 @@ import edu.cornell.mannlib.vitro.webapp.web.AntiScript;
 
 /**
  * Check if the submitted text has potential XSS problems.
- * Error messages from this validator always start with XSS_ERROR_MESSAGE 
- * 
- * @author bdc34 
+ * Error messages from this validator always start with XSS_ERROR_MESSAGE
+ *
+ * @author bdc34
  */
 public class AntiXssValidation implements N3ValidatorVTwo{
     List<String> fieldNamesToValidate;
-    
-       
+
+
     /**
      * Validate all fields on submission.
      */
@@ -43,15 +43,15 @@ public class AntiXssValidation implements N3ValidatorVTwo{
     public AntiXssValidation(List<String> fieldNamesToValidate){
         this.fieldNamesToValidate = fieldNamesToValidate;
     }
-    
+
     @Override
     public Map<String, String> validate(EditConfigurationVTwo editConfig,
             MultiValueEditSubmission editSub) {
-        
+
         if( editSub == null ) {
             return null;
         }
-        
+
         Map<String,String>varToErrMsg = new HashMap<String,String>();
         if( fieldNamesToValidate == null ){
             if( editSub.getLiteralsFromForm() != null ){
@@ -64,46 +64,46 @@ public class AntiXssValidation implements N3ValidatorVTwo{
                     varToErrMsg.putAll( checkSubmissionForField( name, editSub));
                 }
             }
-        }else{                
+        }else{
             for( String fieldName : fieldNamesToValidate){
-                varToErrMsg.putAll( checkSubmissionForField(fieldName, editSub));            
+                varToErrMsg.putAll( checkSubmissionForField(fieldName, editSub));
             }
         }
-        
+
         if( varToErrMsg.isEmpty() )
             return null;
-        else            
-            return varToErrMsg;    
+        else
+            return varToErrMsg;
     }
-    
+
     /**
-     * Check for XSS for a single field. Returns NO_ERROR if there 
-     * are no errors so it can be added to a map with putAll() 
+     * Check for XSS for a single field. Returns NO_ERROR if there
+     * are no errors so it can be added to a map with putAll()
      */
     protected Map<String,String> checkSubmissionForField(
             String fieldName, MultiValueEditSubmission editSub){
-        
+
         if( fieldName == null || fieldName.isEmpty() || editSub == null)
             return NO_ERROR;
-        
-        if( editSub.getLiteralsFromForm() != null && 
+
+        if( editSub.getLiteralsFromForm() != null &&
             editSub.getLiteralsFromForm().containsKey(fieldName) ){
-            
+
             String error = null;
             try {
                 error = literalHasXSS( editSub.getLiteralsFromForm().get(fieldName) );
             } catch (ScanException | PolicyException e) {
                 error = e.getMessage();
             }
-            if( error != null ){                        
+            if( error != null ){
                 return Collections.singletonMap(fieldName, XSS_ERROR_MESSAGE + " " + error);
             }else{
                 return NO_ERROR;
             }
-            
-        } else if (editSub.getUrisFromForm() != null && 
+
+        } else if (editSub.getUrisFromForm() != null &&
                    editSub.getUrisFromForm().containsKey(fieldName)){
-                    
+
             String error;
             try {
                 error = uriHasXSS( editSub.getUrisFromForm().get(fieldName));
@@ -115,11 +115,11 @@ public class AntiXssValidation implements N3ValidatorVTwo{
             }else{
                 return NO_ERROR;
             }
-            
+
         }else{
             //field wasn't in submission
             return  NO_ERROR;
-        }                
+        }
     }
 
     /**
@@ -134,7 +134,7 @@ public class AntiXssValidation implements N3ValidatorVTwo{
             CleanResults cr = antiSamy.scan( uri );
             errorMsgs.addAll( cr.getErrorMessages() );
         }
-        
+
         if( errorMsgs.isEmpty() ){
             return null;
         }else{
@@ -149,19 +149,19 @@ public class AntiXssValidation implements N3ValidatorVTwo{
      */
     private String literalHasXSS(List<Literal> list) throws ScanException, PolicyException {
         AntiSamy antiSamy = AntiScript.getAntiSamyScanner();
-        
-        ArrayList errorMsgs = new ArrayList();        
-        for( Literal literal : list ){   
+
+        ArrayList errorMsgs = new ArrayList();
+        for( Literal literal : list ){
         	if(literal != null) {
 	            CleanResults cr = antiSamy.scan(literal.getLexicalForm());
 	            errorMsgs.addAll( cr.getErrorMessages() );
-	                         
+
 	            String dt = literal.getDatatypeURI();
 	            if( dt != null ){
 	                cr = antiSamy.scan( dt );
 	                errorMsgs.addAll( cr.getErrorMessages() );
 	            }
-	             
+
 	            String lang = literal.getLanguage() ;
 	            if( lang != null ){
 	                cr = antiSamy.scan( lang );
@@ -169,22 +169,22 @@ public class AntiXssValidation implements N3ValidatorVTwo{
 	            }
         	}
         }
-        
+
         if( errorMsgs.isEmpty() )
             return null;
         else
             return StringUtils.join(errorMsgs,", ");
-        
+
     }
 
 
     /**
-     * All error messages will start with this string. 
+     * All error messages will start with this string.
      */
-    public static String XSS_ERROR_MESSAGE = "Field contains unacceptable markup";    
-    
+    public static String XSS_ERROR_MESSAGE = "Field contains unacceptable markup";
+
     private static final Map<String,String>NO_ERROR = Collections.emptyMap();
-    
+
     //value indicates that all fields should be validated.
     private static final List<String> ALL_FIELDS = null;
 }

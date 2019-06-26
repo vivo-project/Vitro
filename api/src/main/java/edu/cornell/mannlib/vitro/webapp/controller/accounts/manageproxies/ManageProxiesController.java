@@ -42,7 +42,7 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 		String action = vreq.getPathInfo();
 		log.debug("action = '" + action + "'");
 
-		
+
 		if (ACTION_CREATE.equals(action)) {
 			return handleCreateRequest(vreq);
 		} else if (ACTION_EDIT.equals(action)) {
@@ -67,17 +67,17 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 
 	private ResponseValues handleEditRequest(VitroRequest vreq) {
 		ManageProxiesEditPage page = new ManageProxiesEditPage(vreq);
-		
+
 		if (page.isValid()) {
 			page.applyEdits();
 			Message.setMessage(vreq, new SuccessMessage());
 		} else {
 			Message.setMessage(vreq, new FailureMessage());
 		}
-		
+
 		return redirectToList();
 	}
-	
+
 	private ResponseValues handleListRequest(VitroRequest vreq) {
 		ManageProxiesListPage page = new ManageProxiesListPage(vreq);
 		return page.showPage();
@@ -103,6 +103,6 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 		public Map<String, Object> getMessageInfoMap() {
 			return assembleMap("failure", Boolean.TRUE);
 		}
-		
+
 	}
 }

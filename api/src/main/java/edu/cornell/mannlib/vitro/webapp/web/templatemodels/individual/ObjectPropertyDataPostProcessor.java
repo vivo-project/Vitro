@@ -5,10 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.List;
 import java.util.Map;
 
-/** 
- * These postprocessors take a list of object property statement data returned from a 
+/**
+ * These postprocessors take a list of object property statement data returned from a
  * SPARQL query and prepare it for insertion into the template data model.
- * 
+ *
  * @author rjy7
  *
  */

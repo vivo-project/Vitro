@@ -19,13 +19,13 @@
     <li style="list-style-type:none;"><input type="radio" name="subgraph" value="abox"/> All Instance data (ABox) for the application</li>
     <%VitroRequest vreq = new VitroRequest(request);
     OntologyDao daoObj = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
-    List ontologiesObj = daoObj.getAllOntologies();  
+    List ontologiesObj = daoObj.getAllOntologies();
     if(ontologiesObj !=null && ontologiesObj.size()>0){
     	Iterator ontItr = ontologiesObj.iterator();
     	while(ontItr.hasNext()){
     		Ontology ont = (Ontology) ontItr.next();%>
     		<li style="list-style-type:none;"><input type="radio" name="subgraph" value=<%=ont.getURI()%>/> <%=ont.getName()%> (TBox)</li>
-    	<%}}%> 
+    	<%}}%>
 </ul>
 <hr/>
 <ul>

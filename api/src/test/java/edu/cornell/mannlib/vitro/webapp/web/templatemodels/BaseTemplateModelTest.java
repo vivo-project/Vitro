@@ -7,16 +7,16 @@ import org.junit.Test;
 public class BaseTemplateModelTest {
 
     private static String value;
-    
-    @Test 
+
+    @Test
     public void testCleanURIofNull(){
-        
+
         BaseTemplateModel btm = new BaseTemplateModel(){};
         //should not throw NPE
         value = btm.cleanURIForDisplay( null );
-        
+
         //should not throw NPE
-        value = btm.cleanTextForDisplay( null );                
+        value = btm.cleanTextForDisplay( null );
     }
 
 }

@@ -176,7 +176,7 @@ dojo.lang.extend(dojo.widget.html.Toolbar, {
 
 	_onclick: function(e) {
 		var widget = this._getItem(e.target);
-		if(widget && widget._onclick){ 
+		if(widget && widget._onclick){
 			widget._onclick(e);
 		}
 	},
@@ -714,17 +714,17 @@ dojo.widget.html.ToolbarDialog = function() {
 dojo.inherits(dojo.widget.html.ToolbarDialog, dojo.widget.html.ToolbarButton);
 dojo.lang.extend(dojo.widget.html.ToolbarDialog, {
 	widgetType: "ToolbarDialog",
-	
+
 	fillInTemplate: function (args, frag) {
 		dojo.widget.html.ToolbarDialog.superclass.fillInTemplate.call(this, args, frag);
 		dojo.event.connect(this, "onSelect", this, "showDialog");
 		dojo.event.connect(this, "onDeselect", this, "hideDialog");
 	},
-	
+
 	showDialog: function (e) {
 		dojo.lang.setTimeout(dojo.event.connect, 1, document, "onmousedown", this, "deselect");
 	},
-	
+
 	hideDialog: function (e) {
 		dojo.event.disconnect(document, "onmousedown", this, "deselect");
 	}
@@ -771,11 +771,11 @@ dojo.lang.extend(dojo.widget.html.ToolbarSeparator, {
 	},
 
 	// don't want events!
-	_onmouseover: null, 
-    _onmouseout: null, 
-    _onclick: null, 
-    _onmousedown: null, 
-    _onmouseup: null 
+	_onmouseover: null,
+    _onmouseout: null,
+    _onclick: null,
+    _onmousedown: null,
+    _onmouseup: null
 });
 
 /* ToolbarSpace
@@ -797,7 +797,7 @@ dojo.lang.extend(dojo.widget.html.ToolbarSpace, {
 });
 
 /* ToolbarSelect
- ******************/ 
+ ******************/
 
 dojo.widget.tags.addParseTreeHandler("dojo:toolbarSelect");
 dojo.widget.html.ToolbarSelect = function() {

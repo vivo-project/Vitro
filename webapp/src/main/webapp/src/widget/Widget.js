@@ -19,7 +19,7 @@ dojo.require("dojo.widget.Manager");
 dojo.require("dojo.event.*");
 
 dojo.declare("dojo.widget.Widget", null, {
-	initializer: function() {								 
+	initializer: function() {
 		// these properties aren't primitives and need to be created on a per-item
 		// basis.
 		this.children = [];
@@ -78,7 +78,7 @@ dojo.declare("dojo.widget.Widget", null, {
 		// then call this.notifyChildrenOfResize() to notify children of resize
 		this.notifyChildrenOfResize();
 	},
-	
+
 	notifyChildrenOfResize: function(){
 		for(var i=0; i<this.children.length; i++){
 			var child = this.children[i];
@@ -179,7 +179,7 @@ dojo.declare("dojo.widget.Widget", null, {
 		}
 		*/
 		// dojo.profile.end("satisfyPropertySets");
-		
+
 		return args;
 	},
 
@@ -222,10 +222,10 @@ dojo.declare("dojo.widget.Widget", null, {
 		// problematic assignments and bugs in the future and will need to be
 		// documented with big bright neon lights.
 
-		// FIXME: fails miserably if a mixin property has a default value of null in 
+		// FIXME: fails miserably if a mixin property has a default value of null in
 		// a widget
 
-		// NOTE: caching lower-cased args in the prototype is only 
+		// NOTE: caching lower-cased args in the prototype is only
 		// acceptable if the properties are invariant.
 		// if we have a name-cache, get it
 		var lcArgs = dojo.widget.lcArgsCache[this.widgetType];
@@ -243,7 +243,7 @@ dojo.declare("dojo.widget.Widget", null, {
 				var y = lcArgs[(new String(x)).toLowerCase()];
 				if(y){
 					args[y] = args[x];
-					x = y; 
+					x = y;
 				}
 			}
 			if(visited[x]){ continue; }
@@ -263,13 +263,13 @@ dojo.declare("dojo.widget.Widget", null, {
 						// FIXME: need to determine if always over-writing instead
 						// of attaching here is appropriate. I suspect that we
 						// might want to only allow attaching w/ action items.
-						
+
 						// RAR, 1/19/05: I'm going to attach instead of
 						// over-write here. Perhaps function objects could have
 						// some sort of flag set on them? Or mixed-into objects
 						// could have some list of non-mutable properties
 						// (although I'm not sure how that would alleviate this
-						// particular problem)? 
+						// particular problem)?
 
 						// this[x] = new Function(args[x]);
 
@@ -277,8 +277,8 @@ dojo.declare("dojo.widget.Widget", null, {
 						// that these event handlers should execute in the
 						// context of the widget, so that the "this" pointer
 						// takes correctly.
-						
-						// argument that contains no punctuation other than . is 
+
+						// argument that contains no punctuation other than . is
 						// considered a function spec, not code
 						if(args[x].search(/[^\w\.]+/i) == -1){
 							this[x] = dojo.evalObjPath(args[x], false);
@@ -290,7 +290,7 @@ dojo.declare("dojo.widget.Widget", null, {
 						this[x] = args[x].split(";");
 					} else if (this[x] instanceof Date) {
 						this[x] = new Date(Number(args[x])); // assume timestamp
-					}else if(typeof this[x] == "object"){ 
+					}else if(typeof this[x] == "object"){
 						// FIXME: should we be allowing extension here to handle
 						// other object types intelligently?
 
@@ -324,7 +324,7 @@ dojo.declare("dojo.widget.Widget", null, {
 		}
 		// dojo.profile.end("mixInProperties");
 	},
-	
+
 	postMixInProperties: function(){
 	},
 
@@ -432,30 +432,30 @@ dojo.declare("dojo.widget.Widget", null, {
 
 	getPreviousSibling: function() {
 		var idx = this.getParentIndex();
- 
+
 		 // first node is idx=0 not found is idx<0
 		if (idx<=0) return null;
- 
+
 		return this.getSiblings()[idx-1];
 	},
- 
+
 	getSiblings: function() {
 		return this.parent.children;
 	},
- 
+
 	getParentIndex: function() {
 		return dojo.lang.indexOf( this.getSiblings(), this, true);
 	},
- 
+
 	getNextSibling: function() {
- 
+
 		var idx = this.getParentIndex();
- 
+
 		if (idx == this.getSiblings().length-1) return null; // last node
 		if (idx < 0) return null; // not found
- 
+
 		return this.getSiblings()[idx+1];
- 
+
 	}
 });
 
@@ -473,7 +473,7 @@ dojo.widget.lcArgsCache = {};
 dojo.widget.tags = {};
 dojo.widget.tags.addParseTreeHandler = function(type){
 	var ltype = type.toLowerCase();
-	this[ltype] = function(fragment, widgetParser, parentComp, insertionIndex, localProps){ 
+	this[ltype] = function(fragment, widgetParser, parentComp, insertionIndex, localProps){
 		return dojo.widget.buildWidgetFromParseTree(ltype, fragment, widgetParser, parentComp, insertionIndex, localProps);
 	}
 }
@@ -498,8 +498,8 @@ dojo.widget.tags["dojo:connect"] = function(fragment, widgetParser, parentComp){
 //	- remove the clone from the render tree
 //	- place the clone
 // this is quite dumb
-dojo.widget.buildWidgetFromParseTree = function(type, frag, 
-												parser, parentComp, 
+dojo.widget.buildWidgetFromParseTree = function(type, frag,
+												parser, parentComp,
 												insertionIndex, localProps){
 	var stype = type.split(":");
 	stype = (stype.length == 2) ? stype[1] : type;
@@ -541,10 +541,10 @@ dojo.widget.defineWidget = function(widgetClass /*string*/, renderer /*string*/,
 			p = 2;
 		}
 		if(dojo.lang.isFunction(arguments[p])){
-			// init (function), props (object) 
+			// init (function), props (object)
 			args.push(arguments[p], arguments[p+1]);
 		}else{
-			// props (object) 
+			// props (object)
 			args.push(null, arguments[p]);
 		}
 		dojo.widget._defineWidget.apply(this, args);

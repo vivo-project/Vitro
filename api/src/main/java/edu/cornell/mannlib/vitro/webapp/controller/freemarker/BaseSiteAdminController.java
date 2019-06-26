@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class BaseSiteAdminController extends FreemarkerHttpServlet {
-	
+
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(BaseSiteAdminController.class);
     protected static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
@@ -82,7 +82,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         registerSiteConfigData("pageManagement", "/pageList", null, SimplePermission.MANAGE_MENUS.ACTION);
     }
-    
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return REQUIRED_ACTIONS;
@@ -95,20 +95,20 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        
-        Map<String, Object> body = new HashMap<String, Object>();        
+
+        Map<String, Object> body = new HashMap<String, Object>();
 
         body.put("dataInput", getDataInputData(vreq));
-        body.put("siteConfig", getSiteConfigData(vreq));        
-        body.put("siteMaintenance", getSiteMaintenanceUrls(vreq));     
+        body.put("siteConfig", getSiteConfigData(vreq));
+        body.put("siteMaintenance", getSiteMaintenanceUrls(vreq));
         body.put("ontologyEditor", getOntologyEditorData(vreq));
         body.put("dataTools", getDataToolsUrls(vreq));
 
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
-    
+
     protected Map<String, Object> getSiteMaintenanceUrls(VitroRequest vreq) {
-        
+
         Map<String, Object> urls = new HashMap<>();
 
         for (AdminUrl adminUrl : siteMaintenanceUrls) {
@@ -133,25 +133,25 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     }
 
     protected Map<String, Object> getDataInputData(VitroRequest vreq) {
-    
+
         Map<String, Object> map = new HashMap<String, Object>();
-        
+
 		if (PolicyHelper.isAuthorizedForActions(vreq,
 				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
 
             map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch"));
-            
+
             WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
-            
+
             // Create map for data input entry form options list
             List<VClassGroup> classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
-    
+
             Set<String> seenGroupNames = new HashSet<String>();
-            
+
             Iterator<VClassGroup> classGroupIt = classGroups.iterator();
             LinkedHashMap<String, List<Option>> orderedClassGroups = new LinkedHashMap<String, List<Option>>(classGroups.size());
             while (classGroupIt.hasNext()) {
-                VClassGroup group = classGroupIt.next();            
+                VClassGroup group = classGroupIt.next();
                 List<Option> opts = FormUtils.makeOptionListFromBeans(group.getVitroClassList(),"URI","PickListName",null,null,false);
                 if( seenGroupNames.contains(group.getPublicName() )){
                     //have a duplicate classgroup name, stick in the URI
@@ -162,14 +162,14 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
                 }else{
                     orderedClassGroups.put(group.getPublicName(),opts);
                     seenGroupNames.add(group.getPublicName());
-                }             
+                }
             }
-            
+
             map.put("groupedClassOptions", orderedClassGroups);
         }
         return map;
     }
-    
+
     protected Map<String, Object> getSiteConfigData(VitroRequest vreq) {
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -190,13 +190,13 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         return data;
     }
-    
+
     protected Map<String, Object> getOntologyEditorData(VitroRequest vreq) {
 
         Map<String, Object> map = new HashMap<String, Object>();
- 
+
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
-            
+
             String error = null;
             String explanation = null;
             TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
@@ -206,7 +206,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             } else if ( status.isInErrorState() ) {
                 error = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
             }
-    
+
             if (error != null) {
                 Map<String, String> tboxReasonerStatus = new HashMap<String, String>();
                 tboxReasonerStatus.put("error", error);
@@ -215,36 +215,36 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
                 }
                 map.put("tboxReasonerStatus", tboxReasonerStatus);
             }
-                    
+
             Map<String, String> urls = new HashMap<String, String>();
-            
+
             urls.put("ontologies", UrlBuilder.getUrl("/listOntologies"));
             urls.put("classHierarchy", UrlBuilder.getUrl("/showClassHierarchy"));
             urls.put("classGroups", UrlBuilder.getUrl("/listGroups"));
             urls.put("dataPropertyHierarchy", UrlBuilder.getUrl("/showDataPropertyHierarchy"));
             urls.put("fauxPropertyList", UrlBuilder.getUrl("/listFauxProperties"));
-            urls.put("propertyGroups", UrlBuilder.getUrl("/listPropertyGroups"));            
+            urls.put("propertyGroups", UrlBuilder.getUrl("/listPropertyGroups"));
             urls.put("objectPropertyHierarchy", UrlBuilder.getUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
             map.put("urls", urls);
         }
-        
+
         return map;
     }
 
     protected Map<String, String> getDataToolsUrls(VitroRequest vreq) {
 
         Map<String, String> urls = new HashMap<String, String>();
-        
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {            
+
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
             urls.put("ingest", UrlBuilder.getUrl("/ingest"));
             urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
             urls.put("rdfExport", UrlBuilder.getUrl("/export"));
 //            urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
         }
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION)) {            
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION)) {
         	urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
         }
-        
+
         return urls;
     }
 

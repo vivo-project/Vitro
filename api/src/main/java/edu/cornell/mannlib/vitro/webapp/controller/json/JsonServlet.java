@@ -70,7 +70,7 @@ public class JsonServlet extends VitroHttpServlet {
         } else if( vreq.getParameter("getDataForPage") != null ){
             throw new IllegalArgumentException("The call invoked deprecated classes " +
                     "and the parameter for this call appeared nowhere in the code base, " +
-                    "so it was removed in Aug 5th 2013.");                        
+                    "so it was removed in Aug 5th 2013.");
         }else if( vreq.getParameter("getRenderedSearchIndividualsByVClass") != null ){
             new GetRenderedSearchIndividualsByVClass(vreq).process(resp);
         }else if( vreq.getParameter("getRandomSearchIndividualsByVClass") != null ){
@@ -78,28 +78,28 @@ public class JsonServlet extends VitroHttpServlet {
         } else if( vreq.getParameter("getAllVClasses") != null ){
             new GetAllVClasses(vreq).process(resp);
         }
-        
+
     }
-    
+
 
     public static ObjectNode getSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
         List<String> vclassURIs = Collections.singletonList(vclassURI);
-        VitroRequest vreq = new VitroRequest(req);        
-        
+        VitroRequest vreq = new VitroRequest(req);
+
         IndividualListResults vcResults = getSearchVClassIntersectionResults(vclassURIs, vreq);
         //last parameter indicates single vclass instead of multiple vclasses
-        return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);                    
+        return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);
     }
 
     public static ObjectNode getSearchIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req) throws Exception {
-   	 	VitroRequest vreq = new VitroRequest(req);   
+   	 	VitroRequest vreq = new VitroRequest(req);
    	 	log.debug("Retrieve search results for vclasses" + vclassURIs.toString());
         IndividualListResults vcResults = getSearchVClassIntersectionResults(vclassURIs, vreq);
         log.debug("Results returned from search engine for " + vclassURIs.toString() + " are of size " + vcResults.getTotalCount());
-        
-        return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, true);        
+
+        return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, true);
    }
-    
+
     //Including version for search query for Vclass Intersections
     private static IndividualListResults getSearchVClassIntersectionResults(List<String> vclassURIs, VitroRequest vreq){
         log.debug("Retrieving search intersection results for " + vclassURIs.toString());
@@ -108,30 +108,30 @@ public class JsonServlet extends VitroHttpServlet {
         log.debug("Alpha and page parameters are " + alpha + " and " + page);
         try {
 	         return IndividualListController.getResultsForVClassIntersections(
-	                 vclassURIs, 
+	                 vclassURIs,
 	                 page, INDIVIDUALS_PER_PAGE,
-	                 alpha, 
-	                 vreq);  
+	                 alpha,
+	                 vreq);
         } catch(Exception ex) {
         	log.error("Error in retrieval of search results for VClass " + vclassURIs.toString(), ex);
         	return IndividualListResults.EMPTY;
         }
    }
- 
+
     public static String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
         String value = ind.getDataValue(dp.getURI());
         if( value == null || value.isEmpty() )
             return "";
         else
-            return value;            
+            return value;
     }
-    
+
     public static ObjectNode getRandomSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
-        VitroRequest vreq = new VitroRequest(req);        
-        
+        VitroRequest vreq = new VitroRequest(req);
+
         IndividualListResults vcResults = getRandomSearchVClassResults(vclassURI, vreq);
         //last parameter indicates single vclass instead of multiple vclasses
-        return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);                            
+        return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);
     }
 
      //Including version for Random search query for Vclass Intersections
@@ -143,10 +143,10 @@ public class JsonServlet extends VitroHttpServlet {
          log.debug("page and pageSize parameters = " + page + " and " + pageSize);
          try {
  	         return IndividualListController.getRandomResultsForVClass(
- 	                 vclassURI, 
- 	                 page, 
- 	                 pageSize, 
- 	                 vreq);  
+ 	                 vclassURI,
+ 	                 page,
+ 	                 pageSize,
+ 	                 vreq);
          } catch(Exception ex) {
          	log.error("Error in retrieval of search results for VClass " + vclassURI, ex);
          	return IndividualListResults.EMPTY;

@@ -33,12 +33,12 @@
 		function widenDomain(domainStr){
 			// the purpose of this is to set the most liberal domain policy
 			var cd = domainStr||document.domain;
-			if(cd.indexOf(".")==-1){ 
+			if(cd.indexOf(".")==-1){
 				document.domain = cd;
 				return;
 			}
 			var dps = cd.split(".");
-			if(dps.length>2){ 
+			if(dps.length>2){
 				dps = dps.slice(dps.length-2);
 			}
 			document.domain = dps.join(".");

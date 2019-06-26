@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
 import java.util.List;
 
-/** 
+/**
  * A group of Identifiers, very commonly used in method signatures
  * since a session will usually have more than one associated identifier.
 */

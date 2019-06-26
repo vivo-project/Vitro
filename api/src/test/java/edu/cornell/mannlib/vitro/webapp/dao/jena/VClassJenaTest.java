@@ -44,15 +44,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
- * 
- * 
- * 
+ *
+ *
+ *
  */
 
 public class VClassJenaTest {
-	
+
 	@Test
-	// NIHVIVO-1157 introduced VClassJena.java, a lazy-loading version of VClass.java.  
+	// NIHVIVO-1157 introduced VClassJena.java, a lazy-loading version of VClass.java.
 	// Per instructions from Brian L., this test tests that for one randomly selected Class,
 	// the getter methods in VClassJena return the same values as would have been
 	// returned by the pre-NIHVIVO-1157 VClass (which would have been set by the
@@ -62,27 +62,27 @@ public class VClassJenaTest {
 	// maybe more stable) if the values returned by the VClassJena getter methods
 	// are tested against hard-coded values (which could be set now based on the
 	// model code)
-	 	
+
 	public void correctValues(){
-	
+
 		// 1. create a model and populate it with the data for one class
 		// 2. retrieve the OntClass for the target class by URI
-		// 3. populate a VClass instance from the OntClass instance, as it would have been 
+		// 3. populate a VClass instance from the OntClass instance, as it would have been
 		//    populated pre-NIHVIVO-1157 (with the deleted vClassWebappFromOntClass, copied here)
 		// 4. populate a VClassJena instance as is done with the current application code
 		// 5. verify that the getter methods on the VClassJena and VClass instances return the same values
-		
+
 		String class1URI = "http://test.vivo/AcademicDegree";
 
-		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		
+		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+
 		String rdfsLabel = "this is the rdfs label";
 		String lang = "en-US";
-		
+
 		// populate sub-model
 		OntClass class1 = ontModel.createClass(class1URI);
-		
-		class1.setLabel(rdfsLabel,lang);   //rdfs:label		
+
+		class1.setLabel(rdfsLabel,lang);   //rdfs:label
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.IN_CLASSGROUP), ontModel.createResource("http://thisIsTheClassGroupURI"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.SHORTDEF), ontModel.createTypedLiteral("this is the short definition"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.EXAMPLE_ANNOT), ontModel.createTypedLiteral("this is the example"));
@@ -97,51 +97,51 @@ public class VClassJenaTest {
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMDISPLAYVIEWANNOT), ontModel.createTypedLiteral("this is the custom display view annotation"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMSHORTVIEWANNOT), ontModel.createTypedLiteral("this is the custom short view annotation"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMSEARCHVIEWANNOT), ontModel.createTypedLiteral("this is the custom search view annotation"));
-	
-		
-		WebappDaoFactoryJena wadf = new WebappDaoFactoryJena(ontModel);
-		
-		// Populate a VClass instance...old style 
-		
-		VClass vClass = vClassWebappFromOntClass(class1,wadf);
-		
-		// Populate a VClassJena instance...modern style
-		
-		VClassJena vClassJena = new VClassJena(class1, wadf);
-		
-		
-		// Check that the getters from the VClass and the VClassJena return the same values
-		
-		Assert.assertEquals(vClassJena.getName(), vClass.getName());  
-		Assert.assertEquals(vClassJena.getLocalNameWithPrefix(), vClass.getLocalNameWithPrefix()); 
 
-		Assert.assertEquals(vClassJena.getPickListName(), vClass.getPickListName());  
-		Assert.assertEquals(vClassJena.getExample(), vClass.getExample());  
-		Assert.assertEquals(vClassJena.getDescription(), vClass.getDescription());  
-		Assert.assertEquals(vClassJena.getShortDef(), vClass.getShortDef());  
-		Assert.assertEquals(vClassJena.getDisplayRank(), vClass.getDisplayRank());  
-		Assert.assertEquals(vClassJena.getGroupURI(), vClass.getGroupURI());  
-		Assert.assertEquals(vClassJena.getCustomEntryForm(), vClass.getCustomEntryForm());  
-		Assert.assertEquals(vClassJena.getCustomShortView(), vClass.getCustomShortView());  
-		Assert.assertEquals(vClassJena.getCustomSearchView(), vClass.getCustomSearchView());  
-		Assert.assertEquals(vClassJena.getSearchBoost(), vClass.getSearchBoost());  
+
+		WebappDaoFactoryJena wadf = new WebappDaoFactoryJena(ontModel);
+
+		// Populate a VClass instance...old style
+
+		VClass vClass = vClassWebappFromOntClass(class1,wadf);
+
+		// Populate a VClassJena instance...modern style
+
+		VClassJena vClassJena = new VClassJena(class1, wadf);
+
+
+		// Check that the getters from the VClass and the VClassJena return the same values
+
+		Assert.assertEquals(vClassJena.getName(), vClass.getName());
+		Assert.assertEquals(vClassJena.getLocalNameWithPrefix(), vClass.getLocalNameWithPrefix());
+
+		Assert.assertEquals(vClassJena.getPickListName(), vClass.getPickListName());
+		Assert.assertEquals(vClassJena.getExample(), vClass.getExample());
+		Assert.assertEquals(vClassJena.getDescription(), vClass.getDescription());
+		Assert.assertEquals(vClassJena.getShortDef(), vClass.getShortDef());
+		Assert.assertEquals(vClassJena.getDisplayRank(), vClass.getDisplayRank());
+		Assert.assertEquals(vClassJena.getGroupURI(), vClass.getGroupURI());
+		Assert.assertEquals(vClassJena.getCustomEntryForm(), vClass.getCustomEntryForm());
+		Assert.assertEquals(vClassJena.getCustomShortView(), vClass.getCustomShortView());
+		Assert.assertEquals(vClassJena.getCustomSearchView(), vClass.getCustomSearchView());
+		Assert.assertEquals(vClassJena.getSearchBoost(), vClass.getSearchBoost());
 		Assert.assertEquals(vClassJena.getHiddenFromDisplayBelowRoleLevel(), vClass.getHiddenFromDisplayBelowRoleLevel());
 		Assert.assertEquals(vClassJena.getProhibitedFromUpdateBelowRoleLevel(), vClass.getProhibitedFromUpdateBelowRoleLevel());
 		Assert.assertEquals(vClassJena.getHiddenFromPublishBelowRoleLevel(), vClass.getHiddenFromPublishBelowRoleLevel());
-    
+
 	}
 
-	
+
 	// To help in debugging the unit test
 	void printModels(OntModel ontModel) {
-	    
+
 		System.out.println("\nThe model has " + ontModel.size() + " statements:");
 		System.out.println("---------------------------------------------------");
 		ontModel.writeAll(System.out,"N3",null);
-		
+
 	}
-	
-	
+
+
 	// The following class and methods are pre-NIHVIVO-1157 code for
 	// populating a VClass. Original comments included.
 
@@ -156,12 +156,12 @@ public class VClassJenaTest {
     protected AnnotationProperty LOCAL_PROPERTY_CUSTOMDISPLAYVIEWANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_CUSTOMDISPLAYVIEWANNOT);
     protected AnnotationProperty LOCAL_PROPERTY_CUSTOMSHORTVIEWANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_CUSTOMSHORTVIEWANNOT);
     protected AnnotationProperty LOCAL_PROPERTY_CUSTOMSEARCHVIEWANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_CUSTOMSEARCHVIEWANNOT);
-    protected AnnotationProperty LOCAL_HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);    
-    protected AnnotationProperty LOCAL_PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);    
-    protected AnnotationProperty LOCAL_HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);    
+    protected AnnotationProperty LOCAL_HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
+    protected AnnotationProperty LOCAL_PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
+    protected AnnotationProperty LOCAL_HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
     protected AnnotationProperty LOCAL_IN_CLASSGROUP = _constModel.createAnnotationProperty(VitroVocabulary.IN_CLASSGROUP);
-	
- 
+
+
     private VClass vClassWebappFromOntClass(OntClass cls, WebappDaoFactoryJena wadf) {
         VClass vcw = new VClass();
         cls.getModel().enterCriticalSection(Lock.READ);
@@ -187,7 +187,7 @@ public class VClassJenaTest {
             } catch (Exception e) {
                 System.out.println("error retrieving vitro:inClassGroup property value for "+cls.getURI());
             }
-            
+
             vcw.setShortDef(getPropertyStringValue(cls,LOCAL_SHORTDEF));
             vcw.setExample(getPropertyStringValue(cls,LOCAL_EXAMPLE_ANNOT));
             vcw.setDescription(getPropertyStringValue(cls,LOCAL_DESCRIPTION_ANNOT));
@@ -198,7 +198,7 @@ public class VClassJenaTest {
             vcw.setCustomShortView(getPropertyStringValue(cls,LOCAL_PROPERTY_CUSTOMSHORTVIEWANNOT));
             vcw.setCustomSearchView(getPropertyStringValue(cls,LOCAL_PROPERTY_CUSTOMSEARCHVIEWANNOT));
             vcw.setSearchBoost(getPropertyFloatValue(cls,LOCAL_SEARCH_BOOST_ANNOT));
-            
+
             //There might be multiple HIDDEN_FROM_EDIT_DISPLAY_ANNOT properties, only use the highest
             StmtIterator it = cls.listProperties(LOCAL_HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
             BaseResourceBean.RoleLevel hiddenRoleLevel = null;
@@ -209,13 +209,13 @@ public class VClassJenaTest {
                     Resource res = (Resource)obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null && 
+                        if( roleFromModel != null &&
                             (hiddenRoleLevel == null || roleFromModel.compareTo(hiddenRoleLevel) > 0 )){
-                            hiddenRoleLevel = roleFromModel;                            
+                            hiddenRoleLevel = roleFromModel;
                         }
                     }
                 }
-            }            
+            }
             vcw.setHiddenFromDisplayBelowRoleLevel(hiddenRoleLevel);//this might get set to null
 
             //There might be multiple PROHIBITED_FROM_UPDATE_DISPLAY_ANNOT properties, only use the highest
@@ -228,15 +228,15 @@ public class VClassJenaTest {
                     Resource res = (Resource)obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null && 
+                        if( roleFromModel != null &&
                             (prohibitedRoleLevel == null || roleFromModel.compareTo(prohibitedRoleLevel) > 0 )){
-                            prohibitedRoleLevel = roleFromModel;                            
+                            prohibitedRoleLevel = roleFromModel;
                         }
                     }
                 }
-            }            
+            }
             vcw.setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel);//this might get set to null
-            
+
             //There might be multiple LOCAL_HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
             it = cls.listProperties(LOCAL_HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
             BaseResourceBean.RoleLevel publishRoleLevel = null;
@@ -247,13 +247,13 @@ public class VClassJenaTest {
                     Resource res = (Resource)obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null && 
+                        if( roleFromModel != null &&
                             (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
-                            publishRoleLevel = roleFromModel;                            
+                            publishRoleLevel = roleFromModel;
                         }
                     }
                 }
-            }            
+            }
             vcw.setHiddenFromPublishBelowRoleLevel(publishRoleLevel);//this might get set to null
 
         } finally {
@@ -262,12 +262,12 @@ public class VClassJenaTest {
         return vcw;
     }
 
-    
+
     public String getLabelForClass(OntClass cls,boolean withPrefix,boolean forPickList,WebappDaoFactoryJena wadf) {
     	cls.getModel().enterCriticalSection(Lock.READ);
     	try {
 	    	if (cls.isAnon()) {
-		    	if (cls.isRestriction()) {	    		
+		    	if (cls.isRestriction()) {
 		    		Restriction rest = cls.asRestriction();
 		    		OntProperty onProperty = rest.getOnProperty();
 		    		String labelStr = "restriction on " + getLabelOrId(onProperty) + ": ";
@@ -282,7 +282,7 @@ public class VClassJenaTest {
 			    			fillerRes = svfRest.getSomeValuesFrom();
 			    			labelStr += "some values from ";
 			    		}
-		    			if (fillerRes.canAs(OntClass.class)) { 
+		    			if (fillerRes.canAs(OntClass.class)) {
 		    				OntClass avf = (OntClass) fillerRes.as(OntClass.class);
 		    				labelStr += getLabelForClass(avf,withPrefix,forPickList,wadf);
 		    			} else {
@@ -291,7 +291,7 @@ public class VClassJenaTest {
 		    				} catch (Exception e) {
 		    					labelStr += "???";
 		    				}
-		    			}		    			
+		    			}
 		    		} else if (rest.isHasValueRestriction()) {
 		    			HasValueRestriction hvRest = rest.asHasValueRestriction();
 		    			labelStr += "has value ";
@@ -300,7 +300,7 @@ public class VClassJenaTest {
 			    			if (fillerNode.isResource()) {
 			    				labelStr += getLabelOrId((OntResource)fillerNode.as(OntResource.class));
 			    			} else {
-			    				labelStr += ((Literal) fillerNode.as(Literal.class)).getLexicalForm(); 
+			    				labelStr += ((Literal) fillerNode.as(Literal.class)).getLexicalForm();
 			    			}
 		    			} catch (Exception e) {
 		    				labelStr += "???";
@@ -356,10 +356,10 @@ public class VClassJenaTest {
                     OntologyDao oDao=wadf.getOntologyDao();
                     Ontology o = (Ontology)oDao.getOntologyByURI(cls.getNameSpace());
                     if (o!=null) {
-                        if (withPrefix) {                        	
+                        if (withPrefix) {
                             return(o.getPrefix()==null?(o.getName()==null?"unspec:"+getLabelOrId(cls):o.getName()+":"+getLabelOrId(cls)):o.getPrefix()+":"+getLabelOrId(cls));
                         } else {
-                            return(getLabelOrId(cls)+(o.getPrefix()==null?(o.getName()==null?" (unspec)":" ("+o.getName()+")"):" ("+o.getPrefix()+")"));                            
+                            return(getLabelOrId(cls)+(o.getPrefix()==null?(o.getName()==null?" (unspec)":" ("+o.getName()+")"):" ("+o.getPrefix()+")"));
                         }
                     } else {
                     	return getLabelOrId(cls);
@@ -373,7 +373,7 @@ public class VClassJenaTest {
     		cls.getModel().leaveCriticalSection();
     	}
     }
-    
+
     protected String getLabelOrId(OntResource r) {
     	String label = null;
     	r.getOntModel().enterCriticalSection(Lock.READ);
@@ -386,45 +386,45 @@ public class VClassJenaTest {
     	}
         return label;
     }
-    
-    
+
+
     private final boolean ALSO_TRY_NO_LANG = true;
     /**
-     * works through list of PREFERRED_LANGUAGES to find an appropriate 
-     * label, or NULL if not found.  
+     * works through list of PREFERRED_LANGUAGES to find an appropriate
+     * label, or NULL if not found.
      */
-    
+
     protected String getLabel(OntResource r){
         String label = null;
         r.getOntModel().enterCriticalSection(Lock.READ);
-        try {            
+        try {
             // try rdfs:label with preferred languages
             label = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
-            
+
             // try vitro:label with preferred languages
             if ( label == null ) {
                 label = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
-            }                              
+            }
         } finally {
             r.getOntModel().leaveCriticalSection();
         }
         return label;
     }
-    
+
     private String tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
     	String label = null;
 	    List<RDFNode> labels = (List<RDFNode>) r.listPropertyValues(p).toList();
-	    
+
 	    String lang = "en-US";
 	    label = getLabel2(lang,labels);
-	    
+
         if ( label == null && alsoTryNoLang ) {
         	label = getLabel2("", labels);
         }
-        
+
 	    return label;
     }
-    
+
     private String getLabel2(String lang, List<RDFNode>labelList) {
 		for (RDFNode label : labelList) {
 			if (label.isLiteral()) {
@@ -440,30 +440,30 @@ public class VClassJenaTest {
 		}
     	return null;
     }
-    
-    
+
+
     /**
-     * Get the local name, bnode or URI of the resource. 
+     * Get the local name, bnode or URI of the resource.
      */
     protected String getLocalNameOrId(OntResource r){
         String label = null;
         r.getOntModel().enterCriticalSection(Lock.READ);
-        try {                       
+        try {
             String localName = r.getLocalName();
             if (localName != null) {
                 label = localName;
             } else if (r.isAnon()) {
                 label = r.getId().toString();
             } else {
-                label = r.getURI();                
-            }                       
+                label = r.getURI();
+            }
         } finally {
             r.getOntModel().leaveCriticalSection();
         }
         return label;
     }
- 
-   
+
+
     protected String getPropertyStringValue(OntResource res, Property dataprop) {
         if (dataprop != null) {
             try {
@@ -483,11 +483,11 @@ public class VClassJenaTest {
             return null;
         }
     }
-   
+
     protected int getPropertyNonNegativeIntValue(OntResource res, Property dataprop) {
-    	
+
         if (dataprop != null) {
-    
+
             try {
 				return ((Literal)res.getPropertyValue(dataprop)).getInt();
 			} catch (Exception e) {
@@ -498,7 +498,7 @@ public class VClassJenaTest {
             return -1;
         }
     }
-    
+
     protected Float getPropertyFloatValue(OntResource res, Property prop){
         if( prop != null ){
             try{
@@ -509,11 +509,11 @@ public class VClassJenaTest {
         }else
             return null;
     }
-    
+
     public synchronized boolean isBooleanClassExpression(OntClass cls) {
     	return (cls.isComplementClass() || cls.isIntersectionClass() || cls.isUnionClass());
     }
-    
+
     protected String getClassURIStr(Resource cls) {
     	if (cls.isAnon()) {
     		return VitroVocabulary.PSEUDO_BNODE_NS+cls.getId().toString();

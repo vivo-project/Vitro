@@ -18,15 +18,15 @@ public abstract class BaseEditElementVTwo  implements EditElementVTwo {
     private static final Log log = LogFactory.getLog(BaseEditElementVTwo.class);
 
     protected FieldVTwo field;
-    
+
     public BaseEditElementVTwo(FieldVTwo field){
         this.field = field;
     }
-    
+
     public void setField(FieldVTwo field){
         this.field = field;
     }
-    
+
     /**
      * Utility method for use in EditElements to merge a freemarker template.
      */
@@ -36,15 +36,15 @@ public abstract class BaseEditElementVTwo  implements EditElementVTwo {
             template = fmConfig.getTemplate(templateName);
         } catch (IOException e) {
             log.error("Cannot get template " + templateName);
-        }  
-         
+        }
+
         StringWriter writer = new StringWriter();
         try {
             template.process(map, writer);
         } catch (TemplateException | IOException e) {
             log.error(e,e);
         }
-        return writer.toString();        
+        return writer.toString();
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class BaseEditElementVTwo  implements EditElementVTwo {
     protected boolean hasNoneOrSingle(String key, Map<String, String[]> queryParameters){
         if( queryParameters != null ){
             if( ! queryParameters.containsKey(key) )
-                return true; //none            
+                return true; //none
             String[] vt = queryParameters.get(key);
             return vt == null || vt.length == 0 || vt.length==1;
         }else{
@@ -63,11 +63,11 @@ public abstract class BaseEditElementVTwo  implements EditElementVTwo {
             return false;
         }
     }
-    
+
     protected boolean hasSingleNonNullNonEmptyValueForKey(String key, Map<String, String[]> queryParameters){
         if( queryParameters != null ){
             if( ! queryParameters.containsKey(key) )
-                return true; //none            
+                return true; //none
             String[] vt = queryParameters.get(key);
             return vt != null && vt.length == 1 && vt[0] != null && ! vt[0].isEmpty() ;
         }else{

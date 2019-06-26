@@ -12,7 +12,7 @@ import org.apache.jena.shared.Lock;
 
 /**
  * For now, this only models Object Properties.
- * 
+ *
  * It should be easy to add Data Property patterns by making this abstract and
  * creating two concrete subclasses.
  */

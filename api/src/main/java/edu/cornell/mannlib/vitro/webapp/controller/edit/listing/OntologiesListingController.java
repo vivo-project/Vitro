@@ -26,7 +26,7 @@ public class OntologiesListingController extends BaseEditController {
     	if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
     		return;
     	}
-    	
+
         VitroRequest vrequest = new VitroRequest(request);
 
         //need to figure out how to structure the results object to put the classes underneath

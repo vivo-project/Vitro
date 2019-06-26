@@ -57,7 +57,7 @@ dojo.io.iframeContentWindow = function(iframe_el) {
 	var win = iframe_el.contentWindow || // IE
 		dojo.io.iframeContentDocument(iframe_el).defaultView || // Moz, opera
 		// Moz. TODO: is this available when defaultView isn't?
-		dojo.io.iframeContentDocument(iframe_el).__parent__ || 
+		dojo.io.iframeContentDocument(iframe_el).__parent__ ||
 		(iframe_el.name && document.frames[iframe_el.name]) || null;
 	return win;
 }
@@ -138,11 +138,11 @@ dojo.io.IframeTransport = new function(){
 			(
 				// FIXME: can we really handle text/plain and
 				// text/javascript requests?
-				dojo.lang.inArray(kwArgs["mimetype"], 
-				[	"text/plain", "text/html", 
+				dojo.lang.inArray(kwArgs["mimetype"],
+				[	"text/plain", "text/html",
 					"text/javascript", "text/json"])
 			)&&(
-				// make sur we really only get used in file upload cases	
+				// make sur we really only get used in file upload cases
 				(kwArgs["formNode"])&&(dojo.io.checkChildrenForFile(kwArgs["formNode"]))
 			)&&(
 				dojo.lang.inArray(kwArgs["method"].toLowerCase(), ["post", "get"])
@@ -216,7 +216,7 @@ dojo.io.IframeTransport = new function(){
 			var cmt = req.mimetype;
 			if((cmt == "text/javascript")||(cmt == "text/json")){
 				// FIXME: not sure what to do here? try to pull some evalulable
-				// text from a textarea or cdata section? 
+				// text from a textarea or cdata section?
 				// how should we set up the contract for that?
 				var js = ifd.getElementsByTagName("textarea")[0].value;
 				if(cmt == "text/json") { js = "(" + js + ")"; }
@@ -227,7 +227,7 @@ dojo.io.IframeTransport = new function(){
 				value = ifd.getElementsByTagName("textarea")[0].value;
 			}
 			success = true;
-		}catch(e){ 
+		}catch(e){
 			// looks like we didn't get what we wanted!
 			var errObj = new dojo.io.Error("IframeTransport Error");
 			if(dojo.lang.isFunction(req["error"])){

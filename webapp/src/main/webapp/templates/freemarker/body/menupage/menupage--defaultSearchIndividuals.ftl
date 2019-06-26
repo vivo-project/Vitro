@@ -9,12 +9,12 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
-    <h2>${title!} 
+    <h2>${title!}
     </h2>
     <#if subtitle?has_content>
         <h4>${subtitle}</h4>
     </#if>
-    
+
     <#if (!noData)>
         <#if errorMessage?has_content>
             <p>${errorMessage}</p>
@@ -34,17 +34,17 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
                     </ul>
                 </#if>
             </#assign>
-            
+
             ${pagination}
-            
+
             <ul>
                 <#list individuals as individual>
-                    <li>       
+                    <li>
                         <@shortView uri=individual.uri viewContext="index" />
                     </li>
                 </#list>
             </ul>
-            
+
             ${pagination}
         </#if>
     <#else>

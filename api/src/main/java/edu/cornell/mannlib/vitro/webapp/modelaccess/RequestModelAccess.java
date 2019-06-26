@@ -33,7 +33,7 @@ public interface RequestModelAccess {
 	 * Get the FULL_UNION OntModel: Language-aware or not.
 	 */
 	OntModel getOntModel(LanguageOption... options);
-	
+
 	/**
 	 * Get an OntModel: Language-aware or not.
 	 */
@@ -49,7 +49,7 @@ public interface RequestModelAccess {
 	 * ASSERTIONS or INFERENCES or both.
 	 */
 	WebappDaoFactory getWebappDaoFactory(WebappDaoFactoryOption... options);
-	
+
 	/**
 	 * When finished, release any resources.
 	 */

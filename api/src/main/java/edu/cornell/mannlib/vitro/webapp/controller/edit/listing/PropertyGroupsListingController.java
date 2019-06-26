@@ -40,13 +40,13 @@ public class PropertyGroupsListingController extends BaseEditController {
 				SimplePermission.EDIT_ONTOLOGY.ACTION)) {
     		return;
     	}
-    	
+
         VitroRequest vreq = new VitroRequest(request);
 
         PropertyGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         List<PropertyGroup> groups = dao.getPublicGroups(WITH_PROPERTIES);
-        
+
         Comparator<Property> comparator = new PropertySorter(vreq.getCollator());
 
         List<String> results = new ArrayList<String>();
@@ -62,7 +62,7 @@ public class PropertyGroupsListingController extends BaseEditController {
                 String publicName = pg.getName();
                 if ( StringUtils.isBlank(publicName) ) {
                     publicName = "(unnamed group)";
-                }           
+                }
                 try {
                     results.add("<a href=\"./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup\">"+publicName+"</a>");
                 } catch (Exception e) {
@@ -86,9 +86,9 @@ public class PropertyGroupsListingController extends BaseEditController {
                         Property prop = propIt.next();
                         results.add("XX");
                         String controllerStr = "propertyEdit";
-                        String nameStr = 
-                        	   (prop.getLabel() == null) 
-                        	           ? "" 
+                        String nameStr =
+                        	   (prop.getLabel() == null)
+                        	           ? ""
                         	           : prop.getLabel();
                         if (prop instanceof ObjectProperty) {
                         	nameStr = ((ObjectProperty) prop).getDomainPublic();
@@ -98,9 +98,9 @@ public class PropertyGroupsListingController extends BaseEditController {
                         }
                         if (prop.getURI() != null) {
                             try {
-                                results.add("<a href=\"" + controllerStr + 
+                                results.add("<a href=\"" + controllerStr +
                                 		"?uri="+URLEncoder.encode(
-                                				prop.getURI(),"UTF-8") + 
+                                				prop.getURI(),"UTF-8") +
                                 				"\">" + nameStr +"</a>");
                             } catch (Exception e) {
                                 results.add(nameStr);
@@ -133,15 +133,15 @@ public class PropertyGroupsListingController extends BaseEditController {
         }
 
     }
-    
+
     private class PropertySorter implements Comparator<Property> {
-    	
+
         Collator collator;
-        
+
         public PropertySorter(Collator collator) {
             this.collator = collator;
         }
-    	
+
     	public int compare(Property p1, Property p2) {
     		String name1 = getName(p1);
     		String name2 = getName(p2);
@@ -154,7 +154,7 @@ public class PropertyGroupsListingController extends BaseEditController {
     		}
     		return collator.compare(name1, name2);
     	}
-    	
+
     	private String getName(Property prop) {
     		if (prop instanceof ObjectProperty) {
     			return ((ObjectProperty) prop).getDomainPublic();
@@ -165,5 +165,5 @@ public class PropertyGroupsListingController extends BaseEditController {
     		}
     	}
     }
-    
+
 }

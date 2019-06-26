@@ -30,7 +30,7 @@ public class BasicValidationVTwo {
 
     Map<String, List<String>> varsToValidations;
     EditConfigurationVTwo editConfig;
-    
+
     public BasicValidationVTwo(EditConfigurationVTwo editConfig, MultiValueEditSubmission editSub){
         this.editConfig = editConfig;
         Map<String,List<String>> validatorsForFields = new HashMap<String,List<String>>();
@@ -49,14 +49,14 @@ public class BasicValidationVTwo {
 
     public Map<String,String> validateUris(Map<String,List<String>> varNamesToValues){
         HashMap<String,String> errors = new HashMap<String,String>();
-        
+
         for( String name : varNamesToValues.keySet()){
-        	
+
             List<String> values = varNamesToValues.get(name);
             List<String> validations = varsToValidations.get(name);
             if( validations!= null){
                 for( String validationType : validations){
-                	//Appending validate message if same field has multiple values 
+                	//Appending validate message if same field has multiple values
                 	StringBuilder validateMsg = null;
                 	for(String value: values){
                 		String thisValidateMsg = validate(validationType,value);
@@ -70,10 +70,10 @@ public class BasicValidationVTwo {
                 	}
                     if( validateMsg != null) {
                         errors.put(name, validateMsg.toString());
-                    }    
+                    }
                 }
             }
-        }               
+        }
         return errors;
     }
 
@@ -87,14 +87,14 @@ public class BasicValidationVTwo {
             if( validations != null ){
                 // NB this is case-sensitive
                 boolean isRequiredField = validations.contains("nonempty");
-                
+
                 for( String validationType : validations){
                     String value = null;
                     StringBuilder validateMsg = null;
                     //If no literals and this field was required, this is an error message
                     //and can return
                     if((literals == null || literals.size() == 0) && isRequiredField) {
-                    	errors.put(name, REQUIRED_FIELD_EMPTY_MSG);     
+                    	errors.put(name, REQUIRED_FIELD_EMPTY_MSG);
                         break;
                     }
                     //Loop through literals if literals exist
@@ -104,12 +104,12 @@ public class BasicValidationVTwo {
 		                        if( literal != null ){
 		                            value = literal.getString();
 		                        }
-		                    }catch(Throwable th){ 
-		                        log.debug("could not convert literal to string" , th); 
+		                    }catch(Throwable th){
+		                        log.debug("could not convert literal to string" , th);
 		                    }
 		                    // Empty field: if required, include only the empty field
-		                    // error message, not a format validation message. If non-required, 
-		                    // don't do format validation, since that is both unnecessary and may 
+		                    // error message, not a format validation message. If non-required,
+		                    // don't do format validation, since that is both unnecessary and may
 		                    // incorrectly generate errors.
 		                    if (isEmpty(value)) {
 		                        if (isRequiredField) {
@@ -135,22 +135,22 @@ public class BasicValidationVTwo {
         }
         return errors;
     }
-    
-    public Map<String,String>validateFiles(Map<String, List<FileItem>> fileItemMap) {        
-        
+
+    public Map<String,String>validateFiles(Map<String, List<FileItem>> fileItemMap) {
+
         HashMap<String,String> errors = new HashMap<String,String>();
-        for(String name: editConfig.getFilesOnForm() ){            
-            List<String> validators = varsToValidations.get(name);            
+        for(String name: editConfig.getFilesOnForm() ){
+            List<String> validators = varsToValidations.get(name);
             for( String validationType : validators){
                 String validateMsg = validate(validationType, fileItemMap.get(name));
                 if( validateMsg != null ) {
                     errors.put(name, validateMsg);
-                }    
+                }
             }
-        }            
-        return errors;    
+        }
+        return errors;
     }
-    
+
     private String validate(String validationType, List<FileItem> fileItems) {
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( fileItems == null || fileItems.size() == 0 ){
@@ -185,19 +185,19 @@ public class BasicValidationVTwo {
         }
         else if( validationType.indexOf("datatype:") == 0 ) {
             String datatypeURI = validationType.substring(9);
-            String errorMsg = validateAgainstDatatype( value, datatypeURI ); 
-            if ( errorMsg == null ) { 
+            String errorMsg = validateAgainstDatatype( value, datatypeURI );
+            if ( errorMsg == null ) {
                 return SUCCESS;
             } else {
                 return errorMsg;
             }
-        } else if ("httpUrl".equalsIgnoreCase(validationType)){ 
+        } else if ("httpUrl".equalsIgnoreCase(validationType)){
         	//check if it has http or https, we could do more but for now this is all.
         	if(! value.startsWith("http://") && ! value.startsWith("https://") ){
-        		return "This URL must start with http:// or https://"; 
+        		return "This URL must start with http:// or https://";
         	}else{
-        		return SUCCESS;        		
-        	}        	 
+        		return SUCCESS;
+        	}
         }
         //Date not past validation
         else if( "dateNotPast".equalsIgnoreCase(validationType)){
@@ -222,7 +222,7 @@ public class BasicValidationVTwo {
             	} else {
             		return SUCCESS;
             	}
-        	}	
+        	}
         }
         return null; //
     }
@@ -230,9 +230,9 @@ public class BasicValidationVTwo {
     private boolean isDate(String in){
          return datePattern.matcher(in).matches();
     }
-    
+
     private static DatatypeDaoJena ddao = null;
-    
+
     public static synchronized String validateAgainstDatatype( String value, String datatypeURI ) {
         if ( ( datatypeURI != null ) && ( datatypeURI.length()>0 ) ) {
             RDFDatatype datatype = TypeMapper.getInstance().getSafeTypeByName(datatypeURI);
@@ -258,10 +258,10 @@ public class BasicValidationVTwo {
         List<String> unknown = new ArrayList<String>();
         for( String key : varsToValidations.keySet()){
             if( varsToValidations.get(key) == null )
-                continue;            
+                continue;
             for( String validator : varsToValidations.get(key)){
                 if( ! basicValidations.contains( validator)) {
-                    if ( ! ( ( validator != null) &&  
+                    if ( ! ( ( validator != null) &&
                          ( validator.indexOf( "datatype:" ) == 0 ) ) ) {
                         unknown.add(validator);
                     }
@@ -273,13 +273,13 @@ public class BasicValidationVTwo {
 
         throw new Error( "Unknown basic validators: " + Arrays.toString(unknown.toArray()));
     }
-    
+
     private static boolean isEmpty(String value) {
-        return (value == null || value.trim().length() == 0); 
+        return (value == null || value.trim().length() == 0);
     }
 
-    
-    
+
+
     private static Pattern urlRX = Pattern.compile("(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
 
     /** we use null to indicate success */

@@ -31,7 +31,7 @@ dojo.widget.html.DropdownButton = function() {
 dojo.inherits(dojo.widget.html.DropdownButton, dojo.widget.HtmlWidget);
 
 dojo.lang.extend(dojo.widget.html.DropdownButton, {
-	
+
 	// In IE, event handlers on objects inside buttons don't work correctly, so
 	// we just set onClick on the button itself.
 	templatePath: dojo.uri.dojoUri("src/widget/templates/HtmlDropDownButtonTemplate.html"),
@@ -57,7 +57,7 @@ dojo.lang.extend(dojo.widget.html.DropdownButton, {
 
 		this.a = dojo.dom.getFirstChildElement(input);	// the button contents
 		this.menu = dojo.dom.getNextSiblingElement(this.a);	// the menu under the button
-		
+
 		this.disabled = dojo.html.hasClass(this.a, "disabled");
 		if( this.disabled ) {
 			dojo.html.addClass(this.button, "dojoDisabled");
@@ -117,7 +117,7 @@ dojo.lang.extend(dojo.widget.html.DropdownButton, {
 		dojo.html.addClass(this.button, "dojoButtonHover");
 		dojo.html.removeClass(this.button, "dojoButtonNoHover");
 	},
-	
+
 	onMouseOut: function(e) {
 		dojo.html.removeClass(this.button, "dojoButtonHover");
 		dojo.html.addClass(this.button, "dojoButtonNoHover");
@@ -150,7 +150,7 @@ dojo.lang.extend(dojo.widget.html.DropdownButton, {
 			this.hideMenu();
 		}
 	},
-	
+
 	showMenu: function() {
 		if ( this.disabled )
 			return;
@@ -171,7 +171,7 @@ dojo.lang.extend(dojo.widget.html.DropdownButton, {
 
 		// If someone clicks somewhere else on the screen then close the menu
 		dojo.event.connect(document.documentElement, "onmousedown", this, "onCanvasMouseDown");
-		
+
 		// When someone clicks the menu, after the menu handles the event,
 		// close the menu (be careful not to close the menu too early or else
 		// the menu will never receive the event.)

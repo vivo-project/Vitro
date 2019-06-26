@@ -10,7 +10,7 @@ public class TemplateResponseValues extends BaseResponseValues {
 
     private final String templateName;
     private final Map<String, Object> map;
-    
+
     public TemplateResponseValues(String templateName) {
         this.templateName = templateName;
         this.map = new HashMap<String, Object>();
@@ -21,7 +21,7 @@ public class TemplateResponseValues extends BaseResponseValues {
         this.templateName = templateName;
         this.map = new HashMap<String, Object>();
     }
-    
+
     public TemplateResponseValues(String templateName, Map<String, Object> map) {
         this.templateName = templateName;
         this.map = map;
@@ -32,7 +32,7 @@ public class TemplateResponseValues extends BaseResponseValues {
         this.templateName = templateName;
         this.map = map;
     }
-    
+
     public TemplateResponseValues put(String key, Object value) {
         this.map.put(key, value);
         return this;
@@ -46,7 +46,7 @@ public class TemplateResponseValues extends BaseResponseValues {
     @Override
     public String getTemplateName() {
         return this.templateName;
-    }   
+    }
 
 }
 

@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 public class ListedIndividual extends BaseListedIndividual {
 
     private static final Log log = LogFactory.getLog(ListedIndividual.class);
-    
+
     ListedIndividual(Individual individual, VitroRequest vreq) {
         super(individual, vreq);
     }

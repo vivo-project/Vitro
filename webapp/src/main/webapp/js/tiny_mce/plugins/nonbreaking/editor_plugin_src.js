@@ -27,7 +27,7 @@
 				ed.onKeyDown.add(function(ed, e) {
 					if (e.keyCode == 9) {
 						e.preventDefault();
-	
+
 						ed.execCommand('mceNonBreaking');
 						ed.execCommand('mceNonBreaking');
 						ed.execCommand('mceNonBreaking');

@@ -28,20 +28,20 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         this.filters = filters;
     }
 
-    
+
     @Override
     public void deleteObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
         innerObjectPropertyStatementDao.deleteObjectPropertyStatement(objPropertyStmt);
     }
 
 
-    private List<ObjectPropertyStatement> filterAndWrapList(List<ObjectPropertyStatement> list){        
+    private List<ObjectPropertyStatement> filterAndWrapList(List<ObjectPropertyStatement> list){
         if( ( list ) != null ){
             innerObjectPropertyStatementDao.resolveAsFauxPropertyStatements(list);
 
             ArrayList<ObjectPropertyStatement> ctemp = new ArrayList<ObjectPropertyStatement>();
             Filter.filter(list,filters.getObjectPropertyStatementFilter(),ctemp);
-                        
+
             List<ObjectPropertyStatement> cout= new ArrayList<ObjectPropertyStatement>(list.size());
             for( ObjectPropertyStatement stmt: ctemp){
                 cout.add( new ObjectPropertyStatementFiltering(stmt,filters) );
@@ -51,14 +51,14 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
             return null;
         }
     }
-    
+
     @Override
     public Individual fillExistingObjectPropertyStatements(Individual entity) {
         Individual ind = innerObjectPropertyStatementDao.fillExistingObjectPropertyStatements(entity);
-        if( ind == null ) 
+        if( ind == null )
             return null;
-        else{    
-            ind.setObjectPropertyStatements( filterAndWrapList( ind.getObjectPropertyStatements()) );       
+        else{
+            ind.setObjectPropertyStatements( filterAndWrapList( ind.getObjectPropertyStatements()) );
             return ind;
         }
     }
@@ -67,12 +67,12 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     public List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty) {
     	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty) );
     }
-    
+
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty, int startIndex, int endIndex) {
-    	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty, startIndex, endIndex));    	
+    	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty, startIndex, endIndex));
     }
-    
+
     @Override
 	public List<ObjectPropertyStatement> getObjectPropertyStatements(
 			ObjectPropertyStatement objPropertyStmt) {
@@ -82,25 +82,25 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     @Override
 	public int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
         return innerObjectPropertyStatementDao.insertNewObjectPropertyStatement(objPropertyStmt);
-    }    	
-	
+    }
+
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, String propertyUri, String objectKey, String domainUri, 
+            String subjectUri, String propertyUri, String objectKey, String domainUri,
             String rangeUri, String query, Set<String> queryStrings, String sortDirection) {
-        
-        List<Map<String, String>> data = 
+
+        List<Map<String, String>> data =
         	innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(
-        			subjectUri, propertyUri, objectKey, domainUri, rangeUri, query, 
+        			subjectUri, propertyUri, objectKey, domainUri, rangeUri, query,
         			        queryStrings,sortDirection);
-        
+
         /* Filter the data
-         * 
+         *
          * Filtering is applied to a list of ObjectPropertyStatements. Create these statements, mapped
          * to the item in data that they are built from, apply filtering to the statements, then get
          * the associated data out of the original list. Use a LinkedHashMap to preserve the ordering.
          */
-        Map<ObjectPropertyStatement, Map<String, String>> stmtsToData = 
+        Map<ObjectPropertyStatement, Map<String, String>> stmtsToData =
             new LinkedHashMap<ObjectPropertyStatement, Map<String, String>>(data.size());
 
         for (Map<String, String> map : data) {
@@ -113,27 +113,27 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
             statement.setProperty(op);
             stmtsToData.put(statement, map);
         }
-        
+
         List<ObjectPropertyStatement> stmtList = new ArrayList<ObjectPropertyStatement>(stmtsToData.keySet());
-        
+
         // Apply the filters to the list of statements
-        List<ObjectPropertyStatement> filteredStatements = filterAndWrapList(stmtList);     
-        
+        List<ObjectPropertyStatement> filteredStatements = filterAndWrapList(stmtList);
+
         // Get the data associated with the filtered statements out of the map
         List<Map<String, String>> filteredData = new ArrayList<Map<String, String>>(filteredStatements.size());
-        for (ObjectPropertyStatement ops : filteredStatements) {        
+        for (ObjectPropertyStatement ops : filteredStatements) {
             if (ops instanceof ObjectPropertyStatementFiltering) {
                 ops = ((ObjectPropertyStatementFiltering)ops).innerStmt;
-            } 
+            }
             filteredData.add(stmtsToData.get(ops));
-        }       
-        
+        }
+
         // Return the filtered list of data
         return filteredData;
 
-    }    
+    }
 
-    @Override 
+    @Override
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
         return innerObjectPropertyStatementDao.getMostSpecificTypesInClassgroupsForIndividual(subjectUri);
     }

@@ -22,29 +22,29 @@ public class PropertyGroupDaoFiltering implements PropertyGroupDao {
 
 	public PropertyGroupDaoFiltering(PropertyGroupDao propertyGroupDao,
             WebappDaoFactoryFiltering webappDaoFactoryFiltering,
-            VitroFilters filters) {	    
+            VitroFilters filters) {
 	    this.innerDao = propertyGroupDao;
         this.filteredDaos = webappDaoFactoryFiltering;
-        this.filters = filters;	    
+        this.filters = filters;
     }
 
     public void deletePropertyGroup(PropertyGroup group) {
 		innerDao.deletePropertyGroup(group);
 	}
 
-	
+
     public PropertyGroup getGroupByURI(String uri) {
         PropertyGroup grp  = innerDao.getGroupByURI(uri);
          wrapPropertyGroup( grp );
          return grp;
     }
-   
+
 	private void  wrapPropertyGroup( PropertyGroup grp ){
-	    if( grp == null ) return ;        
+	    if( grp == null ) return ;
         List<Property> props =  grp.getPropertyList();
-        if( props == null ||  props.size() == 0 ) 
+        if( props == null ||  props.size() == 0 )
             return ;
-        
+
         List<Property> filteredProps = new LinkedList<Property>();
         for( Property prop : props ){
     	    if( prop != null ){
@@ -52,7 +52,7 @@ public class PropertyGroupDaoFiltering implements PropertyGroupDao {
                 	if( filters.getObjectPropertyFilter().fn( (ObjectProperty)prop ) ){
         	           	filteredProps.add( new ObjectPropertyFiltering((ObjectProperty)prop,filters));
             	    }
-	            }else if( prop instanceof ObjectPropertyFiltering ){                
+	            }else if( prop instanceof ObjectPropertyFiltering ){
                 	//log.debug("property instanceof ObjectPropertyFiltering == true but property instanceof ObjectProperty == false");
 	                if( filters.getObjectPropertyFilter().fn( (ObjectProperty)prop ) ){
     	                filteredProps.add( new ObjectPropertyFiltering((ObjectProperty)prop,filters));
@@ -64,10 +64,10 @@ public class PropertyGroupDaoFiltering implements PropertyGroupDao {
     	        }
             }
         }
-        
-        grp.setPropertyList(filteredProps); //side effect 
+
+        grp.setPropertyList(filteredProps); //side effect
     }
-	
+
 	public List<PropertyGroup> getPublicGroups(boolean withProperties) {
 		List<PropertyGroup> groups =  innerDao.getPublicGroups(withProperties);
 		for( PropertyGroup grp : groups ){
@@ -75,16 +75,16 @@ public class PropertyGroupDaoFiltering implements PropertyGroupDao {
 		}
 		return groups;
 	}
-	
+
 	public PropertyGroup createDummyPropertyGroup(String name, int rank) {
 	    return innerDao.createDummyPropertyGroup(name, rank);
 	}
-	
+
 	public String insertNewPropertyGroup(PropertyGroup group) {
 		return innerDao.insertNewPropertyGroup(group);
 	}
 
-	
+
 	public int removeUnpopulatedGroups(List<PropertyGroup> groups) {
 		return innerDao.removeUnpopulatedGroups(groups);
 	}

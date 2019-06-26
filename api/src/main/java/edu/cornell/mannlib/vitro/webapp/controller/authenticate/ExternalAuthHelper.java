@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 /**
  * Capture the properties used by the External Authorization system, and use
  * them to assist in the process.
- * 
+ *
  * The first time this bean is requested, it is created from the configuration
  * properties and cached in the session. After that, the cached version is used.
  */
@@ -43,7 +43,7 @@ public class ExternalAuthHelper {
 
 	/**
 	 * Get the bean from the servlet context. If there is no bean, create one.
-	 * 
+	 *
 	 * Never returns null.
 	 */
 	public static ExternalAuthHelper getHelper(ServletRequest request) {

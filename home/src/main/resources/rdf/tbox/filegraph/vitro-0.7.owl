@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE rdf [
-<!ENTITY vitro "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"> 
+<!ENTITY vitro "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#">
 <!ENTITY list "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"> ]>
 
 <rdf:RDF
@@ -16,7 +16,7 @@ xmlns:vitro="&vitro;"
 
 <!-- Vitro Application Ontology version 0.7 -->
 
-<!-- This ontology is used internally by the Vitro 0.7 Java application.  It is not user viewable or editable:  editing this file could have various unintended consequences --> 
+<!-- This ontology is used internally by the Vitro 0.7 Java application.  It is not user viewable or editable:  editing this file could have various unintended consequences -->
 
 <owl:Ontology rdf:about="http://vitro.mannlib.cornell.edu/ns/vitro/0.7">
     <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vitro internals</rdfs:label>
@@ -36,6 +36,7 @@ xmlns:vitro="&vitro;"
 <owl:AnnotationProperty rdf:about="&vitro;modTimeAnnot"/>
 <owl:AnnotationProperty rdf:about="&vitro;shortDefAnnot"/>
 <owl:AnnotationProperty rdf:about="&vitro;oldId"/>
+<owl:AnnotationProperty rdf:about="&vitro;editing"/>
 
 <!-- VClassGroup-related constructs -->
 
@@ -148,7 +149,7 @@ xmlns:vitro="&vitro;"
   <rdf:Description rdf:about="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customDisplayViewAnnot">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
   </rdf:Description>
-  
+
   <owl:AnnotationProperty rdf:about="&vitro;mostSpecificType"/>
   <owl:AnnotationProperty rdf:about="&vitro;extendedLinkedData"/>
 <!--Institutional Internal class -->

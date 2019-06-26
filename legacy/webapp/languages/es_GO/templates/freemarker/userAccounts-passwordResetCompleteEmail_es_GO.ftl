@@ -35,7 +35,7 @@ ${userAccount.firstName} ${userAccount.lastName}
 
 Contraseña cambiada con éxito.
 
-Su nueva contraseña asociada con ${userAccount.emailAddress} 
+Su nueva contraseña asociada con ${userAccount.emailAddress}
 ha sido cambiado.
 
 Gracias.

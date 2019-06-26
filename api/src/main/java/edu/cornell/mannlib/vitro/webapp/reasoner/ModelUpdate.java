@@ -8,14 +8,14 @@ import org.apache.jena.rdf.model.Statement;
 public class ModelUpdate {
 
 	public static enum Operation {ADD, RETRACT};
-	
+
 	private Operation operation;
 	private Statement statement;
 	private String modelURI;
 	//JenaDataSourceSetupBase.JENA_DB_MODEL;
 	//JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL;
-	
-	
+
+
 	public ModelUpdate() {
 
     }
@@ -23,7 +23,7 @@ public class ModelUpdate {
 	public ModelUpdate(Statement statement,
 			           Operation operation,
 	                   String modelURI) {
-		
+
 		this.operation = operation;
 		this.statement = statement;
 		this.modelURI = modelURI;
@@ -52,13 +52,13 @@ public class ModelUpdate {
 	public void setModelURI(String modelURI) {
 		this.modelURI = modelURI;
 	}
-	
+
 	@Override public String toString() {
 		String ret = "operation = " + this.operation + ",";
 		ret += " model = " + this.modelURI + ",";
 		ret += " statement = " + SimpleReasoner.stmtString(statement);
-		
-		
+
+
 		return ret;
 	}
 }

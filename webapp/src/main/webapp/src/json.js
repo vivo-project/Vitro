@@ -19,7 +19,7 @@ dojo.json = {
 	register: function(name, check, wrap, /*optional*/ override){
 		/***
 
-			Register a JSON serialization function.	 JSON serialization 
+			Register a JSON serialization function.	 JSON serialization
 			functions should take one argument and return an object
 			suitable for JSON serialization:
 
@@ -32,7 +32,7 @@ dojo.json = {
 				- Array-like (length property that is a number)
 				- Objects with a "json" method will have this method called
 				- Any other object will be used as {key:value, ...} pairs
-			
+
 			If override is given, it is used as the highest priority
 			JSON serialization, otherwise it will be used as the lowest.
 		***/

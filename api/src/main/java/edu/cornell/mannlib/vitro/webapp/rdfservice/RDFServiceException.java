@@ -7,15 +7,15 @@ public class RDFServiceException extends Exception {
 	public RDFServiceException() {
 		super();
 	}
-	
+
 	public RDFServiceException(Throwable cause) {
 	    super(cause);
 	}
-	
+
 	public RDFServiceException(String message) {
 		super(message);
 	}
-	
+
     public RDFServiceException(String message, Throwable cause) {
         super(message, cause);
     }

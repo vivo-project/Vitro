@@ -21,7 +21,9 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
 
     private String domainClassURI = null;
     private String rangeDatatypeURI = null;
-    
+
+    private String editing = null;
+
     private boolean functional = false;
 
     private String example = null;
@@ -36,7 +38,7 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     private boolean externalId = false;
 
     private List<DataPropertyStatement> dataPropertyStatements = null;
-    
+
     public DataProperty() { //default constructor needed since Property has one
         super();
     }
@@ -64,7 +66,7 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     public void setPublicName(String publicName) {
         this.publicName = publicName;
     }
-    
+
     public String getLabel() {
         return getPublicName();
     }
@@ -72,7 +74,7 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     public String getDomainClassURI() {
         return domainClassURI;
     }
-    
+
     @Override
     public String getDomainVClassURI() {
         return domainClassURI;
@@ -90,14 +92,22 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
         this.rangeDatatypeURI = rangeDatatypeURI;
     }
 
+    public void setEditing(String editing) {
+    	this.editing = editing;
+    }
+
+    public String getEditing() {
+    	return this.editing;
+    }
+
     public boolean getFunctional() {
     	return this.functional;
     }
-    
+
     public void setFunctional(boolean functional) {
     	this.functional = functional;
     }
-    
+
     public String getExample() {
         return example;
     }
@@ -113,7 +123,7 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     public String getPublicDescription() {
         return publicDescription;
     }
@@ -175,10 +185,10 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     }
 
     public String toString(){
-        if( getURI() != null ) 
+        if( getURI() != null )
             return getURI();
-        else 
-            return "DataProperty without URI(" + hashCode() + ")"; 
+        else
+            return "DataProperty without URI(" + hashCode() + ")";
     }
 }
 

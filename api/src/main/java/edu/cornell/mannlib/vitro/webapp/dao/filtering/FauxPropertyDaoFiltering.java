@@ -52,21 +52,21 @@ public class FauxPropertyDaoFiltering extends BaseFiltering implements FauxPrope
 	public void updateFauxProperty(FauxProperty fp) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("FauxPropertyDaoFiltering.updateFauxProperty() not implemented.");
-		
+
 	}
 
 	@Override
 	public void deleteFauxProperty(FauxProperty fp) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("FauxPropertyDao.deleteFauxProperty() not implemented.");
-		
+
 	}
 
 	@Override
 	public void insertFauxProperty(FauxProperty fp) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("FauxPropertyDao.insertFauxProperty() not implemented.");
-		
+
 	}
 
 }

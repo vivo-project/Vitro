@@ -37,9 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class PropertyRetryController extends BaseEditController {
-    
+
     private static final Log log = LogFactory.getLog(PropertyRetryController.class.getName());
-    
+
     @Override
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
@@ -132,7 +132,7 @@ public class PropertyRetryController extends BaseEditController {
         }
 
         FormObject foo = new FormObject();
-        foo.setErrorMap(epo.getErrMsgMap());     
+        foo.setErrorMap(epo.getErrMsgMap());
 
         HashMap<String, List<Option>> optionMap = new HashMap<String, List<Option>>();
         try {
@@ -142,18 +142,18 @@ public class PropertyRetryController extends BaseEditController {
             throw new RuntimeException(e);
         }
 
-        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(propertyForEditing));    
+        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(propertyForEditing));
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(propertyForEditing));
-        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(propertyForEditing));    
+        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(propertyForEditing));
 
         List<Option> groupOptList = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
         groupOptList = getSortedList(hashMap,groupOptList,request);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
-        
+
         foo.setOptionLists(optionMap);
-        
+
         request.setAttribute("transitive",propertyForEditing.getTransitive());
         request.setAttribute("symmetric",propertyForEditing.getSymmetric());
         request.setAttribute("functional",propertyForEditing.getFunctional());
@@ -163,7 +163,7 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("objectIndividualSortPropertyURI", propertyForEditing.getObjectIndividualSortPropertyURI());
         request.setAttribute("domainEntitySortDirection", propertyForEditing.getDomainEntitySortDirection());
         request.setAttribute("collateBySubclass", propertyForEditing.getCollateBySubclass());
-        
+
         //checkboxes are pretty annoying : we don't know if someone *unchecked* a box, so we have to default to false on updates.
         if (propertyForEditing.getURI() != null) {
              propertyForEditing.setTransitive(false);
@@ -202,32 +202,32 @@ public class PropertyRetryController extends BaseEditController {
         doPost(request, response);
     }
 
-    private void populateOptionMap(HashMap<String, List<Option>> optionMap, 
-                                   ObjectProperty propertyForEditing, 
-                                   VitroRequest request, 
-                                   OntologyDao ontDao, 
+    private void populateOptionMap(HashMap<String, List<Option>> optionMap,
+                                   ObjectProperty propertyForEditing,
+                                   VitroRequest request,
+                                   OntologyDao ontDao,
                                    ObjectPropertyDao propDao) {
-    	
+
         List<Option> namespaceIdList = FormUtils.makeOptionListFromBeans(
-                ontDao.getAllOntologies(), "URI", "Name", 
+                ontDao.getAllOntologies(), "URI", "Name",
                         ((propertyForEditing.getNamespace() == null)
-                                ? "" 
-                                : propertyForEditing.getNamespace()), 
+                                ? ""
+                                : propertyForEditing.getNamespace()),
                         null, (propertyForEditing.getNamespace() != null));
         namespaceIdList.add(0, new Option(
                 request.getUnfilteredWebappDaoFactory().getDefaultNamespace(), "default"));
         optionMap.put("Namespace", namespaceIdList);
-        
+
         List<Option> namespaceIdInverseList = FormUtils.makeOptionListFromBeans(
-                ontDao.getAllOntologies(), "URI", "Name", 
-                        ((propertyForEditing.getNamespaceInverse() == null) 
-                                ? "" 
-                                : propertyForEditing.getNamespaceInverse()), 
+                ontDao.getAllOntologies(), "URI", "Name",
+                        ((propertyForEditing.getNamespaceInverse() == null)
+                                ? ""
+                                : propertyForEditing.getNamespaceInverse()),
                         null, (propertyForEditing.getNamespaceInverse() != null));
         namespaceIdInverseList.add(0, new Option(
                 request.getUnfilteredWebappDaoFactory().getDefaultNamespace(),"default"));
         optionMap.put("NamespaceInverse", namespaceIdInverseList);
-        
+
         List<ObjectProperty> objPropList = propDao.getAllObjectProperties();
         Collections.sort(objPropList);
         List<Option> parentIdList = FormUtils.makeOptionListFromBeans(
@@ -236,34 +236,34 @@ public class PropertyRetryController extends BaseEditController {
         parentIdList = getSortedList(hashMap,parentIdList,request);
         parentIdList.add(0,new Option("-1","none (root property)", false));
         optionMap.put("ParentURI", parentIdList);
-        
+
         List<Option> domainOptionList = FormUtils.makeVClassOptionList(
-                request.getUnfilteredWebappDaoFactory(), 
+                request.getUnfilteredWebappDaoFactory(),
                         propertyForEditing.getDomainVClassURI());
-        if (propertyForEditing.getDomainVClass() != null 
+        if (propertyForEditing.getDomainVClass() != null
                 && propertyForEditing.getDomainVClass().isAnonymous()) {
             domainOptionList.add(0, new Option(
-                    propertyForEditing.getDomainVClass().getURI(), 
-                    propertyForEditing.getDomainVClass().getPickListName(), 
+                    propertyForEditing.getDomainVClass().getURI(),
+                    propertyForEditing.getDomainVClass().getPickListName(),
                     true));
         }
         domainOptionList.add(0, new Option("","(none specified)"));
         optionMap.put("DomainVClassURI", domainOptionList);
-        
+
         List<Option> rangeOptionList = FormUtils.makeVClassOptionList(
-                request.getUnfilteredWebappDaoFactory(), 
+                request.getUnfilteredWebappDaoFactory(),
                         propertyForEditing.getRangeVClassURI());
-        if (propertyForEditing.getRangeVClass() != null 
+        if (propertyForEditing.getRangeVClass() != null
                 && propertyForEditing.getRangeVClass().isAnonymous()) {
             rangeOptionList.add(0, new Option(
-                    propertyForEditing.getRangeVClass().getURI(), 
-                    propertyForEditing.getRangeVClass().getPickListName(), 
+                    propertyForEditing.getRangeVClass().getURI(),
+                    propertyForEditing.getRangeVClass().getPickListName(),
                     true));
         }
         rangeOptionList.add(0, new Option("","(none specified)"));
         optionMap.put("RangeVClassURI", rangeOptionList);
     }
-    
+
     private static class PropertyInsertPageForwarder implements PageForwarder {
         @Override
 		public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
@@ -281,6 +281,6 @@ public class PropertyRetryController extends BaseEditController {
             }
         }
     }
-    
+
 
 }

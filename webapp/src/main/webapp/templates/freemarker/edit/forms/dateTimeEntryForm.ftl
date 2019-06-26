@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<fieldset class="dateTime">              
+<fieldset class="dateTime">
   <input type="hidden" id="literal" name="literal" value="${literalValues}" role="input"/>
   <#if datatype?contains("#date") || datatype?contains("Year") >
     <label for="dateTimeField-year">Year</label>

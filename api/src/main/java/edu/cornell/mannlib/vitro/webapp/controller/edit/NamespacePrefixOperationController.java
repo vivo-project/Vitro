@@ -68,22 +68,22 @@ public class NamespacePrefixOperationController extends BaseEditController {
             }
             return;
         }
-        
+
         if (request.getParameter("_cancel") == null) {
-        	
+
     		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
         	String namespaceStr = request.getParameter("namespace");
         	String prefixStr = request.getParameter("prefix");
 
         	if ( (namespaceStr != null) && (prefixStr != null) ) {
-        		
+
         		Property namespaceURIProp = ontModel.getProperty(VitroVocabulary.NAMESPACE_NAMESPACEURI);
-                
+
                 ontModel.enterCriticalSection(Lock.WRITE);
                 try {
-                		
+
                 			Individual namespaceInd = null;
-                	
+
                 			StmtIterator stmtIt = ontModel.listStatements((Resource)null,(Property)namespaceURIProp,ontModel.createLiteral(namespaceStr));
                 			if (stmtIt.hasNext()) {
                 				Statement stmt = stmtIt.nextStatement();
@@ -92,14 +92,14 @@ public class NamespacePrefixOperationController extends BaseEditController {
                 					namespaceInd = (Individual) namespaceRes.as(Individual.class);
                 				}
                 			}
-                			
+
                 			if (namespaceInd == null) {
                 				namespaceInd = ontModel.createIndividual(ontModel.getResource(VitroVocabulary.NAMESPACE));
                 				namespaceInd.addProperty(namespaceURIProp,namespaceStr);
                 			}
-                			
+
                 			HashSet<Individual> mappingSet = new HashSet<Individual>();
-                			
+
                 			StmtIterator mappingStatementIt = namespaceInd.listProperties(ontModel.getProperty(VitroVocabulary.NAMESPACE_HASPREFIXMAPPING));
                 			while (mappingStatementIt.hasNext()) {
                 				Statement stmt = mappingStatementIt.nextStatement();
@@ -107,17 +107,17 @@ public class NamespacePrefixOperationController extends BaseEditController {
                 					mappingSet.add( (Individual) stmt.getObject().as(Individual.class) );
                 				}
                 			}
-                			
+
                 			for (Individual oldMapping : mappingSet) {
-                				oldMapping.remove();	
+                				oldMapping.remove();
                 			}
-                			
+
                 			if (request.getParameter("_delete")==null) {
                 				Individual newMappingInd = ontModel.createIndividual(ontModel.getResource(VitroVocabulary.NAMESPACE_PREFIX_MAPPING));
                 				newMappingInd.addProperty(ontModel.getProperty(VitroVocabulary.NAMESPACE_PREFIX),prefixStr);
                 				namespaceInd.addProperty(ontModel.getProperty(VitroVocabulary.NAMESPACE_HASPREFIXMAPPING),newMappingInd);
-                			} 
-                			
+                			}
+
                 } finally {
                    	ontModel.leaveCriticalSection();
                 }
@@ -126,7 +126,7 @@ public class NamespacePrefixOperationController extends BaseEditController {
 
         //if no page forwarder was set, just go back to referring page:
         //the referer stuff all will be changed so as not to rely on the HTTP header
-        
+
         String referer = epo.getReferer();
         if (referer == null) {
             try {
@@ -149,5 +149,5 @@ public class NamespacePrefixOperationController extends BaseEditController {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         // don't use get; state changes
     }
-	
+
 }

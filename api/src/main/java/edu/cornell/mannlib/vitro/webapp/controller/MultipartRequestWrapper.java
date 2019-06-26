@@ -30,22 +30,22 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Wraps a multipart HTTP request, and pre-parses it for file uploads, without
  * losing the request parameters.
- * 
+ *
  * Parsing through the request with an Apache ServletFileUpload builds a list of
  * FileItems that includes the parameters and the file parts. After that,
  * however, the parameters are no longer accessible from the request. This
  * wrapper will see that they don't get lost.
- * 
+ *
  * The List of FileItems includes both "formField" items and "file" items. As
  * with the usual parameters on a request, we can have more than one value with
  * the same name. So this creates a map of &lt;String, List&lt;String&gt;&gt; to hold the
  * parameters, and a map of &lt;String, List&lt;FileItem&gt;&gt; to hold the files.
- * 
+ *
  * The parameters will be available to the wrapper through the normal methods.
  * The files will be available as an attribute that holds the map. Also, a
  * separate attribute will hold a Boolean to indicate that this was indeed a
  * multipart request.
- * 
+ *
  * Conveninence methods in VitroRequest will make these easy to handle, without
  * actually touching the attributes.
  */
@@ -180,7 +180,7 @@ public class MultipartRequestWrapper extends HttpServletRequestWrapper {
 
 	/**
 	 * Parse the raw request into a list of parts.
-	 * 
+	 *
 	 * If there is a parsing error, let the strategy handle it. If the strategy
 	 * throws it back, wrap it in an IOException and throw it on up.
 	 */
@@ -289,7 +289,7 @@ public class MultipartRequestWrapper extends HttpServletRequestWrapper {
 
 		/**
 		 * Allows you to handle the exception in your code.
-		 * 
+		 *
 		 * Be aware that the multipart parameters have been lost, and that may
 		 * include form fields.
 		 */

@@ -31,10 +31,10 @@ dojo.xml.domUtil = new function(){
 		DOCUMENT_FRAGMENT_NODE        : 11,
 		NOTATION_NODE                 : 12
 	}
-	
+
 	this.dojoml = "http://www.dojotoolkit.org/2004/dojoml";
 	this.idIncrement = 0;
-	
+
 	this.getTagName = function(){return dojo.dom.getTagName.apply(dojo.dom, arguments);}
 	this.getUniqueId = function(){return dojo.dom.getUniqueId.apply(dojo.dom, arguments);}
 	this.getFirstChildTag = function() {return dojo.dom.getFirstChildElement.apply(dojo.dom, arguments);}

@@ -19,16 +19,16 @@ if( request.getParameter("uri") != null ){
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>  <!-- gotoIndividual.jsp -->           
-    <link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/screen.css"/>" media="screen"/>  
+<head>  <!-- gotoIndividual.jsp -->
+    <link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/screen.css"/>" media="screen"/>
     <link rel="stylesheet" type="text/css" href="<c:url value="/${themeDir}css/formedit.css" />" media="screen"/>
-    
+
     <title>Enter a URI</title>
 </head>
 <body class="formsEdit">
 <div id="wrap">
 
-<% /* BJL23 put this is in a catch block because it seems to fail ungracefully for 
+<% /* BJL23 put this is in a catch block because it seems to fail ungracefully for
       some clones */ %>
 
 <form>

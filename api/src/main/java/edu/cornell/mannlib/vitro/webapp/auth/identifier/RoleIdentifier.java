@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 public abstract class  RoleIdentifier implements Identifier {
     public abstract String getRole();
     public abstract String getUri();
-    
+
     public static String getUri( Identifier id){
         if( id == null ) return null;
         if( id instanceof RoleIdentifier ){
@@ -14,12 +14,12 @@ public abstract class  RoleIdentifier implements Identifier {
             return null;
         }
     }
-    
+
     public static String getUri( IdentifierBundle idb){
         for( Identifier id : idb ){
             if (id instanceof RoleIdentifier) {
                 RoleIdentifier roleId = (RoleIdentifier) id;
-                return roleId.getUri();                
+                return roleId.getUri();
             }
         }
         return null;

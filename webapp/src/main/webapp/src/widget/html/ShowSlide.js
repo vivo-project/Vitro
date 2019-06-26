@@ -88,7 +88,7 @@ dojo.lang.extend(dojo.widget.html.ShowSlide, {
 
 			if(exits){
 				return true;
-			}	
+			}
 
 			if(action.auto == "true"){
 				on = this._actions[this._action].on;
@@ -121,7 +121,7 @@ dojo.lang.extend(dojo.widget.html.ShowSlide, {
 		if(!action){
 			return false;
 		}
-		
+
 		var components = this._components[action.on];
 		for(var i = 0, component; component = components[i]; i++){
 			if(action.action){
@@ -155,7 +155,7 @@ dojo.lang.extend(dojo.widget.html.ShowSlide, {
 				component.style.visibility = "visible";
 			}
 		}
-		
+
 		action = this._actions[this._action + 1];
 		if(action && action.auto == "true"){
 			this.nextAction();

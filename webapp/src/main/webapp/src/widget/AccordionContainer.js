@@ -35,26 +35,26 @@ dojo.widget.defineWidget(
 				dojo.html.addClass(widget.containerNode, this.containerNodeClass);
 				dojo.html.addClass(widget.labelNode, this.labelNodeClass);
 				this.addWidgetAsDirectChild(widget);
-				this.registerChild(widget);	
+				this.registerChild(widget);
 				widget.setSizes();
 				return widget;
 			}
 	        },
-	
+
 		postCreate: function() {
 			var tmpChildren = this.children;
 			this.children=[];
 			dojo.html.removeChildren(this.domNode);
 			dojo.lang.forEach(tmpChildren, dojo.lang.hitch(this,"addChild"));
 		},
-	
+
 		removeChild: function(widget) {
 			dojo.widget.AccordionContainer.superclass.removeChild.call(this, widget);
 			if(this.children[0]){
 				this.children[0].setSizes();
 			}
 		},
-		
+
 		onResized: function(){
 			this.children[0].setSizes();
 		}

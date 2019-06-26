@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * A minimal implementation of the WebappDaoFactory.
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */

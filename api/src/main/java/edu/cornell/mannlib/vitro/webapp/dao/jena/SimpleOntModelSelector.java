@@ -19,10 +19,10 @@ public class SimpleOntModelSelector implements OntModelSelector {
 	protected OntModel applicationMetadataModel;
 	protected OntModel tboxModel;
 	protected OntModel userAccountsModel;
-	
+
 	protected OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 	protected OntModel displayModel;
-	
+
 	/**
 	 * Construct an OntModelSelector with a bunch of empty models
 	 */
@@ -36,12 +36,12 @@ public class SimpleOntModelSelector implements OntModelSelector {
 		fullModel.addSubModel(tboxModel);
 		fullModel.addSubModel(applicationMetadataModel);
 	}
-	
+
 	/**
 	 * Construct An OntModel selector that works with a single union OntModel
 	 * Only for temporary backwards compatibility.
-	 */	
-	public SimpleOntModelSelector(OntModel ontModel) { 
+	 */
+	public SimpleOntModelSelector(OntModel ontModel) {
 		this.fullModel = ontModel;
 		this.aboxModel = ontModel;
 		this.applicationMetadataModel = ontModel;
@@ -49,7 +49,7 @@ public class SimpleOntModelSelector implements OntModelSelector {
 		this.userAccountsModel = ontModel;
 		this.displayModel = ontModel;
 	}
-	
+
 	public void setABoxModel(OntModel m) {
 		fullModel.enterCriticalSection(Lock.WRITE);
 		try {
@@ -60,7 +60,7 @@ public class SimpleOntModelSelector implements OntModelSelector {
 			fullModel.leaveCriticalSection();
 		}
 	}
-	
+
 	public void setApplicationMetadataModel(OntModel m) {
 		fullModel.enterCriticalSection(Lock.WRITE);
 		try {
@@ -71,7 +71,7 @@ public class SimpleOntModelSelector implements OntModelSelector {
 			fullModel.leaveCriticalSection();
 		}
 	}
-	
+
 	public void setTBoxModel(OntModel m) {
 		fullModel.enterCriticalSection(Lock.WRITE);
 		try {
@@ -82,19 +82,19 @@ public class SimpleOntModelSelector implements OntModelSelector {
 			fullModel.leaveCriticalSection();
 		}
 	}
-	
+
 	public void setFullModel(OntModel m) {
 		m.addSubModel(tboxModel);
 		m.addSubModel(aboxModel);
 		m.addSubModel(applicationMetadataModel);
 		this.fullModel = m;
 	}
-	
+
 	@Override
 	public OntModel getABoxModel() {
 		return aboxModel;
 	}
-	
+
 	@Override
 	public OntModel getApplicationMetadataModel() {
 		return applicationMetadataModel;
@@ -114,13 +114,13 @@ public class SimpleOntModelSelector implements OntModelSelector {
 	public OntModel getUserAccountsModel() {
 		return userAccountsModel;
 	}
-	
+
 	public void setUserAccountsModel(OntModel userAccountsModel) {
 		this.userAccountsModel = userAccountsModel;
 	}
 
 	public void setDisplayModel(OntModel displayModel) {
-		this.displayModel = displayModel;		
+		this.displayModel = displayModel;
 	}
 	@Override
 	public OntModel getDisplayModel(){

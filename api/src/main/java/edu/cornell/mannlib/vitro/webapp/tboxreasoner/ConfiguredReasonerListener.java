@@ -26,15 +26,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 /**
  * Listens for changes on a model. When a change is announced, it is checked for
  * worthiness. If worthy, it is added to a change set.
- * 
+ *
  * When an ending EditEvent is received, the current change set is passed along
  * to the reasoner driver, and a new change set is begun.
- * 
+ *
  * Among the criteria for deciding on worthiness is the driving pattern set. In
  * the constructor, a map is made from this set, to reduce the number of tests
  * made against each statement. I don't know whether this optimization is
  * justified.
- * 
+ *
  * It is possible to "suspend" the listener, so it will ignore any changes. This
  * is useful when the reasoner itself makes changes to the models, so those
  * changes do not trigger additional reasoning.
@@ -183,7 +183,7 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 				if (log.isDebugEnabled()) {
 					log.debug("Change set: " + changes);
 				}
-				
+
 				this.reasonerDriver.runSynchronizer(changes);
 			}
 		}

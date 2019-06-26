@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 /**
  * The current user is associated with this Individual page, and has editing
  * rights relating to it.
- * 
+ *
  * Subclasses exist to indicate how that association is created, as either a
  * Self-Editor or a Proxy Editor. In some cases (e.g., the MyProfile link) the
  * distinction is important.

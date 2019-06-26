@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 
 public class PropertyGroupRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(PropertyGroupRetryController.class.getName());
 
    public void doPost (HttpServletRequest req, HttpServletResponse response) {
@@ -77,7 +77,7 @@ public class PropertyGroupRetryController extends BaseEditController {
         } else {
             propertyGroupForEditing = (PropertyGroup) epo.getNewBean();
         }
-        
+
         //validators
         List<Validator> validatorList = new ArrayList<Validator>();
         validatorList.add(new RequiredFieldValidator());

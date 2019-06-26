@@ -26,22 +26,22 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 public class DisplayModelDaoJena implements DisplayModelDao {
     WebappDaoFactoryJena wdf;
-    
+
     protected static final String MENU_N3_FILE = "/WEB-INF/ontologies/app/menu.n3";
     protected static final String MENU_N3_FILE_BACKUP = "/WEB-INF/ontologies/app/menu.backup";
-    
-    protected static Resource MENU_TEXT_RES = 
-        ResourceFactory.createResource(DisplayVocabulary.MENU_TEXT_RES);    
+
+    protected static Resource MENU_TEXT_RES =
+        ResourceFactory.createResource(DisplayVocabulary.MENU_TEXT_RES);
     protected static Property HAS_TEXT_REPRESENTATION =
         ResourceFactory.createProperty(DisplayVocabulary.HAS_TEXT_REPRESENTATION);
-    
+
     public DisplayModelDaoJena(WebappDaoFactoryJena wdfj){
         this.wdf = wdfj;
-    }    
-    
+    }
+
     public void replaceDisplayModel(String n3, ServletContext context) throws Exception{
         OntModel displayModel = wdf.getOntModelSelector().getDisplayModel();
-                
+
         //get old menu file and turn into model
         Model oldMenuStmts = ModelFactory.createDefaultModel();
 //        InputStream oldIn = FileManager.get().open( context.getRealPath(MENU_N3_FILE ) );
@@ -53,8 +53,8 @@ public class DisplayModelDaoJena implements DisplayModelDao {
         }catch(Throwable th){
             throw new Exception("Cannot read in existing menu. " + th.getMessage());
         }
-        
-        //turn the N3 text for the new menu into a model        
+
+        //turn the N3 text for the new menu into a model
         Model newMenuStmts = ModelFactory.createDefaultModel();
         StringReader newIn = new StringReader( n3 );
         try{
@@ -62,34 +62,34 @@ public class DisplayModelDaoJena implements DisplayModelDao {
         }catch(Throwable th){
             throw new Exception("There was an error in the menu N3: "+ th.getMessage());
         }
-        
+
         displayModel.enterCriticalSection(true);
         try{
             //copy old menu file to backup
 //            File oldMenuFile = new File(context.getRealPath(MENU_N3_FILE));
 //            File oldMenuFileBackup = new File(context.getRealPath(MENU_N3_FILE_BACKUP));
 //            copyFile(oldMenuFile , oldMenuFileBackup);
-            
+
             //save new menu file to old menu file
             displayModel.removeAll(MENU_TEXT_RES, HAS_TEXT_REPRESENTATION, null);
             displayModel.add(MENU_TEXT_RES, HAS_TEXT_REPRESENTATION, n3);
-            
+
 //            File newMenuFile = new File(context.getRealPath(MENU_N3_FILE));
 //            FileWriter mfWriter = new FileWriter(newMenuFile);
 //            mfWriter.write(n3);
 //            mfWriter.close();
-            
+
             //remove old menu statements from display model
             displayModel.remove(oldMenuStmts);
-            
+
             //add new menu statements to display model
             displayModel.add(newMenuStmts);
         }finally{
             displayModel.leaveCriticalSection();
-        }        
+        }
     }
-    
-    
+
+
     public String getDisplayModel(ServletContext context) throws IOException{
         OntModel displayModel = wdf.getOntModelSelector().getDisplayModel();
         String text = null;
@@ -101,7 +101,7 @@ public class DisplayModelDaoJena implements DisplayModelDao {
         }finally{
             displayModel.leaveCriticalSection();
         }
-        if( text == null ){       
+        if( text == null ){
             //text of file is not yet in model
             File oldMenuFile = new File(context.getRealPath(MENU_N3_FILE));
             StringBuilder str = new StringBuilder(2000);
@@ -113,9 +113,9 @@ public class DisplayModelDaoJena implements DisplayModelDao {
                 str.append(readData);
             }
             reader.close();
-            
+
             //Now write the file contents into the display model so that on
-            //future edits, the user can be presented with their last input.        
+            //future edits, the user can be presented with their last input.
             String menuN3Content = str.toString();
             displayModel.enterCriticalSection(true);
             try{
@@ -124,11 +124,11 @@ public class DisplayModelDaoJena implements DisplayModelDao {
                 displayModel.leaveCriticalSection();
             }
             return menuN3Content;
-        }else{            
+        }else{
             return text;
-        }        
+        }
     }
-    
+
     public static void copyFile(File sourceFile, File destFile) throws IOException {
         if(!destFile.exists()) {
          destFile.createNewFile();

@@ -45,10 +45,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter;
  * scan the model to determine what each view consists of (data getter URIs,
  * template names), what context each view applies to, and what classes map to
  * each view.
- * 
+ *
  * Data getters must be SparqlQueryDataGetters, and must be described in the
  * same config file.
- * 
+ *
  * TODO Get rid of this when the Application Ontology is implemented.
  */
 public class FakeApplicationOntologyService {
@@ -71,7 +71,7 @@ public class FakeApplicationOntologyService {
 	/**
 	 * Load the model from the config file, and inspect it for Views and
 	 * mappings.
-	 * 
+	 *
 	 * Keep the model - we'll need it when its time to create the DataGetters
 	 * (on each request).
 	 */
@@ -440,7 +440,7 @@ public class FakeApplicationOntologyService {
 	/**
 	 * A special data getter to support the kluge case of browsing an individual
 	 * that belongs to the People class group.
-	 * 
+	 *
 	 * A SPARQL query data getter that initializes itself from its own private
 	 * "display model". The query finds a preferred title for the individual.
 	 */

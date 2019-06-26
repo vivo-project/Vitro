@@ -51,8 +51,8 @@ public class BasicPolicyDecision implements PolicyDecision{
     public void setStackTrace(String stackTrace) {
         StackTrace = stackTrace;
     }
-    
-    public String toString(){ 
+
+    public String toString(){
         return authorized + ": " + message;
     }
 }

@@ -1,11 +1,11 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<#-- Macros for datetime formatting 
+<#-- Macros for datetime formatting
 
      In this library, functions are used to format the datetime or interval
      according to a format string and precision, returning a raw string.
      Macros are used to generate the string with appropriate markup.
---> 
+-->
 
 <#-- MACROS -->
 
@@ -20,10 +20,10 @@
     <#local yearInterval = yearInterval(startDateTime, endDateTime, endYearAsRange)>
     <#if yearInterval?has_content>
         <@dateTimeSpan>${yearInterval}</@dateTimeSpan>
-    </#if>  
+    </#if>
 </#macro>
 
-<#-- Display the datetime value or interval in a classed span appropriate for 
+<#-- Display the datetime value or interval in a classed span appropriate for
      a property statement list -->
 <#macro dateTimeSpan>
     <span class="listDateTime"><#nested></span>
@@ -50,14 +50,14 @@
 <#-- Generate a datetime interval -->
 <#function dateTimeInterval dateTimeStart="" precisionStart="" dateTimeEnd="" precisionEnd="" formatType="short" endAsRange=true>
 
-    <#if dateTimeStart?has_content>   
+    <#if dateTimeStart?has_content>
         <#local start = formatXsdDateTime(dateTimeStart, precisionStart, formatType)>
     </#if>
-    
+
     <#if dateTimeEnd?has_content>
         <#local end = formatXsdDateTime(dateTimeEnd, precisionEnd, formatType)>
     </#if>
-    
+
     <#local interval>
         <#if start?? && end??>
             <#if start == end>
@@ -71,7 +71,7 @@
             <#if endAsRange>-&nbsp;</#if>${end}
         </#if>
     </#local>
-    
+
     <#return interval?trim>
 </#function>
 
@@ -81,7 +81,7 @@
      implementation; see NIHVIVO-1567. We want the Java code to apply the precision to the datetime string to pass only the
      meaningful data to the templates. The templates can format as they like, so these functions/macros would do display formatting
      but not data extraction.
-     
+
      On the other hand, this is so easy that it may not be worth re-implementing to gain a bit more MVC compliance.
 -->
 
@@ -116,18 +116,18 @@
     <#if ! dateTimeStr?matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})")>
         <#return dateTimeStr>
     </#if>
-    
+
     <#-- Convert the string to a datetime object. -->
     <#local dateTimeObj = dateTimeStr?datetime("yyyy-MM-dd HH:mm:ss")>
 
     <#-- If no precision is specified, assign it from the datetime value.
          Pass dateTimeStr rather than dateTimeObj, because dateTimeObj
-         replaces zeroes with default values, whereas we want to set 
+         replaces zeroes with default values, whereas we want to set
          precision based on whether the times values are all 0. -->
     <#if ! precision?has_content>
         <#local precision = getPrecision(dateTimeStr)>
     </#if>
-    
+
     <#-- Get the format string for the datetime output -->
     <#local format = getFormat(formatType, precision)>
 
@@ -142,21 +142,21 @@
     <#list match as m>
         <#local hours = m?groups[4]?number>
         <#local minutes = m?groups[5]?number>
-        <#local seconds = m?groups[6]?number> 
-    </#list> 
-    
-    <#local precision>   
+        <#local seconds = m?groups[6]?number>
+    </#list>
+
+    <#local precision>
         <#if hours == 0 && minutes == 0 && seconds == 0>yearMonthDayPrecision
         <#else>yearMonthDayTimePrecision
         </#if>
-    </#local> 
-    
-    <#return precision?trim>  
+    </#local>
+
+    <#return precision?trim>
 </#function>
 
 <#function getFormat formatType precision>
-    <#-- Use the precision to determine which portion to display, 
-         and the format type to determine how to display it.  -->    
+    <#-- Use the precision to determine which portion to display,
+         and the format type to determine how to display it.  -->
     <#local format>
         <#if formatType == "long">
             <#if precision?ends_with("yearPrecision")>yyyy
@@ -173,8 +173,8 @@
             </#if>
         </#if>
     </#local>
-    
+
     <#return format?trim>
 </#function>
-  
+
 

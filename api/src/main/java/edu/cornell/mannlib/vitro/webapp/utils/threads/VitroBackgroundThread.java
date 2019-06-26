@@ -81,7 +81,7 @@ public class VitroBackgroundThread extends Thread {
 	/**
 	 * An immutable object that holds both the current work level and the time
 	 * that it was set.
-	 * 
+	 *
 	 * Particular threads may want to assign additional state using zero or more
 	 * "flags".
 	 */
@@ -108,7 +108,7 @@ public class VitroBackgroundThread extends Thread {
 			return flags;
 		}
 	}
-	
+
 	/**
 	 * A factory class, for use in Executors, that creates threads with
 	 * successive names.

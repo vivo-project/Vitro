@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
  * This servlet gets all the classes for initizing the sparql query builder.
- * 
+ *
  * @author yuysun
  */
 
@@ -33,9 +33,9 @@ public class GetAllClasses extends BaseEditController {
 
 	/**
 	 * The doGet method of the servlet. <br>
-	 * 
+	 *
 	 * This method is called when a form has its tag value method equals to get.
-	 * 
+	 *
 	 * @param request
 	 *            the request send by the client to the server
 	 * @param response
@@ -51,7 +51,7 @@ public class GetAllClasses extends BaseEditController {
 				SimplePermission.USE_MISCELLANEOUS_PAGES.ACTION)) {
         	return;
 		}
-		
+
 		VitroRequest vreq = new VitroRequest(request);
 
 		// EditProcessObject epo = super.createEpo(request);
@@ -90,10 +90,10 @@ public class GetAllClasses extends BaseEditController {
 
 	/**
 	 * The doPost method of the servlet. <br>
-	 * 
+	 *
 	 * This method is called when a form has its tag value method equals to
 	 * post.
-	 * 
+	 *
 	 * @param request
 	 *            the request send by the client to the server
 	 * @param response

@@ -17,9 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
 
 /**
  * The list of patterns for filtering the models will include:
- * 
+ *
  * All patterns specified by the ReasonerConfiguration,
- * 
+ *
  * One pattern for each deleted property, to match the use of that property as a
  * predicate.
  */

@@ -15,10 +15,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 /**
  * Decorates an OntModelCache with some "virtual" OntModels, each of which is a
  * union of two actual OntModels.
- * 
+ *
  * For example, we might create a model called FULL_ASSERTIONS, that is the
  * union of two models called ABOX_ASSERTIONS and TBOX_ASSERTIONS.
- * 
+ *
  * The inner class UnionSpec holds the model names, and allows us to lazily
  * create the union models.
  */
@@ -28,7 +28,7 @@ public class UnionModelsOntModelsCache implements OntModelCache {
 
 	/**
 	 * Create it like this:
-	 * 
+	 *
 	 * <pre>
 	 * new UnionModelsOntModelsCache(inner,
 	 *     UnionSpec.base("baseUri").plus("plusUri").yields("unionUri"),

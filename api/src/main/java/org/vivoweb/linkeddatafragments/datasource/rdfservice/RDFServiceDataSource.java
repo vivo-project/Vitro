@@ -15,7 +15,7 @@ public class RDFServiceDataSource extends DataSourceBase {
 
     /**
      * The request processor
-     * 
+     *
      */
     protected final RDFServiceBasedRequestProcessorForTPFs requestProcessor;
 

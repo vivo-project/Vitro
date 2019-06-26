@@ -33,20 +33,20 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceMod
 
 /**
  * TODO
- * 
+ *
  * If the statement qualifies, execute the queries and return the accumulated
  * results.
- * 
+ *
  * A statement qualifies if the predicate matches any of the restrictions, or if
  * there are no restrictions.
- * 
+ *
  * If a query contains a ?subject or ?object variable, it will be bound to the
  * URI of the subject or object of the statement, respectively. If the subject
  * or object has no URI for the query, then the query will be ignored.
- * 
+ *
  * All of the result fields of all result rows of all of the queries will be
  * returned.
- * 
+ *
  * A label may be supplied to the instance, for use in logging. If no label is
  * supplied, one will be generated.
  */
