@@ -67,7 +67,6 @@
         <module>api</module>
         <module>dependencies</module>
         <module>webapp</module>
-        <module>solr</module>
         <module>home</module>
     </modules>
 

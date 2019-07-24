@@ -67,5 +67,5 @@ org.apache.commons.fileupload.servlet.FileCleanerCleanup
 #   and the PermissionRegistry must already be set up.
 edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache$Setup
 
-# This should be near the end, because it will issue a warning if the connection to Solr times out.
-edu.cornell.mannlib.vitro.webapp.servlet.setup.SolrSmokeTest
+# This should be near the end, because it will issue a warning if the connection to Solr or ElasticSearch times out.
+edu.cornell.mannlib.vitro.webapp.servlet.setup.SearchEngineSmokeTest
