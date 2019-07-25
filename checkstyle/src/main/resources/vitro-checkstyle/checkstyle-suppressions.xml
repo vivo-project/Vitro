@@ -3,6 +3,8 @@
     "-//Puppy Crawl//DTD Suppressions 1.1//EN"
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
+  <suppress files=".+\.(?:txt|xml|csv|sh|thrift|html|sql|eot|ttf|woff|css|png|java|jar|zip|war|class|tar|bin|gif|jpg|jpeg|properties)$" checks=".*"/>	
+
   <!-- Suppressions for Javadoc in Test classes -->
   <suppress checks="JavadocMethod" files="src[/\\]test[/\\]java"/>
   <suppress checks="JavadocType" files="src[/\\]test[/\\]java"/>
