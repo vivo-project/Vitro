@@ -82,10 +82,10 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             configProps = ConfigurationProperties.getBean(ctx);
             
             if (!configurationPresent()) {
-            	throw new ServletException("TPF not in config");
+            	throw new ServletException("TPF is currently disabled. To enable, add 'tpfActive.flag=true' to the runtime.properties.");
             } else {
-            	if (!tpfActiveFlag.equals("true")) {
-            		throw new ServletException("TPF not set to true");
+            	if (!tpfActiveFlag.equalsIgnoreCase("true")) {
+            		throw new ServletException("TPF is currently disabled. To enable, set 'tpfActive.flag=true' in runtime.properties.");
             	}
             }
             
