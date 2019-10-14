@@ -16,7 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
-import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
 import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
@@ -44,7 +43,6 @@ public class ApplicationImpl implements Application {
 	private SearchIndexer searchIndexer;
 	private ImageProcessor imageProcessor;
 	private FileStorage fileStorage;
-	private EmbeddedRDFDeltaServer embeddedRDFDeltaServer;
 	private RDFDeltaDatasetFactory rdfDeltaDatasetFactory;
 	private JMSMessagingClient jmsMessagingClient;
 	private ContentTripleSource contentTripleSource;
@@ -107,16 +105,6 @@ public class ApplicationImpl implements Application {
 	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasFileStorage", minOccurs = 1, maxOccurs = 1)
 	public void setFileStorage(FileStorage fs) {
 		fileStorage = fs;
-	}
-
-	@Override
-	public EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer() {
-		return embeddedRDFDeltaServer;
-	}
-
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasEmbeddedRDFDeltaServer", minOccurs = 0, maxOccurs = 1)
-	public void setEmbeddedRDFDeltaServer(EmbeddedRDFDeltaServer embeddedRDFDeltaServer) {
-		this.embeddedRDFDeltaServer = embeddedRDFDeltaServer;
 	}
 
 	@Override
@@ -200,14 +188,6 @@ public class ApplicationImpl implements Application {
 			FileStorage fileStorage = app.getFileStorage();
 			fileStorage.startup(app, css);
 			ss.info(this, "Started the FileStorage system: " + fileStorage);
-
-			EmbeddedRDFDeltaServer embeddedRDFDeltaServer = app
-					.getEmbeddedRDFDeltaServer();
-			if (embeddedRDFDeltaServer != null) {
-				embeddedRDFDeltaServer.startup(app, css);
-				ss.info(this, "Started the EmbeddedRDFDeltaServer: "
-						+ embeddedRDFDeltaServer);
-			}
 
 			JMSMessagingClient jmsMessagingClient = app
 					.getJMSMessagingClient();

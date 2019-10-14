@@ -12,7 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
-import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
 import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
@@ -95,12 +94,6 @@ public class ApplicationStub implements Application {
 	public FileStorage getFileStorage() {
 		throw new RuntimeException(
 				"ApplicationStub.getFileStorage() not implemented.");
-	}
-
-	@Override
-	public EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer() {
-		throw new RuntimeException(
-				"ApplicationStub.getEmbeddedRDFDeltaServer() not implemented.");
 	}
 
 	@Override

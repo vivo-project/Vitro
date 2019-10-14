@@ -8,7 +8,6 @@ import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
-import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
 import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
@@ -31,8 +30,6 @@ public interface Application {
 	ImageProcessor getImageProcessor();
 
 	FileStorage getFileStorage();
-
-	EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer();
 
 	JMSMessagingClient getJMSMessagingClient();
 
