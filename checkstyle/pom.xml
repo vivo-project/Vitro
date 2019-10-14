@@ -1,0 +1,7 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.vivoweb</groupId>
+  <artifactId>checkstyle</artifactId>
+  <version>1.11.0-SNAPSHOT</version>
+  <name>Vitro Checkstyle</name>
+</project>
