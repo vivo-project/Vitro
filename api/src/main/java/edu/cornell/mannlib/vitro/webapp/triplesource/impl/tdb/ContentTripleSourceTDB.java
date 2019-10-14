@@ -3,11 +3,15 @@
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.tdb;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.ModelMaker;
 import org.apache.jena.tdb.TDB;
+import org.apache.jena.tdb.TDBFactory;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -16,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ModelMakerWithPersi
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
@@ -41,6 +46,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  */
 public class ContentTripleSourceTDB extends ContentTripleSource {
 	private String tdbPath;
+	
+	private String rdfDeltaDatasource;
+	
+	private boolean emitPatches = false;
 
 	private volatile RDFService rdfService;
 	private RDFServiceFactory rdfServiceFactory;
@@ -53,11 +62,29 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 		tdbPath = path;
 	}
 
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasRDFDeltaDatasource", minOccurs = 0, maxOccurs = 1)
+	public void setRDFDeltaDatasource(String deltaDatasource) {
+		rdfDeltaDatasource = deltaDatasource;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#shouldEmitPatches", minOccurs = 0, maxOccurs = 1)
+	public void setShouldEmitPatches(String emitPatches) {
+		this.emitPatches = Boolean.parseBoolean(emitPatches);
+	}
+
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
 		try {
-			this.rdfService = new RDFServiceTDB(resolveTdbPath(application));
+			String tdbPath = resolveTdbPath();
+			Dataset dataset = TDBFactory.createDataset(tdbPath);
+			if (rdfDeltaDatasource != null) {
+				RDFDeltaDatasetFactory rdfDeltaDatasetFactory = application.getRDFDeltaDatasetFactory();
+				if (rdfDeltaDatasetFactory != null) {
+					dataset = rdfDeltaDatasetFactory.wrap(rdfDeltaDatasource, emitPatches, dataset);
+				}
+			}
+			this.rdfService = new RDFServiceTDB(dataset);
 			this.rdfServiceFactory = createRDFServiceFactory();
 			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.unclosableRdfService);
@@ -70,13 +97,14 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 		}
 	}
 
-	private String resolveTdbPath(Application application) {
-		return application.getHomeDirectory().getPath().resolve(tdbPath)
-				.toString();
-	}
-
 	private void configureTDB() {
 		TDB.getContext().setTrue(TDB.symUnionDefaultGraph);
+	}
+
+	private String resolveTdbPath() throws IOException {
+		Path tdbPath = ApplicationUtils.instance().getHomeDirectory().getPath().resolve(this.tdbPath);
+		Files.createDirectories(tdbPath);
+		return tdbPath.toString();
 	}
 
 	private RDFServiceFactory createRDFServiceFactory() {

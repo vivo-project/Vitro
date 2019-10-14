@@ -7,9 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
@@ -20,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.tdb.TDBFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -35,21 +31,9 @@ public class RDFServiceTDB extends RDFServiceJena {
 
 	private final Dataset dataset;
 
-	public RDFServiceTDB(String directoryPath) throws IOException {
-		Path tdbDir = Paths.get(directoryPath);
-
-		if (!Files.exists(tdbDir)) {
-			Path parentDir = tdbDir.getParent();
-			if (!Files.exists(parentDir)) {
-				throw new IllegalArgumentException(
-						"Cannot create TDB directory '" + tdbDir
-								+ "': parent directory does not exist.");
-			}
-			Files.createDirectory(tdbDir);
-		}
-
-		this.dataset = TDBFactory.createDataset(directoryPath);
-	}
+	public RDFServiceTDB(Dataset dataset) {
+        this.dataset = dataset;
+    }
 
 	@Override
 	protected DatasetWrapper getDatasetWrapper() {

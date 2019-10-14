@@ -15,6 +15,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
@@ -41,6 +44,9 @@ public class ApplicationImpl implements Application {
 	private SearchIndexer searchIndexer;
 	private ImageProcessor imageProcessor;
 	private FileStorage fileStorage;
+	private EmbeddedRDFDeltaServer embeddedRDFDeltaServer;
+	private RDFDeltaDatasetFactory rdfDeltaDatasetFactory;
+	private JMSMessagingClient jmsMessagingClient;
 	private ContentTripleSource contentTripleSource;
 	private ConfigurationTripleSource configurationTripleSource;
 	private TBoxReasonerModule tboxReasonerModule;
@@ -104,6 +110,36 @@ public class ApplicationImpl implements Application {
 	}
 
 	@Override
+	public EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer() {
+		return embeddedRDFDeltaServer;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasEmbeddedRDFDeltaServer", minOccurs = 0, maxOccurs = 1)
+	public void setEmbeddedRDFDeltaServer(EmbeddedRDFDeltaServer embeddedRDFDeltaServer) {
+		this.embeddedRDFDeltaServer = embeddedRDFDeltaServer;
+	}
+
+	@Override
+	public JMSMessagingClient getJMSMessagingClient() {
+		return jmsMessagingClient;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasJMSMessagingClient", minOccurs = 0, maxOccurs = 1)
+	public void setJMSMessagingClient(JMSMessagingClient jmsMessagingClient) {
+		this.jmsMessagingClient = jmsMessagingClient;
+	}
+
+	@Override
+	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {
+		return rdfDeltaDatasetFactory;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasRDFDeltaDatasetFactory", minOccurs = 0, maxOccurs = 1)
+	public void setRDFDeltaDatasetFactory(RDFDeltaDatasetFactory rdfDeltaDatasetFactory) {
+		this.rdfDeltaDatasetFactory = rdfDeltaDatasetFactory;
+	}
+
+	@Override
 	public ContentTripleSource getContentTripleSource() {
 		return contentTripleSource;
 	}
@@ -164,6 +200,30 @@ public class ApplicationImpl implements Application {
 			FileStorage fileStorage = app.getFileStorage();
 			fileStorage.startup(app, css);
 			ss.info(this, "Started the FileStorage system: " + fileStorage);
+
+			EmbeddedRDFDeltaServer embeddedRDFDeltaServer = app
+					.getEmbeddedRDFDeltaServer();
+			if (embeddedRDFDeltaServer != null) {
+				embeddedRDFDeltaServer.startup(app, css);
+				ss.info(this, "Started the EmbeddedRDFDeltaServer: "
+						+ embeddedRDFDeltaServer);
+			}
+
+			JMSMessagingClient jmsMessagingClient = app
+					.getJMSMessagingClient();
+			if (jmsMessagingClient != null) {
+					jmsMessagingClient.startup(app, css);
+					ss.info(this, "Started the JMSMessagingClient: "
+						+ jmsMessagingClient);
+			}
+
+			RDFDeltaDatasetFactory rdfDeltaDatasetFactory = app
+					.getRDFDeltaDatasetFactory();
+			if (rdfDeltaDatasetFactory != null) {
+				rdfDeltaDatasetFactory.startup(app, css);
+				ss.info(this, "Started the RDFDeltaDatasetFactory: "
+						+ rdfDeltaDatasetFactory);
+			}
 
 			ContentTripleSource contentTripleSource = app
 					.getContentTripleSource();

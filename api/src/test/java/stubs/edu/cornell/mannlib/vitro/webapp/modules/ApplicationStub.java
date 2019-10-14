@@ -6,17 +6,20 @@ import java.lang.reflect.Field;
 
 import javax.servlet.ServletContext;
 
-import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStub;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.EmbeddedRDFDeltaServer;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStub;
 
 /**
  * TODO
@@ -86,7 +89,6 @@ public class ApplicationStub implements Application {
 	public ImageProcessor getImageProcessor() {
 		throw new RuntimeException(
 				"ApplicationStub.getImageProcessor() not implemented.");
-
 	}
 
 	@Override
@@ -96,9 +98,21 @@ public class ApplicationStub implements Application {
 	}
 
 	@Override
-	public void shutdown() {
+	public EmbeddedRDFDeltaServer getEmbeddedRDFDeltaServer() {
 		throw new RuntimeException(
-				"ApplicationStub.shutdown() not implemented.");
+				"ApplicationStub.getEmbeddedRDFDeltaServer() not implemented.");
+	}
+
+	@Override
+	public JMSMessagingClient getJMSMessagingClient() {
+		throw new RuntimeException(
+				"ApplicationStub.getJMSMessagingClient() not implemented.");
+}	
+
+	@Override
+	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {
+		throw new RuntimeException(
+				"ApplicationStub.getRDFDeltaDatasetFactory() not implemented.");
 	}
 
 	@Override
@@ -117,6 +131,12 @@ public class ApplicationStub implements Application {
 	public TBoxReasonerModule getTBoxReasonerModule() {
 		throw new RuntimeException(
 				"ApplicationStub.getTBoxReasonerModule() not implemented.");
+	}
+
+	@Override
+	public void shutdown() {
+		throw new RuntimeException(
+				"ApplicationStub.shutdown() not implemented.");
 	}
 
 }
