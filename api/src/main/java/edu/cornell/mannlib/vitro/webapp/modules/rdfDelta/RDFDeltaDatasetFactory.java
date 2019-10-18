@@ -31,8 +31,6 @@ public class RDFDeltaDatasetFactory {
 
     private String deltaClientZone;
 
-    private Zone zone;
-
     private DeltaLink deltaLink;
 
     private DeltaClient deltaClient;
@@ -52,7 +50,7 @@ public class RDFDeltaDatasetFactory {
     public void startup(Application application, ComponentStartupStatus ss) {
         FileOps.ensureDir(deltaClientZone);
         FileOps.clearAll(deltaClientZone);
-        zone = Zone.connect(deltaClientZone);
+        Zone zone = Zone.connect(deltaClientZone);
         deltaLink = DeltaLinkHTTP.connect(deltaServerURL);
         deltaClient = DeltaClient.create(zone, deltaLink);
         jmsMessagingClient = application.getJMSMessagingClient();
