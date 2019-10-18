@@ -35,10 +35,6 @@ public class JMSMessagingClient {
 
     private String brokerPassword;
 
-    private Connection connection;
-
-    private Destination destination;
-
     private Session session;
 
     private MessageProducer producer;
@@ -87,8 +83,8 @@ public class JMSMessagingClient {
             InitialContext ic = new InitialContext(properties);
             ConnectionFactory cf = (ConnectionFactory) ic.lookup(connectionFactory);
 
-            destination = (Destination) ic.lookup(brokerDestination);
-            connection = cf.createConnection(brokerUsername, brokerPassword);
+            Destination destination = (Destination) ic.lookup(brokerDestination);
+            Connection connection = cf.createConnection(brokerUsername, brokerPassword);
             session = connection.createSession(Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
 
