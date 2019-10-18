@@ -90,7 +90,7 @@ public class JMSMessagingClient {
 
             ss.info(String.format("Message producer connected to %s at %s", brokerDestination, providerURL));
         } catch (NamingException | JMSException e) {
-        	ss.error(e, e);
+        	ss.warning(e.getMessage(), e);
         }
 
     }
