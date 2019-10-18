@@ -83,9 +83,6 @@ public class RDFDeltaDatasetFactory {
             }
             log.info(String.format("Wrapped dataset using datasource %s with reference %s", datasourceName, dsRef));
             return dConn.getDataset();
-        } catch (Exception e) {
-            log.error(e, e);
-            throw e;
         }
     }
 
