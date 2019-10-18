@@ -54,7 +54,7 @@ public class RDFDeltaDatasetFactory {
         deltaLink = DeltaLinkHTTP.connect(deltaServerURL);
         deltaClient = DeltaClient.create(zone, deltaLink);
         jmsMessagingClient = application.getJMSMessagingClient();
-        log.info(String.format("DeltaClient connected to DeltaServer at %s with zone %s", deltaServerURL, deltaClientZone));
+        ss.info(String.format("DeltaClient connected to DeltaServer at %s with zone %s", deltaServerURL, deltaClientZone));
     }
 
     public Dataset wrap(String datasourceName, boolean shouldEmitMessage, Dataset dataset) {

@@ -88,9 +88,9 @@ public class JMSMessagingClient {
             session = connection.createSession(Session.AUTO_ACKNOWLEDGE);
             producer = session.createProducer(destination);
 
-            log.info(String.format("Message producer connected to %s at %s", brokerDestination, providerURL));
+            ss.info(String.format("Message producer connected to %s at %s", brokerDestination, providerURL));
         } catch (NamingException | JMSException e) {
-            log.error(e, e);
+        	ss.error(e, e);
         }
 
     }
