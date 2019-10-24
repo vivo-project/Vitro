@@ -1,6 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.modules.messaging;
 
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -70,29 +72,33 @@ public class JMSMessagingClient {
     }
 
     public void startup(Application application, ComponentStartupStatus ss) {
-        Properties properties = new Properties();
-        properties.put("java.naming.factory.initial", factoryInitial);
-        properties.put("java.naming.provider.url", providerURL);
+        Pattern pattern = Pattern.compile("^(topic|queues)/(.*)$");
+        Matcher matcher = pattern.matcher(brokerDestination);
+        if (matcher.find()) {
+            String destinationType = matcher.group(1).equals("topic") ? "topic" : "queue";
+            String destinationName = matcher.group(2);
+            String destinationBinding = String.format("%s.%s", destinationType, brokerDestination);
 
-        String[] destinationParts = brokerDestination.split("/");
-        String destinationBinding = String.format("%s.%s", destinationParts[0], brokerDestination);
-        String destinationName = destinationParts[1];
-        properties.put(destinationBinding, destinationName);
+            Properties properties = new Properties();
+            properties.put("java.naming.factory.initial", factoryInitial);
+            properties.put("java.naming.provider.url", providerURL);
+            properties.put(destinationBinding, destinationName);
 
-        try {
-            InitialContext ic = new InitialContext(properties);
-            ConnectionFactory cf = (ConnectionFactory) ic.lookup(connectionFactory);
-
-            Destination destination = (Destination) ic.lookup(brokerDestination);
-            Connection connection = cf.createConnection(brokerUsername, brokerPassword);
-            session = connection.createSession(Session.AUTO_ACKNOWLEDGE);
-            producer = session.createProducer(destination);
-
-            ss.info(String.format("Message producer connected to %s at %s", brokerDestination, providerURL));
-        } catch (NamingException | JMSException e) {
-            ss.warning(e.getMessage(), e);
+            try {
+                InitialContext ic = new InitialContext(properties);
+                ConnectionFactory cf = (ConnectionFactory) ic.lookup(connectionFactory);
+    
+                Destination destination = (Destination) ic.lookup(brokerDestination);
+                Connection connection = cf.createConnection(brokerUsername, brokerPassword);
+                session = connection.createSession(Session.AUTO_ACKNOWLEDGE);
+                producer = session.createProducer(destination);
+    
+                ss.info(String.format("Message producer connected to %s at %s", brokerDestination, providerURL));
+            } catch (NamingException | JMSException e) {
+                ss.warning(e.getMessage(), e);
+            }
         }
-
+        ss.warning(String.format("%s is not a valid broker destination", brokerDestination));
     }
 
     public void send(String payload) throws JMSException {
