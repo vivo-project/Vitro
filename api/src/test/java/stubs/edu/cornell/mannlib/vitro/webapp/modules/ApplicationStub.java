@@ -12,6 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
@@ -86,7 +88,18 @@ public class ApplicationStub implements Application {
 	public ImageProcessor getImageProcessor() {
 		throw new RuntimeException(
 				"ApplicationStub.getImageProcessor() not implemented.");
+	}
 
+	@Override
+	public JMSMessagingClient getJMSMessagingClient() {
+		throw new RuntimeException(
+				"ApplicationStub.getJMSMessagingClient() not implemented.");
+	}
+
+	@Override
+	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {
+		throw new RuntimeException(
+				"ApplicationStub.getRDFDeltaDatasetFactory() not implemented.");
 	}
 
 	@Override
