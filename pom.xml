@@ -64,7 +64,6 @@
     </properties>
 
     <modules>
-        <module>checkstyle</module>
         <module>api</module>
         <module>dependencies</module>
         <module>webapp</module>
