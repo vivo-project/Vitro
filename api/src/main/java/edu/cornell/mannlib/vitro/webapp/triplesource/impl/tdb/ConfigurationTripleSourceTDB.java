@@ -3,11 +3,13 @@
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.tdb;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.ModelMaker;
 import org.apache.jena.tdb.TDB;
+import org.apache.jena.tdb.TDBFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
@@ -51,12 +53,9 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
 
-		Path vitroHome = ApplicationUtils.instance().getHomeDirectory()
-				.getPath();
-		String tdbPath = vitroHome.resolve(DIRECTORY_TDB).toString();
-
 		try {
-			this.rdfService = new RDFServiceTDB(tdbPath);
+			String tdbPath = resolveTdbPath();
+			this.rdfService = new RDFServiceTDB(TDBFactory.createDataset(tdbPath));
 			this.rdfServiceFactory = createRDFServiceFactory();
 			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.unclosableRdfService);
@@ -70,6 +69,12 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 
 	private void configureTDB() {
 		TDB.getContext().setTrue(TDB.symUnionDefaultGraph);
+	}
+
+	private String resolveTdbPath() throws IOException {
+		Path tdbPath = ApplicationUtils.instance().getHomeDirectory().getPath().resolve(DIRECTORY_TDB);
+		Files.createDirectories(tdbPath);
+		return tdbPath.toString();
 	}
 
 	private RDFServiceFactory createRDFServiceFactory() {
