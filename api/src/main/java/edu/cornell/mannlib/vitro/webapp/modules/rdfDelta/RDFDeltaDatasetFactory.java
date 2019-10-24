@@ -59,7 +59,12 @@ public class RDFDeltaDatasetFactory {
 
     public Dataset wrap(String datasourceName, boolean shouldEmitMessage, Dataset dataset) {
         String datasourceURI = String.format("%s/%s", deltaServerURL, datasourceName);
-        Id dsRef = deltaLink.newDataSource(datasourceName, datasourceURI);
+        Id dsRef;
+        if (deltaLink.existsByName(datasourceName)) {
+            dsRef = deltaLink.getDataSourceDescriptionByName(datasourceName).getId();
+        } else {
+            dsRef = deltaLink.newDataSource(datasourceName, datasourceURI);
+        }
         deltaClient.attachExternal(dsRef, dataset.asDatasetGraph());
         // Connect using SyncPolicy.TXN_W for when a write-transaction starts, ignoring reads.
         // https://github.com/afs/rdf-delta/blob/master/rdf-delta-client/src/main/java/org/seaborne/delta/client/SyncPolicy.java
