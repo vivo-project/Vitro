@@ -99,6 +99,14 @@
 #    # May be an absolute path, or relative to the Vitro home directory.
 #    :hasTdbDirectory "tdbContentModels" .
 
+#:tdbRDFDeltaMessagingContentTripleSource
+#    a   vitroWebapp:triplesource.impl.tdb.ContentTripleSourceTDB ,
+#        vitroWebapp:modules.tripleSource.ContentTripleSource ;
+#    # May be an absolute path, or relative to the Vitro home directory.
+#    :hasTdbDirectory "/opt/vivo/vivo-data" ;
+#    :hasRDFDeltaDatasource "vivo-data" ;
+#    :shouldEmitPatches "true" .
+
 #:sparqlContentTripleSource
 #    a   vitroWebapp:triplesource.impl.virtuoso.ContentTripleSourceSPARQL ,
 #        vitroWebapp:modules.tripleSource.ContentTripleSource ;
@@ -137,3 +145,30 @@
 :jfactTBoxReasonerModule
     a   vitroWebapp:tboxreasoner.impl.jfact.JFactTBoxReasonerModule ,
         vitroWebapp:modules.tboxreasoner.TBoxReasonerModule .
+
+# ----------------------------
+#
+# JMS Messaging Client Module:
+#
+
+#:jmsMessagingClient
+#    a   vitroWebapp:modules.messaging.JMSMessagingClient ;
+#    # JNDI property java.naming.factory.initial
+#    :hasFactoryInitial "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory" ;
+#    # JNDI property java.naming.provider.url
+#    :hasProviderURL "tcp://localhost:61616?type=TOPIC_CF" ;
+#    :hasConnectionFactory "TopicConnectionFactory" ;
+#    :hasBrokerDestination "topic/rdf-delta-patch" ;
+#    :hasBrokerUsername "artemis" ;
+#    :hasBrokerPassword "artemis" .
+
+# ----------------------------
+#
+# RDF Delta Dataset Factory Module:
+#
+
+#:rdfDeltaDatasetFactory
+#    a   vitroWebapp:modules.rdfDelta.RDFDeltaDatasetFactory ;
+#    # becomes an absolute path
+#    :hasDeltaServerURL "http://localhost:1066/" ;
+#    :hasDeltaClientZone "/opt/vivo/Zone" .
