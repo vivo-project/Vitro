@@ -96,12 +96,13 @@ public class JMSMessagingClient {
                 session = connection.createSession(Session.AUTO_ACKNOWLEDGE);
                 producer = session.createProducer(destination);
     
-                ss.info(String.format("Message producer connected to %s at %s", brokerDestination, providerURL));
+                ss.info(String.format("Connected to %s at %s", brokerDestination, providerURL));
             } catch (NamingException | JMSException e) {
-                ss.warning(e.getMessage(), e);
+                ss.warning(String.format("Failed to connect to %s at %s", brokerDestination, providerURL), e);
             }
+        } else {
+            ss.warning(String.format("%s is not a valid broker destination", brokerDestination));
         }
-        ss.warning(String.format("%s is not a valid broker destination", brokerDestination));
     }
 
     public void send(String payload) throws JMSException {
