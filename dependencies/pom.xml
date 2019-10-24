@@ -68,27 +68,27 @@
         <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>59.1</version>
+            <version>59.2</version>
         </dependency>
         <dependency>
             <groupId>com.twelvemonkeys.imageio</groupId>
             <artifactId>imageio-jpeg</artifactId>
-            <version>3.3.2</version>
+            <version>3.4.2</version>
         </dependency>
         <dependency>
             <groupId>com.twelvemonkeys.imageio</groupId>
             <artifactId>imageio-tiff</artifactId>
-            <version>3.3.2</version>
+            <version>3.4.2</version>
         </dependency>
         <dependency>
             <groupId>com.twelvemonkeys.servlet</groupId>
             <artifactId>servlet</artifactId>
-            <version>3.3.2</version>
+            <version>3.4.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.1.1</version>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -98,23 +98,23 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>2.6</version>
         </dependency>
         <dependency>
             <!-- NB: 3.5 conflicts with Jena 3.1.1 -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
+            <version>3.9</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.1</version>
+            <version>4.4</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.46</version>
+            <version>8.0.17</version>
         </dependency>
         <dependency>
             <groupId>net.sf.jga</groupId>
@@ -135,7 +135,7 @@
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>jfact</artifactId>
-            <version>5.0.1</version>
+            <version>5.0.3</version>
             <!-- Exclude OWLAPI OSGi bundle and include separately -->
             <exclusions>
                 <exclusion>
@@ -149,12 +149,12 @@
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-api</artifactId>
-            <version>5.1.1</version>
+            <version>5.1.11</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-apibinding</artifactId>
-            <version>5.1.1</version>
+            <version>5.1.11</version>
             <!-- Exclude rio binding as we don't use Sesame -->
             <exclusions>
                 <exclusion>
@@ -166,17 +166,17 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.3</version>
+            <version>4.5.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.3</version>
+            <version>4.5.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
-            <version>3.11.0</version>
+            <version>3.12.0</version>
             <exclusions>
                 <!-- Exclude OSGi bundles from jsonld-java -->
                 <exclusion>
@@ -192,22 +192,22 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
-            <version>3.11.0</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-sdb</artifactId>
-            <version>3.11.0</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb</artifactId>
-            <version>3.11.0</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>7.4.0</version>
+            <version>8.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.directwebremoting</groupId>
@@ -217,7 +217,7 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.23</version>
+            <version>2.3.29</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -227,7 +227,7 @@
         <dependency>
             <groupId>org.owasp.antisamy</groupId>
             <artifactId>antisamy</artifactId>
-            <version>1.5.6</version>
+            <version>1.5.8</version>
         </dependency>
 
         <!-- Used for JSP runtime -->
@@ -250,7 +250,7 @@
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.2</version>
         </dependency>
     </dependencies>
 </project>
