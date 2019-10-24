@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.modules.messaging;
 
+import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
+import static javax.naming.Context.PROVIDER_URL;
+
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,8 +83,8 @@ public class JMSMessagingClient {
             String destinationBinding = String.format("%s.%s", destinationType, brokerDestination);
 
             Properties properties = new Properties();
-            properties.put("java.naming.factory.initial", factoryInitial);
-            properties.put("java.naming.provider.url", providerURL);
+            properties.put(INITIAL_CONTEXT_FACTORY, factoryInitial);
+            properties.put(PROVIDER_URL, providerURL);
             properties.put(destinationBinding, destinationName);
 
             try {
