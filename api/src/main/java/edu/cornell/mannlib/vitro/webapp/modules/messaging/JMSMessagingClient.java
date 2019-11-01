@@ -63,12 +63,12 @@ public class JMSMessagingClient {
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBrokerType", minOccurs = 1, maxOccurs = 1)
     public void setBrokerType(String type) {
-        this.brokerDestination = type;
+        this.brokerType = type;
     }
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBrokerDestination", minOccurs = 1, maxOccurs = 1)
     public void setBrokerDestination(String destination) {
-        this.brokerType = destination;
+        this.brokerDestination = destination;
     }
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBrokerUsername", minOccurs = 1, maxOccurs = 1)
