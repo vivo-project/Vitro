@@ -104,7 +104,9 @@
 #        vitroWebapp:modules.tripleSource.ContentTripleSource ;
 #    # May be an absolute path, or relative to the Vitro home directory.
 #    :hasTdbDirectory "/opt/vivo/vivo-data" ;
-#    :hasRDFDeltaDatasource "vivo-data" ;
+#    # Name of the RDF Delta Patch Log Datasource
+#    :hasRDFDeltaDatasource "vivo-patches" ;
+#    # Whether or not a triple change should be published, requires jmsMessagingClient
 #    :shouldEmitPatches "true" .
 
 #:sparqlContentTripleSource
