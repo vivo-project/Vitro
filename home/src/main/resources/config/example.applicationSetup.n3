@@ -151,6 +151,9 @@
 # ----------------------------
 #
 # JMS Messaging Client Module:
+#    JNDI implementation of a messaging client used to publish messages
+#    to a broker. Requires an external message broker. Has been tested
+#    against Artemis ActiveMQ topic. https://activemq.apache.org/components/artemis/
 #
 
 #:jmsMessagingClient
