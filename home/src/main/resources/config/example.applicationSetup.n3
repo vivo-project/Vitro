@@ -170,6 +170,11 @@
 # ----------------------------
 #
 # RDF Delta Dataset Factory Module:
+#    Dataset factory implementation in which connects to an external RDF Delta Patch Log service
+#    and affords wrapping TDB datasets. The returned dataset produces RDF Delta Patch Logs for
+#    each write to the triplestore. These patches can be read from the logs or used to emit
+#    the change event.
+#    https://afs.github.io/rdf-delta/
 #
 
 #:rdfDeltaDatasetFactory
