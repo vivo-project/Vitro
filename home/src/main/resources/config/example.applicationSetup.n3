@@ -164,6 +164,7 @@
 #    :hasProviderURL "tcp://localhost:61616?type=TOPIC_CF" ;
 #    :hasConnectionFactory "TopicConnectionFactory" ;
 #    :hasBrokerDestination "topic/rdf-delta-patch" ;
+#    :hasBrokerType "topic" ;
 #    :hasBrokerUsername "artemis" ;
 #    :hasBrokerPassword "artemis" .
 

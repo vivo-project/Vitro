@@ -34,6 +34,8 @@ public class JMSMessagingClient {
 
     private String connectionFactory;
 
+    private String brokerType;
+
     private String brokerDestination;
 
     private String brokerUsername;
@@ -59,9 +61,14 @@ public class JMSMessagingClient {
         this.connectionFactory = connectionFactory;
     }
 
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBrokerType", minOccurs = 1, maxOccurs = 1)
+    public void setBrokerType(String type) {
+        this.brokerDestination = type;
+    }
+
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBrokerDestination", minOccurs = 1, maxOccurs = 1)
     public void setBrokerDestination(String destination) {
-        this.brokerDestination = destination;
+        this.brokerType = destination;
     }
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBrokerUsername", minOccurs = 1, maxOccurs = 1)
@@ -75,12 +82,11 @@ public class JMSMessagingClient {
     }
 
     public void startup(Application application, ComponentStartupStatus ss) {
-        Pattern pattern = Pattern.compile("^(topic|queues)/(.*)$");
+        Pattern pattern = Pattern.compile("^.*/(.*)$");
         Matcher matcher = pattern.matcher(brokerDestination);
         if (matcher.find()) {
-            String destinationType = matcher.group(1).equals("topic") ? "topic" : "queue";
-            String destinationName = matcher.group(2);
-            String destinationBinding = String.format("%s.%s", destinationType, brokerDestination);
+            String destinationName = matcher.group(1);
+            String destinationBinding = String.format("%s.%s", brokerType, brokerDestination);
 
             Properties properties = new Properties();
             properties.put(INITIAL_CONTEXT_FACTORY, factoryInitial);
