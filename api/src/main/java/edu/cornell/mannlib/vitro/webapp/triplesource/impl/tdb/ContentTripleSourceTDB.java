@@ -92,8 +92,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 			checkForFirstTimeStartup();
 			ss.info("Initialized the RDF source for TDB");
 		} catch (IOException e) {
-			throw new RuntimeException(
-					"Failed to set up the RDF source for TDB", e);
+			throw new RuntimeException("Failed to set up the RDF source for TDB", e);
 		}
 	}
 
@@ -108,19 +107,16 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	}
 
 	private RDFServiceFactory createRDFServiceFactory() {
-		return new LoggingRDFServiceFactory(new RDFServiceFactorySingle(
-				this.rdfService));
+		return new LoggingRDFServiceFactory(new RDFServiceFactorySingle(this.rdfService));
 	}
 
 	private ModelMaker createModelMaker() {
-		return addContentDecorators(new ModelMakerWithPersistentEmptyModels(
-				new MemoryMappingModelMaker(new RDFServiceModelMaker(
-						this.unclosableRdfService), SMALL_CONTENT_MODELS)));
+		return addContentDecorators(new ModelMakerWithPersistentEmptyModels(new MemoryMappingModelMaker(
+				new RDFServiceModelMaker(this.unclosableRdfService), SMALL_CONTENT_MODELS)));
 	}
 
 	private void checkForFirstTimeStartup() {
-		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).getGraph()
-				.isEmpty()) {
+		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).getGraph().isEmpty()) {
 			JenaDataSourceSetupBase.thisIsFirstStartup();
 		}
 	}
@@ -146,8 +142,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	}
 
 	@Override
-	public OntModelCache getShortTermOntModels(RDFService shortTermRdfService,
-			OntModelCache longTermOntModelCache) {
+	public OntModelCache getShortTermOntModels(RDFService shortTermRdfService, OntModelCache longTermOntModelCache) {
 		// No need to use short-term models.
 		return longTermOntModelCache;
 	}
