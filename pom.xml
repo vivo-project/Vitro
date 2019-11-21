@@ -64,7 +64,6 @@
     </properties>
 
     <modules>
-        <module>checkstyle</module>
         <module>api</module>
         <module>dependencies</module>
         <module>webapp</module>
@@ -312,7 +311,7 @@
                     <dependency>
                         <groupId>org.vivoweb</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>1.11.1-SNAPSHOT</version>
+                        <version>1.11.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
