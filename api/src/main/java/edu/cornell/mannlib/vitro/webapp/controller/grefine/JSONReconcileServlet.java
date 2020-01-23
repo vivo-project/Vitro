@@ -469,7 +469,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         return queryStr.replaceAll("\\s+", "\\\\ ");
     }
 
-    public class SearchResult implements Comparable<Object> {
+    public class SearchResult implements Comparable<SearchResult> {
         private String label;
         private String uri;
 
@@ -493,7 +493,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
             return map;
         }
 
-        public int compareTo(Object o) throws ClassCastException {
+        public int compareTo(SearchResult o) throws ClassCastException {
             if ( !(o instanceof SearchResult) ) {
                 throw new ClassCastException("Error in SearchResult.compareTo(): expected SearchResult object.");
             }
