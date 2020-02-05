@@ -311,7 +311,7 @@ public class AutocompleteController extends VitroAjaxController {
 		return RDFServiceUtils.getRDFService(new VitroRequest(req));
 	}
 
-    public class SearchResult implements Comparable<Object> {
+    public class SearchResult implements Comparable<SearchResult> {
         private String label;
         private String uri;
         private String msType;
@@ -375,7 +375,7 @@ public class AutocompleteController extends VitroAjaxController {
         	return jsonObj;
         }
 
-        public int compareTo(Object o) throws ClassCastException {
+        public int compareTo(SearchResult o) throws ClassCastException {
             if ( !(o instanceof SearchResult) ) {
                 throw new ClassCastException("Error in SearchResult.compareTo(): expected SearchResult object.");
             }

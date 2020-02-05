@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 /**
  * Represents a single entity record.
 */
+@SuppressWarnings("ComparableType")
 public class IndividualImpl extends BaseResourceBean implements Individual, Comparable<Individual> {
 	/**
 	 * This can be used as a "not initialized" indicator for a property that

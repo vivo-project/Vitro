@@ -64,7 +64,6 @@
     </properties>
 
     <modules>
-        <module>checkstyle</module>
         <module>api</module>
         <module>dependencies</module>
         <module>webapp</module>
@@ -218,6 +217,34 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <!-- Profile for Error Prone plugin -->
+            <id>errorprone</id>
+            <activation>
+                <jdk>[1.8,12)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <arg>-Xplugin:ErrorProne</arg>
+                            </compilerArgs>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>2.3.4</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
@@ -231,15 +258,7 @@
                     <encoding>UTF-8</encoding>
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
-                        <arg>-Xplugin:ErrorProne</arg>
                     </compilerArgs>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_core</artifactId>
-                            <version>2.3.3</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -312,7 +331,7 @@
                     <dependency>
                         <groupId>org.vivoweb</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>1.11.1-SNAPSHOT</version>
+                        <version>1.11.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
