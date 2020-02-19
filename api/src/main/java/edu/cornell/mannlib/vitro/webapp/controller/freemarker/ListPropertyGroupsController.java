@@ -38,10 +38,10 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
 	protected ResponseValues processRequest(VitroRequest vreq) {
-    	
+
         Map<String, Object> body = new HashMap<String, Object>();
         try {
 
@@ -62,7 +62,7 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
                         String publicName = pg.getName();
                         if ( StringUtils.isBlank(publicName) ) {
                             publicName = "(unnamed group)";
-                        }           
+                        }
                         try {
                             json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./editForm?uri=" + URLEncoder.encode(pg.getURI(), "UTF-8") + "&amp;controller=PropertyGroup'>" + publicName + "</a>")).append(", ");
                         } catch (Exception e) {
@@ -79,9 +79,9 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
                             while (propIt.hasNext()) {
                                 Property prop = propIt.next();
                                 String controllerStr = "propertyEdit";
-                                String nameStr = 
-                                	   (prop.getLabel() == null) 
-                                	           ? "" 
+                                String nameStr =
+                                	   (prop.getLabel() == null)
+                                	           ? ""
                                 	           : prop.getLabel();
                                 if (prop instanceof ObjectProperty) {
                                 	nameStr = ((ObjectProperty) prop).getDomainPublic();
@@ -103,7 +103,7 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
                                 json.append("\"data\": { \"shortDef\": \"\"}, \"children\": [] ");
                                 if (propIt.hasNext())
                                     json.append("} , ");
-                                else 
+                                else
                                     json.append("}] ");
                             }
                         }
@@ -123,5 +123,5 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
 
             return new TemplateResponseValues(TEMPLATE_NAME, body);
         }
-    
+
 }

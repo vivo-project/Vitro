@@ -2,7 +2,7 @@
 
 function DeveloperPanel(developerAjaxUrl) {
 	this.setupDeveloperPanel = updateDeveloperPanel;
-	
+
 	function updateDeveloperPanel(data) {
 	    $.ajax({
 	        url: developerAjaxUrl,
@@ -18,31 +18,31 @@ function DeveloperPanel(developerAjaxUrl) {
 	        }
 	    });
 	}
-		
+
 	function updatePanelContents(contents) {
 		document.getElementById("developerPanel").innerHTML = contents;
 	}
-	
+
     function initializeTabs() {
         $("#developerTabs").tabs();
     }
-    
+
 	function addBehaviorToElements() {
 		$( "#developerPanelClickMe" ).click(openPanel);
 	    $( "#developerPanelSaveButton" ).click(saveSettings);
 	    $( "#developerPanelBody input:checkbox" ).change(updateDisabledFields);
 	}
-	
+
 	function openPanel() {
 		$( "#developerPanelClickText" ).hide();
 		$( "#developerPanelBody" ).show();
 	}
-	
+
 	function saveSettings() {
 		$( "#developerPanelBody" ).hide();
 		updateDeveloperPanel(collectFormData());
 	}
-	
+
 	function updateDisabledFields() {
 		var developerEnabled = document.getElementById("developer_enabled").checked;
 		document.getElementById("developer_permitAnonymousControl").disabled = !developerEnabled;
@@ -59,23 +59,23 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developer_searchDeletions_enable").disabled = !developerEnabled;
 		document.getElementById("developer_searchEngine_enable").disabled = !developerEnabled;
 		document.getElementById("developer_authorization_logDecisions_enable").disabled = !developerEnabled;
-	
+
 		var rdfServiceEnabled = developerEnabled && document.getElementById("developer_loggingRDFService_enable").checked;
 		document.getElementById("developer_loggingRDFService_stackTrace").disabled = !rdfServiceEnabled;
 		document.getElementById("developer_loggingRDFService_queryRestriction").disabled = !rdfServiceEnabled;
 		document.getElementById("developer_loggingRDFService_stackRestriction").disabled = !rdfServiceEnabled;
-	
+
 		var searchIndexEnabled = developerEnabled && document.getElementById("developer_searchIndex_enable").checked;
 		document.getElementById("developer_searchIndex_showDocuments").disabled = !searchIndexEnabled;
 		document.getElementById("developer_searchIndex_uriOrNameRestriction").disabled = !searchIndexEnabled;
 		document.getElementById("developer_searchIndex_documentRestriction").disabled = !searchIndexEnabled;
-		
+
 		var searchEngineEnabled = developerEnabled && document.getElementById("developer_searchEngine_enable").checked;
 		document.getElementById("developer_searchEngine_addStackTrace").disabled = !searchEngineEnabled;
 		document.getElementById("developer_searchEngine_addResults").disabled = !searchEngineEnabled;
 		document.getElementById("developer_searchEngine_queryRestriction").disabled = !searchEngineEnabled;
 		document.getElementById("developer_searchEngine_stackRestriction").disabled = !searchEngineEnabled;
-		
+
 		var authLoggingEnabled = developerEnabled && document.getElementById("developer_authorization_logDecisions_enable").checked;
 		document.getElementById("developer_authorization_logDecisions_skipInconclusive").disabled = !authLoggingEnabled;
 		document.getElementById("developer_authorization_logDecisions_addIdentifiers").disabled = !authLoggingEnabled;
@@ -94,17 +94,17 @@ function DeveloperPanel(developerAjaxUrl) {
 			});
 		return data;
 	}
-}	
+}
 
 /*
  * Relies on the global variables for the AJAX URL and the CSS files.
  */
-$(document).ready(function() {   
+$(document).ready(function() {
 	$.each(developerCssLinks, function(index, value){
         var cssLink = $("<link rel='stylesheet' type='text/css' href='" + value + "'>");
-        $("head").append(cssLink); 
-    });	
+        $("head").append(cssLink);
+    });
 
-	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel();	
-}); 
+	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel();
+});
 

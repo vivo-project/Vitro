@@ -27,7 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 @WebServlet(name = "ObjectPropertyStatementListingController", urlPatterns = {"/listObjectPropertyStatements"} )
 public class ObjectPropertyStatementListingController extends
 		BaseEditController {
-	
+
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
        if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
        	return;
@@ -36,18 +36,18 @@ public class ObjectPropertyStatementListingController extends
         VitroRequest vrequest = new VitroRequest(request);
 
         boolean assertedStatementsOnly = false;
-     
+
         String assertParam = request.getParameter("assertedStmts");
         if (assertParam!=null && assertParam.equalsIgnoreCase("true")) {
             assertedStatementsOnly = true;
         }
-                
+
         boolean showVClasses = false;
         String displayParam = request.getParameter("showVClasses");
         if (displayParam!=null && displayParam.equalsIgnoreCase("true")) {
             showVClasses = true;  // this will trigger a limitation to asserted vclasses, since we can't easily display all vclasses for an individual
         }
-        
+
         int startAt=1;
         String startAtParam = request.getParameter("startAt");
         if (startAtParam!=null && startAtParam.trim().length()>0) {
@@ -60,7 +60,7 @@ public class ObjectPropertyStatementListingController extends
                 throw new Error("Cannot interpret "+startAtParam+" as a number");
             }
         }
-        
+
         int endAt=50;
         String endAtParam = request.getParameter("endAt");
         if (endAtParam!=null && endAtParam.trim().length()>0) {
@@ -79,18 +79,18 @@ public class ObjectPropertyStatementListingController extends
             }
         }
 
-        
+
         ArrayList<String> results = new ArrayList();
-        
+
         request.setAttribute("results",results);
-        
+
         results.add("XX");
         results.add("subject");
         if (showVClasses) results.add("type");
         results.add("property");
         results.add("object");
         if (showVClasses) results.add("type");
-        
+
         ObjectPropertyStatementDao opsDao = null;
         if (assertedStatementsOnly){ // get only asserted, not inferred, object property statements
             opsDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyStatementDao();
@@ -100,18 +100,18 @@ public class ObjectPropertyStatementListingController extends
 
         // get all object properties -- no concept of asserted vs. inferred object properties
         ObjectPropertyDao opDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
-        
+
         IndividualDao iDao = null;
         if (showVClasses) {
             iDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao();
         } else {
             iDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
         }
-        
+
         String propURIStr = request.getParameter("propertyURI");
-        
-        ObjectProperty op = opDao.getObjectPropertyByURI(propURIStr);        
-        
+
+        ObjectProperty op = opDao.getObjectPropertyByURI(propURIStr);
+
         int count = 0;
 
 
@@ -139,7 +139,7 @@ public class ObjectPropertyStatementListingController extends
                }
            }
        }
-        
+
         if (count == 0) {
         	results.add("XX");
         	results.add("No statements found for property \""+op.getPickListName()+"\"");
@@ -150,7 +150,7 @@ public class ObjectPropertyStatementListingController extends
         	    results.add("");
         	}
         }
-        
+
         if (showVClasses){
             request.setAttribute("columncount",new Integer(6));
         } else {
@@ -179,11 +179,11 @@ public class ObjectPropertyStatementListingController extends
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        
+
    }
-      
+
    public void doPost(HttpServletRequest request, HttpServletResponse response) {
 	   // don't post to this controller
    }
-	
+
 }

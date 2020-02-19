@@ -35,9 +35,9 @@ public class LoginWidget extends Widget {
         FORCE_PASSWORD_CHANGE("forcePasswordChange"),
         ALREADY_LOGGED_IN("alreadyLoggedIn"),
         SERVER_ERROR("error");
-        
+
         private final String macroName;
-        
+
         Macro(String macroName) {
             this.macroName = macroName;
         }
@@ -46,7 +46,7 @@ public class LoginWidget extends Widget {
 		public String toString() {
             return macroName;
         }
-        
+
     }
 
     private static enum TemplateVariable {
@@ -62,7 +62,7 @@ public class LoginWidget extends Widget {
     	MAXIMUM_PASSWORD_LENGTH("maximumPasswordLength");
 
         private final String variableName;
-        
+
         TemplateVariable(String variableName) {
             this.variableName = variableName;
         }
@@ -71,22 +71,22 @@ public class LoginWidget extends Widget {
 		public String toString() {
             return variableName;
         }
-        
+
     }
 
     @Override
     protected WidgetTemplateValues process(Environment env, Map params,
             HttpServletRequest request, ServletContext context) {
-        
+
         WidgetTemplateValues values = null;
-  
+
         try {
-           
+
             State state = getCurrentLoginState(request);
             log.debug("State on exit: " + state);
-            
+
             TemplateHashModel dataModel = env.getDataModel();
-            
+
             switch (state) {
             case LOGGED_IN:
                 // On the login page itself, show a message that the user is already logged in.
@@ -104,22 +104,22 @@ public class LoginWidget extends Widget {
             default:
                 values = showLoginScreen(request, dataModel.get("siteName").toString());
             }
-            
+
             values.put("urls", dataModel.get("urls"));
             values.put("currentServlet", dataModel.get("currentServlet"));
-            
+
             @SuppressWarnings("unchecked")
-            Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);     
-            User user =  (User) dm.get("user");   
-            values.put("user", user); 
-            
+            Map<String, Object> dm = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);
+            User user =  (User) dm.get("user");
+            values.put("user", user);
+
         } catch (Exception e) {
             log.error(e, e);
             // This widget should display an error message rather than throwing the exception
             // up to the doMarkup() method, which would result in no display.
             values = showError(e);
-        } 
-        
+        }
+
         return values;
 
     }
@@ -134,7 +134,7 @@ public class LoginWidget extends Widget {
         WidgetTemplateValues values = new WidgetTemplateValues(Macro.LOGIN.toString());
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
-        
+
 		boolean showExternalAuth = StringUtils.isNotBlank(
 				ConfigurationProperties.getBean(request).getProperty(
 						"externalAuth.netIdHeaderName"));
@@ -151,12 +151,12 @@ public class LoginWidget extends Widget {
         if (!errorMessage.isEmpty()) {
             values.put(TemplateVariable.ERROR_MESSAGE.toString(), errorMessage);
         }
-        
+
         values.put(TemplateVariable.SITE_NAME.toString(), siteName);
 
         return values;
     }
-    
+
     private WidgetTemplateValues showMessageToLoggedInUser(HttpServletRequest request) {
         return new WidgetTemplateValues(Macro.ALREADY_LOGGED_IN.toString());
     }
@@ -196,7 +196,7 @@ public class LoginWidget extends Widget {
     private State getCurrentLoginState(HttpServletRequest request) {
         if (LoginStatusBean.getBean(request).isLoggedIn()) {
             return State.LOGGED_IN;
-        } 
+        }
         if (isOutdatedLoginProcessBean(request)) {
         	LoginProcessBean.removeBean(request);
         }
@@ -205,8 +205,8 @@ public class LoginWidget extends Widget {
 
 	/**
 	 * A LoginProcessBean is outdated unless the the "in-process" flag is set in the
-	 * session. 
-	 * 
+	 * session.
+	 *
 	 * Each time we hit Authenticate, the flag is set, and each time
 	 * we draw the widget it is reset.
 	 */
@@ -215,13 +215,13 @@ public class LoginWidget extends Widget {
 		if (!inProcess) {
 			log.debug("The process bean is outdated. Discard it.");
 		}
-		
+
 		return !inProcess;
 	}
 
 	/** What's the URL for this servlet? */
     private String getAuthenticateUrl(HttpServletRequest request) {
-        String contextPath = request.getContextPath();   
+        String contextPath = request.getContextPath();
         return contextPath + "/authenticate";
     }
 

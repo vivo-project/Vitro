@@ -25,7 +25,7 @@ public class DumpAllDirective extends BaseDumpDirective {
 
     @SuppressWarnings("unused")
     private static final Log log = LogFactory.getLog(DumpDirective.class);
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
@@ -34,13 +34,13 @@ public class DumpAllDirective extends BaseDumpDirective {
         if (params.size() != 0) {
             throw new TemplateModelException(
                 "The dumpAll directive doesn't allow parameters.");
-        }    
-        
+        }
+
         if (loopVars.length != 0) {
             throw new TemplateModelException(
                 "The dump directive doesn't allow loop variables.");
         }
-        
+
         if (body != null) {
             throw new TemplateModelException(
                 "The dump directive doesn't allow nested content.");
@@ -50,21 +50,21 @@ public class DumpAllDirective extends BaseDumpDirective {
         String title = "Template data model dump for " + env.getTemplate().getName();
         dump(dump, env, title);
     }
-    
+
     SortedMap<String, Object> getDataModelDump(Environment env) throws TemplateModelException {
         SortedMap<String, Object> dump = new TreeMap<String, Object>();
-        TemplateHashModel dataModel = env.getDataModel();  
+        TemplateHashModel dataModel = env.getDataModel();
         // Need to unwrap in order to iterate through the variables
         @SuppressWarnings("unchecked")
-        Map<String, Object> unwrappedDataModel = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);        
-        List<String> varNames = new ArrayList<String>(unwrappedDataModel.keySet());  
+        Map<String, Object> unwrappedDataModel = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);
+        List<String> varNames = new ArrayList<String>(unwrappedDataModel.keySet());
 
         for (String varName : varNames) {
             dump.putAll(getTemplateVariableDump(varName, dataModel.get(varName)));
         }
-        
+
         return dump;
-        
+
     }
 
     @Override
@@ -76,7 +76,7 @@ public class DumpAllDirective extends BaseDumpDirective {
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " />");
         map.put("examples", examples);
-        
+
         return map;
     }
 }

@@ -4,32 +4,32 @@
  * A collection of building blocks for the proxy-management UI.
  */
 
-/* 
+/*
  * ----------------------------------------------------------------------------
  * itemElement
  * ----------------------------------------------------------------------------
- * Display information about an entity according to the template. The entity 
+ * Display information about an entity according to the template. The entity
  * can be either:
  *    a profile -- Individual to be edited.
- *    a proxy   -- User Account to do the editing, optionally with info from a 
+ *    a proxy   -- User Account to do the editing, optionally with info from a
  *                   profile associated with that individual.
- * 
+ *
  * You provide:
- *   template -- the HTML text that determines how the element should look. 
+ *   template -- the HTML text that determines how the element should look.
  *             The template must be a single HTML element, which may contain
  *             any number of sub-elements. It needs to have a single outer
  *             wrapper, however.
  *   uri, label, classLabel, imageUrl -- as described below
- *   remove -- a function that we can call when the user clicks on the remove 
+ *   remove -- a function that we can call when the user clicks on the remove
  *             link or button. We will pass a reference to this struct.
  * ----------------------------------------------------------------------------
  * The template must inlude a link or button with attribute templatePart="remove"
- * 
+ *
  * The template may include tokens to be replaced, from the following:
- *    %uri% -- the URI of the individual being displayed 
+ *    %uri% -- the URI of the individual being displayed
  *    %label& -- the label of the individual.
  *    %classLabel% -- the label of the most specific class of the individual.
- *    %imageUrl% -- the URL that will fetch the image of the individual, 
+ *    %imageUrl% -- the URL that will fetch the image of the individual,
  *                  or a placeholder image.
  * ----------------------------------------------------------------------------
  * This relies on magic names for the styles:
@@ -40,13 +40,13 @@
  */
 function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
 	var self = this;
-	
+
 	this.uri = uri;
 	this.label = label;
 	this.classLabel = classLabel;
 	this.imageUrl = imageUrl;
 	this.removeInfo = removeInfo;
-	
+
 	this.toString = function() {
 		return "itemElement: " + content;
 	}
@@ -56,7 +56,7 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
 				              .replace(/%label%/g, this.label)
 				              .replace(/%classLabel%/g, this.classLabel)
 				              .replace(/%imageUrl%/g, this.imageUrl);
-		
+
 		var element = $(content);
 		element.addClass("proxyInfoElement");
 
@@ -71,23 +71,23 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
 }
 
 
-/* 
+/*
  * ----------------------------------------------------------------------------
  * proxyAutoComplete
  * ----------------------------------------------------------------------------
- * Attach the autocomplete funcionality that we like in proxy panels. 
- * 
+ * Attach the autocomplete funcionality that we like in proxy panels.
+ *
  * You provide:
  *   parms -- a map containing the URL and the action code needed for the AJAX call.
  *   excludedUris -- these URIs are always filtered out of the results.
  *   getProxyInfos -- a function that will return an array of itemElements
- *   	    that are already present in the list and so should be filtered out of 
+ *   	    that are already present in the list and so should be filtered out of
  *          the autocomplete response.
  *   addProxyInfo -- a function that we can call when an item is selected.
- *          It will take the selection info, build an itemElement, and add 
+ *          It will take the selection info, build an itemElement, and add
  *          it to the panel.
  *   reportSearchStatus -- a function that we can call when a search is done. It
- *          will accept the length of the search term and the number of results, 
+ *          will accept the length of the search term and the number of results,
  *          and will display it in some way.
  * ----------------------------------------------------------------------------
  * The AJAX request will include a "term" parameter, set to the current search term.
@@ -101,7 +101,7 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
  */
 function proxyAutocomplete(parms, excludedUris, getProxyInfos, addProxyInfo, reportSearchStatus) {
 	var cache = [];
-	
+
 	var filterResults = function(parsed) {
 		var filtered = [];
 		var existingUris = $.map(getProxyInfos(), function(p) {
@@ -122,12 +122,12 @@ function proxyAutocomplete(parms, excludedUris, getProxyInfos, addProxyInfo, rep
 	}
 
     this.minLength = 0,
-    
+
     this.source = function(request, response) {
     	if (request.term.length < 3) {
     		sendResponse(request, response, []);
     		return;
-    	} 
+    	}
         if (request.term in cache) {
         	sendResponse(request, response, filterResults(cache[request.term]));
             return;
@@ -141,12 +141,12 @@ function proxyAutocomplete(parms, excludedUris, getProxyInfos, addProxyInfo, rep
             },
             complete: function(xhr, status) {
                 var results = $.parseJSON(xhr.responseText);
-                cache[request.term] = results; 
+                cache[request.term] = results;
                 sendResponse(request, response, filterResults(results));
             }
         });
     }
-    
+
     this.select = function(event, ui) {
     	addProxyInfo(ui.item);
         event.preventDefault();

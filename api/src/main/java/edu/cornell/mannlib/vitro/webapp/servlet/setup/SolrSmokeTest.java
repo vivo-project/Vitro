@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
@@ -28,15 +27,17 @@ import org.apache.http.util.EntityUtils;
 
 /**
  * Spin off a thread that will try to connect to Solr.
- * 
+ *
  * We need to do this in a separate thread because if Solr is in the same Tomcat
  * instance as Vitro, it may not be initialized until after Vitro is
  * initialized. Which is to say, after this Listener has run.
- * 
+ *
  * If we can't connect to Solr, add a Warning item to the StartupStatus.
  */
-public class SolrSmokeTest implements ServletContextListener {
+public class SolrSmokeTest {
 	private static final Log log = LogFactory.getLog(SolrSmokeTest.class);
+
+	private final ServletContextListener listener;
 
 	/*
 	 * We don't want to treat socket timeout as a non-recoverable error like the
@@ -44,14 +45,17 @@ public class SolrSmokeTest implements ServletContextListener {
 	 */
 	private static final int SOCKET_TIMEOUT_STATUS = -500;
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
+	public SolrSmokeTest(ServletContextListener listener) {
+		this.listener = listener;
+	}
+
+	public void doTest(ServletContextEvent sce) {
 		final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
 		String solrUrlString = ConfigurationProperties.getBean(sce)
 				.getProperty("vitro.local.solr.url", "");
 		if (solrUrlString.isEmpty()) {
-			ss.fatal(this, "Can't connect to Solr search engine. "
+			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "runtime.properties must contain a value for "
 					+ "vitro.local.solr.url");
 			return;
@@ -62,27 +66,22 @@ public class SolrSmokeTest implements ServletContextListener {
 		try {
 			solrUrl = new URL(solrUrlString);
 		} catch (MalformedURLException e) {
-			ss.fatal(this, "Can't connect to Solr search engine. "
+			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "The value for vitro.local.solr.url "
 					+ "in runtime.properties is not a valid URL: '"
 					+ solrUrlString + "'", e);
 		}
 
-		ss.info(this, "Starting thread for Solr test.");
-		new SolrSmokeTestThread(this, solrUrl, ss).start();
-	}
-
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		// nothing to tear down.
+		ss.info(listener, "Starting thread for Solr test.");
+		new SolrSmokeTestThread(listener, solrUrl, ss).start();
 	}
 
 	private static class SolrSmokeTestThread extends VitroBackgroundThread {
-		private final SolrSmokeTest listener;
+		private final ServletContextListener listener;
 		private final URL solrUrl;
 		private final StartupStatus ss;
 
-		public SolrSmokeTestThread(SolrSmokeTest listener, URL solrUrl,
+		public SolrSmokeTestThread(ServletContextListener listener, URL solrUrl,
 				StartupStatus ss) {
 			super("SolrSmokeTest");
 			this.listener = listener;
@@ -205,6 +204,8 @@ public class SolrSmokeTest implements ServletContextListener {
 	 */
 	private static class SolrHomePager {
 		private static final long SLEEP_INTERVAL = 20000; // 20 seconds
+        private static final long SLEEP_MAX = 300000; // maximum sleep time: 5 minutes
+        private static long SLEEP_DURATION = 0; // how long have we been sleeping?
 
 		private final URL solrUrl;
 		private final HttpClient httpClient = HttpClientFactory.getHttpClient();
@@ -218,12 +219,7 @@ public class SolrSmokeTest implements ServletContextListener {
 		public void connect() throws SolrProblemException {
 			tryToConnect();
 
-			if (!isDone()) {
-				sleep();
-				tryToConnect();
-			}
-
-			if (!isDone()) {
+            while (!isDone() && SLEEP_DURATION < SLEEP_MAX) {
 				sleep();
 				tryToConnect();
 			}
@@ -234,17 +230,19 @@ public class SolrSmokeTest implements ServletContextListener {
 		}
 
 		private void tryToConnect() throws SolrProblemException {
+            SolrSmokeTest.log.debug("Trying to connect to Solr, wait up to " + SLEEP_MAX / 60000 + " minutes - " +
+                    (int)(SLEEP_DURATION * 100.0 / SLEEP_MAX) + "%");
+
 			try {
-				HttpGet method = new HttpGet(solrUrl.toExternalForm());
-				SolrSmokeTest.log.debug("Trying to connect to Solr");
-				HttpResponse response = httpClient.execute(method);
+				HttpGet method = new HttpGet(solrUrl.toExternalForm() + "/select");
+                HttpResponse response = httpClient.execute(method);
 				try {
 					statusCode = response.getStatusLine().getStatusCode();
 					SolrSmokeTest.log.debug("HTTP status was " + statusCode);
 				} finally {
 					EntityUtils.consume(response.getEntity());
 				}
-			} catch (SocketTimeoutException e) {
+            } catch (IOException e) {
 				// Catch the exception so we can retry this.
 				// Save the status so we know why we failed.
 				statusCode = SolrSmokeTest.SOCKET_TIMEOUT_STATUS;
@@ -264,6 +262,7 @@ public class SolrSmokeTest implements ServletContextListener {
 
 		private void sleep() {
 			try {
+                SLEEP_DURATION += SLEEP_INTERVAL;
 				Thread.sleep(SLEEP_INTERVAL);
 			} catch (InterruptedException e) {
 				e.printStackTrace(); // Should never happen

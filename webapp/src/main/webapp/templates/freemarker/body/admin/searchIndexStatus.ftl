@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<#-- 
-    Template for the page that controls the updating or rebuilding of the Search Index. 
+<#--
+    Template for the page that controls the updating or rebuilding of the Search Index.
 -->
 
 <section id="indexer" role="region">
@@ -25,8 +25,8 @@
     <#else>
         <h3>The search indexer status is: ${status.statusType}
     </#if>
-    
-    
+
+
     <form action="${rebuildUrl}" method="POST">
         <p>
             <#if status.statusType == "IDLE">
@@ -75,6 +75,6 @@
        Number of document before rebuild: ${counts.documentsBefore}
        <#if counts.documentsAfter != 0>
            - after rebuild: ${counts.documentsAfter}
-       </#if> 
+       </#if>
    </#if>
 </#macro>

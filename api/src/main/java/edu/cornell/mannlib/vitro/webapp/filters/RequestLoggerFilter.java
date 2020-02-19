@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class RequestLoggerFilter implements Filter {
 
 	private static final Log log = LogFactory.getLog(RequestLoggerFilter.class);
-	
+
 	public void destroy() {
 		// TODO Auto-generated method stub
 
@@ -45,7 +45,7 @@ public class RequestLoggerFilter implements Filter {
 			}
 		} catch (Exception e) {
 			// This shouldn't really happen, but if it does, we'll be ready for it.
-		} finally {		
+		} finally {
 			filterChain.doFilter(request, response);
 		}
 	}

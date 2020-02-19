@@ -27,15 +27,15 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 /**
  * For a given statement, return the URIs that may need to be updated in
  * the search index because of their object property relations to the resources
- * in the statement.    
- * 
+ * in the statement.
+ *
  * Context nodes are not handled here. They are taken care of in AdditionalURIsForContextNodex.
  */
 public class AdditionalURIsForObjectProperties implements IndexingUriFinder, ContextModelsUser {
     protected static final Log log = LogFactory.getLog(AdditionalURIsForObjectProperties.class);
-    
+
     protected RDFService rdfService;
-    
+
     @Override
 	public void setContextModels(ContextModelAccess models) {
     	this.rdfService = models.getRDFService();
@@ -45,10 +45,10 @@ public class AdditionalURIsForObjectProperties implements IndexingUriFinder, Con
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
         if(  stmt == null )
             return Collections.emptyList();
-        
+
         if( stmt.getObject().isLiteral() )
             return doDataPropertyStmt( stmt );
-        else 
+        else
             return doObjectPropertyStmt( stmt );
     }
 
@@ -57,12 +57,12 @@ public class AdditionalURIsForObjectProperties implements IndexingUriFinder, Con
 
     @Override
     public void endIndexing() { /* nothing to do */ }
-    
+
     protected List<String> doObjectPropertyStmt(Statement stmt) {
-        // Only need to consider the object since the subject 
-        // will already be updated in search index as part of 
+        // Only need to consider the object since the subject
+        // will already be updated in search index as part of
         // SearchReindexingListener.
-        
+
         // Also, context nodes are not handled here. They are
         // taken care of in AdditionalURIsForContextNodex.
         if( stmt.getObject().isURIResource() )
@@ -72,7 +72,7 @@ public class AdditionalURIsForObjectProperties implements IndexingUriFinder, Con
     }
 
     protected List<String> doDataPropertyStmt(Statement stmt) {
-        
+
         if( RDFS.label.equals( stmt.getPredicate()  )){
             // If the property is rdfs:labe then we need to update
             // all the individuals related by object properties. This
@@ -80,7 +80,7 @@ public class AdditionalURIsForObjectProperties implements IndexingUriFinder, Con
             // is handled in AdditionalURIsForContextNodex.
             if( stmt.getSubject().isURIResource() ){
                 return allIndividualsRelatedByObjectPropertyStmts( stmt.getSubject().getURI() );
-            }else{ 
+            }else{
                 log.debug("ignored bnode");
                 return Collections.emptyList();
             }
@@ -89,21 +89,21 @@ public class AdditionalURIsForObjectProperties implements IndexingUriFinder, Con
             // is handled in AdditionalURIsForContextNodex.
             return Collections.emptyList();
         }
-        
+
     }
 
     protected List<String> allIndividualsRelatedByObjectPropertyStmts( String uri ) {
         List<String> additionalUris = new ArrayList<String>();
-        
+
         QuerySolutionMap initialBinding = new QuerySolutionMap();
-        Resource uriResource = ResourceFactory.createResource(uri);        
+        Resource uriResource = ResourceFactory.createResource(uri);
         initialBinding.add("uri", uriResource);
-        
+
 		ResultSet results = QueryUtils.getQueryResults(QUERY_FOR_RELATED,
 				initialBinding, rdfService);
 
-        while(results.hasNext()){                    
-            QuerySolution soln = results.nextSolution();                                   
+        while(results.hasNext()){
+            QuerySolution soln = results.nextSolution();
             Iterator<String> iter =  soln.varNames() ;
             while( iter.hasNext()){
                 String name = iter.next();
@@ -112,29 +112,29 @@ public class AdditionalURIsForObjectProperties implements IndexingUriFinder, Con
                     if( node.isURIResource() ){
                         additionalUris.add( node.as( Resource.class ).getURI()  );
                     }else{
-                        log.warn( "value from query for var " + name + "  was not a URIResource, it was " + node);    
+                        log.warn( "value from query for var " + name + "  was not a URIResource, it was " + node);
                     }
                 }else{
                     log.warn("value for query for var " + name + " was null");
-                }                        
+                }
             }
         }
 
         return additionalUris;
     }
 
-    protected static final String prefixs = 
+    protected static final String prefixs =
         "prefix owl:  <http://www.w3.org/2002/07/owl#> \n" +
         "prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  \n" +
         "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n";
 
-    protected final String QUERY_FOR_RELATED = 
-        prefixs + 
-        "SELECT ?related WHERE { \n" +        
+    protected final String QUERY_FOR_RELATED =
+        prefixs +
+        "SELECT ?related WHERE { \n" +
         "  ?uri ?p ?related  \n " +
-        "  filter( isURI( ?related ) && ?p != rdf:type )  \n" +                
+        "  filter( isURI( ?related ) && ?p != rdf:type )  \n" +
         "}" ;
-    
+
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName();

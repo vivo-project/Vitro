@@ -24,23 +24,23 @@ import com.tonicsystems.jarjar.KlugedDepFind;
 
 /**
  * This takes the place of the JarJar main routine, in doing a Find operation.
- * 
+ *
  * One thing this lets us do is to call KlugedDepFind instead of DepFind.
  * KlugedDepFind was created because JarJar had a known bug that wasn't fixed in
  * the latest release. (see http://code.google.com/p/jarjar/issues/detail?id=6).
  * I had to put KlugedDepFind into the com.tonicsystems.jarjar package so it
  * wauld have access to DepFindVisitor, which is package-private.
- * 
+ *
  * The other thing we can do is to provide a custom DepHandler which records the
  * dependencies directly instead of writing them to a file which we would need
  * to parse. Since we have the dependencies in a data structure, it's easy to
  * walk the tree and find out what JARs are required, even through several
  * layers of dependency.
- * 
+ *
  * When calling this, pass 2 arguments. The first is the path to the JAR which
  * contains the Vitro (or VIVO) classes. The second is the path to the directory
  * that contains the JARs. (shouldn't end with a slash)
- * 
+ *
  * There is a list of JARs which we know we need but which aren't shown by the
  * analysis. For example, the MySQL driver is loaded dynamically by name, so an
  * analysis of the class files in the JARs won't show that it is used. For now,
@@ -50,9 +50,9 @@ import com.tonicsystems.jarjar.KlugedDepFind;
 public class JarLister {
 	/**
 	 * <pre>
-	 * 
+	 *
 	 * What I originally wanted to do was this:
-	 * 
+	 *
 	 * <target name="jarlist" depends="jar" description="Figure out what JARs are needed">
 	 *   <java classname="com.tonicsystems.jarjar.Main" fork="no" failonerror="true">
 	 *     <classpath refid="utility.run.classpath" />
@@ -62,9 +62,9 @@ public class JarLister {
 	 *     <arg value="${appbase.dir}/lib/*" />
 	 *   </java>
 	 * </target>
-	 * 
+	 *
 	 * I ended up with this instead:
-	 * 
+	 *
 	 * <target name="jarlist" depends="jar" description="Figure out what JARs are needed">
 	 *   <java classname="edu.cornell.mannlib.vitro.utilities.jarlist.JarLister" fork="no" failonerror="true">
 	 *     <classpath refid="utility.run.classpath" />
@@ -73,7 +73,7 @@ public class JarLister {
 	 *     <arg value="${appbase.dir}/config/jarlist/known_dependencies.txt" />
 	 *   </java>
 	 * </target>
-	 * 
+	 *
 	 * </pre>
 	 */
 

@@ -12,9 +12,9 @@ import java.util.Map;
 
 /**
  * A harness that runs a system-level command.
- * 
+ *
  * No provision is made for standard input.
- * 
+ *
  * The standard output and standard error streams are asynchronously read, so
  * the sub-process will not block on full buffers. Warning: if either of these
  * streams contain more data than can fit into a String, then we will have a
@@ -40,7 +40,7 @@ public class ProcessRunner {
 
 	/**
 	 * Run the command.
-	 * 
+	 *
 	 * @param command
 	 *            a list containing the operating system program and its
 	 *            arguments. See

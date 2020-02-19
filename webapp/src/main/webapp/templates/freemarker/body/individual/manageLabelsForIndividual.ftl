@@ -38,11 +38,11 @@
 
 
     <section id="rdfsLabels" role="container">
-    
+
      <script type="text/javascript">
         var existingLabelsData = [];
     </script>
-    
+
         <ul id="existingLabelsList" name="existingLabelsList">
         <#if editConfiguration.pageData.labelsSortedByLanguageName?has_content>
         	<#--List of labelInformation objects as value where key = language name -->
@@ -50,32 +50,32 @@
         	<#--Keys would be the actual names of languages-->
         	<#assign labelLanguages = labelsSorted?keys?sort />
         	<#assign editGenerator = "editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator" />
-        	
+
         	<#--What we need here is printing out the labels by the language Name and not language code, starting with untyped first-->
         	<@m.displayExistingLabelsForLanguage "untyped" labelsSorted editable editGenerator/>
         	<@m.displayExistingTypedLabels  labelLanguages labelsSorted editable editGenerator/>
-        	
+
         </#if>
         </ul>
 
-        <br />   
-        <p>      
-        
-	    <#if editable>   
+        <br />
+        <p>
+
+	    <#if editable>
 		    <#include "manageLabelsForIndividualSubmissionErrors.ftl">
 			<div id="showAddForm">
-				<input type="submit" value="${i18n().add_label}" id="showAddFormButton" name="showAddFormButton">  ${i18n().or} 
+				<input type="submit" value="${i18n().add_label}" id="showAddFormButton" name="showAddFormButton">  ${i18n().or}
 				<a class="cancel" href="${cancelUrl}&url=/individual" title="${returnText}">${returnText}</a>
-			</div>  
+			</div>
 			<div id="showCancelOnly">
 				<a class="cancel" href="${cancelUrl}&url=/individual" title="${returnText}">${returnText}</a>
 			</div>
 		    <#include "manageLabelsForIndividualAddForm.ftl" >
 	    </#if>
-	    
+
 		</p>
 	</section>
-	    
+
 
 <script type="text/javascript">
 var selectLocalesFullList = [];
@@ -86,7 +86,7 @@ var selectLocalesFullList = [];
 		<#assign label= localeInfo["label"] />
 		selectLocalesFullList.push({'code':'${code}', 'label':'${label}'});
 	</#list>
-	
+
 </#if>
 
 var customFormData = {
@@ -107,4 +107,4 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/utils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>',
                 '<script type="text/javascript" src="${urls.base}/js/individual/manageLabelsForIndividual.js"></script>')}
-              
+

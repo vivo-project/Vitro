@@ -178,7 +178,7 @@ public class RdfLiteralHashTest {
 //        Assert.assertNull(stmt);
 //
 //    }
-    
+
 //    @Test
 //    public void testGetRdfsLabelStatementByHash(){
 //
@@ -187,7 +187,7 @@ public class RdfLiteralHashTest {
 //            "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"+
 //            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"+
 //            " ex:bob rdfs:label \"Smith, Bob\"^^<"+XSD.xstring.getURI()+"> ." ;
-//               
+//
 //        Model model = (ModelFactory.createDefaultModel()).read(new StringReader(n3), "", "N3");
 //
 //        Individual bob = new IndividualImpl();
@@ -195,16 +195,16 @@ public class RdfLiteralHashTest {
 //
 //        int hash = RdfLiteralHash.makeRdfsLabelLiteralHash(bob, "Smith, Bob", model);
 //        DataPropertyStatement stmt = RdfLiteralHash.getRdfsLabelStatementByHash(bob.getURI(), model, hash);
-//        
+//
 //        String data = stmt.getData();
 //        String datatypeUri = stmt.getDatatypeURI();
 //        String predicateUri = stmt.getDatapropURI();
 //        String subjectUri = stmt.getIndividualURI();
-//        
+//
 //        Assert.assertEquals("Smith, Bob", data);
 //        Assert.assertEquals(XSD.xstring.getURI(), datatypeUri);
 //        Assert.assertEquals(VitroVocabulary.LABEL, predicateUri);
 //        Assert.assertEquals("http://example.com/bob", subjectUri);
-//      
+//
 //    }
 }

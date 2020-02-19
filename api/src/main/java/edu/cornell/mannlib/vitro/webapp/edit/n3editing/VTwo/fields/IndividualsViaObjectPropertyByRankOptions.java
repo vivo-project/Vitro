@@ -32,11 +32,11 @@ public class IndividualsViaObjectPropertyByRankOptions extends IndividualsViaObj
        this.wdf = wdf;
        this.queryModel = model;
     }
-    
+
     public Comparator<String[]> getCustomComparator() {
     	return new DisplayRankComparator(wdf, queryModel);
     }
-    
+
     private static class DisplayRankComparator implements Comparator<String[]> {
     	private WebappDaoFactory wdf = null;
         private Model queryModel = null;
@@ -61,11 +61,11 @@ public class IndividualsViaObjectPropertyByRankOptions extends IndividualsViaObj
                 } else if (s1[1] == null){
                     return -1;
                 } else {
-                    return compareRanks(s1, s2); 
+                    return compareRanks(s1, s2);
                 }
             }
         }
-        
+
         private  int compareRanks(String[] s1, String[] s2) {
         	String uri1 = s1[0];
         	String uri2 = s2[0];
@@ -73,13 +73,13 @@ public class IndividualsViaObjectPropertyByRankOptions extends IndividualsViaObj
         	Individual ind2 = this.wdf.getIndividualDao().getIndividualByURI(uri2);
         	int displayRank1 = getDisplayRank(ind1);
         	int displayRank2 = getDisplayRank(ind2);
-        	//Get display ranks 
+        	//Get display ranks
         	return (Integer.compare(displayRank1, displayRank2));
         	//TODO: Incorporate sparql query here to retrieve the ranks
         	//This qualifies as neither a data property or an object property so will need to access
         	//using sparql query
         }
-        
+
         //Run sparql query to get display rank for individual - uses vitro annotation property
         private Integer getDisplayRank(Individual ind) {
         	Integer rankResult = new Integer(0);
@@ -103,7 +103,7 @@ public class IndividualsViaObjectPropertyByRankOptions extends IndividualsViaObj
                 		} else {
                 			log.debug("Rank was not returned in query or was not literal");
                 		}
-                		
+
                 	}
                 }finally{ qe.close(); }
 
@@ -112,13 +112,13 @@ public class IndividualsViaObjectPropertyByRankOptions extends IndividualsViaObj
             } finally {
             	this.queryModel.leaveCriticalSection();
             }
-        	
+
         	return rankResult;
         }
-        
+
         private String getRankQuery() {
-        	return "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> " + 
+        	return "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> " +
         			"SELECT ?rank WHERE {?individualURI vitro:displayRankAnnot ?rank .} ";
         }
-    }    
+    }
 }

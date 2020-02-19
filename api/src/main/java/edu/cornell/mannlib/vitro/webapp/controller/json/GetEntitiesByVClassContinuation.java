@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
- * 
+ *
  */
 public class GetEntitiesByVClassContinuation extends JsonArrayProducer {
 	private static final Log log = LogFactory
@@ -58,7 +58,7 @@ public class GetEntitiesByVClassContinuation extends JsonArrayProducer {
                 count++;
             }
             if( log.isDebugEnabled() ) log.debug("getEntitiesByVClassContinuation(): Creating reply with continue token," +
-            		" sending in this reply: " + count +", remaing to send: " + entsInVClass.size() );  
+            		" sending in this reply: " + count +", remaing to send: " + entsInVClass.size() );
         } else {
             //send out reply with no continuation
             entsToReturn = entsInVClass;

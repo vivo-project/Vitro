@@ -33,71 +33,71 @@ public class NewURIMakerVitroTest extends AbstractTestClass{
 		newResources.put("page", null);
 		newResources.put("menuItem", null);
 		newResources.put("dataGetter", null);
-		
+
 		//Setup webappdaofactory
 		WebappDaoFactoryJena wadf = this.setupWebappDaoFactory();
 		NewURIMakerVitro nv = new NewURIMakerVitro(wadf);
-		
+
 		//Now test for new URI
-		HashMap<String,String> varToNewURIs = new HashMap<String,String>();       
+		HashMap<String,String> varToNewURIs = new HashMap<String,String>();
 		try {
 			for (String key : newResources.keySet()) {
 	           String prefix = newResources.get(key);
-	           String uri = nv.getUnusedNewURI(prefix);                        
-	           varToNewURIs.put(key, uri);  
-			}  
+	           String uri = nv.getUnusedNewURI(prefix);
+	           varToNewURIs.put(key, uri);
+			}
 		} catch(Exception ex) {
 			System.out.println("Error occurred " + ex);
 		}
-		
+
 		//Ensure that URIs are not included more than once
 		List<String> values = new ArrayList<String>(varToNewURIs.values());
 		Set<String> valuesSet = new HashSet<String>(varToNewURIs.values());
 		assertTrue(valuesSet.size() == values.size());
 
 	}
-	
+
 	@Test
 	public void testNonNullNamespace() {
 		//Three items needs new URIs assigned in the default namespace
 		//Var name to namespace, in this case null to denote default namespace
 		Map<String,String> newResources = new HashMap<String, String>();
 		newResources.put("page", "http://displayOntology/test/n12");
-	
-		
+
+
 		//Setup webappdaofactory
 		WebappDaoFactoryJena wadf = this.setupWebappDaoFactory();
 		NewURIMakerVitro nv = new NewURIMakerVitro(wadf);
-		
+
 		//Now test for new URI
-		HashMap<String,String> varToNewURIs = new HashMap<String,String>();       
+		HashMap<String,String> varToNewURIs = new HashMap<String,String>();
 		try {
 			for (String key : newResources.keySet()) {
 	           String prefix = newResources.get(key);
-	           String uri = nv.getUnusedNewURI(prefix);                        
-	           varToNewURIs.put(key, uri);  
-			}  
+	           String uri = nv.getUnusedNewURI(prefix);
+	           varToNewURIs.put(key, uri);
+			}
 		} catch(Exception ex) {
 			System.out.println("Error occurred " + ex);
 		}
-		
+
 		//Ensure that URIs are not included more than once
 		List<String> values = new ArrayList<String>(varToNewURIs.values());
 		Set<String> valuesSet = new HashSet<String>(varToNewURIs.values());
 		assertTrue(valuesSet.size() == values.size());
 	}
-	
+
 	private WebappDaoFactoryJena setupWebappDaoFactory() {
 		String defaultNamespace= "http://vivo.mannlib.cornell.edu/individual/";
 		String testNamespace = "http://displayOntology/test/";
-		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		ontModel.add(
 				ontModel.createResource(defaultNamespace + "n234"),
-				RDF.type, 
+				RDF.type,
 				OWL.Thing);
 		ontModel.add(
 				ontModel.createResource(testNamespace + "n234"),
-				RDF.type, 
+				RDF.type,
 				OWL.Thing);
 		OntModelSelector selector = new SimpleOntModelSelector(ontModel);
 		//Set up default namespace somewhere?

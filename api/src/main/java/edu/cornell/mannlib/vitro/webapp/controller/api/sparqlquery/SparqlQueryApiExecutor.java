@@ -21,7 +21,7 @@ public abstract class SparqlQueryApiExecutor {
 	/**
 	 * Get an instance that is appropriate to the query and the acceptable
 	 * types.
-	 * 
+	 *
 	 * @throws AcceptHeaderParsingException
 	 *             if the accept header was not in a valid format
 	 * @throws NotAcceptableException

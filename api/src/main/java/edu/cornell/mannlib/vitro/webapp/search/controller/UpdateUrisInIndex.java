@@ -36,7 +36,7 @@ public class UpdateUrisInIndex {
 
 	/**
 	 * Web service for update in search index of a list of URIs.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	protected int doUpdateUris(HttpServletRequest req, SearchIndexer indexer)
@@ -45,7 +45,7 @@ public class UpdateUrisInIndex {
 		if (map == null) {
 			throw new ServletException("Expected Multipart Content");
 		}
-		
+
 		Charset enc = getEncoding(req);
 
 		int uriCount = 0;
@@ -58,7 +58,7 @@ public class UpdateUrisInIndex {
 		return uriCount;
 	}
 
-	private int processFileItem(SearchIndexer indexer, 
+	private int processFileItem(SearchIndexer indexer,
 			FileItem item, Charset enc) throws IOException {
 		List<String> uris = new ArrayList<>();
 		Reader reader = new InputStreamReader(item.getInputStream(), enc.name());

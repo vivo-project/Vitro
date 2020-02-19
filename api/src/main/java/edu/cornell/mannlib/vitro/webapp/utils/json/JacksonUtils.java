@@ -46,9 +46,9 @@ public class JacksonUtils {
 	/**
 	 * net.sf.json provided this method (assuming that 'values' is an array of
 	 * JSON objects that contain Strings.
-	 * 
+	 *
 	 * literalValues = (List<String>) JSONSerializer.toJava(values);
-	 * 
+	 *
 	 * So here is a replacement for that.
 	 */
 	public static List<String> jsonArrayToStrings(ArrayNode values) {

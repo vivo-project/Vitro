@@ -18,17 +18,17 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 public class RDFServiceFactorySDB implements RDFServiceFactory {
 
     private final static Log log = LogFactory.getLog(RDFServiceFactorySDB.class);
-    
+
     private DataSource ds;
     private StoreDesc storeDesc;
     private RDFService longTermRDFService;
-    
+
     public RDFServiceFactorySDB(DataSource dataSource, StoreDesc storeDesc) {
         this.ds = dataSource;
         this.storeDesc = storeDesc;
         this.longTermRDFService = new RDFServiceSDB(dataSource, storeDesc);
     }
-    
+
     @Override
     public RDFService getRDFService() {
         return this.longTermRDFService;
@@ -40,18 +40,18 @@ public class RDFServiceFactorySDB implements RDFServiceFactory {
             RDFService rdfService = new RDFServiceSDB(ds.getConnection(), storeDesc);
             for (ChangeListener cl : ((RDFServiceSDB) longTermRDFService)
                     .getRegisteredListeners() ) {
-                rdfService.registerListener(cl);    
+                rdfService.registerListener(cl);
             }
             for (ModelChangedListener cl : ((RDFServiceSDB) longTermRDFService)
                     .getRegisteredJenaModelChangedListeners() ) {
-                rdfService.registerJenaModelChangedListener(cl);    
+                rdfService.registerJenaModelChangedListener(cl);
             }
             return rdfService;
         } catch (Exception e) {
             log.error(e,e);
             throw new RuntimeException(e);
         }
-    } 
+    }
 
     @Override
     public void registerListener(ChangeListener changeListener)
@@ -64,7 +64,7 @@ public class RDFServiceFactorySDB implements RDFServiceFactory {
             throws RDFServiceException {
         this.longTermRDFService.unregisterListener(changeListener);
     }
-    
+
     @Override
     public void registerJenaModelChangedListener(ModelChangedListener changeListener)
             throws RDFServiceException {

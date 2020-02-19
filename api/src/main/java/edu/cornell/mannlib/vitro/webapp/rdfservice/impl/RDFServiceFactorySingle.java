@@ -26,45 +26,45 @@ import org.apache.jena.rdf.model.RDFNode;
 public class RDFServiceFactorySingle implements RDFServiceFactory {
 
     private RDFService rdfService;
-    
+
     public RDFServiceFactorySingle(RDFService rdfService) {
         this.rdfService = new UnclosableRDFService(rdfService);
     }
-    
+
     @Override
     public RDFService getRDFService() {
         return this.rdfService;
     }
-    
-    @Override 
+
+    @Override
     public RDFService getShortTermRDFService() {
         return this.rdfService;
     }
-    
+
     @Override
     public void registerListener(ChangeListener listener) throws RDFServiceException {
         this.rdfService.registerListener(listener);
     }
-    
+
     @Override
     public void unregisterListener(ChangeListener listener) throws RDFServiceException {
         this.rdfService.unregisterListener(listener);
     }
-    
+
     @Override
     public void registerJenaModelChangedListener(ModelChangedListener listener) throws RDFServiceException {
         this.rdfService.registerJenaModelChangedListener(listener);
     }
-    
+
     @Override
     public void unregisterJenaModelChangedListener(ModelChangedListener listener) throws RDFServiceException {
         this.rdfService.unregisterJenaModelChangedListener(listener);
     }
-    
+
     public class UnclosableRDFService implements RDFService {
-        
+
         private RDFService s;
-        
+
         public UnclosableRDFService(RDFService rdfService) {
             this.s = rdfService;
         }
@@ -175,7 +175,7 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
                 throws RDFServiceException {
             s.unregisterListener(changeListener);
         }
-        
+
         @Override
         public void registerJenaModelChangedListener(ModelChangedListener changeListener)
                 throws RDFServiceException {
@@ -212,7 +212,7 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         public void close() {
             // Don't close s.  It's being used by everybody.
         }
-        
+
 		@Override
 		public String toString() {
 			return ToString.simpleName(this) + "[" + ToString.hashHex(this)

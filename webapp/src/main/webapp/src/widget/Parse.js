@@ -16,7 +16,7 @@ dojo.require("dojo.dom");
 dojo.widget.Parse = function(fragment) {
 	this.propertySetsList = [];
 	this.fragment = fragment;
-	
+
 	this.createComponents = function(frag, parentComp){
 		var comps = [ ];
 		var built = false;
@@ -68,7 +68,7 @@ dojo.widget.Parse = function(fragment) {
 	}
 
 	/*  parsePropertySets checks the top level of a raw JavaScript object
-			structure for any propertySets.  It stores an array of references to 
+			structure for any propertySets.  It stores an array of references to
 			propertySets that it finds.
 	*/
 	this.parsePropertySets = function(fragment) {
@@ -83,7 +83,7 @@ dojo.widget.Parse = function(fragment) {
 		this.propertySetsList.push(propertySets);
 		return propertySets;
 	}
-	
+
 	/*  parseProperties checks a raw JavaScript object structure for
 			properties, and returns an array of properties that it finds.
 	*/
@@ -98,7 +98,7 @@ dojo.widget.Parse = function(fragment) {
 			}else{
 				if((fragment[item]["tagName"])&&
 					(dojo.widget.tags[fragment[item].tagName.toLowerCase()])){
-					// TODO: it isn't a property or property set, it's a fragment, 
+					// TODO: it isn't a property or property set, it's a fragment,
 					// so do something else
 					// FIXME: needs to be a better/stricter check
 					// TODO: handle xlink:href for external property sets
@@ -125,10 +125,10 @@ dojo.widget.Parse = function(fragment) {
 
 	/* getPropertySetById returns the propertySet that matches the provided id
 	*/
-	
+
 	this.getDataProvider = function(objRef, dataUrl) {
-		// FIXME: this is currently sync.  To make this async, we made need to move 
-		//this step into the widget ctor, so that it is loaded when it is needed 
+		// FIXME: this is currently sync.  To make this async, we made need to move
+		//this step into the widget ctor, so that it is loaded when it is needed
 		// to populate the widget
 		dojo.io.bind({
 			url: dataUrl,
@@ -142,7 +142,7 @@ dojo.widget.Parse = function(fragment) {
 		});
 	}
 
-	
+
 	this.getPropertySetById = function(propertySetId){
 		for(var x = 0; x < this.propertySetsList.length; x++){
 			if(propertySetId == this.propertySetsList[x]["id"][0].value){
@@ -151,7 +151,7 @@ dojo.widget.Parse = function(fragment) {
 		}
 		return "";
 	}
-	
+
 	/* getPropertySetsByType returns the propertySet(s) that match(es) the
 	 * provided componentClass
 	 */
@@ -167,14 +167,14 @@ dojo.widget.Parse = function(fragment) {
 		}
 		return propertySets;
 	}
-	
+
 	/* getPropertySets returns the propertySet for a given component fragment
 	*/
 	this.getPropertySets = function(fragment){
 		var ppl = "dojo:propertyproviderlist";
 		var propertySets = [];
 		var tagname = fragment["tagName"];
-		if(fragment[ppl]){ 
+		if(fragment[ppl]){
 			var propertyProviderIds = fragment[ppl].value.split(" ");
 			// FIXME: should the propertyProviderList attribute contain #
 			// 		  syntax for reference to ids or not?
@@ -199,9 +199,9 @@ dojo.widget.Parse = function(fragment) {
 		// iteration happens.
 		return (this.getPropertySetsByType(tagname)).concat(propertySets);
 	}
-	
-	/* 
-		nodeRef is the node to be replaced... in the future, we might want to add 
+
+	/*
+		nodeRef is the node to be replaced... in the future, we might want to add
 		an alternative way to specify an insertion point
 
 		componentName is the expected dojo widget name, i.e. Button of ContextMenu
@@ -243,7 +243,7 @@ dojo.widget.getParser = function(name){
  *                 refNode argument
  * @return The new Widget object
  */
- 
+
 dojo.widget.createWidget = function(name, props, refNode, position){
 	var lowerCaseName = name.toLowerCase();
 	var namespacedName = "dojo:" + lowerCaseName;
@@ -259,7 +259,7 @@ dojo.widget.createWidget = function(name, props, refNode, position){
 	}
 
 	function fromScript (placeKeeperNode, name, props) {
-		props[namespacedName] = { 
+		props[namespacedName] = {
 			dojotype: [{value: lowerCaseName}],
 			nodeRef: placeKeeperNode,
 			fastMixIn: true
@@ -269,12 +269,12 @@ dojo.widget.createWidget = function(name, props, refNode, position){
 	}
 
 	if (typeof name != "string" && typeof props == "string") {
-		dojo.deprecated("dojo.widget.createWidget", 
+		dojo.deprecated("dojo.widget.createWidget",
 			"argument order is now of the form " +
 			"dojo.widget.createWidget(NAME, [PROPERTIES, [REFERENCENODE, [POSITION]]])", "0.4");
 		return fromScript(name, props, refNode);
 	}
-	
+
 	props = props||{};
 	var notRef = false;
 	var tn = null;
@@ -304,7 +304,7 @@ dojo.widget.createWidget = function(name, props, refNode, position){
 	}
 	return widgetArray[0]; // just return the widget
 }
- 
+
 dojo.widget.fromScript = function(name, props, refNode, position){
 	dojo.deprecated("dojo.widget.fromScript", " use " +
 		"dojo.widget.createWidget instead", "0.4");

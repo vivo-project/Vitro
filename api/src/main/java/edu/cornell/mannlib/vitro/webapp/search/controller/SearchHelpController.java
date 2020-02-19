@@ -20,19 +20,19 @@ public class SearchHelpController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(SearchHelpController.class.getName());
     private static final String TEMPLATE_NAME = "search-help.ftl";
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
         Map<String, Object> body = new HashMap<String, Object>();
 
         String pointOfOrigin = "helpLink";
-        
+
         body.put("origination", pointOfOrigin);
 
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
-  
+
 }
 
 

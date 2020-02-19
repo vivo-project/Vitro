@@ -41,9 +41,9 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 /**
  * This servlet is for servicing JSON requests from Google Refine's
  * Reconciliation Service.
- * 
+ *
  * @author Eliza Chan (elc2013@med.cornell.edu)
- * 
+ *
  */
 @WebServlet(name = "JSON Reconcile Service", urlPatterns = {"/reconcile"} )
 public class JSONReconcileServlet extends VitroHttpServlet {
@@ -90,7 +90,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				int serverPort = req.getServerPort();
 
 				if (vreq.getWebappDaoFactory() != null) {
-					defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();	
+					defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
 				}
 				defaultTypeList = ConfigurationProperties.getBean(req).getProperty("Vitro.reconcile.defaultTypeList");
 				serverName = req.getServerName();
@@ -182,7 +182,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 
 	/**
 	 * Returns a default JSON response.
-	 * 
+	 *
 	 * @param req Servlet Request
 	 * @param resp Servlet Response
 	 */
@@ -231,7 +231,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 
 	private ObjectNode runSearch(HashMap<String, JsonNode> currMap) throws ServletException {
 		ObjectNode qJson = JsonNodeFactory.instance.objectNode();
-		
+
 		try {
 
 			for (Map.Entry<String, JsonNode> entry : currMap.entrySet()) {
@@ -241,7 +241,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				String queryVal = json.get("query").asText();
 
 				// System.out.println("query: " + json.toString());
-				
+
 				// continue with properties list
 				String searchType = null;
 				int limit = 10; // default
@@ -285,26 +285,26 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	                SearchEngine search = ApplicationUtils.instance().getSearchEngine();
 	            	queryResponse = search.query(query);
 	            } else {
-	            	log.error("Query for a search was null");                
+	            	log.error("Query for a search was null");
 	            }
 
 	            SearchResultDocumentList docs = null;
 	            if (queryResponse != null) {
 	            	docs = queryResponse.getResults();
 	            } else {
-	            	log.error("Query response for a search was null");                
+	            	log.error("Query response for a search was null");
 	            }
 
 	            if (docs != null) {
-	            	
+
 	                List<SearchResult> results = new ArrayList<SearchResult>();
 	                for (SearchResultDocument doc : docs) {
-	                    try {                         
+	                    try {
 	                        String uri = doc.getStringValue(VitroSearchTermNames.URI);
 	                        String name = doc.getStringValue(VitroSearchTermNames.NAME_RAW);
-	                        
+
 	                        SearchResult result = new SearchResult(name, uri);
-	                        
+
 	                        // populate result for Google Refine
 							ObjectNode resultJson = JsonNodeFactory.instance.objectNode();
 							Object score = doc.getFirstValue("score");
@@ -316,7 +316,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 							String modUri = result.getUri().replace("#", "%23");
 							resultJson.put("id", modUri);
 							resultJson.put("name", result.getLabel());
-							
+
 							Collection<Object> rdfTypes = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);
 							ArrayNode typesJsonArr = JsonNodeFactory.instance.arrayNode();
 							if (rdfTypes != null) {
@@ -347,7 +347,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 						}
 					}
 	            } else {
-	            	log.error("Docs for a search was null");                
+	            	log.error("Docs for a search was null");
 	            }
 				resultAllJson.put("result", resultJsonArr);
 				qJson.put(key, resultAllJson);
@@ -368,91 +368,91 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	}
 
     protected SearchQuery getQuery(String queryStr, String searchType, int limit, ArrayList<String[]> propertiesList) {
-        
+
         if ( queryStr == null) {
-            log.error("There was no parameter '"+ PARAM_QUERY            
-                +"' in the request.");                
+            log.error("There was no parameter '"+ PARAM_QUERY
+                +"' in the request.");
             return null;
         } else if( queryStr.length() > MAX_QUERY_LENGTH ) {
             log.debug("The search was too long. The maximum " +
                     "query length is " + MAX_QUERY_LENGTH );
             return null;
         }
-                   
+
         /// original
         ///SearchQuery query = new SearchQuery();
-        
+
         /// test
         SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery(queryStr.toLowerCase());
 
         // original code:
-        // query.setStart(0).setRows(DEFAULT_MAX_HIT_COUNT);  
+        // query.setStart(0).setRows(DEFAULT_MAX_HIT_COUNT);
         // Google Refine specific:
         query.setStart(0).setRows(limit);
-        
+
         // TODO: works better without using tokenizeNameQuery(), need to investigate a bit more
         /// comment out original: query.setQuery(queryStr);
-        
+
         // Filter by type
         // e.g. http://xmlns.com/foaf/0.1/Person
         if (searchType != null) {
         	query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + searchType + "\"");
-        }        
-        
+        }
+
         // Added score to original code:
         query.addFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, "*", "score"); // fields to retrieve
- 
+
 		// if propertiesList has elements, add extra queries to query
 		for (String[] pvPair : propertiesList) {
 			query.addFilterQueries(tokenizeNameQuery(pvPair[1]), VitroSearchTermNames.RDFTYPE + ":\"" + pvPair[0] + "\"");
-		}       
+		}
 
         // Can't sort on multivalued field, so we sort the results in Java when we get them.
         // query.addSortField(VitroSearchTermNames.NAME_LOWERCASE, Order.ASC);
-        
+
         return query;
     }
- 
 
-    
+
+
     private String tokenizeNameQuery(String queryStr) {
         /* We currently have no use case for a tokenized, unstemmed autocomplete search field, so the option
          * has been disabled. If needed in the future, will need to add a new field and field type which
          * is like AC_NAME_STEMMED but doesn't include the stemmer.
-        String stemParam = (String) request.getParameter("stem"); 
+        String stemParam = (String) request.getParameter("stem");
         boolean stem = "true".equals(stemParam);
         if (stem) {
             String acTermName = VitroSearchTermNames.AC_NAME_STEMMED;
             String nonAcTermName = VitroSearchTermNames.NAME_STEMMED;
         } else {
             String acTermName = VitroSearchTermNames.AC_NAME_UNSTEMMED;
-            String nonAcTermName = VitroSearchTermNames.NAME_UNSTEMMED;        
+            String nonAcTermName = VitroSearchTermNames.NAME_UNSTEMMED;
         }
         */
-        
+
         String acTermName = VitroSearchTermNames.AC_NAME_STEMMED;
         String nonAcTermName = VitroSearchTermNames.NAME_STEMMED;
         String acQueryStr;
-        
+
         if (queryStr.endsWith(" ")) {
-            acQueryStr = makeTermQuery(nonAcTermName, queryStr, true);    
+            acQueryStr = makeTermQuery(nonAcTermName, queryStr, true);
         } else {
             int indexOfLastWord = queryStr.lastIndexOf(" ") + 1;
             List<String> terms = new ArrayList<String>(2);
-            
+
             String allButLastWord = queryStr.substring(0, indexOfLastWord);
             if (StringUtils.isNotBlank(allButLastWord)) {
                 terms.add(makeTermQuery(nonAcTermName, allButLastWord, true));
             }
-            
+
             String lastWord = queryStr.substring(indexOfLastWord);
             if (StringUtils.isNotBlank(lastWord)) {
                 terms.add(makeTermQuery(acTermName, lastWord, false));
             }
-            
+
             acQueryStr = StringUtils.join(terms, " AND ");
         }
-        
+
         log.debug("Tokenized name query string = " + acQueryStr);
         return acQueryStr;
     }
@@ -469,23 +469,23 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         return queryStr.replaceAll("\\s+", "\\\\ ");
     }
 
-    public class SearchResult implements Comparable<Object> {
+    public class SearchResult implements Comparable<SearchResult> {
         private String label;
         private String uri;
-        
+
         SearchResult(String label, String uri) {
             this.label = label;
             this.uri = uri;
         }
-        
+
         public String getLabel() {
             return label;
         }
-        
+
         public String getUri() {
             return uri;
         }
-        
+
         Map<String, String> toMap() {
             Map<String, String> map = new HashMap<String, String>();
             map.put("label", label);
@@ -493,7 +493,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
             return map;
         }
 
-        public int compareTo(Object o) throws ClassCastException {
+        public int compareTo(SearchResult o) throws ClassCastException {
             if ( !(o instanceof SearchResult) ) {
                 throw new ClassCastException("Error in SearchResult.compareTo(): expected SearchResult object.");
             }

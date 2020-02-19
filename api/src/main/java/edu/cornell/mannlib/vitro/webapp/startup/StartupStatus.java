@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Accumulates a list of messages from the StartupManager, and from the context
  * listeners that the run during startup.
- * 
+ *
  * This is thread-safe, with immutable items in the list and synchronized access
  * to the list.
  */

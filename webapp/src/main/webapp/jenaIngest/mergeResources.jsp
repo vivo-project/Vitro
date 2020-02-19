@@ -17,13 +17,13 @@
 
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Merge Resources</h2>
 
-<p>This tool allows two resources with different URIs to be collapsed into a 
-   single URI. Any statements using the "duplicate resource URI" will be 
-   rewritten using the "primary resource URI."  If there are multiple 
+<p>This tool allows two resources with different URIs to be collapsed into a
+   single URI. Any statements using the "duplicate resource URI" will be
+   rewritten using the "primary resource URI."  If there are multiple
    statements for a property that can have only a single value, the extra
    statements will be retracted from the model and offered for download.</p>
-<p>This tool operates on the main web application model only, not on any 
-   of the additional Jena models.</p> 
+<p>This tool operates on the main web application model only, not on any
+   of the additional Jena models.</p>
 
 <form id="takeuri" action="ingest" method="get">
     <input type="hidden" name="action" value="mergeResources"/>

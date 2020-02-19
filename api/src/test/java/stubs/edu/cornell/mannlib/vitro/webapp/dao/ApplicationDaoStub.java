@@ -9,7 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 
 /**
  * A minimal implementation of the ApplicationDao.
- * 
+ *
  * I have only implemented the methods that I needed. Feel free to implement
  * others.
  */

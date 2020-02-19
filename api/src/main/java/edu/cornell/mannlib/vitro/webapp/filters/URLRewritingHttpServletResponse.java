@@ -24,13 +24,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/*implements HttpServletResponse */{
 
 	private final static Log log = LogFactory.getLog(URLRewritingHttpServletResponse.class);
-	
+
 	private HttpServletResponse _response;
 	private ServletContext _context;
 	private WebappDaoFactory wadf;
 	private int contextPathDepth;
 	private Pattern slashPattern = Pattern.compile("/");
-	
+
 	public URLRewritingHttpServletResponse(HttpServletResponse response, HttpServletRequest request, ServletContext context) {
 	    super(response);
 		this._response = response;
@@ -38,12 +38,12 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 		this.wadf =	ModelAccess.on(context).getWebappDaoFactory();
 		this.contextPathDepth = slashPattern.split(request.getContextPath()).length-1;
 	}
-		
+
 	/** for testing. */
 	protected URLRewritingHttpServletResponse(HttpServletResponse res){
 	    super(res);
 	}
-	
+
 	/**
 	 * @deprecated
 	 */
@@ -54,7 +54,7 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 	public String encodeRedirectURL(String arg0) {
 		return _response.encodeRedirectURL(arg0);
 	}
-	
+
 	/**
 	 * @deprecated
 	 */
@@ -75,7 +75,7 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
             log.debug("externallyLinkedNamespaces " + externallyLinkedNamespaces);
             log.debug( inUrl );
         }
-        
+
 	    String encodedUrl = encodeForVitro(
 	            inUrl,
 	            this.getCharacterEncoding(),
@@ -85,20 +85,20 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 	            wadf.getDefaultNamespace(),
 	            externallyLinkedNamespaces
 	            );
-	    
+
 	    log.debug(encodedUrl);
 	    log.debug("END");
 	    return encodedUrl;
 	}
-	
+
 	/**
-	 * bdc34: Isolating this method for unit 
-	 * testing purposes.  This method should not use 
-	 * any object properties, only objects passed into method. 
+	 * bdc34: Isolating this method for unit
+	 * testing purposes.  This method should not use
+	 * any object properties, only objects passed into method.
 	 */
 	protected String encodeForVitro(
-	        String inUrl, 
-	        String characterEncoding, 
+	        String inUrl,
+	        String characterEncoding,
 	        Boolean isSInglePortal,
 	        int contextPathDepth,
 	        NamespaceMapper nsMap,
@@ -112,19 +112,19 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 			if (url.host != null) {
 				// if it's not an in-context URL, we don't want to mess with it
 				// It looks like encodeURL isn't even called for external URLs
-			    //String rv = _response.encodeURL(inUrl); 
+			    //String rv = _response.encodeURL(inUrl);
 	            String rv = inUrl;
 			    if( log.isDebugEnabled()){
 			        log.debug("Encoded as  '"+rv+"'");
 			    }
 				return rv;
 			}
-			
+
 			// rewrite "entity" as "individual"
 			if ("entity".equals(url.pathParts.get(url.pathParts.size()-1))) {
 				url.pathParts.set(url.pathParts.size()-1, "individual");
 			}
-			
+
 			// rewrite individual URI parameters as pretty URLs if possible
 			if ("individual".equals(url.pathParts.get(url.pathParts.size()-1))) {
 				Iterator<String[]> qpIt = url.queryParams.iterator();
@@ -138,7 +138,7 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 							IndividualImpl uri = new IndividualImpl(keyAndValue[1]);
 							String namespace = uri.getNamespace();
 							String localName = uri.getLocalName();
-							if ( (namespace != null) && (localName != null) ) { 
+							if ( (namespace != null) && (localName != null) ) {
 								String prefix = nsMap.getPrefixForNamespace(namespace);
 								if (defaultNamespace.equals(namespace) && prefix == null) {
 									// make a URI that matches the URI
@@ -147,7 +147,7 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 									url.pathParts.add(localName);
 									// remove the ugly uri parameter
 									indexToRemove = qpIndex;
-							    // namespace returned from URIImpl.getNamespace() ends in a slash, so will 
+							    // namespace returned from URIImpl.getNamespace() ends in a slash, so will
 							    // match externally linked namespaces, which also end in a slash
 								} else if (isExternallyLinkedNamespace(namespace,externalNamespaces)) {
 								    log.debug("Found externally linked namespace " + namespace);
@@ -183,7 +183,7 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 				if (indexToRemove > -1) {
 					url.queryParams.remove(indexToRemove);
 				}
-	
+
 			}
 			//String rv = _response.encodeURL(_response.encodeURL(url.toString()));
 	         String rv = url.toString();
@@ -191,17 +191,17 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 			    log.debug("Encoded as  '" + rv + "'");
 			}
 			return rv;
-		} catch (Exception e) {			
-			log.error(e,e);			
+		} catch (Exception e) {
+			log.error(e,e);
             //String rv =  _response.encodeURL(inUrl);
 			String rv =  inUrl;
             log.error("Encoded as  '"+rv+"'");
 			return rv;
 		}
-	}	
-	
-	private boolean isExternallyLinkedNamespace(String namespace,List<String> externallyLinkedNamespaces) {	    
+	}
+
+	private boolean isExternallyLinkedNamespace(String namespace,List<String> externallyLinkedNamespaces) {
 	    return externallyLinkedNamespaces.contains(namespace);
 	}
-	
+
 }

@@ -35,9 +35,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 
 /**
  * Process SPARQL Updates, as an API.
- * 
+ *
  * Supports only POST requests, not GET or HEAD. May produce these responses:
- * 
+ *
  * <pre>
  * 200 Success
  * 400 Failed to parse SPARQL update

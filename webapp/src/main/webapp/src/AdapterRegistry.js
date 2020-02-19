@@ -16,7 +16,7 @@ dojo.AdapterRegistry = function(){
         A registry to facilitate adaptation.
 
         Pairs is an array of [name, check, wrap] triples
-        
+
         All check/wrap functions in this registry should be of the same arity.
     ***/
     this.pairs = [];

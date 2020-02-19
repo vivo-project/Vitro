@@ -1,17 +1,17 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
-  
+
 // Sets up event listeners so that the submit button gets enabled only if the user has changed
 // an existing value.
 //
 // Used with both the userAccounts--myAccounts.ftl and userAccounts--edit.ftl.
-    
+
 $(document).ready(function(){
 
     var theForm = $('form').last();
     var theSubmitButton = theForm.find(':submit');
 
     theSubmitButton.addClass("disabledSubmit");
-    
+
     function disableSubmit() {
         theSubmitButton.removeAttr('disabled');
         theSubmitButton.removeClass("disabledSubmit");
@@ -35,7 +35,7 @@ $(document).ready(function(){
             disableSubmit()
         });
     });
-    
+
     $('.remove-proxy').click(function(){
         disableSubmit()
     })

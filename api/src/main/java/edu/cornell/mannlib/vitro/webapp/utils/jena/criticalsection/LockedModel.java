@@ -9,13 +9,13 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractModelDecorat
 /**
  * A model that is easy to use in a try-with-resources code block. It can only
  * be created by locking a LockableModel.
- * 
+ *
  * <pre>
  * try (LockedModel m = lockableModel.read()) {
  *    ...
  * }
  * </pre>
- * 
+ *
  * The close method has been hijacked to simply release the lock, and not to
  * actually close the wrapped model.
  */

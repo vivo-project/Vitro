@@ -10,7 +10,7 @@ function ValidateForm(formName) {
 
     // Check for Email formatting
     if (document.forms[formName].EmailFields) {
-        errorList = '\n' + i18nStrings.pleaseFormatEmail + '\n\n \"userid@institution.edu\" \n\n' 
+        errorList = '\n' + i18nStrings.pleaseFormatEmail + '\n\n \"userid@institution.edu\" \n\n'
                     + i18nStrings.enterValidAddress;
         // build array of required fields
         emailStr = document.forms[formName].EmailFields.value;

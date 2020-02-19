@@ -14,7 +14,7 @@
                 <#-- Only render classgroups that have at least one populated class -->
                 <#if (classGroup.individualCount > 0)>
 
-                    <#list classGroup.classes as class>  
+                    <#list classGroup.classes as class>
                         <#if (class.individualCount > 0)>
                             <#assign groupSize = groupSize + 1 >
                         </#if>
@@ -23,7 +23,7 @@
                     <li class="wookmark-group" style="float: left;">
                     <h2>${classGroup.displayName}</h2>
                         <ul id="class-group-list" role="list">
-                            <#list classGroup.classes as class> 
+                            <#list classGroup.classes as class>
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>
                                     <li role="listitem"><a href="${class.url}" title="${i18n().class_name}">${class.name}</a> (${class.individualCount})</li>

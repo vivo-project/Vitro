@@ -27,12 +27,12 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 public class IndividualRequestAnalyzer {
 	private static final Log log = LogFactory
 			.getLog(IndividualRequestAnalyzer.class);
-	
-	
+
+
 	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]+)/\\1\\.(rdf|n3|ttl|jsonld)$");
     private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]+)$");
-	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");		
-	
+	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");
+
 	private final VitroRequest vreq;
 	private final IndividualRequestAnalysisContext analysisContext;
 	private final String url;
@@ -55,27 +55,27 @@ public class IndividualRequestAnalyzer {
 		if (redirectUrl != null) {
 			return IndividualRequestInfo.buildRdfRedirectInfo(redirectUrl);
 		}
-	
+
 		// Figure out what individual we are talking about. If we can't figure
 		// it out, complain.
 		Individual individual = getIndividualFromRequest();
 		if (individual == null) {
 			return IndividualRequestInfo.buildNoIndividualInfo();
 		}
-	
+
 		// If the requested individual is a FileBytestream, redirect to its
 		// "alias URL".
 		redirectUrl = getAliasUrlForBytestreamIndividual(individual);
 		if (redirectUrl != null) {
 			return IndividualRequestInfo.buildBytestreamRedirectInfo(redirectUrl);
 		}
-	
+
 		// Check to see whether Linked Data was requested.
 		ContentType rdfFormat = checkUrlForLinkedDataRequest();
 		if (rdfFormat != null) {
 			return IndividualRequestInfo.buildLinkedDataInfo(individual, rdfFormat);
 		}
-	
+
 		// No redirect, no Linked Data; no problem.
 		return IndividualRequestInfo.buildDefaultInfo(individual);
 	}
@@ -95,7 +95,7 @@ public class IndividualRequestAnalyzer {
 	 */
 	private static Pattern URI_PATTERN = Pattern
 			.compile("^/individual/([^/]*)$");
-	
+
 	private String checkForRedirect() {
 		// A "format" parameter is special, and is dealt with elsewhere.
 		String formatParam = getRequestParameter("format", "");
@@ -126,7 +126,7 @@ public class IndividualRequestAnalyzer {
 		// or redirect to the canonical URL for HTML representation.
 		return "/display/" + m.group(1);
 	}
-	
+
 	/**
 	 * Check the accept header. This request will trigger a redirect with a 303
 	 * ("see also"), because the request is for an individual but the server can
@@ -134,17 +134,17 @@ public class IndividualRequestAnalyzer {
 	 */
 	protected ContentType checkAcceptHeaderForLinkedDataRequest() {
 		String acceptHeader = vreq.getHeader("Accept");
-		if (acceptHeader == null) 
-		    acceptHeader = vreq.getHeader("accept");		   
 		if (acceptHeader == null)
-			return null;		
-	
+		    acceptHeader = vreq.getHeader("accept");
+		if (acceptHeader == null)
+			return null;
+
 		try {
 			Map<String, Float> typesAndQ = ContentType
 					.getTypesAndQ(acceptHeader);
 			String ctStr = ContentType.getBestContentType(typesAndQ,
 					IndividualController.ACCEPTED_CONTENT_TYPES);
-	
+
 			if (RDFXML_MIMETYPE.equals(ctStr) || N3_MIMETYPE.equals(ctStr)
 					|| TTL_MIMETYPE.equals(ctStr) || JSON_MIMETYPE.equals(ctStr)
 					|| JSON_LD_MIMETYPE.equals(ctStr)) {
@@ -155,23 +155,23 @@ public class IndividualRequestAnalyzer {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Gets the entity id from the request. Works for the following styles of
 	 * URLs:
-	 * 
+	 *
 	 * <pre>
 	 *     /individual?uri=urlencodedURI
 	 *     /individual?netId=bdc34
 	 *     /individual?netid=bdc34
-	 *     /individual/localname         
+	 *     /individual/localname
 	 *     /display/localname
 	 *     /individual/localname/localname.rdf
 	 *     /individual/localname/localname.n3
 	 *     /individual/localname/localname.ttl
 	 *     /individual/localname/localname.jsonld
 	 * </pre>
-	 * 
+	 *
 	 * @return null on failure.
 	 */
 	public Individual getIndividualFromRequest() {
@@ -181,32 +181,32 @@ public class IndividualRequestAnalyzer {
 			if (!uri.isEmpty()) {
 				return getIndividualByUri(uri);
 			}
-	
+
 			// Check for "netId" or "netid" parameter
 			String netId = getRequestParameter("netId",
 					getRequestParameter("netid", ""));
 			if (!netId.isEmpty()) {
 				return getIndividualByNetId(netId);
 			}
-	
+
 			// Check for just a local name
 			Matcher linkedDataMatch = LINKED_DATA_URL.matcher(url);
 			if (linkedDataMatch.matches() && linkedDataMatch.groupCount() == 1) {
 				return getIndividualByLocalname(linkedDataMatch.group(1));
 			}
-	
+
 			// Check for the canonical HTML request.
 			Matcher htmlMatch = HTML_REQUEST.matcher(url);
 			if (htmlMatch.matches() && htmlMatch.groupCount() == 1) {
 				return getIndividualByLocalname(htmlMatch.group(1));
 			}
-	
+
 			// Check for a request for RDF.
 			Matcher rdfMatch = RDF_REQUEST.matcher(url);
 			if (rdfMatch.matches() && rdfMatch.groupCount() == 2) {
 				return getIndividualByLocalname(rdfMatch.group(1));
 			}
-	
+
 			// Couldn't match it to anything.
 			return null;
 		} catch (Throwable e) {
@@ -214,10 +214,10 @@ public class IndividualRequestAnalyzer {
 			return null;
 		}
 	}
-	
+
 	private String getAliasUrlForBytestreamIndividual(Individual individual) {
 		String aliasUrl =  analysisContext.getAliasUrlForBytestreamIndividual(individual);
-		
+
 		if (individual.getURI().equals(aliasUrl)) {
 			// Avoid a tight loop; if the alias URL is equal to the URI,
 			// then don't recognize it as a FileBytestream.
@@ -230,7 +230,7 @@ public class IndividualRequestAnalyzer {
 	/**
 	 * @return null if this is not a linked data request, returns content type
 	 *         if it is a linked data request.
-	 * 
+	 *
 	 *         These are Vitro-specific ways of requesting rdf, unrelated to
 	 *         semantic web standards. They do not trigger a redirect with a
 	 *         303, because the request is for a set of bytes rather than an
@@ -254,7 +254,7 @@ public class IndividualRequestAnalyzer {
         if (formatParam.contains("jsonld") || formatParam.contains("json")){
             return ContentType.JSON;
         }
-                
+
 		/*
 		 * Check for parts of URL that indicate request for RDF. Examples:
 		 * http://vivo.cornell.edu/individual/n23/n23.rdf
@@ -281,7 +281,7 @@ public class IndividualRequestAnalyzer {
 
 		return null;
 	}
-	
+
 
 
 	private String getRequestParameter(String key, String defaultValue) {

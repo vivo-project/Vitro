@@ -15,12 +15,12 @@ public class FilteredResultSet implements ResultSet {
     protected Iterator<QuerySolution> solutIt;
     protected ResultSet originalResultSet;
     protected int rowNum = -1;
-    
+
     public FilteredResultSet (List<QuerySolution> solutions, ResultSet originalResultSet) {
         this.solutIt = solutions.iterator();
         this.originalResultSet = originalResultSet;
     }
-    
+
     @Override
     public void remove() {
         throw new UnsupportedOperationException("Attempt to remove an element");

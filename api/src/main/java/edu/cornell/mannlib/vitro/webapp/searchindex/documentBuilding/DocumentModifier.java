@@ -7,14 +7,14 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument
 
 /**
  * An object that can add to a SearchInputDocument.
- * 
+ *
  * Implementations must be thread-safe.
  */
 public interface DocumentModifier {
 	/**
 	 * Use the rules contained within this class to modify this search document,
 	 * according to the characteristics of this individual.
-	 * 
+	 *
 	 * @param individual
 	 *            The individual that is being indexed. Will not be null.
 	 * @param doc

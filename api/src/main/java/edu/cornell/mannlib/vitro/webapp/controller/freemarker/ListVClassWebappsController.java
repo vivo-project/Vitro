@@ -33,17 +33,17 @@ import javax.servlet.annotation.WebServlet;
 public class ListVClassWebappsController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ListVClassWebappsController.class.getName());
-    
+
     private static final String TEMPLATE_NAME = "siteAdmin-classHierarchy.ftl";
-        
+
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
-    
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        
+
         Map<String, Object> body = new HashMap<String, Object>();
 
         body.put("displayOption", "all");
@@ -130,8 +130,8 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
 				}
 			}
             body.put("jsonTree", json.toString());
-        }      
-        
+        }
+
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
 

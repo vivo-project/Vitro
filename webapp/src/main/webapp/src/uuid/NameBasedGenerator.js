@@ -13,7 +13,7 @@ dojo.provide("dojo.uuid.NameBasedGenerator");
 dojo.uuid.NameBasedGenerator = new function() {
 
 /**
- * This function generates name-based UUIDs, meaning "version 3" 
+ * This function generates name-based UUIDs, meaning "version 3"
  * and "version 5" UUIDs.
  *
  * Examples:
@@ -28,12 +28,12 @@ dojo.uuid.NameBasedGenerator = new function() {
  */
 	this.generate = function(returnType) {
 		dojo.unimplemented('dojo.uuid.NameBasedGenerator.generate');
-		
+
 		// FIXME:
-		// For an algorithm to generate name-based UUIDs, 
+		// For an algorithm to generate name-based UUIDs,
 		// see sections 4.3 of RFC 4122:
 		//  http://www.ietf.org/rfc/rfc4122.txt
-		
+
 		var returnValue = "00000000-0000-0000-0000-000000000000"; // FIXME
 		if (returnType && (returnType != String)) {
 			returnValue = new returnType(returnValue);

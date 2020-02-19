@@ -118,7 +118,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		super.init();
 		fileStorage = ApplicationUtils.instance().getFileStorage();
 	}
-	
+
 	/**
 	 * How large an image file will we accept?
 	 */
@@ -144,7 +144,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			String action = vreq.getParameter(PARAMETER_ACTION);
 			Individual entity = validateEntityUri(vreq);
 			String imageUri = entity.getMainImageUri();
-			
+
 			Property indMainImage = new Property();
 			indMainImage.setURI(VitroVocabulary.IND_MAIN_IMAGE);
 
@@ -178,9 +178,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		Individual entity = null;
 		try {
 			entity = validateEntityUri(vreq);
-			
+
 			checkForFileTooBigException(vreq);
-			
+
 			String action = vreq.getParameter(PARAMETER_ACTION);
 			if (ACTION_UPLOAD.equals(action)) {
 				return doUploadImage(vreq, entity);
@@ -388,7 +388,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	/**
 	 * The individual has no image - go to the Add Image page.
-	 * 
+	 *
 	 * @param entity
 	 *            if this is null, then all URLs lead to the welcome page.
 	 */

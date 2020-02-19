@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
 /**
  * On what basis are we selecting user accounts?
- * 
+ *
  * Search terms are matched against email, and against firstName combined with
  * lastName. Searches are case-insensitive.
  */

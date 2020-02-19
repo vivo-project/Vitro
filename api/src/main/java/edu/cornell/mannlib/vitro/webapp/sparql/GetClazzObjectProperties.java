@@ -106,10 +106,10 @@ public class GetClazzObjectProperties extends BaseEditController {
 
 	/**
 	 * The doPost method of the servlet. <br>
-	 * 
+	 *
 	 * This method is called when a form has its tag value method equals to
 	 * post.
-	 * 
+	 *
 	 * @param request
 	 *            the request send by the client to the server
 	 * @param response

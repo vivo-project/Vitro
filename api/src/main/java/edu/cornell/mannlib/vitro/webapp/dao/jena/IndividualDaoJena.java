@@ -124,7 +124,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     public List<Individual> getIndividualsByVClass(VClass vclass ) {
         return getIndividualsByVClassURI(vclass.getURI(),-1,-1);
     }
-    
+
     public List<Individual> getIndividualsByVClassURI(String vclassURI) {
         return getIndividualsByVClassURI(vclassURI,-1,-1);
     }
@@ -134,15 +134,15 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     	if (vclassURI==null) {
             return null;
         }
-        
+
         List<Individual> ents = new ArrayList<Individual>();
-        
-        Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0) 
+
+        Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0)
             ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
             : ResourceFactory.createResource(vclassURI);
-    
-        
-        
+
+
+
         if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
         	UnionClass u = theClass.as(UnionClass.class);
         	for (OntClass operand : u.listOperands().toList()) {
@@ -167,7 +167,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         		ontModel.leaveCriticalSection();
         	}
         }
-        
+
 
         java.util.Collections.sort(ents);
 
@@ -204,19 +204,19 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
      * Note that a number of magic things happen in here.
      */
     public String insertNewIndividual(Individual ent, OntModel ontModel) throws InsertException {
-    	
-        String preferredURI = getUnusedURI(ent);          
-           
+
+        String preferredURI = getUnusedURI(ent);
+
         String entURI = null;
-        
-    	Resource cls = (ent.getVClassURI() != null) 
+
+    	Resource cls = (ent.getVClassURI() != null)
             ? ontModel.getResource(ent.getVClassURI())
             : OWL.Thing; // This assumes we want OWL-DL compatibility.
                          // Individuals cannot be untyped.
-        
+
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
-         
+
             entURI = preferredURI;
             org.apache.jena.ontology.Individual test = ontModel.getIndividual(entURI);
             int count = 0;
@@ -225,7 +225,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 entURI = preferredURI + count;
                 test = ontModel.getIndividual(entURI);
             }
-            
+
             try {
                 ontModel.getBaseModel().notifyEvent(new IndividualCreationEvent(getWebappDaoFactory().getUserURI(),true,entURI));
                 org.apache.jena.ontology.Individual ind = ontModel.createIndividual(entURI,cls);
@@ -241,7 +241,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 addPropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
                 if (ent.getMainImageUri() != null) {
                 	addPropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri());
-                }                
+                }
                 if( ent.getSearchBoost() != null ) {
                     addPropertyFloatValue(ind,SEARCH_BOOST_ANNOT, ent.getSearchBoost(), ontModel);
                 }
@@ -287,7 +287,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             org.apache.jena.ontology.Individual ind = ontModel.getIndividual(ent.getURI());
             if (ind != null) {
                 if (ent.getName() != null && ( (ind.getLabel(getDefaultLanguage())==null) || (ind.getLabel(getDefaultLanguage())!=null && ent.getName()!=null && !ent.getName().equals(ind.getLabel(getDefaultLanguage())) ) ) ) {
-                	
+
                 	// removal of existing values done this odd way to trigger
                 	// the change listeners
                 	Model temp = ModelFactory.createDefaultModel();
@@ -408,10 +408,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             return null;
 
         OntModel ontModel = getOntModelSelector().getABoxModel();
-        
+
         ontModel.enterCriticalSection(Lock.READ);
         try {
-        	OntResource ontRes = (entityURI.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) 
+        	OntResource ontRes = (entityURI.startsWith(VitroVocabulary.PSEUDO_BNODE_NS))
         		? (OntResource) ontModel.createResource(new AnonId(entityURI.substring(VitroVocabulary.PSEUDO_BNODE_NS.length()))).as(OntResource.class)
         		: ontModel.getOntResource(entityURI);
             Individual ent = new IndividualJena(ontRes, getWebappDaoFactory());
@@ -430,12 +430,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     /**
      * In Jena it can be difficult to get an object with a given dataproperty if
      * you do not care about the datatype or lang of the literal.  Use this
-     * method if you would like to ignore the lang and datatype.  
-     * 
-     * Note: this method doesn't require that a property be declared in the 
+     * method if you would like to ignore the lang and datatype.
+     *
+     * Note: this method doesn't require that a property be declared in the
      * ontology as a data property -- only that it behaves as one.
      */
-    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value){        
+    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value){
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
@@ -443,7 +443,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             prop = getOntModel().getProperty(dataPropertyUri);
         }
 
-        if( prop == null ) {            
+        if( prop == null ) {
             log.debug("Could not getIndividualsByDataProperty() " +
                     "because " + dataPropertyUri + "was not found in model.");
             return Collections.emptyList();
@@ -454,114 +454,114 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     "because value was null");
             return Collections.emptyList();
         }
-        
-        Literal litv1 = getOntModel().createLiteral(value);        
-        Literal litv2 = getOntModel().createTypedLiteral(value);   
-        
+
+        Literal litv1 = getOntModel().createLiteral(value);
+        Literal litv2 = getOntModel().createTypedLiteral(value);
+
         //warning: this assumes that any language tags will be EN
-        Literal litv3 = getOntModel().createLiteral(value,"EN");        
-        
+        Literal litv3 = getOntModel().createLiteral(value,"EN");
+
         HashMap<String,Individual> individualsMap = new HashMap<String, Individual>();
-                
+
         getOntModel().enterCriticalSection(Lock.READ);
         int count = 0;
         try{
             StmtIterator stmts
-                = getOntModel().listStatements((Resource)null, prop, litv1);                                           
+                = getOntModel().listStatements((Resource)null, prop, litv1);
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
-                
+
                 RDFNode sub = stmt.getSubject();
-                if( sub == null || sub.isAnon() || sub.isLiteral() )                    
-                    continue;                
-                
+                if( sub == null || sub.isAnon() || sub.isLiteral() )
+                    continue;
+
                 RDFNode obj = stmt.getObject();
                 if( obj == null || !obj.isLiteral() )
                     continue;
-                
+
                 Literal literal = (Literal)obj;
                 Object v = literal.getValue();
-                if( v == null )                     
-                    continue;                
-                
+                if( v == null )
+                    continue;
+
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     org.apache.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
                     individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
                 }
             }
-            
-            stmts = getOntModel().listStatements((Resource)null, prop, litv2);                                           
+
+            stmts = getOntModel().listStatements((Resource)null, prop, litv2);
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
-                
+
                 RDFNode sub = stmt.getSubject();
-                if( sub == null || sub.isAnon() || sub.isLiteral() )                    
-                    continue;                
-                
+                if( sub == null || sub.isAnon() || sub.isLiteral() )
+                    continue;
+
                 RDFNode obj = stmt.getObject();
                 if( obj == null || !obj.isLiteral() )
                     continue;
-                
+
                 Literal literal = (Literal)obj;
                 Object v = literal.getValue();
-                if( v == null )                     
-                    continue;                
-                
+                if( v == null )
+                    continue;
+
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     org.apache.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
                     individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
-                }                
+                }
             }
-            
-            stmts = getOntModel().listStatements((Resource)null, prop, litv3);                                           
+
+            stmts = getOntModel().listStatements((Resource)null, prop, litv3);
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
-                
+
                 RDFNode sub = stmt.getSubject();
-                if( sub == null || sub.isAnon() || sub.isLiteral() )                    
-                    continue;                
-                
+                if( sub == null || sub.isAnon() || sub.isLiteral() )
+                    continue;
+
                 RDFNode obj = stmt.getObject();
                 if( obj == null || !obj.isLiteral() )
                     continue;
-                
+
                 Literal literal = (Literal)obj;
                 Object v = literal.getValue();
-                if( v == null )                     
-                    continue;                
-                
+                if( v == null )
+                    continue;
+
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     org.apache.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
                     individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
-                }                
+                }
             }
         } finally {
             getOntModel().leaveCriticalSection();
         }
-        
+
         List<Individual> rv = new ArrayList<Individual>(individualsMap.size());
         rv.addAll(individualsMap.values());
         return rv;
     }
 
-    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value, String datatypeUri, String lang){        
+    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value, String datatypeUri, String lang){
         if( datatypeUri == null && lang == null )
             return getIndividualsByDataProperty(dataPropertyUri,value);
-        
+
         Property prop = null;
-        
+
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
         }else{
             prop = getOntModel().getDatatypeProperty(dataPropertyUri);
         }
-        
+
         if( prop == null || value == null){
             log.debug("Could not getIndividualsByDataProperty() " +
                     "because " + dataPropertyUri + "was not found in model.");
@@ -595,12 +595,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             getOntModel().leaveCriticalSection();
         }
         return inds;
-    }    
+    }
 
     public Collection<String> getAllIndividualUris() {
         //this is implemented in IndivdiualSDB
         throw new NotImplementedException("");
-    }  
+    }
 
     public Iterator<String> getUpdatedSinceIterator(long updatedSince){
         //this is implemented in IndivdiualSDB
@@ -608,30 +608,30 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     }
 
     public boolean isIndividualOfClass(String vclassURI, String indURI) {
-        if( vclassURI == null || indURI == null 
-            || "".equals(vclassURI) || "".equals(indURI)) 
+        if( vclassURI == null || indURI == null
+            || "".equals(vclassURI) || "".equals(indURI))
             return false;
-        return getOntModel().contains(getOntModel().getResource(indURI), 
+        return getOntModel().contains(getOntModel().getResource(indURI),
                     RDF.type ,
-                    getOntModel().getResource(vclassURI));        
+                    getOntModel().getResource(vclassURI));
     }
-    
+
 	public String getUnusedURI(Individual individual) throws InsertException {
-		String errMsg = null;		
+		String errMsg = null;
 		String namespace = null;
 		String uri = null;
 		boolean uriIsGood = false;
-		
-		if ( individual == null || 
-			(individual.getURI() != null && individual.getURI().startsWith( DEFAULT_NAMESPACE ) ) 
-			|| individual.getNamespace() == null 
-			|| individual.getNamespace().length() == 0 
+
+		if ( individual == null ||
+			(individual.getURI() != null && individual.getURI().startsWith( DEFAULT_NAMESPACE ) )
+			|| individual.getNamespace() == null
+			|| individual.getNamespace().length() == 0
 		    || DEFAULT_NAMESPACE.equals(individual.getNamespace()) ){
 			//we always want local names like n23423 for the default namespace
 			namespace = DEFAULT_NAMESPACE;
-			uri = null;			
+			uri = null;
 			log.debug("Setting namespace to default namespace " + DEFAULT_NAMESPACE + " and uri is null");
-			log.debug("Individual : " + individual + " - URI: " + individual.getURI() + " - namespace -" + 
+			log.debug("Individual : " + individual + " - URI: " + individual.getURI() + " - namespace -" +
 			individual.getNamespace() + "- ");
 		}else if( individual.getURI() != null ){
 			errMsg = getWebappDaoFactory().checkURI(individual.getURI());
@@ -662,15 +662,15 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 					if( errMsg == null)
 						uriIsGood = true;
 					else
-						throw new InsertException(errMsg);		
+						throw new InsertException(errMsg);
 					log.debug("uriIsGood is true and uri is " + uri);
 				}
 			}
-			/* else try namespace + n2343 */ 			
+			/* else try namespace + n2343 */
 		}
-		
+
 		int attempts = 0;
-		
+
 		while(!uriIsGood && attempts < 30 ){
 			log.debug("While loop: Uri is good false, attempt=" + attempts);
 			String localName = "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
@@ -680,19 +680,19 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 			if(  errMsg != null)
 				uri = null;
 			else
-				uriIsGood = true;		
+				uriIsGood = true;
 			attempts++;
 		}
-		
+
 		if( uri == null )
 			throw new InsertException("Could not create URI for individual: " + errMsg);
-		log.debug("Using URI" + uri);						
+		log.debug("Using URI" + uri);
 		return uri;
 	}
 
     @Override
     // This method returns an EditLiteral rather than a Jena Literal, since IndividualDao
-    // should not reference Jena objects. (However, the problem isn't really solved 
+    // should not reference Jena objects. (However, the problem isn't really solved
     // because EditLiteral currently references the Jena API.)
     public EditLiteral getLabelEditLiteral(String individualUri) {
         Literal literal = getLabelLiteral(individualUri);
@@ -702,7 +702,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         String value = literal.getLexicalForm();
         String datatype = literal.getDatatypeURI();
         String lang = literal.getLanguage();
-        return new EditLiteral(value, datatype, lang);       
+        return new EditLiteral(value, datatype, lang);
     }
-	
+
 }

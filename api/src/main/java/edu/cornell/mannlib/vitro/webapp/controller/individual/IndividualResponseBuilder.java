@@ -4,7 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.rdf.model.RDFNode;
@@ -42,12 +44,22 @@ import freemarker.template.TemplateModelException;
 /**
  * We have determined that the request is for a normal Individual, and needs an
  * HTML response. Assemble the information for that response.
- * 
+ *
  * TODO clean this up.
  */
 class IndividualResponseBuilder {
 	private static final Log log = LogFactory
 			.getLog(IndividualResponseBuilder.class);
+
+	public interface ExtendedResponse {
+	    void addOptions(VitroRequest vreq, Map<String, Object> body);
+    }
+
+    private static List<ExtendedResponse> extendedResponses = new ArrayList<>();
+
+    public static void registerExtendedResponse(ExtendedResponse extendedResponse) {
+        extendedResponses.add(extendedResponse);
+    }
 	
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
         put("display", VitroVocabulary.DISPLAY);
@@ -70,23 +82,24 @@ class IndividualResponseBuilder {
 		this.opDao = wadf.getObjectPropertyDao();
 
 		this.individual = individual;
-		//initializing execute data retrieval 
+		//initializing execute data retrieval
 		this.eDataRetrieval = new ExecuteDataRetrieval(this.vreq, this.vreq.getDisplayModel(), this.individual);
 	}
 
 
 	ResponseValues assembleResponse() throws TemplateModelException {
 		Map<String, Object> body = new HashMap<String, Object>();
-		
-		body.put("title", individual.getName());            
+
+		body.put("title", individual.getName());
 		body.put("relatedSubject", getRelatedSubject());
 		body.put("namespaces", namespaces);
 		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
 		body.put("profilePageTypesEnabled", getprofilePageTypesFlag());
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
 
-        addAltMetricOptions(body);
-        addPlumPrintOptions(body);
+		for (ExtendedResponse extendedResponse : extendedResponses) {
+		    extendedResponse.addOptions(vreq, body);
+        }
 
 		//Execute data getters that might apply to this individual, e.g. because of the class of the individual
 		try{
@@ -94,8 +107,8 @@ class IndividualResponseBuilder {
 		} catch(Exception ex) {
 			log.error("Data retrieval for individual lead to error", ex);
 		}
-		
-		// for quick profile view - users can toggle between the quick and the full views, 
+
+		// for quick profile view - users can toggle between the quick and the full views,
 		// so the "destination" let's us know which view they are targeting. On normal
 		// page request, this string is empty and the default template is loaded.
         String targetedView = "";
@@ -104,10 +117,10 @@ class IndividualResponseBuilder {
 
 		//Individual template model
 		IndividualTemplateModel itm = getIndividualTemplateModel(individual);
-		/* We need to expose non-getters in displaying the individual's property list, 
+		/* We need to expose non-getters in displaying the individual's property list,
 		 * since it requires calls to methods with parameters.
 		 * This is still safe, because we are only putting BaseTemplateModel objects
-		 * into the data model: no real data can be modified. 
+		 * into the data model: no real data can be modified.
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
@@ -116,17 +129,17 @@ class IndividualResponseBuilder {
 	    body.put("localesCount", SelectedLocale.getSelectableLocales(vreq).size());
 	    body.put("profileType", getProfileType(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
-		
-		body.put("headContent", getRdfLinkTag(itm));	       
-		
+
+		body.put("headContent", getRdfLinkTag(itm));
+
 		//If special values required for individuals like menu, include values in template values
 		body.putAll(getSpecialEditingValues());
-		
+
         // VIVO OpenSocial Extension by UCSF
         try {
-	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, 
+	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq,
 	        		itm.isEditable() ? "individual-EDIT-MODE" : "individual", itm.isEditable());
-	        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
+	        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL,
 	        		OpenSocialManager.buildJSONPersonIds(individual, "1 person found"));
 	        body.put(OpenSocialManager.TAG_NAME, openSocialManager);
 	        if (openSocialManager.isVisible()) {
@@ -136,24 +149,24 @@ class IndividualResponseBuilder {
         	log.error("IOException in doTemplate()", e);
         } catch (SQLException e) {
             log.error("SQLException in doTemplate()", e);
-        }	               
-        
+        }
+
 		String template = new IndividualTemplateLocator(vreq, individual).findTemplate();
-		        
+
 		return new TemplateResponseValues(template, body);
 	}
 
 	/**
 	 * Check if a "relatedSubjectUri" parameter has been supplied, and, if so,
 	 * retrieve the related individual.
-	 * 
+	 *
 	 * Some individuals make little sense standing alone and should be displayed
 	 * in the context of their relationship to another.
 	 */
     private Map<String, Object> getRelatedSubject() {
         Map<String, Object> map = null;
-        
-        String relatedSubjectUri = vreq.getParameter("relatedSubjectUri"); 
+
+        String relatedSubjectUri = vreq.getParameter("relatedSubjectUri");
         if (relatedSubjectUri != null) {
             Individual relatedSubjectInd = iDao.getIndividualByURI(relatedSubjectUri);
             if (relatedSubjectInd != null) {
@@ -161,7 +174,7 @@ class IndividualResponseBuilder {
                 map.put("name", relatedSubjectInd.getName());
 
                 map.put("url", UrlBuilder.getIndividualProfileUrl(relatedSubjectInd, vreq));
-                
+
                 String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
                 if (relatingPredicateUri != null) {
                     ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
@@ -172,52 +185,6 @@ class IndividualResponseBuilder {
             }
         }
         return map;
-    }
-
-    private void addAltMetricOptions(Map<String, Object> body) {
-        ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
-
-        if (properties != null) {
-            String enabled        = properties.getProperty("resource.altmetric", "enabled");
-            String displayTo      = properties.getProperty("resource.altmetric.displayto", "right");
-            String badgeType      = properties.getProperty("resource.altmetric.badge-type", "donut");
-            String badgeHideEmpty = properties.getProperty("resource.altmetric.hide-no-mentions", "true");
-            String badgePopover   = properties.getProperty("resource.altmetric.badge-popover", "right");
-            String badgeDetails   = properties.getProperty("resource.altmetric.badge-details");
-
-            if (!"disabled".equalsIgnoreCase(enabled)) {
-                body.put("altmetricEnabled", true);
-
-                body.put("altmetricDisplayTo", displayTo);
-                body.put("altmetricBadgeType", badgeType);
-                if ("true".equalsIgnoreCase(badgeHideEmpty)) {
-                    body.put("altmetricHideEmpty", true);
-                }
-                body.put("altmetricPopover", badgePopover);
-                body.put("altmetricDetails", badgeDetails);
-            }
-        }
-    }
-
-    private void addPlumPrintOptions(Map<String, Object> body) {
-        ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
-
-        if (properties != null) {
-            String enabled = properties.getProperty("resource.plum-print", "enabled");
-            String displayTo = properties.getProperty("resource.plum-print.displayto", "right");
-            String printHideEmpty = properties.getProperty("resource.plum-print.hide-when-empty", "true");
-            String printPopover = properties.getProperty("resource.plum-print.popover", "right");
-            String printSize = properties.getProperty("resource.plum-print.size", "medium");
-
-            if (!"disabled".equalsIgnoreCase(enabled)) {
-                body.put("plumPrintEnabled", true);
-
-                body.put("plumPrintDisplayTo", displayTo);
-                body.put("plumPrintHideEmpty", "true".equalsIgnoreCase(printHideEmpty) ? "true" : "false");
-                body.put("plumPrintPopover", printPopover);
-                body.put("plumPrintSize", printSize);
-            }
-        }
     }
 
 	private boolean getTemporalVisualizationFlag() {
@@ -234,7 +201,7 @@ class IndividualResponseBuilder {
 
     private Map<String, Object> getVerbosePropertyValues() {
         Map<String, Object> map = null;
-        
+
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_VERBOSE_PROPERTY_INFORMATION.ACTION)) {
             // Get current verbose property display value
             String verbose = vreq.getParameter("verbose");
@@ -244,12 +211,12 @@ class IndividualResponseBuilder {
                 verboseValue = "true".equals(verbose);
             // If form not submitted, get the session value
             } else {
-                Boolean verbosePropertyDisplayValueInSession = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay"); 
+                Boolean verbosePropertyDisplayValueInSession = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
                 // True if session value is true, otherwise (session value is false or null) false
-                verboseValue = Boolean.TRUE.equals(verbosePropertyDisplayValueInSession);           
+                verboseValue = Boolean.TRUE.equals(verbosePropertyDisplayValueInSession);
             }
             vreq.getSession().setAttribute("verbosePropertyDisplay", verboseValue);
-            
+
             map = new HashMap<String, Object>();
             map.put("currentValue", verboseValue);
 
@@ -258,10 +225,10 @@ class IndividualResponseBuilder {
                  the form data is appended to the action with a "?", so there can't already be a query string
                  on it.
                - The browser (at least Firefox) does not submit a form that has no form data.
-               - Some browsers might strip the query string off the form action of a POST - though 
+               - Some browsers might strip the query string off the form action of a POST - though
                  probably they shouldn't, because the HTML spec allows a full URI as a form action.
                - Given these three, the only reliable solution is to dynamically create hidden inputs
-                 for the query parameters. 
+                 for the query parameters.
                - Much simpler is to just create an anchor element. This has the added advantage that the
                  browser doesn't ask to resend the form data when reloading the page.
              */
@@ -280,16 +247,16 @@ class IndividualResponseBuilder {
         } else {
             vreq.getSession().setAttribute("verbosePropertyDisplay", false);
         }
-        
+
         return map;
     }
-    
+
 	private IndividualTemplateModel getIndividualTemplateModel(
 			Individual individual) {
 		//individual.sortForDisplay();
 		return IndividualTemplateModelBuilder.build(individual, vreq);
 	}
-		
+
     private TemplateModel wrap(Object obj, BeansWrapper wrapper) throws TemplateModelException {
         return wrapper.wrap(obj);
     }
@@ -303,15 +270,15 @@ class IndividualResponseBuilder {
         }
         return linkTag;
     }
-    
+
     //Get special values for cases such as Menu Management editing
     private Map<String, Object> getSpecialEditingValues() {
         Map<String, Object> map = new HashMap<String, Object>();
-        
+
     	if(vreq.getAttribute(VitroRequest.SPECIAL_WRITE_MODEL) != null) {
     		map.put("reorderUrl", UrlBuilder.getUrl(DisplayVocabulary.REORDER_MENU_URL));
     	}
-    	
+
     	return map;
     }
 
@@ -321,14 +288,14 @@ class IndividualResponseBuilder {
         + "    ?subject rdfs:label ?label \n"
         + "    FILTER isLiteral(?label) \n"
         + "}" ;
-           
+
     private static String DISTINCT_LANGUAGE_QUERY = ""
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
             + "SELECT ( str(COUNT(DISTINCT lang(?label))) AS ?languageCount ) WHERE { \n"
             + "    ?subject rdfs:label ?label \n"
             + "    FILTER isLiteral(?label) \n"
             + "}" ;
-    
+
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
@@ -346,17 +313,17 @@ class IndividualResponseBuilder {
             }
         } catch (Exception e) {
             log.error(e, e);
-        }    
+        }
         return theCount;
     }
-    
+
     //what is the number of languages represented across the labels
     private static Integer getLanguagesRepresentedCount(String subjectUri, VitroRequest vreq) {
     	   String queryStr = QueryUtils.subUriForQueryVar(DISTINCT_LANGUAGE_QUERY, "subject", subjectUri);
            log.debug("queryStr = " + queryStr);
            int theCount = 0;
            try {
-              
+
                ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
                if (results.hasNext()) {
                    QuerySolution soln = results.nextSolution();
@@ -367,7 +334,7 @@ class IndividualResponseBuilder {
                }
            } catch (Exception e) {
                log.error(e, e);
-           }    
+           }
            return theCount;
     }
 
@@ -376,7 +343,7 @@ class IndividualResponseBuilder {
         + "SELECT ?profile WHERE { \n"
         + "    ?subject display:hasDefaultProfilePageType ?profile \n"
         + "}" ;
-           
+
     private static String getProfileType(String subjectUri, VitroRequest vreq) {
         String queryStr = QueryUtils.subUriForQueryVar(PROFILE_TYPE_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
@@ -392,7 +359,7 @@ class IndividualResponseBuilder {
             }
         } catch (Exception e) {
             log.error(e, e);
-        }    
+        }
         return profileType;
     }
 }

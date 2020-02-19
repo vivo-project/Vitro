@@ -1,8 +1,8 @@
 ﻿/* http://keith-wood.name/realPerson.html
    Real Person Form Submission for jQuery v1.0.1.
    Written by Keith Wood (kwood{at}iinet.com.au) June 2009.
-   Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
-   MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
+   Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and
+   MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses.
    Please attribute the author if you use it. */
 
 (function($) { // Hide scope, no $ conflict

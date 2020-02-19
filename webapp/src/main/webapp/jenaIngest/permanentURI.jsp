@@ -15,19 +15,19 @@
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Assign Permanent URIs To Resources</h2>
 
 <p>This tool will rename the resources in the selected model to with new
-randomly-generated URIs following the pattern used in the main application.  
-The tool will generate URIs that are not already in use in the main web 
-application model. Statements using the newly-renamed resources will be 
-written to the "model to save."</p> 
+randomly-generated URIs following the pattern used in the main application.
+The tool will generate URIs that are not already in use in the main web
+application model. Statements using the newly-renamed resources will be
+written to the "model to save."</p>
 
-<p>The permanent URIs may be generated in an arbitrary "new namespace for 
+<p>The permanent URIs may be generated in an arbitrary "new namespace for
 resources."  Otherwise, the "use default namespace" option will generate
 URIs exactly of the form created through the GUI interface.</p>
 
 <form action="ingest" method="get" >
 <input type="hidden" name="oldModel" value="${modelName}"/>
 <input type="hidden" name="action" value="permanentURI" />
-<p>Current namespace of resources  
+<p>Current namespace of resources
 <select name=oldNamespace>
 <%List namespaces = (List)request.getAttribute("namespaceList");
 if(namespaces != null) {

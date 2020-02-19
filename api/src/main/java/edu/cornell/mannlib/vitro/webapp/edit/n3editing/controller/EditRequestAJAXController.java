@@ -26,22 +26,22 @@ import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
  * by the N3 editing system.  It will examine the request parameters, determine
  * which form to use, execute a EditConfiguration setup, and evaluate the
  * view indicated by the EditConfiguration.
- * 
- * Do not add code to this class to achieve some behavior in a 
+ *
+ * Do not add code to this class to achieve some behavior in a
  * form.  Try adding the behavior logic to the code that generates the
- * EditConfiguration for the form.  
+ * EditConfiguration for the form.
  */
 @WebServlet(name = "EditRequestAJAX", urlPatterns = {"/editRequestAJAX"} )
 public class EditRequestAJAXController extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     public static Log log = LogFactory.getLog(EditRequestDispatchController.class);
-  
-   
+
+
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.DO_FRONT_END_EDITING.ACTION;
 	}
 
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doPost(req, resp);
@@ -65,20 +65,20 @@ public class EditRequestAJAXController extends VitroHttpServlet {
         } catch(Exception ex) {
         	log.error("An error occurred in retrieving configuration and/or generator ", ex);
         }
-        
+
     }
-    
+
     protected EditConfigurationVTwo getEditConfiguration(VitroRequest vreq) {
-    	
+
     	EditConfigurationVTwo config = EditConfigurationVTwo.getConfigFromSession(vreq.getSession(), vreq);
     	return config;
     }
-    
+
     private EditConfigurationAJAXGenerator getAJAXGenerator(
             String editConfGeneratorName, VitroRequest vreq, HttpSession session) throws Exception {
-    	
+
     	EditConfigurationAJAXGenerator EditConfigurationVTwoGenerator = null;
-    	
+
         Object object = null;
         try {
             Class classDefinition = Class.forName(editConfGeneratorName);
@@ -89,12 +89,12 @@ public class EditRequestAJAXController extends VitroHttpServlet {
         }
 
         if(EditConfigurationVTwoGenerator == null){
-        	throw new Error("Could not find EditConfigurationVTwoGenerator " + editConfGeneratorName);        	
+        	throw new Error("Could not find EditConfigurationVTwoGenerator " + editConfGeneratorName);
         } else {
            return EditConfigurationVTwoGenerator;
         }
-        
+
     }
 
-    
+
 }

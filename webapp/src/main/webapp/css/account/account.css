@@ -7,7 +7,7 @@
     line-height: 1.5em;
     border: 1px dotted #E2C822;
     background-color: #FFF9D7;
-    padding: .5em;  
+    padding: .5em;
     margin-bottom: 20px;
 }
 input#externalAuthChkBox {
@@ -25,22 +25,22 @@ input#externalAuthChkBox {
     height: 60px;
 }
 .account-alpha-browse {
-    width: 10px; 
+    width: 10px;
     height: 22px;
-    float: right; 
-    padding-right: 10px; 
+    float: right;
+    padding-right: 10px;
 }
 .sort-asc {
      width: 9px;
      height:10px;
-     padding-top: 4px; 
+     padding-top: 4px;
      background: url(../../images/account/sort-asc.gif) 0 4px no-repeat;
      display: block;
 }
 .sort-desc {
      width: 9px;
      height:10px;
-     padding-bottom: 4px; 
+     padding-bottom: 4px;
      background: url(../../images/account/sort-desc.gif) 0 4px no-repeat;
      display: block;
 }
@@ -126,12 +126,12 @@ padding-right: 5px;
     font-style:bold;
     width:280px;
     margin-left:10px;
-    line-height:15px; 
+    line-height:15px;
     margin-top:-8px !important;
 }
 #associated,
 #associationOptions {
-    float:right; 
+    float:right;
     display:none;
 }
 #associated label {
@@ -145,7 +145,7 @@ padding-right: 5px;
     margin-left:8px;
 }
 #associateProfileBackgroundOne {
-    background-color:#fff; 
+    background-color:#fff;
     padding:7px 0 5px 0;
     margin-left:-8px;
     margin-right:-8px;
@@ -163,7 +163,7 @@ padding-right: 5px;
 #associateProfileBackgroundTwo {
     background-color:#f1f2ee;
     padding:7px 94px 33px 0;
-    margin-top:-129px; 
+    margin-top:-129px;
     margin-right:-8px;
     z-index:-100;
     border:1px solid #ccc;
@@ -177,10 +177,10 @@ padding-right: 5px;
 }
 #associateProfileBackgroundThree {
     background-color:#f1f2ee;
-    padding:7px 94px 26px 12px; 
-    margin-top:-129px; 
+    padding:7px 94px 26px 12px;
+    margin-top:-129px;
     margin-left:-12px;
-    margin-right:-8px; 
+    margin-right:-8px;
     z-index:-100;
     border:1px solid #ccc;
     border-left:none;
@@ -195,7 +195,7 @@ padding-right: 5px;
     margin-top:-3px;
     margin-left:-12px;
     margin-right:-8px;
-    z-index:-100; 
+    z-index:-100;
     border:1px solid #ccc;
     border-top:none;
     border-bottom-left-radius: 5px;
@@ -288,7 +288,7 @@ section.proxy-profile h4 {
     -webkit-border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;
-    
+
 }
 .list-proxy-profile {
     background-color: #F7F7F4;
@@ -322,7 +322,7 @@ section.proxy-profile h4 {
     color: #7F8993;
     padding-left: 25px;
     height: 20px;
-    
+
 }
 #list-relation label {
     color: #064D68;
@@ -341,7 +341,7 @@ p.selected-editors {
     border-top: 1px solid #E0DFDF;
     padding-left: 1.2em;
 }
-img.photo-profile, 
+img.photo-profile,
 img.photo-proxy {
     border: 1px solid #DDE4E3;
     float: left;

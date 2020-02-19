@@ -3,14 +3,14 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 /**
- * 
+ *
  * We need to document what is in source and destinationURI for each
  * change type.
  *
  */
 public class AtomicOntologyChange {
 
-	private String sourceURI;	
+	private String sourceURI;
 	private String destinationURI;
 	private AtomicChangeType atomicChangeType;
 	private String notes;
@@ -23,7 +23,7 @@ public class AtomicOntologyChange {
 	                            String destinationURI,
 	                            AtomicChangeType atomicChangeType,
 	                            String notes) {
-		
+
 		this.sourceURI = sourceURI;
 		this.destinationURI = destinationURI;
 		this.atomicChangeType = atomicChangeType;
@@ -35,7 +35,7 @@ public class AtomicOntologyChange {
 	    return "Source: " + sourceURI + "; Destination: " + destinationURI +
 	            "; Type: " + atomicChangeType + "; Notes:" + notes;
 	}
-	
+
 	/**
 	 * Contains the URI of a class or property in the previous version of
 	 * the ontology, or null if a new class or property was introduced
@@ -44,24 +44,24 @@ public class AtomicOntologyChange {
 	public String getSourceURI() {
 		return this.sourceURI;
 	}
-	
+
 	public void setSourceURI(String sourceURI) {
 		this.sourceURI = sourceURI;
 	}
-	
+
 	/**
-	 * Contains the URI of a class or property in the current version of 
+	 * Contains the URI of a class or property in the current version of
 	 * the ontology, or null if a class or property was removed from the
 	 * previous version of the ontology.
 	 */
 	public String getDestinationURI() {
 		return this.destinationURI;
 	}
-	
+
 	public void setDestinationURI(String destinationURI) {
 		this.destinationURI = destinationURI;
 	}
-	
+
 	public AtomicChangeType getAtomicChangeType() {
 		return atomicChangeType;
 	}

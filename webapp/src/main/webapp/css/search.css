@@ -3,16 +3,16 @@
 /* Search form styles */
 
 /* Class and subclass refinement links */
-.searchTOC {    
-    margin-bottom: 1.5em; 
+.searchTOC {
+    margin-bottom: 1.5em;
 }
 /* Search results */
 .advancedSearchForm .form-button,
-.searchhits li {    
+.searchhits li {
     margin-top: 1em;
 }
-.searchhits li a {    
-    margin-right: .4em; 
+.searchhits li a {
+    margin-right: .4em;
 }
 p.snippet {
     font-size: .8em;
@@ -26,8 +26,8 @@ a:visited span.SearchTerm {
     color: #7D7D7D;
 }
 /* bPaging links */
-.searchpages {    
-    margin-top: 2em; 
+.searchpages {
+    margin-top: 2em;
 }
 .searchpages a,
 .searchpages span {
@@ -35,12 +35,12 @@ a:visited span.SearchTerm {
     margin-right: .5em;
 }
 .searchpages a:link,
-.searchpages a:visited {    
+.searchpages a:visited {
     text-decoration: none;
 }
 .searchpages a:hover,
-.searchpages a:active {    
-    text-decoration: underline; 
+.searchpages a:active {
+    text-decoration: underline;
 }
 .searchpages a.prev {
     margin-right: 1em;

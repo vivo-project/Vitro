@@ -18,19 +18,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 
 class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectPropertyDao{
-    final ObjectPropertyDao innerObjectPropertyDao;    
-    final VitroFilters filters;   
+    final ObjectPropertyDao innerObjectPropertyDao;
+    final VitroFilters filters;
 
     public ObjectPropertyDaoFiltering(ObjectPropertyDao objectPropertyDao,
             VitroFilters filters) {
         super();
         this.innerObjectPropertyDao = objectPropertyDao;
-        this.filters = filters;              
-    }  
-    
+        this.filters = filters;
+    }
+
     /* filtered methods */
     public List getAllObjectProperties() {
-        return filterAndWrap(innerObjectPropertyDao.getAllObjectProperties(), filters);        
+        return filterAndWrap(innerObjectPropertyDao.getAllObjectProperties(), filters);
     }
 
     public List getObjectPropertiesForObjectPropertyStatements(List<ObjectPropertyStatement> objectPropertyStatements) {
@@ -46,7 +46,7 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
         ObjectProperty newOprop=innerObjectPropertyDao.getObjectPropertyByURI(objectPropertyURI);
         return (newOprop == null) ? null : new ObjectPropertyFiltering(newOprop, filters);
     }
-    
+
     public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI) {
         ObjectProperty newOprop=innerObjectPropertyDao.getObjectPropertyByURIs(objectPropertyURI, domainURI, rangeURI);
         return (newOprop == null) ? null : new ObjectPropertyFiltering(newOprop, filters);
@@ -56,12 +56,12 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
         ObjectProperty newOprop=innerObjectPropertyDao.getObjectPropertyByURIs(objectPropertyURI, domainURI, rangeURI, base);
         return (newOprop == null) ? null : new ObjectPropertyFiltering(newOprop, filters);
     }
-    
+
     public List getRootObjectProperties() {
         return filterAndWrap(innerObjectPropertyDao.getRootObjectProperties(),filters);
     }
- 
-    
+
+
     /* other methods */
     public void deleteObjectProperty(String objectPropertyURI) {
         innerObjectPropertyDao.deleteObjectProperty(objectPropertyURI);
@@ -88,35 +88,35 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     public void addSuperproperty(ObjectProperty property, ObjectProperty superproperty) {
     	innerObjectPropertyDao.addSuperproperty(property, superproperty);
     }
-    
+
     public void addSuperproperty(String propertyURI, String superpropertyURI) {
     	innerObjectPropertyDao.addSuperproperty(propertyURI, superpropertyURI);
     }
-    
+
     public void removeSuperproperty(ObjectProperty property, ObjectProperty superproperty) {
     	innerObjectPropertyDao.removeSuperproperty(property, superproperty);
     }
-    
+
     public void removeSuperproperty(String propertyURI, String superpropertyURI) {
     	innerObjectPropertyDao.removeSuperproperty(propertyURI, superpropertyURI);
     }
-    
+
     public void addSubproperty(ObjectProperty property, ObjectProperty subproperty) {
     	innerObjectPropertyDao.addSubproperty(property, subproperty);
     }
-    
+
     public void addSubproperty(String propertyURI, String subpropertyURI) {
     	innerObjectPropertyDao.addSubproperty(propertyURI, subpropertyURI);
     }
-    
+
     public void removeSubproperty(ObjectProperty property, ObjectProperty subproperty) {
     	innerObjectPropertyDao.removeSubproperty(property, subproperty);
     }
-    
+
     public void removeSubproperty(String propertyURI, String subpropertyURI) {
     	innerObjectPropertyDao.removeSubproperty(propertyURI, subpropertyURI);
     }
-    
+
     public List <String> getSubPropertyURIs(String propertyURI) {
     	return innerObjectPropertyDao.getSubPropertyURIs(propertyURI);
     }
@@ -131,26 +131,26 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
 
     public List <String> getAllSuperPropertyURIs(String propertyURI) {
     	return innerObjectPropertyDao.getAllSuperPropertyURIs(propertyURI);
-    }    
-                                             
+    }
+
     public static List<ObjectProperty> filterAndWrap(List<ObjectProperty> list, VitroFilters filters){
         if( list == null ) return null;
         if( list.size() ==0 ) return list;
-        
-        List<ObjectProperty> filtered = new LinkedList<ObjectProperty>();         
-        Filter.filter(list, 
-                new AndUnary<ObjectProperty>(notNull,filters.getObjectPropertyFilter()), 
+
+        List<ObjectProperty> filtered = new LinkedList<ObjectProperty>();
+        Filter.filter(list,
+                new AndUnary<ObjectProperty>(notNull,filters.getObjectPropertyFilter()),
                 filtered);
-                                
-        List<ObjectProperty> wrapped = new LinkedList<ObjectProperty>();        
+
+        List<ObjectProperty> wrapped = new LinkedList<ObjectProperty>();
         for( ObjectProperty prop : filtered){
             if( prop != null){
                 wrapped.add( new ObjectPropertyFiltering(prop, filters));
             }
-        }        
-        return wrapped;   
+        }
+        return wrapped;
     }
-    
+
     private static final UnaryFunctor<ObjectProperty,Boolean> notNull =
         new UnaryFunctor<ObjectProperty,Boolean>(){
             @Override
@@ -160,7 +160,7 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     };
 
 	public void addSubproperty(Property property, Property subproperty) {
-		innerObjectPropertyDao.addSubproperty(property, subproperty);	
+		innerObjectPropertyDao.addSubproperty(property, subproperty);
 	}
 
 	public void addSuperproperty(Property property, Property superproperty) {
@@ -198,11 +198,11 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
 			Property equivalentProperty) {
 		innerObjectPropertyDao.removeEquivalentProperty(property, equivalentProperty);
 	}
-    
+
 	public boolean skipEditForm(String predicateURI) {
 		return innerObjectPropertyDao.skipEditForm(predicateURI);
 	}
-	
+
     public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
     	return innerObjectPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
     }
@@ -212,7 +212,7 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     public List<ObjectProperty> getObjectPropertyList(Individual subject) {
         return innerObjectPropertyDao.getObjectPropertyList(subject);
     }
-    
+
     @Override
     // This may need to be filtered at some point.
     public List<ObjectProperty> getObjectPropertyList(String subjectUri) {

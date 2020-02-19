@@ -40,32 +40,32 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 /**
  * The basic implementation of the TBoxReasonerDriver. It gets help from a
  * listener, an executor, and a reasoner.
- * 
+ *
  * Create a listener that listens for changes to the TBox, but filters them
  * according to a ReasonerConfiguration object. The listener accumulates the
  * changes it likes, until it detects an ending EditEvent. Then it passes the
  * change set back to the driver.
- * 
+ *
  * Each time a change set is received, a task is created and given to the
  * executor to run. The executor is single-threaded, so the change sets are
  * processed in sequence.
- * 
+ *
  * Processing involves the following steps:
- * 
+ *
  * 1. Telling the reasoner about the changes, so it can update its own internal
  * ontology model.
- * 
+ *
  * 2. Telling the reasoner to re-inference its model. A status is returned.
- * 
+ *
  * 3. Asking the reasoner for the inferences from its model. As with the initial
  * changes, these inferences are filtered according to the
  * ReasonerConfiguration.
- * 
+ *
  * 4. Synchronizing the applications TBox inferences model with the inferences
  * obtained from the reasoner.
- * 
+ *
  * ----------------------
- * 
+ *
  * Possible optimization: if change sets come in quickly enough that the third
  * set is received while the first is still being processed, it would be
  * reasonable to merge the second and third sets into one.

@@ -32,9 +32,9 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 			HttpServletRequest request) {
 		updateModelWithLabel(additionsModel);
 	}
-	
+
 	private String getSparqlQuery() {
-		String queryStr = "SELECT ?subject ?firstName ?middleName ?lastName where {" + 
+		String queryStr = "SELECT ?subject ?firstName ?middleName ?lastName where {" +
 				"?subject <http://purl.obolibrary.org/obo/ARG_2000028>  ?individualVcard ." +
 				"?individualVcard <http://www.w3.org/2006/vcard/ns#hasName> ?fullName ." +
 				"?fullName <http://www.w3.org/2006/vcard/ns#givenName> ?firstName ." +
@@ -46,7 +46,7 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 				"}";
 		return queryStr;
 	}
-	
+
 	private void updateModelWithLabel(Model additionsModel) {
 		Model changesModel = ModelFactory.createDefaultModel();
 		String queryStr = getSparqlQuery();
@@ -62,7 +62,7 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
                     query, additionsModel);
             ResultSet res = qe.execSelect();
             while( res.hasNext() ){
-				String newLabel = ""; 
+				String newLabel = "";
 				Resource subject = null;
             	QuerySolution qs = res.nextSolution();
             	subject = qs.getResource("subject");
@@ -73,14 +73,14 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
     				String firstNameLanguage = firstNameLiteral.getLanguage();
     				String lastNameLanguage = lastNameLiteral.getLanguage();
     				newLabel = lastNameLiteral.getString() + ", " + firstNameLiteral.getString();
-    				
+
     				if(qs.getLiteral("middleName") != null) {
     					Literal middleNameLiteral = qs.getLiteral("middleName");
     					newLabel += " " + middleNameLiteral.getString();
                 	}
-    				
-    				if(subject != null && 
-    						firstNameLanguage != null && lastNameLanguage != null 
+
+    				if(subject != null &&
+    						firstNameLanguage != null && lastNameLanguage != null
     						&& firstNameLanguage.equals(lastNameLanguage)) {
     					//create a literal with the appropriate value and the language
     					Literal labelWithLanguage = changesModel.createLiteral(newLabel, firstNameLanguage);
@@ -89,8 +89,8 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
     					changesModel.add(subject, rdfsLabelP, newLabel );
     				}
             	}
-            	
-            	
+
+
             }
 
         } catch(Throwable th){
@@ -101,7 +101,7 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
             }
             additionsModel.getLock().leaveCriticalSection();
         }
-        
+
         //Write changes model to additions model
         additionsModel.getLock().enterCriticalSection(Lock.WRITE);
         try {
@@ -109,7 +109,7 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
         }catch(Throwable th){
             log.error("An error occurred in writing model", th);
          } finally {
-             
+
              additionsModel.getLock().leaveCriticalSection();
          }
 

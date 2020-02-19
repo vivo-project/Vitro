@@ -41,7 +41,7 @@ dojo.widget.defineWidget(
 
 		fillInTemplate: function(args, frag){
 			var source = this.getFragNodeRef(frag);
-			
+
 			this.containerNode.style.left = "";
 			this.containerNode.style.top = "";
 
@@ -50,7 +50,7 @@ dojo.widget.defineWidget(
 			this.inputNode.style.width = this.inputWidth;
 
 			dojo.event.connect(this.inputNode, "onchange", this, "onInputChange");
-			
+
 			this.containerIframe = new dojo.html.BackgroundIframe(this.containerNode);
 			this.containerIframe.size([0,0,0,0]);
 		},
@@ -74,7 +74,7 @@ dojo.widget.defineWidget(
 				this.showContainer();
 			}
 		},
-		
+
 		showContainer: function(){
 			this.containerAnimInProgress=true;
 			this.containerToggleObj.show(this.containerNode, this.containerToggleDuration, null,
@@ -96,7 +96,7 @@ dojo.widget.defineWidget(
 		onContainerHide: function(){
 			this.containerAnimInProgress=false;
 		},
-		
+
 		sizeBackgroundIframe: function(){
 			var w = dojo.style.getOuterWidth(this.containerNode);
 			var h = dojo.style.getOuterHeight(this.containerNode);

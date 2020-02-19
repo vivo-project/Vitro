@@ -89,11 +89,11 @@ dojo.validate.check = function(form, profile) {
 
 	// See if required input fields have values missing.
 	if ( profile.required instanceof Array ) {
-		for (var i = 0; i < profile.required.length; i++) { 
+		for (var i = 0; i < profile.required.length; i++) {
 			if(!dojo.lang.isString(profile.required[i])){ continue; }
 			var elem = form[profile.required[i]];
 			// Are textbox, textarea, or password fields blank.
-			if ( (elem.type == "text" || elem.type == "textarea" || elem.type == "password") && /^\s*$/.test(elem.value) ) {	
+			if ( (elem.type == "text" || elem.type == "textarea" || elem.type == "password") && /^\s*$/.test(elem.value) ) {
 				missing[missing.length] = elem.name;
 			}
 			// Does drop-down box have option selected.
@@ -106,7 +106,7 @@ dojo.validate.check = function(form, profile) {
 				for (var j = 0; j < elem.length; j++) {
 					if (elem[j].checked) { checked = true; }
 				}
-				if ( !checked ) {	
+				if ( !checked ) {
 					missing[missing.length] = elem[0].name;
 				}
 			}
@@ -115,11 +115,11 @@ dojo.validate.check = function(form, profile) {
 
 	// See if checkbox groups and select boxes have x number of required values.
 	if ( profile.required instanceof Array ) {
-		for (var i = 0; i < profile.required.length; i++) { 
+		for (var i = 0; i < profile.required.length; i++) {
 			if(!dojo.lang.isObject(profile.required[i])){ continue; }
 			var elem, numRequired;
-			for (var name in profile.required[i]) { 
-				elem = form[name]; 
+			for (var name in profile.required[i]) {
+				elem = form[name];
 				numRequired = profile.required[i][name];
 			}
 			// case 1: elem is a check box group
@@ -128,7 +128,7 @@ dojo.validate.check = function(form, profile) {
 				for (var j = 0; j < elem.length; j++) {
 					if (elem[j].checked) { checked++; }
 				}
-				if ( checked < numRequired ) {	
+				if ( checked < numRequired ) {
 					missing[missing.length] = elem[0].name;
 				}
 			}
@@ -138,7 +138,7 @@ dojo.validate.check = function(form, profile) {
 				for (var j = 0; j < elem.options.length; j++) {
 					if (elem.options[j].selected) { selected++; }
 				}
-				if ( selected < numRequired ) {	
+				if ( selected < numRequired ) {
 					missing[missing.length] = elem.name;
 				}
 			}
@@ -190,11 +190,11 @@ dojo.validate.check = function(form, profile) {
 				if(typeof isValidSomething != "undefined"){
 					isValid = isValidSomething.apply(null, params);
 				}else{
-					isValid = false; 
+					isValid = false;
 				}
 			}
 
-			if(!isValid){	
+			if(!isValid){
 				invalid[invalid.length] = elem.name;
 			}
 		}
@@ -205,14 +205,14 @@ dojo.validate.check = function(form, profile) {
 		for(name in profile.confirm){
 			var elem = form[name];	// the confirm element
 			var target = form[profile.confirm[name]];
-			if ( (elem.type != "text" && elem.type != "textarea" && elem.type != "password") 
+			if ( (elem.type != "text" && elem.type != "textarea" && elem.type != "password")
 				||(target.type != elem.type)
 				||(target.value == elem.value)	// it's valid
 				||(results.isInvalid(elem.name))// already listed as invalid
 				||(/^\s*$/.test(target.value))	)	// skip if blank - only confirm if target has a value
 			{
-				continue; 
-			}	
+				continue;
+			}
 			invalid[invalid.length] = elem.name;
 		}
 	}

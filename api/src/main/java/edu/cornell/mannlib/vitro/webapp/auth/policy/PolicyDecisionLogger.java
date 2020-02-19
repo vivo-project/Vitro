@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 /**
  * If enabled in the developer settings (and log levels), log each
  * PolicyDecision (subject to restrictions).
- * 
+ *
  * Some restrictions apply to the logger as a whole. Others apply to the
  * particular policy or the particular decision.
  */
@@ -65,7 +65,7 @@ public class PolicyDecisionLogger {
 	 * The identifier bundle passes if there is no restriction, or if the
 	 * restriction pattern is found within concatenated string of the identifier
 	 * bundle.
-	 * 
+	 *
 	 * If the restriction is invalid, the action fails.
 	 */
 	private boolean passesUserRestriction() {
@@ -77,7 +77,7 @@ public class PolicyDecisionLogger {
 	/**
 	 * The requested action passes if there is no restriction, or if the
 	 * restriction pattern is found within the class name of the action.
-	 * 
+	 *
 	 * If the restriction is invalid, the action fails.
 	 */
 	private boolean passesActionRestriction() {

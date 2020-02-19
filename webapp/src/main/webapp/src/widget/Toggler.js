@@ -22,14 +22,14 @@ dojo.inherits(dojo.widget.Toggler, dojo.widget.DomWidget);
 
 dojo.lang.extend(dojo.widget.Toggler, {
 	widgetType: "Toggler",
-	
-	// Associated widget 
+
+	// Associated widget
 	targetId: '',
-	
+
 	fillInTemplate: function() {
 		dojo.event.connect(this.domNode, "onclick", this, "onClick");
 	},
-	
+
 	onClick: function() {
 		var pane = dojo.widget.byId(this.targetId);
 		if(!pane){ return; }

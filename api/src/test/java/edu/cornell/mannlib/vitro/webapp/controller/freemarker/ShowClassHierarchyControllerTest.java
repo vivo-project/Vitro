@@ -27,38 +27,38 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 /**
  * Not a well-formed set of unit tests. But it's a pretty good exercise of the
  * different possibilities in the output stage.
- * 
+ *
  * Test plan:
- * 
+ *
  * <pre>
  * No data - roots is null -- NONSENSICAL
  * No data - roots is empty
- * 
+ *
  * Ontology is not specified
  * Ontology is specified and matches
  * Ontology is specified and does not match
  * VClass does not match Ontology, but has child properties that do.
- * 
+ *
  * pickListName
  * no pickListName
- * 
+ *
  * shortDef
  * no shortDef
- * 
+ *
  * Group no group URI
  * Group no group for URI
  * Group no name
  * Group has a name
- * 
+ *
  * No ontology for namespace
  * Ontology but no name
  * Ontology with name
- * 
+ *
  * DP_1A Ont1, no pickListName, no shortDef, no GroupURI, no matching Ontology
  * DP_1B Ont2, pickListName, shortDef, no group for GroupURI, ontology has no name
  * DP_1B2A Ont3, pickListName, shortDef, group has no name, ontology with name
  * DP_1B2B Ont1, pickListName, shortDef, group with name, no matching Ontology
- * 
+ *
  * Try once with no data
  * Try with all data and no ontology specified
  * Try with all data and Ont1, Ont2, Ont3

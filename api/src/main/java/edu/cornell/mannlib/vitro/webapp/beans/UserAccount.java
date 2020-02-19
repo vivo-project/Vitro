@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 
 /**
  * Information about the account of a user. URI, email, password, etc.
- * 
+ *
  * The "password link expires hash" is just a string that is derived from the
  * value in the passwordLinkExpires field. It doesn't have to be a hash, and
  * there is no need for it to be cryptographic, but it seems embarrassing to
@@ -66,7 +66,7 @@ public class UserAccount {
 	private Set<String> permissionSetUris = Collections.emptySet();
 
 	private boolean rootUser = false;
-	
+
 	/** This may be empty, but should never be null. */
 	private Set<String> proxiedIndividualUris = Collections.emptySet();
 

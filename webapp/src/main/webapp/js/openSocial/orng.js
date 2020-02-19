@@ -3,16 +3,16 @@
 /*
     ORNG Shindig Helper functions for gadget-to-container commands
  */
- 
+
  // dummy function so google analytics does not break for institutions who do not use it
- 
+
 _gaq = {};
-_gaq.push = function(data) {    // 
+_gaq.push = function(data) {    //
  };
 
 // pubsub
 gadgets.pubsubrouter.init(function(id) {
-    return my.gadgets[shindig.container.gadgetService.getGadgetIdFromModuleId(id)].url; 
+    return my.gadgets[shindig.container.gadgetService.getGadgetIdFromModuleId(id)].url;
   }, {
     onSubscribe: function(sender, channel) {
       setTimeout("my.onSubscribe('" + sender + "', '" + channel + "')", 3000);
@@ -26,14 +26,14 @@ gadgets.pubsubrouter.init(function(id) {
     },
     onPublish: function(sender, channel, message) {
       // return true to reject the request.
-      
+
       // track with google analytics
       if (sender != '..' ) {
           var moduleId = shindig.container.gadgetService.getGadgetIdFromModuleId(sender);
       }
-      
+
       if (channel == 'VISIBLE') {
-	      var statusId = document.getElementById(sender + '_status');	      
+	      var statusId = document.getElementById(sender + '_status');
           if (statusId) {
             // only act on these in HOME view since they are only  meant to be seen when viewer=owner
             if (my.gadgets[moduleId].view != 'home') {
@@ -71,7 +71,7 @@ gadgets.pubsubrouter.init(function(id) {
       }
       else if (channel == 'added' && my.gadgets[moduleId].view == 'home') {
           if (message == 'Y') {
-            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'SHOW', 'profile_edit_view']);    
+            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'SHOW', 'profile_edit_view']);
             // find out whose page we are on, if any
         	var userId = gadgets.util.getUrlParameters()['uri'] || document.URL.replace('/display/', '/individual/');
             osapi.activities.create(
@@ -81,12 +81,12 @@ gadgets.pubsubrouter.init(function(id) {
 		    }).execute(function(response){});
 		  }
 		  else {
-            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'HIDE', 'profile_edit_view']);    
+            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'HIDE', 'profile_edit_view']);
 		  }
       }
       else if (channel == 'status') {
           // message should be of the form 'COLOR:Message Content'
-	      var statusId = document.getElementById(sender + '_status');	      
+	      var statusId = document.getElementById(sender + '_status');
           if (statusId) {
             var messageSplit = message.split(':');
             if (messageSplit.length == 2) {
@@ -100,22 +100,22 @@ gadgets.pubsubrouter.init(function(id) {
       }
       else if (channel == 'analytics') {
           // publish to google analytics
-          // message should be JSON encoding object with required action and optional label and value 
+          // message should be JSON encoding object with required action and optional label and value
           // as documented here: http://code.google.com/apis/analytics/docs/tracking/eventTrackerGuide.html
           // note that event category will be set to the gadget name automatically by this code
-          // Note: message will be already converted to an object 
+          // Note: message will be already converted to an object
           if (message.hasOwnProperty('value')) {
-            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, message.action, message.label, message.value]);    
+            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, message.action, message.label, message.value]);
           }
           else if (message.hasOwnProperty('label')) {
-            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, message.action, message.label]);    
+            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, message.action, message.label]);
           }
           else {
-            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, message.action]);    
+            _gaq.push(['_trackEvent', my.gadgets[moduleId].name, message.action]);
           }
       }
       else if (channel == 'profile') {
-          _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'go_to_profile', message]);    
+          _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'go_to_profile', message]);
           document.location.href = '/' + location.pathname.split('/')[1] + '/display/n' + message;
 	  }
       else if (channel == 'hide') {
@@ -141,7 +141,7 @@ my.findGadgetsAttachingTo = function(chromeId) {
     }
     return retval;
 };
-    
+
 my.removeGadgets = function(gadgetsToRemove) {
     for (var i = 0; i < gadgetsToRemove.length; i++) {
         for (var j = 0; j < my.gadgets.length; j++) {
@@ -153,7 +153,7 @@ my.removeGadgets = function(gadgetsToRemove) {
     }
 };
 
-my.onSubscribe = function(sender, channel) {     
+my.onSubscribe = function(sender, channel) {
      // lookup pubsub data based on channel and if a match is found, publish the data to that channel after a delay
      if (my.pubsubData[channel]) {
         gadgets.pubsubrouter.publish(channel, my.pubsubData[channel]);
@@ -178,12 +178,12 @@ my.removeParameterFromURL = function(url, parameter) {
 };
 
  // publish the people
-my.CallSuccess = function(result) {    
+my.CallSuccess = function(result) {
      gadgets.pubsubrouter.publish('person', result);
 };
- 
+
  // alert message on some failure
-my.CallFailed = function(error) {    
+my.CallFailed = function(error) {
      alert(error.get_message());
 };
 
@@ -204,7 +204,7 @@ my.requestGadgetMetaData = function(view, opt_callback) {
       if (my.gadgets[moduleId].view == view) {
 	    request.gadgets[request.gadgets.length] = {'url': my.gadgets[moduleId].url, 'moduleId': moduleId};
 	  }
-    }    
+    }
 
     var makeRequestParams = {
       "CONTENT_TYPE" : "JSON",
@@ -242,9 +242,9 @@ my.generateGadgets = function (metadata) {
             'title': metadata.gadgets[i].title, 'userPrefs': metadata.gadgets[i].userPrefs,
             'height': height, 'width': width, 'debug': my.debug};
 
-        // do a shallow merge of the opt_params from the database.  This will overwrite anything with the same name, and we like that 
+        // do a shallow merge of the opt_params from the database.  This will overwrite anything with the same name, and we like that
         for (var attrname in my.gadgets[moduleId].opt_params) {
-            opt_params[attrname] = my.gadgets[moduleId].opt_params[attrname]; 
+            opt_params[attrname] = my.gadgets[moduleId].opt_params[attrname];
         }
 
         my.renderableGadgets[moduleId] = shindig.container.createGadget(opt_params);
@@ -271,7 +271,7 @@ my.init = function() {
 	shindig.container = new ORNGContainer();
 
 	shindig.container.gadgetService = new ORNGGadgetService();
-	shindig.container.layoutManager = new ORNGLayoutManager();    
+	shindig.container.layoutManager = new ORNGLayoutManager();
 
 	shindig.container.setNoCache(my.noCache);
 
@@ -306,7 +306,7 @@ ORNGContainer.prototype.createGadget = function (opt_params) {
     }
 }
 
-//ORNGLayoutManager. 
+//ORNGLayoutManager.
 ORNGLayoutManager = function() {
 	shindig.LayoutManager.call(this);
 };
@@ -337,9 +337,9 @@ ORNGGadgetService.prototype.setTitle = function (title) {
     if (my.gadgets[moduleId].view == 'canvas') {
         ORNGGadgetService.setCanvasTitle(title);
     }
-    else {    	
+    else {
     	var element = document.getElementById(this.f + '_title');
-       	element.innerHTML = my.renderableGadgets[moduleId].getTitleHtml(title); 
+       	element.innerHTML = my.renderableGadgets[moduleId].getTitleHtml(title);
     }
 };
 
@@ -352,15 +352,15 @@ ORNGGadgetService.prototype.requestNavigateTo = function(view, opt_params) {
     var url = urlTemplate || 'OpenSocial.aspx?';
 
     url += window.location.search.substring(1);
-    
+
     // remove appId if present
     url = my.removeParameterFromURL(url, 'appId');
-    
+
     // Add appId if the URL Template begins with the word 'Gadget'
     if (urlTemplate.indexOf('Gadget') == 0) {
         var moduleId = shindig.container.gadgetService.getGadgetIdFromModuleId(this.f);
         var appId = my.gadgets[moduleId].appId;
-        url += '&appId=' + appId;    
+        url += '&appId=' + appId;
     }
 
 	if (opt_params) {
@@ -434,10 +434,10 @@ ORNGGadget.prototype.getTitleBarContent = function(continuation) {
 	    continuation(
 	      '<div id="' + this.cssClassTitleBar + '-' + this.id +
 	      '" class="' + this.cssClassTitleBar + '"><span class="' +
-	      this.cssClassTitleButtonBar + '">' + 
+	      this.cssClassTitleButtonBar + '">' +
 	      '</span> <span id="' +
-	      this.getIframeId() + '_title" class="' + this.cssClassTitle + '">' + 
-	      this.getTitleHtml(this.title) + '</span><span id="' + 
+	      this.getIframeId() + '_title" class="' + this.cssClassTitle + '">' +
+	      this.getTitleHtml(this.title) + '</span><span id="' +
 		  this.getIframeId() + '_status" class="gadgets-gadget-status"></span></div>');
 	  }
 };
@@ -481,7 +481,7 @@ ORNGToggleGadget.prototype.handleToggle = function (track) {
 
             if (my.gadgets[this.id].view == 'home') {
                 if (track) {
-                    // record in google analytics     
+                    // record in google analytics
                     _gaq.push(['_trackEvent', my.gadgets[this.id].name,
 						'OPEN_IN_EDIT', 'profile_edit_view']);
                 }
@@ -504,7 +504,7 @@ ORNGToggleGadget.prototype.handleToggle = function (track) {
 									});
                 }
                 if (track) {
-                    // record in google analytics     
+                    // record in google analytics
                     _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'OPEN']);
                 }
             }
@@ -518,11 +518,11 @@ ORNGToggleGadget.prototype.handleToggle = function (track) {
             gadgetImg.src = '/' + location.pathname.split('/')[1] + '/themes/wilma/images/green_plus_sign.gif'
             if (track) {
                 if (my.gadgets[this.id].view == 'home') {
-                    // record in google analytics     
+                    // record in google analytics
                     _gaq.push(['_trackEvent', my.gadgets[this.id].name,
 							'CLOSE_IN_EDIT', 'profile_edit_view']);
                 } else {
-                    // record in google analytics     
+                    // record in google analytics
                     _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'CLOSE']);
                 }
             }
@@ -569,7 +569,7 @@ ORNGToggleGadget.prototype.finishRender = function(chrome) {
 	window.frames[this.getIframeId()].location = this.getIframeUrl();
 	if (this.start_closed) {
 		this.handleToggle(false);
-	} 
+	}
 	else if (chrome && this.width) {
 		chrome.style.width = this.width + 'px';
 	}

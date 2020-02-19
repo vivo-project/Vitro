@@ -23,20 +23,20 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectProp
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel.ConfigError;
 import freemarker.cache.TemplateLoader;
 
-public class PropertyListConfig {  
+public class PropertyListConfig {
     private static final Log log = LogFactory.getLog(PropertyListConfig.class);
-	
-	
+
+
     private static final String CONFIG_FILE_PATH = "/config/";
     private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
-    
+
     /* NB The default post-processor is not the same as the post-processor for the default view. The latter
      * actually defines its own post-processor, whereas the default post-processor is used for custom views
      * that don't define a post-processor, to ensure that the standard post-processing applies.
-     * 
+     *
      * edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor
      */
-    
+
     // TODO Lump these together into the PropertyListConfigContext
     private final ObjectPropertyTemplateModel optm;
     private final VitroRequest vreq;
@@ -48,10 +48,10 @@ public class PropertyListConfig {
     private String templateName;
     private ObjectPropertyDataPostProcessor postprocessor; // never null
 
-    public PropertyListConfig(ObjectPropertyTemplateModel optm, TemplateLoader templateLoader, VitroRequest vreq, 
-    		ObjectProperty op, boolean editing) 
+    public PropertyListConfig(ObjectPropertyTemplateModel optm, TemplateLoader templateLoader, VitroRequest vreq,
+    		ObjectProperty op, boolean editing)
         throws InvalidConfigurationException {
-    	
+
     	this.optm = optm;
     	this.vreq = vreq;
     	WebappDaoFactory wadf = vreq.getWebappDaoFactory();
@@ -65,48 +65,48 @@ public class PropertyListConfig {
         	CustomListViewLogger.log(op, configFileName);
         }
         log.debug("Using list view config file " + configFileName + " for object property " + op.getURI());
-        
+
         String configFilePath = getConfigFilePath(configFileName);
-        
+
         try {
-            File config = new File(configFilePath);            
+            File config = new File(configFilePath);
             if ( ! isDefaultConfig(configFileName) && ! config.exists() ) {
                 log.warn("Can't find config file " + configFilePath + " for object property " + op.getURI() + "\n" +
                         ". Using default config file instead.");
                 configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                 // Should we test for the existence of the default, and throw an error if it doesn't exist?
-            }                   
-            setValuesFromConfigFile(configFilePath, wadf, editing);           
+            }
+            setValuesFromConfigFile(configFilePath, wadf, editing);
 
         } catch (Exception e) {
             log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
             // What should we do here?
         }
-        
+
         if ( ! isDefaultConfig(configFileName) ) {
             ConfigError configError = checkConfiguration();
             if ( configError != null ) { // the configuration contains an error
-                // If this is a collated property, throw an error: this results in creating an 
+                // If this is a collated property, throw an error: this results in creating an
                 // UncollatedPropertyTemplateModel instead.
                 if (optm instanceof CollatedObjectPropertyTemplateModel) {
                     throw new InvalidConfigurationException(configError.getMessage());
                 }
                 // Otherwise, switch to the default config
-                log.warn("Invalid list view config for object property " + op.getURI() + 
-                        " in " + configFilePath + ":\n" +                            
+                log.warn("Invalid list view config for object property " + op.getURI() +
+                        " in " + configFilePath + ":\n" +
                         configError + " Using default config instead.");
                 configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                setValuesFromConfigFile(configFilePath, wadf, editing);                    
+                setValuesFromConfigFile(configFilePath, wadf, editing);
             }
         }
-        
+
         isDefaultConfig = isDefaultConfig(configFileName);
     }
-    
+
     private boolean isDefaultConfig(String configFileName) {
         return configFileName.equals(DEFAULT_CONFIG_FILE_NAME);
     }
-    
+
     private ConfigError checkConfiguration() {
 
         ConfigError error = optm.checkQuery(selectQuery);
@@ -132,13 +132,13 @@ public class PropertyListConfig {
 
         return null;
     }
-    
-    private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf, 
+
+    private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf,
             boolean editing) {
 		try {
 			FileReader reader = new FileReader(configFilePath);
 			CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
-			
+
 			boolean collated = optm instanceof CollatedObjectPropertyTemplateModel;
 
 			selectQuery = configFileContents.getSelectQuery(collated, editing, ListConfigUtils.getUsePreciseSubquery(vreq));
@@ -151,7 +151,7 @@ public class PropertyListConfig {
 			log.error("Error processing config file " + configFilePath, e);
 		}
     }
-    
+
 	private ObjectPropertyDataPostProcessor getPostProcessor(
 			String className,
 			ObjectPropertyTemplateModel optm,
@@ -160,7 +160,7 @@ public class PropertyListConfig {
 			if (StringUtils.isBlank(className)) {
 				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
 			}
-			
+
 			Class<?> clazz = Class.forName(className);
 			Constructor<?> constructor = clazz.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
 			return (ObjectPropertyDataPostProcessor) constructor.newInstance(optm, wdf);
@@ -187,7 +187,7 @@ public class PropertyListConfig {
 					+ "': can't create postprocessor instance of class '"
 					+ className + "'. " + "Using default postprocessor.", e);
 			return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
-		}           
+		}
 	}
 
     private String getConfigFilePath(String filename) {

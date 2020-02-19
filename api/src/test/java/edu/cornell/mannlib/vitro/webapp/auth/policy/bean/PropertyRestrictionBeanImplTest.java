@@ -34,14 +34,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 /**
  * If we believe that authorization will succeed regardless of user role, check
  * that it succeeds with the lowest role.
- * 
+ *
  * If we believe that authorization will fail regardless of user role, check
  * that it fails with the highest role.
- * 
+ *
  * If we believe that authorization depends on the user role, it should pass if
  * the user role is higher than or equal to the threshold, and fail if the user
  * role is less than the threshold.
- * 
+ *
  * Note that we can't set a threshold to be tested to either the lowest or
  * highest role, or the attempt to test with higher or lower role will throw an
  * exception.

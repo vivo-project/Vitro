@@ -47,7 +47,7 @@ function encodeUrl(pstrString) {
 /**
    @param ele - element to addRows to
    @param data - array of data to add as rows to ele
-   @param rowFunc - function that returns a <tr> element 
+   @param rowFunc - function that returns a <tr> element
    @param cellFuncs - array of funcs, data will be passed as a parameter
     and the result will be added to the <tr> as a <td>. something like:
     function(row){return dosument.createElement("tr");}
@@ -67,10 +67,10 @@ function addRows(ele, data, cellFuncs, rowFunc) {
 }
 
 function makeRow( row, cellFuncs, rowFunc){
-  if( rowFunc != null ){ 
-    var tr = rowFunc(row); 
-  }  else { 
-    var tr = document.createElement("tr"); 
+  if( rowFunc != null ){
+    var tr = rowFunc(row);
+  }  else {
+    var tr = document.createElement("tr");
   }
 
   for(var j=0; j < cellFuncs.length; j++) {
@@ -92,8 +92,8 @@ function makeRow( row, cellFuncs, rowFunc){
 }
 
 /** added this from the dwr.util.js */
-isDate = function(data) {     
-    return (data && data.toUTCString) ? true : false; 
+isDate = function(data) {
+    return (data && data.toUTCString) ? true : false;
 };
 
 /** returns the summed colspan of the cells of the row.  */
@@ -144,7 +144,7 @@ function date2iso8601( jdate ){
   return year + "-" + monthS + "-" + dayS;
 }
 
-function setDateValue(ele, date, date2StrFunc){  
+function setDateValue(ele, date, date2StrFunc){
   if( date == null || ! isDate(date)) { return; }
   if( date2StrFunc == null ) { date2StrFunc = date2iso8601; }
   ele = dwr.util.byId(ele);
@@ -161,7 +161,7 @@ function clear(ele){
 
 function hideElementById(eleId){
   var ele = dwr.util.byId(eleId);
-  if( ele != null ){  ele.style.display="none"; } 
+  if( ele != null ){  ele.style.display="none"; }
 }
 
 function makeEntLinkElement(entityURI, text){
@@ -185,8 +185,8 @@ function makePropLinkElement(propURI, text){
     @returns on error a string with description of what went wrong.
 */
 function iso8601toDate( str ){
-  if( str == null || str.length < 8 || str.length > 10 ) { 
-    return "too long or short"; 
+  if( str == null || str.length < 8 || str.length > 10 ) {
+    return "too long or short";
   }
   parts = str.split("-");
   if( parts.length != 3 ) { return "bad split, use -"; }
@@ -202,7 +202,7 @@ function iso8601toDate( str ){
   if( month > 12 || month < 1 ) {return "month bad"; }
   if( day > 31 || day < 1 ) {return "day bad"; } //could be better
   month = month - 1; //months are jan=0, feb=1, etc
-  return new Date(year, month, day);   //do we need a try/catch here?  
+  return new Date(year, month, day);   //do we need a try/catch here?
 }
 
 /** use with Date.getYear() which is broken to get the correct year.
@@ -243,7 +243,7 @@ function addEvent(obj, evType, fn){
 // @version   1.0-RC1
 // @author    Adam Michela
 var Fat = {
-	make_hex : function (r,g,b) 
+	make_hex : function (r,g,b)
 	{
 		r = r.toString(16); if (r.length == 1) r = '0' + r;
 		g = g.toString(16); if (g.length == 1) g = '0' + g;
@@ -253,7 +253,7 @@ var Fat = {
 	fade_all : function ()
 	{
 		var a = document.getElementsByTagName("*");
-		for (var i = 0; i < a.length; i++) 
+		for (var i = 0; i < a.length; i++)
 		{
 			var o = a[i];
 			var r = /fade-?(\w{3,6})?/.exec(o.className);
@@ -264,28 +264,28 @@ var Fat = {
 			}
 		}
 	},
-	fade_element : function (id, fps, duration, from, to) 
+	fade_element : function (id, fps, duration, from, to)
 	{
 		if (!fps) fps = 30;
 		if (!duration) duration = 3000;
 		if (!from || from=="#") from = "#FFFF33";
 		if (!to) to = this.get_bgcolor(id);
-		
+
 		var frames = Math.round(fps * (duration / 1000));
 		var interval = duration / frames;
 		var delay = interval;
 		var frame = 0;
-		
+
 		if (from.length < 7) from += from.substr(1,3);
 		if (to.length < 7) to += to.substr(1,3);
-		
+
 		var rf = parseInt(from.substr(1,2),16);
 		var gf = parseInt(from.substr(3,2),16);
 		var bf = parseInt(from.substr(5,2),16);
 		var rt = parseInt(to.substr(1,2),16);
 		var gt = parseInt(to.substr(3,2),16);
 		var bt = parseInt(to.substr(5,2),16);
-		
+
 		var r,g,b,h;
 		while (frame < frames)
 		{
@@ -293,11 +293,11 @@ var Fat = {
 			g = Math.floor(gf * ((frames-frame)/frames) + gt * (frame/frames));
 			b = Math.floor(bf * ((frames-frame)/frames) + bt * (frame/frames));
 			h = this.make_hex(r,g,b);
-		
+
 			setTimeout("Fat.set_bgcolor('"+id+"','"+h+"')", delay);
 
 			frame++;
-			delay = interval * frame; 
+			delay = interval * frame;
 		}
 		setTimeout("Fat.set_bgcolor('"+id+"','"+to+"')", delay);
 	},
@@ -324,7 +324,7 @@ var Fat = {
 	}
 }
 
-// window.onload = function () 
+// window.onload = function ()
 // 	{
 // 	Fat.fade_all();
 // 	}
@@ -335,8 +335,8 @@ var Fat = {
 
 /* note that when an iframe is stuck into a page the iframe nees to be resized */
 
-/* <iframe id="myFrame" frameborder="0" vspace="0" hspace="0" marginwidth="0" 
-marginheight="0" width="100%" src="external.html" scrolling="no" 
+/* <iframe id="myFrame" frameborder="0" vspace="0" hspace="0" marginwidth="0"
+marginheight="0" width="100%" src="external.html" scrolling="no"
 style="overflow:visible"></iframe>
 ...
 <body ... onload = "adjustIFrameSize('myFrame');">
@@ -347,7 +347,7 @@ style="overflow:visible"></iframe>
 //     if (myIframe) {
 //         if (myIframe .contentDocument && myIframe.contentDocument.body.offsetHeight) {
 //             // W3C DOM (and Mozilla) syntax
-//             myIframe.height = myIframe.contentDocument.body.offsetHeight;    
+//             myIframe.height = myIframe.contentDocument.body.offsetHeight;
 //         } else if (myIframe.Document && myIframe.Document.body.scrollHeight) {
 //             // IE DOM syntax
 //             myIframe.height = myIframe.Document.body.scrollHeight;
@@ -360,7 +360,7 @@ function adjustIFrameSize(id) {
     if (myIframe) {
         if (myIframe.contentDocument && myIframe.contentDocument.body.offsetHeight) {
             // W3C DOM (and Mozilla) syntax
-            myIframe.height = myIframe.contentDocument.body.offsetHeight;    
+            myIframe.height = myIframe.contentDocument.body.offsetHeight;
         } else if (myIframe.Document && myIframe.Document.body.scrollHeight) {
             // IE DOM syntax
             myIframe.height = myIframe.Document.body.scrollHeight;
@@ -386,7 +386,7 @@ function resizeIframe(evt) {
     // take care of W3C event processing from iframe's root document
     if (target.nodeType == 9) {
       if (evt.currentTarget && evt.currentTarget.tagName.toLowerCase() == "iframe") {
-            target = evt.currentTarget;    
+            target = evt.currentTarget;
         }
     }
     if (target) {

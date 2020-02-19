@@ -9,9 +9,9 @@
 //					swrlb	:	"http://www.w3.org/2003/11/swrlb#",
 //					vitro	:	"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
 				};
-			
+
 			var level = 0;
-			
+
 			function init(){
 				var url = "getAllClasses";
 				var preurl = "getAllPrefix";
@@ -29,11 +29,11 @@
 							for(i=0; i<options.length; i++){
 								base[base.length] = new Option(options[i].childNodes[0].firstChild.data, options[i].childNodes[1].firstChild.data);
 							}
-							
+
 							var subdiv = document.getElementById("subject(0)");
 							subdiv.appendChild(document.createElement("br"));
-							
-							
+
+
 							var addprop = document.createElement("input");
 							addprop.type = "button";
 							addprop.value = "Add Property";
@@ -46,7 +46,7 @@
 						}
 					}
 				);
-				
+
 				var myPrefixAjax = new Ajax.Request( preurl, {method: "get", parameters: "", onComplete: function(originalRequest){
 							var response = originalRequest.responseXML;
 							var options = response.getElementsByTagName("option");
@@ -60,10 +60,10 @@
 					}
 				);
 			}
-			
-			
+
+
 			function getProperty(addprop){
-				
+
 				var url = "getClazzAllProperties";
 				var base = document.getElementById("subject(" + addprop.level + ",0)");
 				var subject = base.value;
@@ -87,23 +87,23 @@
 								}
 								property.level = base.level;
 								property.count = base.count;
-								
+
 								property.onchange = function() {
 									return getObject(this);
 								}
-								
+
 								var prediv = document.getElementById("predicate(" + base.level + ")");
-								
+
 								if (prediv.innerHTML.trim() != "") {
 									var lastNode = prediv.lastChild.previousSibling;
 									if (lastNode.selectedIndex == 0){
 										alert("You have a undefined property, please make sure it has been initialized.");
 										return;
 									}
-										
+
 								}
 								prediv.appendChild(property);
-								
+
 								base.count += 1
 								prediv.appendChild(document.createElement("br"));
 							}
@@ -111,17 +111,17 @@
 					);
 				}
 			}
-			
-			
+
+
 			function getObject(property){
 				var url = "getObjectClasses";
-				
+
 				var base = document.getElementById("subject(" + property.level + ",0)")
 				var subject = base.value;
-				
+
 				//Disable the selection
 				property.disabled = true;
-				
+
 				//DEL PROPERTY
 				var delprop = document.createElement("input");
 				delprop.type = "button";
@@ -133,8 +133,8 @@
 				}
 				var prediv = document.getElementById("predicate(" + base.level + ")");
 				prediv.insertBefore(delprop, property.nextSibling);
-				
-				
+
+
 				var predicate = property.value;
 				var type = predicate.charAt(predicate.length-1);
 				predicate = predicate.substring(0, predicate.length-1);
@@ -151,7 +151,7 @@
 				}
 				else{
 				var params = "predicate=" + predicate.replace('#', '%23');
-				
+
 				var myAjax = new Ajax.Request( url, {method: "get", parameters: params, onComplete: function(originalRequest){
 								var response = originalRequest.responseXML;
 								var objdiv = document.getElementById("object(" + base.level + ")");
@@ -171,14 +171,14 @@
 										obj.onchange = function(){
 											return addClass(this);
 										}
-										
+
 									}
 									else{
 										obj = document.createElement("input");
 										obj.type = "text";
 									}
 									obj.id = "object(" + base.level + "," + (base.count - 1) + ")";
-									
+
 									obj.level = base.level;
 									obj.count = base.count - 1;
 									objdiv.appendChild(obj);
@@ -186,7 +186,7 @@
 								}
 								else{
 									var objpar = obj.parentNode;
-									
+
 									if (options.length > 0){
 										var newobj = document.createElement("select");
 										newobj[newobj.length] = new Option("Classes", "");
@@ -196,14 +196,14 @@
 										newobj.onchange = function(){
 											return addClass(this);
 										}
-										
+
 									}
 									else{
 										newobj = document.createElement("input");
 										newobj.type = "text";
 									}
 									newobj.id = "object(" + base.level + "," + base.count + ")";
-									
+
 									newobj.level = base.level;
 									newobj.count = base.count;
 									objpar.replaceChild(newobj, obj);
@@ -214,25 +214,25 @@
 				}
 
 			}
-			
+
 			function addClass(obj){
 				addClazz();
-				
+
 				//disable the selection
 				obj.disabled = true;
-				
+
 				var subject = document.createElement("select");
-				
+
 				subject[subject.length] = new Option(obj.options[obj.selectedIndex].text, obj.value);
 				subject.disabled = true;
 				subject.level = level;
 				level ++;
 				subject.count = 0;
 				subject.id = "subject(" + subject.level + "," + subject.count + ")";
-				
+
 				var subdiv = document.getElementById("subject(" + subject.level +")");
 				subdiv.appendChild(subject);
-				
+
 				var delclazz = document.createElement("input");
 				delclazz.type = "button";
 				delclazz.value = "Delete";
@@ -251,12 +251,12 @@
 					return getProperty(this);
 				}
 				subdiv.appendChild(addprop);
-				
+
 			}
-			
+
 			function addClazz(){
 				var builder = document.getElementById("builder");
-				
+
 				var clazz = document.createElement("tr");
 				clazz.id = "clazz(" + level + ")";
 				var subject = document.createElement("td");
@@ -265,34 +265,34 @@
 				predicate.id = "predicate(" + level + ")";
 				var object = document.createElement("td");
 				object.id = "object(" + level + ")";
-				
+
 				clazz.appendChild(subject);
 				clazz.appendChild(predicate);
 				clazz.appendChild(object);
-				
+
 				builder.appendChild(clazz);
 			}
-			
+
 			function delClazz(level){
 				var clazz = document.getElementById("clazz(" + level +")");
 				var builder = document.getElementById("builder");
 				builder.removeChild(clazz);
 			}
-			
+
 			function delProperty(delprop){
 				var sub = document.getElementById("predicate(" + delprop.level + "," + delprop.count + ")");
 				var obj = document.getElementById("object(" + delprop.level + "," + delprop.count + ")");
 				var subdiv = document.getElementById("predicate(" + delprop.level +")");
-				var objdiv = document.getElementById("object(" + delprop.level +")");	
+				var objdiv = document.getElementById("object(" + delprop.level +")");
 				subdiv.removeChild(sub.nextSibling.nextSibling);
 				subdiv.removeChild(sub.nextSibling);
 				subdiv.removeChild(sub);
-				
+
 				objdiv.removeChild(obj.nextSibling);
 				objdiv.removeChild(obj);
-				
+
 			}
-			
+
 			function genQuery(){
 				var items = new Array();
 				var criterias = new Array();
@@ -300,8 +300,8 @@
 				var number = 0;
 				var _sub;
 				var _obj;
-				
-				
+
+
 				// namespaces shown in the SPARQL query box
 				var namespace = getNamespace();
 				//var gid = 0;
@@ -312,9 +312,9 @@
 					}
 					var subNodes = subjects.getElementsByTagName("select");
 					var sub = subNodes[0].value;
-					
+
 					sub = getNameWithPrefix(sub);
-					
+
 					if (!clazz[sub.substring(sub.indexOf(":") + 1)]){
 						clazz[sub.substring(sub.indexOf(":") + 1)] = 1;
 						_sub = sub.substring(sub.indexOf(":") + 1) + 1;
@@ -326,12 +326,12 @@
 					//gid++;
 					//criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " rdf:type " + sub + " . }";
 					criterias[criterias.length] = subname + " rdf:type " + sub + " .";
-					
-					
+
+
 					var predicates = document.getElementById("predicate(" + i + ")");
 					var preNodes = predicates.getElementsByTagName("select");
 					var num = preNodes.length;
-					
+
 					for (j=0; j<num; j++){
 						//gid++;
 						var pre = preNodes[j];
@@ -345,7 +345,7 @@
 						pre = getNameWithPrefix(pre);
 						if (obj.tagName == "INPUT"){
 							var objname = subname + "_" + pre.substring(pre.indexOf(":") + 1);
-							
+
 							//criterias[criterias.length] = "GRAPH ?g" + gid + " { " + subname + " " + pre + " " + objname + " . }";
 							criterias[criterias.length] = subname + " " + pre + " " + objname + " .";
 							items[items.length] = objname;
@@ -354,7 +354,7 @@
 							}
 						}
 						else{
-							
+
 							obj = obj.value;
 							obj = getNameWithPrefix(obj);
 							if (!clazz[obj.substring(obj.indexOf(":") + 1)]){
@@ -371,7 +371,7 @@
 							criterias[criterias.length] = subname + " " + pre + " " + objname + " .";
 						}
 					}
-					
+
 				}
 				if (items.length == 0) {
 					var item = "*"
@@ -380,14 +380,14 @@
 					var item = "distinct " + items.join(" ");
 				}
 				var criteria = criterias.join("\n");
-				
+
 				var query = namespace+ "SELECT " + item + "\nWHERE{\n" + criteria + "\n}\n";
 				var quediv = document.getElementById("sparqlquery");
 				var quetextarea = document.getElementById("query");
 				quediv.style.visibility = "visible";
 				quetextarea.value = query;
 			}
-			
+
 			function getNamespace(){
 				var namespace = "";
 				for (key in namespaces){

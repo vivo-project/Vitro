@@ -5,7 +5,7 @@
 <#-- Like original jsp, allow the passing of variables -->
 <#assign defaultHeight="200" />
 <#assign defaultWidth="75%" />
-<#assign defaultButton="bold,italic,underline,separator,link,bullist,numlist,separator,sub,sup,charmap,separator,undo,redo,separator,code"/>   
+<#assign defaultButton="bold,italic,underline,separator,link,bullist,numlist,separator,sub,sup,charmap,separator,undo,redo,separator,code"/>
 <#assign defaultToolbarLocation = "top" />
 <#if !height?has_content>
 	<#assign height=defaultHeight/>

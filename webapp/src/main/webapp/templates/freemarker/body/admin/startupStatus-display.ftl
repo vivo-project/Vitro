@@ -1,8 +1,8 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<#-- 
-    Template for the page that displays the StartupStatus on request. 
-    
+<#--
+    Template for the page that displays the StartupStatus on request.
+
     Unlike the "raw" page, this one assumes that the usual Freemarker framework is in place.
 -->
 
@@ -21,7 +21,7 @@
 
     <li class="item ${color}" role="listitem">
         <h4>${item.level}: ${item.shortSourceName}</h4>
-        
+
         <ul class="item-spec" role="navigation">
             <li role="listitem">${item.message}</li>
             <li role="listitem">${item.sourceName}</li>
@@ -36,9 +36,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.c
 
 <#if status.errorItems?has_content>
     <h2>${i18n().fatal_error}</h2>
-    
+
     <p>${i18n().fatal_error_detected(applicationName)}</p>
-   
+
     <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
     <#list status.errorItems as item>
       <@statusItem item=item />
@@ -48,9 +48,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.c
 
 <#if status.warningItems?has_content>
     <h2>${i18n().warning}</h2>
-    
+
     <p>${i18n().warnings_issued(applicationName)}</p>
-    
+
     <ul id="startup-trace" cellspacing="0" class="trace" role="navigation"><#list status.warningItems as item>
       <@statusItem item=item />
     </#list>

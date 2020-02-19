@@ -9,9 +9,9 @@ import java.util.List;
  * A mutable version of ProxyRelationshipSelection, that can be assembled
  * piecemeal as the info becomes available and then translated to an immutable
  * ProxyRelationshipSelection.
- * 
+ *
  * Uses mutable subclasses Relationship and ItemInfo.
- * 
+ *
  * ItemInfo contains a field for externalAuthId only because it is useful when
  * gathering the classLabel and imageUrl.
  */

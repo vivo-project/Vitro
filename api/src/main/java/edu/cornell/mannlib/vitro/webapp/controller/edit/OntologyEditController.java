@@ -79,13 +79,13 @@ public class OntologyEditController extends BaseEditController {
         // add the options
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
-        
+
         // funky hack because Ontology.getURI() will append a hash for a hash namespace
         // See OntologyDaoJena.ontologyFromOntologyResource() comments
         String realURI = OntologyDaoJena.adjustOntologyURI(o.getURI());
         request.setAttribute("realURI", realURI);
         request.setAttribute("exportURL", request.getContextPath() + Controllers.EXPORT_RDF);
-        
+
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("title","Ontology Control Panel");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");

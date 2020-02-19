@@ -35,19 +35,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Utility to convert JSON to Freemarker-compatible data model
- * 
+ *
  * @author janv
  */
 public final class JsonToFmModel
 {
     public static String ROOT_ARRAY = "root";
-    
+
     // note: current format is dependent on ISO8601DateFormat.parser, eg. YYYY-MM-DDThh:mm:ss.sssTZD
 //    private static String REGEXP_ISO8061 = "^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(.([0-9]){3})?(Z|[\\+\\-]([0-9]{2}):([0-9]{2}))$";
 //    private static Pattern matcherISO8601 = Pattern.compile(REGEXP_ISO8061);
-//    
+//
 //    public static boolean autoConvertISO8601 = true;
-    
+
     /**
      * JSONObject is an unordered collection of name/value pairs -&gt; convert to Map (equivalent to Freemarker "hash")
      */
@@ -60,7 +60,7 @@ public final class JsonToFmModel
         while (itr.hasNext())
         {
             String key = (String)itr.next();
-            
+
             Object o = jo.get(key);
             if (o instanceof ObjectNode)
             {
@@ -76,14 +76,14 @@ public final class JsonToFmModel
 //                {
 //                    o = ISO8601DateFormat.parse((String)o);
 //                }
-                
+
                 model.put(key, o);
             }
         }
-       
+
         return model;
     }
-   
+
     /**
      * JSONArray is an ordered sequence of values -&gt; convert to List (equivalent to Freemarker "sequence")
      */
@@ -109,34 +109,34 @@ public final class JsonToFmModel
 //                {
 //                    o = ISO8601DateFormat.parse((String)o);
 //                }
-                
+
                 model.add(o);
             }
         }
-       
+
         return model;
     }
-   
+
     // for debugging only
     public static String toString(Map<String, Object> map)
     {
         return JsonToFmModel.toStringBuffer(map, 0).toString();
     }
-    
+
     @SuppressWarnings("unchecked")
     private static StringBuffer toStringBuffer(Map<String, Object> unsortedMap, int indent)
-    {      
+    {
         StringBuilder tabs = new StringBuilder();
         for (int i = 0; i < indent; i++)
         {
             tabs.append("\t");
         }
-        
+
         StringBuffer sb = new StringBuffer();
-        
+
         SortedMap<String, Object> map = new TreeMap<String, Object>();
         map.putAll(unsortedMap);
-        
+
         for (Map.Entry<String, Object> entry : map.entrySet())
         {
             if (entry.getValue() instanceof Map)
@@ -155,10 +155,10 @@ public final class JsonToFmModel
             }
             else
             {
-                sb.append(tabs).append(entry.getKey()).append(":").append(entry.getValue()).append(":").append((entry.getValue() != null ? entry.getValue().getClass() : "null")).append("\n");         
+                sb.append(tabs).append(entry.getKey()).append(":").append(entry.getValue()).append(":").append((entry.getValue() != null ? entry.getValue().getClass() : "null")).append("\n");
             }
         }
-        
+
         return sb;
     }
 }

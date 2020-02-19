@@ -48,7 +48,7 @@ public class CharsetEncodingFilter implements Filter {
 		if (servletResponse.getContentType() != null) {
 			return;
 		}
-		
+
 		String uri = req.getRequestURI();
 		if (!hasExtension(uri)) {
 			servletResponse.setContentType("text/html;charset=UTF-8");

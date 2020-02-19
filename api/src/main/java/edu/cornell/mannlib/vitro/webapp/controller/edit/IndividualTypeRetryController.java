@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class IndividualTypeRetryController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(IndividualTypeRetryController.class.getName());
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
@@ -41,24 +41,24 @@ public class IndividualTypeRetryController extends BaseEditController {
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-		
+
         VitroRequest vreq = new VitroRequest(request);
-        
+
         WebappDaoFactory wadf = vreq.getUnfilteredAssertionsWebappDaoFactory();
         IndividualDao iDao = wadf.getIndividualDao();
         VClassDao vcDao = wadf.getVClassDao();
-        
+
         String individualURI = request.getParameter("IndividualURI");
-        
+
         Individual ind = iDao.getIndividualByURI(individualURI);
         if (ind == null) {
         	ind = new IndividualImpl(individualURI);
         }
         request.setAttribute("individual", ind);
-        
+
 		List<VClass> allVClasses = vcDao.getAllVclasses();
 	    sortForPickList(allVClasses, vreq);
-			
+
 		Set<String> prohibitedURIset = new HashSet<String>();
 		for (VClass vc : ind.getVClasses(false)) {
 			if (vc.isAnonymous()) {
@@ -67,27 +67,27 @@ public class IndividualTypeRetryController extends BaseEditController {
 			prohibitedURIset.add(vc.getURI());
 			prohibitedURIset.addAll(vcDao.getDisjointWithClassURIs(vc.getURI()));
 		}
-		
+
 		List<VClass> eligibleVClasses = new ArrayList<VClass>();
 		for (VClass vc : allVClasses) {
 		    if(vc.getURI() != null && !(prohibitedURIset.contains(vc.getURI()))) {
 		        eligibleVClasses.add(vc);
 		    }
 		}
-		
+
 		FormObject foo = new FormObject();
 		epo.setFormObject(foo);
 		HashMap optionMap = new HashMap();
 		foo.setOptionLists(optionMap);
 
-		List<Option> typeOptionList = new ArrayList<Option>(); 
+		List<Option> typeOptionList = new ArrayList<Option>();
 		for (VClass vc : eligibleVClasses) {
 			Option opt = new Option(vc.getURI(), vc.getPickListName());
 			typeOptionList.add(opt);
 		}
-		
+
 		optionMap.put("types",typeOptionList);
-		
+
 	       request.setAttribute("editAction","individualTypeOp");
 	        request.setAttribute("scripts","/templates/edit/formBasic.js");
         	request.setAttribute("formJsp","/templates/edit/specific/individualType_retry.jsp");
@@ -102,11 +102,11 @@ public class IndividualTypeRetryController extends BaseEditController {
 	            log.error(e.getMessage());
 	            log.error(e.getStackTrace());
 	        }
-	        
+
 	}
-	
+
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		// shouldn't be posting to this controller
-	}	
-	
+	}
+
 }

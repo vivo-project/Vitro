@@ -8,9 +8,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showSources.css
     <p>
         <em>The information displayed here has also been written to the log.</em>
     </p>
-    
+
     <h2>Current RDF Data Structures</h2>
-    
+
     <h3>RDFServices</h3>
     <table>
         <tr>
@@ -37,7 +37,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showSources.css
                 <td><pre>${datasets[which].request}</pre></td>
             </tr>
         </#list>
-    </table> 
+    </table>
 
     <h3>ModelAccess</h3>
     <table>
@@ -54,10 +54,10 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showSources.css
     <h3>Models</h3>
     <table>
         <tr>
-            <th>Name</th><th>(Context only)</th> 
+            <th>Name</th><th>(Context only)</th>
         </tr>
         <tr>
-            <th>&nbsp;</th><th>CONFIGURATION</th> 
+            <th>&nbsp;</th><th>CONFIGURATION</th>
         </tr>
         <#list models.CONFIGURATION?keys as name>
             <tr>
@@ -66,7 +66,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showSources.css
             </tr>
         </#list>
         <tr>
-            <th>&nbsp;</th><th>CONTENT</th> 
+            <th>&nbsp;</th><th>CONTENT</th>
         </tr>
         <#list models.CONTENT?keys as name>
             <tr>
@@ -74,7 +74,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showSources.css
                 <td><pre>${models.CONTENT[name].context}</pre></td>
             </tr>
         </#list>
-    </table> 
+    </table>
 
     <h3>OntModels</h3>
     <table>
@@ -88,6 +88,6 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showSources.css
                 <td><pre>${ontModels[name].request}</pre></td>
             </tr>
         </#list>
-    </table> 
+    </table>
 
 </section>

@@ -15,7 +15,7 @@
     </tr>
 
     <!-- begin datatype properties section -->
-    
+
     <tr class="editformcell" style="border-collapse:collapse;">
         <td colspan="2">
             <ul style="margin-left:0;padding-left:0;list-style-type:none">
@@ -24,7 +24,7 @@
 	</td>
     </tr>
 
-    <!-- end datatype properties section -->    
+    <!-- end datatype properties section -->
 
 
 

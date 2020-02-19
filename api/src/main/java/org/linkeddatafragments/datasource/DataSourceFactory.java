@@ -13,16 +13,16 @@ import org.linkeddatafragments.exceptions.UnknownDataSourceTypeException;
 public class DataSourceFactory {
     /**
      * Create a datasource using a JSON config
-     * 
+     *
      * @param config
      * @return datasource interface
-     * @throws DataSourceCreationException 
+     * @throws DataSourceCreationException
      */
     public static IDataSource create(JsonNode config) throws DataSourceCreationException {
         String title = config.get("title").asText();
         String description = config.get("description").asText();
         String typeName = config.get("type").asText();
-        
+
         JsonNode settings = config.get("settings");
 
         final IDataSourceType type = DataSourceTypesRegistry.getType(typeName);

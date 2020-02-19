@@ -9,14 +9,14 @@
     <#if typeName?has_content>${i18n().limited_to_type} '${typeName}'</#if>
 </#escape>
 <script type="text/javascript">
-	var url = window.location.toString();	
+	var url = window.location.toString();
 	if (url.indexOf("?") == -1){
 		var queryText = 'querytext=${querytext}';
 	} else {
 		var urlArray = url.split("?");
 		var queryText = urlArray[1];
 	}
-	
+
 	var urlsBase = '${urls.base}';
 </script>
 
@@ -30,12 +30,12 @@
     <#-- Refinement links -->
     <#if classGroupLinks?has_content>
         <div class="searchTOC">
-            <h4>${i18n().display_only}</h4>           
-            <ul>           
+            <h4>${i18n().display_only}</h4>
+            <ul>
             <#list classGroupLinks as link>
                 <li><a href="${link.url}" title="${i18n().class_group_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
-            </ul>           
+            </ul>
         </div>
     </#if>
 
@@ -46,7 +46,7 @@
             <#else>
                 <h4>${i18n().limit_to}</h4>
             </#if>
-            <ul>           
+            <ul>
             <#list classLinks as link>
                 <li><a href="${link.url}" title="${i18n().class_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
@@ -57,17 +57,17 @@
     <#-- Search results -->
     <ul class="searchhits">
         <#list individuals as individual>
-            <li>                        
+            <li>
             	<@shortView uri=individual.uri viewContext="search" />
             </li>
         </#list>
     </ul>
-    
+
 
     <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
-            ${i18n().pages}: 
+            ${i18n().pages}:
             <#if prevPage??><a class="prev" href="${prevPage}" title="${i18n().previous}">${i18n().previous}</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>

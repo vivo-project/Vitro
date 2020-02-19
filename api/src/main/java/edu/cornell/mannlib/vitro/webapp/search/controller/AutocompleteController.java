@@ -47,20 +47,20 @@ public class AutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
-    
+
     //private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
-    
+
     private static final String PARAM_QUERY = "term";
     private static final String PARAM_RDFTYPE = "type";
     private static final String PARAM_MULTIPLE_RDFTYPE = "multipleTypes";
 
 	private boolean hasMultipleTypes = false;
-	
-    String NORESULT_MSG = "";    
+
+    String NORESULT_MSG = "";
     private static final int DEFAULT_MAX_HIT_COUNT = 1000;
 
     public static final int MAX_QUERY_LENGTH = 500;
-    
+
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTION;
@@ -90,7 +90,7 @@ public class AutocompleteController extends VitroAjaxController {
 	        	//in this case, it would be useful to show the most specific type of the individual
 	        	hasMultipleTypes = true;
 	        }
-			
+
             SearchQuery query = getQuery(qtxt, vreq);
             if (query == null ) {
                 log.debug("query for '" + qtxt +"' is null.");
@@ -121,11 +121,11 @@ public class AutocompleteController extends VitroAjaxController {
             if ( hitCount < 1 ) {
                 doNoSearchResults(response);
                 return;
-            }  
+            }
 
             List<SearchResult> results = new ArrayList<SearchResult>();
             for (SearchResultDocument doc : docs) {
-                try {                
+                try {
                     String uri = doc.getStringValue(VitroSearchTermNames.URI);
                     String name = doc.getStringValue(VitroSearchTermNames.NAME_RAW);
                     //There may be multiple most specific types, sending them all back
@@ -144,7 +144,7 @@ public class AutocompleteController extends VitroAjaxController {
             }
 			// now that we have the search result, reset this boolean
 			hasMultipleTypes = false;
-			
+
             Collections.sort(results);
 
             ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
@@ -171,7 +171,7 @@ public class AutocompleteController extends VitroAjaxController {
                     "query length is " + MAX_QUERY_LENGTH );
             return null;
         }
-          
+
         SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery();
         query.setStart(0)
              .setRows(DEFAULT_MAX_HIT_COUNT);
@@ -230,7 +230,7 @@ public class AutocompleteController extends VitroAjaxController {
     }
 
     private void setTokenizedNameQuery(SearchQuery query, String queryStr, HttpServletRequest request) {
- 
+
         /* We currently have no use case for a tokenized, unstemmed autocomplete search field, so the option
          * has been disabled. If needed in the future, will need to add a new field and field type which
          * is like AC_NAME_STEMMED but doesn't include the stemmer.
@@ -267,7 +267,7 @@ public class AutocompleteController extends VitroAjaxController {
 
             acQueryStr = StringUtils.join(terms, " AND ");
         }
-        
+
         log.debug("Tokenized name query string = " + acQueryStr);
         query.setQuery(acQueryStr);
 
@@ -290,7 +290,7 @@ public class AutocompleteController extends VitroAjaxController {
         // The search engine wants whitespace to be escaped with a backslash
         return queryStr.replaceAll("\\s+", "\\\\ ");
     }
-       
+
     private void doNoQuery(HttpServletResponse response) throws IOException  {
         // For now, we are not sending an error message back to the client because
         // with the default autocomplete configuration it chokes.
@@ -298,7 +298,7 @@ public class AutocompleteController extends VitroAjaxController {
     }
 
     private void doSearchError(HttpServletResponse response) throws IOException {
-        // For now, we are not sending an error message back to the client because 
+        // For now, we are not sending an error message back to the client because
         // with the default autocomplete configuration it chokes.
         doNoSearchResults(response);
     }
@@ -311,7 +311,7 @@ public class AutocompleteController extends VitroAjaxController {
 		return RDFServiceUtils.getRDFService(new VitroRequest(req));
 	}
 
-    public class SearchResult implements Comparable<Object> {
+    public class SearchResult implements Comparable<SearchResult> {
         private String label;
         private String uri;
         private String msType;
@@ -323,13 +323,13 @@ public class AutocompleteController extends VitroAjaxController {
 	            this.label = label + " (" + getMsTypeLocalName(msType, vreq) + ")";
 			}
 			else {
-	            this.label = label;				
+	            this.label = label;
 			}
             this.uri = uri;
             this.msType = msType;
             this.allMsTypes = allMsTypes;
         }
-		
+
         public String getLabel() {
             return label;
         }
@@ -341,7 +341,7 @@ public class AutocompleteController extends VitroAjaxController {
         public String getMsType() {
             return msType;
         }
-        
+
         public List<String> getAllMsTypes() {
         	return allMsTypes;
         }
@@ -375,7 +375,7 @@ public class AutocompleteController extends VitroAjaxController {
         	return jsonObj;
         }
 
-        public int compareTo(Object o) throws ClassCastException {
+        public int compareTo(SearchResult o) throws ClassCastException {
             if ( !(o instanceof SearchResult) ) {
                 throw new ClassCastException("Error in SearchResult.compareTo(): expected SearchResult object.");
             }

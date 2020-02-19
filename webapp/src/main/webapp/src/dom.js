@@ -23,7 +23,7 @@ dojo.dom.DOCUMENT_NODE                 = 9;
 dojo.dom.DOCUMENT_TYPE_NODE            = 10;
 dojo.dom.DOCUMENT_FRAGMENT_NODE        = 11;
 dojo.dom.NOTATION_NODE                 = 12;
-	
+
 dojo.dom.dojoml = "http://www.dojotoolkit.org/2004/dojoml";
 
 /**
@@ -73,7 +73,7 @@ dojo.dom.getTagName = function(node){
 
 	var tagName = node.tagName;
 	if(tagName.substr(0,5).toLowerCase()!="dojo:"){
-		
+
 		if(tagName.substr(0,4).toLowerCase()=="dojo"){
 			// FIXME: this assuumes tag names are always lower case
 			return "dojo:" + tagName.substring(4).toLowerCase();
@@ -84,7 +84,7 @@ dojo.dom.getTagName = function(node){
 		if(djt){
 			return "dojo:"+djt.toLowerCase();
 		}
-		
+
 		if((node.getAttributeNS)&&(node.getAttributeNS(this.dojoml,"type"))){
 			return "dojo:" + node.getAttributeNS(this.dojoml,"type").toLowerCase();
 		}
@@ -231,7 +231,7 @@ dojo.dom.getAncestors = function(node, filterFunction, returnFirstHit) {
 			ancestors.push(node);
 		}
 		if (returnFirstHit && ancestors.length > 0) { return ancestors[0]; }
-		
+
 		node = node.parentNode;
 	}
 	if (returnFirstHit) { return null; }
@@ -285,7 +285,7 @@ dojo.dom.createDocument = function(){
 		(document.implementation.createDocument)){
 		doc = document.implementation.createDocument("", "", null);
 	}
-	
+
 	return doc;
 }
 
@@ -422,10 +422,10 @@ dojo.dom.insertAtIndex = function(node, containingNode, insertionIndex){
 		return dojo.dom.insertBefore(node, siblingNodes.item(0));
 	}
 }
-	
+
 /**
  * implementation of the DOM Level 3 attribute.
- * 
+ *
  * @param node The node to scan for text
  * @param text Optional, set the text to this value.
  */

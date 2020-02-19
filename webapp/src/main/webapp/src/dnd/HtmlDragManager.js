@@ -134,7 +134,7 @@ dojo.lang.extend(dojo.dnd.HtmlDragManager, {
 	/**
 	* Get the DOM element that is meant to drag.
 	* Loop through the parent nodes of the event target until
-	* the element is found that was created as a DragSource and 
+	* the element is found that was created as a DragSource and
 	* return it.
 	*
 	* @param event object The event for which to get the drag source.
@@ -175,7 +175,7 @@ dojo.lang.extend(dojo.dnd.HtmlDragManager, {
 
 		// find a selection object, if one is a parent of the source node
 		var ds = this.getDragSource(e);
-		
+
 		// this line is important.  if we aren't selecting anything then
 		// we need to return now, so preventDefault() isn't called, and thus
 		// the event is propogated to other handling code
@@ -247,12 +247,12 @@ dojo.lang.extend(dojo.dnd.HtmlDragManager, {
 				// while the mouse doesnt "hold" the dragged object anymore ... and so on
 				dojo.lang.delayThese([
 					function() {
-						// in FF1.5 this throws an exception, see 
+						// in FF1.5 this throws an exception, see
 						// http://dojotoolkit.org/pipermail/dojo-interest/2006-April/006751.html
 						try{
 							tempDragObj.dragSource.onDragEnd(e)
 						} catch(err) {
-							// since the problem seems passing e, we just copy all 
+							// since the problem seems passing e, we just copy all
 							// properties and try the copy ...
 							var ecopy = {};
 							for (var i in e) {
@@ -348,7 +348,7 @@ dojo.lang.extend(dojo.dnd.HtmlDragManager, {
 			// selectedSources (elements that move along) then the first one is the master
 			// and for it the events will be fired etc.
 			this.dragSource = this.selectedSources[0];
-			
+
 			dojo.lang.forEach(this.selectedSources, function(tempSource){
 				if(!tempSource){ return; }
 				var tdo = tempSource.onDragStart(e);

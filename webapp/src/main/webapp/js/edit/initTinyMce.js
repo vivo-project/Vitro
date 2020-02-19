@@ -6,9 +6,9 @@ var initTinyMCE = {
         this.mergeFromTemplate();
         this.initObjects();
         this.initEditor();
-       
+
     },
-    
+
     // Add variables from menupage template
     mergeFromTemplate: function() {
         $.extend(this, customFormData);
@@ -19,7 +19,7 @@ var initTinyMCE = {
     // Create references to frequently used elements for convenience
     initEditor: function() {
     	initTinyMCE.wsywigFields.tinymce(initTinyMCE.tinyMCEData);
-    	
+
     }
 };
 

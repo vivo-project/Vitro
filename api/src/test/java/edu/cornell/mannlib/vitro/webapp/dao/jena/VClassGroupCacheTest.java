@@ -22,11 +22,11 @@ public class VClassGroupCacheTest {
 
     @Test
     public void testIsVClassGroupNameChange() {
-        
-        
+
+
         //protected static boolean isVClassGroupNameChange(Statement stmt, OntModel jenaOntModel) {
-        
-        String rdf = 
+
+        String rdf =
             "core:Summer \n" +
             "      a       owl:Class ; \n" +
             "      rdfs:label \"Spring and toast 3\"@en-US ; \n" +
@@ -45,36 +45,36 @@ public class VClassGroupCacheTest {
             "              <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ; \n" +
             "      vitro:shortDef \"sfsfe\"^^xsd:string ; \n" +
             "      owl:equivalentClass core:Summer . ";
-        
+
         OntModel om = ModelFactory.createOntologyModel();
         om.read( new StringReader( prefixes + rdf) , null , "N3");
-        
+
         Statement stmt = ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://vivoweb.org/ontology/core#Summer"),
                 RDFS.label,
                 ResourceFactory.createPlainLiteral("some old label"));
-                
+
         boolean isNameChange = VClassGroupCache.isClassNameChange(stmt, om);
         Assert.assertTrue("Expected it to be a name change but it wasn't.", isNameChange);
-        
+
         stmt = ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://vivoweb.org/ontology/core#bogus"),
                 ResourceFactory.createProperty("http://example.com/nonLabelProperty"),
                 ResourceFactory.createPlainLiteral("some old label"));
-                
+
         boolean notNameChange = ! VClassGroupCache.isClassNameChange(stmt, om);
         Assert.assertTrue("Expected it to NOT be a name change but it was.",  notNameChange);
-     
+
         stmt = ResourceFactory.createStatement(
                 ResourceFactory.createResource("http://vivoweb.org/ontology/core#bogus"),
                 RDFS.label,
                 ResourceFactory.createPlainLiteral("some old label"));
-                
+
         notNameChange = ! VClassGroupCache.isClassNameChange(stmt, om);
         Assert.assertTrue("Expected it to NOT be a name change but it was.",  notNameChange);
     }
 
-    static final String prefixes = 
+    static final String prefixes =
     "@prefix dc:      <http://purl.org/dc/elements/1.1/> . \n" +
     "@prefix pvs:     <http://vivoweb.org/ontology/provenance-support#> . \n" +
     "@prefix geo:     <http://aims.fao.org/aos/geopolitical.owl#> . \n" +
@@ -97,6 +97,6 @@ public class VClassGroupCacheTest {
     "@prefix dcelem:  <http://purl.org/dc/elements/1.1/> . \n" +
     "@prefix ero:     <http://purl.obolibrary.org/obo/> . \n" +
     " \n" ;
-    
-   
+
+
 }

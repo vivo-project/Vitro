@@ -34,7 +34,7 @@ ${userAccount.firstName} ${userAccount.lastName}
 
 Password successfully created.
 
-Your new password associated with ${userAccount.emailAddress} 
+Your new password associated with ${userAccount.emailAddress}
 has been created.
 
 Thank you.

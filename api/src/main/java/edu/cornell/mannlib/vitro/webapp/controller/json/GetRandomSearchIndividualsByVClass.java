@@ -32,25 +32,25 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 	}
 
 	/**
-	 * Search for individuals by VClass. 
+	 * Search for individuals by VClass.
 	 */
 	@Override
 	protected ObjectNode process() throws Exception {
 		ObjectNode rObj = null;
-		
+
 		//This gets the first vclass value and sets that as display type.
 		List<String> vclassIds = super.getVclassIds(vreq);
 		String vclassId = vclassIds.get(0);
 		vreq.setAttribute("queryType", "random");
 //		vreq.setAttribute("displayType", vclassId);
-		
+
 		//This will get all the solr individuals by VClass (if one value) or the intersection
 		//i.e. individuals that have all the types for the different vclasses entered
 		rObj = super.process();
 		addShortViewRenderings(rObj);
 		return rObj;
 	}
-	
+
 	/**
 	 * Look through the return object. For each individual, render the short
 	 * view and insert the resulting HTML into the object.

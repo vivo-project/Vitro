@@ -26,7 +26,7 @@ dojo.widget.defineWidget(
 			"justifyfull", "justifyleft", "justifyright", "cut", "copy", "paste",
 			"delete", "undo", "redo", "createlink", "unlink", "removeformat",
 			"inserthorizontalrule", "insertimage", "insertorderedlist",
-			"insertunorderedlist", "indent", "outdent", "formatblock", "strikethrough", 
+			"insertunorderedlist", "indent", "outdent", "formatblock", "strikethrough",
 			"inserthtml", "blockdirltr", "blockdirrtl", "dirltr", "dirrtl",
 			"inlinedirltr", "inlinedirrtl", "inserttable", "insertcell",
 			"insertcol", "insertrow", "deletecells", "deletecols", "deleterows",
@@ -98,9 +98,9 @@ dojo.widget.defineWidget(
 		pasteClick: function(){ this.exec("paste"); },
 		undoClick: function(){ this.exec("undo"); },
 		redoClick: function(){ this.exec("redo"); },
-		linkClick: function(){ 
+		linkClick: function(){
 			// FIXME: we need to alert the user if they haven't selected any text
-			// this.exec(	"createlink", 
+			// this.exec(	"createlink",
 			// 			prompt("Please enter the URL of the link:", "http://"));
 		},
 		insertunorderedlistClick: function(){ this.exec("insertunorderedlist"); },
@@ -108,7 +108,7 @@ dojo.widget.defineWidget(
 		inserthorizontalruleClick: function(){ this.exec("inserthorizontalrule"); },
 		strikethroughClick: function(){ this.exec("strikethrough"); },
 
-		formatSelectClick: function(){ 
+		formatSelectClick: function(){
 			var sv = this.formatSelectBox.value.toLowerCase();
 			this.exec("formatblock", sv);
 		},
@@ -210,8 +210,8 @@ dojo.widget.defineWidget(
 				dojo.event.connect(pal, "onColorSelect", function(){ cid.style.display = "none"; });
 
 				dojo.event.kwConnect({
-					srcObj:		document.body, 
-					srcFunc:	"onclick", 
+					srcObj:		document.body,
+					srcFunc:	"onclick",
 					targetObj:	this,
 					targetFunc:	"hideAllDropDowns",
 					once:		true
@@ -236,8 +236,8 @@ dojo.widget.defineWidget(
 			if(!dojo.render.html.ie){
 				// apparently this causes leakage on IE!
 				dojo.event.kwDisconnect({
-					srcObj:		document.body, 
-					srcFunc:	"onclick", 
+					srcObj:		document.body,
+					srcFunc:	"onclick",
 					targetObj:	this,
 					targetFunc:	"hideAllDropDowns",
 					once:		true

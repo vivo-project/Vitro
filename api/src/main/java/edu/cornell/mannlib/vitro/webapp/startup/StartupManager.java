@@ -20,10 +20,10 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Instantiate and run the ServletContextListeners for Vitro, while accumulating
  * messages in StartupStatus.
- * 
+ *
  * The startup listeners are stored in a file with one full-qualified class name
  * per line. Blank lines and comment lines (starting with '#') are ignored.
- * 
+ *
  * No exception in the listeners should prevent the successful completion.
  * However, an uncaught exception or a fatal error status will cause the
  * StartupStatusDisplayFilter to disply the problem instead of showing the home
@@ -46,7 +46,7 @@ public class StartupManager implements ServletContextListener {
 	/**
 	 * Build a list of the listeners, and run contextInitialized() on each of
 	 * them, at least until we get a fatal error.
-	 * 
+	 *
 	 * Each step of this should handle its own exceptions, but we'll wrap the
 	 * whole thing in a try/catch just in case.
 	 */
@@ -77,7 +77,7 @@ public class StartupManager implements ServletContextListener {
 
 	/**
 	 * Read the file and instantiate build a list of listener instances.
-	 * 
+	 *
 	 * If there is a problem, it will occur and be handled in a sub-method.
 	 */
 	private void findAndInstantiateListeners() {
@@ -95,7 +95,7 @@ public class StartupManager implements ServletContextListener {
 
 	/**
 	 * Read the names of the listener classes.
-	 * 
+	 *
 	 * If there is a problem, set a fatal error, and return an empty list.
 	 */
 	private List<String> readFileOfListeners() {
@@ -144,7 +144,7 @@ public class StartupManager implements ServletContextListener {
 
 	/**
 	 * Instantiate a context listener from this class name.
-	 * 
+	 *
 	 * If there is a problem, set a fatal error, and return null.
 	 */
 	private ServletContextListener instantiateListener(String className) {
@@ -165,7 +165,7 @@ public class StartupManager implements ServletContextListener {
 
 	/**
 	 * Call contextInitialized() on the listener.
-	 * 
+	 *
 	 * If there is an unexpected exception, set a fatal error.
 	 */
 	private void initialize(ServletContextListener listener,

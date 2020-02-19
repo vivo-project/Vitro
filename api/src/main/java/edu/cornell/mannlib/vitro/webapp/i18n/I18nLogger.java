@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 /**
  * If enabled in developer mode, write a message to the log each time someone
  * asks for a language string.
- * 
+ *
  * The I18nBundle has a life span of one HTTP request, and so does this.
  */
 public class I18nLogger {

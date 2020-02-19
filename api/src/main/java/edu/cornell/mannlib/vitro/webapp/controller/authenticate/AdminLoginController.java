@@ -28,7 +28,7 @@ import javax.servlet.annotation.WebServlet;
 /**
  * Provide a "hidden" login page for systems where the Login Widget has been
  * modified to only show the link to an External Authentication system.
- * 
+ *
  * This page is only hidden because there is no link to it. Anyone who knows the
  * URL can come here, but they need to pass Internal Authentication to proceed.
  */
@@ -189,7 +189,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			body.put("password", password);
 			body.put("newPassword", newPassword);
 			body.put("confirmPassword", confirmPassword);
-			
+
 			body.put("minPasswordLength", MIN_PASSWORD_LENGTH);
 			body.put("maxPasswordLength", MAX_PASSWORD_LENGTH);
 

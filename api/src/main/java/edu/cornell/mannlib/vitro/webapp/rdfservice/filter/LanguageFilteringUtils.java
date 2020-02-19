@@ -25,7 +25,7 @@ public class LanguageFilteringUtils {
 	 * Take an Enumeration of Locale objects, such as we might get from a
 	 * request, and convert to a List of langauage strings, such as are needed
 	 * by the LanguageFilteringRDFService.
-	 * 
+	 *
 	 * While converting, change all underscores (as in Locale names) to hyphens
 	 * (as in RDF language specifiers).
 	 */

@@ -14,23 +14,23 @@ public class SDBGraphConnectionGenerator {
 
 	private final static Log log = LogFactory.getLog(
 			SDBGraphConnectionGenerator.class);
-	
+
 	private DataSource ds = null;
 	private Connection connection = null;
-	
+
 	public SDBGraphConnectionGenerator(DataSource dataSource) {
 		this.ds = dataSource;
 	}
-	
+
 	public Connection generateConnection() throws SQLException {
         if ( this.connection == null ) {
             this.connection = ds.getConnection();
         } else if ( this.connection.isClosed() ) {
             try {
                 this.connection.close();
-            } catch (SQLException e) {                  
+            } catch (SQLException e) {
                 // The connection will throw an "Already closed"
-                // SQLException that we need to catch.  We need to 
+                // SQLException that we need to catch.  We need to
                 // make this extra call to .close() in order to make
                 // sure that the connection is returned to the pool.
                 // This depends on the particular behavior of version
@@ -43,5 +43,5 @@ public class SDBGraphConnectionGenerator {
         }
         return connection;
 	}
-	
+
 }

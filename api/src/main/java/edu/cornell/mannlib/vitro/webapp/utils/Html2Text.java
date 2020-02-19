@@ -30,9 +30,9 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
          log.error("could not strip html",e);
      }finally{
          r.close();
-     }     
+     }
  }
- 
+
  public void handleText(char[] text, int pos) {
    s.append(text);
  }
@@ -46,10 +46,10 @@ public class Html2Text extends HTMLEditorKit.ParserCallback {
         parse(in);
     } catch (IOException e) {
         log.debug("could not strip html",e);
-    }     
+    }
      return getText();
  }
- 
- 
+
+
  private static final Log log = LogFactory.getLog(Html2Text.class.getName());
 }

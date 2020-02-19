@@ -6,8 +6,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.riot.Lang;
+import org.apache.commons.lang3.StringUtils;
 import org.linkeddatafragments.config.ConfigReader;
 import org.linkeddatafragments.datasource.DataSourceFactory;
 import org.linkeddatafragments.datasource.DataSourceTypesRegistry;
@@ -47,11 +49,15 @@ import java.util.Map.Entry;
 @WebServlet(name = "TpfServlet", urlPatterns = {"/tpf/*"})
 public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
 
-    private final static long serialVersionUID = 1L;
-
+	private final static long serialVersionUID = 1L;
+	
+	private static final String PROPERTY_TPF_ACTIVE_FLAG = "tpf.activeFlag";
+	
     private ConfigReader config;
     private final HashMap<String, IDataSource> dataSources = new HashMap<>();
     private final Collection<String> mimeTypes = new ArrayList<>();
+    private ConfigurationProperties configProps;
+    private String tpfActiveFlag;
 
     private File getConfigFile(ServletConfig config) throws IOException {
         String path = config.getServletContext().getRealPath("/");
@@ -73,6 +79,16 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
     public void init(ServletConfig servletConfig) throws ServletException {
         try {
             ServletContext ctx = servletConfig.getServletContext();
+            configProps = ConfigurationProperties.getBean(ctx);
+            
+            if (!configurationPresent()) {
+            	throw new ServletException("TPF is currently disabled. To enable, add 'tpfActive.flag=true' to the runtime.properties.");
+            } else {
+            	if (!tpfActiveFlag.equalsIgnoreCase("true")) {
+            		throw new ServletException("TPF is currently disabled. To enable, set 'tpfActive.flag=true' in runtime.properties.");
+            	}
+            }
+            
             RDFService rdfService = ModelAccess.on(ctx).getRDFService();
             RDFServiceBasedRequestProcessorForTPFs.setRDFService(rdfService);
 
@@ -117,9 +133,19 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             catch( Exception e ) {
                 // ignore
             }
-        }   
+        }
     }
 
+    private boolean configurationPresent() {
+    	String activeFlag = configProps.getProperty(PROPERTY_TPF_ACTIVE_FLAG);
+    	if (StringUtils.isNotEmpty(activeFlag)) {
+    		this.tpfActiveFlag = activeFlag;
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+    
     private IDataSource getDataSource(HttpServletRequest request) throws DataSourceNotFoundException {
         String contextPath = request.getContextPath();
         String requestURI = request.getRequestURI();
@@ -170,12 +196,12 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             response.setHeader("Server", "Linked Data Fragments Server");
             response.setContentType(bestMatch);
             response.setCharacterEncoding("utf-8");
-            
+
             // create a writer depending on the best matching mimeType
             ILinkedDataFragmentWriter writer = LinkedDataFragmentWriterFactory.create(config.getPrefixes(), dataSources, bestMatch);
-            
+
             try {
-            
+
                 final IDataSource dataSource = getDataSource( request );
 
                 final ILinkedDataFragmentRequest ldfRequest =
@@ -187,7 +213,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
 
                 response.setHeader("Access-Control-Allow-Origin", "*");
                 writer.writeFragment(response.getOutputStream(), dataSource, fragment, ldfRequest);
-            
+
             } catch (DataSourceNotFoundException ex) {
                 try {
                     response.setStatus(404);
@@ -199,7 +225,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
                 response.setStatus(500);
                 writer.writeError(response.getOutputStream(), e);
             }
-          
+
         } catch (Exception e) {
             throw new ServletException(e);
         }

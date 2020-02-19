@@ -51,13 +51,13 @@ dojo.lang.extend(dojo.widget.html.Show, {
 		}
 		this.sourceNode.className = "dojoShowPrint";
 		this.sourceNode.style.display = "none";
-		
+
 		dojo.event.connect(document, "onclick", this, "gotoSlideByEvent");
 		dojo.event.connect(document, "onkeypress", this, "gotoSlideByEvent");
 		dojo.event.connect(window, "onresize", this, "resizeWindow");
 		dojo.event.connect(this.nav, "onmousemove", this, "popUpNav");
 	},
-	postCreate: function(){		
+	postCreate: function(){
 		this._slides = [];
 		for(var i = 0, child; child = this.children[i]; i++){
 			if(child.widgetType == "ShowSlide"){
@@ -86,15 +86,15 @@ dojo.lang.extend(dojo.widget.html.Show, {
 				}
 			}
 		}
-		
+
 		if(!this._slides[slide]){
 			return;
 		}
-		
+
 		if(this._slide != -1){
 			while(this._slides[this._slide].previousAction()){}
 		}
-		
+
 		this._slide = slide;
 		this.select.selectedIndex = slide;
 		while(this.contentNode.hasChildNodes()){ this.contentNode.removeChild(this.contentNode.firstChild); }

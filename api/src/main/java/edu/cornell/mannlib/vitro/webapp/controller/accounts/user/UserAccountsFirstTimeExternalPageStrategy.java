@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 /**
  * Handle the variations in the UserAccountsFirstTimeExternal page. If email is
  * available, inform the template, and send a notification to the user.
- * 
+ *
  * If not, then don't.
  */
 public abstract class UserAccountsFirstTimeExternalPageStrategy extends

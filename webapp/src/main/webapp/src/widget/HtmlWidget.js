@@ -16,7 +16,7 @@ dojo.require("dojo.lang.extras");
 dojo.require("dojo.lang.func");
 dojo.require("dojo.lfx.toggle");
 
-dojo.declare("dojo.widget.HtmlWidget", dojo.widget.DomWidget, {								 
+dojo.declare("dojo.widget.HtmlWidget", dojo.widget.DomWidget, {
 	widgetType: "HtmlWidget",
 
 	templateCssPath: null,

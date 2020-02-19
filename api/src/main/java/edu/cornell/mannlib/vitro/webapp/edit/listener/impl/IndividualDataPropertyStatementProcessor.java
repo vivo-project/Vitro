@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BasicValidationVTwo;
 
 public class IndividualDataPropertyStatementProcessor implements ChangeListener {
-	
+
 	private static final Log log = LogFactory.getLog(IndividualDataPropertyStatementProcessor.class.getName());
 
     public void doInserted(Object newObj, EditProcessObject epo) {

@@ -58,10 +58,10 @@ public class RDFFilesLoader {
 
 	/**
 	 * Load the "first time" files if we say it is the first time.
-	 * 
+	 *
 	 * The location is based on the home directory and the model path: "abox",
 	 * "display", etc.
-	 * 
+	 *
 	 * The files from the directory are added to the model.
 	 */
 	public static void loadFirstTimeFiles(String modelPath, Model model,
@@ -81,10 +81,10 @@ public class RDFFilesLoader {
 
 	/**
 	 * Load the "every time" files.
-	 * 
+	 *
 	 * The location is based on the home directory and the model path: "abox",
 	 * "display", etc.
-	 * 
+	 *
 	 * The files from the directory become a sub-model of the model.
 	 */
 	public static void loadEveryTimeFiles(String modelPath, OntModel model) {

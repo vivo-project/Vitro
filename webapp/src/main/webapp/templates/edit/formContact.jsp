@@ -31,9 +31,9 @@
 		<!--<span class="entryFormHeadInstructions">(<sup>*</sup> Required Fields)</span>-->
 
 
-	
+
 <span class="warning">${globalErrorMsg}</span>
-	
+
 	<jsp:include page="${formJsp}"/>
 	<br />
 
@@ -41,19 +41,19 @@
 				<c:when test='${_action == "insert"}'>
 					<input id="primaryAction" type="submit" class="submit" name="_insert" value="Create new record"/>
 				</c:when>
-				<c:otherwise>		
+				<c:otherwise>
     				<input id="primaryAction" type="submit" class="submit" name="_update" value="Save changes"/>
-                    <c:if test="${ ! (_cancelButtonDisabled == 'disabled') }">	
+                    <c:if test="${ ! (_cancelButtonDisabled == 'disabled') }">
 				        <!--<input type="submit" class="delete" name="_delete" onclick="return confirmDelete();" value="Delete"/>-->
                     </c:if>
 				</c:otherwise>
 			</c:choose>
-			
+
 			<!--<input type="reset" class="delete" value="Reset"/>-->
-			
+
             <c:choose>
                 <c:when test="${!empty formOnCancel}">
-                    <input type="submit" class="delete" name="_cancel" onclick="${formOnCancel}" value="Cancel"/> 
+                    <input type="submit" class="delete" name="_cancel" onclick="${formOnCancel}" value="Cancel"/>
                 </c:when>
                 <c:otherwise>
 		            <input type="submit" class="delete" name="_cancel" value="Cancel"/>

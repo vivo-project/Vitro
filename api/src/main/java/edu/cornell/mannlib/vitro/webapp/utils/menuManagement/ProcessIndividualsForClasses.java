@@ -32,7 +32,7 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
     private static final Log log = LogFactory.getLog(ProcessIndividualsForClasses.class);
 
    /**Retrieve and populate**/
-    
+
   //Based on institutional internal page and not general individualsForClasses
     @Override
 	public void populateTemplate(HttpServletRequest req, Map<String, Object> pageData, Map<String, Object> templateData) {
@@ -40,27 +40,27 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 		populateIncludedClasses(pageData, templateData);
 		populateRestrictedClasses(pageData, templateData);
 		//Also save the class group for display
-		DataGetterUtils.getClassGroupForDataGetter(req, pageData, templateData); 
+		DataGetterUtils.getClassGroupForDataGetter(req, pageData, templateData);
 
 	}
-    
+
     protected void initTemplateData(Map<String,Object> templateData) {
     	templateData.put("isIndividualsForClassesPage", true);
 		templateData.put("isClassGroupPage", false);
 		templateData.put("includeAllClasses", false);
     }
-    
+
     protected void populateIncludedClasses(Map<String, Object> pageData, Map<String, Object> templateData) {
 		//what classes are to be included on page, note this should be a list of string uris
 		VClassGroup includedClasses = (VClassGroup) pageData.get("vClassGroup");
 		templateData.put("includeClasses", getClassUrisAsList(includedClasses));
     }
-    
+
     protected void populateRestrictedClasses(Map<String, Object> pageData, Map<String, Object> templateData) {
 		VClassGroup restrictedClasses = (VClassGroup) pageData.get("restrictVClassGroup");
 		templateData.put("restricted", getClassUrisAsList(restrictedClasses));
     }
-    
+
     protected List<String> getClassUrisAsList(VClassGroup includedClasses) {
 		List<String> classUris = new ArrayList<String>();
 		List<VClass> classList = includedClasses.getVitroClassList();
@@ -69,7 +69,7 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 		}
 		return classUris;
 	}
-    
+
 	/**Process submission**/
 	//Check and see if we should use this process
 	//Use this if either internal class is selected or all classes have been selected
@@ -82,16 +82,16 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 		String[] selectedClasses = vreq.getParameterValues("classInClassGroup");
 		String dataGetterTypeUri = DataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());
 		Model dgModel = ModelFactory.createDefaultModel();
-		dgModel.add(dgModel.createStatement(dataGetterResource, 
-				RDF.type, 
+		dgModel.add(dgModel.createStatement(dataGetterResource,
+				RDF.type,
 				ResourceFactory.createResource(dataGetterTypeUri)));
 		for(String classUri: selectedClasses) {
 			dgModel.add(dgModel.createStatement(
-					dataGetterResource, 
+					dataGetterResource,
 					ResourceFactory.createProperty(DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS),
 					ResourceFactory.createResource(classUri)));
 		}
-		
+
 		//This code can be uncommented when the form includes inputs for restricted class uris
 		//At that time, use the input that returns the uris for restriction classes and replace below
 		/*
@@ -99,19 +99,19 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 			String[] restrictedClasses = vreq.getParameterValues("restrictedClassUris");
 			for(String restrictedClassUri: restrictedClasses) {
 				dgModel.add(dgModel.createStatement(
-						dataGetterResource, 
+						dataGetterResource,
 						ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY),
 						dgModel.createLiteral(restrictedClassUri)));
 			}
 		}*/
 		return dgModel;
 	}
-	
+
 	private  boolean allClassesSelected(VitroRequest vreq) {
 			String allClasses = vreq.getParameter("allSelected");
 			return (allClasses != null && !allClasses.isEmpty());
 	}
-		
+
 	//This code can be uncommented when the form includes inputs for restricted class uris
 	//At that time, use the input that returns the uris for restriction classes and replace below
 	/*
@@ -119,6 +119,6 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 	   String restrictedClasses = vreq.getParameter("restrictedClassUri");
 		return (restrictedClasses != null && !restrictedClasses.isEmpty());
 	}
-	*/		
-		
+	*/
+
 }

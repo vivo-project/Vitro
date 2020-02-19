@@ -28,14 +28,14 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 /**
  * A TDB triple-store has no concept of connections, so we need not manage them
  * here.
- * 
+ *
  * As a result, we have a single RDFService, a RDFServiceFactory that always
  * returns that single RDFService, a single instance of the Dataset and the
  * ModelMaker.
- * 
+ *
  * We keep a copy of the RDFService wrapped in an Unclosable shell, and hand
  * that out when requested. The inner RDFService is only closed on shutdown().
- * 
+ *
  * Memory-map all of the configuration models, and add the standard decorators.
  */
 public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {

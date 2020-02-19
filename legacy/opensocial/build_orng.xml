@@ -2,16 +2,16 @@
 
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<!-- ====================================================================== 
-     Build script for the ORNG Shindig webapp. 
-     
+<!-- ======================================================================
+     Build script for the ORNG Shindig webapp.
+
      This can be used on its own, or invoked from the "orng" target of the main build file.
      ====================================================================== -->
 
 <project name="ORNG-shindig" default="describe">
 
-	<!-- ================================= 
-          target: describe              
+	<!-- =================================
+          target: describe
          ================================= -->
 	<target name="describe" description="--> Describe the targets (this is the default).">
 		<echo>
@@ -21,13 +21,13 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 	    </echo>
 	</target>
 
-	<!-- ================================= 
-          target: all              
+	<!-- =================================
+          target: all
          ================================= -->
 	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: properties                      
+	<!-- - - - - - - - - - - - - - - - - -
+          target: properties
          - - - - - - - - - - - - - - - - - -->
 	<target name="properties">
 		<property name="build.properties.file" location="../webapp/config/build.properties" />
@@ -39,7 +39,7 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 				</not>
 			</condition>
 		</fail>
-		
+
 		<property file="${build.properties.file}" />
 
 		<fail unless="tomcat.home" message="${build.properties.file} must contain a value for tomcat.home" />
@@ -48,14 +48,14 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 
 		<property name="runtime.properties.file" location="${vitro.home}/runtime.properties" />
 
-		<fail message="The runtime properties file &quot;${runtime.properties.file}&quot; does not exist."> 
+		<fail message="The runtime properties file &quot;${runtime.properties.file}&quot; does not exist.">
 			<condition>
 				<not>
 					<available file="${runtime.properties.file}" />
 				</not>
 			</condition>
 		</fail>
-		
+
 		<property file="${runtime.properties.file}" />
 
 		<fail unless="VitroConnection.DataSource.url" message="${runtime.properties.file} must contain a value for VitroConnection.DataSource.url" />
@@ -110,16 +110,16 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		<property name="shindig.properties.template.file" location="${basedir}/shindigorng.properties.template" />
 		<property name="shindig.properties.modified.file" location="${build.shindig.dir}/shindigorng.properties" />
 		<property name="shindig.properties.deployed.file" location="${shindig.config.dir}/shindigorng.properties" />
-		
+
 		<!-- sample-gadgets webapp -->
 		<property name="sample.webapp.original.dir" location="./sample-gadgets" />
 		<property name="sample.webapp.deployed.dir" location="${tomcat.webapps.dir}/sample-gadgets" />
-		
+
 
 	</target>
 
-	<!-- ================================= 
-          target: clean              
+	<!-- =================================
+          target: clean
          ================================= -->
 	<target name="clean" depends="properties" description="--> Delete all artifacts">
 		<delete includeemptydirs="true" failonerror="false">
@@ -130,8 +130,8 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		</delete>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: prepare                      
+	<!-- - - - - - - - - - - - - - - - - -
+          target: prepare
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepare" depends="properties">
 		<mkdir dir="${build.dir}" />
@@ -141,8 +141,8 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		<mkdir dir="${shindig.config.dir}" />
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: modifyPropertiesFile                      
+	<!-- - - - - - - - - - - - - - - - - -
+          target: modifyPropertiesFile
          - - - - - - - - - - - - - - - - - -->
 	<target name="modifyPropertiesFile" depends="properties, prepare">
 		<copy file="${shindig.properties.template.file}" toFile="${shindig.properties.modified.file}">
@@ -157,8 +157,8 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		</copy>
 	</target>
 
-	<!-- ================================= 
-          target: deploy              
+	<!-- =================================
+          target: deploy
          ================================= -->
 	<target name="deploy" depends="modifyPropertiesFile" description="--> Deploy the application directly into the Tomcat webapps directory.">
 		<copy file="${shindig.properties.modified.file}" tofile="${shindig.properties.deployed.file}" />

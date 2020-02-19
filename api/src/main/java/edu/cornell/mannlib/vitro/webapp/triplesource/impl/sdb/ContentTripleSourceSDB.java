@@ -50,7 +50,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * Create the connection to the SDB triple-store.
- * 
+ *
  * Do some smoke-tests on the parameters, create the connection pool, and create
  * the RDFServiceFactory.
  */
@@ -198,7 +198,7 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	 * Use models from the short-term RDFService, since there is less contention
 	 * for the database connections that way. The exceptions are the
 	 * memory-mapped models. By keeping them, we also keep their sub-models.
-	 * 
+	 *
 	 * Set up the Union models again also, so they will reference the short-term
 	 * models.
 	 */
@@ -270,7 +270,7 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	 * The MySQL driver leaves a thread running after it is deregistered.
 	 * Versions after 5.1.23 provide AbandonedConnectionCleanupThread.shutdown()
 	 * to stop this thread.
-	 * 
+	 *
 	 * Using reflection to invoke this method means that we don't have a
 	 * hard-coded dependency to MySQL.
 	 */

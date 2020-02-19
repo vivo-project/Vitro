@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  */
 public abstract class JsonProducer {
 	private static final Log log = LogFactory.getLog(JsonProducer.class);
-	
+
 	/**
 	 * Process a list of Individuals into a JSON array that holds the Names and URIs.
 	 */
@@ -40,7 +40,7 @@ public abstract class JsonProducer {
 
 	/**
 	 * Get the "vclassId" parameter from the request and instantiate the VClass.
-	 * 
+	 *
 	 * There must be one, and it must be valid.
 	 */
 	protected VClass getVclassParameter(VitroRequest vreq) {
@@ -55,7 +55,7 @@ public abstract class JsonProducer {
 	/**
 	 * Get one or more "vclassId" parameters from the request. Confirm that
 	 * there is at least one, and that all are valid.
-	 * 
+	 *
 	 * Return value is never null and never empty.
 	 */
 	protected List<String> getVclassIds(VitroRequest vreq) {
@@ -71,7 +71,7 @@ public abstract class JsonProducer {
 
 		return Arrays.asList(vclassIds);
 	}
-	
+
 	private VClass instantiateVclass(String uri, VitroRequest vreq) {
 		VClass vclass = vreq.getWebappDaoFactory().getVClassDao()
 				.getVClassByURI(uri);

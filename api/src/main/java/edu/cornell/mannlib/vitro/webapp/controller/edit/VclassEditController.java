@@ -34,7 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 @WebServlet(name = "VclassEditController", urlPatterns = {"/vclassEdit"} )
 public class VclassEditController extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
 	private static final int NUM_COLS = 14;
 
@@ -50,14 +50,14 @@ public class VclassEditController extends BaseEditController {
 
         VClassDao vcwDao = ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
-        
+
         if (vcl == null) {
         	vcl = request.getUnfilteredWebappDaoFactory()
         	        .getVClassDao().getTopConcept();
         }
 
         request.setAttribute("VClass",vcl);
-        
+
         ArrayList results = new ArrayList();
         results.add("class");                // 1
         results.add("class label");          // 2
@@ -67,14 +67,14 @@ public class VclassEditController extends BaseEditController {
         results.add("short definition");     // 6
         results.add("example");              // 7
         results.add("editor description");   // 8
-        //results.add("curator comments"); 
+        //results.add("curator comments");
         results.add("display level");        // 9
         results.add("update level");         // 10
         results.add("display rank");         // 11
         results.add("custom entry form");    // 12
         results.add("URI");                  // 13
         results.add("publish level");        // 14
-        
+
         String ontologyName = null;
         if (vcl.getNamespace() != null) {
             Ontology ont = request.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(vcl.getNamespace());
@@ -86,7 +86,7 @@ public class VclassEditController extends BaseEditController {
         WebappDaoFactory wadf = request.getUnfilteredWebappDaoFactory();
         String groupURI = vcl.getGroupURI();
         String groupName = "none";
-        if(groupURI != null) { 
+        if(groupURI != null) {
             VClassGroupDao groupDao= wadf.getVClassGroupDao();
             VClassGroup classGroup = groupDao.getGroupByURI(groupURI);
             if (classGroup != null) {
@@ -97,7 +97,7 @@ public class VclassEditController extends BaseEditController {
         String shortDef = (vcl.getShortDef()==null) ? "" : vcl.getShortDef();
         String example = (vcl.getExample()==null) ? "" : vcl.getExample();
         String description = (vcl.getDescription()==null) ? "" : vcl.getDescription();
-        
+
         boolean foundComment = false;
         StringBuffer commSb = null;
         for (String s : request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI())) {
@@ -110,7 +110,7 @@ public class VclassEditController extends BaseEditController {
         if (!foundComment) {
             commSb = new StringBuffer("no comments yet");
         }
-               
+
 		String hiddenFromDisplay = (vcl.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)"
 				: vcl.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
 		String ProhibitedFromUpdate = (vcl
@@ -120,11 +120,11 @@ public class VclassEditController extends BaseEditController {
 				: vcl.getHiddenFromPublishBelowRoleLevel().getDisplayLabel());
 
         String customEntryForm = (vcl.getCustomEntryForm() == null ? "(unspecified)" : vcl.getCustomEntryForm());
-        
+
        //String lastModified = "<i>not implemented yet</i>"; // TODO
-        
+
         String uri = (vcl.getURI() == null) ? "" : vcl.getURI();
-        
+
         results.add(vcl.getPickListName());                                // 1
         results.add(vcl.getName() == null ? "(no public label)" : vcl.getName()); // 2
         results.add(groupName);                                                   // 3
@@ -133,7 +133,7 @@ public class VclassEditController extends BaseEditController {
         results.add(shortDef);               // 6
         results.add(example);                // 7
         results.add(description);            // 8
-        //results.add(commSb.toString());    // 
+        //results.add(commSb.toString());    //
         results.add(hiddenFromDisplay);      // 9
         results.add(ProhibitedFromUpdate);   // 10
         results.add(String.valueOf(vcl.getDisplayRank())); // 11
@@ -154,7 +154,7 @@ public class VclassEditController extends BaseEditController {
         // if supported, we want to show only the asserted superclasses and subclasses.
         VClassDao vcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
         VClassDao displayVcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getVClassDao();
-        
+
         List<VClass> superVClasses = getVClassesForURIList(
                 vcDao.getSuperClassURIs(vcl.getURI(),false), displayVcDao);
         sortForPickList(superVClasses, request);
@@ -164,7 +164,7 @@ public class VclassEditController extends BaseEditController {
                 vcDao.getSubClassURIs(vcl.getURI()), displayVcDao);
         sortForPickList(subVClasses, request);
         request.setAttribute("subclasses",subVClasses);
-            
+
         List<VClass> djVClasses = getVClassesForURIList(
                 vcDao.getDisjointWithClassURIs(vcl.getURI()), displayVcDao);
         sortForPickList(djVClasses, request);
@@ -174,13 +174,13 @@ public class VclassEditController extends BaseEditController {
                 vcDao.getEquivalentClassURIs(vcl.getURI()), displayVcDao);
         sortForPickList(eqVClasses, request);
         request.setAttribute("equivalentClasses",eqVClasses);
-   
+
         // add the options
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
         boolean instantiable = !vcl.getURI().equals(OWL.Nothing.getURI());
-        
+
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("vclassWebapp", vcl);
         request.setAttribute("instantiable", instantiable);
@@ -200,7 +200,7 @@ public class VclassEditController extends BaseEditController {
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
     }
-    
+
     private List<VClass> getVClassesForURIList(List<String> vclassURIs, VClassDao vcDao) {
         List<VClass> vclasses = new ArrayList<VClass>();
         for (String vclassURI : vclassURIs) {

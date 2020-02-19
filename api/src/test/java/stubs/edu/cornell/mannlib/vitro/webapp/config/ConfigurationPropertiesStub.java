@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
  * A version of ConfigurationProperties that we can use for unit tests. Unlike
  * the basic implementation, this starts as an empty map, and allows the user to
  * add properties as desired.
- * 
+ *
  * Call setBean() to store these properties in the ServletContext.
  */
 public class ConfigurationPropertiesStub extends ConfigurationProperties {

@@ -58,7 +58,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSe
 public abstract class RDFServiceJena extends RDFServiceImpl implements RDFService {
 
     private final static Log log = LogFactory.getLog(RDFServiceJena.class);
-        
+
     protected abstract DatasetWrapper getDatasetWrapper();
 
     protected volatile boolean rebuildGraphURICache = true;
@@ -66,13 +66,13 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
 	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
-     
+
     protected void notifyListenersOfPreChangeEvents(ChangeSet changeSet) {
 		for (Object o : changeSet.getPreChangeEvents()) {
 		    this.notifyListenersOfEvent(o);
 		}
 	}
-    
+
     protected void insureThatInputStreamsAreResettable(ChangeSet changeSet) throws IOException {
 		for (ModelChange modelChange: changeSet.getModelChanges()) {
             if (!modelChange.getSerializedModel().markSupported()) {
@@ -87,15 +87,15 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		for (ModelChange modelChange: changeSet.getModelChanges()) {
 			dataset.getLock().enterCriticalSection(Lock.WRITE);
 			try {
-				Model model = (modelChange.getGraphURI() == null) ? 
-						dataset.getDefaultModel() : 
+				Model model = (modelChange.getGraphURI() == null) ?
+						dataset.getDefaultModel() :
 						dataset.getNamedModel(modelChange.getGraphURI());
 				operateOnModel(model, modelChange, dataset);
 			} finally {
 				dataset.getLock().leaveCriticalSection();
 			}
 		}
-	}  
+	}
 
     protected void notifyListenersOfPostChangeEvents(ChangeSet changeSet) {
 		for (Object o : changeSet.getPostChangeEvents()) {
@@ -120,12 +120,12 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                 }
             } else {
                 log.error("unrecognized operation type");
-            } 
+            }
         } finally {
             model.leaveCriticalSection();
         }
     }
-    
+
 	/**
 	 * As a debug statement, log info about the model change operation: add or
 	 * delete, model URI, model class, punctuation count, beginning of the
@@ -179,7 +179,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 	}
 
 	private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {
-               
+
         List<Statement> blankNodeStatements = new ArrayList<Statement>();
         StmtIterator stmtIt = model.listStatements();
         while (stmtIt.hasNext()) {
@@ -188,22 +188,22 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                 blankNodeStatements.add(stmt);
             }
         }
-        
+
         if(blankNodeStatements.size() == 0) {
             return;
         }
-        
+
         Model blankNodeModel = ModelFactory.createDefaultModel();
         blankNodeModel.add(blankNodeStatements);
-        
+
         log.debug("removal model size " + model.size());
         log.debug("blank node model size " + blankNodeModel.size());
-                
+
         if (blankNodeModel.size() == 1) {
             log.warn("Deleting single triple with blank node: " + blankNodeModel);
             log.warn("This likely indicates a problem; excessive data may be deleted.");
         }
-        
+
         Query rootFinderQuery = QueryFactory.create(BNODE_ROOT_QUERY);
         QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
         try {
@@ -223,8 +223,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                     if (graphURI == null) {
                         ds.setDefaultModel(dataset.getDefaultModel());
                     } else {
-                        ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));    
-                    }  
+                        ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));
+                    }
                     if (s.isAnon()) {
                         removeUsingSparqlUpdate(ds, tree, graphURI);
                     } else {
@@ -245,11 +245,11 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                                     qe3.execDescribe(m2);
                                 } finally {
                                     qe3.close();
-                                }    
+                                }
                             }
-                            m2.add(stmt);    
+                            m2.add(stmt);
                             removeUsingSparqlUpdate(ds, m2, graphURI);
-                        }  
+                        }
                     }
                 } finally {
                     qee.close();
@@ -257,9 +257,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             }
         } finally {
             qe.close();
-        }        
+        }
     }
-    
+
     private String makeDescribe(Resource s) {
         StringBuilder query = new StringBuilder("DESCRIBE <") ;
         if (s.isAnon()) {
@@ -270,15 +270,15 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         query.append(">");
         return query.toString();
     }
-    
-    private void removeUsingSparqlUpdate(Dataset dataset, Model model, String graphURI) {      
+
+    private void removeUsingSparqlUpdate(Dataset dataset, Model model, String graphURI) {
         StmtIterator stmtIt = model.listStatements();
-        
+
         if (!stmtIt.hasNext()) {
             stmtIt.close();
             return;
         }
-        
+
         StringBuffer queryBuff = new StringBuffer();
         queryBuff.append("CONSTRUCT { \n");
         List<Statement> stmts = stmtIt.toList();
@@ -296,9 +296,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             queryBuff.append("    } \n");
         }
         queryBuff.append("} \n");
-        
+
         log.debug(queryBuff.toString());
-        
+
         Query construct = QueryFactory.create(queryBuff.toString());
         // make a plain dataset to force the query to be run in a way that
         // won't overwhelm MySQL with too many joins
@@ -306,21 +306,21 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         if (graphURI == null) {
             ds.setDefaultModel(dataset.getDefaultModel());
         } else {
-            ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));            
+            ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));
         }
         QueryExecution qe = QueryExecutionFactory.create(construct, ds);
         try {
             Model m = qe.execConstruct();
             if (graphURI != null) {
-                dataset.getNamedModel(graphURI).remove(m);    
+                dataset.getNamedModel(graphURI).remove(m);
             } else {
                 dataset.getDefaultModel().remove(m);
             }
         } finally {
             qe.close();
-        }       
+        }
     }
-    
+
     private List<Statement> sort(List<Statement> stmts) {
         List<Statement> output = new ArrayList<Statement>();
         int originalSize = stmts.size();
@@ -350,7 +350,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                     if(stmt.getSubject().equals(subj)) {
                         output.add(stmt);
                         if (stmt.getObject().isResource()) {
-                            subjQueue.add((Resource) stmt.getObject()); 
+                            subjQueue.add((Resource) stmt.getObject());
                         }
                     } else {
                         temp.add(stmt);
@@ -360,14 +360,14 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             }
         }
         if(output.size() != originalSize) {
-            throw new RuntimeException("original list size was " + originalSize + 
-                    " but sorted size is " + output.size());      
+            throw new RuntimeException("original list size was " + originalSize +
+                    " but sorted size is " + output.size());
         }
         return output;
     }
-    
+
     private static final boolean WHERE_CLAUSE = true;
-    
+
     private void addStatementPatterns(List<Statement> stmts, StringBuffer patternBuff, boolean whereClause) {
         for(Statement stmt : stmts) {
             Triple t = stmt.asTriple();
@@ -387,15 +387,15 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             }
         }
     }
-    
+
     private Model parseModel(ModelChange modelChange) {
         Model model = ModelFactory.createDefaultModel();
         model.read(modelChange.getSerializedModel(), null,
                 getSerializationFormatString(modelChange.getSerializationFormat()));
         return model;
     }
-    
-    private InputStream getRDFResultStream(String query, boolean construct, 
+
+    private InputStream getRDFResultStream(String query, boolean construct,
             ModelSerializationFormat resultFormat) throws RDFServiceException {
         DatasetWrapper dw = getDatasetWrapper();
         try {
@@ -434,9 +434,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
 
     private static final boolean CONSTRUCT = true;
-    
+
     private static final boolean DESCRIBE = false;
-    
+
     @Override
     public InputStream sparqlConstructQuery(String query,
             ModelSerializationFormat resultFormat) throws RDFServiceException {
@@ -466,7 +466,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             QueryExecution qe = createQueryExecution(query, q, d);
             try {
                 ResultSet resultSet = qe.execSelect();
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 switch (resultFormat) {
                    case CSV:
                       ResultSetFormatter.outputAsCSV(outputStream,resultSet);
@@ -480,9 +480,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                    case XML:
                       ResultSetFormatter.outputAsXML(outputStream, resultSet);
                       break;
-                   default: 
+                   default:
                       throw new RDFServiceException("unrecognized result format");
-                }              
+                }
                 InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
                 return result;
             } finally {
@@ -557,7 +557,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     public void getGraphMetadata() throws RDFServiceException {
     	// nothing to do
     }
-    
+
     @Override
 	public void serializeAll(OutputStream outputStream)
 			throws RDFServiceException {
@@ -604,7 +604,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 	 * tripleStore, and ask whether they are isomorphic.
 	 */
 	@Override
-	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, 
+	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph,
 			ModelSerializationFormat serializationFormat) throws RDFServiceException {
 		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
 		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
@@ -700,7 +700,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     public void close() {
         // nothing
     }
-    
+
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
         return QueryExecutionFactory.create(q, d);
     }

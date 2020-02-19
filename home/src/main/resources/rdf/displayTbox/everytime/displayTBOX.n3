@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in LICENSE$ 
+# $This file is distributed under the terms of the license in LICENSE$
 
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
@@ -7,32 +7,32 @@
 @prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
 @prefix vitro:  <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 
-#########Classes######### 
+#########Classes#########
 ###Basic
 owl:Class a owl:Class .
-owl:Ontology a owl:Class .     
-owl:AnnotationProperty a owl:Class .   
+owl:Ontology a owl:Class .
+owl:AnnotationProperty a owl:Class .
 owl:DatatypeProperty a owl:Class .
 owl:ObjectProperty a owl:Class .
-      
-###Display Model 
+
+###Display Model
 display:MainMenu
       a       owl:Class ;
       vitro:customDisplayViewAnnot "individual-menu.ftl"^^xsd:string .
 
 display:NavigationElement a owl:Class .
 
-display:Page a owl:Class . 
+display:Page a owl:Class .
 
 display:HomePage a owl:Class .
 
 display:ClassGroupPage a owl:Class .
-      
-display:IndividualsForClassesPage a owl:Class .      
-      
-display:InternalClassesPage a owl:Class .   
-      
-display:DataGetter a owl:Class .  
+
+display:IndividualsForClassesPage a owl:Class .
+
+display:InternalClassesPage a owl:Class .
+
+display:DataGetter a owl:Class .
 
 display:RequiredAction a owl:Class ;
     rdfs:comment "Represents a action that may need authorization to perform." .
@@ -40,15 +40,15 @@ display:RequiredAction a owl:Class ;
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>
     a owl:Class ;
     rdfs:comment "Data getter for running a SPARQL query." .
-    
+
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter>
     a owl:Class ;
     rdfs:comment "A data getter for a Class search, i.e. get individuals for VClass" .
-    
+
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlUpdate>
     a owl:Class ;
     rdfs:comment "A data getter that runs a SPARQL Update" .
-      
+
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter>
     a owl:Class ;
     rdfs:comment "A data getter for a standard Vitro browse page" .
@@ -63,10 +63,10 @@ display:RequiredAction a owl:Class ;
 
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter>
     a owl:Class .
-    
-## Class defining what N3 editing model preprocessors are associated with the system  
+
+## Class defining what N3 editing model preprocessors are associated with the system
 ## This is technically a JAVA interface but we can designate this as an owl:Class to indicate
-## which classes are model change preprocessors  
+## which classes are model change preprocessors
 
 <java:edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor> a owl:Class .
 ########Data Properties#########
@@ -74,67 +74,67 @@ display:RequiredAction a owl:Class ;
 ###Basic
 
 rdfs:comment
-      a       owl:DatatypeProperty .      
+      a       owl:DatatypeProperty .
 rdfs:label
-      a       owl:DatatypeProperty .      
+      a       owl:DatatypeProperty .
 owl:versionInfo
       a       owl:DatatypeProperty .
-      
-###Vitro model 
+
+###Vitro model
 
 vitro:modTime
       a       owl:DatatypeProperty .
 vitro:displayRank
-      a       owl:DatatypeProperty .      
+      a       owl:DatatypeProperty .
 vitro:customDisplayViewAnnot
       a       owl:DatatypeProperty .
-      
-###Display model 
+
+###Display model
 
 display:listViewConfigFile
     a       owl:DatatypeProperty .
 
 display:title
-    a       owl:DatatypeProperty .      
+    a       owl:DatatypeProperty .
 
 display:urlMapping
     a       owl:DatatypeProperty .
 
 display:requiresBodyTemplate
-    a       owl:DatatypeProperty .      
+    a       owl:DatatypeProperty .
 
 display:isSelfContainedTemplate
-    a       owl:DatatypeProperty .      
+    a       owl:DatatypeProperty .
 
 display:menuPosition
     a       owl:DatatypeProperty ;
     vitro:displayLimitAnnot
-              "1"^^xsd:int .      
+              "1"^^xsd:int .
 
 display:linkText
-    a       owl:DatatypeProperty .      
+    a       owl:DatatypeProperty .
 
 display:hasMenuText
-    a       owl:DatatypeProperty .        
+    a       owl:DatatypeProperty .
 
 display:usesDataGetterClass
-    a       owl:DatatypeProperty .      
+    a       owl:DatatypeProperty .
 
 display:query
-    a owl:DatatypeProperty .   
+    a owl:DatatypeProperty .
 
 display:saveToVar
-    a owl:DatatypeProperty.   
+    a owl:DatatypeProperty.
 
 display:queryModel
-    a owl:DatatypeProperty.     
+    a owl:DatatypeProperty.
 
 display:htmlValue
-    a owl:DatatypeProperty.      
+    a owl:DatatypeProperty.
 
 display:cannotDeletePage
-    a owl:DatatypeProperty.                   
-      
+    a owl:DatatypeProperty.
+
 ######### Object Properties#########
 ###Basic
 rdfs:range
@@ -147,14 +147,14 @@ owl:topObjectProperty
 display:hasVClassId
     a owl:ObjectProperty ;
     rdfs:comment "Object property defining class for search data getter" .
-           
+
 ###Vitro properties without which individual templates throw errors as are required
 
 <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage>
       a       owl:ObjectProperty ;
       rdfs:range <http://vitro.mannlib.cornell.edu/ns/vitro/public#File> ;
       rdfs:subPropertyOf <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> , owl:topObjectProperty .
-      
+
 vitro:primaryLink
       a       owl:ObjectProperty ;
       rdfs:label "Primary Link"@en-US ;
@@ -169,18 +169,18 @@ vitro:primaryLink
       vitro:selectFromExistingAnnot
               "false"^^xsd:boolean ;
       vitro:stubObjectPropertyAnnot
-              "true"^^xsd:boolean .      
+              "true"^^xsd:boolean .
 
-rdf:type 
+rdf:type
       a owl:ObjectProperty ;
       rdfs:label "RDF Type"@en-US ;
-      rdfs:range owl:Class ;                   
+      rdfs:range owl:Class ;
       vitro:customEntryFormAnnot
-         "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfTypeGenerator"^^xsd:string ;                             
+         "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfTypeGenerator"^^xsd:string ;
       vitro:offerCreateNewOptionAnnot
               "true"^^xsd:boolean ;
       vitro:selectFromExistingAnnot
-              "true"^^xsd:boolean .       
+              "true"^^xsd:boolean .
 
 
 vitro:additionalLink
@@ -198,30 +198,30 @@ vitro:additionalLink
               "false"^^xsd:boolean ;
       vitro:stubObjectPropertyAnnot
               "true"^^xsd:boolean .
-              
-###Display model    
+
+###Display model
 
 display:hasElement
       a       owl:ObjectProperty .
-      
+
 display:excludeClass
       a       owl:ObjectProperty .
 
 display:toPage
-      a       owl:ObjectProperty .      
-      
+      a       owl:ObjectProperty .
+
 display:forClassGroup
       a       owl:ObjectProperty .
-      
+
 display:hasDataGetter
       a       owl:ObjectProperty .
-      
+
 display:getIndividualsForClass
-      a       owl:ObjectProperty .  
-      
+      a       owl:ObjectProperty .
+
 display:restrictResultsByClass
-      a       owl:ObjectProperty .    
+      a       owl:ObjectProperty .
 
 display:requiresAction
       a owl:ObjectProperty .
-      
+

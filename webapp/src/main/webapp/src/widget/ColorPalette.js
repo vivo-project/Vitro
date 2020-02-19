@@ -18,7 +18,7 @@ dojo.widget.tags.addParseTreeHandler("dojo:ToolbarColorDialog");
 
 dojo.widget.html.ToolbarColorDialog = function(){
 	dojo.widget.html.ToolbarDialog.call(this);
-	
+
 	/*
 	FIXME: 	why the fuck did anyone ever think this kind of expensive iteration
 			was a good idea?
@@ -49,14 +49,14 @@ dojo.lang.extend(dojo.widget.html.ToolbarColorDialog, {
 		this._value = color;
 		this._fireEvent("onSetValue", color);
 	},
-	
+
 	showDialog: function (e) {
 		dojo.widget.html.ToolbarColorDialog.superclass.showDialog.call(this, e);
 		var x = dojo.html.getAbsoluteX(this.domNode);
 		var y = dojo.html.getAbsoluteY(this.domNode) + dojo.html.getInnerHeight(this.domNode);
 		this.dialog.showAt(x, y);
 	},
-	
+
 	hideDialog: function (e) {
 		dojo.widget.html.ToolbarColorDialog.superclass.hideDialog.call(this, e);
 		this.dialog.hide();
@@ -76,11 +76,11 @@ dojo.inherits(dojo.widget.html.ColorPalette, dojo.widget.HtmlWidget);
 dojo.lang.extend(dojo.widget.html.ColorPalette, {
 
 	widgetType: "colorpalette",
-	
+
 	palette: "7x10",
 
 	bgIframe: null,
-	
+
 	palettes: {
 		"7x10": [["fff", "fcc", "fc9", "ff9", "ffc", "9f9", "9ff", "cff", "ccf", "fcf"],
 			["ccc", "f66", "f96", "ff6", "ff3", "6f9", "3ff", "6ff", "99f", "f9f"],
@@ -89,7 +89,7 @@ dojo.lang.extend(dojo.widget.html.ColorPalette, {
 			["666", "900", "c60", "c93", "990", "090", "399", "33f", "60c", "939"],
 			["333", "600", "930", "963", "660", "060", "366", "009", "339", "636"],
 			["000", "300", "630", "633", "330", "030", "033", "006", "309", "303"]],
-	
+
 		"3x4": [["ffffff"/*white*/, "00ff00"/*lime*/, "008000"/*green*/, "0000ff"/*blue*/],
 			["c0c0c0"/*silver*/, "ffff00"/*yellow*/, "ff00ff"/*fuchsia*/, "000080"/*navy*/],
 			["808080"/*gray*/, "ff0000"/*red*/, "800080"/*purple*/, "000000"/*black*/]]
@@ -97,7 +97,7 @@ dojo.lang.extend(dojo.widget.html.ColorPalette, {
 	},
 
 	buildRendering: function () {
-		
+
 		this.domNode = document.createElement("table");
 		dojo.html.disableSelection(this.domNode);
 		dojo.event.connect(this.domNode, "onmousedown", function (e) {
@@ -116,7 +116,7 @@ dojo.lang.extend(dojo.widget.html.ColorPalette, {
 				if (colors[i][j].length == 3) {
 					colors[i][j] = colors[i][j].replace(/(.)(.)(.)/, "$1$1$2$2$3$3");
 				}
-	
+
 				var td = document.createElement("td");
 				with (td.style) {
 					backgroundColor = "#" + colors[i][j];
@@ -124,13 +124,13 @@ dojo.lang.extend(dojo.widget.html.ColorPalette, {
 					width = height = "15px";
 					fontSize = "1px";
 				}
-	
+
 				td.color = "#" + colors[i][j];
-	
+
 				td.onmouseover = function (e) { this.style.borderColor = "white"; }
 				td.onmouseout = function (e) { this.style.borderColor = "gray"; }
 				dojo.event.connect(td, "onmousedown", this, "click");
-	
+
 				td.innerHTML = "&nbsp;";
 				tr.appendChild(td);
 			}
@@ -162,7 +162,7 @@ dojo.lang.extend(dojo.widget.html.ColorPalette, {
 			this.bgIframe.style.display = "none";
 		}
 	},
-	
+
 	showAt: function (x, y) {
 		with(this.domNode.style){
 			top = y + "px";

@@ -12,32 +12,32 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange.Operation;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class ChangeSetImpl implements ChangeSet {
-	
+
 	public ChangeSetImpl() {
 		modelChanges = new ArrayList<ModelChange>();
 	}
-	
+
 	private String preconditionQuery;
 	private RDFService.SPARQLQueryType queryType;
 	private ArrayList<ModelChange> modelChanges = new ArrayList<ModelChange>();
 	private ArrayList<Object> preChangeEvents = new ArrayList<Object>();
 	private ArrayList<Object> postChangeEvents = new ArrayList<Object>();
- 	
+
 	@Override
 	public String getPreconditionQuery() {
-	   return preconditionQuery;	
+	   return preconditionQuery;
 	}
-	
+
 	@Override
 	public void setPreconditionQuery(String preconditionQuery) {
 		this.preconditionQuery = preconditionQuery;
 	}
-	
+
 	@Override
 	public RDFService.SPARQLQueryType getPreconditionQueryType() {
 		return queryType;
 	}
-	
+
 	@Override
 	public void setPreconditionQueryType(RDFService.SPARQLQueryType queryType) {
 		this.queryType = queryType;
@@ -47,20 +47,20 @@ public class ChangeSetImpl implements ChangeSet {
 	public List<ModelChange> getModelChanges() {
 	    	return modelChanges;
 	}
-	
+
 	@Override
 	public void addAddition(InputStream model, RDFService.ModelSerializationFormat format, String graphURI) {
 		modelChanges.add(manufactureModelChange(model,format, ModelChange.Operation.ADD, graphURI));
 	}
-	
+
 	@Override
 	public void addRemoval(InputStream model, RDFService.ModelSerializationFormat format, String graphURI) {
 		modelChanges.add(manufactureModelChange(model, format, ModelChange.Operation.REMOVE, graphURI));
 	}
-	
+
 	@Override
 	public ModelChange manufactureModelChange() {
-		return new ModelChangeImpl(); 
+		return new ModelChangeImpl();
 	}
 
 	@Override
@@ -68,24 +68,24 @@ public class ChangeSetImpl implements ChangeSet {
                                               RDFService.ModelSerializationFormat serializationFormat,
                                               Operation operation,
                                               String graphURI) {
-		return new ModelChangeImpl(serializedModel, serializationFormat, operation, graphURI); 
+		return new ModelChangeImpl(serializedModel, serializationFormat, operation, graphURI);
 	}
-	
-	@Override 
+
+	@Override
 	public void addPreChangeEvent(Object o) {
 	    this.preChangeEvents.add(o);
 	}
-	
-	@Override 
+
+	@Override
     public void addPostChangeEvent(Object o) {
         this.postChangeEvents.add(o);
     }
-	
+
 	@Override
 	public List<Object> getPreChangeEvents() {
 	    return this.preChangeEvents;
 	}
-	
+
 	@Override
     public List<Object> getPostChangeEvents() {
         return this.postChangeEvents;
@@ -97,6 +97,6 @@ public class ChangeSetImpl implements ChangeSet {
 				+ ", queryType=" + queryType + ", modelChanges=" + modelChanges
 				+ ", preChangeEvents=" + preChangeEvents
 				+ ", postChangeEvents=" + postChangeEvents + "]";
-	}	
-	
+	}
+
 }

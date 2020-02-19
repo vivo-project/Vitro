@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 /**
  * Represents a single entity record.
 */
+@SuppressWarnings("ComparableType")
 public class IndividualImpl extends BaseResourceBean implements Individual, Comparable<Individual> {
 	/**
 	 * This can be used as a "not initialized" indicator for a property that
@@ -51,12 +52,12 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected ImageInfo imageInfo = null;
     protected Float searchBoost;
     protected String searchSnippet;
-    
+
     /** indicates if sortForDisplay has been called  */
     protected boolean sorted = false;
     protected boolean DIRECT = true;
     protected boolean ALL = false;
-    
+
     public IndividualImpl() {
     }
 
@@ -76,7 +77,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public void setName(String in){name=in;}
 
     public String getRdfsLabel(){ return rdfsLabel; }
-    public void setRdfsLabel(String s){ rdfsLabel = s; }    	
+    public void setRdfsLabel(String s){ rdfsLabel = s; }
 
     public String getVClassURI(){return vClassURI;}
     public void setVClassURI(String in){vClassURI=in;}
@@ -134,7 +135,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public List<DataPropertyStatement> getDataPropertyStatements(){
         return dataPropertyStatements;
     }
-    
+
     public List<DataPropertyStatement> getDataPropertyStatements(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements();
         List<DataPropertyStatement> stmtsForProp = new ArrayList<DataPropertyStatement>();
@@ -143,15 +144,15 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
                 stmtsForProp.add(stmt);
             }
         }
-        return stmtsForProp;        
+        return stmtsForProp;
     }
 
     public DataPropertyStatement getDataPropertyStatement(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
-        return stmts.isEmpty() ? null : stmts.get(0);       
+        return stmts.isEmpty() ? null : stmts.get(0);
     }
-    
-    public List<String> getDataValues(String propertyUri) {     
+
+    public List<String> getDataValues(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
         List<String> dataValues = new ArrayList<String>(stmts.size());
         for (DataPropertyStatement stmt : stmts) {
@@ -159,7 +160,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
         }
         return dataValues;
     }
- 
+
     public String getDataValue(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
         return stmts.isEmpty() ? null : stmts.get(0).getData();
@@ -171,11 +172,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public void setVClass(VClass class1) {
         vClass = class1;
     }
-    
+
     public List<VClass> getVClasses() {
     	return allVClasses;
     }
-    
+
     @Override
 	public boolean isVClass(String uri) {
     	if (uri == null) {
@@ -196,15 +197,15 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     		return allVClasses;
     	}
     }
-    
+
     public void setVClasses(List<VClass> vClassList, boolean direct) {
     	if (direct) {
-    		this.directVClasses = vClassList; 
+    		this.directVClasses = vClassList;
     	} else {
     		this.allVClasses = vClassList;
     	}
     }
-    
+
     @Override
     public List<String> getMostSpecificTypeURIs() {
         List<String> typeURIs = new ArrayList<String>();
@@ -226,7 +227,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public List <ObjectPropertyStatement> getObjectPropertyStatements(){
         return objectPropertyStatements;
     }
-    
+
     public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyUri) {
         List<ObjectPropertyStatement> stmts = getObjectPropertyStatements();
         List<ObjectPropertyStatement> stmtsForProp = new ArrayList<ObjectPropertyStatement>();
@@ -237,18 +238,18 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
         }
         return stmtsForProp;
     }
-    
+
     public List<Individual> getRelatedIndividuals(String propertyUri) {
         List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);
         List<Individual> relatedIndividuals = new ArrayList<Individual>(stmts.size());
         for (ObjectPropertyStatement stmt : stmts) {
             relatedIndividuals.add(stmt.getObject());
         }
-        return relatedIndividuals;       
+        return relatedIndividuals;
     }
-    
+
     public Individual getRelatedIndividual(String propertyUri) {
-        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);    
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);
         return stmts.isEmpty() ? null : stmts.get(0).getObject();
     }
 
@@ -258,7 +259,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public void setExternalIds(List<DataPropertyStatement> externalIds){
         this.externalIds = externalIds;
     }
-    
+
 	@Override
 	public String getMainImageUri() {
 		return (mainImageUri == NOT_INITIALIZED) ? null : mainImageUri;
@@ -280,12 +281,12 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 		return "thumbUrl";
 	}
 
-    public Float getSearchBoost() { return searchBoost;  }    
+    public Float getSearchBoost() { return searchBoost;  }
     public void setSearchBoost(Float boost) { searchBoost = boost; }
-    
+
     public String getSearchSnippet() { return searchSnippet; }
     public void setSearchSnippet(String snippet) { searchSnippet = snippet; }
-    
+
     /**
      * Sorts the ents2ents records into the proper order for display.
      *
@@ -335,11 +336,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
            return getURI() + " " + getName();
        }
    }
-    
+
     public boolean hasThumb() {
         return getThumbUrl() != null && ! getThumbUrl().isEmpty();
     }
-    
+
 	@Override
 	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		// No webappDaoFactory, so nothing to do.

@@ -39,37 +39,37 @@ import javax.servlet.annotation.WebServlet;
 /**
  * Show the details of where our RDF data is coming from. What are the
  * structures that supply the triples?
- * 
+ *
  * <pre>
  * Display like this:
- * 
+ *
  * ModelAccess for Context
  * blah-blah
- * 
+ *
  * ModelAccess for Request
- * blah-blah 
- * 
+ * blah-blah
+ *
  * RDFServices
  *               CONTEXT    REQUEST
  * CONTENT       blah-blah  argle-bargle
  * CONFIGURATION balderdash obstreporous
- * 
+ *
  * Datasets  [same]
- * 
+ *
  * Models
  * Name                     ContextOnly
  * DISPLAY                  blah-blah
  * filegraph:tbox/junk.owl  bork-bork-bork
- * 
+ *
  * OntModels
  * Name                     Context        REQUEST
  * DISPLAY                  blah-blah      song-and-dance
  * filegraph:tbox/junk.owl  bork-bork-bork bogus-malarkey
- * 
- * For the request object, 
+ *
+ * For the request object,
  *     Get the LANGUAGE_NEUTRAL versions, since they have fewer decorators.
  *     If the string is the same as the corresponding object in the context, show as "SAME AS CONTEXT"
- * 
+ *
  * Structure for freemarker:
  * map:
  *    modelAccess:
@@ -86,22 +86,22 @@ import javax.servlet.annotation.WebServlet;
  *       [same]
  *    models:
  *       content:
- *          name1: 
+ *          name1:
  *             context: text
- *          name2: 
+ *          name2:
  *             context: text
  *          ...
  *       configuration:
- *          name3: 
+ *          name3:
  *             context: text
  *             request: text
  *          ...
  *    ontModels:
- *       name1: 
+ *       name1:
  *          context: text
  *          request: text
  *       ...
- *       
+ *
  * At the same time, write these to the log as INFO messages, without the fancy formatting.
  * </pre>
  */

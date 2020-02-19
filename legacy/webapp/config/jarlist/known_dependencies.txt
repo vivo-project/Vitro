@@ -1,10 +1,10 @@
 #
 # A list of JARs that we know to be required by the source code (and notes on where they are required).
 #
-# The "jarlist" target of the build script will work on the assumption that these JARs and any JARs 
+# The "jarlist" target of the build script will work on the assumption that these JARs and any JARs
 # that they depend on are required by the app.
 #
-# For example, the JDBC drivers are never explicitly included, but instead are invoked using Class.forName(), 
+# For example, the JDBC drivers are never explicitly included, but instead are invoked using Class.forName(),
 # so they are required even though the "jarlist" target won't find any such requirement.
 #
 

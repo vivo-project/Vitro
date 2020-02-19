@@ -35,31 +35,31 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	private Log log = LogFactory.getLog(ProcessClassGroupDataGetterN3.class);
 
 	public ProcessClassGroupDataGetterN3(){
-		
+
 	}
-	//Pass in variable that represents the counter 
+	//Pass in variable that represents the counter
 
 	//TODO: ensure correct model returned
 	//We shouldn't use the ACTUAL values here but generate the n3 required
     public List<String> retrieveN3Required(int counter) {
     	return this.retrieveN3ForTypeAndClassGroup(counter);
-    	
+
     }
     public List<String> retrieveN3Optional(int counter) {
     	return null;
     }
-    
+
     public List<String> retrieveN3ForTypeAndClassGroup(int counter) {
     	String n3ForType = this.getN3ForTypePartial(counter);
-    	String n3 = n3ForType +"; \n" + 
+    	String n3 = n3ForType +"; \n" +
     		"<" + DisplayVocabulary.FOR_CLASSGROUP + "> " + getN3VarName(classGroupVarBase, counter) + " .";
     	List<String> n3List = new ArrayList<String>();
     	n3List.add(getPrefixes() + n3);
     	return n3List;
     }
-    
+
     public String getN3ForTypePartial(int counter) {
-    	//UPDATE: including class type as 
+    	//UPDATE: including class type as
     	String dataGetterVar = getDataGetterVar(counter);
     	String classTypeVar = getN3VarName(classTypeVarBase, counter);
     	//String n3 = dataGetterVar + " a <" + getClassType() + ">";
@@ -67,18 +67,18 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 
     	return n3;
     }
-    
+
     //These methods will return the literals and uris expected within the n3
-    //and the counter is used to ensure they are numbered correctly 
-    
+    //and the counter is used to ensure they are numbered correctly
+
     public List<String> retrieveLiteralsOnForm(int counter) {
     	//no literals, just the class group URI
     	List<String> literalsOnForm = new ArrayList<String>();
     	return literalsOnForm;
-    	
+
     }
-    
-     
+
+
     public List<String> retrieveUrisOnForm(int counter) {
     	List<String> urisOnForm = new ArrayList<String>();
     	//Class group is a URI
@@ -86,9 +86,9 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
     	//UPDATE: adding class type as uri on form
     	urisOnForm.add(getVarName(classTypeVarBase, counter));
     	return urisOnForm;
-    	
+
     }
-    
+
    public List<FieldVTwo> retrieveFields(int counter) {
 	   List<FieldVTwo> fields = new ArrayList<FieldVTwo>();
 	   fields.add(new FieldVTwo().setName(getVarName("classGroup", counter)));
@@ -97,24 +97,24 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 
 	   return fields;
    }
-   
+
    //These var names  match the names of the elements within the json object returned with the info required for the data getter
-   
+
    public List<String> getLiteralVarNamesBase() {
-	   return Arrays.asList();   
+	   return Arrays.asList();
    }
 
    //these are for the fields ON the form
    public List<String> getUriVarNamesBase() {
 	   //UPDATE: adding class type as uri
-	   return Arrays.asList("classGroup", classTypeVarBase);   
+	   return Arrays.asList("classGroup", classTypeVarBase);
    }
 
    //This class can be extended so returning type here
    public String getClassType() {
 	   return classType;
    }
-   
+
    //for existing values
    //TODO: Update
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
@@ -140,19 +140,19 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }
-	   
-	   
+
+
    }
-  
-   
+
+
    //?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
    protected String getExistingValuesClassGroup(String dataGetterURI) {
-	   String query = this.getSparqlPrefix() + " SELECT ?classGroup  WHERE {" + 
+	   String query = this.getSparqlPrefix() + " SELECT ?classGroup  WHERE {" +
 			   "<" + dataGetterURI + "> <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup  . \n" +
 			   "}";
 	   return query;
    }
-   
+
    public ObjectNode getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
 	   ObjectNode jObject = new ObjectMapper().createObjectNode();
 	   jObject.put("dataGetterClass", classType);
@@ -163,7 +163,7 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	   getExistingClassesInClassGroup(context, dataGetterURI, jObject);
 	   return jObject;
    }
-   
+
    private void getExistingClassGroup(String dataGetterURI, ObjectNode jObject, OntModel queryModel) {
 	   String querystr = getExistingValuesClassGroup(dataGetterURI);
 	   QueryExecution qe = null;
@@ -180,17 +180,17 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }
-       
-  
+
+
    }
-   
+
    //Assumes JSON Object received will have the class group resource URI within it
    //TODO: Refactor to take advantage of existing code that uses OTHER JSON library
    protected void getExistingClassesInClassGroup(ServletContext context, String dataGetterURI, ObjectNode jObject) {
 	   //Check for class group resource within json object
 	   if(jObject.has(classGroupVarBase)) {
 		   String classGroupURI = jObject.get(classGroupVarBase).asText();
-		   //Get classes for classGroupURI and include in 
+		   //Get classes for classGroupURI and include in
 		   VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
 		   VClassGroup group = vcgc.getGroup(classGroupURI);
 		   populateClassesInClassGroupJSON(jObject, group);
@@ -198,7 +198,7 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 		   log.error("JSONObject does not have class group URI included. ");
 	   }
    }
-   
+
    //JSONObject will include results JSON object that will include classes JSON Arrya as well as
    //class group information
    protected void populateClassesInClassGroupJSON(ObjectNode jObject, VClassGroup group) {
@@ -211,8 +211,8 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
            classes.add(vcObj);
        }
        ObjectNode results = mapper.createObjectNode();
-      
-       results.set("classes", classes);                
+
+       results.set("classes", classes);
        results.put("classGroupName", group.getPublicName());
        results.put("classGroupUri", group.getURI());
        jObject.set("results", results);

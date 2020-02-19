@@ -302,7 +302,7 @@ dojo.event.MethodInvocation.prototype.proceed = function() {
 		var meth = ti[1];
 		return mobj[meth].call(mobj, this);
 	}
-} 
+}
 
 
 dojo.event.MethodJoinPoint = function(obj, methname){
@@ -345,7 +345,7 @@ dojo.event.MethodJoinPoint.getForMethod = function(obj, methname) {
 		obj[jpfuncname] = obj[methname];
 		// joinpoint = obj[jpname] = new dojo.event.MethodJoinPoint(obj, methname);
 		joinpoint = obj[jpname] = new dojo.event.MethodJoinPoint(obj, jpfuncname);
-		obj[methname] = function(){ 
+		obj[methname] = function(){
 			var args = [];
 
 			if((isNode)&&(!arguments.length)){
@@ -374,8 +374,8 @@ dojo.event.MethodJoinPoint.getForMethod = function(obj, methname) {
 					}
 				}
 			}
-			// return joinpoint.run.apply(joinpoint, arguments); 
-			return joinpoint.run.apply(joinpoint, args); 
+			// return joinpoint.run.apply(joinpoint, arguments);
+			return joinpoint.run.apply(joinpoint, args);
 		}
 		obj[methname].__preJoinArity = origArity;
 	}
@@ -403,19 +403,19 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 			aargs[x] = args[x];
 		}
 
-		var unrollAdvice  = function(marr){ 
+		var unrollAdvice  = function(marr){
 			if(!marr){
 				dojo.debug("Null argument to unrollAdvice()");
 				return;
 			}
-		  
+
 			var callObj = marr[0]||dj_global;
 			var callFunc = marr[1];
-			
+
 			if(!callObj[callFunc]){
 				dojo.raise("function \"" + callFunc + "\" does not exist on \"" + callObj + "\"");
 			}
-			
+
 			var aroundObj = marr[2]||dj_global;
 			var aroundFunc = marr[3];
 			var msg = marr[6];
@@ -469,16 +469,16 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 				if((hasDelay)&&((dojo.render.html)||(dojo.render.svg))){  // FIXME: the render checks are grotty!
 					dj_global["setTimeout"](function(){
 						if(msg){
-							callObj[callFunc].call(callObj, to); 
+							callObj[callFunc].call(callObj, to);
 						}else{
-							callObj[callFunc].apply(callObj, args); 
+							callObj[callFunc].apply(callObj, args);
 						}
 					}, delay);
 				}else{ // many environments can't support delay!
 					if(msg){
-						callObj[callFunc].call(callObj, to); 
+						callObj[callFunc].call(callObj, to);
 					}else{
-						callObj[callFunc].apply(callObj, args); 
+						callObj[callFunc].apply(callObj, args);
 					}
 				}
 			}
@@ -515,16 +515,16 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 	},
 
 	kwAddAdvice: function(args){
-		this.addAdvice(	args["adviceObj"], args["adviceFunc"], 
-						args["aroundObj"], args["aroundFunc"], 
-						args["adviceType"], args["precedence"], 
-						args["once"], args["delay"], args["rate"], 
+		this.addAdvice(	args["adviceObj"], args["adviceFunc"],
+						args["aroundObj"], args["aroundFunc"],
+						args["adviceType"], args["precedence"],
+						args["once"], args["delay"], args["rate"],
 						args["adviceMsg"]);
 	},
 
-	addAdvice: function(	thisAdviceObj, thisAdvice, 
-							thisAroundObj, thisAround, 
-							advice_kind, precedence, 
+	addAdvice: function(	thisAdviceObj, thisAdvice,
+							thisAroundObj, thisAround,
+							advice_kind, precedence,
 							once, delay, rate, asMessage){
 		var arr = this.getArr(advice_kind);
 		if(!arr){
@@ -532,7 +532,7 @@ dojo.lang.extend(dojo.event.MethodJoinPoint, {
 		}
 
 		var ao = [thisAdviceObj, thisAdvice, thisAroundObj, thisAround, delay, rate, asMessage];
-		
+
 		if(once){
 			if(this.hasAdvice(thisAdviceObj, thisAdvice, advice_kind, arr) >= 0){
 				return;

@@ -30,7 +30,7 @@ public class EntityPropertyListFilter extends UnaryFunctor<List<Property>, List<
 
 	private static final org.apache.jena.rdf.model.Property MASKS_PROPERTY = ResourceFactory.createProperty(VitroVocabulary.MASKS_PROPERTY);
 	private Map<String,Collection<String>> propertyMaskMap;
-	
+
 	public EntityPropertyListFilter(OntModel ontModel) {
 		propertyMaskMap = new HashMap<String,Collection<String>>();
 		ontModel.enterCriticalSection(Lock.READ);
@@ -55,7 +55,7 @@ public class EntityPropertyListFilter extends UnaryFunctor<List<Property>, List<
 			ontModel.leaveCriticalSection();
 		}
 	}
-		
+
 	@Override
 	public List<Property> fn(List<Property> propertyList) {
 		List<Property> filteredList = new ArrayList<Property>();
@@ -83,14 +83,14 @@ public class EntityPropertyListFilter extends UnaryFunctor<List<Property>, List<
 						List<ObjectPropertyStatement> stmtList = ((ObjectProperty) p).getObjectPropertyStatements();
 						propHasStatements = (stmtList != null) && (stmtList.size() > 0);
 					} else if (p instanceof DataProperty) {
-						List<DataPropertyStatement> stmtList = ((DataProperty) p).getDataPropertyStatements(); 
+						List<DataPropertyStatement> stmtList = ((DataProperty) p).getDataPropertyStatements();
 						propHasStatements = (stmtList != null) && (stmtList.size() > 0);
 					}
 					if (maskingProp instanceof ObjectProperty) {
 						List<ObjectPropertyStatement> stmtList = ((ObjectProperty) maskingProp).getObjectPropertyStatements();
 						maskerHasStatements = (stmtList != null) && (stmtList.size() > 0);
 					} else if (maskingProp instanceof DataProperty) {
-						List<DataPropertyStatement> stmtList = ((DataProperty) maskingProp).getDataPropertyStatements(); 
+						List<DataPropertyStatement> stmtList = ((DataProperty) maskingProp).getDataPropertyStatements();
 						maskerHasStatements = (stmtList != null) && (stmtList.size() > 0);
 					}
 				}
@@ -101,5 +101,5 @@ public class EntityPropertyListFilter extends UnaryFunctor<List<Property>, List<
 		}
 		return filteredList;
 	}
-	
+
 }

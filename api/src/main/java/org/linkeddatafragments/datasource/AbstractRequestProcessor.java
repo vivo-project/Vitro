@@ -10,7 +10,7 @@ import org.linkeddatafragments.fragments.ILinkedDataFragmentRequest;
  */
 abstract public class AbstractRequestProcessor
     implements IFragmentRequestProcessor
-{ 
+{
     @Override
     public void close() {}
 
@@ -42,7 +42,7 @@ abstract public class AbstractRequestProcessor
 
     /**
      * Processes {@link ILinkedDataFragmentRequest}s
-     * 
+     *
      */
     abstract static protected class Worker
     {
@@ -51,10 +51,10 @@ abstract public class AbstractRequestProcessor
          * The  {@link ILinkedDataFragmentRequest} to process
          */
         public final ILinkedDataFragmentRequest request;
-        
+
         /**
          * Create a Worker
-         * 
+         *
          * @param request
          */
         public Worker( final ILinkedDataFragmentRequest request )
@@ -64,7 +64,7 @@ abstract public class AbstractRequestProcessor
 
         /**
          * Create the requested {@link ILinkedDataFragment}
-         * 
+         *
          * @return The ILinkedDataFragment
          * @throws IllegalArgumentException
          */

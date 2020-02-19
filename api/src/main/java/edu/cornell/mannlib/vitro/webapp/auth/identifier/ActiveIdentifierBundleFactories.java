@@ -68,7 +68,7 @@ public class ActiveIdentifierBundleFactories {
 	/**
 	 * Get the Identifiers from the list of factories. This might return an
 	 * empty bundle, but it never returns null.
-	 * 
+	 *
 	 * This is package access, and should only be called by RequestIdentifiers.
 	 * Everyone else should ask RequestIdentifiers to fetch them from the
 	 * request.
@@ -94,7 +94,7 @@ public class ActiveIdentifierBundleFactories {
 		if (req == null) {
 			throw new NullPointerException("req may not be null.");
 		}
-		
+
 		return getActiveFactories(req.getSession().getServletContext());
 	}
 

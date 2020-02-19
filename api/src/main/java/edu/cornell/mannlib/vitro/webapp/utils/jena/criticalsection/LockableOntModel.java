@@ -11,18 +11,18 @@ import org.apache.jena.shared.Lock;
  * Makes it easy to use a Jena OntModel in a try-with-resources block. At the
  * end of the block, the close() method will not close the model, but will
  * merely release the lock.
- * 
+ *
  * Returned by the LockableOntModelSelector, or it can be wrapped around a bare
  * OntModel. Cannot be used without locking.
- * 
+ *
  * <pre>
  * try (LockedOntModel m = lockableOms.getDisplayModel.read()) {
  *    ...
  * }
  * </pre>
- * 
+ *
  * or
- * 
+ *
  * <pre>
  * try (LockedOntModel m = new LockableOntModel(ontModel).read()) {
  *    ...

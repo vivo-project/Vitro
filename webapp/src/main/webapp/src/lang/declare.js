@@ -16,35 +16,35 @@ dojo.require("dojo.lang.extras");
 /*
  * Creates a constructor: inherit and extend
  *
- * - inherits from "superclass(es)" 
+ * - inherits from "superclass(es)"
  *
- *   "superclass" argument may be a Function, or an array of 
- *   Functions. 
+ *   "superclass" argument may be a Function, or an array of
+ *   Functions.
  *
- *   If "superclass" is an array, the first element is used 
- *   as the prototypical ancestor and any following Functions 
- *   become mixin ancestors. 
- * 
+ *   If "superclass" is an array, the first element is used
+ *   as the prototypical ancestor and any following Functions
+ *   become mixin ancestors.
+ *
  *   All "superclass(es)" must be Functions (not mere Objects).
  *
  *   Using mixin ancestors provides a type of multiple
- *   inheritance. Mixin ancestors prototypical 
- *   properties are copied to the subclass, and any 
- *   inializater/constructor is invoked. 
+ *   inheritance. Mixin ancestors prototypical
+ *   properties are copied to the subclass, and any
+ *   inializater/constructor is invoked.
  *
  * - "props" are copied to the constructor prototype
  *
- * - name of the class ("className" argument) is stored in 
+ * - name of the class ("className" argument) is stored in
  *   "declaredClass" property
- * 
- * - An initializer function can be specified in the "init" 
- *   argument, or by including a function called "initializer" 
+ *
+ * - An initializer function can be specified in the "init"
+ *   argument, or by including a function called "initializer"
  *   in "props".
- * 
+ *
  * - Superclass methods (inherited methods) can be invoked using "inherited" method:
  *
  * this.inherited(<method name>[, <argument array>]);
- * 
+ *
  * - inherited will continue up the prototype chain until it finds an implementation of method
  * - nested calls to inherited are supported (i.e. inherited method "A" can succesfully call inherited("A"), and so on)
  *
@@ -54,7 +54,7 @@ dojo.require("dojo.lang.extras");
  *
  * dojo.declare("my.classes.bar", my.classes.foo, {
  *	initializer: function() {
- *		this.myComplicatedObject = new ReallyComplicatedObject(); 
+ *		this.myComplicatedObject = new ReallyComplicatedObject();
  *	},
  *	someValue: 2,
  *	aMethod: function() { doStuff(); }
@@ -65,11 +65,11 @@ dojo.lang.declare = function(className /*string*/, superclass /*function || arra
 	// FIXME: parameter juggling for backward compat ... deprecate and remove after 0.3.*
 	// new sig: (className (string)[, superclass (function || array)[, init (function)][, props (object)]])
 	// old sig: (className (string)[, superclass (function || array), props (object), init (function)])
-	if ((dojo.lang.isFunction(props))||((!props)&&(!dojo.lang.isFunction(init)))){ 
+	if ((dojo.lang.isFunction(props))||((!props)&&(!dojo.lang.isFunction(init)))){
 		var temp = props;
 		props = init;
 		init = temp;
-	}	
+	}
 	var mixins = [ ];
 	if (dojo.lang.isArray(superclass)) {
 		mixins = superclass;
@@ -84,7 +84,7 @@ dojo.lang.declare = function(className /*string*/, superclass /*function || arra
 	if(scp){
 		scp.prototyping = true;
 		ctor.prototype = new superclass();
-		scp.prototyping = false; 
+		scp.prototyping = false;
 	}
 	ctor.superclass = scp;
 	ctor.mixins = mixins;
@@ -105,7 +105,7 @@ dojo.lang.declare = function(className /*string*/, superclass /*function || arra
 }
 
 dojo.lang.declare._makeConstructor = function() {
-	return function(){ 
+	return function(){
 		// get the generational context (which object [or prototype] should be constructed)
 		var self = this._getPropContext();
 		var s = self.constructor.superclass;
@@ -137,7 +137,7 @@ dojo.lang.declare.base = {
 		this.___proto = stack;
 		return result;
 	},
-	// invokes ctor.prototype.method, with args, in our context 
+	// invokes ctor.prototype.method, with args, in our context
 	inheritedFrom: function(ctor, prop, args){
 		var p = ((ctor)&&(ctor.prototype)&&(ctor.prototype[prop]));
 		return (dojo.lang.isFunction(p) ? p.apply(this, (args||[])) : p);

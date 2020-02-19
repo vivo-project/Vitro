@@ -51,9 +51,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResponseFilter;
  * that have no matching property, unless it matches the current externalAuthId.
  * (So a Profile that is currently associated with the user is not excluded from
  * the list.)
- * 
+ *
  * For each such Profile, return the label, the URL and the URI.
- * 
+ *
  * If the matching property is not defined, or if the search term is empty, or
  * if an error occurs, return an empty result.
  */
@@ -168,7 +168,7 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 	/**
 	 * To test whether a search result is acceptable, find the matching property
 	 * for the individual.
-	 * 
+	 *
 	 * We will accept any individual without a matching property, or with a
 	 * matching property that matches the user we are editing.
 	 */

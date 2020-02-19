@@ -25,14 +25,14 @@ dojo.require("dojo.lang.common");
 		CONTENT_BOX: "content-box"
 	};
 	var bs = ds.boxSizing;
-	
+
 	ds.getBoxSizing = function(node){
-		if((h.ie)||(h.opera)){ 
+		if((h.ie)||(h.opera)){
 			var cm = document["compatMode"];
-			if((cm == "BackCompat")||(cm == "QuirksMode")){ 
-				return bs.BORDER_BOX; 
+			if((cm == "BackCompat")||(cm == "QuirksMode")){
+				return bs.BORDER_BOX;
 			}else{
-				return bs.CONTENT_BOX; 
+				return bs.CONTENT_BOX;
 			}
 		}else{
 			if(arguments.length == 0){ node = document.documentElement; }
@@ -86,7 +86,7 @@ dojo.require("dojo.lang.common");
 			- Uncomputable values are returned as NaN.
 			- setOuterWidth/Height return *false* if the outer size could not
 			  be computed, otherwise *true*.
-			- (sjmiles) knows no way to find the calculated values for auto-margins. 
+			- (sjmiles) knows no way to find the calculated values for auto-margins.
 			- All returned values are floating point in 'px' units. If a
 			  non-zero computed style value is not specified in 'px', NaN is
 			  returned.
@@ -118,36 +118,36 @@ dojo.require("dojo.lang.common");
 		var s = ds.getComputedStyle(node, cssSelector);
 		if((!s)||((s == 'auto')&&(autoIsZero))){ return { value: 0, units: 'px' }; }
 		if(dojo.lang.isUndefined(s)){return ds.getUnitValue.bad;}
-		// FIXME: is regex inefficient vs. parseInt or some manual test? 
+		// FIXME: is regex inefficient vs. parseInt or some manual test?
 		var match = s.match(/(\-?[\d.]+)([a-z%]*)/i);
 		if (!match){return ds.getUnitValue.bad;}
 		return { value: Number(match[1]), units: match[2].toLowerCase() };
 	}
 	// FIXME: 'bad' value should be 0?
 	ds.getUnitValue.bad = { value: NaN, units: '' };
-	
+
 	ds.getPixelValue = function(node, cssSelector, autoIsZero){
 		var result = ds.getUnitValue(node, cssSelector, autoIsZero);
 		// FIXME: there is serious debate as to whether or not this is the right solution
 		if(isNaN(result.value)){ return 0; }
-		// FIXME: code exists for converting other units to px (see Dean Edward's IE7) 
+		// FIXME: code exists for converting other units to px (see Dean Edward's IE7)
 		// but there are cross-browser complexities
 		if((result.value)&&(result.units != 'px')){ return NaN; }
 		return result.value;
 	}
-	
+
 	// FIXME: deprecated
 	ds.getNumericStyle = function() {
 		dojo.deprecated('dojo.(style|html).getNumericStyle', 'in favor of dojo.(style|html).getPixelValue', '0.4');
-		return ds.getPixelValue.apply(this, arguments); 
+		return ds.getPixelValue.apply(this, arguments);
 	}
 
 	ds.setPositivePixelValue = function(node, selector, value){
 		if(isNaN(value)){return false;}
-		node.style[selector] = Math.max(0, value) + 'px'; 
+		node.style[selector] = Math.max(0, value) + 'px';
 		return true;
 	}
-	
+
 	ds._sumPixelValues = function(node, selectors, autoIsZero){
 		var total = 0;
 		for(var x=0; x<selectors.length; x++){
@@ -179,7 +179,7 @@ dojo.require("dojo.lang.common");
 	ds.getPadBorderWidth = function(node) {
 		return ds.getPaddingWidth(node) + ds.getBorderWidth(node);
 	}
-	
+
 	ds.getContentBoxWidth = function(node){
 		node = dojo.byId(node);
 		return node.offsetWidth - ds.getPadBorderWidth(node);
@@ -233,7 +233,7 @@ dojo.require("dojo.lang.common");
 	ds.getPadBorderHeight = function(node) {
 		return ds.getPaddingHeight(node) + ds.getBorderHeight(node);
 	}
-	
+
 	ds.getContentBoxHeight = function(node){
 		node = dojo.byId(node);
 		return node.offsetHeight - ds.getPadBorderHeight(node);
@@ -301,7 +301,7 @@ dojo.require("dojo.lang.common");
 			ret.y = bo.y - ds.sumAncestorProperties(node, "scrollTop");
 		}else{
 			if(node["offsetParent"]){
-				var endNode;		
+				var endNode;
 				// in Safari, if the node is an absolutely positioned child of
 				// the body and the body has a margin the offset of the child
 				// and the body contain the body's margins, so we need to end
@@ -347,7 +347,7 @@ dojo.require("dojo.lang.common");
 	ds.sumAncestorProperties = function(node, prop){
 		node = dojo.byId(node);
 		if(!node){ return 0; } // FIXME: throw an error?
-		
+
 		var retVal = 0;
 		while(node){
 			var val = node[prop];
@@ -375,8 +375,8 @@ dojo.require("dojo.lang.common");
 	ds.styleSheet = null;
 
 	// FIXME: this is a really basic stub for adding and removing cssRules, but
-	// it assumes that you know the index of the cssRule that you want to add 
-	// or remove, making it less than useful.  So we need something that can 
+	// it assumes that you know the index of the cssRule that you want to add
+	// or remove, making it less than useful.  So we need something that can
 	// search for the selector that you you want to remove.
 	ds.insertCssRule = function(selector, declaration, index) {
 		if (!ds.styleSheet) {
@@ -460,7 +460,7 @@ dojo.require("dojo.lang.common");
 		// IE is b0rken enough to require that we add the element to the doc
 		// before changing it's properties
 		var head = doc.getElementsByTagName("head")[0];
-		if(!head){ // must have a head tag 
+		if(!head){ // must have a head tag
 			dojo.debug("No head tag in document, aborting styles");
 			return;
 		}else{
@@ -477,7 +477,7 @@ dojo.require("dojo.lang.common");
 
 	// String cssText = fixPathsInCssText(String cssStr, dojo.uri.Uri URI)
 	// usage: cssText comes from dojoroot/src/widget/templates/HtmlFoobar.css
-	// 	it has .dojoFoo { background-image: url(images/bar.png);} 
+	// 	it has .dojoFoo { background-image: url(images/bar.png);}
 	//	then uri should point to dojoroot/src/widget/templates/
 	ds.fixPathsInCssText = function(cssStr, URI){
 		if(!cssStr || !URI){ return; }
@@ -525,11 +525,11 @@ dojo.require("dojo.lang.common");
 		if(!node || !node.style){
 			return inValue;
 		}else if(document.defaultView){ // W3, gecko, KHTML
-			try{			
+			try{
 				var cs = document.defaultView.getComputedStyle(node, "");
-				if (cs){ 
+				if (cs){
 					return cs.getPropertyValue(cssSelector);
-				} 
+				}
 			}catch(e){ // reports are that Safari can throw an exception above
 				if (node.style.getPropertyValue){ // W3
 					return node.style.getPropertyValue(cssSelector);
@@ -544,7 +544,7 @@ dojo.require("dojo.lang.common");
 		}
 	}
 
-	/** 
+	/**
 	 * Retrieve a property value from a node's style object.
 	 */
 	ds.getStyleProperty = function(node, cssSelector){
@@ -555,7 +555,7 @@ dojo.require("dojo.lang.common");
 		return (node && node.style ? node.style[ds.toCamelCase(cssSelector)] : undefined);
 	}
 
-	/** 
+	/**
 	 * Retrieve a property value from a node's style object.
 	 */
 	ds.getStyle = function(node, cssSelector){
@@ -576,7 +576,7 @@ dojo.require("dojo.lang.common");
 		for(var i = 1; i < arr.length; i++) {
 			cc += arr[i].charAt(0).toUpperCase() + arr[i].substring(1);
 		}
-		return cc;		
+		return cc;
 	}
 
 	ds.toSelectorCase = function(selector) {
@@ -615,7 +615,7 @@ dojo.require("dojo.lang.common");
 			node.style.opacity = opacity;
 		}
 	}
-		
+
 	ds.getOpacity = function getOpacity (node){
 		node = dojo.byId(node);
 		if(h.ie){
@@ -654,44 +654,44 @@ dojo.require("dojo.lang.common");
 		}
 	}
 
-	/** 
-	* Set the given style attributes for the node. 
+	/**
+	* Set the given style attributes for the node.
 	* Patch submitted by Wolfram Kriesing, 22/03/2006.
 	*
-	* Ie. dojo.style.setStyleAttributes(myNode, "position:absolute; left:10px; top:10px;") 
-	* This just makes it easier to set a style directly without the need to  
-	* override it completely (as node.setAttribute() would). 
-	* If there is a dojo-method for an attribute, like for "opacity" there 
-	* is setOpacity, the dojo method is called instead. 
-	* For example: dojo.style.setStyleAttributes(myNode, "opacity: .4"); 
-	*  
-	* Additionally all the dojo.style.set* methods can also be used. 
-	* Ie. when attributes contains "outer-height: 10;" it will call dojo.style.setOuterHeight("10"); 
-	* 
-	* @param object The node to set the style attributes for. 
-	* @param string Ie. "position:absolute; left:10px; top:10px;" 
-	*/ 
-	ds.setStyleAttributes = function(node, attributes) { 
-		var methodMap={ 
+	* Ie. dojo.style.setStyleAttributes(myNode, "position:absolute; left:10px; top:10px;")
+	* This just makes it easier to set a style directly without the need to
+	* override it completely (as node.setAttribute() would).
+	* If there is a dojo-method for an attribute, like for "opacity" there
+	* is setOpacity, the dojo method is called instead.
+	* For example: dojo.style.setStyleAttributes(myNode, "opacity: .4");
+	*
+	* Additionally all the dojo.style.set* methods can also be used.
+	* Ie. when attributes contains "outer-height: 10;" it will call dojo.style.setOuterHeight("10");
+	*
+	* @param object The node to set the style attributes for.
+	* @param string Ie. "position:absolute; left:10px; top:10px;"
+	*/
+	ds.setStyleAttributes = function(node, attributes) {
+		var methodMap={
 			"opacity":dojo.style.setOpacity,
 			"content-height":dojo.style.setContentHeight,
 			"content-width":dojo.style.setContentWidth,
 			"outer-height":dojo.style.setOuterHeight,
-			"outer-width":dojo.style.setOuterWidth 
-		} 
+			"outer-width":dojo.style.setOuterWidth
+		}
 
-		var splittedAttribs=attributes.replace(/(;)?\s*$/, "").split(";"); 
-		for(var i=0; i<splittedAttribs.length; i++){ 
-			var nameValue=splittedAttribs[i].split(":"); 
+		var splittedAttribs=attributes.replace(/(;)?\s*$/, "").split(";");
+		for(var i=0; i<splittedAttribs.length; i++){
+			var nameValue=splittedAttribs[i].split(":");
 			var name=nameValue[0].replace(/\s*$/, "").replace(/^\s*/, "").toLowerCase();
 			var value=nameValue[1].replace(/\s*$/, "").replace(/^\s*/, "");
-			if(dojo.lang.has(methodMap,name)) { 
-				methodMap[name](node,value); 
-			} else { 
-				node.style[dojo.style.toCamelCase(name)]=value; 
-			} 
-		} 
-	} 
+			if(dojo.lang.has(methodMap,name)) {
+				methodMap[name](node,value);
+			} else {
+				node.style[dojo.style.toCamelCase(name)]=value;
+			}
+		}
+	}
 
 	ds._toggle = function(node, tester, setter){
 		node = dojo.byId(node);
@@ -701,8 +701,8 @@ dojo.require("dojo.lang.common");
 
 	// show/hide are library constructs
 
-	// show() 
-	// if the node.style.display == 'none' then 
+	// show()
+	// if the node.style.display == 'none' then
 	// set style.display to '' or the value cached by hide()
 	ds.show = function(node){
 		node = dojo.byId(node);
@@ -712,7 +712,7 @@ dojo.require("dojo.lang.common");
 		}
 	}
 
-	// if the node.style.display == 'none' then 
+	// if the node.style.display == 'none' then
 	// set style.display to '' or the value cached by hide()
 	ds.hide = function(node){
 		node = dojo.byId(node);
@@ -744,7 +744,7 @@ dojo.require("dojo.lang.common");
 	// display is a CSS concept
 
 	// Simple mapping of tag names to display values
-	// FIXME: simplistic 
+	// FIXME: simplistic
 	ds.displayMap = { tr: '', td: '', th: '', img: 'inline', span: 'inline', input: 'inline', button: 'inline' };
 
 	// Suggest a value for the display property that will show 'node' based on it's tag

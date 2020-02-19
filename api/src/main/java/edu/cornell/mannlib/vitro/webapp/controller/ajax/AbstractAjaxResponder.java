@@ -122,7 +122,7 @@ public abstract class AbstractAjaxResponder {
 		/**
 		 * Subclasses must implement. Return a map of field names and values,
 		 * which will become a row in the result.
-		 * 
+		 *
 		 * Or return null, and no row will be created in the result.
 		 */
 		protected abstract Map<String, String> parseSolutionRow(

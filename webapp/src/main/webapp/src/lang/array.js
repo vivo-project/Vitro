@@ -28,7 +28,7 @@ dojo.lang.isEmpty = function(obj) {
 			if(obj[x] && (!tmp[x])){
 				count++;
 				break;
-			} 
+			}
 		}
 		return (count == 0);
 	} else if(dojo.lang.isArrayLike(obj) || dojo.lang.isString(obj)) {
@@ -67,8 +67,8 @@ dojo.lang.map = function(arr, obj, unary_func){
 
 // http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array:forEach
 dojo.lang.forEach = function(anArray /* Array */, callback /* Function */, thisObject /* Object */){
-	if(dojo.lang.isString(anArray)){ 
-		anArray = anArray.split(""); 
+	if(dojo.lang.isString(anArray)){
+		anArray = anArray.split("");
 	}
 	if(Array.forEach){
 		Array.forEach(anArray, callback, thisObject);
@@ -77,15 +77,15 @@ dojo.lang.forEach = function(anArray /* Array */, callback /* Function */, thisO
 		if(!thisObject){
 			thisObject=dj_global;
 		}
-		for(var i=0,l=anArray.length; i<l; i++){ 
+		for(var i=0,l=anArray.length; i<l; i++){
 			callback.call(thisObject, anArray[i], i, anArray);
 		}
 	}
 }
 
 dojo.lang._everyOrSome = function(every, arr, callback, thisObject){
-	if(dojo.lang.isString(arr)){ 
-		arr = arr.split(""); 
+	if(dojo.lang.isString(arr)){
+		arr = arr.split("");
 	}
 	if(Array.every){
 		return Array[ (every) ? "every" : "some" ](arr, callback, thisObject);

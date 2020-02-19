@@ -54,7 +54,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 
 @WebServlet(name = "JenaAdminServlet", urlPatterns = {"/jenaAdmin"} )
 public class JenaAdminActions extends BaseEditController {
-	
+
 	private static final Log log = LogFactory.getLog(JenaAdminActions.class.getName());
 
     private boolean checkURI( String uri ) {
@@ -69,11 +69,11 @@ public class JenaAdminActions extends BaseEditController {
         	return false;
         }
     }
-    
+
 	private static final String VITRO = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#";
     private static final String AKT_SUPPORT = "http://www.aktors.org/ontology/support#";
     private static final String AKT_PORTAL = "http://www.aktors.org/ontology/portal#";
-    
+
     private void copyStatements(Model src, Model dest, Resource subj, Property pred, RDFNode obj) {
     	for (Statement stmt : src.listStatements(subj,pred,obj).toList()) {
     		String subjNs = stmt.getSubject().getNameSpace();
@@ -89,8 +89,8 @@ public class JenaAdminActions extends BaseEditController {
     		}
     	}
     }
-    
-    
+
+
     /**
      * This doesn't really print just the TBox.  It takes a copy of the model, removes all the individuals, and writes the result.
      */
@@ -122,7 +122,7 @@ public class JenaAdminActions extends BaseEditController {
             e.printStackTrace();
         }
     }
-    
+
     private Model extractTaxonomy(OntModel ontModel) {
     	ontModel.enterCriticalSection(Lock.READ);
     	Model taxonomyModel = ModelFactory.createDefaultModel();
@@ -159,7 +159,7 @@ public class JenaAdminActions extends BaseEditController {
     	}
     	return cleanModel;
     }
-    
+
 	private String testWriteXML() {
 		StringBuilder output = new StringBuilder();
 		output.append("<html><head><title>Test Write XML</title></head><body><pre>\n");
@@ -213,10 +213,10 @@ public class JenaAdminActions extends BaseEditController {
     		for (Resource inst : rest.listInstances().toList() ) {
     			log.trace("     "+inst.getURI());
     		}
-    		
+
     	}
     }
-    
+
     private void removeLongLiterals() {
 		OntModel memoryModel = ModelAccess.on(getServletContext()).getOntModel();
     	memoryModel.enterCriticalSection(Lock.WRITE);
@@ -237,7 +237,7 @@ public class JenaAdminActions extends BaseEditController {
     		memoryModel.leaveCriticalSection();
     	}
     }
-    
+
     @Override
 	public void doGet(HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
@@ -262,8 +262,8 @@ public class JenaAdminActions extends BaseEditController {
 				}
 				break;
 		}
-        
-        if (actionStr.equals("checkURIs")) { 
+
+        if (actionStr.equals("checkURIs")) {
     		OntModel memoryModel = ModelAccess.on(getServletContext()).getOntModel();
         	StmtIterator stmtIt = memoryModel.listStatements();
         	try {
@@ -282,7 +282,7 @@ public class JenaAdminActions extends BaseEditController {
 	        		}
 	        		if (stmt.getObject().isResource() && ((Resource)stmt.getObject()).getURI() != null) {
 	        			oFailed = checkURI(oURI = ((Resource)stmt.getObject()).getURI());
-	        		}        		
+	        		}
 	        		if (sFailed || pFailed || oFailed) {
 	        			log.debug(sURI+" | "+pURI+" | "+oURI);
 	        		}
@@ -291,7 +291,7 @@ public class JenaAdminActions extends BaseEditController {
         		stmtIt.close();
         	}
         }
-        
+
         if (actionStr.equals("output")) {
             OntModel memoryModel = null;
 	    if (request.getParameter("assertionsOnly") != null) {
@@ -303,7 +303,7 @@ public class JenaAdminActions extends BaseEditController {
 	    } else {
 			memoryModel = ModelAccess.on(getServletContext()).getOntModel();
 	    	System.out.println("jenaOntModel");
-	    }  
+	    }
 	    int subModelCount = memoryModel.listSubModels().toList().size();
 	    System.out.println("Submodels: "+subModelCount);
 	        try {
@@ -317,11 +317,11 @@ public class JenaAdminActions extends BaseEditController {
 	            e.printStackTrace();
 	        }
         }
-        
+
         if (actionStr.equals("removeLongLiterals")) {
         	removeLongLiterals();
         }
-        
+
         if (actionStr.equals("outputTaxonomy")) {
             OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
         	Model taxonomyModel = extractTaxonomy(ontModel);

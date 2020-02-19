@@ -27,22 +27,22 @@
           </c:forEach>
     </ul>
 
-	
+
 	<input type="text" name="propertyURI"/>
-    <p>Property URI for which Values Should Be Split</p>	
+    <p>Property URI for which Values Should Be Split</p>
 
 	<input type="text" name="splitRegex"/>
     <p>Regex Pattern on which To Split</p>
-	
+
 	<input type="text" name="newPropertyURI"/>
     <p>Property URI To Be Used with the Newly-Split Values</p>
-	
+
 	<h3></h3>
-	
+
 	<p>
 	<input type="checkbox" name="trim" value="true"/> trim bordering whitespace
 	</p>
-	
+
     <h3>Select Destination Model</h3>
 
     <select name="destinationModelName">

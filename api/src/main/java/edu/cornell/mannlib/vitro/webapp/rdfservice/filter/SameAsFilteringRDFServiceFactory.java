@@ -46,7 +46,7 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             SameAsFilteringRDFServiceFactory.class);
     private RDFServiceFactory f;
     private Model sameAsModel;
-    
+
     public SameAsFilteringRDFServiceFactory(RDFServiceFactory rdfServiceFactory) {
         this.f = rdfServiceFactory;
         try {
@@ -56,50 +56,50 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public RDFService getRDFService() {
         return new SameAsFilteringRDFService(f.getRDFService());
     }
-    
+
     @Override
     public RDFService getShortTermRDFService() {
         return new SameAsFilteringRDFService(f.getShortTermRDFService());
     }
-    
+
     @Override
     public void registerListener(ChangeListener changeListener) throws RDFServiceException {
         f.registerListener(changeListener);
     }
-    
+
     @Override
     public void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
         f.registerListener(changeListener);
     }
-    
+
     @Override
     public void registerJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
         f.registerJenaModelChangedListener(changeListener);
     }
-    
+
     @Override
     public void unregisterJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
         f.registerJenaModelChangedListener(changeListener);
     }
-    
+
     public class SameAsFilteringRDFService extends RDFServiceImpl implements RDFService {
-        
+
         private final Log log = LogFactory.getLog(SameAsFilteringRDFService.class);
-        
+
         private RDFService s;
-        
+
         public SameAsFilteringRDFService(RDFService rdfService) {
             this.s = rdfService;
         }
-        
+
         @Override
-        public InputStream sparqlConstructQuery(String query, 
-                RDFService.ModelSerializationFormat resultFormat) 
+        public InputStream sparqlConstructQuery(String query,
+                RDFService.ModelSerializationFormat resultFormat)
                         throws RDFServiceException {
             Model m = RDFServiceUtils.parseModel(
                     s.sparqlConstructQuery(query, resultFormat), resultFormat);
@@ -133,11 +133,11 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         }
 
         @Override
-        public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat) 
+        public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
                 throws RDFServiceException {
             ResultSet rs = ResultSetFactory.load(
-                    s.sparqlSelectQuery(query, resultFormat), 
-                            RDFServiceUtils.getJenaResultSetFormat(resultFormat));            
+                    s.sparqlSelectQuery(query, resultFormat),
+                            RDFServiceUtils.getJenaResultSetFormat(resultFormat));
             List<QuerySolution> solutions = new ArrayList<QuerySolution>();
             while (rs.hasNext()) {
                 QuerySolution solution = rs.nextSolution();
@@ -146,7 +146,7 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
                 }
             }
             ResultSet resultSet = new FilteredResultSet(solutions, rs);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             switch (resultFormat) {
                case CSV:
                   ResultSetFormatter.outputAsCSV(outputStream,resultSet);
@@ -160,10 +160,10 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
                case XML:
                   ResultSetFormatter.outputAsXML(outputStream, resultSet);
                   break;
-               default: 
+               default:
                   throw new RDFServiceException("unrecognized result format");
-            }              
-            return new ByteArrayInputStream(outputStream.toByteArray());        
+            }
+            return new ByteArrayInputStream(outputStream.toByteArray());
         }
 
         @Override
@@ -184,7 +184,7 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             List<Resource> sameAsResources = getSameAsResources(s.getSubject());
             if (sameAsResources.size() > 0 && !sameAsResources.get(0).equals(s.getSubject())) {
                 return true;
-            } 
+            }
             if (s.getObject().isLiteral() || s.getObject().isAnon()) {
                 return false;
             }
@@ -194,7 +194,7 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             }
             return false;
         }
-        
+
         private List<Resource> getSameAsResources(Resource resource) {
             List<Resource> sameAsResources = new ArrayList<Resource>();
             if (resource.isAnon()) {
@@ -263,7 +263,7 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             filtered.write(out, RDFServiceUtils.getSerializationFormatString(
                     resultFormat));
-            return new ByteArrayInputStream(out.toByteArray()); 
+            return new ByteArrayInputStream(out.toByteArray());
         }
 
         @Override
@@ -315,9 +315,9 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         public void close() {
             s.close();
         }
-        
-        
+
+
     }
-    
-    
+
+
 }

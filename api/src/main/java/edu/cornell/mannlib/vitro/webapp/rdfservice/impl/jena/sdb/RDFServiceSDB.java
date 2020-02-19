@@ -46,24 +46,24 @@ import org.apache.jena.sdb.store.LayoutType;
 public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 
     private final static Log log = LogFactory.getLog(RDFServiceSDB.class);
-    
+
     private DataSource ds;
     private StoreDesc storeDesc;
     private Connection conn;
     private StaticDatasetFactory staticDatasetFactory;
-    
+
     public RDFServiceSDB(DataSource dataSource, StoreDesc storeDesc) {
         this.ds = dataSource;
         this.storeDesc = storeDesc;
     }
-    
+
     public RDFServiceSDB(Connection conn, StoreDesc storeDesc) {
         this.conn = conn;
         this.storeDesc = storeDesc;
         this.staticDatasetFactory = new StaticDatasetFactory(getDataset(
                 new SDBConnection(conn)));
     }
-    
+
     @Override
     protected DatasetWrapper getDatasetWrapper() {
         try {
@@ -75,21 +75,21 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
             throw new RuntimeException(sqle);
-        }     
+        }
     }
-       
+
     @Override
     public boolean changeSetUpdate(ChangeSet changeSet)
             throws RDFServiceException {
-             
-        if (changeSet.getPreconditionQuery() != null 
+
+        if (changeSet.getPreconditionQuery() != null
                 && !isPreconditionSatisfied(
-                        changeSet.getPreconditionQuery(), 
+                        changeSet.getPreconditionQuery(),
                                 changeSet.getPreconditionQueryType())) {
             return false;
         }
-            
-        SDBConnection sdbConn = getSDBConnection();        
+
+        SDBConnection sdbConn = getSDBConnection();
         Dataset dataset = getDataset(sdbConn);
         try {
             insureThatInputStreamsAreResettable(changeSet);
@@ -103,7 +103,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
         	applyChangeSetToModel(changeSet, dataset);
             commitTransaction(sdbConn);
             notifyListenersOfChanges(changeSet);
-            notifyListenersOfPostChangeEvents(changeSet);            
+            notifyListenersOfPostChangeEvents(changeSet);
             return true;
         } catch (Exception e) {
             log.error(e, e);
@@ -114,7 +114,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             close(sdbConn);
         }
     }
-    
+
 	private SDBConnection getSDBConnection() throws RDFServiceException  {
 		try {
 			Connection c = (conn != null) ? conn : ds.getConnection();
@@ -122,7 +122,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 		} catch (SQLException sqle) {
 			log.error(sqle, sqle);
 			throw new RDFServiceException(sqle);
-		}        
+		}
     }
 
     private void close(SDBConnection sdbConn) {
@@ -130,13 +130,13 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             sdbConn.close();
         }
     }
-    
+
     private Dataset getDataset(SDBConnection sdbConn) {
         Store store = SDBFactory.connectStore(sdbConn, storeDesc);
         store.getLoader().setUseThreading(false);
         return SDBFactory.connectDataset(store);
     }
-    
+
 	private void beginTransaction(SDBConnection sdbConn) {
 		if (sdbConn.getTransactionHandler().transactionsSupported()) {
 		    sdbConn.getTransactionHandler().begin();
@@ -148,13 +148,13 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 			sdbConn.getTransactionHandler().commit();
 		}
 	}
-	
+
 	private void abortTransaction(SDBConnection sdbConn) {
 		if (sdbConn.getTransactionHandler().transactionsSupported()) {
 			sdbConn.getTransactionHandler().abort();
 		}
 	}
-	    
+
     @Override
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
         return QueryExecutionFactory.create(q, d);

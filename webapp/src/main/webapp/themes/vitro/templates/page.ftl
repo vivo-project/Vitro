@@ -7,7 +7,7 @@
     <head>
         <#include "head.ftl">
     </head>
-    
+
     <body class="${bodyClasses!}">
         <header id="branding" role="banner">
             <#include "identity.ftl">

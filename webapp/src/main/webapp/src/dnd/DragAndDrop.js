@@ -31,7 +31,7 @@ dojo.lang.extend(dojo.dnd.DragSource, {
 	},
 
 	/*
-	 * This function gets called when the DOM element was 
+	 * This function gets called when the DOM element was
 	 * selected for dragging by the HtmlDragAndDropManager.
 	 */
 	onSelected: function(){

@@ -14,11 +14,11 @@ table.choices td {
 <h2>Dump or Restore the knowledge base</h2>
 
 <p class="explain">
-    <b>Content models</b> hold the data that VIVO contains and operates on. 
+    <b>Content models</b> hold the data that VIVO contains and operates on.
     This includes the ABox and the TBox, instances and ontologies, assertions and inferences.
 </p>
 <p class="explain">
-    <b>Configuration models</b> hold the data that controls VIVO, 
+    <b>Configuration models</b> hold the data that controls VIVO,
     including display options, privacy restrictions, and user accounts.
 </p>
 
@@ -27,7 +27,7 @@ table.choices td {
 <h3>Dump</h3>
 
 <p class="explain">
-    Dumping the content models make take several minutes, and may produce large files. 
+    Dumping the content models make take several minutes, and may produce large files.
     For example, dumping a fully populated VIVO instance may take 20 minutes and produce a file of 3 gigabytes.
 </p>
 
@@ -56,10 +56,10 @@ table.choices td {
 <h3>Restore</h3>
 
 <p class="explain">
-    The restore process is additive: it will not delete existing triples. 
+    The restore process is additive: it will not delete existing triples.
 </p>
 <p class="explain">
-    Choosing to purge large models can result in an OutOfMemory error. 
+    Choosing to purge large models can result in an OutOfMemory error.
     It is better to start with a small or empty knowledge base.
 </p>
 <p class="explain">

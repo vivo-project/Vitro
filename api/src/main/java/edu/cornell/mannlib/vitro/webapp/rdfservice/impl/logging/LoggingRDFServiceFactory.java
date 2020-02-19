@@ -53,7 +53,7 @@ public class LoggingRDFServiceFactory implements RDFServiceFactory {
             throws RDFServiceException {
         factory.unregisterJenaModelChangedListener(changeListener);
     }
-    
+
 	@Override
 	public String toString() {
 		return "LoggingRDFServiceFactory[factory=" + factory + "]";

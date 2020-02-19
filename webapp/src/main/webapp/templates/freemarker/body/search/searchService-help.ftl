@@ -15,8 +15,8 @@ multpart/form-data. The service inspect all parts of this POST for
 lists of URIs to reindex. The URIs should be separated by commas and/or white space.
 If no information can be found for a URI it will be ignored.</p>
 
-<p>The request parameters email and password allow the form to be submitted 
-for a user account.  Only internal accounts are supported, external authentication 
+<p>The request parameters email and password allow the form to be submitted
+for a user account.  Only internal accounts are supported, external authentication
 is not supported.</p>
 
 <h2>Example form for Update Search Index for URIs</h2>
@@ -25,7 +25,7 @@ is not supported.</p>
 <form action="${urls.base}/searchService/updateUrisInSearch"
       enctype="multipart/form-data"
       method="post">
-      
+
     <label for="email">Account email</label>
     <input type="text" name="email" id="email"/>
 

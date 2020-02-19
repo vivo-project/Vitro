@@ -3,7 +3,7 @@
 <#-- Confirmation that an account has been created. -->
 
 <#assign subject = "Su cuenta ${siteName} ha sido creado." />
- 
+
 <#assign html>
 <html>
     <head>
@@ -51,13 +51,13 @@ ${userAccount.firstName} ${userAccount.lastName}
 
 Enhorabuena!
 
-Hemos creado la nueva cuenta en ${siteName}, 
+Hemos creado la nueva cuenta en ${siteName},
 asociada con ${userAccount.emailAddress}.
 
 Si no has solicitado esta nueva cuenta puede ignorar este mensaje.
 Esta solicitud caducará si no se hubiere pronunciado sobre durante 30 días.
 
-Pega el siguiente enlace en la barra de direcciones de su navegador para 
+Pega el siguiente enlace en la barra de direcciones de su navegador para
 crear su contraseña para su nueva cuenta usando nuestro servidor seguro.
 
 ${passwordLink}

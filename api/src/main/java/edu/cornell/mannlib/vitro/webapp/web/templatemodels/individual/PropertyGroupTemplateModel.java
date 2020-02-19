@@ -28,23 +28,23 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
-    private static final Log log = LogFactory.getLog(PropertyGroupTemplateModel.class); 
-    
+    private static final Log log = LogFactory.getLog(PropertyGroupTemplateModel.class);
+
     private final String name;
     private final List<PropertyTemplateModel> properties;
 
 
 
-    PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
-            Individual subject, boolean editing, 
-            List<DataProperty> populatedDataPropertyList, 
+    PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group,
+            Individual subject, boolean editing,
+            List<DataProperty> populatedDataPropertyList,
             List<ObjectProperty> populatedObjectPropertyList) {
 
         this.name = group.getName();
-        
+
         List<Property> propertyList = group.getPropertyList();
         properties = new ArrayList<PropertyTemplateModel>(propertyList.size());
-        
+
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty) p;
@@ -54,7 +54,7 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
                 ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
                         op, subject, vreq, editing, populatedObjectPropertyList);
                 if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
-                    properties.add(tm);                    
+                    properties.add(tm);
                 }
 
             } else if (p instanceof DataProperty){
@@ -79,7 +79,7 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 		if (PolicyHelper.isAuthorizedForActions(vreq, dop)) {
 			return true;
 		}
-	
+
 		RequestedAction dops = new DisplayObjectPropertyStatement(
 				subject.getURI(), op, SOME_URI);
         return PolicyHelper.isAuthorizedForActions(vreq, dops);
@@ -107,11 +107,11 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 	protected boolean isEmpty() {
         return properties.isEmpty();
     }
-    
+
     protected void remove(PropertyTemplateModel ptm) {
         properties.remove(ptm);
     }
-    
+
 
     @Override
 	public String toString(){
@@ -123,14 +123,14 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         }
         return String.format("\nPropertyGroupTemplateModel %s[%s] ",name, ptmStr.toString());
     }
-    
+
     /* Accessor methods for templates */
     // Add this so it's included in dumps for debugging. The templates will want to display
     // name using getName(String)
     public String getName() {
         return name;
     }
-    
+
     public String getName(String otherGroupName) {
         if (name == null || name.isEmpty()) {
             return otherGroupName;
@@ -138,8 +138,8 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
             return name;
         }
     }
-    
+
     public List<PropertyTemplateModel> getProperties() {
         return properties;
-    }    
+    }
 }

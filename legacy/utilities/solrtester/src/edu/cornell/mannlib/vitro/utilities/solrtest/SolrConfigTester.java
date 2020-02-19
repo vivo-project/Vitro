@@ -226,22 +226,22 @@ public class SolrConfigTester {
 
 /**
  * TODO
- * 
+ *
  * <pre>
  * // ** Let's index a document into our embedded server
- * 
+ *
  * SolrInputDocument newDoc = new SolrInputDocument();
  * newDoc.addField(&quot;title&quot;, &quot;Test Document 1&quot;);
  * newDoc.addField(&quot;id&quot;, &quot;doc-1&quot;);
  * newDoc.addField(&quot;text&quot;, &quot;Hello world!&quot;);
  * server.add(newDoc);
  * server.commit();
- * 
+ *
  * // ** And now let's query for it
- * 
+ *
  * params.set(&quot;q&quot;, &quot;title:test&quot;);
  * QueryResponse qResp = server.query(params);
- * 
+ *
  * SolrDocumentList docList = qResp.getResults();
  * System.out.println(&quot;Num docs: &quot; + docList.getNumFound());
  * SolrDocument doc = docList.get(0);

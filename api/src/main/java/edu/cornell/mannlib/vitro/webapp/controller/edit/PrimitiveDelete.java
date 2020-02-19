@@ -23,26 +23,26 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class PrimitiveDelete extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(PrimitiveDelete.class);  
+    private static final Log log = LogFactory.getLog(PrimitiveDelete.class);
 
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTION;
     }
-    
+
     @Override
     protected void doRequest(VitroRequest vreq, HttpServletResponse response) {
-     
+
         String uriToDelete = vreq.getParameter("deletion");
         if (StringUtils.isEmpty(uriToDelete)) {
             doError(response, "No individual specified for deletion", 500);
             return;
         }
-        
+
         // Check permissions
         // The permission-checking code should be inherited from superclass
         boolean hasPermission = true;
-        
+
         if( !hasPermission ){
             //if not okay, send error message
             doError(response,"Insufficent permissions.", SC_UNAUTHORIZED);

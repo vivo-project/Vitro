@@ -54,9 +54,9 @@ class Stemmer
                j, k;
    private static final int INC = 50;
                      /* unit of size whereby b is increased */
-   
+
    private static final Log log = LogFactory.getLog(Stemmer.class.getName());
-   
+
    public Stemmer()
    {  b = new char[INC];
       i = 0;

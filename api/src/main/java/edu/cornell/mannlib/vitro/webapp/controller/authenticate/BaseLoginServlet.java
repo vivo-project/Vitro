@@ -25,19 +25,19 @@ public class BaseLoginServlet extends HttpServlet {
 	protected static Message messageLoginFailed(HttpServletRequest req) {
 		return new LoginProcessBean.Message(req, MLevel.ERROR, "external_login_failed");
 	}
-	
+
 	/** Tell the user that it's nothing personal, they just aren't allowed in. */
 	protected static Message messageLoginDisabled(HttpServletRequest req) {
 		return new LoginProcessBean.Message(req, MLevel.ERROR, "logins_temporarily_disabled");
 	}
-	
+
 	protected Authenticator getAuthenticator(HttpServletRequest req) {
 		return Authenticator.getInstance(req);
 	}
 
 	/**
 	 * Store an error message in the login bean and go back where we came from.
-	 * 
+	 *
 	 * Remove the referring URL from the session after using it.
 	 */
 	protected void complainAndReturnToReferrer(HttpServletRequest req,

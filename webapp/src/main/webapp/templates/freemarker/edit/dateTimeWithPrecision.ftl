@@ -6,7 +6,7 @@ an example and I didn't really see any other way to get the jsp custom forms to 
 this at the moment. Needless to say, we need to be able to call the macro and pass
 parameters from within the original custom form -->
 
-<#-- 
+<#--
 Available variables:
 
 fieldName -- name of field
@@ -68,11 +68,12 @@ precisionConstants.second -- URI for precision
         <#assign reqLevel = 0 />
     </#if>
 
-    <fieldset class="dateTime">              
-    
+    <fieldset class="dateTime">
+
         <#if precLevel gte 1>
             <#-- Only text input field in the mix. We should have some validation to ensure it's a valid year (4 digits, integer, etc) -->
-            <label for="${fieldName}-year">Year<#if reqLevel gte 1> <span class="requiredHint">*</span></#if></label>
+            <label for="${fieldName}-year">${i18n()[('label.dateTimeWithPrecision.year_capitalized')]}
+            <#if reqLevel gte 1> <span class="requiredHint">*</span></#if></label>
             <input class="text-field" name="${fieldName}-year" id="${fieldName}-year" type="text" value="${year!}" size="4" maxlength="4" <#if reqLevel gte 1>required </#if>/>
         </#if>
 

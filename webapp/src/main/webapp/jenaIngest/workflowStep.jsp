@@ -20,11 +20,11 @@
         <input type="hidden" name="action" value="executeWorkflow"/>
 
     <h3>Choose a Workflow Step at Which To Start</h3>
-   
+
         <input type="hidden" name="workflowURI" value="${param.workflowURI}"/>
 
 		<select name="workflowStepURI">
-             
+
         <%
               OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
@@ -42,5 +42,5 @@
 	      }
         %>
         </select>
-  
+
     <input id="submit" type="submit" value="Execute Workflow"/>

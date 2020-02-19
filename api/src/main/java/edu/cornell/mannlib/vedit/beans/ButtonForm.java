@@ -8,35 +8,35 @@ public class ButtonForm {
     private String label  = "no label specified";
     private String cssClass = null;
     private HashMap<String,String> params = null;
-    
+
     public ButtonForm() {
         action = ""; // submits to same page
         cssClass = null;
         label = "no label specified";
         params = null;
     }
-    
+
     public ButtonForm(String actionStr, String classStr, String labelStr, HashMap<String,String> paramMap) {
         action = actionStr;
         cssClass = classStr; // can be null
         label = labelStr;
         params = paramMap;
     }
-    
+
     public String getAction(){
         return action;
     }
     public void setAction(String s){
         action = s;
     }
-    
+
     public String getLabel(){
         return label;
     }
     public void setLabel(String s){
         label = s;
     }
-    
+
     public String getCssClass(){
         if (cssClass==null){
             return "";
@@ -46,7 +46,7 @@ public class ButtonForm {
     public void setCssClass(String s){
         cssClass=s;
     }
-    
+
     public HashMap<String,String> getParams(){
         return params;
     }

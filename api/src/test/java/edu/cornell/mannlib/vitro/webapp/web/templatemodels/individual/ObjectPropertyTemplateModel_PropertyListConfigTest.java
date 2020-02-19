@@ -74,13 +74,13 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	private TemplateLoaderStub tl;
 
 	private StringWriter logMessages;
-	
+
 	private ModelAccessFactoryStub mafs;
 
 	/**
 	 * In general, we expect no exception, but individual tests may override,
 	 * like this:
-	 * 
+	 *
 	 * <pre>
 	 * thrown.expect(InvalidConfigurationException.class);
 	 * thrown.expectMessage(&quot;Bozo&quot;);
@@ -138,7 +138,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		hreq.setSession(session);
 
 		vreq = new VitroRequest(hreq);
-		
+
 		mafs = new ModelAccessFactoryStub();
 		mafs.get(vreq).setWebappDaoFactory(wadf, ASSERTIONS_AND_INFERENCES);
 		mafs.get(vreq).setWebappDaoFactory(wadf, POLICY_NEUTRAL);
@@ -394,7 +394,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	/**
 	 * Sets up an operation with name "foobar" and adds it to the
 	 * ObjectPropertyDaoStub.
-	 * 
+	 *
 	 * The URI will be "http://foobar", and the ListViewConfig file will be
 	 * "testConfig-foobar.xml". That file is assumed to exist already, and to be
 	 * mapped in the ServletContextStub.

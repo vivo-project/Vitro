@@ -16,12 +16,12 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class StandardModelSelector implements ModelSelector {
     private static final Log log = LogFactory.getLog(StandardModelSelector.class);
-    
+
     @Override
 	public OntModel getModel(HttpServletRequest request, ServletContext context) {
     	return ModelAccess.on(context).getOntModel(ABOX_UNION);
     }
-    
+
     public static final ModelSelector selector = new StandardModelSelector();
 
 }

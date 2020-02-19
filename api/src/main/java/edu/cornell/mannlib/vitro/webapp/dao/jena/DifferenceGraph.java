@@ -23,12 +23,12 @@ public class DifferenceGraph implements Graph {
 
     private Graph g;
     private Graph subtract;
-    
-    public DifferenceGraph(Graph g, Graph subtract) {    
+
+    public DifferenceGraph(Graph g, Graph subtract) {
         this.g = g;
         this.subtract = subtract;
     }
-    
+
     @Override
     public void close() {
         // not clear what the best behavior here is

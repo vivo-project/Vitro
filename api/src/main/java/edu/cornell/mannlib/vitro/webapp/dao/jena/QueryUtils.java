@@ -26,29 +26,29 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import org.apache.jena.riot.out.NodeFormatter;
 import org.apache.jena.riot.out.NodeFormatterTTL;
 
-/** 
- * Utilities for executing queries and working with query results. 
- * 
+/**
+ * Utilities for executing queries and working with query results.
+ *
  */
 
 public class QueryUtils {
-    
+
     private static final Log log = LogFactory.getLog(QueryUtils.class);
-    
+
     private QueryUtils() { }
-    
+
     public static Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
         Map<String,Object> map = new HashMap<String,Object>();
         Iterator<String> varNames = soln.varNames();
         while(varNames.hasNext()){
             String varName = varNames.next();
             Object value = nodeToObject( soln.get(varName));
-            log.debug("Adding " + varName + " : " + value + " to query solution data.");            
+            log.debug("Adding " + varName + " : " + value + " to query solution data.");
             map.put(varName, value);
         }
         return map;
     }
- 
+
     public static Map<String,String> querySolutionToStringValueMap( QuerySolution soln ){
         Map<String,String> map = new HashMap<String,String>();
         Iterator<String> varNames = soln.varNames();
@@ -56,11 +56,11 @@ public class QueryUtils {
             String varName = varNames.next();
             String value = nodeToString( soln.get(varName));
             log.debug("Adding " + varName + " : " + value + " to query solution data.");
-            map.put(varName, value);           
+            map.put(varName, value);
         }
         return map;
     }
-    
+
 	/**
 	 * If any pair of maps in the list has the same (non-null) value for any of
 	 * these keys, call the maps duplicates and keep only the first of them.
@@ -93,7 +93,7 @@ public class QueryUtils {
 				+ Arrays.toString(keys) + ". Keeping " + filteredMap
 				+ ". Discarding " + rawMap + ".");
 	}
-    
+
     public static Object nodeToObject( RDFNode node ){
         if( node == null ){
             return "";
@@ -103,7 +103,7 @@ public class QueryUtils {
         }else if( node.isURIResource() ){
             Resource resource = node.asResource();
             return resource.getURI();
-        }else if( node.isAnon() ){  
+        }else if( node.isAnon() ){
             Resource resource = node.asResource();
             return resource.getId().getLabelString(); //get b-node id
         }else{
@@ -120,19 +120,19 @@ public class QueryUtils {
         }else if( node.isURIResource() ){
             Resource resource = node.asResource();
             return resource.getURI();
-        }else if( node.isAnon() ){  
+        }else if( node.isAnon() ){
             Resource resource = node.asResource();
             return resource.getId().getLabelString(); //get b-node id
         }else{
             return "";
         }
     }
-    
+
     /** Manually replace query variables with uris when prebinding causes the query to fail, probably
      * due to a Jena bug.
      */
     public static String subUrisForQueryVars(String queryString, Map<String, String> varsToUris) {
-        
+
         for (String var : varsToUris.keySet()) {
            queryString = subUriForQueryVar(queryString, var, varsToUris.get(var));
         }
@@ -145,12 +145,12 @@ public class QueryUtils {
     public static String subUriForQueryVar(String queryString, String varName, String uri) {
         return queryString.replaceAll("\\?" + varName + "\\b", "<" + uri + ">");
     }
-    
+
     /**Replace one variable name with another**/
     public static String replaceQueryVar(String queryString, String varName, String newVarName) {
         return queryString.replaceAll("\\?" + varName + "\\b", "?" + newVarName);
     }
-    
+
     public static ResultSet getQueryResults(String queryStr, VitroRequest vreq) {
         return getQueryResults(queryStr, vreq.getRDFService());
     }
@@ -158,7 +158,7 @@ public class QueryUtils {
     public static ResultSet getQueryResults(String queryStr, QuerySolution initialBindings, RDFService rdfService) {
     	return getQueryResults(bindVariables(queryStr, initialBindings), rdfService);
     }
-    
+
 	public static ResultSet getLanguageNeutralQueryResults(String queryStr, VitroRequest vreq) {
     	return getQueryResults(queryStr, vreq.getUnfilteredRDFService());
     }

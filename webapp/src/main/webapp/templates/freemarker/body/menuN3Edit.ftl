@@ -2,18 +2,18 @@
 
 <div id="navigationManagement">
     <h2>${i18n().menu_management}</h2>
-    
+
     <#if errorMessage??>
         <div id="errorAlert">
             <img src="../images/iconAlert.png" alt="${i18n().error_alert_icon}" height="31" width="32">
             <p>${errorMessage}</p>
         </div>
     </#if>
-    
+
     <#if message??>
         <p>${message}</p>
     </#if>
-    
+
     <#if menuN3??>
         <form class="" action="${urls.currentPage}" method="post">
             <label for="navigatioN3">${i18n().setup_navigation_menu}</label>

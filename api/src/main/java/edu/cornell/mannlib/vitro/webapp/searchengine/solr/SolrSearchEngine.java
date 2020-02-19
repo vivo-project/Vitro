@@ -10,10 +10,13 @@ import java.util.Collection;
 
 import javax.servlet.ServletContext;
 
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -32,8 +35,8 @@ import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
  * The Solr-based implementation of SearchEngine.
  */
 public class SolrSearchEngine implements SearchEngine {
-	private HttpSolrServer queryEngine;
-	private ConcurrentUpdateSolrServer updateEngine;
+	private SolrClient queryEngine;
+	private ConcurrentUpdateSolrClient updateEngine;
 
 	/**
 	 * Set up the http connection with the solr server
@@ -53,16 +56,26 @@ public class SolrSearchEngine implements SearchEngine {
 		}
 
 		try {
-			queryEngine = new HttpSolrServer(solrServerUrlString);
-			queryEngine.setSoTimeout(10000); // socket read timeout
-			queryEngine.setConnectionTimeout(10000);
-			queryEngine.setDefaultMaxConnectionsPerHost(100);
-			queryEngine.setMaxTotalConnections(100);
-			queryEngine.setMaxRetries(1);
+			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(solrServerUrlString);
 
-			updateEngine = new ConcurrentUpdateSolrServer(solrServerUrlString, 100, 1);
-			updateEngine.setConnectionTimeout(10000);
-			updateEngine.setPollQueueTime(25);
+			builder.withSocketTimeout(10000); // socket read timeout
+			builder.withConnectionTimeout(10000);
+
+			HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+			httpClientBuilder.setMaxConnPerRoute(100);
+			httpClientBuilder.setMaxConnTotal(100);
+			httpClientBuilder.setRetryHandler(new StandardHttpRequestRetryHandler(1, false));
+
+			builder.withHttpClient(httpClientBuilder.build());
+
+			queryEngine = builder.build();
+
+			ConcurrentUpdateSolrClient.Builder updateBuilder =
+					new ConcurrentUpdateSolrClient.Builder(solrServerUrlString);
+			updateBuilder.withConnectionTimeout(10000);
+			// no apparent 7.4.0 analogy to `setPollQueueTime(25)`
+
+			updateEngine = updateBuilder.build();
 
 			css.info("Set up the Solr search engine; URL = '" + solrServerUrlString + "'.");
 		} catch (Exception e) {
@@ -72,8 +85,12 @@ public class SolrSearchEngine implements SearchEngine {
 
 	@Override
 	public void shutdown(Application application) {
-		queryEngine.shutdown();
-		updateEngine.shutdown();
+		try {
+			queryEngine.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Error shutting down 'queryEngine'", e);
+		}
+		updateEngine.shutdownNow();
 	}
 
 	@Override
@@ -170,7 +187,7 @@ public class SolrSearchEngine implements SearchEngine {
 			SolrQuery solrQuery = SolrConversionUtils.convertToSolrQuery(query);
 			QueryResponse response = queryEngine.query(solrQuery);
 			return SolrConversionUtils.convertToSearchResponse(response);
-		} catch (SolrServerException e) {
+		} catch (SolrServerException | IOException e) {
 			throw appropriateException(
 					"Solr server failed to execute the query" + query, e);
 		}

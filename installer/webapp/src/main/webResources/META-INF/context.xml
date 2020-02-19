@@ -1,6 +1,6 @@
 <Context> <!-- useHttpOnly="false" -->
    <Environment
-        type="java.lang.String" 
+        type="java.lang.String"
         name="vitro/home"
         value="${vitro-dir}" override="true"/>
 

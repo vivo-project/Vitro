@@ -31,7 +31,7 @@
 		<c:param name="uri" value="${ent.URI}"/>
 	</c:url>
         <li>
-            <a href='<c:out value="${entHref}"/>'>${ent.name}</a> 
+            <a href='<c:out value="${entHref}"/>'>${ent.name}</a>
 			<c:if test="${!empty ent.moniker}">
 			  <span class="tab-moniker">
 				| <c:out value="${ent.moniker}"/>
@@ -45,7 +45,7 @@
 				</c:forEach>
 			</c:if>
 			<c:set var="anchorText" value="${ent.anchor}"/>
-						
+
 			<c:if test="${(!empty customSearchView) && (!empty anchorText)}">
                 <c:set scope="request" var="individual" value="${ent}"/>
                 <c:if test="${!empty ent.url}">
@@ -55,8 +55,8 @@
                 <c:remove var="individual"/>
                 <c:remove var="individualURL"/>
                 <c:remove var="anchorText"/>
-			</c:if>		
-			
+			</c:if>
+
             <c:if test="${!empty anchorText}">
               <span class="tab-extLink"> |
                 <c:choose>
@@ -86,8 +86,8 @@
 </ul>
 
 <%-- Show pages to select from --%>
-<%  
-if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)request.getAttribute("alpha"))) {  
+<%
+if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)request.getAttribute("alpha"))) {
   request.setAttribute("pageAlpha",request.getAttribute("alpha"));
 }else{
   request.setAttribute("pageAlpha",request.getAttribute("all"));
@@ -100,8 +100,8 @@ if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)re
 	<c:forEach items='${requestScope.pages }' var='page'>
 	   <c:url var='pageUrl' value=".${requestScope.servlet}">
 	     <c:param name ="primary">${requestScope.tabId}</c:param>
-	     <c:param name="page">${page.index}</c:param>	     
-	     <c:if test="${not empty requestScope.pageAlpha}">	     
+	     <c:param name="page">${page.index}</c:param>
+	     <c:if test="${not empty requestScope.pageAlpha}">
 	       <c:param name="alpha">${requestScope.pageAlpha}</c:param>
           </c:if>
 	   </c:url>
@@ -109,8 +109,8 @@ if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)re
 	     ${page.text}
 	   </c:if>
 	   <c:if test="${ not page.selected }">
-	     <a class="minimumFontMain" href="${pageUrl}">${page.text} </a>    
-	   </c:if>   
+	     <a class="minimumFontMain" href="${pageUrl}">${page.text} </a>
+	   </c:if>
 	</c:forEach>
     </div>
 </c:if>

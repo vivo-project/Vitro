@@ -7,7 +7,7 @@
 <#if aboutText?has_content>
     <div class="pageGroupBody" id="aboutText">${aboutText}</div>
 </#if>
-    
+
 <#if acknowledgeText?has_content>
-    <div class="pageGroupBody" id="acknowledgementText">${acknowledgeText}</div> 
+    <div class="pageGroupBody" id="acknowledgementText">${acknowledgeText}</div>
 </#if>

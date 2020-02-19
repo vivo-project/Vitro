@@ -14,12 +14,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class IndividualDeletionEvent extends IndividualEditEvent {
 
-	private static final String INDIVIDUAL_DELETION_EVENT = VitroVocabulary.INDIVIDUAL_DELETION_EVENT; 
-	
+	private static final String INDIVIDUAL_DELETION_EVENT = VitroVocabulary.INDIVIDUAL_DELETION_EVENT;
+
 	public IndividualDeletionEvent(String userURI, boolean begin, String individualURI) {
 		super(userURI,begin,individualURI);
 	}
-	
+
 	public Map<String,List<RDFNode>> getPropertyMap() {
 		Map<String,List<RDFNode>> map = super.getPropertyMap();
 		List<RDFNode> typeValueList = map.get(RDF.type.getURI());
@@ -28,7 +28,7 @@ public class IndividualDeletionEvent extends IndividualEditEvent {
 		}
 		typeValueList.add(ResourceFactory.createResource(INDIVIDUAL_DELETION_EVENT));
 		map.put(RDF.type.getURI(),typeValueList);
-		return map;	
+		return map;
 	}
-	
+
 }
