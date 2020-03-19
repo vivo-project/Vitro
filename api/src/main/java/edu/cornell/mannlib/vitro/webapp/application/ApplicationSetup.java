@@ -45,6 +45,8 @@ public class ApplicationSetup implements ServletContextListener {
 			this.vitroHomeDir = VitroHomeDirectory.find(ctx);
 			ss.info(this, vitroHomeDir.getDiscoveryMessage());
 
+			this.vitroHomeDir.populateIfEmpty();
+
 			locateApplicationConfigFile();
 			loadApplicationConfigFile();
 			createConfigurationBeanLoader();
