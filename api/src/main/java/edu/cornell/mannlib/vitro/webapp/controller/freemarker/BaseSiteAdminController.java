@@ -199,12 +199,18 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
             String error = null;
             String explanation = null;
-            TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
-            if (!status.isConsistent()) {
-                error = "INCONSISTENT ONTOLOGY: reasoning halted.";
-                explanation = status.getExplanation();
-            } else if ( status.isInErrorState() ) {
-                error = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
+            try {
+                TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
+                if (!status.isConsistent()) {
+                    error = "INCONSISTENT ONTOLOGY: reasoning halted.";
+                    explanation = status.getExplanation();
+                } else if ( status.isInErrorState() ) {
+                    error = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
+                }
+            } catch (IllegalStateException e) {
+                error = "The inferencing engine is disabled.";
+                log.warn("Status of reasoner could not be determined.");
+                log.debug(e);
             }
 
             if (error != null) {
