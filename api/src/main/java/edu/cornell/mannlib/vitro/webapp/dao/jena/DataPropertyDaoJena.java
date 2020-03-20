@@ -360,8 +360,13 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
 
     protected boolean reasoningAvailable() {
+        try {
     	TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
-    	return status.isConsistent() && !status.isInErrorState();
+        return status.isConsistent() && !status.isInErrorState();
+        } catch (IllegalStateException e) {
+            log.debug("Status of reasoner could not be determined.", e);
+            return false;
+        }
     }
 
     private String getRequiredDatatypeURI(Individual individual, DataProperty dataprop, List<String> vclassURIs) {

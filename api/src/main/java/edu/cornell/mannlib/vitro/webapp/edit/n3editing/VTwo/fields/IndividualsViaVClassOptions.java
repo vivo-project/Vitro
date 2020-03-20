@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -16,6 +19,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerStatus;
 
 public class IndividualsViaVClassOptions implements FieldOptions {
+
+    protected static final Log log = LogFactory.getLog(IndividualsViaVClassOptions.class.getName());
 
     public static final String LEFT_BLANK = "";
     protected List<String> vclassURIs;
@@ -102,8 +107,13 @@ public class IndividualsViaVClassOptions implements FieldOptions {
     }
 
     protected boolean isReasoningAvailable(){
-    	TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
-    	return status.isConsistent() && !status.isInErrorState();
+    	try {
+            TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
+            return status.isConsistent() && !status.isInErrorState();
+            } catch (IllegalStateException e) {
+                log.debug("Status of reasoner could not be determined.", e);
+                return false;
+            }
     }
 
     protected Map<String, Individual> addWhenMissingInference( String classUri , WebappDaoFactory wDaoFact ){
