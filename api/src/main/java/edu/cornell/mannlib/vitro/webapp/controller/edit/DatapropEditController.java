@@ -42,7 +42,7 @@ public class DatapropEditController extends BaseEditController {
 
     	VitroRequest vreq = new VitroRequest(request);
 
-        final int NUM_COLS=18;
+        final int NUM_COLS=19;
 
         String datapropURI = request.getParameter("uri");
 
@@ -73,8 +73,9 @@ public class DatapropEditController extends BaseEditController {
         results.add("display tier");          // column 14
         results.add("display limit");         // column 15
         results.add("custom entry form");     // column 16
-        results.add("URI");                   // column 17
-        results.add("publish level");         // column 18
+        results.add("editing");               // column 17
+        results.add("URI");                   // column 18
+        results.add("publish level");         // column 19
 
         results.add(dp.getPickListName()); // column 1
         results.add(dp.getPublicName() == null ? "(no public label)" : dp.getPublicName()); // column 2
@@ -142,9 +143,10 @@ public class DatapropEditController extends BaseEditController {
         results.add(String.valueOf(dp.getDisplayTier()));  // column 14
         results.add(String.valueOf(dp.getDisplayLimit()));  // column 15
         results.add(dp.getCustomEntryForm() == null ? "(unspecified)" : dp.getCustomEntryForm());  // column 16
-        results.add(dp.getURI() == null ? "" : dp.getURI()); // column 17
+        results.add(dp.getEditing() == null ? "" : dp.getEditing()); // column 17
+        results.add(dp.getURI() == null ? "" : dp.getURI()); // column 18
 		results.add(dp.getHiddenFromPublishBelowRoleLevel() == null ? "(unspecified)"
-				: dp.getHiddenFromPublishBelowRoleLevel().getDisplayLabel()); // column 18
+				: dp.getHiddenFromPublishBelowRoleLevel().getDisplayLabel()); // column 19
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");
