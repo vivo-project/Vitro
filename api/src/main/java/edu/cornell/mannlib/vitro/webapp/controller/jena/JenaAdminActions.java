@@ -192,29 +192,33 @@ public class JenaAdminActions extends BaseEditController {
 	}
 
     private void printRestrictions() {
-    	TBoxReasonerModule reasoner = ApplicationUtils.instance().getTBoxReasonerModule();
-    	for (Restriction rest : reasoner.listRestrictions() ) {
-    		if (rest.isAllValuesFromRestriction()) {
-    			log.trace("All values from: ");
-    			AllValuesFromRestriction avfr = rest.asAllValuesFromRestriction();
-    			Resource res = avfr.getAllValuesFrom();
-    			if (res.canAs(OntClass.class)) {
-    				OntClass resClass = res.as(OntClass.class);
-    				for (Resource inst : resClass.listInstances().toList() ) {
-    					log.trace("    -"+inst.getURI());
-    				}
-    			}
-    		} else if (rest.isSomeValuesFromRestriction()) {
-    			log.trace("Some values from: ");
-    		} else if (rest.isHasValueRestriction()) {
-    			log.trace("Has value: ");
-    		}
-    		log.trace("On property "+rest.getOnProperty().getURI());
-    		for (Resource inst : rest.listInstances().toList() ) {
-    			log.trace("     "+inst.getURI());
-    		}
-
-    	}
+		try {
+			TBoxReasonerModule reasoner = ApplicationUtils.instance().getTBoxReasonerModule();
+			for (Restriction rest : reasoner.listRestrictions() ) {
+				if (rest.isAllValuesFromRestriction()) {
+					log.trace("All values from: ");
+					AllValuesFromRestriction avfr = rest.asAllValuesFromRestriction();
+					Resource res = avfr.getAllValuesFrom();
+					if (res.canAs(OntClass.class)) {
+						OntClass resClass = res.as(OntClass.class);
+						for (Resource inst : resClass.listInstances().toList() ) {
+							log.trace("    -"+inst.getURI());
+						}
+					}
+				} else if (rest.isSomeValuesFromRestriction()) {
+					log.trace("Some values from: ");
+				} else if (rest.isHasValueRestriction()) {
+					log.trace("Has value: ");
+				}
+				log.trace("On property "+rest.getOnProperty().getURI());
+				for (Resource inst : rest.listInstances().toList() ) {
+					log.trace("     "+inst.getURI());
+				}
+			}
+		}
+		catch (IllegalStateException e) {
+			log.debug("Status of reasoner could not be determined. It is likely disabled", e);
+		}
     }
 
     private void removeLongLiterals() {

@@ -361,10 +361,10 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
 
     protected boolean reasoningAvailable() {
         try {
-    	TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
-        return status.isConsistent() && !status.isInErrorState();
+            TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
+            return status.isConsistent() && !status.isInErrorState();
         } catch (IllegalStateException e) {
-            log.debug("Status of reasoner could not be determined.", e);
+            log.debug("Status of reasoner could not be determined. It is likely disabled.", e);
             return false;
         }
     }

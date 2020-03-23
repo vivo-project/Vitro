@@ -110,10 +110,10 @@ public class IndividualsViaVClassOptions implements FieldOptions {
     	try {
             TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
             return status.isConsistent() && !status.isInErrorState();
-            } catch (IllegalStateException e) {
-                log.debug("Status of reasoner could not be determined.", e);
-                return false;
-            }
+        } catch (IllegalStateException e) {
+            log.debug("Status of reasoner could not be determined. It is likely disabled.", e);
+            return false;
+        }
     }
 
     protected Map<String, Individual> addWhenMissingInference( String classUri , WebappDaoFactory wDaoFact ){
