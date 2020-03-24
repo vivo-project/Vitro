@@ -208,7 +208,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
                     error = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
                 }
             } catch (IllegalStateException e) {
-                error = "The inferencing engine is disabled.";
+                error = "The inferencing engine is disabled. Data entered manually may exhibit unexpected behavior prior to inferencing.";
                 log.debug("Status of reasoner could not be determined. It is likely disabled.", e);
             }
 

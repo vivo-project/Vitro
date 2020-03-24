@@ -217,7 +217,7 @@ public class JenaAdminActions extends BaseEditController {
 			}
 		}
 		catch (IllegalStateException e) {
-			log.debug("Status of reasoner could not be determined. It is likely disabled", e);
+			log.warn("Status of reasoner could not be determined. It is likely disabled", e);
 		}
     }
 
