@@ -13,18 +13,11 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.ontology.OntModel;
+
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -42,10 +35,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSubmissionTemplateModel;
-
 
 /**
  * This servlet is intended to handle all requests to create a form for use
@@ -69,33 +60,8 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
 
     @Override
-    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-    	//Check if this statement can be edited here and return unauthorized if not
-		String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
-		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
-		String domainUri = EditConfigurationUtils.getDomainUri(vreq);
-		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
-		Property predicateProp = new Property();
-		predicateProp.setURI(predicateUri);
-		predicateProp.setDomainVClassURI(domainUri);
-		predicateProp.setRangeVClassURI(rangeUri);
-		OntModel ontModel = ModelAccess.on(vreq).getOntModel();
-		AbstractObjectPropertyStatementAction objectPropertyAction;
-		if (objectUri == null) {
-			objectPropertyAction = new AddObjectPropertyStatement(ontModel, subjectUri, predicateProp, RequestedAction.SOME_URI);
-		} else {
-			if (isDeleteForm(vreq)) {
-				objectPropertyAction = new DropObjectPropertyStatement(ontModel, subjectUri, predicateProp, objectUri);
-			} else {
-				objectPropertyAction = new EditObjectPropertyStatement(ontModel, subjectUri, predicateProp, objectUri);
-			}
-		}
-		boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, 
-				new EditDataPropertyStatement(ontModel, subjectUri, predicateUri, objectUri).
-				or(objectPropertyAction));
-
-		return isAuthorized? SimplePermission.DO_FRONT_END_EDITING.ACTION: AuthorizationRequest.UNAUTHORIZED;
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+    	return SimplePermission.DO_FRONT_END_EDITING.ACTION;
 	}
 
 	@Override

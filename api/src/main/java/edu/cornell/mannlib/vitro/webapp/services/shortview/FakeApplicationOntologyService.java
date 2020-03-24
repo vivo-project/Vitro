@@ -45,10 +45,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter;
  * scan the model to determine what each view consists of (data getter URIs,
  * template names), what context each view applies to, and what classes map to
  * each view.
- *
+ * 
  * Data getters must be SparqlQueryDataGetters, and must be described in the
  * same config file.
- *
+ * 
  * TODO Get rid of this when the Application Ontology is implemented.
  */
 public class FakeApplicationOntologyService {
@@ -71,7 +71,7 @@ public class FakeApplicationOntologyService {
 	/**
 	 * Load the model from the config file, and inspect it for Views and
 	 * mappings.
-	 *
+	 * 
 	 * Keep the model - we'll need it when its time to create the DataGetters
 	 * (on each request).
 	 */
@@ -185,7 +185,7 @@ public class FakeApplicationOntologyService {
 	 */
 	private Map<String, List<ViewSpec>> createClassMappings(
 			Map<String, ViewSpec> viewSpecsByUri)
-			throws ShortViewConfigException {
+					throws ShortViewConfigException {
 		Property hasView = viewModel.getProperty(HAS_VIEW);
 
 		StmtIterator stmts = viewModel.listStatements(null, hasView,
@@ -440,19 +440,31 @@ public class FakeApplicationOntologyService {
 	/**
 	 * A special data getter to support the kluge case of browsing an individual
 	 * that belongs to the People class group.
-	 *
+	 * 
 	 * A SPARQL query data getter that initializes itself from its own private
 	 * "display model". The query finds a preferred title for the individual.
 	 */
 	private static class FakeVivoPeopleDataGetter extends SparqlQueryDataGetter {
-		private static String QUERY_STRING = ""
+		//		private static String QUERY_STRING = ""
+		//				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
+		//				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
+		//				+ "SELECT ?pt  \n" + "WHERE {  \n"
+		//				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
+		//				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
+		//				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
+
+		/*
+		 * UQAM New query including Linguistic context
+		 */
+		private static String QUERY_STRING_LANG = ""
 				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
 				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
 				+ "SELECT ?pt  \n" + "WHERE {  \n"
 				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
 				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
-				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
-
+				+ "    ?vTitle vcard:title ?pt . \n" 
+				+ "    FILTER (lang(?pt) = '?langCtx' )  \n" 
+				+ " } LIMIT 1";
 		private static final String FAKE_VIVO_PEOPLE_DATA_GETTER_URI = "http://FakeVivoPeopleDataGetter";
 
 		private static OntModel fakeDisplayModel = initializeFakeDisplayModel();
@@ -467,7 +479,7 @@ public class FakeApplicationOntologyService {
 			Property saveToVarProperty = m
 					.getProperty(DisplayVocabulary.SAVE_TO_VAR);
 
-			m.add(dataGetter, queryProperty, QUERY_STRING);
+			m.add(dataGetter, queryProperty, QUERY_STRING_LANG); //UQAM Using query with linguistic context
 			m.add(dataGetter, saveToVarProperty, "extra");
 			return m;
 		}
@@ -475,18 +487,21 @@ public class FakeApplicationOntologyService {
 		private String individualUri;
 		private VitroRequest vreq;
 		private ServletContext ctx;
+		private String langCtx = "en-US";
 
 		public FakeVivoPeopleDataGetter(VitroRequest vreq, String individualUri) {
-			super(vreq, fakeDisplayModel, "http://FakeVivoPeopleDataGetter");
+			super(vreq, initializeFakeDisplayModel(), "http://FakeVivoPeopleDataGetter");
 			this.individualUri = individualUri;
 			this.vreq = vreq;
 			this.ctx = vreq.getSession().getServletContext();
+			this.langCtx =  vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry(); // UQAM add the linguistic context
 		}
 
 		@Override
 		public Map<String, Object> getData(Map<String, Object> pageData) {
 			Map<String, Object> parms = new HashMap<>();
 			parms.put("uri", individualUri);
+			parms.put("langCtx", langCtx); //UQAM add the linguistic context
 
 			return super.getData(parms);
 		}

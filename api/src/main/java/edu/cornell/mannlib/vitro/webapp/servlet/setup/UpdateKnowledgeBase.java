@@ -534,8 +534,12 @@ public class UpdateKnowledgeBase {
 			try {
 				if (f.getName().endsWith(".md")) {
 					// Markdown files are documentation - skip.
-				} else if (f.getName().endsWith(".n3")) {
+					// UQAM accept lower and upper case in fn extension
+				} else if (f.getName().toLowerCase().endsWith(".n3")) {
 					om.read(fis, null, "N3");
+					// UQAM Accept Turtle
+				} else if (f.getName().toLowerCase().endsWith(".ttl")) {
+					om.read(fis, null, "TURTLE");
 				} else {
 					om.read(fis, null, "RDF/XML");
 				}

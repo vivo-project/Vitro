@@ -22,11 +22,11 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -35,19 +35,19 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class LanguageFilteringRDFService implements RDFService {
-
+        
     private static final Log log = LogFactory.getLog(LanguageFilteringRDFService.class);
     private RDFService s;
     private List<String> langs;
-
+    
     public LanguageFilteringRDFService(RDFService service, List<String> langs) {
         this.s = service;
         this.langs = normalizeLangs(langs);
     }
-
+    
 	private List<String> normalizeLangs(List<String> langs) {
 		log.debug("Preferred languages:" + langs);
-
+		
 		List<String> normalizedLangs = new ArrayList<String>(langs);
 		for (String lang : langs) {
 			String baseLang = lang.split("-")[0];
@@ -55,13 +55,13 @@ public class LanguageFilteringRDFService implements RDFService {
 				normalizedLangs.add(baseLang);
 			}
 		}
-
+		
 		log.debug("Normalized languages:" + normalizedLangs);
 		return normalizedLangs;
 	}
 
     @Override
-    public boolean changeSetUpdate(ChangeSet changeSet)
+    public boolean changeSetUpdate(ChangeSet changeSet) 
             throws RDFServiceException {
         return s.changeSetUpdate(changeSet);
     }
@@ -91,15 +91,7 @@ public class LanguageFilteringRDFService implements RDFService {
     @Override
     public void sparqlConstructQuery(String query, Model model)
             throws RDFServiceException {
-        if (model.isEmpty()) {
-            s.sparqlConstructQuery(query, model);
-            filterModel(model);
-        } else {
-            Model constructedModel = ModelFactory.createDefaultModel();
-            s.sparqlConstructQuery(query, constructedModel);
-            filterModel(constructedModel);
-            model.add(constructedModel);
-        }
+        s.sparqlConstructQuery(query, model);
     }
 
     @Override
@@ -107,15 +99,15 @@ public class LanguageFilteringRDFService implements RDFService {
             ModelSerializationFormat resultFormat)
             throws RDFServiceException {
         Model m = RDFServiceUtils.parseModel(s.sparqlDescribeQuery(query, resultFormat), resultFormat);
-        return outputModel(filterModel(m), resultFormat);
+        return outputModel(filterModel(m), resultFormat);        
     }
-
+    
     private InputStream outputModel(Model m, ModelSerializationFormat resultFormat) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         m.write(out, RDFServiceUtils.getSerializationFormatString(resultFormat));
         return new ByteArrayInputStream(out.toByteArray());
     }
-
+    
     private Model filterModel(Model m) {
     	log.debug("filterModel");
         List<Statement> retractions = new ArrayList<Statement>();
@@ -139,7 +131,7 @@ public class LanguageFilteringRDFService implements RDFService {
                         continue;
                     } else if (chuckRemaining) {
                         retractions.add(s);
-                    }
+                    } 
                     String lang = s.getObject().asLiteral().getLanguage();
                     if (langRegister == null) {
                         langRegister = lang;
@@ -149,7 +141,7 @@ public class LanguageFilteringRDFService implements RDFService {
                     }
                 }
             }
-
+            
         }
         m.remove(retractions);
         return m;
@@ -174,7 +166,7 @@ public class LanguageFilteringRDFService implements RDFService {
 
 	@Override
     public InputStream sparqlSelectQuery(String query,
-            ResultFormat resultFormat) throws RDFServiceException {
+            ResultFormat resultFormat) throws RDFServiceException {        
     	log.debug("sparqlSelectQuery: " + query.replaceAll("\\s+", " "));
         ResultSet resultSet = ResultSetFactory.fromJSON(
                 s.sparqlSelectQuery(query, RDFService.ResultFormat.JSON));
@@ -231,7 +223,7 @@ public class LanguageFilteringRDFService implements RDFService {
             }
         }
         ResultSet filtered = new FilteredResultSet(compactedList, resultSet);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
         switch (resultFormat) {
            case CSV:
               ResultSetFormatter.outputAsCSV(outputStream, filtered);
@@ -245,16 +237,15 @@ public class LanguageFilteringRDFService implements RDFService {
            case XML:
               ResultSetFormatter.outputAsXML(outputStream, filtered);
               break;
-           default:
+           default: 
               throw new RDFServiceException("unrecognized result format");
-        }
-        return new ByteArrayInputStream(outputStream.toByteArray());
+        }        
+        return new ByteArrayInputStream(outputStream.toByteArray());       
     }
 
     @Override
     public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException {
         log.debug("sparqlSelectQuery: " + query.replaceAll("\\s+", " "));
-
         s.sparqlSelectQuery(query, new ResultSetConsumer.Chaining(consumer) {
             List<String> vars;
             List<QuerySolution> solnList = new ArrayList<QuerySolution>();
@@ -338,26 +329,26 @@ public class LanguageFilteringRDFService implements RDFService {
 	}
 
 	private class RowIndexedLiteral {
-
+        
         private Literal literal;
         private int index;
-
+        
         public RowIndexedLiteral(Literal literal, int index) {
             this.literal = literal;
             this.index = index;
         }
-
+        
         public Literal getLiteral() {
             return this.literal;
         }
-
+        
         public int getIndex() {
-            return index;
+            return index;   
         }
-
+        
     }
-
-    private boolean matchesExceptForVar(QuerySolution a, QuerySolution b,
+    
+    private boolean matchesExceptForVar(QuerySolution a, QuerySolution b, 
             String varName, List<String> varList) {
         if (varName == null) {
             throw new RuntimeException("expected non-null variable nane");
@@ -384,7 +375,7 @@ public class LanguageFilteringRDFService implements RDFService {
         }
         return true;
     }
-
+    
     private List<QuerySolution> getSolutionList(ResultSet resultSet) {
         List<QuerySolution> solnList = new ArrayList<QuerySolution>();
         while (resultSet.hasNext()) {
@@ -450,7 +441,7 @@ public class LanguageFilteringRDFService implements RDFService {
             throws RDFServiceException {
         s.unregisterListener(changeListener);
     }
-
+    
     @Override
     public void registerJenaModelChangedListener(ModelChangedListener changeListener)
             throws RDFServiceException {
@@ -486,21 +477,21 @@ public class LanguageFilteringRDFService implements RDFService {
 
     @Override
     public void close() {
-        s.close();
+        s.close();            
     }
-
+       
     private class LangSort {
     	// any inexact match is worse than any exact match
     	private int inexactMatchPenalty = langs.size();
     	// no language is worse than any inexact match (if the preferred list does not include "").
-    	private int noLanguage = 2 * inexactMatchPenalty;
+    	private int noLanguage = 2 * inexactMatchPenalty; 
     	// no match is worse than no language.
-    	private int noMatch = noLanguage + 1;
-
+    	private int noMatch = noLanguage + 1; 
+        
         protected int compareLangs(String t1lang, String t2lang) {
         	return languageIndex(t1lang) - languageIndex(t2lang);
         }
-
+        
 		/**
 		 * Return index of exact match, or index of partial match, or
 		 * language-free, or no match.
@@ -532,38 +523,52 @@ public class LanguageFilteringRDFService implements RDFService {
 			return noMatch;
 		}
     }
-
+    
     private class RowIndexedLiteralSortByLang extends LangSort implements Comparator<RowIndexedLiteral> {
-
+        
         public int compare(RowIndexedLiteral rilit1, RowIndexedLiteral rilit2) {
             if (rilit1 == null || rilit2 == null) {
                 return 0;
             }
-
+            
             String t1lang = rilit1.getLiteral().getLanguage();
             String t2lang = rilit2.getLiteral().getLanguage();
-
+                    
             return compareLangs(t1lang, t2lang);
-        }
+        }   
     }
-
+    
     private class StatementSortByLang extends LangSort implements Comparator<Statement> {
-
+        
         public int compare(Statement s1, Statement s2) {
             if (s1 == null || s2 == null) {
                 return 0;
             } else if (!s1.getObject().isLiteral() || !s2.getObject().isLiteral()) {
                 return 0;
             }
-
+            
             String s1lang = s1.getObject().asLiteral().getLanguage();
             String s2lang = s2.getObject().asLiteral().getLanguage();
-
+                    
             return compareLangs(s1lang, s2lang);
         }
     }
+	/* 
+	 * UQAM Useful among other things to transport the linguistic context in the service 
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
 
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
+
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}    
+ 
 }
-
-
-
+    
+    
+    

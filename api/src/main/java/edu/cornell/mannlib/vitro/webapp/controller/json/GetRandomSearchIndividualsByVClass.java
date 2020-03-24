@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.json;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService.ShortViewContext;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup;
@@ -32,25 +34,25 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 	}
 
 	/**
-	 * Search for individuals by VClass.
+	 * Search for individuals by VClass. 
 	 */
 	@Override
 	protected ObjectNode process() throws Exception {
 		ObjectNode rObj = null;
-
+		
 		//This gets the first vclass value and sets that as display type.
 		List<String> vclassIds = super.getVclassIds(vreq);
 		String vclassId = vclassIds.get(0);
 		vreq.setAttribute("queryType", "random");
 //		vreq.setAttribute("displayType", vclassId);
-
+		
 		//This will get all the solr individuals by VClass (if one value) or the intersection
 		//i.e. individuals that have all the types for the different vclasses entered
 		rObj = super.process();
 		addShortViewRenderings(rObj);
 		return rObj;
 	}
-
+	
 	/**
 	 * Look through the return object. For each individual, render the short
 	 * view and insert the resulting HTML into the object.
@@ -73,7 +75,8 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 		modelMap.put("individual",
 				IndividualTemplateModelBuilder.build(individual, vreq));
 		modelMap.put("vclass", vclassName);
-
+		String langCtx = vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();  //UQAM build the linguistic context
+		modelMap.put("langCtx", langCtx); // UQAM add the linguistic context to map
 		ShortViewService svs = ShortViewServiceSetup.getService(ctx);
 		return svs.renderShortView(individual, ShortViewContext.BROWSE,
 				modelMap, vreq);

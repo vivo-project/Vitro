@@ -32,6 +32,7 @@ import org.apache.jena.riot.out.NodeFormatter;
 import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.apache.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
@@ -42,40 +43,40 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public abstract class RDFServiceImpl implements RDFService {
-
+	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
-	protected static final String BNODE_ROOT_QUERY =
+	protected static final String BNODE_ROOT_QUERY = 
 	        "SELECT DISTINCT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
-
+	
 	protected String defaultWriteGraphURI;
 	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
 	protected List<ModelChangedListener> registeredJenaListeners = new CopyOnWriteArrayList<ModelChangedListener>();
-
+    	
 	@Override
-	public void newIndividual(String individualURI,
+	public void newIndividual(String individualURI, 
 			                  String individualTypeURI) throws RDFServiceException {
-
+	
        newIndividual(individualURI, individualTypeURI, defaultWriteGraphURI);
 	}
-
+		
     @Override
-    public void newIndividual(String individualURI,
-                              String individualTypeURI,
+    public void newIndividual(String individualURI, 
+                              String individualTypeURI, 
                               String graphURI) throws RDFServiceException {
-
+    
        StringBuilder containsQuery = new StringBuilder("ASK { \n");
        if (graphURI != null) {
            containsQuery.append("  GRAPH <").append(graphURI).append("> { ");
        }
-       containsQuery.append("<");
+       containsQuery.append("<");   
        containsQuery.append(individualURI);
-       containsQuery.append("> ");
+       containsQuery.append("> ");  
        containsQuery.append("?p ?o");
        if (graphURI != null) {
            containsQuery.append(" } \n");
        }
        containsQuery.append("\n}");
-
+       
        if (sparqlAskQuery(containsQuery.toString())) {
             throw new RDFServiceException("individual already exists");
        } else {
@@ -85,26 +86,26 @@ public abstract class RDFServiceImpl implements RDFService {
             cs.addAddition(new ByteArrayInputStream(
                     sparqlTriple(triple).getBytes()), ModelSerializationFormat.N3, graphURI);
             changeSetUpdate(cs);
-       }
+       }    
     }
-
+	
 	@Override
 	public String getDefaultWriteGraphURI() throws RDFServiceException {
         return defaultWriteGraphURI;
 	}
-
+		
 	@Override
 	public synchronized void registerListener(ChangeListener changeListener) throws RDFServiceException {
 		if (!registeredListeners.contains(changeListener)) {
 		   registeredListeners.add(changeListener);
 		}
 	}
-
+	
 	@Override
 	public synchronized void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
 		registeredListeners.remove(changeListener);
 	}
-
+	
 	@Override
 	public synchronized void registerJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
 	    if (!registeredJenaListeners.contains(changeListener)) {
@@ -120,15 +121,15 @@ public abstract class RDFServiceImpl implements RDFService {
 	public synchronized List<ChangeListener> getRegisteredListeners() {
 	    return this.registeredListeners;
 	}
-
+	
 	public synchronized List<ModelChangedListener> getRegisteredJenaModelChangedListeners() {
 	    return this.registeredJenaListeners;
 	}
-
+	
 	@Override
 	public ChangeSet manufactureChangeSet() {
 		return new ChangeSetImpl();
-	}
+	}    
 
     protected void notifyListenersOfChanges(ChangeSet changeSet)
             throws IOException {
@@ -139,10 +140,10 @@ public abstract class RDFServiceImpl implements RDFService {
             notifyListeners(modelChange);
         }
     }
-
+	
     protected void notifyListeners(ModelChange modelChange) throws IOException {
+        modelChange.getSerializedModel().reset();
         for (ChangeListener listener : registeredListeners) {
-            modelChange.getSerializedModel().reset();
             listener.notifyModelChange(modelChange);
         }
         log.debug(registeredJenaListeners.size() + " registered Jena listeners");
@@ -153,24 +154,24 @@ public abstract class RDFServiceImpl implements RDFService {
         Model tempModel = ModelFactory.createDefaultModel();
         Iterator<ModelChangedListener> jenaIter = registeredJenaListeners.iterator();
         while (jenaIter.hasNext()) {
-            ModelChangedListener listener = jenaIter.next();
+            ModelChangedListener listener = jenaIter.next(); 
             log.debug("\t" + listener.getClass().getSimpleName());
             tempModel.register(listener);
         }
         if (Operation.ADD.equals(modelChange.getOperation())) {
             tempModel.read(modelChange.getSerializedModel(), null,
                    RDFServiceUtils.getSerializationFormatString(
-                           modelChange.getSerializationFormat()));
+                           modelChange.getSerializationFormat())); 
         } else if (Operation.REMOVE.equals(modelChange.getOperation())) {
             tempModel.remove(RDFServiceUtils.parseModel(
-                    modelChange.getSerializedModel(),
+                    modelChange.getSerializedModel(), 
                     modelChange.getSerializationFormat()));
         }
         while (jenaIter.hasNext()) {
             tempModel.unregister(jenaIter.next());
         }
     }
-
+    
     public void notifyListenersOfEvent(Object event) {
         for (ChangeListener listener : registeredListeners) {
             // TODO what is the graphURI parameter for?
@@ -179,9 +180,9 @@ public abstract class RDFServiceImpl implements RDFService {
         for (ModelChangedListener listener : registeredJenaListeners) {
             listener.notifyEvent(null, event);
         }
-    }
-
-    protected boolean isPreconditionSatisfied(String query,
+    }    
+    
+    protected boolean isPreconditionSatisfied(String query, 
             RDFService.SPARQLQueryType queryType)
                     throws RDFServiceException {
         Model model = ModelFactory.createDefaultModel();
@@ -197,19 +198,19 @@ public abstract class RDFServiceImpl implements RDFService {
             case ASK:
                 return sparqlAskQuery(query);
             default:
-                throw new RDFServiceException("unrecognized SPARQL query type");
-        }
+                throw new RDFServiceException("unrecognized SPARQL query type");  
+        }       
     }
 
     protected static String getSerializationFormatString(RDFService.ModelSerializationFormat format) {
         switch (format) {
-            case RDFXML:
+            case RDFXML: 
                 return "RDF/XML";
-            case N3:
+            case N3: 
                 return "TTL";
-            case NTRIPLE:
-                return "N-TRIPLE";
-            default:
+            case NTRIPLE: 
+                return "N-TRIPLE";    
+            default: 
                 log.error("unexpected format in getFormatString");
                 return null;
         }
@@ -232,7 +233,7 @@ public abstract class RDFServiceImpl implements RDFService {
         return serializedTriple.toString();
 
     }
-
+    
     protected static String sparqlNodeUpdate(Node node, String varName) {
         if (node.isBlank()) {
             return "_:" + node.getBlankNodeLabel().replaceAll("\\W", "");
@@ -254,17 +255,28 @@ public abstract class RDFServiceImpl implements RDFService {
             literalBuff.append("\"");
             pyString(literalBuff, node.getLiteralLexicalForm());
             literalBuff.append("\"");
-            if (node.getLiteralDatatypeURI() != null) {
-                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
+            /*
+             * UQAM 
+             * reversing the condition tests. 
+             * It is important to prioritize the language typology test in order to exploit the linguistic context in testing the type of data
+             */
+//          if (node.getLiteralDatatypeURI() != null) {
+//          literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
+//      } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
+//          literalBuff.append("@").append(node.getLiteralLanguage());
+//      }
+            if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
-            }
+            } else if (node.getLiteralDatatypeURI() != null) {
+                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
+            }             
+            
             return literalBuff.toString();
         } else {
             return varName;
         }
     }
-
+       
      // see http://www.python.org/doc/2.5.2/ref/strings.html
      // or see jena's n3 grammar jena/src/org.apache/jena/n3/n3.g
     protected static void pyString(StringBuffer sbuff, String s)  {
@@ -277,27 +289,27 @@ public abstract class RDFServiceImpl implements RDFService {
                 sbuff.append('\\') ;
                 sbuff.append(c) ;
                 continue ;
-            }
+            }            
 
-            // Whitespace
+            // Whitespace                        
             if (c == '\n'){ sbuff.append("\\n");continue; }
             if (c == '\t'){ sbuff.append("\\t");continue; }
             if (c == '\r'){ sbuff.append("\\r");continue; }
-            if (c == '\f'){ sbuff.append("\\f");continue; }
+            if (c == '\f'){ sbuff.append("\\f");continue; }                            
             if (c == '\b'){ sbuff.append("\\b");continue; }
             if( c == 7 )  { sbuff.append("\\a");continue; }
-
+            
             // Output as is (subject to UTF-8 encoding on output that is)
             sbuff.append(c) ;
         }
     }
-
+    
     /**
-     * Returns a pair of models.  The first contains any statement containing at
+     * Returns a pair of models.  The first contains any statement containing at 
      * least one blank node.  The second contains all remaining statements.
      * @param gm Jena model
      */
-
+    
     protected Model[] separateStatementsWithBlankNodes(Model gm) {
         Model blankNodeModel = ModelFactory.createDefaultModel();
         Model nonBlankNodeModel = ModelFactory.createDefaultModel();
@@ -315,17 +327,17 @@ public abstract class RDFServiceImpl implements RDFService {
         result[1] = nonBlankNodeModel;
         return result;
     }
-
+    
     protected Query createQuery(String queryString) throws RDFServiceException {
         List<Syntax> syntaxes = Arrays.asList(
-                Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11,
+                Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11, 
                 Syntax.syntaxSPARQL_10, Syntax.syntaxSPARQL, Syntax.syntaxARQ);
         Query q = null;
-        Iterator<Syntax> syntaxIt = syntaxes.iterator();
+        Iterator<Syntax> syntaxIt = syntaxes.iterator(); 
         while (q == null) {
             Syntax syntax = syntaxIt.next();
             try {
-               q = QueryFactory.create(queryString, syntax);
+               q = QueryFactory.create(queryString, syntax);  
             } catch (QueryParseException e) {
                if (!syntaxIt.hasNext()) {
 					throw new RDFServiceException("Failed to parse query \""
@@ -453,4 +465,19 @@ public abstract class RDFServiceImpl implements RDFService {
             }
         }
     }
+	/* 
+	 * UQAM Useful among other things to transport the linguistic context in the service 
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
+
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
+
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}    
+
 }

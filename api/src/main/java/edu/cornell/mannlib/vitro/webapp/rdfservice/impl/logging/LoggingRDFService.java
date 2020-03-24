@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -19,7 +20,7 @@ import org.apache.jena.rdf.model.RDFNode;
 /**
  * This RDFService wrapper adds instrumentation to the time-consuming methods of
  * the inner RDFService.
- *
+ * 
  * For the other methods, it just delegates to the inner RDFService.
  */
 public class LoggingRDFService implements RDFService {
@@ -207,4 +208,19 @@ public class LoggingRDFService implements RDFService {
 	public String toString() {
 		return "LoggingRDFService[inner=" + innerService + "]";
 	}
+	/* 
+	 * UQAM Useful among other things to transport the linguistic context in the service 
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
+
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
+
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}    
+
 }

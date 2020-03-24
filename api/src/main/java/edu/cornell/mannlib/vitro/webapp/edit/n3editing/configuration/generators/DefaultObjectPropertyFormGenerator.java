@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LANGUAGE_NEUTRAL;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NEUTRAL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.IndividualsVi
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
@@ -125,7 +129,10 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         // Someday we'll need to figure out a different way of doing this.
         //WebappDaoFactory ctxDaoFact = ModelAccess.on(
         //        vreq.getSession().getServletContext()).getWebappDaoFactory();
-        WebappDaoFactory ctxDaoFact = vreq.getLanguageNeutralWebappDaoFactory();
+//        WebappDaoFactory ctxDaoFact = vreq.getLanguageNeutralWebappDaoFactory();
+		//UQAM Manage linguistic context
+        WebappDaoFactory ctxDaoFact =  ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE, PolicyOption.POLICY_NEUTRAL);
+
 
         List<VClass> types = new ArrayList<VClass>();
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);

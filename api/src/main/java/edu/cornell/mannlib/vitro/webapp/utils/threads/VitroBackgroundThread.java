@@ -21,6 +21,10 @@ import org.apache.commons.logging.LogFactory;
  * check their current status.
  */
 public class VitroBackgroundThread extends Thread {
+	// UQAM add start 
+	public synchronized void start() {
+		super.start();
+	}
 	private static final Log log = LogFactory.getLog(VitroBackgroundThread.class);
 
 	private static final ConcurrentLinkedQueue<WeakReference<VitroBackgroundThread>> allThreads = new ConcurrentLinkedQueue<WeakReference<VitroBackgroundThread>>();
@@ -81,7 +85,7 @@ public class VitroBackgroundThread extends Thread {
 	/**
 	 * An immutable object that holds both the current work level and the time
 	 * that it was set.
-	 *
+	 * 
 	 * Particular threads may want to assign additional state using zero or more
 	 * "flags".
 	 */
@@ -108,7 +112,7 @@ public class VitroBackgroundThread extends Thread {
 			return flags;
 		}
 	}
-
+	
 	/**
 	 * A factory class, for use in Executors, that creates threads with
 	 * successive names.

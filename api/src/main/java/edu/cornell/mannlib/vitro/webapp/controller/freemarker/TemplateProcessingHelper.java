@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,8 @@ public class TemplateProcessingHelper {
         throws TemplateProcessingException {
         Template template = getTemplate(templateName);
         StringWriter sw = new StringWriter();
+        
+        
         processTemplate(template, map, sw);
         return sw;
     }
@@ -42,6 +45,10 @@ public class TemplateProcessingHelper {
 
         try {
             Environment env = template.createProcessingEnvironment(map, writer);
+            /*
+             * UQAM Set encoding to UTF-8 for i18n special character
+             */
+//            env.setOutputEncoding("utf-8");
 
             // Define a setup template to be included by every page template
             String templateType = (String) map.get("templateType");
@@ -52,6 +59,7 @@ public class TemplateProcessingHelper {
             // Apply any data-getters that are associated with this template.
             // TODO clean this up VIVO-249
             FreemarkerConfigurationImpl.retrieveAndRunDataGetters(env, template.getName());
+
 
             // Now process it.
             env.process();
