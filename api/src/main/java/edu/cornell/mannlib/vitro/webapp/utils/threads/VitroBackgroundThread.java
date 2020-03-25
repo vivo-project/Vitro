@@ -21,6 +21,10 @@ import org.apache.commons.logging.LogFactory;
  * check their current status.
  */
 public class VitroBackgroundThread extends Thread {
+	// UQAM add start
+	public synchronized void start() {
+		super.start();
+	}
 	private static final Log log = LogFactory.getLog(VitroBackgroundThread.class);
 
 	private static final ConcurrentLinkedQueue<WeakReference<VitroBackgroundThread>> allThreads = new ConcurrentLinkedQueue<WeakReference<VitroBackgroundThread>>();

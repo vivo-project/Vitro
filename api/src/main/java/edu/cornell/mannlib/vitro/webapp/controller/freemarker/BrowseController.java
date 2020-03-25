@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,8 @@ public class BrowseController extends FreemarkerHttpServlet {
         List<VClassGroup> groups = null;
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         groups =vcgc.getGroups();
+        Collections.sort(groups, publicNameComparator);
+//        sortGroupListByPublicName(groups);
         List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());
         for (VClassGroup group : groups) {
             vcgroups.add(new VClassGroupTemplateModel(group));
@@ -50,4 +54,35 @@ public class BrowseController extends FreemarkerHttpServlet {
 
         return new TemplateResponseValues(templateName, body);
     }
+    public Comparator<VClassGroup> publicNameComparator = new Comparator<VClassGroup>() {
+
+    	public int compare(VClassGroup s1, VClassGroup s2) {
+    	   String groupName1 = s1.getPublicName().toUpperCase();
+    	   String groupName2 = s2.getPublicName().toUpperCase();
+
+    	   //ascending order
+    	   return groupName1.compareTo(groupName2);
+
+    	   //descending order
+    	   //return groupName2.compareTo(groupName1);
+        }};
+
+//
+//    public void sortGroupListByPublicName(List<VClassGroup> groupList) {
+//        groupList.sort(new Comparator<VClassGroup>() {
+//            public int compare(VClassGroup first, VClassGroup second) {
+//                if (first != null) {
+//                    if (second != null) {
+//                        return (first.getDisplayRank() - second.getDisplayRank());
+//                    } else {
+//                        log.error("error--2nd VClassGroup is null in VClassGroupDao.getGroupList().compare()");
+//                    }
+//                } else {
+//                    log.error("error--1st VClassGroup is null in VClassGroupDao.getGroupList().compare()");
+//                }
+//                return 0;
+//            }
+//        });
+//    }
+
 }

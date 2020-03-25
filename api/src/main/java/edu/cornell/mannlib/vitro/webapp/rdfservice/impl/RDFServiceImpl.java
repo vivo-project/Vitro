@@ -32,6 +32,7 @@ import org.apache.jena.riot.out.NodeFormatter;
 import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.apache.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
@@ -141,8 +142,8 @@ public abstract class RDFServiceImpl implements RDFService {
     }
 
     protected void notifyListeners(ModelChange modelChange) throws IOException {
+        modelChange.getSerializedModel().reset();
         for (ChangeListener listener : registeredListeners) {
-            modelChange.getSerializedModel().reset();
             listener.notifyModelChange(modelChange);
         }
         log.debug(registeredJenaListeners.size() + " registered Jena listeners");
@@ -254,11 +255,22 @@ public abstract class RDFServiceImpl implements RDFService {
             literalBuff.append("\"");
             pyString(literalBuff, node.getLiteralLexicalForm());
             literalBuff.append("\"");
-            if (node.getLiteralDatatypeURI() != null) {
-                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
+            /*
+             * UQAM
+             * reversing the condition tests.
+             * It is important to prioritize the language typology test in order to exploit the linguistic context in testing the type of data
+             */
+//          if (node.getLiteralDatatypeURI() != null) {
+//          literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
+//      } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
+//          literalBuff.append("@").append(node.getLiteralLanguage());
+//      }
+            if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
+            } else if (node.getLiteralDatatypeURI() != null) {
+                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
             }
+
             return literalBuff.toString();
         } else {
             return varName;
@@ -453,4 +465,19 @@ public abstract class RDFServiceImpl implements RDFService {
             }
         }
     }
+	/*
+	 * UQAM Useful among other things to transport the linguistic context in the service
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
+
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
+
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}
+
 }

@@ -66,7 +66,9 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
             return handleMissingConfiguration(vreq);
 
         //get the EditSubmission
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);
+ //       MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);
+        // Modified by UQAM
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, configuration);
         EditSubmissionUtils.putEditSubmissionInSession(vreq.getSession(), submission);
 
         //if errors, return error response
@@ -102,7 +104,6 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		    changes = ProcessRdfForm.addDependentDeletes(changes, queryModel);
 
 		N3EditUtils.preprocessModels(changes, configuration, vreq);
-
 		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, N3EditUtils.getEditorUri(vreq) );
 
 		//Here we are trying to get the entity to return to URL,

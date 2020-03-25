@@ -42,6 +42,7 @@ import org.apache.jena.sdb.SDB;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.Quad;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
@@ -704,4 +705,19 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
         return QueryExecutionFactory.create(q, d);
     }
+	/*
+	 * UQAM Useful among other things to transport the linguistic context in the service
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
+
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
+
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}
+
 }

@@ -74,9 +74,11 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         //The submission for getting the entity to return to is not retrieved from the session but needs
         //to be created - as it is in processRdfForm3.jsp
         if( entityToReturnTo == null ){
-            //this will not work if there entityToReturnTo has a new resource URI,
-            //in that case entityToReturnTo should not have been passed to this method as null
-            MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);
+            // this will not work if there entityToReturnTo has a new resource URI,
+            // in that case entityToReturnTo should not have been passed to this method as null
+        	// UQAM
+        	// MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);
+            MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, editConfig);
             entityToReturnTo = N3EditUtils.processEntityToReturnTo(editConfig, submission, vreq);
         }
 

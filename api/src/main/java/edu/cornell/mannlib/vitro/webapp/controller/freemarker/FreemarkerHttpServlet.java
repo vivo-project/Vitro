@@ -8,6 +8,7 @@ import static javax.mail.Message.RecipientType.TO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,7 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.MenuDaoJena;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -93,6 +93,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         throws IOException, ServletException {
 
         super.doGet(request,response);
+//UQAM set for UTF-8
+        response.setCharacterEncoding("UTF-8");
 
         VitroRequest vreq = new VitroRequest(request);
         ResponseValues responseValues = null;
@@ -103,8 +105,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
                 return;
             }
-
 			responseValues = processRequest(vreq);
+
 	        doResponse(vreq, response, responseValues);
 
     	} catch (Throwable e) {
@@ -256,7 +258,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 	protected void doTemplate(VitroRequest vreq, HttpServletResponse response,
             ResponseValues values) throws TemplateProcessingException {
 
-        Map<String, Object> templateDataModel = new HashMap<String, Object>();
+		Map<String, Object> templateDataModel = new HashMap<String, Object>();
         templateDataModel.putAll(getPageTemplateValues(vreq));
 
         // Add the values that we got from the subcontroller processRequest() method, and merge to the template.
@@ -276,7 +278,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             // is specified in the main page template.
             bodyString = "";
         }
+
+        //UQAM Add linguistic control management
+ //       String bodyStringUTF = new String(bodyString.getBytes(), Charset.forName("UTF-8"));
         templateDataModel.put("body", bodyString);
+
+        String lang = vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();
+        templateDataModel.put("country", lang);
 
         // Tell the template and any directives it uses that we're processing a page template.
         templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);
@@ -462,7 +470,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
     protected MainMenu getDisplayModelMenu(VitroRequest vreq){
         String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
-        return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(vreq, url);
+        return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
 
     // NIHVIVO-3307: we need this here instead of FreemarkerConfiguration.java so that updates to

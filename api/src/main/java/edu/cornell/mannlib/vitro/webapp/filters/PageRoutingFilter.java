@@ -63,6 +63,11 @@ public class PageRoutingFilter implements Filter{
         // get URL without hostname or servlet context
         HttpServletResponse response = (HttpServletResponse) arg1;
         HttpServletRequest req = (HttpServletRequest) arg0;
+        // UQAM Manage UTF-8 for i18n
+ //       req.setCharacterEncoding("UTF-8");
+ //       response.setContentType("text/html; charset=UTF-8");
+ //       response.setCharacterEncoding("UTF-8");
+
         String path = req.getRequestURI().substring(req.getContextPath().length());
 
         // check for first part of path

@@ -39,6 +39,9 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
@@ -98,7 +101,9 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	private void populateDropdowns() throws Exception {
 
 		//For each field with an optionType defined, create the options
-		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+//		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+		// UQAM Manage Linguistic context
+		WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
 		for(String fieldName: editConfig.getFields().keySet()){
 		    FieldVTwo field = editConfig.getField(fieldName);
 		    //TODO: Check if we even need empty options if field options do not exist
@@ -106,7 +111,9 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    	//empty options
 		    	field.setOptions(new ConstantFieldOptions());
 		    }
+		    //UQAM changing signature for including internationalization in scroll-down menu
 		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);
+//		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, vreq);
 		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap, field.getFieldOptions().getCustomComparator(), vreq);
 		    if(pageData.containsKey(fieldName)) {
 		    	log.error("Check the edit configuration setup as pageData already contains " + fieldName + " and this will be overwritten now with empty collection");
@@ -184,7 +191,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
-    	VClass rangeClass = EditConfigurationUtils.getRangeVClass(vreq);
+    	VClass rangeClass = EditConfigurationUtils.getLangAwardRangeVClass(vreq);
     	if(objectIndividual != null) {
     		propertyTitle = prop.getDomainPublic();
     	}  else {
@@ -529,14 +536,17 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	//TODO:Check where this logic should actually go, copied from input element formatting tag
     //Updating to enable multiple vclasses applicable to subject to be analyzed to understand possible range of types
     public Map<String, String> getOfferTypesCreateNew() {
-		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+//		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+		// UQAM Manage Linguistic context
+		WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
     	ObjectProperty op =
     		wdf.getObjectPropertyDao().getObjectPropertyByURI(editConfig.getPredicateUri());
 
     	Individual sub =
     		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
 
-    	VClass rangeClass = EditConfigurationUtils.getRangeVClass(vreq);
+		// UQAM Manage Linguistic context
+    	VClass rangeClass = EditConfigurationUtils.getLangAwardRangeVClass(vreq);
 
     	List<VClass> vclasses = null;
     	List<VClass> subjectVClasses = sub.getVClasses();

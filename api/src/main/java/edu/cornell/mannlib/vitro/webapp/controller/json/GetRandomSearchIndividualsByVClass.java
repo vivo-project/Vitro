@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.json;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService.ShortViewContext;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup;
@@ -73,7 +75,8 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 		modelMap.put("individual",
 				IndividualTemplateModelBuilder.build(individual, vreq));
 		modelMap.put("vclass", vclassName);
-
+		String langCtx = vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();  //UQAM build the linguistic context
+		modelMap.put("langCtx", langCtx); // UQAM add the linguistic context to map
 		ShortViewService svs = ShortViewServiceSetup.getService(ctx);
 		return svs.renderShortView(individual, ShortViewContext.BROWSE,
 				modelMap, vreq);

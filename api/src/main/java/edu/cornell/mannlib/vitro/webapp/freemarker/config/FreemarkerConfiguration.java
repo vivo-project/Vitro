@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -73,6 +74,14 @@ public abstract class FreemarkerConfiguration {
 			clearTemplateCacheIfRequested();
 			keepTemplateLoaderCurrentWithThemeDirectory(req);
 			setThreadLocalsForRequest(req);
+			/*
+			 * UQAM, encoded ftl to UTF-8
+			 */
+//			instance.setEncoding(req.getLocale(), "utf-8");
+//			instance.setIncompatibleImprovements(freemarker.template.Configuration.VERSION_2_3_23);
+//			instance.setDefaultEncoding("utf-8");
+//			instance.setOutputEncoding("utf-8");
+//			instance.setURLEscapingCharset("UTF-8");
 			return instance;
 		}
 	}

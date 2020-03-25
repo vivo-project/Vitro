@@ -10,6 +10,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
 import org.apache.jena.rdf.model.RDFNode;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+
 /**
  * Interface for API to write, read, and update Vitro's RDF store, with support
  * to allow listening, logging and auditing.
@@ -263,4 +265,10 @@ public interface RDFService {
      * multiple invocations do not cause an error.
      */
     public void close();
+    /**
+     * UQAM Useful among other things to transport the linguistic context in the service
+     * @param vitroRequest
+     */
+	public void setVitroRequest(VitroRequest vitroRequest);
+	public VitroRequest getVitroRequest();
 }

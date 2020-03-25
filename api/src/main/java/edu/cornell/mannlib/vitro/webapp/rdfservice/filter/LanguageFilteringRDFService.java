@@ -22,11 +22,11 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -91,15 +91,7 @@ public class LanguageFilteringRDFService implements RDFService {
     @Override
     public void sparqlConstructQuery(String query, Model model)
             throws RDFServiceException {
-        if (model.isEmpty()) {
-            s.sparqlConstructQuery(query, model);
-            filterModel(model);
-        } else {
-            Model constructedModel = ModelFactory.createDefaultModel();
-            s.sparqlConstructQuery(query, constructedModel);
-            filterModel(constructedModel);
-            model.add(constructedModel);
-        }
+        s.sparqlConstructQuery(query, model);
     }
 
     @Override
@@ -254,7 +246,6 @@ public class LanguageFilteringRDFService implements RDFService {
     @Override
     public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException {
         log.debug("sparqlSelectQuery: " + query.replaceAll("\\s+", " "));
-
         s.sparqlSelectQuery(query, new ResultSetConsumer.Chaining(consumer) {
             List<String> vars;
             List<QuerySolution> solnList = new ArrayList<QuerySolution>();
@@ -562,6 +553,20 @@ public class LanguageFilteringRDFService implements RDFService {
             return compareLangs(s1lang, s2lang);
         }
     }
+	/*
+	 * UQAM Useful among other things to transport the linguistic context in the service
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
+
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
+
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}
 
 }
 

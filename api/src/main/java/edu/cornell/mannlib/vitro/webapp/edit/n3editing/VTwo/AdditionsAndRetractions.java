@@ -57,7 +57,8 @@ public class AdditionsAndRetractions {
         str += "\nadditions:[";
         if( getAdditions() != null ) {
            StringWriter writer = new StringWriter();
-           getAdditions().write(writer, "N3-PP");
+           // UQAM Replacing N3-PP by N3 (N3-PP does not exist in Jena
+           getAdditions().write(writer, "N3");
            str += "\n" + writer.toString() + "\n";
         }
         str += "],\n";
@@ -65,7 +66,7 @@ public class AdditionsAndRetractions {
         str += "\nretractions:[";
         if( getRetractions() != null ) {
            StringWriter writer = new StringWriter();
-           getRetractions().write(writer, "N3-PP");
+           getRetractions().write(writer, "N3");
            str += "\n" + writer.toString() + "\n";
         }
         str += "],\n";

@@ -9,15 +9,23 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.Lock;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -41,6 +49,7 @@ public class ProcessRdfForm {
     private EditN3GeneratorVTwo populator;
 
     private Map<String,String> urisForNewResources = null;
+//	private VitroRequest _vreq;
    /**
      * Construct the ProcessRdfForm object.
      */
@@ -76,9 +85,9 @@ public class ProcessRdfForm {
 
         AdditionsAndRetractions changes;
         if( configuration.isUpdate() ){
-            changes = editExistingStatements(configuration, submission);
+            changes = editExistingStatements(configuration, submission, vreq); //UQAM  vreq for getting linguistic context
         } else {
-            changes = createNewStatements(configuration, submission );
+            changes = createNewStatements(configuration, submission, vreq ); //UQAM vreq for getting linguistic context
         }
 
         changes = getMinimalChanges(changes);
@@ -99,12 +108,15 @@ public class ProcessRdfForm {
      * any optional N3 is to originally configure the
      * configuration.setN3Optional() to be empty.
      *
+     * UQAM add vreq for linguistic context managing
+     *
      * @throws Exception May throw an exception if the required N3
      * does not parse.
+     *
      */
     private AdditionsAndRetractions createNewStatements(
             EditConfigurationVTwo configuration,
-            MultiValueEditSubmission submission) throws Exception {
+            MultiValueEditSubmission submission, VitroRequest vreq) throws Exception {
         log.debug("in createNewStatements()" );
 
         //getN3Required and getN3Optional will return copies of the
@@ -113,10 +125,10 @@ public class ProcessRdfForm {
         List<String> optionalN3 = configuration.getN3Optional();
 
         /* substitute in the form values and existing values */
-        subInValuesToN3( configuration, submission, requiredN3, optionalN3, null , null);
+        subInValuesToN3( configuration, submission, requiredN3, optionalN3, null , null, vreq);
 
         /* parse N3 to RDF Models, No retractions since all of the statements are new. */
-        return parseN3ToChange(requiredN3, optionalN3, null, null);
+        return parseN3ToChange(requiredN3, optionalN3, null, null, vreq);
     }
 
     /* for a list of N3 strings, substitute in the subject, predicate and object URIs
@@ -140,10 +152,12 @@ public class ProcessRdfForm {
      * retractions are mutually diff'ed before statements are added to or
      * removed from the model. The explicit change check can cause problems in
      * more complex setups, like the automatic form building in DataStaR.
+     * @param vreq For getting linguistic context
+
      */
     protected AdditionsAndRetractions editExistingStatements(
             EditConfigurationVTwo editConfig,
-            MultiValueEditSubmission submission) throws Exception {
+            MultiValueEditSubmission submission, VitroRequest vreq) throws Exception {
 
         log.debug("editing an existing resource: " + editConfig.getObject() );
 
@@ -156,18 +170,18 @@ public class ProcessRdfForm {
 
         subInValuesToN3(editConfig, submission,
                 N3RequiredAssert, N3OptionalAssert,
-                N3RequiredRetract, N3OptionalRetract);
+                N3RequiredRetract, N3OptionalRetract, vreq);
 
         return parseN3ToChange(
                 N3RequiredAssert,N3OptionalAssert,
-                N3RequiredRetract, N3OptionalRetract);
+                N3RequiredRetract, N3OptionalRetract, vreq);
     }
 
     @SuppressWarnings("unchecked")
     protected void subInValuesToN3(
             EditConfigurationVTwo editConfig, MultiValueEditSubmission submission,
             List<String> requiredAsserts, List<String> optionalAsserts,
-            List<String> requiredRetracts, List<String> optionalRetracts ) throws InsertException{
+            List<String> requiredRetracts, List<String> optionalRetracts, VitroRequest vreq ) throws InsertException{
 
         //need to substitute into the return to URL becase it may need new resource URIs
         List<String> URLToReturnTo = Arrays.asList(submission.getEntityToReturnTo());
@@ -184,7 +198,36 @@ public class ProcessRdfForm {
         //Retractions does NOT get values from form.
 
         /* ******** Form submission Literals *********** */
-        substituteInMultiLiterals( submission.getLiteralsFromForm(), requiredAsserts, optionalAsserts, URLToReturnTo);
+        /*
+         * UQAM Set all literals in the linguistic context
+         */
+        Map<String, List<Literal>> literalsFromForm = submission.getLiteralsFromForm();
+    	Set<String> keys = literalsFromForm.keySet();
+    	for (Iterator iterator = keys.iterator(); iterator.hasNext();) {
+			String aKey = (String) iterator.next();
+			List<Literal> literalFromForm = literalsFromForm.get(aKey);
+			List<Literal> newLiteralFromForm = new ArrayList<>();
+			for (Iterator iterator2 = literalFromForm.iterator(); iterator2.hasNext();) {
+				Literal aLiteral = (Literal) iterator2.next();
+				String aLiteratDT = aLiteral.getDatatype().getURI();
+				Literal newLiteral= null;
+				String aText = aLiteral.getLexicalForm();
+				/*
+				 * do it only if aLiteral are xstring datatype
+				 */
+
+				if ( XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT) ) {
+					String lang =vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();
+					newLiteral = ResourceFactory.createLangLiteral(aText, lang);
+				} else {
+					newLiteral = ResourceFactory.createTypedLiteral(aText, aLiteral.getDatatype());
+				}
+				newLiteralFromForm.add(newLiteral);
+			}
+			literalsFromForm.replace(aKey, newLiteralFromForm);
+		}
+
+        substituteInMultiLiterals( literalsFromForm, requiredAsserts, optionalAsserts, URLToReturnTo);
         logSubstitue( "Added form Literals", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         //Retractions does NOT get values from form.
 
@@ -254,20 +297,87 @@ public class ProcessRdfForm {
 
     protected AdditionsAndRetractions parseN3ToChange(
             List<String> requiredAdds, List<String> optionalAdds,
-            List<String> requiredDels, List<String> optionalDels) throws Exception{
+            List<String> requiredDels, List<String> optionalDels, VitroRequest vreq) throws Exception{
 
         List<Model> adds = parseN3ToRDF(requiredAdds, REQUIRED);
         adds.addAll( parseN3ToRDF(optionalAdds, OPTIONAL));
-
         List<Model> retracts = new ArrayList<Model>();
         if( requiredDels != null && optionalDels != null ){
-            retracts.addAll( parseN3ToRDF(requiredDels, REQUIRED) );
-            retracts.addAll( parseN3ToRDF(optionalDels, OPTIONAL) );
+            String lingCxt=null;
+    		//UQAM Taking into account the linguistic context in retract
+    		try {
+    				lingCxt	= vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();
+    		} catch (Exception e) {
+    		}
+            retracts.addAll( parseN3ToRDF(requiredDels, REQUIRED, lingCxt) );
+            retracts.addAll( parseN3ToRDF(optionalDels, OPTIONAL, lingCxt) );
         }
 
         return new AdditionsAndRetractions(adds,retracts);
     }
+    /**
+     * Parse the n3Strings to a List of RDF Model objects.
+     *
+     * @param n3Strings N3 Strings to parse
+     * @param parseType if OPTIONAL, then don't throw exceptions on errors
+     * @param linguisticContext For Literals, Making parse only if the literal linguisticContext are same than  linguisticContext parameter //UQAM
+     * If REQUIRED, then throw exceptions on errors.
+     * @throws Exception
+     */
+    protected static List<Model> parseN3ToRDF(
+            List<String> n3Strings, N3ParseType parseType, String linguisticContext ) throws Exception {
+       List<String> errorMessages = new ArrayList<String>();
 
+        List<Model> rdfModels = new ArrayList<Model>();
+        for(String n3 : n3Strings){
+            try{
+                Model model = ModelFactory.createDefaultModel();
+                StringReader reader = new StringReader(n3);
+                model.read(reader, "", "N3");
+                List<Statement> stmts = model.listStatements().toList();
+                for (Iterator iterator = stmts.iterator(); iterator.hasNext();) {
+					Statement stmt = (Statement) iterator.next();
+					Resource subj = stmt.getSubject();
+					Property pred = stmt.getPredicate();
+					RDFNode obj = stmt.getObject();
+					if (obj.isLiteral()) {
+						Literal lit = obj.asLiteral();
+						String lang = lit.getLanguage();
+						if (! linguisticContext.equals(lang)) {
+							//UQAM Remove if linguisticContext != lang of the Literal
+							model.remove(subj, pred, obj);
+						}
+					}
+
+				}
+                rdfModels.add( model );
+            }catch(Throwable t){
+                errorMessages.add(t.getMessage() + "\nN3: \n" + n3 + "\n");
+            }
+        }
+
+        StringBuilder errors = new StringBuilder();
+        for( String errorMsg : errorMessages){
+            errors.append(errorMsg).append('\n');
+        }
+
+       if( !errorMessages.isEmpty() ){
+           if( REQUIRED.equals(parseType)  ){
+               throw new Exception("Errors processing required N3. The EditConfiguration should " +
+                    "be setup so that if a submission passes validation, there will not be errors " +
+                    "in the required N3.\n" +  errors );
+           }else if( OPTIONAL.equals(parseType) ){
+               log.debug("Some Optional N3 did not parse, if a optional N3 does not parse it " +
+                    "will be ignored.  This allows optional parts of a form submission to " +
+                    "remain unfilled out and then the optional N3 does not get values subsituted in from" +
+                    "the form submission values.  It may also be the case that there are unintentional " +
+                    "syntax errors the optional N3." );
+               log.debug(errors.toString());
+           }
+       }
+
+       return rdfModels;
+    }
     /**
      * Parse the n3Strings to a List of RDF Model objects.
      *
