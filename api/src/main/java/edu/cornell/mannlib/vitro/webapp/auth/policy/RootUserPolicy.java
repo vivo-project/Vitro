@@ -37,7 +37,14 @@ public class RootUserPolicy implements PolicyIface {
 	private static final Log log = LogFactory.getLog(RootUserPolicy.class);
 
 	private static final String PROPERTY_ROOT_USER_EMAIL = "rootUser.emailAddress";
+	/*
+	 * UQAM For parameterization of rootUser
+	 */
+	private static final String PROPERTY_ROOT_USER_PASSWORD = "rootUser.password";
+	private static final String PROPERTY_ROOT_USER_PASSWORD_CHANGE_REQUIRED = "rootUser.passwordChangeRequired";
+
 	private static final String ROOT_USER_INITIAL_PASSWORD = "rootPassword";
+	private static final String ROOT_USER_INITIAL_PASSWORD_CHANGE_REQUIRED = "true";
 
 	/**
 	 * This is the entire policy. If you are a root user, you are authorized.
@@ -150,10 +157,13 @@ public class RootUserPolicy implements PolicyIface {
 			ua.setEmailAddress(configuredRootUser);
 			ua.setFirstName("root");
 			ua.setLastName("user");
+			// UQAM using getRootPasswordFromConfig()
 			ua.setArgon2Password(Authenticator.applyArgon2iEncoding(
-					ROOT_USER_INITIAL_PASSWORD));
+					getRootPasswordFromConfig()));
 			ua.setMd5Password("");
-			ua.setPasswordChangeRequired(true);
+			Boolean toto;
+			// UQAM using getRootPasswdChangeRequiredFromConfig()
+			ua.setPasswordChangeRequired(getRootPasswdChangeRequiredFromConfig().booleanValue());
 			ua.setStatus(Status.ACTIVE);
 			ua.setRootUser(true);
 
@@ -191,7 +201,31 @@ public class RootUserPolicy implements PolicyIface {
 			ss.warning(this, "For security, "
 					+ "it is best to delete unneeded root user accounts.");
 		}
+		/*
+		 * UQAM
+		 * Add for getting rootUser.password property value from runtime.properties
+		 */
+		private String getRootPasswordFromConfig() {
+			String passwd = ConfigurationProperties.getBean(ctx).getProperty(
+					PROPERTY_ROOT_USER_PASSWORD);
+			if (passwd == null) {
+				passwd = ROOT_USER_INITIAL_PASSWORD;
+			}
+			return passwd;
+		}
 
+		/*
+		 * UQAM
+		 * Add for getting rootUser.passwordChangeRequired  property value  from runtime.properties
+		 */
+		private Boolean getRootPasswdChangeRequiredFromConfig() {
+			String passwdCR = ConfigurationProperties.getBean(ctx).getProperty(
+					PROPERTY_ROOT_USER_PASSWORD_CHANGE_REQUIRED);
+			if (passwdCR == null) {
+				passwdCR = ROOT_USER_INITIAL_PASSWORD_CHANGE_REQUIRED;
+			}
+			return new Boolean(passwdCR);
+		}
 		@Override
 		public void contextDestroyed(ServletContextEvent sce) {
 			// Nothing to destroy

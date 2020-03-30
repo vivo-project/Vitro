@@ -4,9 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -47,10 +44,7 @@ public abstract class BaseEditElementVTwo  implements EditElementVTwo {
         } catch (TemplateException | IOException e) {
             log.error(e,e);
         }
-        String sWrite = writer.toString();
-
- //       String UTF8String =  new String(sWrite.getBytes(), Charset.forName("UTF-8"));
-        return sWrite;
+        return writer.toString();
     }
 
     /**
