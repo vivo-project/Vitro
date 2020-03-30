@@ -185,7 +185,7 @@ public class FakeApplicationOntologyService {
 	 */
 	private Map<String, List<ViewSpec>> createClassMappings(
 			Map<String, ViewSpec> viewSpecsByUri)
-					throws ShortViewConfigException {
+			throws ShortViewConfigException {
 		Property hasView = viewModel.getProperty(HAS_VIEW);
 
 		StmtIterator stmts = viewModel.listStatements(null, hasView,
@@ -487,21 +487,21 @@ public class FakeApplicationOntologyService {
 		private String individualUri;
 		private VitroRequest vreq;
 		private ServletContext ctx;
-		private String langCtx = "en-US";
+		private String langCtx = "en-US";		
 
 		public FakeVivoPeopleDataGetter(VitroRequest vreq, String individualUri) {
 			super(vreq, initializeFakeDisplayModel(), "http://FakeVivoPeopleDataGetter");
 			this.individualUri = individualUri;
 			this.vreq = vreq;
 			this.ctx = vreq.getSession().getServletContext();
-			this.langCtx =  vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry(); // UQAM add the linguistic context
+			this.langCtx =  vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry(); // UQAM add the linguistic context			
 		}
 
 		@Override
 		public Map<String, Object> getData(Map<String, Object> pageData) {
 			Map<String, Object> parms = new HashMap<>();
 			parms.put("uri", individualUri);
-			parms.put("langCtx", langCtx); //UQAM add the linguistic context
+			parms.put("langCtx", langCtx); //UQAM add the linguistic context			
 
 			return super.getData(parms);
 		}
