@@ -32,7 +32,6 @@ public class HomePageController extends FreemarkerHttpServlet {
 
         Map<String, Object> body = new HashMap<String, Object>();
 
-
         List<DataGetter> dgList = DataGetterUtils.getDataGettersForPage(vreq, vreq.getDisplayModel(), DisplayVocabulary.HOME_PAGE_URI);
 
         for( DataGetter dg : dgList){
