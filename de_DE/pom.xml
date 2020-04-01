@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.vivoweb</groupId>
-    <artifactId>vitro-languages</artifactId>
+    <artifactId>vitro-languages-de_DE</artifactId>
     <version>1.11.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Vitro Languages</name>
+    <name>Vitro Languages de_DE</name>
     <description>Vitro Languages</description>
     <url>http://vivoweb.org/</url>
 
@@ -62,6 +62,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <modules>
+        <module>webapp</module>
+    </modules>
 
     <profiles>
         <profile>
@@ -212,16 +215,9 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-    <modules>
-    	<module>core</module>
-    	
-    	
-    	
-    	
-    	<module>en_US</module>
-    	<module>es</module>
-    	<module>fr_CA</module>
-    	<module>pt_BR</module>
-    	<module>de_DE</module>
-    </modules>
+    <parent>
+    	<artifactId>vitro-languages</artifactId>
+    	<groupId>org.vivoweb</groupId>
+    	<version>1.11.2-SNAPSHOT</version>
+    </parent>
 </project>
