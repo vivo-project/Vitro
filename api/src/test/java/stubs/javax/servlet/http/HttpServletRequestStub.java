@@ -510,8 +510,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 
 	@Override
 	public Locale getLocale() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getLocale() not implemented.");
+		return Locale.ENGLISH;
 	}
 
 	@Override
