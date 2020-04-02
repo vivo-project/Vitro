@@ -67,7 +67,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
         //get the EditSubmission
  //       MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);
-        // Modified by UQAM
+        // Modified by UQAM-Linguistic-Management
         MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, configuration);
         EditSubmissionUtils.putEditSubmissionInSession(vreq.getSession(), submission);
 

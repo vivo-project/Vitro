@@ -168,7 +168,7 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 			String value = merged.get(key);
 			if (value.startsWith("http:")) {
 				/*
-				 * UQAM if the "value" looks like an URI then wrap the value with the characters '<' '>'
+				 * UQAM-Optimization if the "value" looks like an URI then wrap the value with the characters '<' '>'
 				 *
 				 */
 				bound = bound.replaceAll("([?$]" + key + ")([^a-zA-Z0-9_\\-])", "<" + value + ">$2");

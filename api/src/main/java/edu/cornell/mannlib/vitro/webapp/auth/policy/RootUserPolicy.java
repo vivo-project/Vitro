@@ -38,7 +38,7 @@ public class RootUserPolicy implements PolicyIface {
 
 	private static final String PROPERTY_ROOT_USER_EMAIL = "rootUser.emailAddress";
 	/*
-	 * UQAM For parameterization of rootUser
+	 * UQAM Add-Feature For parameterization of rootUser
 	 */
 	private static final String PROPERTY_ROOT_USER_PASSWORD = "rootUser.password";
 	private static final String PROPERTY_ROOT_USER_PASSWORD_CHANGE_REQUIRED = "rootUser.passwordChangeRequired";
@@ -157,12 +157,11 @@ public class RootUserPolicy implements PolicyIface {
 			ua.setEmailAddress(configuredRootUser);
 			ua.setFirstName("root");
 			ua.setLastName("user");
-			// UQAM using getRootPasswordFromConfig()
+			// UQAM Add-Feature using getRootPasswordFromConfig()
 			ua.setArgon2Password(Authenticator.applyArgon2iEncoding(
 					getRootPasswordFromConfig()));
 			ua.setMd5Password("");
-			Boolean toto;
-			// UQAM using getRootPasswdChangeRequiredFromConfig()
+			// UQAM Add-Feature using getRootPasswdChangeRequiredFromConfig()
 			ua.setPasswordChangeRequired(getRootPasswdChangeRequiredFromConfig().booleanValue());
 			ua.setStatus(Status.ACTIVE);
 			ua.setRootUser(true);
@@ -202,7 +201,7 @@ public class RootUserPolicy implements PolicyIface {
 					+ "it is best to delete unneeded root user accounts.");
 		}
 		/*
-		 * UQAM
+		 * UQAM Add-Feature
 		 * Add for getting rootUser.password property value from runtime.properties
 		 */
 		private String getRootPasswordFromConfig() {
@@ -215,7 +214,7 @@ public class RootUserPolicy implements PolicyIface {
 		}
 
 		/*
-		 * UQAM
+		 * UQAM Add-Feature
 		 * Add for getting rootUser.passwordChangeRequired  property value  from runtime.properties
 		 */
 		private Boolean getRootPasswdChangeRequiredFromConfig() {

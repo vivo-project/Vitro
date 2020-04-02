@@ -121,7 +121,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
 		return true;
 	}
 	/*
-	 * UQAM Useful among other things to transport the linguistic context in the service
+	 * UQAM-Linguistic-Management Useful among other things to transport the linguistic context in the service
 	 * (non-Javadoc)
 	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
 	 */

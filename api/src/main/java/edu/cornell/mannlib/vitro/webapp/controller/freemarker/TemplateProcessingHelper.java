@@ -45,11 +45,7 @@ public class TemplateProcessingHelper {
 
         try {
             Environment env = template.createProcessingEnvironment(map, writer);
-            /*
-             * UQAM Set encoding to UTF-8 for i18n special character
-             */
-//            env.setOutputEncoding("utf-8");
-
+ 
             // Define a setup template to be included by every page template
             String templateType = (String) map.get("templateType");
             if (FreemarkerHttpServlet.PAGE_TEMPLATE_TYPE.equals(templateType)) {

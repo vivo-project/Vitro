@@ -454,7 +454,7 @@ public class FakeApplicationOntologyService {
 		//				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
 
 		/*
-		 * UQAM New query including Linguistic context
+		 * UQAM-Optimization New query including Linguistic context
 		 */
 		private static String QUERY_STRING_LANG = ""
 				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
@@ -479,7 +479,7 @@ public class FakeApplicationOntologyService {
 			Property saveToVarProperty = m
 					.getProperty(DisplayVocabulary.SAVE_TO_VAR);
 
-			m.add(dataGetter, queryProperty, QUERY_STRING_LANG); //UQAM Using query with linguistic context
+			m.add(dataGetter, queryProperty, QUERY_STRING_LANG); //UQAM-Optimization Using query with linguistic context
 			m.add(dataGetter, saveToVarProperty, "extra");
 			return m;
 		}
@@ -494,14 +494,14 @@ public class FakeApplicationOntologyService {
 			this.individualUri = individualUri;
 			this.vreq = vreq;
 			this.ctx = vreq.getSession().getServletContext();
-			this.langCtx =  vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry(); // UQAM add the linguistic context
+			this.langCtx =  vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry(); // UQAM-Optimization add the linguistic context
 		}
 
 		@Override
 		public Map<String, Object> getData(Map<String, Object> pageData) {
 			Map<String, Object> parms = new HashMap<>();
 			parms.put("uri", individualUri);
-			parms.put("langCtx", langCtx); //UQAM add the linguistic context
+			parms.put("langCtx", langCtx); //UQAM-Optimization add the linguistic context
 
 			return super.getData(parms);
 		}

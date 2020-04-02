@@ -784,7 +784,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     return labelLit;
                 } else
                     /*
-                     * UQAM
+                     * UQAM-Linguistic-Management
                      * Check for country-part of lang (ex: 'en' for default consideration of labelLanguage in english but not encoded by 'en-US' most case of labels in vivo.owl)
                      */
                 	if ((lang != null) && (Arrays.asList(lang.split("-")).get(0).equals(labelLanguage))) {

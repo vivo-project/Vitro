@@ -102,7 +102,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 
 		//For each field with an optionType defined, create the options
 //		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-		// UQAM Manage Linguistic context
+		// UQAM-Optimization Manage Linguistic context
 		WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
 		for(String fieldName: editConfig.getFields().keySet()){
 		    FieldVTwo field = editConfig.getField(fieldName);
@@ -111,7 +111,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    	//empty options
 		    	field.setOptions(new ConstantFieldOptions());
 		    }
-		    //UQAM changing signature for including internationalization in scroll-down menu
+		    //UQAM-Optimization changing signature for including internationalization in scroll-down menu
 		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);
 //		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, vreq);
 		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap, field.getFieldOptions().getCustomComparator(), vreq);
@@ -537,7 +537,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     //Updating to enable multiple vclasses applicable to subject to be analyzed to understand possible range of types
     public Map<String, String> getOfferTypesCreateNew() {
 //		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-		// UQAM Manage Linguistic context
+		// UQAM-Optimization Manage Linguistic context
 		WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
     	ObjectProperty op =
     		wdf.getObjectPropertyDao().getObjectPropertyByURI(editConfig.getPredicateUri());
@@ -545,7 +545,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	Individual sub =
     		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
 
-		// UQAM Manage Linguistic context
+		// UQAM-Optimization Manage Linguistic context
     	VClass rangeClass = EditConfigurationUtils.getLangAwardRangeVClass(vreq);
 
     	List<VClass> vclasses = null;
