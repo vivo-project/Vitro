@@ -130,7 +130,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         //WebappDaoFactory ctxDaoFact = ModelAccess.on(
         //        vreq.getSession().getServletContext()).getWebappDaoFactory();
 //        WebappDaoFactory ctxDaoFact = vreq.getLanguageNeutralWebappDaoFactory();
-		//UQAM Manage linguistic context
+		//UQAM Linguistic-Management Manage linguistic context
         WebappDaoFactory ctxDaoFact =  ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE, PolicyOption.POLICY_NEUTRAL);
 
 

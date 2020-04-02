@@ -42,7 +42,7 @@ public class ChildVClassesWithParent implements FieldOptions {
     }
 
 /*
- * UQAM
+ * UQAM-Linguistic-Management
  * This method is polymorphism of getOptions(EditConfigurationVTwo editConfig,String fieldName, WebappDaoFactory wDaoFact)
  * for the internationalization of word "other" in the scroling list of personHasAdvisorRelationship.ftl
  */

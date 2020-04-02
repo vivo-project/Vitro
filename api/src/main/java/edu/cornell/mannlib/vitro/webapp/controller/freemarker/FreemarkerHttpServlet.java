@@ -93,7 +93,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         throws IOException, ServletException {
 
         super.doGet(request,response);
-//UQAM set for UTF-8
+//UQAM-Optimization set for UTF-8
         response.setCharacterEncoding("UTF-8");
 
         VitroRequest vreq = new VitroRequest(request);
@@ -279,8 +279,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             bodyString = "";
         }
 
-        //UQAM Add linguistic control management
- //       String bodyStringUTF = new String(bodyString.getBytes(), Charset.forName("UTF-8"));
         templateDataModel.put("body", bodyString);
 
         String lang = vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();

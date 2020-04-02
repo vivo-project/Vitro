@@ -53,7 +53,7 @@ public class SelectListGeneratorVTwo {
             return Collections.emptyMap();
         }
     }
-    // UQAM Overcharge method for linguistic contexte processisng
+    // UQAM-Linguistic-ManagementOvercharge method for linguistic contexte processisng
 	public static Map<String,String> getOptions(
 			EditConfigurationVTwo editConfig,
 			String fieldName,
@@ -80,7 +80,7 @@ public class SelectListGeneratorVTwo {
 		}
 
 		try {
-			//UQAM need vreq instead of WebappDaoFactory
+			//UQAM-Linguistic-Management need vreq instead of WebappDaoFactory
 			Map<String, String> parentClass = Collections.emptyMap();
 			FieldOptions fieldOptions = field.getFieldOptions();
 			// UQAM TODO - Only internationalization of ChildVClassesWithParent are implemented. For TODO, implement the internationalization for the rest of instanceof "FieldOptions"

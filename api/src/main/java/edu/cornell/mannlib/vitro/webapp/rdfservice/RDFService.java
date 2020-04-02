@@ -266,7 +266,7 @@ public interface RDFService {
      */
     public void close();
     /**
-     * UQAM Useful among other things to transport the linguistic context in the service
+     * UQAM-Bug-Correction  Useful among other things to transport the linguistic context in the service
      * @param vitroRequest
      */
 	public void setVitroRequest(VitroRequest vitroRequest);

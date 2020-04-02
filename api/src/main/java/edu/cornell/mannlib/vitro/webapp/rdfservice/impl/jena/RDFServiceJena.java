@@ -706,7 +706,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         return QueryExecutionFactory.create(q, d);
     }
 	/*
-	 * UQAM Useful among other things to transport the linguistic context in the service
+	 * UQAM-Linguistic-Management Useful among other things to transport the linguistic context in the service
 	 * (non-Javadoc)
 	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
 	 */

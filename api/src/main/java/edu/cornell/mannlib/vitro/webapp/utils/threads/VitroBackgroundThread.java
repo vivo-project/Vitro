@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
  * check their current status.
  */
 public class VitroBackgroundThread extends Thread {
-	// UQAM add start
+	// UQAM-Bug-Correction add start
 	public synchronized void start() {
 		super.start();
 	}

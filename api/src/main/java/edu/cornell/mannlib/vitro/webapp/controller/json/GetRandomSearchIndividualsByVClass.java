@@ -75,8 +75,8 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 		modelMap.put("individual",
 				IndividualTemplateModelBuilder.build(individual, vreq));
 		modelMap.put("vclass", vclassName);
-		String langCtx = vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();  //UQAM build the linguistic context
-		modelMap.put("langCtx", langCtx); // UQAM add the linguistic context to map
+		String langCtx = vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();  //UQAM-Linguistic-Management build the linguistic context
+		modelMap.put("langCtx", langCtx); // UQAM-Linguistic-Management add the linguistic context to map
 		ShortViewService svs = ShortViewServiceSetup.getService(ctx);
 		return svs.renderShortView(individual, ShortViewContext.BROWSE,
 				modelMap, vreq);
