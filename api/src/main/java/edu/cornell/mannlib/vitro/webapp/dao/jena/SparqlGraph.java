@@ -233,7 +233,7 @@ public class SparqlGraph implements GraphWithPerform {
             pyString(literalBuff, node.getLiteralLexicalForm());
             literalBuff.append("\"");
             /*
-             * UQAM
+             * UQAM-Bug-Correction
              * reversing the condition tests.
              * It is important to prioritize the language typology test in order to exploit the linguistic context in testing the type of data
              */

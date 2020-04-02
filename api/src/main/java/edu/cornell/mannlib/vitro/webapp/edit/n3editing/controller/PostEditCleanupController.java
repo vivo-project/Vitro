@@ -76,7 +76,7 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         if( entityToReturnTo == null ){
             // this will not work if there entityToReturnTo has a new resource URI,
             // in that case entityToReturnTo should not have been passed to this method as null
-        	// UQAM
+        	// UQAM-Linguistic-Management
         	// MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);
             MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, editConfig);
             entityToReturnTo = N3EditUtils.processEntityToReturnTo(editConfig, submission, vreq);

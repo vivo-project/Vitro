@@ -74,7 +74,7 @@ public class EditConfigurationUtils {
     }
 
     public static VClass getLangAwardRangeVClass(VitroRequest vreq) {
-        // UQAM
+        // UQAM-Linguistic-Management
         //
 
         // This needs a WebappDaoFactory with linguistic context filtering/RDFService
@@ -136,7 +136,7 @@ public class EditConfigurationUtils {
     public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq,
             String predicateUri, String domainUri, String rangeUri) {
     	// WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	// UQAM Use linguistic context
+    	// UQAM-Linguistic-Management Use linguistic context
         WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
     	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
     	        predicateUri, domainUri, rangeUri);
@@ -307,12 +307,6 @@ public class EditConfigurationUtils {
 	public static String generateHTMLForElement(VitroRequest vreq, String fieldName, EditConfigurationVTwo editConfig) {
 		String html = "";
         Configuration fmConfig = FreemarkerConfiguration.getConfig(vreq);
-		/*
-		 * UQAM, encoded ftl to UTF-8
-		 */
- //       fmConfig.setDefaultEncoding("utf-8");
- //       fmConfig.setOutputEncoding("utf-8");
- //       fmConfig.setURLEscapingCharset("UTF-8");
 
         FieldVTwo field = editConfig == null ? null : editConfig.getField(fieldName);
         MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
