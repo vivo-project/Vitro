@@ -113,7 +113,7 @@ public class SelectListGeneratorVTwo {
 
         //if no comparator is passed in, utilize MapPairsComparator
         if(comparator == null) {
-            comparator = new MapPairsComparator(vreq);
+        	comparator = new MapPairsComparator(vreq);
         }
 
         objectsToSort.sort(comparator);
@@ -139,11 +139,11 @@ public class SelectListGeneratorVTwo {
             } else if (s1 == null) {
                 return -1;
             } else {
-                if ("".equals(s1[0])) {
-                    return -1;
-                } else if ("".equals(s2[0])) {
-                    return 1;
-                }
+            	if ("".equals(s1[0])) {
+            		return -1;
+            	} else if ("".equals(s2[0])) {
+            		return 1;
+            	}
                 if (s2[1]==null) {
                     return 1;
                 } else if (s1[1] == null){
