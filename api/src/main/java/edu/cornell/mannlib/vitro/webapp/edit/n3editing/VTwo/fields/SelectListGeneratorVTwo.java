@@ -20,7 +20,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 
 public class SelectListGeneratorVTwo {
 
-	static Log log = LogFactory.getLog(SelectListGeneratorVTwo.class);
+    static Log log = LogFactory.getLog(SelectListGeneratorVTwo.class);
+
     public static Map<String,String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
@@ -53,7 +54,8 @@ public class SelectListGeneratorVTwo {
             return Collections.emptyMap();
         }
     }
-    // UQAM-Linguistic-ManagementOvercharge method for linguistic contexte processisng
+
+    // UQAM Overcharge method for linguistic contexte processisng
 	public static Map<String,String> getOptions(
 			EditConfigurationVTwo editConfig,
 			String fieldName,
@@ -80,7 +82,7 @@ public class SelectListGeneratorVTwo {
 		}
 
 		try {
-			//UQAM-Linguistic-Management need vreq instead of WebappDaoFactory
+			//UQAM need vreq instead of WebappDaoFactory
 			Map<String, String> parentClass = Collections.emptyMap();
 			FieldOptions fieldOptions = field.getFieldOptions();
 			// UQAM TODO - Only internationalization of ChildVClassesWithParent are implemented. For TODO, implement the internationalization for the rest of instanceof "FieldOptions"
@@ -96,61 +98,61 @@ public class SelectListGeneratorVTwo {
 	}
 
 
-	//Methods to sort the options map
-	// from http://forum.java.sun.com/thread.jspa?threadID=639077&messageID=4250708
-	//Modified to allow for a custom comparator to be sent in, defaults to mapPairsComparator
-	public static Map<String,String> getSortedMap(Map<String,String> hmap,
-			Comparator<String[]> comparator, VitroRequest vreq){
-		// first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
-		List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
-		for (String key:hmap.keySet()) {
-			String[] x = new String[2];
-			x[0] = key;
-			x[1] = hmap.get(key);
-			objectsToSort.add(x);
-		}
+    //Methods to sort the options map
+    // from http://forum.java.sun.com/thread.jspa?threadID=639077&messageID=4250708
+    //Modified to allow for a custom comparator to be sent in, defaults to mapPairsComparator
+    public static Map<String,String> getSortedMap(Map<String,String> hmap,
+            Comparator<String[]> comparator, VitroRequest vreq){
+        // first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
+        List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
+        for (String key:hmap.keySet()) {
+            String[] x = new String[2];
+            x[0] = key;
+            x[1] = hmap.get(key);
+            objectsToSort.add(x);
+        }
 
-		//if no comparator is passed in, utilize MapPairsComparator
-		if(comparator == null) {
-			comparator = new MapPairsComparator(vreq);
-		}
+        //if no comparator is passed in, utilize MapPairsComparator
+        if(comparator == null) {
+        	comparator = new MapPairsComparator(vreq);
+        }
 
-		objectsToSort.sort(comparator);
+        objectsToSort.sort(comparator);
 
-		HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
-		for (String[] pair:objectsToSort) {
-			map.put(pair[0],pair[1]);
-		}
-		return map;
-	}
+        HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
+        for (String[] pair:objectsToSort) {
+            map.put(pair[0],pair[1]);
+        }
+        return map;
+    }
 
-	//Sorts by the value of the 2nd element in each of the arrays
-	private static class MapPairsComparator implements Comparator<String[]> {
+    //Sorts by the value of the 2nd element in each of the arrays
+    private static class MapPairsComparator implements Comparator<String[]> {
 
-		private Collator collator;
+        private Collator collator;
 
-		public MapPairsComparator(VitroRequest vreq) {
-			this.collator = vreq.getCollator();
-		}
-		public int compare (String[] s1, String[] s2) {
-			if (s2 == null) {
-				return 1;
-			} else if (s1 == null) {
-				return -1;
-			} else {
-				if ("".equals(s1[0])) {
-					return -1;
-				} else if ("".equals(s2[0])) {
-					return 1;
-				}
-				if (s2[1]==null) {
-					return 1;
-				} else if (s1[1] == null){
-					return -1;
-				} else {
-					return collator.compare(s1[1],s2[1]);
-				}
-			}
-		}
-	}
+        public MapPairsComparator(VitroRequest vreq) {
+            this.collator = vreq.getCollator();
+        }
+        public int compare (String[] s1, String[] s2) {
+            if (s2 == null) {
+                return 1;
+            } else if (s1 == null) {
+                return -1;
+            } else {
+            	if ("".equals(s1[0])) {
+            		return -1;
+            	} else if ("".equals(s2[0])) {
+            		return 1;
+            	}
+                if (s2[1]==null) {
+                    return 1;
+                } else if (s1[1] == null){
+                    return -1;
+                } else {
+                    return collator.compare(s1[1],s2[1]);
+                }
+            }
+        }
+    }
 }
