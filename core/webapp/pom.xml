@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.vivoweb</groupId>
-    <artifactId>vitro-languages-webapp</artifactId>
+    <artifactId>vitro-languages-webapp-core</artifactId>
     <version>1.11.2-SNAPSHOT</version>
     <packaging>war</packaging>
 
