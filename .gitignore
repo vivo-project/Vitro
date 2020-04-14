@@ -12,6 +12,8 @@ utilities/rdbmigration/.work
 **/*.iml
 **/target
 
+*~
+
 **/overlays
 
 # Eclipse artifacts
