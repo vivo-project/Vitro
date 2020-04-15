@@ -8,7 +8,7 @@
 
 <#-- This is included by identity.ftl  -->
 <#if selectLocale??>
-<li><ul class="language-dropdown">  <li id="language-menu"><a id="lang-link" href="#" title="user">${i18n().select_a_language}</a><ul class="sub_menu">
+<li><ul class="language-dropdown">  <li id="language-menu"><a id="lang-link" href="#" title="${i18n().select_a_language}">${i18n().select_a_language}</a><ul class="sub_menu">
     <#list selectLocale.locales as locale>
 
             <li <#if locale.selected>status="selected"</#if>>
