@@ -43,17 +43,14 @@ public class LanguageFilteringUtils {
 	}
 
 	/**
-	 * Add a Language Filtering layer to an OntModel by treating it as an RDFService.
+	 * Add a Language Filtering layer to an OntModel
 	 */
 	public static OntModel wrapOntModelInALanguageFilter(OntModel rawModel,
 			ServletRequest req) {
-		/** This is some nasty layering. Could we do this more easily? */
 		List<String> languages = localesToLanguages(req.getLocales());
 		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
-				RDFServiceGraph.createRDFServiceModel(
-						new RDFServiceGraph(
-								new LanguageFilteringRDFService(
-										new RDFServiceModel(rawModel), languages))));
+		        ModelFactory.createModelForGraph(new LanguageFilteringGraph(
+		                rawModel.getGraph(), languages)));
 	}
 
 	private LanguageFilteringUtils() {
