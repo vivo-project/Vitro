@@ -27,8 +27,9 @@ public class LanguageFilteringGraph extends AbstractGraphDecorator
     /**
      * Return a graph wrapped in a decorator that will filter find() results
      * according to the supplied list of acceptable languages  
-     * @param g the graph to wrap with language awareness
-     * @param preferredLanguages a list of preferred language strings
+     * @param g the graph to wrap with language awareness. May not be null.
+     * @param preferredLanguages a list of preferred language strings. May not 
+     * be null.
      */
     protected LanguageFilteringGraph(Graph g, List<String> preferredLanguages) {
         super(g);

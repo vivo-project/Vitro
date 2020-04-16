@@ -24,7 +24,7 @@ public class LangSort {
      * Construct a language string sorter with a supplied list of preferred 
      * language strings
      * @param preferredLanguageStrings list of preferred languages of form
-     *                                 'en-US', 'es', 'fr-CA', etc.
+     *                                 'en-US', 'es', 'fr-CA'.  May not be null.
      */
     public LangSort(List<String> preferredLanguageStrings) {
         this.langs = preferredLanguageStrings;

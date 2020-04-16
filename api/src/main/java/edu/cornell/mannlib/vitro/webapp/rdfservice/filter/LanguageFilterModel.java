@@ -12,10 +12,19 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
+/**
+ * A filter of literal statements from Models according to language preferences. 
+ */
 public class LanguageFilterModel {
 
     private static final Log log = LogFactory.getLog(LanguageFilterModel.class);
     
+    /**
+     * 
+     * @param m the model to filter. May not be null.
+     * @param langs list of strings of type 'en-US'. May not be null.
+     * @return model with language-inappropriate literal statements filtered out.
+     */
     public Model filterModel(Model m, List<String> langs) {
         log.debug("filterModel");
         List<Statement> retractions = new ArrayList<Statement>();
