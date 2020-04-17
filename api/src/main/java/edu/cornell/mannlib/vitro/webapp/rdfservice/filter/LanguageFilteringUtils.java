@@ -13,9 +13,6 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
-
 /**
  * Some methods that will come in handy when dealing with Language Filtering
  */

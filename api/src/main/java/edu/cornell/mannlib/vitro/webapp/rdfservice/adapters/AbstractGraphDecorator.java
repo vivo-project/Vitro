@@ -7,7 +7,6 @@ import org.apache.jena.graph.GraphStatisticsHandler;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.TransactionHandler;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.graph.impl.GraphWithPerform;
 import org.apache.jena.shared.AddDeniedException;
 import org.apache.jena.shared.DeleteDeniedException;
 import org.apache.jena.shared.PrefixMapping;
@@ -28,7 +27,7 @@ public abstract class AbstractGraphDecorator implements
 
     protected AbstractGraphDecorator(Graph g) {
         if (g == null) {
-            throw new NullPointerException("g may not be null.");
+            throw new IllegalArgumentException("g may not be null.");
         }
         this.inner = g;
     }

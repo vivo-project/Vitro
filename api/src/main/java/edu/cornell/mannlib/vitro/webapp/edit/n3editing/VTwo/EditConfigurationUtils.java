@@ -70,8 +70,9 @@ public class EditConfigurationUtils {
 
     public static VClass getLangAwardRangeVClass(VitroRequest vreq) {
         // UQAM-Linguistic-Management
-        WebappDaoFactory ctxDaoFact = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
-        return ctxDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
+        WebappDaoFactory vreqDaoFact = ModelAccess.on(vreq).getWebappDaoFactory(
+                LanguageOption.LANGUAGE_AWARE);
+        return vreqDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
     }
     
     //get individual

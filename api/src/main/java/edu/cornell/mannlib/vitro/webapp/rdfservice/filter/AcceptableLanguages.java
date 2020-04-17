@@ -12,13 +12,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AcceptableLanguages extends ArrayList<String>{
     
+    private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AcceptableLanguages.class);
     
     /**
      * Construct a normalized list of acceptable language strings
      * from a set of raw language strings.  For any values of form 'aa-BB',
      * the base language ('aa') will be also added to the list. 
-     * @param rawLangs may not be null
+     * @param rawLanguageStrs may not be null
      */
     public AcceptableLanguages(List<String> rawLanguageStrs) {                
         log.debug("Raw language strings:" + rawLanguageStrs);

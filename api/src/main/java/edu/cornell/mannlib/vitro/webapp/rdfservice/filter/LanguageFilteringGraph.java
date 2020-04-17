@@ -11,7 +11,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractGraphDecorator;
-import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * A graph decorator that filters find() results according to a list of 
@@ -22,7 +21,6 @@ public class LanguageFilteringGraph extends AbstractGraphDecorator
 
     private List<String> langs;
     private LanguageFilterModel filterModel = new LanguageFilterModel();
-    private String toString;
     
     /**
      * Return a graph wrapped in a decorator that will filter find() results
@@ -34,13 +32,6 @@ public class LanguageFilteringGraph extends AbstractGraphDecorator
     protected LanguageFilteringGraph(Graph g, List<String> preferredLanguages) {
         super(g);
         this.langs = preferredLanguages;
-        this.toString = "LanguageFilteringGraph[wrapping "
-                + ToString.graphToString(g) + "]";
-    }
-    
-    @Override 
-    public String toString() {
-        return this.toString;
     }
 
     @Override
