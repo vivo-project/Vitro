@@ -63,11 +63,6 @@ public class EditConfigurationUtils {
     }
 
     public static VClass getRangeVClass(VitroRequest vreq) {
-
-        // This needs a WebappDaoFactory with no filtering/RDFService
-        // funny business because it needs to be able to retrieve anonymous union
-        // classes by their "pseudo-bnode URIs".
-        // Someday we'll need to figure out a different way of doing this.
         WebappDaoFactory ctxDaoFact = ModelAccess.on(
                 vreq.getSession().getServletContext()).getWebappDaoFactory();
         return ctxDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
@@ -75,17 +70,12 @@ public class EditConfigurationUtils {
 
     public static VClass getLangAwardRangeVClass(VitroRequest vreq) {
         // UQAM-Linguistic-Management
-        //
-
-        // This needs a WebappDaoFactory with linguistic context filtering/RDFService
-        // funny business because it needs to be able to retrieve anonymous union
-        // classes by their "pseudo-bnode URIs".
-        // Someday we'll need to figure out a different way of doing this.
-        WebappDaoFactory ctxDaoFact = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
-        return ctxDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
+        WebappDaoFactory vreqDaoFact = ModelAccess.on(vreq).getWebappDaoFactory(
+                LanguageOption.LANGUAGE_AWARE);
+        return vreqDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
     }
+    
     //get individual
-
     public static Individual getSubjectIndividual(VitroRequest vreq) {
     	Individual subject = null;
     	String subjectUri = getSubjectUri(vreq);

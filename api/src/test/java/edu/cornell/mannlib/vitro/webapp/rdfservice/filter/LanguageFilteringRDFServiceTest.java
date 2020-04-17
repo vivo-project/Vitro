@@ -282,12 +282,12 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 	private Comparator<Object> buildRowIndexedLiteralSortByLang() {
 		try {
 			Class<?> clazz = Class.forName(COLLATOR_CLASSNAME);
-			Class<?>[] argTypes = { LanguageFilteringRDFService.class };
-			Constructor<?> constructor = clazz.getDeclaredConstructor(argTypes);
+			Class<?>[] argTypes = { LanguageFilteringRDFService.class, List.class };
+			Constructor<?> constructor = clazz.getDeclaredConstructor(argTypes);						
 			constructor.setAccessible(true);
-
 			return (Comparator<Object>) constructor
-					.newInstance(filteringRDFService);
+					.newInstance(filteringRDFService, new AcceptableLanguages(
+					        preferredLanguages));
 		} catch (Exception e) {
 			throw new RuntimeException("Could not create a collator", e);
 		}
