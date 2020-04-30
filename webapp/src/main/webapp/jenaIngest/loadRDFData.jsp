@@ -15,6 +15,11 @@
 <p>Or upload a file from your computer:</p>
 <p><input type="file" name="filePath" /></p>
 
+<ul style="list-style-type:none;">
+	<li><input type="radio" name="mode" value="directAddABox" checked="checked"/>add instance data</li>
+	<li><input type="radio" name="mode" value="remove"/>remove instance data</li>
+</ul>
+
 <select name="language">
 	<option value="RDF/XML">RDF/XML</option>
 	<option value="N3">N3</option>
