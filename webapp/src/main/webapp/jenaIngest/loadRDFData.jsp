@@ -16,8 +16,8 @@
 <p><input type="file" name="filePath" /></p>
 
 <ul style="list-style-type:none;">
-	<li><input type="radio" name="mode" value="directAddABox" checked="checked"/>add instance data</li>
-	<li><input type="radio" name="mode" value="remove"/>remove instance data</li>
+	<li><input type="radio" name="mode" value="directAddABox" checked="checked"/>add RDF data</li>
+	<li><input type="radio" name="mode" value="remove"/>remove RDF data</li>
 </ul>
 
 <select name="language">
