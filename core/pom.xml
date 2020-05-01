@@ -3,11 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>vitro-languages-core</artifactId>
+    <version>1.11.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Vitro Languages CORE</name>
     <description>Vitro Languages</description>
     <url>http://vivoweb.org/</url>
+
+    <parent>
+        <groupId>org.vivoweb</groupId>
+        <artifactId>vitro-languages</artifactId>
+        <version>1.11.2-SNAPSHOT</version>
+    </parent>
 
     <licenses>
         <license>
@@ -149,55 +156,38 @@
         </profile> 
     </profiles>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.1</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-war-plugin</artifactId>
-					<version>3.2.3</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.4</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.8</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-webapp-en_US</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-webapp-de_DE</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-webapp-es</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-webapp-fr_CA</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-webapp-pt_BR</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
 
     <distributionManagement>
         <site>
@@ -213,11 +203,4 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-    <parent>
-    	<groupId>org.vivoweb</groupId>
-    	<artifactId>vitro-languages</artifactId>
-    	<version>1.11.2-SNAPSHOT</version>
-    </parent>
-    <groupId>org.vivoweb</groupId>
-    <version>1.11.2-SNAPSHOT</version>
 </project>
