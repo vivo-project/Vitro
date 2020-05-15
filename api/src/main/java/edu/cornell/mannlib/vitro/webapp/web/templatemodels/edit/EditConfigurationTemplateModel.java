@@ -136,6 +136,11 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		return selectedValue;
 	}
 
+    public String getPageTitle() {
+        String pageTitle = i18n.text("edit_page_title");
+        return pageTitle != null ? pageTitle : "Edit";
+    }
+
 	private void setFormTitle() {
 		String predicateUri = editConfig.getPredicateUri();
 		if(predicateUri != null) {
