@@ -118,14 +118,14 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 			String format = interpretRequestedFormats(req, query);
 			SparqlQueryApiExecutor core = SparqlQueryApiExecutor.instance(
 					rdfService, queryString, format);
+			resp.setContentType(core.getMediaType());
+
 			if (download) {	
 				String extension = getFilenameExtension(req, query, format);
 				resp.setHeader("Content-Transfer-Encoding", "binary");
 				resp.setHeader("Content-disposition", "attachment; filename=sparqlquery." + extension);
 			}
-			else {
-				resp.setContentType(core.getMediaType());
-			}
+
 			core.executeAndFormat(resp.getOutputStream());
 		} catch (InvalidQueryTypeException e) {
 			do400BadRequest("Query type is not SELECT, ASK, CONSTRUCT, "
