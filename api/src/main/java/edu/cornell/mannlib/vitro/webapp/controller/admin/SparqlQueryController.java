@@ -40,6 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.RdfResultMediaType;
+import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.ResultSetMediaType;
 
 /**
  * Present the SPARQL Query form, and execute the queries.
@@ -110,11 +112,20 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 				.getRDFService();
 
 		String queryString = req.getParameter("query");
+		boolean download = Boolean.parseBoolean(req.getParameter("download"));
+		Query query = SparqlQueryUtils.create(queryString);
 		try {
-			String format = interpretRequestedFormats(req, queryString);
+			String format = interpretRequestedFormats(req, query);
 			SparqlQueryApiExecutor core = SparqlQueryApiExecutor.instance(
 					rdfService, queryString, format);
-			resp.setContentType(core.getMediaType());
+			if (download) {	
+				String extension = getFilenameExtension(req, query, format);
+				resp.setHeader("Content-Transfer-Encoding", "binary");
+				resp.setHeader("Content-disposition", "attachment; filename=sparqlquery." + extension);
+			}
+			else {
+				resp.setContentType(core.getMediaType());
+			}
 			core.executeAndFormat(resp.getOutputStream());
 		} catch (InvalidQueryTypeException e) {
 			do400BadRequest("Query type is not SELECT, ASK, CONSTRUCT, "
@@ -132,8 +143,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 	}
 
 	private String interpretRequestedFormats(HttpServletRequest req,
-			String queryString) throws NotAcceptableException {
-		Query query = SparqlQueryUtils.create(queryString);
+			Query query) throws NotAcceptableException {
 		String parameterName = (query.isSelectType() || query.isAskType()) ? "resultFormat"
 				: "rdfResultFormat";
 		String parameterValue = req.getParameter(parameterName);
@@ -143,6 +153,20 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 		} else {
 			return parameterValue;
 		}
+	}
+
+	private String getFilenameExtension(HttpServletRequest req, 
+			Query query, String format) {
+		String extension;
+		if (query.isSelectType() || query.isAskType()) {
+			ResultSetMediaType mediaType = ResultSetMediaType.fromContentType(format);
+			extension = mediaType.getExtension();
+		}
+		else {
+			RdfResultMediaType mediaType = RdfResultMediaType.fromContentType(format);
+			extension = mediaType.getExtension();
+		}
+		return extension;
 	}
 
 	private void do400BadRequest(String message, HttpServletResponse resp)
