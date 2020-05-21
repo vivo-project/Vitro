@@ -89,7 +89,7 @@ public class LocaleSelectionDataGetter implements DataGetter {
 			Locale currentLocale) throws FileNotFoundException {
 		Map<String, Object> map = new HashMap<>();
 		map.put("code", locale.toString());
-		map.put("label", locale.getDisplayName(currentLocale));
+		map.put("label", locale.getDisplayLanguage(locale));
 		map.put("imageUrl", LocaleSelectorUtilities.getImageUrl(vreq, locale));
 		map.put("selected", currentLocale.equals(locale));
 		return map;
