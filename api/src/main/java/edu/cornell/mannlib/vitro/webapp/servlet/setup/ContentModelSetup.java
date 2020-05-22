@@ -67,15 +67,15 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
         OntModel baseABoxModel = models.getOntModel(ABOX_ASSERTIONS);
         if (firstTimeStartup) {
-        	RDFFilesLoader.loadFirstTimeFiles("abox", baseABoxModel, true);
+            RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", baseABoxModel, true);
         }
-        RDFFilesLoader.loadEveryTimeFiles("abox", baseABoxModel);
+        RDFFilesLoader.loadEveryTimeFiles(ctx, "abox", baseABoxModel);
 
         OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
         if (firstTimeStartup) {
-        	RDFFilesLoader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
+            RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", baseTBoxModel, true);
         }
-    	RDFFilesLoader.loadEveryTimeFiles("tbox", baseTBoxModel);
+        RDFFilesLoader.loadEveryTimeFiles(ctx, "tbox", baseTBoxModel);
     }
 
 	private long secondsSince(long startTime) {
@@ -94,7 +94,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 	private void initializeApplicationMetadata(ServletContext ctx,
 			Model applicationMetadataModel) {
 		OntModel temporaryAMModel = VitroModelFactory.createOntologyModel();
-    	RDFFilesLoader.loadFirstTimeFiles("applicationMetadata", temporaryAMModel, true);
+        RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", temporaryAMModel, true);
     	setPortalUriOnFirstTime(temporaryAMModel, ctx);
     	applicationMetadataModel.add(temporaryAMModel);
 	}

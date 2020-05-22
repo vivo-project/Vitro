@@ -114,7 +114,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          templateData.put("editConfiguration", etm);
          templateData.put("editSubmission", submissionTemplateModel);
          //Corresponding to original note for consistency with selenium tests and 1.1.1
-         templateData.put("title", "Edit");
+         templateData.put("title", etm.getPageTitle());
          templateData.put("submitUrl", getSubmissionUrl(vreq));
          templateData.put("cancelUrl", etm.getCancelUrl());
          templateData.put("editKey", editConfig.getEditKey());
