@@ -90,7 +90,7 @@ public class LocaleSelectionDataGetter implements DataGetter {
 		Map<String, Object> map = new HashMap<>();
 		map.put("code", locale.toString());
 		map.put("label", locale.getDisplayLanguage(locale));
-		map.put("imageUrl", LocaleSelectorUtilities.getImageUrl(vreq, locale));
+		map.put("country", locale.getDisplayCountry(locale));
 		map.put("selected", currentLocale.equals(locale));
 		return map;
 	}
