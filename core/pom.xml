@@ -187,6 +187,12 @@
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-webapp-en_CA</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
