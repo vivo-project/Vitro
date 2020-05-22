@@ -1,25 +1,31 @@
-# $This file is distributed under the terms of the license in LICENSE$
+# baseURI: http://vitro.mannlib.cornell.edu/ontologies/display/1.1
 
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
-@base <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-display:ProfilePageType rdf:type owl:Class ;
-
-                 owl:equivalentClass [ rdf:type owl:Class ;
-                                       owl:oneOf ( display:standard
-                                                   display:quickView
-                                                 )
-                                     ] .
-
-display:quickView rdf:type display:ProfilePageType ,
-                                owl:NamedIndividual .
-
-display:standard rdf:type display:ProfilePageType ,
-                          owl:NamedIndividual .
-
-display:hasDefaultProfilePageType rdf:type owl:ObjectProperty .
-display:hasDefaultProfilePageType rdfs:range display:ProfilePageType .
+display:ProfilePageType
+  a owl:Class ;
+  owl:equivalentClass [
+      a owl:Class ;
+      owl:oneOf (
+          display:standard
+          display:quickView
+        ) ;
+    ] ;
+.
+display:hasDefaultProfilePageType
+  a owl:ObjectProperty ;
+  rdfs:range display:ProfilePageType ;
+.
+display:quickView
+  a display:ProfilePageType ;
+  a owl:NamedIndividual ;
+.
+display:standard
+  a display:ProfilePageType ;
+  a owl:NamedIndividual ;
+.

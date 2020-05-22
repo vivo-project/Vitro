@@ -1,0 +1,219 @@
+# baseURI: http://vitro.mannlib.cornell.edu/ns/vitro-0.7
+
+@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro-0.7#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://vitro.mannlib.cornell.edu/ns/vitro/0.7>
+  a owl:Ontology ;
+  rdfs:label "Vitro internals" ;
+  owl:versionInfo 0.7 ;
+.
+vitro:Application
+  a owl:Class ;
+.
+vitro:ClassGroup
+  a owl:Class ;
+.
+vitro:Namespace
+  a owl:Class ;
+.
+vitro:Portal
+  a owl:Class ;
+.
+vitro:PropertyGroup
+  a owl:Class ;
+.
+vitro:User
+  a owl:Class ;
+.
+vitro:aboutText
+  a owl:DatatypeProperty ;
+.
+vitro:acknowledgeText
+  a owl:DatatypeProperty ;
+.
+vitro:bannerHeight
+  a owl:DatatypeProperty ;
+.
+vitro:bannerImage
+  a owl:DatatypeProperty ;
+.
+vitro:bannerWidth
+  a owl:DatatypeProperty ;
+.
+vitro:contactMail
+  a owl:DatatypeProperty ;
+.
+vitro:copyrightAnchor
+  a owl:DatatypeProperty ;
+.
+vitro:copyrightURL
+  a owl:DatatypeProperty ;
+.
+vitro:customDisplayViewAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:customEntryFormAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:customShortViewAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:descriptionAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:displayLimit
+  a owl:DatatypeProperty ;
+.
+vitro:displayLimitAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:displayRank
+  a owl:DatatypeProperty ;
+.
+vitro:displayRankAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:editing
+  a owl:AnnotationProperty ;
+.
+vitro:exampleAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:extendedLinkedData
+  a owl:AnnotationProperty ;
+.
+vitro:firstTime
+  a owl:DatatypeProperty ;
+.
+vitro:forceStubDeletionAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:fullPropertyNameAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:harvestId
+  a owl:AnnotationProperty ;
+.
+vitro:hidden
+  a owl:DatatypeProperty ;
+.
+vitro:hiddenAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:hiddenFromDisplayBelowRoleLevelAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:hiddenFromPublishBelowRoleLevelAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:imageThumbWidth
+  a owl:DatatypeProperty ;
+.
+vitro:inClassGroup
+  a owl:AnnotationProperty ;
+.
+vitro:inPropertyGroupAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:individualSortDirectionAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:isExternalId
+  a owl:AnnotationProperty ;
+.
+vitro:isMenuPageIntersectionClass
+  a owl:AnnotationProperty ;
+.
+vitro:loginCount
+  a owl:DatatypeProperty ;
+.
+vitro:logotypeHeight
+  a owl:DatatypeProperty ;
+.
+vitro:logotypeImage
+  a owl:DatatypeProperty ;
+.
+vitro:logotypeWidth
+  a owl:DatatypeProperty ;
+.
+vitro:md5password
+  a owl:DatatypeProperty ;
+.
+vitro:modTime
+  a owl:DatatypeProperty ;
+.
+vitro:modTimeAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:moniker
+  a owl:DatatypeProperty ;
+.
+vitro:mostSpecificType
+  a owl:AnnotationProperty ;
+.
+vitro:namespaceURI
+  a owl:DatatypeProperty ;
+.
+vitro:objectIndividualSortProperty
+  a owl:AnnotationProperty ;
+.
+vitro:offerCreateNewOptionAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:oldId
+  a owl:AnnotationProperty ;
+.
+vitro:oldpassword
+  a owl:DatatypeProperty ;
+.
+vitro:originalId
+  a owl:AnnotationProperty ;
+.
+vitro:prohibitedFromUpdateBelowRoleLevelAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:publicDescriptionAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:roleURI
+  a owl:DatatypeProperty ;
+.
+vitro:rootBreadCrumbAnchor
+  a owl:DatatypeProperty ;
+.
+vitro:rootBreadCrumbURL
+  a owl:DatatypeProperty ;
+.
+vitro:rootLogotypeImage
+  a owl:DatatypeProperty ;
+.
+vitro:rootTab
+  a owl:ObjectProperty ;
+.
+vitro:selectFromExistingAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:shortDef
+  a owl:AnnotationProperty ;
+.
+vitro:shortDefAnnot
+  a owl:AnnotationProperty ;
+.
+vitro:shortHand
+  a owl:DatatypeProperty ;
+.
+vitro:themeDir
+  a owl:DatatypeProperty ;
+.
+vitro:urlPrefix
+  a owl:DatatypeProperty ;
+.
+vitro:username
+  a owl:DatatypeProperty ;
+.
