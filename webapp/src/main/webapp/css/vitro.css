@@ -255,7 +255,7 @@ ul.language-dropdown {
 }
 ul.language-dropdown li#language-menu {
     background: url(../images/arrowDownOverAccount.gif) right 9px no-repeat;
-    min-width:110px;
+    min-width:150px;
     position: relative;
     margin-right: -10px !important;
 }
