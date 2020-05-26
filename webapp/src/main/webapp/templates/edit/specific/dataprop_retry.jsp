@@ -174,6 +174,12 @@
         </c:if>
     	</td>
 	</td>
+	<td valign="top" colspan="2">
+		<b>Rich text editing</b><br/>
+		<select name="Editing">
+		    <form:option name="Editing"/>
+		</select>
+	</td>
 </tr>
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 

@@ -57,7 +57,6 @@ public class AdditionsAndRetractions {
         str += "\nadditions:[";
         if( getAdditions() != null ) {
            StringWriter writer = new StringWriter();
-           // UQAM-Bug Replacing N3-PP by N3 (N3-PP does not exist in Jena
            getAdditions().write(writer, "N3");
            str += "\n" + writer.toString() + "\n";
         }

@@ -168,13 +168,26 @@ public class DatapropRetryController extends BaseEditController {
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(objectForEditing));
         optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(objectForEditing));
 
+        // Set the value of the editing parameter (as defined in VitroVocabulary.java). 
+        // Use value to control form types as in defaultDataPropertyForm.ftl
+        String editingVal = objectForEditing.getEditing();
+        List<Option> editingOptList = new ArrayList<Option>();
+        editingOptList.add(0,new Option("","plaintext"));
+        editingOptList.add(1,new Option("HTML","rich text"));
+        for (Option val : editingOptList) {
+            if(editingVal != null && editingVal.equals(val.getValue())) {
+                val.setSelected(true);
+            }
+        }
+        optionMap.put("Editing", editingOptList);
+
         foo.setOptionLists(optionMap);
 
         request.setAttribute("functional",objectForEditing.getFunctional());
 
         //checkboxes are pretty annoying : we don't know if someone *unchecked* a box, so we have to default to false on updates.
         if (objectForEditing.getURI() != null) {
-        	objectForEditing.setFunctional(false);
+              objectForEditing.setFunctional(false);
         }
 
         foo.setErrorMap(epo.getErrMsgMap());

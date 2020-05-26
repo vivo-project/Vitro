@@ -360,8 +360,13 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
 
     protected boolean reasoningAvailable() {
-    	TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
-    	return status.isConsistent() && !status.isInErrorState();
+        try {
+            TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
+            return status.isConsistent() && !status.isInErrorState();
+        } catch (IllegalStateException e) {
+            log.debug("Status of reasoner could not be determined. It is likely disabled.", e);
+            return false;
+        }
     }
 
     private String getRequiredDatatypeURI(Individual individual, DataProperty dataprop, List<String> vclassURIs) {
@@ -514,6 +519,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             addPropertyStringValue(jDataprop, EXAMPLE, dtp.getExample(), ontModel);
             addPropertyStringValue(jDataprop, DESCRIPTION_ANNOT, dtp.getDescription(), ontModel);
             addPropertyStringValue(jDataprop, PUBLIC_DESCRIPTION_ANNOT, dtp.getPublicDescription(), ontModel);
+            addPropertyStringValue(jDataprop, EDITING, dtp.getEditing(), ontModel);
             addPropertyNonNegativeIntValue(jDataprop, DISPLAY_RANK_ANNOT, dtp.getDisplayTier(), ontModel);
             addPropertyNonNegativeIntValue(jDataprop, DISPLAY_LIMIT, dtp.getDisplayLimit(), ontModel);
             //addPropertyStringValue(jDataprop, HIDDEN_ANNOT, dtp.getHidden(), ontModel);
@@ -584,6 +590,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             updatePropertyStringValue(jDataprop, EXAMPLE, dtp.getExample(), ontModel);
             updatePropertyStringValue(jDataprop, DESCRIPTION_ANNOT, dtp.getDescription(), ontModel);
             updatePropertyStringValue(jDataprop, PUBLIC_DESCRIPTION_ANNOT, dtp.getPublicDescription(), ontModel);
+            updatePropertyStringValue(jDataprop, EDITING, dtp.getEditing(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_RANK_ANNOT, dtp.getDisplayTier(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_LIMIT, dtp.getDisplayLimit(), ontModel);
 
