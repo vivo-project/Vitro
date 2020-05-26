@@ -16,11 +16,11 @@
 <#--
  * selectLocale
  * -- selectLocaleUrl
- * -- locales [list of maps]
- *    -- [map]
+ * -- locales [list of locales with country]
+ *    -- [locale with country]
  *       -- code
- *       -- label (tooltip relative to the current Locale)
- *       -- imageUrl
+ *       -- label (tooltip displayed in original locale, not current locale)
+ *       -- country (displayed in original locale, not current locale)
  *       -- selected (boolean)
 -->
 <script type="text/javascript">
