@@ -81,7 +81,7 @@
 
 <#macro displayLabel labelSeq labelStr languageCode labelEditLink tagOrTypeStr editGenerator editable displayRemoveLink>
     <li>${labelStr} <#if labelSeq?seq_contains(labelStr)> (duplicate value) </#if>
-    <#if editable> <#if labelEditLink?has_content> <a href="${labelEditLink}&${editGenerator}">Edit</a></#if>
+    <#if editable> <#if labelEditLink?has_content> <a href="${labelEditLink}&${editGenerator}">${i18n().edit_capitalized}</a></#if>
     <#if displayRemoveLink>
 	<a href="${urls.base}/edit/primitiveRdfEdit" languageName="${labelLang}" languageCode="${languageCode}"
 	labelValue="${labelStr}" tagOrType="${tagOrTypeStr!}" class="remove" title="${i18n().remove_capitalized}">${i18n().remove_capitalized}</a>

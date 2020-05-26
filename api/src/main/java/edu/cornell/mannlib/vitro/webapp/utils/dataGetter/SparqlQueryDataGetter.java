@@ -165,7 +165,16 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 	private String bindParameters(String text, Map<String, String> merged) {
 		String bound = text;
 		for (String key : merged.keySet()) {
-            bound = bound.replaceAll("([?$]" + key + ")([^a-zA-Z0-9_\\-])", "<" + merged.get(key) + ">$2");
+			String value = merged.get(key);
+			if (value.startsWith("http:")) {
+				/*
+				 * UQAM-Optimization if the "value" looks like an URI then wrap the value with the characters '<' '>'
+				 *
+				 */
+				bound = bound.replaceAll("([?$]" + key + ")([^a-zA-Z0-9_\\-])", "<" + value + ">$2");
+			} else {
+				bound = bound.replaceAll("([?$]" + key + ")([^a-zA-Z0-9_\\-])", value + "$2");
+			}
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("parameters: " + merged);

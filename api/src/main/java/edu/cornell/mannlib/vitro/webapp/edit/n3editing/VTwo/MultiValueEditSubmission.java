@@ -25,6 +25,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
@@ -34,21 +35,34 @@ public class MultiValueEditSubmission {
 
     private Map<String,List<Literal>> literalsFromForm ;
     private Map<String,List<String>> urisFromForm ;
-
     private Map<String,String> validationErrors;
     private BasicValidationVTwo basicValidation;
-
+    private static DateTimeFormatter dformater = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:00");
+    private static DateTimeFormatter dateFormater = DateTimeFormat.forPattern("yyyy-MM-dd");
     private Map<String, List<FileItem>> filesFromForm;
-
     private static Model literalCreationModel;
-
     private String entityToReturnTo;
+	private VitroRequest _vreq;
+    private static final String DATE_TIME_URI = XSD.dateTime.getURI();
+    private static final String DATE_URI = XSD.date.getURI();
+    private static final String TIME_URI = XSD.time.getURI();
+
 
     static{
         literalCreationModel = ModelFactory.createDefaultModel();
     }
-
-    public MultiValueEditSubmission(Map<String,String[]> queryParameters,  EditConfigurationVTwo editConfig){
+	/*
+	 *  UQAM
+	 *   replace
+	 *   public MultiValueEditSubmission(Map<String,String[]> queryParameters,  EditConfigurationVTwo editConfig)
+	 *   by this new signature
+	 *   This affect PostEditCleanupController and ProcessRdfFormController classes.
+	 *   This replacement is justified by the fact that we need a linguistic context in this class.
+	 */
+    public MultiValueEditSubmission(VitroRequest vreq,  EditConfigurationVTwo editConfig){
+    	// UQAM add this both lines
+		_vreq  = vreq;
+		Map<String,String[]> queryParameters = vreq.getParameterMap();
         if( editConfig == null )
             throw new Error("EditSubmission needs an EditConfiguration");
         this.editKey = editConfig.getEditKey();
@@ -96,7 +110,8 @@ public class MultiValueEditSubmission {
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );
         //Validate literals and add errors to the list of existing errors
         errors.putAll(basicValidation.validateLiterals( literalsFromForm ));
-        if( errors != null ) {
+        // UQAM Add empty contition
+        if( errors != null  && !errors.isEmpty()) {
             validationErrors.putAll( errors);
         }
 
@@ -141,9 +156,8 @@ public class MultiValueEditSubmission {
             }
         }
     }
-
     /* maybe this could be static */
-    public Literal createLiteral(String value, String datatypeUri, String lang) {
+    public Literal createLiteral_ORIG(String value, String datatypeUri, String lang) {
         if( datatypeUri != null ){
             if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
                 try {
@@ -159,12 +173,28 @@ public class MultiValueEditSubmission {
             return ResourceFactory.createPlainLiteral(value);
     }
 
-    private static final String DATE_TIME_URI = XSD.dateTime.getURI();
-    private static final String DATE_URI = XSD.date.getURI();
-    private static final String TIME_URI = XSD.time.getURI();
-
-    private static DateTimeFormatter dformater = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:00");
-    private static DateTimeFormatter dateFormater = DateTimeFormat.forPattern("yyyy-MM-dd");
+	/* maybe this could be static */
+	public Literal createLiteral(String value, String datatypeUri, String lang) {
+		Literal literal;
+		if( datatypeUri != null && !datatypeUri.isEmpty() ){
+			// UQAM Original code contained tow-dots ':' in place of '#'
+//            if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
+			if( XSD.anyURI.getURI().equals(datatypeUri) ){
+//				try {
+//					return literalCreationModel.createTypedLiteral( URLEncoder.encode(value, "UTF8"), datatypeUri);
+					return literalCreationModel.createTypedLiteral( value, datatypeUri);
+//				} catch (UnsupportedEncodingException e) {
+//					log.error(e, e);
+//				}
+			} else if ( XSD.xstring.getURI().equals(datatypeUri) ){
+				if( lang != null && lang.length() > 0 )	return ResourceFactory.createLangLiteral(value, lang);
+			}
+			return literalCreationModel.createTypedLiteral(value, datatypeUri);
+			// UQAM take into account the linguistic context
+		} else if( lang != null && lang.length() > 0 )
+			return ResourceFactory.createLangLiteral(value, lang);
+		return ResourceFactory.createPlainLiteral(value);
+	}
 
     public Map<String,String> getValidationErrors(){
         return validationErrors;
@@ -264,12 +294,31 @@ public class MultiValueEditSubmission {
         	for(String value:valueList) {
         		value = N3EditUtils.stripInvalidXMLChars(value);
                 //Add to array of literals corresponding to this variable
+        		/* UQAM OLD
                 if (!StringUtils.isEmpty(value)) {
                     literalsArray.add(createLiteral(
                                                 value,
                                                 field.getRangeDatatypeUri(),
                                                 field.getRangeLang()));
                 }
+                */
+        		/*
+        		 * UQAM Replaced by this to take the linguistic context into consideration.
+        		 */
+				if (!StringUtils.isEmpty(value)) {
+					String rangeLang = field.getRangeLang();  //UQAM  Default value
+					try {
+						if (_vreq != null ) {
+							rangeLang	= _vreq.getLocale().getLanguage() + "-"+_vreq.getLocale().getCountry();
+						}
+
+					} catch (Exception e) {
+					}
+					literalsArray.add(createLiteral(
+							value,
+							field.getRangeDatatypeUri(),
+							rangeLang));
+				}
         	}
         	literalsFromForm.put(var, literalsArray);
 

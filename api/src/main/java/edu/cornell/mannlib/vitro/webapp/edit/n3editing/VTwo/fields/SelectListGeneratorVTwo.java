@@ -55,6 +55,48 @@ public class SelectListGeneratorVTwo {
         }
     }
 
+    // UQAM Overcharge method for linguistic contexte processisng
+	public static Map<String,String> getOptions(
+			EditConfigurationVTwo editConfig,
+			String fieldName,
+			VitroRequest vreq){
+
+
+		if( editConfig == null ){
+			log.error( "fieldToSelectItemList() must be called with a non-null EditConfigurationVTwo ");
+			return Collections.emptyMap();
+		}
+		if( fieldName == null ){
+			log.error( "fieldToSelectItemList() must be called with a non-null fieldName");
+			return Collections.emptyMap();
+		}
+
+		FieldVTwo field = editConfig.getField(fieldName);
+		if (field==null) {
+			log.error("no field \""+fieldName+"\" found from editConfig.");
+			return Collections.emptyMap();
+		}
+
+		if( field.getFieldOptions() == null ){
+			return Collections.emptyMap();
+		}
+
+		try {
+			//UQAM need vreq instead of WebappDaoFactory
+			Map<String, String> parentClass = Collections.emptyMap();
+			FieldOptions fieldOptions = field.getFieldOptions();
+			// UQAM TODO - Only internationalization of ChildVClassesWithParent are implemented. For TODO, implement the internationalization for the rest of instanceof "FieldOptions"
+			if (fieldOptions instanceof ChildVClassesWithParent ) {
+				return ((ChildVClassesWithParent)fieldOptions).getOptions(editConfig,fieldName,vreq);
+			} else {
+				return fieldOptions.getOptions(editConfig,fieldName,vreq.getWebappDaoFactory());
+			}
+		} catch (Exception e) {
+			log.error("Error runing getFieldOptionis()",e);
+			return Collections.emptyMap();
+		}
+	}
+
 
     //Methods to sort the options map
     // from http://forum.java.sun.com/thread.jspa?threadID=639077&messageID=4250708

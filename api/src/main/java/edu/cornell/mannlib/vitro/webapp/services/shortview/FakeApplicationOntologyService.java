@@ -445,14 +445,26 @@ public class FakeApplicationOntologyService {
 	 * "display model". The query finds a preferred title for the individual.
 	 */
 	private static class FakeVivoPeopleDataGetter extends SparqlQueryDataGetter {
-		private static String QUERY_STRING = ""
+		//		private static String QUERY_STRING = ""
+		//				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
+		//				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
+		//				+ "SELECT ?pt  \n" + "WHERE {  \n"
+		//				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
+		//				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
+		//				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
+
+		/*
+		 * UQAM-Optimization New query including Linguistic context
+		 */
+		private static String QUERY_STRING_LANG = ""
 				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
 				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
 				+ "SELECT ?pt  \n" + "WHERE {  \n"
 				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
 				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
-				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
-
+				+ "    ?vTitle vcard:title ?pt . \n"
+				+ "    FILTER (lang(?pt) = '?langCtx' )  \n"
+				+ " } LIMIT 1";
 		private static final String FAKE_VIVO_PEOPLE_DATA_GETTER_URI = "http://FakeVivoPeopleDataGetter";
 
 		private static OntModel fakeDisplayModel = initializeFakeDisplayModel();
@@ -467,7 +479,7 @@ public class FakeApplicationOntologyService {
 			Property saveToVarProperty = m
 					.getProperty(DisplayVocabulary.SAVE_TO_VAR);
 
-			m.add(dataGetter, queryProperty, QUERY_STRING);
+			m.add(dataGetter, queryProperty, QUERY_STRING_LANG); //UQAM-Optimization Using query with linguistic context
 			m.add(dataGetter, saveToVarProperty, "extra");
 			return m;
 		}
@@ -475,18 +487,21 @@ public class FakeApplicationOntologyService {
 		private String individualUri;
 		private VitroRequest vreq;
 		private ServletContext ctx;
+		private String langCtx = "en-US";		
 
 		public FakeVivoPeopleDataGetter(VitroRequest vreq, String individualUri) {
-			super(vreq, fakeDisplayModel, "http://FakeVivoPeopleDataGetter");
+			super(vreq, initializeFakeDisplayModel(), "http://FakeVivoPeopleDataGetter");
 			this.individualUri = individualUri;
 			this.vreq = vreq;
 			this.ctx = vreq.getSession().getServletContext();
+			this.langCtx =  vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry(); // UQAM-Optimization add the linguistic context
 		}
 
 		@Override
 		public Map<String, Object> getData(Map<String, Object> pageData) {
 			Map<String, Object> parms = new HashMap<>();
 			parms.put("uri", individualUri);
+			parms.put("langCtx", langCtx); //UQAM-Optimization add the linguistic context
 
 			return super.getData(parms);
 		}
