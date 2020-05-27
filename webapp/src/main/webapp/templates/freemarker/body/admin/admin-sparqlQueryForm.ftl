@@ -29,7 +29,7 @@
 
 		<div class="options">
 			<input type="checkbox" id="download" name="download" value="true">
-			<label for="download"> Force download of results</label><br>		
+			<label for="download"> Save results to file</label><br>		
 		</div>
 
         <input class="submit" type="submit" value="Run Query" />

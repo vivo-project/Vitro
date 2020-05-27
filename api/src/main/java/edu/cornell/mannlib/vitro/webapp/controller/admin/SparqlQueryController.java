@@ -123,7 +123,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 			if (download) {	
 				String extension = getFilenameExtension(req, query, format);
 				resp.setHeader("Content-Transfer-Encoding", "binary");
-				resp.setHeader("Content-disposition", "attachment; filename=sparqlquery." + extension);
+				resp.setHeader("Content-disposition", "attachment; filename=query-results." + extension);
 			}
 
 			core.executeAndFormat(resp.getOutputStream());

@@ -22,7 +22,7 @@ public enum RdfResultMediaType {
 
 	JSON("application/json", false, "N3", "JSON", "json"),
 
-	JSON_LD("application/ld+json", false, "N3", "JSON", "json");
+	JSON_LD("application/ld+json", false, "N3", "JSON", "jsonld");
 
 	// ----------------------------------------------------------------------
 	// Keep a map of content types, for easy conversion back and forth
