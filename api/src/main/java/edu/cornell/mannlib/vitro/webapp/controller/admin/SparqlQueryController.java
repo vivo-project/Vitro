@@ -17,6 +17,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -75,8 +77,8 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 	private static final String[] SAMPLE_QUERY = { //
 			"", //
 			"#", //
-			"# This example query gets 20 geographic locations", //
-			"# and (if available) their labels", //
+			"i18n:sparql_query_description_0", //
+			"i18n:sparql_query_description_1", //
 			"#", //
 			"SELECT ?geoLocation ?label", //
 			"WHERE", //
@@ -193,9 +195,11 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 
 	@Override
 	protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
+		I18nBundle i18n = I18n.bundle(vreq);
+
 		Map<String, Object> bodyMap = new HashMap<>();
-		bodyMap.put("sampleQuery", buildSampleQuery(buildPrefixList(vreq)));
-		bodyMap.put("title", "SPARQL Query");
+		bodyMap.put("sampleQuery", buildSampleQuery(i18n, buildPrefixList(vreq)));
+		bodyMap.put("title", i18n.text("sparql_query_title"));
 		bodyMap.put("submitUrl", UrlBuilder.getUrl("admin/sparqlquery"));
 		return new TemplateResponseValues(TEMPLATE_NAME, bodyMap);
 	}
@@ -222,7 +226,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 		return prefixList;
 	}
 
-	private String buildSampleQuery(List<Prefix> prefixList) {
+	private String buildSampleQuery(I18nBundle i18n, List<Prefix> prefixList) {
 		StringWriter sw = new StringWriter();
 		PrintWriter writer = new PrintWriter(sw);
 
@@ -230,6 +234,10 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 			writer.println(p);
 		}
 		for (String line : SAMPLE_QUERY) {
+			if (line.startsWith("i18n:")) {
+			    // Get i18n translation
+				line =  i18n.text(line.substring("i18n:".length()));
+			}
 			writer.println(line);
 		}
 
