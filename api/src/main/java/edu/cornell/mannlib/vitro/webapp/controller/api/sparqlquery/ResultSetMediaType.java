@@ -12,15 +12,15 @@ import java.util.Map;
  * SELECT and ASK).
  */
 public enum ResultSetMediaType {
-	TEXT("text/plain", true, "TEXT", null),
+	TEXT("text/plain", true, "TEXT", null, "txt"),
 
-	CSV("text/csv", true, "CSV", null),
+	CSV("text/csv", true, "CSV", null, "csv"),
 
-	TSV("text/tab-separated-values", false, "CSV", "tsv"),
+	TSV("text/tab-separated-values", false, "CSV", "tsv", "tsv"),
 
-	XML("application/sparql-results+xml", true, "XML", null),
+	XML("application/sparql-results+xml", true, "XML", null, "xml"),
 
-	JSON("application/sparql-results+json", true, "JSON", null);
+	JSON("application/sparql-results+json", true, "JSON", null, "json");
 
 	// ----------------------------------------------------------------------
 	// Keep a map of content types, for easy conversion back and forth
@@ -78,12 +78,18 @@ public enum ResultSetMediaType {
 	 */
 	private final String jenaResponseFormat;
 
+	/**
+	 * What extension should be used if file is downloaded?
+	 */
+	private final String extension;
+
 	private ResultSetMediaType(String contentType, boolean nativeFormat,
-			String rdfServiceFormat, String jenaResponseFormat) {
+			String rdfServiceFormat, String jenaResponseFormat, String extension) {
 		this.contentType = contentType;
 		this.nativeFormat = nativeFormat;
 		this.rdfServiceFormat = rdfServiceFormat;
 		this.jenaResponseFormat = jenaResponseFormat;
+		this.extension = extension;
 	}
 
 	public String getContentType() {
@@ -100,6 +106,10 @@ public enum ResultSetMediaType {
 
 	public String getJenaResponseFormat() {
 		return jenaResponseFormat;
+	}
+
+	public String getExtension() {
+		return extension;
 	}
 
 }

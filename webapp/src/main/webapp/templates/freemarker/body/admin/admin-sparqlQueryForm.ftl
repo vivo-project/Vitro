@@ -27,6 +27,11 @@
         	 <label><input type='radio' name='rdfResultFormat' value='application/json'>JSON-LD</label>
         </div>
 
+		<div class="options">
+			<input type="checkbox" id="download" name="download" value="true">
+			<label for="download"> Save results to file</label><br>		
+		</div>
+
         <input class="submit" type="submit" value="Run Query" />
     </form>
 </div><!-- content -->

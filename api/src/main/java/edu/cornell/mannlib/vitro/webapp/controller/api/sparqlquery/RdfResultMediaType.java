@@ -12,17 +12,17 @@ import java.util.Map;
  * and DESCRIBE).
  */
 public enum RdfResultMediaType {
-	TEXT("text/plain", true, "NTRIPLE", "N-TRIPLE"),
+	TEXT("text/plain", true, "NTRIPLE", "N-TRIPLE", "nt"),
 
-	RDF_XML("application/rdf+xml", true, "RDFXML", "RDF/XML"),
+	RDF_XML("application/rdf+xml", true, "RDFXML", "RDF/XML", "rdf"),
 
-	N3("text/n3", true, "N3", "N3"),
+	N3("text/n3", true, "N3", "N3", "n3"),
 
-	TTL("text/turtle", false, "N3", "TTL"),
+	TTL("text/turtle", false, "N3", "TTL", "ttl"),
 
-	JSON("application/json", false, "N3", "JSON"),
+	JSON("application/json", false, "N3", "JSON", "json"),
 
-	JSON_LD("application/ld+json", false, "N3", "JSON");
+	JSON_LD("application/ld+json", false, "N3", "JSON", "jsonld");
 
 	// ----------------------------------------------------------------------
 	// Keep a map of content types, for easy conversion back and forth
@@ -79,12 +79,18 @@ public enum RdfResultMediaType {
 	 */
 	private final String jenaResponseFormat;
 
+	/**
+	 * What extension should be used if file is downloaded?
+	 */
+	private final String extension;
+
 	private RdfResultMediaType(String contentType, boolean nativeFormat,
-			String serializationFormat, String jenaResponseFormat) {
+			String serializationFormat, String jenaResponseFormat, String extension) {
 		this.contentType = contentType;
 		this.nativeFormat = nativeFormat;
 		this.serializationFormat = serializationFormat;
 		this.jenaResponseFormat = jenaResponseFormat;
+		this.extension = extension;
 	}
 
 	public String getContentType() {
@@ -101,6 +107,10 @@ public enum RdfResultMediaType {
 
 	public String getJenaResponseFormat() {
 		return jenaResponseFormat;
+	}
+
+	public String getExtension() {
+		return extension;
 	}
 
 }
