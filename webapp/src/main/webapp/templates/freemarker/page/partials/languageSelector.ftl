@@ -6,7 +6,7 @@
     <#list selectLocale.locales as locale>
 
             <li <#if locale.selected>status="selected"</#if>>
-                       <a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}">${locale.label?capitalize}<#if locale.country?has_content> (${locale.country})</#if></a>
+                	<a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}">${locale.label?capitalize}<#if locale.country?has_content> (${locale.country})</#if></a>
             </li>
     </#list>
     </ul>
