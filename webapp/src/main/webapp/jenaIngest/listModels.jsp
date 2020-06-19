@@ -56,7 +56,7 @@ function init(){
                 <input type="hidden" name="action" value="loadRDFData"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="load RDF data"/>
+                <input type="submit" name="submit" value="add/remove RDF data"/>
             </form>
             </td>
             <td>
