@@ -110,11 +110,11 @@ public class UpdateKnowledgeBase {
 			settings.setDisplayModel(ModelAccess.on(ctx).getOntModel(DISPLAY));
 			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxModelDir()));
 			settings.setOldTBoxModel(oldTBoxModel);
-			OntModel newTBoxModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "filegraph").toString());
+			OntModel newTBoxModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "core", "tbox", "filegraph").toString());
 			settings.setNewTBoxModel(newTBoxModel);
 			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxAnnotationsDir()));
 			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
-			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "firsttime").toString());
+			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "core", "tbox", "firsttime").toString());
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 			settings.setRDFService(ModelAccess.on(ctx).getRDFService());
 
@@ -224,7 +224,7 @@ public class UpdateKnowledgeBase {
 		settings.setLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate", "log")).toString());
 		settings.setErrorLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate.error", "log")).toString());
 
-		Path qualifiedPropertyConfigFile = getFilePath(homeDir, "rdf", "display", "firsttime", "PropertyConfig.n3");
+		Path qualifiedPropertyConfigFile = getFilePath(homeDir, "rdf", "core", "display", "firsttime", "PropertyConfig.n3");
 		settings.setQualifiedPropertyConfigFile(qualifiedPropertyConfigFile.toString());
 	}
 

@@ -27,7 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntMo
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedOntModel;
 
 /**
- * PropertyConfig.n3 has moved to rdf/display/firsttime, so it is only pulled in
+ * PropertyConfig.n3 has moved to rdf/core/display/firsttime, so it is only pulled in
  * if the display model is empty.
  *
  * Let's pull it in one time, anyway.
@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedOntMode
  * firsttime. If we can't find the file, warn
  */
 public class FauxPropertiesUpdater {
-	private static final String[] PATH_TO_PROPERTY_CONFIG = { "rdf", "display",
+	private static final String[] PATH_TO_PROPERTY_CONFIG = { "rdf", "core", "display",
 			"firsttime", "PropertyConfig.n3" };
 
 	private static final Resource DISPLAY_MODEL = createResource(ModelNames.DISPLAY);
