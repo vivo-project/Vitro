@@ -32,7 +32,7 @@
 			<label for="download"> ${i18n().sparql_query_save_results}</label><br>
 		</div>
 
-        <input class="submit" type="submit" value="Run Query" />
+        <input class="submit" type="submit" value="${i18n().sparql_query_run_query}" />
     </form>
 </div><!-- content -->
 
