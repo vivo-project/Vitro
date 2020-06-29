@@ -10,6 +10,7 @@ import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 public class ConstantFieldOptions implements FieldOptions {
 
@@ -54,7 +55,8 @@ public class ConstantFieldOptions implements FieldOptions {
     public Map<String, String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wDaoFact) throws Exception {
+            WebappDaoFactory wDaoFact,
+            I18nBundle i18n) throws Exception {
         // originally not auto-sorted but sorted now, and empty values not removed or replaced
         HashMap <String,String> optionsMap = new LinkedHashMap<String,String>();
 

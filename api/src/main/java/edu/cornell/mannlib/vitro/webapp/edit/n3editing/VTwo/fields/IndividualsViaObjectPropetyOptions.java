@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -77,7 +78,8 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
     public Map<String, String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wDaoFact) {
+            WebappDaoFactory wDaoFact,
+            I18nBundle i18n) {
         HashMap<String, String> optionsMap = new LinkedHashMap<String, String>();
         int optionsCount = 0;
 

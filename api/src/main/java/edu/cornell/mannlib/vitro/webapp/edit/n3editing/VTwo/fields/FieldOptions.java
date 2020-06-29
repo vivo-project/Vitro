@@ -6,6 +6,7 @@ import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 /**
  * Represents an object that can return a list of options
@@ -28,7 +29,8 @@ public interface FieldOptions {
     public Map<String,String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wDaoFact) throws Exception;
+            WebappDaoFactory wDaoFact,
+            I18nBundle i18n) throws Exception;
 
     /*
      * Certain field options may have custom sorting requirements. If no sorting requirements exist,
