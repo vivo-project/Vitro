@@ -87,14 +87,14 @@
 </#if>
 <script>
     var i18nStringsUriRdf = {
-        shareProfileUri: '${i18n().share_profile_uri}',
-        viewRDFProfile: '${i18n().view_profile_in_rdf}',
-        closeString: '${i18n().close}'
+        shareProfileUri: "${i18n().share_profile_uri}",
+        viewRDFProfile: "${i18n().view_profile_in_rdf}",
+        closeString: "${i18n().close}"
     };
 	var i18nStrings = {
-	    displayLess: '${i18n().display_less}',
-	    displayMoreEllipsis: '${i18n().display_more_ellipsis}',
-	    showMoreContent: '${i18n().show_more_content}',
+	    displayLess: "${i18n().display_less}",
+	    displayMoreEllipsis: "${i18n().display_more_ellipsis}",
+	    showMoreContent: "${i18n().show_more_content}",
 	};
 
 </script>

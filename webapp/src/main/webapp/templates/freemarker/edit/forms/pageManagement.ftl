@@ -176,21 +176,21 @@
 <#include "pageManagement--customDataScript.ftl">
 <script>
     var i18nStrings = {
-        browseClassGroup: '${i18n().browse_class_group}',
-        fixedHtml: '${i18n().fixed_html}',
-        sparqlResults: '${i18n().sparql_query_results}',
-        searchIndividuals: '${i18n().search_individual_results}',
-        orString: '${i18n().or}',
-        deleteString: '${i18n().delete}',
-        allCapitalized: '${i18n().all_capitalized}',
-        mapProcessorError: '${i18n().map_processor_error}',
-        codeProcessingError: '${i18n().code_processing_error}',
-        supplyName: '${i18n().supply_name}',
-        supplyPrettyUrl: '${i18n().supply_url}',
-        startUrlWithSlash: '${i18n().start_url_with_slash}',
-        supplyTemplate: '${i18n().supply_template}',
-        selectContentType: '${i18n().select_content_type}',
-        multipleContentWithDefaultTemplateError: '${i18n().multiple_content_default_template_error}'
+        browseClassGroup: "${i18n().browse_class_group}",
+        fixedHtml: "${i18n().fixed_html}",
+        sparqlResults: "${i18n().sparql_query_results}",
+        searchIndividuals: "${i18n().search_individual_results}",
+        orString: "${i18n().or}",
+        deleteString: "${i18n().delete}",
+        allCapitalized: "${i18n().all_capitalized}",
+        mapProcessorError: "${i18n().map_processor_error}",
+        codeProcessingError: "${i18n().code_processing_error}",
+        supplyName: "${i18n().supply_name}",
+        supplyPrettyUrl: "${i18n().supply_url}",
+        startUrlWithSlash: "${i18n().start_url_with_slash}",
+        supplyTemplate: "${i18n().supply_template}",
+        selectContentType: "${i18n().select_content_type}",
+        multipleContentWithDefaultTemplateError: "${i18n().multiple_content_default_template_error}"
     };
 </script>
 
