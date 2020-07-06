@@ -166,7 +166,7 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 		String bound = text;
 		for (String key : merged.keySet()) {
 			String value = merged.get(key);
-			if (value.startsWith("http:")) {
+			if (value.startsWith("http://") || value.startsWith("https://")) {
 				/*
 				 * UQAM-Optimization if the "value" looks like an URI then wrap the value with the characters '<' '>'
 				 *
