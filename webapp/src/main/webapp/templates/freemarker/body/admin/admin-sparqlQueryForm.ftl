@@ -3,14 +3,14 @@
 <#-- Template that presents the SPARQL query form. -->
 
 <div id="content" class="sparqlform">
-    <h2>SPARQL Query</h2>
+    <h2>${i18n().sparql_query_title}</h2>
     <form action='${submitUrl}?posted' method="post">
-        <h3>Query:</h3>
+        <h3>${i18n().sparql_query_header}:</h3>
 
         <textarea name='query' rows='30' cols='100' class="span-23 maxWidth" id="query-area">${sampleQuery}</textarea>
 
         <div class="options">
-        	 <h3>Format for SELECT and ASK query results:</h3>
+			 <h3>${i18n().sparql_query_select_ask_results}:</h3>
         	 <label><input type='radio' name='resultFormat' value='text/plain' checked>RS_TEXT</label>
         	 <label><input type='radio' name='resultFormat' value='text/csv'>CSV</label>
         	 <label><input type='radio' name='resultFormat' value='text/tab-separated-values'>TSV</label>
@@ -19,7 +19,7 @@
         </div>
 
         <div class="options">
-        	 <h3>Format for CONSTRUCT and DESCRIBE query results:</h3>
+			 <h3>${i18n().sparql_query_construct_describe_results}:</h3>
         	 <label><input type='radio' name='rdfResultFormat' value='text/plain'>N-Triples</label>
         	 <label><input type='radio' name='rdfResultFormat' value='application/rdf+xml' checked>RDF/XML</label>
         	 <label><input type='radio' name='rdfResultFormat' value='text/n3'>N3</label>
@@ -27,7 +27,12 @@
         	 <label><input type='radio' name='rdfResultFormat' value='application/json'>JSON-LD</label>
         </div>
 
-        <input class="submit" type="submit" value="Run Query" />
+		<div class="options">
+			<input type="checkbox" id="download" name="download" value="true">
+			<label for="download"> ${i18n().sparql_query_save_results}</label><br>
+		</div>
+
+        <input class="submit" type="submit" value="${i18n().sparql_query_run_query}" />
     </form>
 </div><!-- content -->
 

@@ -1,0 +1,57 @@
+# baseURI: http://vitro.mannlib.cornell.edu/ns/vitro/public
+
+@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/public#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://vitro.mannlib.cornell.edu/ns/vitro/public>
+  a owl:Ontology ;
+  rdfs:label "Vitro public constructs ontology" ;
+  owl:versionInfo 0.1 ;
+.
+:File
+  a owl:Class ;
+.
+:FileByteStream
+  a owl:Class ;
+.
+:attribution
+  a owl:DatatypeProperty ;
+  rdfs:domain :File ;
+  rdfs:range xsd:string ;
+.
+:directDownloadUrl
+  a owl:DatatypeProperty ;
+  rdfs:domain :FileByteStream ;
+  rdfs:range xsd:string ;
+.
+:downloadLocation
+  a owl:ObjectProperty ;
+  rdfs:domain :File ;
+  rdfs:range :FileByteStream ;
+.
+:filename
+  a owl:DatatypeProperty ;
+  rdfs:domain :File ;
+  rdfs:range xsd:string ;
+.
+:image
+  a owl:ObjectProperty ;
+  rdfs:range :File ;
+.
+:mainImage
+  a owl:ObjectProperty ;
+  rdfs:range :File ;
+.
+:mimeType
+  a owl:DatatypeProperty ;
+  rdfs:domain :File ;
+  rdfs:range xsd:string ;
+.
+:thumbnailImage
+  a owl:ObjectProperty ;
+  rdfs:domain :File ;
+  rdfs:range :File ;
+.

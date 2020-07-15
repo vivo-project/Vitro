@@ -270,6 +270,7 @@ public class RDFUploadController extends JenaIngestController {
         String modelName = request.getParameter("modelName");
         String docLoc = request.getParameter("docLoc");
         String languageStr = request.getParameter("language");
+        boolean remove = "remove".equals(request.getParameter("mode"));
         ModelMaker maker = getModelMaker(request);
 
         String bodyJsp;
@@ -279,7 +280,7 @@ public class RDFUploadController extends JenaIngestController {
         } else {
             RDFService rdfService = getRDFService(request, maker, modelName);
             try {
-                doLoadRDFData(modelName, docLoc, filePath, languageStr, rdfService);
+                doLoadRDFData(modelName, docLoc, filePath, languageStr, rdfService, remove);
             } finally {
                 rdfService.close();
             }
@@ -378,12 +379,19 @@ public class RDFUploadController extends JenaIngestController {
                                String docLoc,
                                String filePath,
                                String language,
-                               RDFService rdfService) {
+                               RDFService rdfService,
+                               boolean remove) {
         try {
             if ( (docLoc != null) && (docLoc.length()>0) ) {
                 URL docLocURL = new URL(docLoc);
                 InputStream in = docLocURL.openStream();
-                readIntoModel(in, language, rdfService, modelName);
+                if(!remove) {
+                    readIntoModel(in, language, rdfService,
+                            modelName);
+                } else {
+                    removeFromModel(in, language, rdfService,
+                            modelName);
+                }
             } else if ( (filePath != null) && (filePath.length()>0) ) {
                 File file = new File(filePath);
                 File[] files;
@@ -396,8 +404,13 @@ public class RDFUploadController extends JenaIngestController {
                 for (File currentFile : files) {
                     log.debug("Reading file " + currentFile.getName());
                     try {
-                        readIntoModel(fileStream.getInputStream(), language,
-                                rdfService, modelName);
+                        if(!remove) {
+                            readIntoModel(fileStream.getInputStream(), language, rdfService,
+                                    modelName);
+                        } else {
+                            removeFromModel(fileStream.getInputStream(), language, rdfService,
+                                    modelName);
+                        }
                         fileStream.delete();
                     } catch (IOException ioe) {
                         String errMsg = "Error loading RDF from " +

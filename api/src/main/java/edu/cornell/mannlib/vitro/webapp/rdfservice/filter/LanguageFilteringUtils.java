@@ -13,9 +13,6 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
-
 /**
  * Some methods that will come in handy when dealing with Language Filtering
  */
@@ -43,17 +40,14 @@ public class LanguageFilteringUtils {
 	}
 
 	/**
-	 * Add a Language Filtering layer to an OntModel by treating it as an RDFService.
+	 * Add a Language Filtering layer to an OntModel
 	 */
 	public static OntModel wrapOntModelInALanguageFilter(OntModel rawModel,
 			ServletRequest req) {
-		/** This is some nasty layering. Could we do this more easily? */
 		List<String> languages = localesToLanguages(req.getLocales());
 		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
-				RDFServiceGraph.createRDFServiceModel(
-						new RDFServiceGraph(
-								new LanguageFilteringRDFService(
-										new RDFServiceModel(rawModel), languages))));
+		        ModelFactory.createModelForGraph(new LanguageFilteringGraph(
+		                rawModel.getGraph(), languages)));
 	}
 
 	private LanguageFilteringUtils() {

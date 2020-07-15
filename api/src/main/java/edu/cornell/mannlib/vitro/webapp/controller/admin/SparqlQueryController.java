@@ -17,6 +17,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,6 +42,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.RdfResultMediaType;
+import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.ResultSetMediaType;
 
 /**
  * Present the SPARQL Query form, and execute the queries.
@@ -73,8 +77,8 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 	private static final String[] SAMPLE_QUERY = { //
 			"", //
 			"#", //
-			"# This example query gets 20 geographic locations", //
-			"# and (if available) their labels", //
+			"i18n:sparql_query_description_0", //
+			"i18n:sparql_query_description_1", //
 			"#", //
 			"SELECT ?geoLocation ?label", //
 			"WHERE", //
@@ -110,11 +114,20 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 				.getRDFService();
 
 		String queryString = req.getParameter("query");
+		boolean download = Boolean.parseBoolean(req.getParameter("download"));
+		Query query = SparqlQueryUtils.create(queryString);
 		try {
-			String format = interpretRequestedFormats(req, queryString);
+			String format = interpretRequestedFormats(req, query);
 			SparqlQueryApiExecutor core = SparqlQueryApiExecutor.instance(
 					rdfService, queryString, format);
 			resp.setContentType(core.getMediaType());
+
+			if (download) {	
+				String extension = getFilenameExtension(req, query, format);
+				resp.setHeader("Content-Transfer-Encoding", "binary");
+				resp.setHeader("Content-disposition", "attachment; filename=query-results." + extension);
+			}
+
 			core.executeAndFormat(resp.getOutputStream());
 		} catch (InvalidQueryTypeException e) {
 			do400BadRequest("Query type is not SELECT, ASK, CONSTRUCT, "
@@ -132,8 +145,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 	}
 
 	private String interpretRequestedFormats(HttpServletRequest req,
-			String queryString) throws NotAcceptableException {
-		Query query = SparqlQueryUtils.create(queryString);
+			Query query) throws NotAcceptableException {
 		String parameterName = (query.isSelectType() || query.isAskType()) ? "resultFormat"
 				: "rdfResultFormat";
 		String parameterValue = req.getParameter(parameterName);
@@ -143,6 +155,20 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 		} else {
 			return parameterValue;
 		}
+	}
+
+	private String getFilenameExtension(HttpServletRequest req, 
+			Query query, String format) {
+		String extension;
+		if (query.isSelectType() || query.isAskType()) {
+			ResultSetMediaType mediaType = ResultSetMediaType.fromContentType(format);
+			extension = mediaType.getExtension();
+		}
+		else {
+			RdfResultMediaType mediaType = RdfResultMediaType.fromContentType(format);
+			extension = mediaType.getExtension();
+		}
+		return extension;
 	}
 
 	private void do400BadRequest(String message, HttpServletResponse resp)
@@ -169,9 +195,11 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 
 	@Override
 	protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
+		I18nBundle i18n = I18n.bundle(vreq);
+
 		Map<String, Object> bodyMap = new HashMap<>();
-		bodyMap.put("sampleQuery", buildSampleQuery(buildPrefixList(vreq)));
-		bodyMap.put("title", "SPARQL Query");
+		bodyMap.put("sampleQuery", buildSampleQuery(i18n, buildPrefixList(vreq)));
+		bodyMap.put("title", i18n.text("sparql_query_title"));
 		bodyMap.put("submitUrl", UrlBuilder.getUrl("admin/sparqlquery"));
 		return new TemplateResponseValues(TEMPLATE_NAME, bodyMap);
 	}
@@ -198,7 +226,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 		return prefixList;
 	}
 
-	private String buildSampleQuery(List<Prefix> prefixList) {
+	private String buildSampleQuery(I18nBundle i18n, List<Prefix> prefixList) {
 		StringWriter sw = new StringWriter();
 		PrintWriter writer = new PrintWriter(sw);
 
@@ -206,6 +234,10 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 			writer.println(p);
 		}
 		for (String line : SAMPLE_QUERY) {
+			if (line.startsWith("i18n:")) {
+			    // Get i18n translation
+				line =  i18n.text(line.substring("i18n:".length()));
+			}
 			writer.println(line);
 		}
 

@@ -9,9 +9,12 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+
+import stubs.javax.servlet.http.HttpServletRequestStub;
 
 public class AntiXssValidationTest {
 
@@ -29,8 +32,10 @@ public class AntiXssValidationTest {
         String[] vals= { "some sort of string" };
         params.put("X", vals);
 
+        VitroRequest vreq = createRequestWithParameters(params);
+
         MultiValueEditSubmission mvEditSub =
-            new MultiValueEditSubmission(params,eConf);
+            new MultiValueEditSubmission(vreq,eConf);
 
         Map<String, String> res = validator.validate(eConf, mvEditSub);
         Assert.assertEquals(null, res);
@@ -53,8 +58,10 @@ public class AntiXssValidationTest {
         String[] strings2 = {"no problem 2"};
         params.put("Z", strings2 );
 
+        VitroRequest vreq = createRequestWithParameters(params);
+
         MultiValueEditSubmission mvEditSub =
-            new MultiValueEditSubmission(params,eConf);
+            new MultiValueEditSubmission(vreq,eConf);
 
         Map<String, String> res = validator.validate(eConf, mvEditSub);
         Assert.assertNull( res );
@@ -72,8 +79,10 @@ public class AntiXssValidationTest {
         Map<String, String[]> params = new HashMap<String,String[]>();
         params.put("X", strings );
 
+        VitroRequest vreq = createRequestWithParameters(params);
+
         MultiValueEditSubmission mvEditSub =
-            new MultiValueEditSubmission(params,eConf);
+            new MultiValueEditSubmission(vreq,eConf);
 
         return validator.validate(eConf, mvEditSub);
     }
@@ -125,5 +134,15 @@ public class AntiXssValidationTest {
         Assert.assertNotNull(result);
     }
 
+    private VitroRequest createRequestWithParameters(Map<String, String[]> parameters) {
+        HttpServletRequestStub req = new HttpServletRequestStub();
+        for (String key : parameters.keySet()) {
+            for (String value : parameters.get(key)) {
+                req.addParameter(key, value);
+            }
+        }
+
+        return new VitroRequest(req);
+    }
 
 }

@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -779,6 +780,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     return labelLit;
                 }
                 if ((lang != null) && (lang.equals(labelLanguage))) {
+                    return labelLit;
+                } else
+                    /*
+                     * UQAM-Linguistic-Management
+                     * Check for country-part of lang (ex: 'en' for default consideration of labelLanguage in english but not encoded by 'en-US' most case of labels in vivo.owl)
+                     */
+                	if ((lang != null) && (Arrays.asList(lang.split("-")).get(0).equals(labelLanguage))) {
                     return labelLit;
                 }
             }

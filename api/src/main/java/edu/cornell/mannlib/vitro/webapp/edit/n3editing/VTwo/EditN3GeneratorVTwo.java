@@ -366,6 +366,8 @@ public class EditN3GeneratorVTwo {
         {
             sbuff.append("@") ;
             sbuff.append(lang) ;
+            //   added by UQAM to exit at this point without adding datatype
+            return sbuff.toString() ;
         }
 
         // Format the datatype
