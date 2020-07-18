@@ -254,10 +254,10 @@ public abstract class RDFServiceImpl implements RDFService {
             literalBuff.append("\"");
             pyString(literalBuff, node.getLiteralLexicalForm());
             literalBuff.append("\"");
-            if (node.getLiteralDatatypeURI() != null) {
-                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
+            if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
+            } else if (node.getLiteralDatatypeURI() != null) {
+                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
             }
             return literalBuff.toString();
         } else {
