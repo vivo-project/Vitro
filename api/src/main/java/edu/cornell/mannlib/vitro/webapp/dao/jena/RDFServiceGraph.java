@@ -290,10 +290,10 @@ public class RDFServiceGraph implements GraphWithPerform {
             literalBuff.append("\"");
             pyString(literalBuff, node.getLiteralLexicalForm());
             literalBuff.append("\"");
-            if (node.getLiteralDatatypeURI() != null) {
-                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
+            if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
+            } else if (node.getLiteralDatatypeURI() != null) {
+                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
             }
             return literalBuff.toString();
         } else {
