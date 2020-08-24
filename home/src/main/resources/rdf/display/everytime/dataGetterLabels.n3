@@ -1,20 +1,14 @@
-# baseURI: http://vitro.mannlib.cornell.edu/ns/vitro/dataGetterLabels
-
-@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/dataGetterLabels#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# $This file is distributed under the terms of the license in LICENSE$
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter>
-  rdfs:label "Browse Page" ;
-.
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData>
-  rdfs:label "Class Group Page" ;
-.
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter>
-  rdfs:label "Class Group Page - Selected Classes" ;
-.
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>
-  rdfs:label "Sparql Query Results" ;
-.
+#Data getter type labels
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData>  rdfs:label "Class Group Page" .
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> rdfs:label "Browse Page" .
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter> rdfs:label "Class Group Page - Selected Classes" .
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter> rdfs:label "Sparql Query Results" .
+
+
+

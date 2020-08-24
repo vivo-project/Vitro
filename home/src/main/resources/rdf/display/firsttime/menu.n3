@@ -1,31 +1,38 @@
-# baseURI: http://vitro.mannlib.cornell.edu/ns/vitro/menu
+# $This file is distributed under the terms of the license in LICENSE$
 
-@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/menu#> .
-@prefix action: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
-@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix action: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+
+### This file defines the default menu for vitro. ###
+
+#### Default Menu ####
 
 display:DefaultMenu
-  a display:MainMenu ;
-  display:hasElement display:HomeMenuItem ;
-.
-display:Home
-  a display:HomePage ;
-  a display:Page ;
-  display:cannotDeletePage "true" ;
-  display:hasDataGetter display:homeDataGetter ;
-  display:title "Home" ;
-  display:urlMapping "/" ;
-.
+    a  display:MainMenu ;
+    display:hasElement display:HomeMenuItem .
+
+#### Menu Items for Default Menu ####
+
 display:HomeMenuItem
-  a display:NavigationElement ;
-  display:linkText "Home" ;
-  display:menuPosition 1 ;
-  display:toPage display:Home ;
-.
-display:homeDataGetter
-  a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> ;
-.
+    a display:NavigationElement ;
+    display:menuPosition 1;
+    display:linkText "Home";
+    display:toPage display:Home .
+
+########## Pages ############
+
+display:Home
+    a display:HomePage ;
+    a display:Page ;
+    display:title "Home" ;
+    display:urlMapping "/" ;
+    display:hasDataGetter display:homeDataGetter;
+    display:cannotDeletePage "true" .
+
+########## Data Getter ############
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#homeDataGetter>
+      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> .
