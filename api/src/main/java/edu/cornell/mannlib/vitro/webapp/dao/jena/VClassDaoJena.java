@@ -96,7 +96,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     Restriction rest = cls.asRestriction();
                     OntProperty onProperty = rest.getOnProperty();
                     StringBuilder labelStr = new StringBuilder();
-                    labelStr.append(format("%s %s ", i18n.text("restrition"), i18n.text("on")))
+                    labelStr.append(format("%s %s ", i18n.text("restriction"), i18n.text("on")))
                         .append(getLabelOrId(onProperty))
                         .append(": ");
                     if (rest.isAllValuesFromRestriction() || rest.isSomeValuesFromRestriction()) {
