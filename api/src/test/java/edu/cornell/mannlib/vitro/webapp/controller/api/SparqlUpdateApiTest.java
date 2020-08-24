@@ -73,7 +73,6 @@ public class SparqlUpdateApiTest extends AbstractTestClass {
         try {
             if(ds.supportsTransactions()) {
                 ds.begin(ReadWrite.WRITE);
-                System.out.println("yep");
             }
             UpdateAction.execute(UpdateFactory.create(updateStr1), graphStore);
         } finally {
