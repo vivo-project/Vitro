@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 import java.util.List;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 public interface WebappDaoFactory {
