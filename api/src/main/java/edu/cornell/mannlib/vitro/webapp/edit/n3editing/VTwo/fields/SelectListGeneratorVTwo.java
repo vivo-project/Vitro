@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,7 +27,8 @@ public class SelectListGeneratorVTwo {
     public static Map<String,String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wDaoFact){
+            WebappDaoFactory wDaoFact,
+            I18nBundle i18n){
 
 
         if( editConfig == null ){
@@ -48,7 +51,7 @@ public class SelectListGeneratorVTwo {
         }
 
         try {
-            return field.getFieldOptions().getOptions(editConfig,fieldName,wDaoFact);
+            return field.getFieldOptions().getOptions(editConfig,fieldName,wDaoFact,i18n);
         } catch (Exception e) {
             log.error("Error runing getFieldOptionis()",e);
             return Collections.emptyMap();
@@ -56,6 +59,7 @@ public class SelectListGeneratorVTwo {
     }
 
     // UQAM Overcharge method for linguistic contexte processisng
+    // AWoods: This method appears to never be invoked.
 	public static Map<String,String> getOptions(
 			EditConfigurationVTwo editConfig,
 			String fieldName,
@@ -85,12 +89,7 @@ public class SelectListGeneratorVTwo {
 			//UQAM need vreq instead of WebappDaoFactory
 			Map<String, String> parentClass = Collections.emptyMap();
 			FieldOptions fieldOptions = field.getFieldOptions();
-			// UQAM TODO - Only internationalization of ChildVClassesWithParent are implemented. For TODO, implement the internationalization for the rest of instanceof "FieldOptions"
-			if (fieldOptions instanceof ChildVClassesWithParent ) {
-				return ((ChildVClassesWithParent)fieldOptions).getOptions(editConfig,fieldName,vreq);
-			} else {
-				return fieldOptions.getOptions(editConfig,fieldName,vreq.getWebappDaoFactory());
-			}
+			return fieldOptions.getOptions(editConfig,fieldName,vreq.getWebappDaoFactory(), I18n.bundle(vreq));
 		} catch (Exception e) {
 			log.error("Error runing getFieldOptionis()",e);
 			return Collections.emptyMap();
