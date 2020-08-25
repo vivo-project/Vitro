@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.edit.listener.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
