@@ -30,6 +30,8 @@ public class BasicValidationVTwo {
 
     public final static String REQUIRED_FIELD_EMPTY_MSG = "required_field_empty_msg";
 
+    public final static String DATA_NOT_PAST_MSG = "data_not_past_msg";
+
     private I18nBundle i18n;
 
     Map<String, List<String>> varsToValidations;
@@ -100,7 +102,7 @@ public class BasicValidationVTwo {
                     //If no literals and this field was required, this is an error message
                     //and can return
                     if((literals == null || literals.size() == 0) && isRequiredField) {
-                    	errors.put(name, i18n.text("required_field_empty_msg"));
+                    	errors.put(name, i18n.text(REQUIRED_FIELD_EMPTY_MSG));
                         break;
                     }
                     //Loop through literals if literals exist
@@ -119,7 +121,7 @@ public class BasicValidationVTwo {
 		                    // incorrectly generate errors.
 		                    if (isEmpty(value)) {
 		                        if (isRequiredField) {
-		                           errors.put(name, i18n.text("required_field_empty_msg"));
+		                           errors.put(name, i18n.text(REQUIRED_FIELD_EMPTY_MSG));
 		                        }
 		                        break;
 		                    }
@@ -180,7 +182,7 @@ public class BasicValidationVTwo {
         // This case may be needed for validation of other field types.
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( isEmpty(value) )
-                return i18n.text("required_field_empty_msg");
+                return i18n.text(REQUIRED_FIELD_EMPTY_MSG);
         }
         // Format validation
         else if("isDate".equalsIgnoreCase(validationType)){
@@ -222,7 +224,7 @@ public class BasicValidationVTwo {
         		dayParamStr = value.substring(monthDash + 1, value.length());
         		inputC.set(Integer.parseInt(yearParamStr), Integer.parseInt(monthParamStr) - 1, Integer.parseInt(dayParamStr));
         		if(inputC.before(c)) {
-            		return i18n.text("data_not_past_msg");
+            		return i18n.text(DATA_NOT_PAST_MSG);
             		//Returning null makes the error message "field is empty" display instead
             		//return null;
             	} else {
