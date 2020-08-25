@@ -96,7 +96,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     Restriction rest = cls.asRestriction();
                     OntProperty onProperty = rest.getOnProperty();
                     StringBuilder labelStr = new StringBuilder();
-                    labelStr.append(format("%s %s ", i18n.text("restriction"), i18n.text("on")))
+                    labelStr.append(format("%s ", i18n.text("restriction_on")))
                         .append(getLabelOrId(onProperty))
                         .append(": ");
                     if (rest.isAllValuesFromRestriction() || rest.isSomeValuesFromRestriction()) {
@@ -104,11 +104,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         if (rest.isAllValuesFromRestriction()) {
                             AllValuesFromRestriction avfRest = rest.asAllValuesFromRestriction();
                             fillerRes = avfRest.getAllValuesFrom();
-                            labelStr.append(format("%s %s ", i18n.text("all"), i18n.text("values_from")));
+                            labelStr.append(format("%s ", i18n.text("all_values_from")));
                         } else {
                             SomeValuesFromRestriction svfRest = rest.asSomeValuesFromRestriction();
                             fillerRes = svfRest.getSomeValuesFrom();
-                            labelStr.append(format("%s %s ", i18n.text("some"), i18n.text("values_from")));
+                            labelStr.append(format("%s ", i18n.text("some_values_from")));
                         }
                         if (fillerRes.canAs(OntClass.class)) {
                             OntClass avf = fillerRes.as(OntClass.class);
@@ -135,11 +135,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         }
                     } else if (rest.isMinCardinalityRestriction()) {
                         MinCardinalityRestriction mcRest = rest.asMinCardinalityRestriction();
-                        labelStr.append(format("%s %s ", i18n.text("minimum"), i18n.text("cardinality")));
+                        labelStr.append(format("%s ", i18n.text("minimum_cardinality")));
                         labelStr.append(mcRest.getMinCardinality());
                     } else if (rest.isMaxCardinalityRestriction()) {
                         MaxCardinalityRestriction mcRest = rest.asMaxCardinalityRestriction();
-                        labelStr.append(format("%s %s ", i18n.text("maximum"), i18n.text("cardinality")));
+                        labelStr.append(format("%s ", i18n.text("maximum_cardinality")));
                         labelStr.append(mcRest.getMaxCardinality());
                     } else if (rest.isCardinalityRestriction()) {
                         CardinalityRestriction cRest = rest.asCardinalityRestriction();
