@@ -230,6 +230,7 @@ public class I18n {
 	private void checkForChangeInThemeDirectory(ServletContext ctx) {
 		WebappDaoFactory wdf = ModelAccess.on(ctx)
 			.getWebappDaoFactory();
+		// Only applicable if context has a built model access
 		if (Objects.nonNull(wdf)) {
 			String currentDir = wdf
 				.getApplicationDao()
@@ -239,7 +240,7 @@ public class I18n {
 			if (!currentDir.equals(previousDir)) {
 				log.debug("Theme directory changed from '" + previousDir + "' to '"
 						+ currentDir + "' - clearing the cache.");
-				clearCacheOnRequest(ctx);
+				ResourceBundle.clearCache();
 			}
 		}
 	}
@@ -252,17 +253,6 @@ public class I18n {
 			ResourceBundle.clearCache();
 			log.debug("Cache cleared.");
 			req.setAttribute(ATTRIBUTE_CACHE_CLEARED, Boolean.TRUE);
-		}
-	}
-
-	/** Only clear the cache one time per request. */
-	private void clearCacheOnRequest(ServletContext ctx) {
-		if (ctx.getAttribute(ATTRIBUTE_CACHE_CLEARED) != null) {
-			log.debug("Cache was already cleared on this request.");
-		} else {
-			ResourceBundle.clearCache();
-			log.debug("Cache cleared.");
-			ctx.setAttribute(ATTRIBUTE_CACHE_CLEARED, Boolean.TRUE);
 		}
 	}
 
