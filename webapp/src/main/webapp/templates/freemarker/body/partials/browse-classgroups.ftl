@@ -72,8 +72,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
                 defaultBrowseClassGroupCount: '${firstPopulatedClassGroup.individualCount!}'
             };
             var i18nStrings = {
-                browseAllString: '${i18n().browse_all}',
-                contentString: '${i18n().content}'
+                browseAllString: '${i18n().browse_all?js_string}',
+                contentString: '${i18n().content?js_string}'
             };
 
         </script>

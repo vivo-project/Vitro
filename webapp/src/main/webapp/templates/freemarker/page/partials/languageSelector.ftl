@@ -25,7 +25,7 @@
 -->
 <script type="text/javascript">
 var i18nStringsLangMenu = {
-    selectLanguage: "${i18n().select_a_language}"
+    selectLanguage: "${i18n().select_a_language?js_string}"
 };
 </script>
 
