@@ -104,7 +104,7 @@ public abstract class SelectedLocale {
 	 * <li>null</li>
 	 * </ul>
 	 */
-	public static Locale getOverridingLocale(ServletContext ctx) {
+	private static Locale getOverridingLocale(ServletContext ctx) {
 		Object ctxInfo = ctx.getAttribute(ATTRIBUTE_NAME);
 		if (ctxInfo instanceof ContextSelectedLocale) {
 			Locale forcedLocale = ((ContextSelectedLocale) ctxInfo)
