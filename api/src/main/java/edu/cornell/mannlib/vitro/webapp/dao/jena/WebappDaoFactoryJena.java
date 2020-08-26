@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -615,6 +616,21 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     @Override
     public I18nBundle getI18nBundle() {
+        // this may be removed if and when vitro request is decoupled from rdf service
+        if (Objects.nonNull(rdfService.getVitroRequest())) {
+            // return default request based bundle
+            return I18n.bundle(rdfService.getVitroRequest());
+        }
+
+        // Should we expose language aware rdf service languages? If so, need to 
+        // transform normalized AcceptableLanguages to a list of Locales.
+
+        // Alternatively, langauge aware rdf services should adhere to the selectable
+        // languages on the context. The context should have selectable languages and
+        // the language aware rdf service could either add to context selectable
+        // languages or use the context selectable languages.
+
+        // return default context based bundle
         return I18n.bundle();
     }
 
