@@ -99,7 +99,7 @@ public class I18n {
 	}
 
 	/**
-	 * Get a cotext I18nBundle by this name.
+	 * Get a context I18nBundle by this name.
 	 */
 	public static I18nBundle bundle(String bundleName) {
 		return instance.getBundle(bundleName);
