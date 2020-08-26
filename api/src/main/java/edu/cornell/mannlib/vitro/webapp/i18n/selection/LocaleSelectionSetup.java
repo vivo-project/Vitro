@@ -46,11 +46,12 @@ public class LocaleSelectionSetup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ctx = sce.getServletContext();
-
-		I18n.setup(ctx);
-
 		ss = StartupStatus.getBean(ctx);
 		props = ConfigurationProperties.getBean(sce);
+
+		// Instantiate I18n instance to afford access to ServletContext
+		// when requesting a bundle with or without a VitroRequest
+		I18n.setup(ctx);
 
 		readProperties();
 

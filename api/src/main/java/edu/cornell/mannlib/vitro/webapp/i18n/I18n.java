@@ -64,6 +64,11 @@ public class I18n {
 	// Static methods
 	// ----------------------------------------------------------------------
 
+	/**
+	 * This setup method must be called before I18n static methods can be used.
+	 * It is currently called from LocaleSelectionSetup.contextInitialized, which
+	 * should ensure it is called when the context is initialized.
+	 */
 	public static void setup(ServletContext ctx) {
 		I18n.instance = new I18n(ctx);
 	}
