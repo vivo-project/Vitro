@@ -158,7 +158,7 @@ public class I18n {
 	protected I18nBundle getBundle(String bundleName) {
 		log.debug("Getting context bundle '" + bundleName + "'");
 
-		checkDevelopmentMode(ctx);
+		checkDevelopmentMode();
 		checkForChangeInThemeDirectory(ctx);
 
 		Locale locale = SelectedLocale.getCurrentLocale(ctx);
@@ -202,10 +202,10 @@ public class I18n {
 	/**
 	 * If we are in development mode, clear the cache on each request.
 	 */
-	private void checkDevelopmentMode(ServletContext ctx) {
+	private void checkDevelopmentMode() {
 		if (DeveloperSettings.getInstance().getBoolean(Key.I18N_DEFEAT_CACHE)) {
 			log.debug("In development mode - clearing the cache.");
-			clearCacheOnRequest(ctx);
+			ResourceBundle.clearCache();
 		}
 	}
 
