@@ -14,6 +14,7 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -45,6 +46,9 @@ public class LocaleSelectionSetup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ctx = sce.getServletContext();
+
+		I18n.setup(ctx);
+
 		ss = StartupStatus.getBean(ctx);
 		props = ConfigurationProperties.getBean(sce);
 

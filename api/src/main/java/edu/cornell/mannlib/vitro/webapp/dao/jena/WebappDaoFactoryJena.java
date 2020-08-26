@@ -615,7 +615,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     @Override
     public I18nBundle getI18nBundle() {
-        return I18n.bundle(rdfService.getVitroRequest());
+        return I18n.bundle();
     }
 
 }

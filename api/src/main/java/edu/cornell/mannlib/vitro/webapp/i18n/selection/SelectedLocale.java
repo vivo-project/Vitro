@@ -96,6 +96,40 @@ public abstract class SelectedLocale {
 	}
 
 	/**
+	 * return the
+	 * first of these to be found:
+	 * <ul>
+	 * <li>The forced Locale in the servlet context</li>
+	 * <li>The first of the selectable Locales</li>
+	 * <li>null</li>
+	 * </ul>
+	 */
+	public static Locale getOverridingLocale(ServletContext ctx) {
+		Object ctxInfo = ctx.getAttribute(ATTRIBUTE_NAME);
+		if (ctxInfo instanceof ContextSelectedLocale) {
+			Locale forcedLocale = ((ContextSelectedLocale) ctxInfo)
+					.getForcedLocale();
+			if (forcedLocale != null) {
+				log.debug("Found forced locale in the context: " + forcedLocale);
+				return forcedLocale;
+			}
+		}
+
+		if (ctxInfo instanceof ContextSelectedLocale) {
+			List<Locale> selectableLocales = ((ContextSelectedLocale) ctxInfo)
+					.getSelectableLocales();
+			if (selectableLocales != null && !selectableLocales.isEmpty()) {
+				Locale defaultLocale = selectableLocales.get(0);
+				log.debug("Using first selectable locale as default: "
+						+ defaultLocale);
+				return defaultLocale;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get the current Locale to use, which is the first of these to be found:
 	 * <ul>
 	 * <li>The forced Locale in the servlet context</li>
@@ -115,6 +149,24 @@ public abstract class SelectedLocale {
 		if (requestLocale != null) {
 			log.debug("Found locale in the request: " + requestLocale);
 			return requestLocale;
+		}
+
+		log.debug("Using default locale: " + Locale.getDefault());
+		return Locale.getDefault();
+	}
+
+	/**
+	 * Get the current Locale to use, which is the first of these to be found:
+	 * <ul>
+	 * <li>The forced Locale in the servlet context</li>
+	 * <li>The default Locale for the JVM</li>
+	 * </ul>
+	 */
+	public static Locale getCurrentLocale(ServletContext ctx) {
+		Locale overridingLocale = getOverridingLocale(ctx);
+
+		if (overridingLocale != null) {
+			return overridingLocale;
 		}
 
 		log.debug("Using default locale: " + Locale.getDefault());

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -20,7 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
@@ -49,11 +52,21 @@ public class I18n {
 	 * This is where the work gets done. Not declared final, so it can be
 	 * modified in unit tests.
 	 */
-	private static I18n instance = new I18n();
+	private static I18n instance;
+
+	private final ServletContext ctx;
+
+	protected I18n(ServletContext ctx) {
+		this.ctx = ctx;
+	}
 
 	// ----------------------------------------------------------------------
 	// Static methods
 	// ----------------------------------------------------------------------
+
+	public static void setup(ServletContext ctx) {
+		I18n.instance = new I18n(ctx);
+	}
 
 	/**
 	 * A convenience method to get a bundle and format the text.
@@ -72,17 +85,31 @@ public class I18n {
 	}
 
 	/**
-	 * Get a I18nBundle by this name.
+	 * Get a request I18nBundle by this name.
 	 */
 	public static I18nBundle bundle(String bundleName, HttpServletRequest req) {
 		return instance.getBundle(bundleName, req);
 	}
 
 	/**
-	 * Get the default I18nBundle.
+	 * Get the default request I18nBundle.
 	 */
 	public static I18nBundle bundle(HttpServletRequest req) {
 		return instance.getBundle(DEFAULT_BUNDLE_NAME, req);
+	}
+
+	/**
+	 * Get a cotext I18nBundle by this name.
+	 */
+	public static I18nBundle bundle(String bundleName) {
+		return instance.getBundle(bundleName);
+	}
+
+	/**
+	 * Get the default context I18nBundle.
+	 */
+	public static I18nBundle bundle() {
+		return instance.getBundle(DEFAULT_BUNDLE_NAME);
 	}
 
 	// ----------------------------------------------------------------------
@@ -106,25 +133,58 @@ public class I18n {
 	 * Declared 'protected' so it can be overridden in unit tests.
 	 */
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
-		log.debug("Getting bundle '" + bundleName + "'");
+		log.debug("Getting request bundle '" + bundleName + "'");
 
+		checkDevelopmentMode(req);
+		checkForChangeInThemeDirectory(req);
+
+		Locale locale = req.getLocale();
+
+		return getBundle(bundleName, locale);
+	}
+
+	/**
+	 * Get an I18nBundle by this name. The context provides the preferred
+	 * Locale, the application directory, the theme directory and the
+	 * development mode flag.
+	 *
+	 * If the context indicates that the system is in development mode, then the
+	 * cache is cleared on each request.
+	 *
+	 * If the theme directory has changed, the cache is cleared.
+	 *
+	 * Declared 'protected' so it can be overridden in unit tests.
+	 */
+	protected I18nBundle getBundle(String bundleName) {
+		log.debug("Getting context bundle '" + bundleName + "'");
+
+		checkDevelopmentMode(ctx);
+		checkForChangeInThemeDirectory(ctx);
+
+		Locale locale = SelectedLocale.getCurrentLocale(ctx);
+
+		return getBundle(bundleName, locale);
+	}
+
+	/**
+	 * Get an I18nBundle by this name, context, and locale.
+	 */
+	private I18nBundle getBundle(String bundleName, Locale locale) {
 		I18nLogger i18nLogger = new I18nLogger();
 		try {
-			checkDevelopmentMode(req);
-			checkForChangeInThemeDirectory(req);
-
 			String dir = themeDirectory.get();
-			ServletContext ctx = req.getSession().getServletContext();
-
 			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
-					req.getLocale(), control);
+					locale, control);
+
 			return new I18nBundle(bundleName, rb, i18nLogger);
 		} catch (MissingResourceException e) {
 			log.warn("Didn't find text bundle '" + bundleName + "'");
+
 			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		} catch (Exception e) {
 			log.error("Failed to create text bundle '" + bundleName + "'", e);
+
 			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		}
 	}
@@ -136,6 +196,16 @@ public class I18n {
 		if (DeveloperSettings.getInstance().getBoolean(Key.I18N_DEFEAT_CACHE)) {
 			log.debug("In development mode - clearing the cache.");
 			clearCacheOnRequest(req);
+		}
+	}
+
+	/**
+	 * If we are in development mode, clear the cache on each request.
+	 */
+	private void checkDevelopmentMode(ServletContext ctx) {
+		if (DeveloperSettings.getInstance().getBoolean(Key.I18N_DEFEAT_CACHE)) {
+			log.debug("In development mode - clearing the cache.");
+			clearCacheOnRequest(ctx);
 		}
 	}
 
@@ -153,6 +223,27 @@ public class I18n {
 		}
 	}
 
+	/**
+	 * If the theme directory has changed from before, clear the cache of all
+	 * ResourceBundles.
+	 */
+	private void checkForChangeInThemeDirectory(ServletContext ctx) {
+		WebappDaoFactory wdf = ModelAccess.on(ctx)
+			.getWebappDaoFactory();
+		if (Objects.nonNull(wdf)) {
+			String currentDir = wdf
+				.getApplicationDao()
+				.getApplicationBean()
+				.getThemeDir();
+			String previousDir = themeDirectory.getAndSet(currentDir);
+			if (!currentDir.equals(previousDir)) {
+				log.debug("Theme directory changed from '" + previousDir + "' to '"
+						+ currentDir + "' - clearing the cache.");
+				clearCacheOnRequest(ctx);
+			}
+		}
+	}
+
 	/** Only clear the cache one time per request. */
 	private void clearCacheOnRequest(HttpServletRequest req) {
 		if (req.getAttribute(ATTRIBUTE_CACHE_CLEARED) != null) {
@@ -161,6 +252,17 @@ public class I18n {
 			ResourceBundle.clearCache();
 			log.debug("Cache cleared.");
 			req.setAttribute(ATTRIBUTE_CACHE_CLEARED, Boolean.TRUE);
+		}
+	}
+
+	/** Only clear the cache one time per request. */
+	private void clearCacheOnRequest(ServletContext ctx) {
+		if (ctx.getAttribute(ATTRIBUTE_CACHE_CLEARED) != null) {
+			log.debug("Cache was already cleared on this request.");
+		} else {
+			ResourceBundle.clearCache();
+			log.debug("Cache cleared.");
+			ctx.setAttribute(ATTRIBUTE_CACHE_CLEARED, Boolean.TRUE);
 		}
 	}
 

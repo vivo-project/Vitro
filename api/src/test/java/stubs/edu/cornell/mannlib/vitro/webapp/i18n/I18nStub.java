@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
+import stubs.javax.servlet.ServletContextStub;
 
 /**
  * An implementation of I18n for unit tests. Construct a new instance and it
@@ -45,6 +46,7 @@ public class I18nStub extends I18n {
 
 	/** Make it private, so they will use the setup() method. */
 	private I18nStub() {
+		super(new ServletContextStub());
 		// Nothing to initialize.
 	}
 
