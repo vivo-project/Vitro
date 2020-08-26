@@ -54,8 +54,8 @@
             positionPredicate: '${positionPredicate}'
         };
         var i18nStrings = {
-            dragDropMenus: "${i18n().drag_drop_to_reorder_menus}",
-            reorderingFailed: "${i18n().reordering_menus_failed}"
+            dragDropMenus: "${i18n().drag_drop_to_reorder_menus?js_string}",
+            reorderingFailed: "${i18n().reordering_menus_failed?js_string}"
         };
     </script>
 

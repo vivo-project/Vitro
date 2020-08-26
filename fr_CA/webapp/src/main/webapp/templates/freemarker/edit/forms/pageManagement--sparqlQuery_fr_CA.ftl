@@ -15,11 +15,11 @@
 </section>
 <script>
     var i18nStringsSparqlQuery = {
-        sparqlResults: "${i18n().sparql_query_results}",
-        supplyQueryVariable: "${i18n().supply_query_variable}",
-        noApostrophes: "${i18n().apostrophe_not_allowed}",
-        noDoubleQuotes: "${i18n().double_quote_note_allowed}",
-        supplyQuery: "${i18n().supply_sparql_query}"
+        sparqlResults: "${i18n().sparql_query_results?js_string}",
+        supplyQueryVariable: "${i18n().supply_query_variable?js_string}",
+        noApostrophes: "${i18n().apostrophe_not_allowed?js_string}",
+        noDoubleQuotes: "${i18n().double_quote_note_allowed?js_string}",
+        supplyQuery: "${i18n().supply_sparql_query?js_string}"
     };
 </script>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processSparqlDataGetterContent.js"></script>')}

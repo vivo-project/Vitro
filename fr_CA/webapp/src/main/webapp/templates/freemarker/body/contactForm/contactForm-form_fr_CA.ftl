@@ -43,8 +43,8 @@
 </section>
 <script type="text/javascript">
     var i18nStrings = {
-        pleaseFormatEmail: "${i18n().please_format_email}",
-        enterValidAddress: "${i18n().or_enter_valid_address}"
+        pleaseFormatEmail: "${i18n().please_format_email?js_string}",
+        enterValidAddress: "${i18n().or_enter_valid_address?js_string}"
     };
 </script>
 

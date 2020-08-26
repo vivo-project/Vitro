@@ -59,10 +59,10 @@
             </section>
 <script>
     var i18nStringsBrowseGroups = {
-        browseClassGroup: "${i18n().browse_class_group}",
-        allCapitalized: "${i18n().all_capitalized}",
-        supplyClassGroup: "${i18n().supply_class_group}",
-        selectClasses: "${i18n().select_classes_to_display}"
+        browseClassGroup: "${i18n().browse_class_group?js_string}",
+        allCapitalized: "${i18n().all_capitalized?js_string}",
+        supplyClassGroup: "${i18n().supply_class_group?js_string}",
+        selectClasses: "${i18n().select_classes_to_display?js_string}"
     };
 </script>
  <#--Include JavaScript specific to the types of data getters related to this content-->

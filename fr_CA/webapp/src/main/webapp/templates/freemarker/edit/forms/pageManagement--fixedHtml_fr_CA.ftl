@@ -13,11 +13,11 @@
 </section>
 <script>
     var i18nStringsFixedHtml = {
-        fixedHtml: "${i18n().fixed_html}",
-        supplyVariableName: "${i18n().supply_variable_name}",
-        noApostrophes: "${i18n().apostrophe_not_allowed}",
-        noDoubleQuotes: "${i18n().double_quote_note_allowed}",
-        supplyHtml: "${i18n().supply_html}"
+        fixedHtml: "${i18n().fixed_html?js_string}",
+        supplyVariableName: "${i18n().supply_variable_name?js_string}",
+        noApostrophes: "${i18n().apostrophe_not_allowed?js_string}",
+        noDoubleQuotes: "${i18n().double_quote_note_allowed?js_string}",
+        supplyHtml: "${i18n().supply_html?js_string}"
     };
 </script>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processFixedHTMLDataGetterContent.js"></script>')}

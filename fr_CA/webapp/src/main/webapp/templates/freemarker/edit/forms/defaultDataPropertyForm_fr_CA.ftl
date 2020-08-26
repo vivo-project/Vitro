@@ -85,14 +85,14 @@
 	var datatype = "${datatype!}";
 
 	var i18nStrings = {
-    	four_digit_year: "${i18n().four_digit_year}",
-    	year_numeric: "${i18n().year_numeric}",
-    	year_month_day: "${i18n().year_month_day}",
-    	minimum_ymd: "${i18n().minimum_ymd}",
-    	minimum_hour: "${i18n().minimum_hour}",
-    	year_month: "${i18n().year_month}",
-    	decimal_only: "${i18n().decimal_only}",
-    	whole_number: "${i18n().whole_number}"
+    	four_digit_year: "${i18n().four_digit_year?js_string}",
+    	year_numeric: "${i18n().year_numeric?js_string}",
+    	year_month_day: "${i18n().year_month_day?js_string}",
+    	minimum_ymd: "${i18n().minimum_ymd?js_string}",
+    	minimum_hour: "${i18n().minimum_hour?js_string}",
+    	year_month: "${i18n().year_month?js_string}",
+    	decimal_only: "${i18n().decimal_only?js_string}",
+    	whole_number: "${i18n().whole_number?js_string}"
 	};
 </script>
 

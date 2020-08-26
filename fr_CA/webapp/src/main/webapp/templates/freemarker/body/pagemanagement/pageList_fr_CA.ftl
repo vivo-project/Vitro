@@ -75,7 +75,7 @@
 
 <script>
     var i18nStrings = {
-        confirmPageDeletion: "${i18n().confirm_page_deletion}"
+        confirmPageDeletion: "${i18n().confirm_page_deletion?js_string}"
     };
 </script>
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css" />',

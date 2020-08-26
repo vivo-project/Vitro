@@ -22,12 +22,12 @@
 </section>
 <script>
     var i18nStringsSearchIndividuals = {
-        searchIndividuals: "${i18n().search_individual_results}",
-        supplyQueryVariable: "${i18n().supply_query_variable}",
-        noApostrophes: "${i18n().apostrophe_not_allowed}",
-        noDoubleQuotes: "${i18n().double_quote_note_allowed}",
-        supplyQuery: "${i18n().supply_sparql_query}",
-        selectClass: "${i18n().select_class_for_search}"
+        searchIndividuals: "${i18n().search_individual_results?js_string}",
+        supplyQueryVariable: "${i18n().supply_query_variable?js_string}",
+        noApostrophes: "${i18n().apostrophe_not_allowed?js_string}",
+        noDoubleQuotes: "${i18n().double_quote_note_allowed?js_string}",
+        supplyQuery: "${i18n().supply_sparql_query?js_string}",
+        selectClass: "${i18n().select_class_for_search?js_string}"
     };
 </script>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processSearchDataGetterContent.js"></script>')}

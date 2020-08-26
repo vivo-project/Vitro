@@ -189,7 +189,7 @@ var proxyContextInfo = {
     ajaxUrl: '${formUrls.ajax}'
 };
 var i18nStrings = {
-    selectEditorAndProfile: "${i18n().select_editor_and_profile}"
+    selectEditorAndProfile: "${i18n().select_editor_and_profile?js_string}"
 };
 </script>
 

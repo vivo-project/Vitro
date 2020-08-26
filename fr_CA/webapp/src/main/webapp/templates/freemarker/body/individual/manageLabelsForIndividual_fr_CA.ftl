@@ -97,8 +97,8 @@ var customFormData = {
     numberAvailableLocales:${availableLocalesNumber}
 };
 var i18nStrings = {
-    errorProcessingLabels: "${i18n().error_processing_labels}",
-    selectLocaleOptionString : "${i18n().select_locale}"
+    errorProcessingLabels: "${i18n().error_processing_labels?js_string}",
+    selectLocaleOptionString : "${i18n().select_locale?js_string}"
 };
 </script>
 

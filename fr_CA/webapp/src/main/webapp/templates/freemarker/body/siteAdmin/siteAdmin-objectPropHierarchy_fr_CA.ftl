@@ -47,19 +47,19 @@
     var json = [${jsonTree!}];
 	var propertyType = '${propType}';
     var i18nStrings = {
-        hideProperties: "${i18n().hide_properties}",
-        showProperties: "${i18n().show_properties}",
-        localNameString: "${i18n().local_name}",
-        groupString: "${i18n().group_capitalized}",
-        domainClass: "${i18n().domain_class}",
-        rangeClass: "${i18n().range_class}",
-        rangeDataType: "${i18n().range_data_type}",
-        expandAll: "${i18n().expand_all}",
-        collapseAll: "${i18n().collapse_all}",
-        subProperties: "${i18n().sub_properties}",
-        displayRank: "${i18n().display_rank}",
-        subProperty: "${i18n().subproperty}",
-        propertiesString: "${i18n().properties_capitalized}"
+        hideProperties: "${i18n().hide_properties?js_string}",
+        showProperties: "${i18n().show_properties?js_string}",
+        localNameString: "${i18n().local_name?js_string}",
+        groupString: "${i18n().group_capitalized?js_string}",
+        domainClass: "${i18n().domain_class?js_string}",
+        rangeClass: "${i18n().range_class?js_string}",
+        rangeDataType: "${i18n().range_data_type?js_string}",
+        expandAll: "${i18n().expand_all?js_string}",
+        collapseAll: "${i18n().collapse_all?js_string}",
+        subProperties: "${i18n().sub_properties?js_string}",
+        displayRank: "${i18n().display_rank?js_string}",
+        subProperty: "${i18n().subproperty?js_string}",
+        propertiesString: "${i18n().properties_capitalized?js_string}"
     };
 </script>
 

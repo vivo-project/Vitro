@@ -99,13 +99,13 @@
 </section>
 <script>
     var i18nStrings = {
-        supplyName: "${i18n().supply_name}",
-        supplyPrettyUrl: "${i18n().supply_url}",
-        startUrlWithSlash: "${i18n().start_url_with_slash}",
-        supplyTemplate: "${i18n().supply_template}",
-        supplyContentType: "${i18n().supply_content_type}",
-        selectContentType: "${i18n().select_content_type}",
-        allCapitalized: "${i18n().all_capitalized}"
+        supplyName: "${i18n().supply_name?js_string}",
+        supplyPrettyUrl: "${i18n().supply_url?js_string}",
+        startUrlWithSlash: "${i18n().start_url_with_slash?js_string}",
+        supplyTemplate: "${i18n().supply_template?js_string}",
+        supplyContentType: "${i18n().supply_content_type?js_string}",
+        selectContentType: "${i18n().select_content_type?js_string}",
+        allCapitalized: "${i18n().all_capitalized?js_string}"
     };
 </script>
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menuManagement.css" />')}
