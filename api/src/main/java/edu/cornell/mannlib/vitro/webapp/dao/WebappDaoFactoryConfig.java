@@ -21,6 +21,7 @@ public class WebappDaoFactoryConfig {
 	public Map<FullPropertyKey, String> customListViewConfigFileMap;
 
 	public WebappDaoFactoryConfig() {
+		preferredLocales = Arrays.asList(Locale.getDefault());
 		preferredLanguages = Arrays.asList("en-US", "en", "EN");
 		defaultNamespace = "http://vitro.mannlib.cornell.edu/ns/default#";
 		nonUserNamespaces = new HashSet<String>();
