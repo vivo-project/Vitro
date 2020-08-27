@@ -495,9 +495,9 @@ public class FakeApplicationOntologyService {
 			this.vreq = vreq;
 			this.ctx = vreq.getSession().getServletContext();
 			this.langCtx =  vreq.getLocale().getLanguage(); // UQAM-Optimization add the linguistic context
-            if (!vreq.getLocale().getCountry().isEmpty()) {
-                this.langCtx += "-" + vreq.getLocale().getCountry();
-            }
+			if (!vreq.getLocale().getCountry().isEmpty()) {
+				this.langCtx += "-" + vreq.getLocale().getCountry();
+			}
 		}
 
 		@Override
