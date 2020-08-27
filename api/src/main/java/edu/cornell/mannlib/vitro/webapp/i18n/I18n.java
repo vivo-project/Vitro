@@ -104,7 +104,7 @@ public class I18n {
 	}
 
 	/**
-	 * Get the default context I18nBundle.
+	 * Get the default context I18nBundle for preferred locales.
 	 */
 	public static I18nBundle bundle(List<Locale> preferredLocales) {
 		return instance.getBundle(DEFAULT_BUNDLE_NAME, preferredLocales);
