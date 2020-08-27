@@ -309,7 +309,7 @@ public class ProcessRdfForm {
             String lingCxt=null;
             //UQAM Taking into account the linguistic context in retract
             try {
-                lingCxt	= vreq.getLocale().getLanguage();
+                lingCxt = vreq.getLocale().getLanguage();
                 if (!vreq.getLocale().getCountry().isEmpty()) {
                     lingCxt += "-" + vreq.getLocale().getCountry();
                 }

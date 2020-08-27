@@ -303,7 +303,7 @@ public class MultiValueEditSubmission {
 					String rangeLang = field.getRangeLang();  //UQAM  Default value
 					try {
 						if (_vreq != null ) {
-							rangeLang	= _vreq.getLocale().getLanguage();
+							rangeLang = _vreq.getLocale().getLanguage();
 							if (!_vreq.getLocale().getCountry().isEmpty()) {
 								rangeLang += "-" + _vreq.getLocale().getCountry();
 							}
