@@ -106,6 +106,20 @@ public class I18n {
 	/**
 	 * Get a context I18nBundle by this name.
 	 */
+	public static I18nBundle bundle(String bundleName, List<Locale> preferredLocales) {
+		return instance.getBundle(bundleName, preferredLocales);
+	}
+
+	/**
+	 * Get the default context I18nBundle.
+	 */
+	public static I18nBundle bundle(List<Locale> preferredLocales) {
+		return instance.getBundle(DEFAULT_BUNDLE_NAME, preferredLocales);
+	}
+
+	/**
+	 * Get a context I18nBundle by this name.
+	 */
 	public static I18nBundle bundle(String bundleName) {
 		return instance.getBundle(bundleName);
 	}
@@ -144,6 +158,30 @@ public class I18n {
 		checkForChangeInThemeDirectory(req);
 
 		Locale locale = req.getLocale();
+
+		return getBundle(bundleName, locale);
+	}
+
+	/**
+	 * Get an I18nBundle by this name. The context provides the preferred
+	 * Locale, the application directory, the theme directory and the
+	 * development mode flag. Choosing matching locale from context from
+	 * provided preferred locales.
+	 *
+	 * If the context indicates that the system is in development mode, then the
+	 * cache is cleared on each request.
+	 *
+	 * If the theme directory has changed, the cache is cleared.
+	 *
+	 * Declared 'protected' so it can be overridden in unit tests.
+	 */
+	protected I18nBundle getBundle(String bundleName, List<Locale> preferredLocales) {
+		log.debug("Getting context bundle '" + bundleName + "'");
+
+		checkDevelopmentMode();
+		checkForChangeInThemeDirectory(ctx);
+
+		Locale locale = SelectedLocale.getMatchingLocale(ctx, preferredLocales);
 
 		return getBundle(bundleName, locale);
 	}

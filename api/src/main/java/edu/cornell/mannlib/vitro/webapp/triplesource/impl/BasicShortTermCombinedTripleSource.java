@@ -100,6 +100,7 @@ public class BasicShortTermCombinedTripleSource implements
 		List<String> langs = getPreferredLanguages();
 		WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
 		config.setDefaultNamespace(props.getProperty("Vitro.defaultNamespace"));
+		config.setPreferredLocales(Collections.list(getPreferredLocales()));
 		config.setPreferredLanguages(langs);
 		config.setUnderlyingStoreReasoned(isStoreReasoned());
 		config.setCustomListViewConfigFileMap(getCustomListViewConfigFileMap());

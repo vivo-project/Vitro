@@ -130,6 +130,44 @@ public abstract class SelectedLocale {
 	}
 
 	/**
+	 * return the
+	 * first of these to be found:
+	 * <ul>
+	 * <li>The forced Locale in the servlet context</li>
+	 * <li>The first of the preferred locales matching a selectable locale</li>
+	 * <li>null</li>
+	 * </ul>
+	 */
+	private static Locale getOverridingLocale(ServletContext ctx, List<Locale> preferredLocales) {
+		Object ctxInfo = ctx.getAttribute(ATTRIBUTE_NAME);
+		if (ctxInfo instanceof ContextSelectedLocale) {
+			Locale forcedLocale = ((ContextSelectedLocale) ctxInfo)
+					.getForcedLocale();
+			if (forcedLocale != null) {
+				log.debug("Found forced locale in the context: " + forcedLocale);
+				return forcedLocale;
+			}
+		}
+
+		if (ctxInfo instanceof ContextSelectedLocale) {
+			List<Locale> selectableLocales = ((ContextSelectedLocale) ctxInfo)
+					.getSelectableLocales();
+
+			if (selectableLocales != null && preferredLocales != null) {
+				for (Locale preferredLocal : preferredLocales) {
+					for (Locale selectableLocal : selectableLocales) {
+						if (selectableLocal.equals(preferredLocal)) {
+							return selectableLocal;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get the current Locale to use, which is the first of these to be found:
 	 * <ul>
 	 * <li>The forced Locale in the servlet context</li>
@@ -164,6 +202,25 @@ public abstract class SelectedLocale {
 	 */
 	public static Locale getCurrentLocale(ServletContext ctx) {
 		Locale overridingLocale = getOverridingLocale(ctx);
+
+		if (overridingLocale != null) {
+			return overridingLocale;
+		}
+
+		log.debug("Using default locale: " + Locale.getDefault());
+		return Locale.getDefault();
+	}
+
+	/**
+	 * Get the preferred Locale to use, which is the first of these to be found:
+	 * <ul>
+	 * <li>The forced Locale in the servlet context</li>
+	 * <li>The first preferred Locale matching selectable locales</li>
+	 * <li>The default Locale for the JVM</li>
+	 * </ul>
+	 */
+	public static Locale getMatchingLocale(ServletContext ctx, List<Locale> preferredLocales) {
+		Locale overridingLocale = getOverridingLocale(ctx, preferredLocales);
 
 		if (overridingLocale != null) {
 			return overridingLocale;

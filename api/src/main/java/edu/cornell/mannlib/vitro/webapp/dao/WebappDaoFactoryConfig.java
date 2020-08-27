@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 
 public class WebappDaoFactoryConfig {
 
+	private List<Locale> preferredLocales;
 	private List<String> preferredLanguages;
 	private String defaultNamespace;
 	private Set<String> nonUserNamespaces;
@@ -19,10 +21,18 @@ public class WebappDaoFactoryConfig {
 	public Map<FullPropertyKey, String> customListViewConfigFileMap;
 
 	public WebappDaoFactoryConfig() {
-	    preferredLanguages = Arrays.asList("en-US", "en", "EN");
+		preferredLanguages = Arrays.asList("en-US", "en", "EN");
 		defaultNamespace = "http://vitro.mannlib.cornell.edu/ns/default#";
 		nonUserNamespaces = new HashSet<String>();
 		nonUserNamespaces.add(VitroVocabulary.vitroURI);
+	}
+
+	public List<Locale> getPreferredLocales() {
+		return this.preferredLocales;
+	}
+
+	public void setPreferredLocales(List<Locale> pl) {
+		this.preferredLocales = pl;
 	}
 
 	public List<String> getPreferredLanguages() {

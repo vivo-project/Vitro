@@ -616,14 +616,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     @Override
     public I18nBundle getI18nBundle() {
-        // this may be removed if and when vitro request is decoupled from rdf service
-        if (Objects.nonNull(rdfService.getVitroRequest())) {
-            // return default request based bundle
-            return I18n.bundle(rdfService.getVitroRequest());
-        }
-
-        // return default context based bundle
-        return I18n.bundle();
+        // return context based bundle for preffered locales
+        return I18n.bundle(config.getPreferredLocales());
     }
 
 }
