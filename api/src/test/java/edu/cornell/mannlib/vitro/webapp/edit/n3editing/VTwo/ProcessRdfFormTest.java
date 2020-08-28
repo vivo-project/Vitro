@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.jena.rdf.model.Model;
@@ -23,10 +24,15 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
-
+import stubs.edu.cornell.mannlib.vitro.webapp.i18n.I18nStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 
 public class ProcessRdfFormTest extends AbstractTestClass{
+
+    @Before
+    public void useI18nStubBundles() {
+        I18nStub.setup();
+    }
 
     @Test
     public void basicNewStatementTest() throws Exception{

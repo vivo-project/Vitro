@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -20,7 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
@@ -49,11 +52,26 @@ public class I18n {
 	 * This is where the work gets done. Not declared final, so it can be
 	 * modified in unit tests.
 	 */
-	private static I18n instance = new I18n();
+	private static I18n instance;
+
+	private final ServletContext ctx;
+
+	protected I18n(ServletContext ctx) {
+		this.ctx = ctx;
+	}
 
 	// ----------------------------------------------------------------------
 	// Static methods
 	// ----------------------------------------------------------------------
+
+	/**
+	 * This setup method must be called before I18n static methods can be used.
+	 * It is currently called from LocaleSelectionSetup.contextInitialized, which
+	 * should ensure it is called when the context is initialized.
+	 */
+	public static void setup(ServletContext ctx) {
+		I18n.instance = new I18n(ctx);
+	}
 
 	/**
 	 * A convenience method to get a bundle and format the text.
@@ -72,17 +90,24 @@ public class I18n {
 	}
 
 	/**
-	 * Get a I18nBundle by this name.
+	 * Get a request I18nBundle by this name.
 	 */
 	public static I18nBundle bundle(String bundleName, HttpServletRequest req) {
 		return instance.getBundle(bundleName, req);
 	}
 
 	/**
-	 * Get the default I18nBundle.
+	 * Get the default request I18nBundle.
 	 */
 	public static I18nBundle bundle(HttpServletRequest req) {
 		return instance.getBundle(DEFAULT_BUNDLE_NAME, req);
+	}
+
+	/**
+	 * Get the default context I18nBundle for preferred locales.
+	 */
+	public static I18nBundle bundle(List<Locale> preferredLocales) {
+		return instance.getBundle(DEFAULT_BUNDLE_NAME, preferredLocales);
 	}
 
 	// ----------------------------------------------------------------------
@@ -106,25 +131,59 @@ public class I18n {
 	 * Declared 'protected' so it can be overridden in unit tests.
 	 */
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
-		log.debug("Getting bundle '" + bundleName + "'");
+		log.debug("Getting request bundle '" + bundleName + "'");
 
+		checkDevelopmentMode(req);
+		checkForChangeInThemeDirectory(req);
+
+		Locale locale = req.getLocale();
+
+		return getBundle(bundleName, locale);
+	}
+
+	/**
+	 * Get an I18nBundle by this name. The context provides the selectable
+	 * Locale, the application directory, the theme directory and the
+	 * development mode flag. Choosing matching locale from context by
+	 * provided preferred locales.
+	 *
+	 * If the context indicates that the system is in development mode, then the
+	 * cache is cleared on each request.
+	 *
+	 * If the theme directory has changed, the cache is cleared.
+	 *
+	 * Declared 'protected' so it can be overridden in unit tests.
+	 */
+	protected I18nBundle getBundle(String bundleName, List<Locale> preferredLocales) {
+		log.debug("Getting context bundle '" + bundleName + "'");
+
+		checkDevelopmentMode();
+		checkForChangeInThemeDirectory(ctx);
+
+		Locale locale = SelectedLocale.getPreferredLocale(ctx, preferredLocales);
+
+		return getBundle(bundleName, locale);
+	}
+
+	/**
+	 * Get an I18nBundle by this name, context, and locale.
+	 */
+	private I18nBundle getBundle(String bundleName, Locale locale) {
 		I18nLogger i18nLogger = new I18nLogger();
 		try {
-			checkDevelopmentMode(req);
-			checkForChangeInThemeDirectory(req);
-
 			String dir = themeDirectory.get();
-			ServletContext ctx = req.getSession().getServletContext();
-
 			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
-					req.getLocale(), control);
+					locale, control);
+
 			return new I18nBundle(bundleName, rb, i18nLogger);
 		} catch (MissingResourceException e) {
 			log.warn("Didn't find text bundle '" + bundleName + "'");
+
 			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		} catch (Exception e) {
 			log.error("Failed to create text bundle '" + bundleName + "'", e);
+
 			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		}
 	}
@@ -140,6 +199,16 @@ public class I18n {
 	}
 
 	/**
+	 * If we are in development mode, clear the cache.
+	 */
+	private void checkDevelopmentMode() {
+		if (DeveloperSettings.getInstance().getBoolean(Key.I18N_DEFEAT_CACHE)) {
+			log.debug("In development mode - clearing the cache.");
+			ResourceBundle.clearCache();
+		}
+	}
+
+	/**
 	 * If the theme directory has changed from before, clear the cache of all
 	 * ResourceBundles.
 	 */
@@ -150,6 +219,28 @@ public class I18n {
 			log.debug("Theme directory changed from '" + previousDir + "' to '"
 					+ currentDir + "' - clearing the cache.");
 			clearCacheOnRequest(req);
+		}
+	}
+
+	/**
+	 * If we have a complete model access and the theme directory has changed
+	 * from before, clear the cache of all ResourceBundles.
+	 */
+	private void checkForChangeInThemeDirectory(ServletContext ctx) {
+		WebappDaoFactory wdf = ModelAccess.on(ctx)
+			.getWebappDaoFactory();
+		// Only applicable if context has a complete model access
+		if (Objects.nonNull(wdf)) {
+			String currentDir = wdf
+				.getApplicationDao()
+				.getApplicationBean()
+				.getThemeDir();
+			String previousDir = themeDirectory.getAndSet(currentDir);
+			if (!currentDir.equals(previousDir)) {
+				log.debug("Theme directory changed from '" + previousDir + "' to '"
+						+ currentDir + "' - clearing the cache.");
+				ResourceBundle.clearCache();
+			}
 		}
 	}
 

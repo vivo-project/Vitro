@@ -21,7 +21,7 @@ public class AcceptableLanguages extends ArrayList<String>{
      * the base language ('aa') will be also added to the list. 
      * @param rawLanguageStrs may not be null
      */
-    public AcceptableLanguages(List<String> rawLanguageStrs) {                
+    public AcceptableLanguages(List<String> rawLanguageStrs) {
         log.debug("Raw language strings:" + rawLanguageStrs);
         for (String lang : rawLanguageStrs) {
             this.add(lang);
