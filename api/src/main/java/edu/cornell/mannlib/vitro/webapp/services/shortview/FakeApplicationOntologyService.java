@@ -494,7 +494,10 @@ public class FakeApplicationOntologyService {
 			this.individualUri = individualUri;
 			this.vreq = vreq;
 			this.ctx = vreq.getSession().getServletContext();
-			this.langCtx =  vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry(); // UQAM-Optimization add the linguistic context
+			this.langCtx =  vreq.getLocale().getLanguage(); // UQAM-Optimization add the linguistic context
+			if (!vreq.getLocale().getCountry().isEmpty()) {
+				this.langCtx += "-" + vreq.getLocale().getCountry();
+			}
 		}
 
 		@Override

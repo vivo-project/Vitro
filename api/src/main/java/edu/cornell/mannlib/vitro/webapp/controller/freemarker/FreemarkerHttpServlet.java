@@ -281,7 +281,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         templateDataModel.put("body", bodyString);
 
-        String lang = vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();
+        String lang = vreq.getLocale().getLanguage();
+        if (!vreq.getLocale().getCountry().isEmpty()) {
+            lang += "-" + vreq.getLocale().getCountry();
+        }
         templateDataModel.put("country", lang);
 
         // Tell the template and any directives it uses that we're processing a page template.
