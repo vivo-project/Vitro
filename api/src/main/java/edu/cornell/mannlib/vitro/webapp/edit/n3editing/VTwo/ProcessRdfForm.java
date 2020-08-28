@@ -216,7 +216,10 @@ public class ProcessRdfForm {
                      */
 
                     if (XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT)) {
-                        String lang = vreq.getLocale().getLanguage() + "-" + vreq.getLocale().getCountry();
+                        String lang = vreq.getLocale().getLanguage();
+                        if (!vreq.getLocale().getCountry().isEmpty()) {
+                            lang += "-" + vreq.getLocale().getCountry();
+                        }
                         newLiteral = ResourceFactory.createLangLiteral(aText, lang);
                     } else {
                         newLiteral = ResourceFactory.createTypedLiteral(aText, aLiteral.getDatatype());
@@ -304,11 +307,14 @@ public class ProcessRdfForm {
         List<Model> retracts = new ArrayList<Model>();
         if( requiredDels != null && optionalDels != null ){
             String lingCxt=null;
-    		//UQAM Taking into account the linguistic context in retract
-    		try {
-    				lingCxt	= vreq.getLocale().getLanguage() + "-"+vreq.getLocale().getCountry();
-    		} catch (Exception e) {
-    		}
+            //UQAM Taking into account the linguistic context in retract
+            try {
+                lingCxt = vreq.getLocale().getLanguage();
+                if (!vreq.getLocale().getCountry().isEmpty()) {
+                    lingCxt += "-" + vreq.getLocale().getCountry();
+                }
+            } catch (Exception e) {
+            }
             retracts.addAll( parseN3ToRDF(requiredDels, REQUIRED, lingCxt) );
             retracts.addAll( parseN3ToRDF(optionalDels, OPTIONAL, lingCxt) );
         }
