@@ -98,10 +98,11 @@ public class BasicShortTermCombinedTripleSource implements
 	@Override
 	public WebappDaoFactoryConfig getWebappDaoFactoryConfig() {
 		List<String> langs = getPreferredLanguages();
+		List<Locale> locales = Collections.list(getPreferredLocales());
 		WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
 		config.setDefaultNamespace(props.getProperty("Vitro.defaultNamespace"));
-		config.setPreferredLocales(Collections.list(getPreferredLocales()));
 		config.setPreferredLanguages(langs);
+		config.setPreferredLocales(locales);
 		config.setUnderlyingStoreReasoned(isStoreReasoned());
 		config.setCustomListViewConfigFileMap(getCustomListViewConfigFileMap());
 		return config;
@@ -112,7 +113,6 @@ public class BasicShortTermCombinedTripleSource implements
 		return LanguageFilteringUtils.localesToLanguages(getPreferredLocales());
 	}
 
-	@SuppressWarnings("unchecked")
 	private Enumeration<Locale> getPreferredLocales() {
 		return req.getLocales();
 	}
