@@ -48,10 +48,11 @@ public class LanguageFilteringUtils {
 	}
 
 	/**
-	 * Take an List of language strings and convert to a List of Locale.
+	 * Take a List of language strings and convert to a List of Locale.
 	 *
 	 * While converting, change all hyphens (as in RDF language specifiers) to
-	 * under scores (as in Locale names).
+	 * under scores (as in Locale names). Ensure language string is lowercase
+	 * and country abbriviation is uppercase.
 	 */
 	public static List<Locale> languagesToLocales(List<String> langs) {
 		Set<Locale> locales = new HashSet<>();
