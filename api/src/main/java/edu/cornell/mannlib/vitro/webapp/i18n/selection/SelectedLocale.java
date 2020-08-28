@@ -124,14 +124,14 @@ public abstract class SelectedLocale {
 						}
 					}
 				}
-
-				if (!preferredLocales.isEmpty()) {
-					Locale preferredLocal = preferredLocales.get(0);
-					log.debug("Using first preferred locale as default: "
-							+ preferredLocal);
-					return preferredLocal;
-				}
 			}
+		}
+
+		if (Objects.nonNull(preferredLocales) && !preferredLocales.isEmpty()) {
+			Locale preferredLocal = preferredLocales.get(0);
+			log.debug("Using first preferred locale as default: "
+					+ preferredLocal);
+			return preferredLocal;
 		}
 
 		return null;
