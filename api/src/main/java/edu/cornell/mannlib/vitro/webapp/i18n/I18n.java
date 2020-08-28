@@ -142,9 +142,9 @@ public class I18n {
 	}
 
 	/**
-	 * Get an I18nBundle by this name. The context provides the preferred
+	 * Get an I18nBundle by this name. The context provides the selectable
 	 * Locale, the application directory, the theme directory and the
-	 * development mode flag. Choosing matching locale from context from
+	 * development mode flag. Choosing matching locale from context by
 	 * provided preferred locales.
 	 *
 	 * If the context indicates that the system is in development mode, then the
