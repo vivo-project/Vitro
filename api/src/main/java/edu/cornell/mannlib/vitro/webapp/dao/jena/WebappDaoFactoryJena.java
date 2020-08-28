@@ -615,7 +615,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     @Override
     public I18nBundle getI18nBundle() {
-        // return context based bundle for preffered locales
+        // return context based bundle for preferred locales
         return I18n.bundle(config.getPreferredLocales());
     }
 
