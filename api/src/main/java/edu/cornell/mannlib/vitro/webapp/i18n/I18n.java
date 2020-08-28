@@ -160,7 +160,7 @@ public class I18n {
 		checkDevelopmentMode();
 		checkForChangeInThemeDirectory(ctx);
 
-		Locale locale = SelectedLocale.getMatchingLocale(ctx, preferredLocales);
+		Locale locale = SelectedLocale.getPreferredLocale(ctx, preferredLocales);
 
 		return getBundle(bundleName, locale);
 	}
@@ -199,7 +199,7 @@ public class I18n {
 	}
 
 	/**
-	 * If we are in development mode, clear the cache on each request.
+	 * If we are in development mode, clear the cache.
 	 */
 	private void checkDevelopmentMode() {
 		if (DeveloperSettings.getInstance().getBoolean(Key.I18N_DEFEAT_CACHE)) {
@@ -223,13 +223,13 @@ public class I18n {
 	}
 
 	/**
-	 * If the theme directory has changed from before, clear the cache of all
-	 * ResourceBundles.
+	 * If we have a complete model access and the theme directory has changed
+	 * from before, clear the cache of all ResourceBundles.
 	 */
 	private void checkForChangeInThemeDirectory(ServletContext ctx) {
 		WebappDaoFactory wdf = ModelAccess.on(ctx)
 			.getWebappDaoFactory();
-		// Only applicable if context has a built model access
+		// Only applicable if context has a complete model access
 		if (Objects.nonNull(wdf)) {
 			String currentDir = wdf
 				.getApplicationDao()
