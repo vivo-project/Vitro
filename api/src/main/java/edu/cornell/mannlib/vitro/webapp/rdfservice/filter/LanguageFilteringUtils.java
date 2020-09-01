@@ -80,7 +80,7 @@ public class LanguageFilteringUtils {
 	 */
 	public static OntModel wrapOntModelInALanguageFilter(OntModel rawModel,
 			ServletRequest req) {
-		List<String> languages = localesToLanguages(req.getLocales());
+		List<String> languages = new AcceptableLanguages(localesToLanguages(req.getLocales()));
 		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
 		        ModelFactory.createModelForGraph(new LanguageFilteringGraph(
 		                rawModel.getGraph(), languages)));
