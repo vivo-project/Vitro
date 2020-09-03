@@ -67,7 +67,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	private OntModel ontModel;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		ctx = new ServletContextStub();
 
 		PropertyRestrictionBeanStub
