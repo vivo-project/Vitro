@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,7 +50,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  *
  */
 
-public class VClassJenaTest {
+public class VClassJenaTest extends AbstractTestClass {
 
 	@Test
 	// NIHVIVO-1157 introduced VClassJena.java, a lazy-loading version of VClass.java.
