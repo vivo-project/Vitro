@@ -230,7 +230,9 @@ public class I18n {
 		WebappDaoFactory wdf = ModelAccess.on(ctx)
 			.getWebappDaoFactory();
 		// Only applicable if context has a complete model access
-		if (Objects.nonNull(wdf)) {
+		if (Objects.nonNull(wdf)
+				&& Objects.nonNull(wdf.getApplicationDao())
+				&& Objects.nonNull(wdf.getApplicationDao().getApplicationBean())) {
 			String currentDir = wdf
 				.getApplicationDao()
 				.getApplicationBean()
