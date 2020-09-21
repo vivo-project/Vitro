@@ -36,6 +36,7 @@ public class RDFFilesLoader {
 
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
 	private static final String RDF = "rdf";
+	private static final String I18N = "i18n";
 	private static final String FIRST_TIME = "firsttime";
 	private static final String EVERY_TIME = "everytime";
 
@@ -73,11 +74,14 @@ public class RDFFilesLoader {
 			boolean firstTime) {
 		if (firstTime) {
 			String home = locateHomeDirectory();
-			Set<String> enabledLocales = getEnabledLocales(ctx);
 
-			Set<Path> paths = new HashSet<>();
+			// Load common files
+			Set<Path> paths = getPaths(home, RDF, modelPath, FIRST_TIME);
+
+			// Load enabled languages
+			Set<String> enabledLocales = getEnabledLocales(ctx);
 			for (String locale : enabledLocales) {
-				paths.addAll(getPaths(home, RDF, locale, modelPath, FIRST_TIME));
+				paths.addAll(getPaths(home, RDF, I18N, locale, modelPath, FIRST_TIME));
 			}
 
 			for (Path p : paths) {
@@ -102,11 +106,14 @@ public class RDFFilesLoader {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
 		String home = locateHomeDirectory();
-		Set<String> enabledLocales = getEnabledLocales(ctx);
 
-		Set<Path> paths = new HashSet<>();
+		// Load common files
+		Set<Path> paths = getPaths(home, RDF, modelPath, EVERY_TIME);
+
+		// Load enabled languages
+		Set<String> enabledLocales = getEnabledLocales(ctx);
 		for (String locale : enabledLocales) {
-			paths.addAll(getPaths(home, RDF, locale, modelPath, EVERY_TIME));
+			paths.addAll(getPaths(home, RDF, I18N, locale, modelPath, EVERY_TIME));
 		}
 
 		for (Path p : paths) {
@@ -129,9 +136,6 @@ public class RDFFilesLoader {
 		if (enabledLocales.isEmpty()) {
 			enabledLocales.add("en_US");
 		}
-
-		// Always ensure 'core' RDF is loaded
-		enabledLocales.add("core");
 
 		return enabledLocales;
 	}

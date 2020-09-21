@@ -47,6 +47,7 @@ public class FileGraphSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
 
 	private static final String RDF = "rdf";
+    private static final String I18N = "i18n";
     private static final String ABOX = "abox";
     private static final String TBOX = "tbox";
     private static final String FILEGRAPH = "filegraph";
@@ -74,13 +75,13 @@ public class FileGraphSetup implements ServletContextListener {
             Dataset dataset = ModelAccess.on(ctx).getDataset();
 			RDFService rdfService = ModelAccess.on(ctx).getRDFService(CONTENT);
 
-            // Load files from 'core' and enabled languages
-            Set<String> enabledLocales = getEnabledLocales(ctx);
-
             // ABox files
-            Set<Path> paths = new HashSet<>();
+            Set<Path> paths = getFilegraphPaths(ctx, RDF, ABOX, FILEGRAPH);
+
+            // Load ABox files from enabled languages
+            Set<String> enabledLocales = getEnabledLocales(ctx);
             for (String locale : enabledLocales) {
-                paths.addAll(getFilegraphPaths(ctx, RDF, locale, ABOX, FILEGRAPH));
+                paths.addAll(getFilegraphPaths(ctx, RDF, I18N, locale, ABOX, FILEGRAPH));
             }
 
             cleanupDB(dataset, pathsToURIs(paths, ABOX), ABOX);
@@ -89,9 +90,11 @@ public class FileGraphSetup implements ServletContextListener {
             aboxChanged = readGraphs(paths, rdfService, ABOX, /* aboxBaseModel */ null);
 
             // TBox files
-            paths = new HashSet<>();
+            paths = getFilegraphPaths(ctx, RDF, TBOX, FILEGRAPH);
+
+            // Load TBox files from enabled languages
             for (String locale : enabledLocales) {
-                paths.addAll(getFilegraphPaths(ctx, RDF, locale, TBOX, FILEGRAPH));
+                paths.addAll(getFilegraphPaths(ctx, RDF, I18N, locale, TBOX, FILEGRAPH));
             }
 
             cleanupDB(dataset, pathsToURIs(paths, TBOX),TBOX);
