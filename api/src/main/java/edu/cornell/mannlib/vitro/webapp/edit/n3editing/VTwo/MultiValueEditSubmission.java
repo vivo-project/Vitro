@@ -21,7 +21,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.XSD;
-import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
@@ -181,7 +180,7 @@ public class MultiValueEditSubmission {
 //				} catch (UnsupportedEncodingException e) {
 //					log.error(e, e);
 //				}
-            } else if ( XSD.xstring.getURI().equals(datatypeUri) || RDF.dtLangString.getURI().equals(datatypeUri)){
+            } else if ( XSD.xstring.getURI().equals(datatypeUri) ){
 				if( lang != null && lang.length() > 0 )	return ResourceFactory.createLangLiteral(value, lang);
 			}
 			return literalCreationModel.createTypedLiteral(value, datatypeUri);

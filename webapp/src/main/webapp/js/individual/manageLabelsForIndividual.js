@@ -35,7 +35,7 @@ var manageLabels = {
     // Initial page setup. Called only at page load.
     initPage: function() {
 
-        var disableSubmit = true;
+        //var disableSubmit = true;
         if(this.submissionErrorsExist == "false") {
         	//hide the form to add label
         	this.addLabelForm.hide();
@@ -54,19 +54,19 @@ var manageLabels = {
         	this.onShowAddForm();
 
         	//Also make sure the save button is enabled in case there is a value selected for the drop down
-        	if(this.labelLanguage.val() != "") {
-        		disableSubmit = false;
-        	}
+        	// if(this.labelLanguage.val() != "") {
+        	// 	disableSubmit = false;
+        	// }
 
         }
 
 
 
-        if(disableSubmit) {
-        	//disable submit until user selects a language
-            this.submit.attr('disabled', 'disabled');
-            this.submit.addClass('disabledSubmit');
-        }
+        // if(disableSubmit) {
+        // 	//disable submit until user selects a language
+        //     this.submit.attr('disabled', 'disabled');
+        //     this.submit.addClass('disabledSubmit');
+        // }
 
         this.bindEventListeners();
 
@@ -74,17 +74,17 @@ var manageLabels = {
 
     bindEventListeners: function() {
 
-        this.labelLanguage.change( function() {
-        	//if language selected, allow submission, otherwise disallow
-        	var selectedLanguage = manageLabels.labelLanguage.val();
-        	if(selectedLanguage != "") {
-        		manageLabels.submit.attr('disabled', false);
-        		manageLabels.submit.removeClass('disabledSubmit');
-        	} else {
-        		manageLabels.submit.attr('disabled', 'disabled');
-        		manageLabels.submit.addClass('disabledSubmit');
-        	}
-        });
+        // this.labelLanguage.change( function() {
+        // 	//if language selected, allow submission, otherwise disallow
+        // 	var selectedLanguage = manageLabels.labelLanguage.val();
+        // 	if(selectedLanguage != "") {
+        // 		manageLabels.submit.attr('disabled', false);
+        // 		manageLabels.submit.removeClass('disabledSubmit');
+        // 	} else {
+        // 		manageLabels.submit.attr('disabled', 'disabled');
+        // 		manageLabels.submit.addClass('disabledSubmit');
+        // 	}
+        // });
 
         //enable form to add label to be displayed or hidden
         this.showFormButton.click(function() {
@@ -124,8 +124,8 @@ var manageLabels = {
     	//clear inputs and select
     	manageLabels.addLabelForm.find("input[type='text'],select").val("");
     	//set the button for save to be disabled again
-    	manageLabels.submit.attr('disabled', 'disabled');
-		manageLabels.submit.addClass('disabledSubmit');
+    	// manageLabels.submit.attr('disabled', 'disabled');
+		// manageLabels.submit.addClass('disabledSubmit');
     },
     onShowAddForm:function() {
     	manageLabels.addLabelForm.show();
