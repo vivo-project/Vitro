@@ -214,7 +214,6 @@ public class ProcessRdfForm {
                     /*
                      * do it only if aLiteral are xstring datatype
                      */
-
                     if (XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT)) {
                         String lang = vreq.getLocale().getLanguage();
                         if (!vreq.getLocale().getCountry().isEmpty()) {
