@@ -21,6 +21,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.XSD;
+import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
@@ -180,7 +181,7 @@ public class MultiValueEditSubmission {
 //				} catch (UnsupportedEncodingException e) {
 //					log.error(e, e);
 //				}
-			} else if ( XSD.xstring.getURI().equals(datatypeUri) ){
+			} else if ( XSD.xstring.getURI().equals(datatypeUri) || RDF.dtLangString.getURI().equals(datatypeUri) ){
 				if( lang != null && lang.length() > 0 )	return ResourceFactory.createLangLiteral(value, lang);
 			}
 			return literalCreationModel.createTypedLiteral(value, datatypeUri);
@@ -303,9 +304,14 @@ public class MultiValueEditSubmission {
 					String rangeLang = field.getRangeLang();  //UQAM  Default value
 					try {
 						if (_vreq != null ) {
-							rangeLang = _vreq.getLocale().getLanguage();
-							if (!_vreq.getLocale().getCountry().isEmpty()) {
-								rangeLang += "-" + _vreq.getLocale().getCountry();
+							if (editConfig.getLiteralsInScope().get("label").get(0).getLanguage() != "")
+							{
+								rangeLang = editConfig.getLiteralsInScope().get("label").get(0).getLanguage();
+							} else {
+								rangeLang = _vreq.getLocale().getLanguage();
+								if (!_vreq.getLocale().getCountry().isEmpty()) {
+									rangeLang += "-" + _vreq.getLocale().getCountry();
+								}
 							}
 						}
 

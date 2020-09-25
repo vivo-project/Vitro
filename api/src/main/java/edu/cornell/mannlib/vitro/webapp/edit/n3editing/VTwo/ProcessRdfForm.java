@@ -128,7 +128,7 @@ public class ProcessRdfForm {
         subInValuesToN3( configuration, submission, requiredN3, optionalN3, null , null, vreq);
 
         /* parse N3 to RDF Models, No retractions since all of the statements are new. */
-        return parseN3ToChange(requiredN3, optionalN3, null, null, vreq);
+        return parseN3ToChange(requiredN3, optionalN3, null, null, vreq, null);
     }
 
     /* for a list of N3 strings, substitute in the subject, predicate and object URIs
@@ -174,7 +174,7 @@ public class ProcessRdfForm {
 
         return parseN3ToChange(
                 N3RequiredAssert,N3OptionalAssert,
-                N3RequiredRetract, N3OptionalRetract, vreq);
+                N3RequiredRetract, N3OptionalRetract, vreq, editConfig);
     }
 
     @SuppressWarnings("unchecked")
@@ -214,7 +214,10 @@ public class ProcessRdfForm {
                     /*
                      * do it only if aLiteral are xstring datatype
                      */
-                    if (XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT)) {
+                    if (RDF.dtLangString.getURI().equals(aLiteratDT) && !aLiteral.getLanguage().isEmpty()) {
+                        newLiteral = aLiteral;
+                    }
+                    else if (XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT)) {
                         String lang = vreq.getLocale().getLanguage();
                         if (!vreq.getLocale().getCountry().isEmpty()) {
                             lang += "-" + vreq.getLocale().getCountry();
@@ -299,7 +302,7 @@ public class ProcessRdfForm {
 
     protected AdditionsAndRetractions parseN3ToChange(
             List<String> requiredAdds, List<String> optionalAdds,
-            List<String> requiredDels, List<String> optionalDels, VitroRequest vreq) throws Exception{
+            List<String> requiredDels, List<String> optionalDels, VitroRequest vreq, EditConfigurationVTwo editConfig) throws Exception{
 
         List<Model> adds = parseN3ToRDF(requiredAdds, REQUIRED);
         adds.addAll( parseN3ToRDF(optionalAdds, OPTIONAL));
@@ -308,9 +311,13 @@ public class ProcessRdfForm {
             String lingCxt=null;
             //UQAM Taking into account the linguistic context in retract
             try {
-                lingCxt = vreq.getLocale().getLanguage();
-                if (!vreq.getLocale().getCountry().isEmpty()) {
-                    lingCxt += "-" + vreq.getLocale().getCountry();
+                if (editConfig != null && editConfig.getLiteralsInScope().get("label").get(0).getLanguage() != "") {
+                    lingCxt = editConfig.getLiteralsInScope().get("label").get(0).getLanguage();
+                } else {
+                    lingCxt = vreq.getLocale().getLanguage();
+                    if (!vreq.getLocale().getCountry().isEmpty()) {
+                        lingCxt += "-" + vreq.getLocale().getCountry();
+                    }
                 }
             } catch (Exception e) {
             }
