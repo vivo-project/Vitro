@@ -304,10 +304,12 @@ public class MultiValueEditSubmission {
 					String rangeLang = field.getRangeLang();  //UQAM  Default value
 					try {
 						if (_vreq != null ) {
-							if (editConfig.getLiteralsInScope().get("label").get(0).getLanguage() != "")
+							// if the language is set in the given Literal, this language-tag should be used and remain the same
+							// for example when you edit an label with an langauge-tag (no matter which language is selected globally)
+							if (!StringUtils.isBlank(editConfig.getLiteralsInScope().get("label").get(0).getLanguage()))
 							{
 								rangeLang = editConfig.getLiteralsInScope().get("label").get(0).getLanguage();
-							} else {
+							} else { // if the literal has no langauge-tag, use the language which is globally selected
 								rangeLang = _vreq.getLocale().getLanguage();
 								if (!_vreq.getLocale().getCountry().isEmpty()) {
 									rangeLang += "-" + _vreq.getLocale().getCountry();

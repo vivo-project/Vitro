@@ -26,6 +26,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
+import org.apache.commons.lang3.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -311,9 +312,11 @@ public class ProcessRdfForm {
             String lingCxt=null;
             //UQAM Taking into account the linguistic context in retract
             try {
-                if (editConfig != null && editConfig.getLiteralsInScope().get("label").get(0).getLanguage() != "") {
+                // if the language is set in the given Literal, this language-tag should be used and remain the same
+                // for example when you edit an label with an langauge-tag (no matter which language is selected globally)
+                if (editConfig != null && !StringUtils.isBlank(editConfig.getLiteralsInScope().get("label").get(0).getLanguage())) {
                     lingCxt = editConfig.getLiteralsInScope().get("label").get(0).getLanguage();
-                } else {
+                } else { // if the literal has no langauge-tag, use the language which is globally selected
                     lingCxt = vreq.getLocale().getLanguage();
                     if (!vreq.getLocale().getCountry().isEmpty()) {
                         lingCxt += "-" + vreq.getLocale().getCountry();
