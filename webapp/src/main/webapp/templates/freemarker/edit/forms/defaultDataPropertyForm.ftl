@@ -72,7 +72,7 @@
     the default label for default data/object property editing is returned from Edit Configuration Template Model,
     but that method may not return the correct result for other custom forms-->
     <input type="submit" id="submit" value="${editConfiguration.submitLabel}" role="button"/>
-    <span class="or"> or </span>
+    <span class="or"> ${i18n().or} </span>
     <a title="${i18n().cancel_title}" href="${cancelUrl}">${i18n().cancel_link}</a>
 
 </form>
