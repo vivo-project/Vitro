@@ -21,6 +21,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.XSD;
+import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
@@ -180,7 +181,7 @@ public class MultiValueEditSubmission {
 //				} catch (UnsupportedEncodingException e) {
 //					log.error(e, e);
 //				}
-			} else if ( XSD.xstring.getURI().equals(datatypeUri) ){
+			} else if ( XSD.xstring.getURI().equals(datatypeUri) || RDF.dtLangString.getURI().equals(datatypeUri) ){
 				if( lang != null && lang.length() > 0 )	return ResourceFactory.createLangLiteral(value, lang);
 			}
 			return literalCreationModel.createTypedLiteral(value, datatypeUri);
@@ -303,9 +304,21 @@ public class MultiValueEditSubmission {
 					String rangeLang = field.getRangeLang();  //UQAM  Default value
 					try {
 						if (_vreq != null ) {
-							rangeLang = _vreq.getLocale().getLanguage();
-							if (!_vreq.getLocale().getCountry().isEmpty()) {
-								rangeLang += "-" + _vreq.getLocale().getCountry();
+							// only if the request comes from the rdfsLabelGenerator the language should be used
+							Boolean getLabelLanguage = false;
+							if (!StringUtils.isBlank(editConfig.formUrl) && editConfig.formUrl.contains("RDFSLabelGenerator")) {
+								getLabelLanguage = true;
+							}
+							// if the language is set in the given Literal, this language-tag should be used and remain the same
+							// for example when you edit an label with an langauge-tag (no matter which language is selected globally)
+							if (!StringUtils.isBlank(editConfig.getLiteralsInScope().get("label").get(0).getLanguage()) && getLabelLanguage)
+							{
+								rangeLang = editConfig.getLiteralsInScope().get("label").get(0).getLanguage();
+							} else { // if the literal has no langauge-tag, use the language which is globally selected
+								rangeLang = _vreq.getLocale().getLanguage();
+								if (!_vreq.getLocale().getCountry().isEmpty()) {
+									rangeLang += "-" + _vreq.getLocale().getCountry();
+								}
 							}
 						}
 

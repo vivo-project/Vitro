@@ -26,6 +26,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
+import org.apache.commons.lang3.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -128,7 +129,7 @@ public class ProcessRdfForm {
         subInValuesToN3( configuration, submission, requiredN3, optionalN3, null , null, vreq);
 
         /* parse N3 to RDF Models, No retractions since all of the statements are new. */
-        return parseN3ToChange(requiredN3, optionalN3, null, null, vreq);
+        return parseN3ToChange(requiredN3, optionalN3, null, null, vreq, null);
     }
 
     /* for a list of N3 strings, substitute in the subject, predicate and object URIs
@@ -174,7 +175,7 @@ public class ProcessRdfForm {
 
         return parseN3ToChange(
                 N3RequiredAssert,N3OptionalAssert,
-                N3RequiredRetract, N3OptionalRetract, vreq);
+                N3RequiredRetract, N3OptionalRetract, vreq, editConfig);
     }
 
     @SuppressWarnings("unchecked")
@@ -214,7 +215,10 @@ public class ProcessRdfForm {
                     /*
                      * do it only if aLiteral are xstring datatype
                      */
-                    if (XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT)) {
+                    if (RDF.dtLangString.getURI().equals(aLiteratDT) && !aLiteral.getLanguage().isEmpty()) {
+                        newLiteral = aLiteral;
+                    }
+                    else if (XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT)) {
                         String lang = vreq.getLocale().getLanguage();
                         if (!vreq.getLocale().getCountry().isEmpty()) {
                             lang += "-" + vreq.getLocale().getCountry();
@@ -299,7 +303,7 @@ public class ProcessRdfForm {
 
     protected AdditionsAndRetractions parseN3ToChange(
             List<String> requiredAdds, List<String> optionalAdds,
-            List<String> requiredDels, List<String> optionalDels, VitroRequest vreq) throws Exception{
+            List<String> requiredDels, List<String> optionalDels, VitroRequest vreq, EditConfigurationVTwo editConfig) throws Exception{
 
         List<Model> adds = parseN3ToRDF(requiredAdds, REQUIRED);
         adds.addAll( parseN3ToRDF(optionalAdds, OPTIONAL));
@@ -308,9 +312,20 @@ public class ProcessRdfForm {
             String lingCxt=null;
             //UQAM Taking into account the linguistic context in retract
             try {
-                lingCxt = vreq.getLocale().getLanguage();
-                if (!vreq.getLocale().getCountry().isEmpty()) {
-                    lingCxt += "-" + vreq.getLocale().getCountry();
+                // only if the request comes from the rdfsLabelGenerator the language should be used
+                Boolean getLabelLanguage = false;
+                if (!StringUtils.isBlank(editConfig.formUrl) && editConfig.formUrl.contains("RDFSLabelGenerator")) {
+                    getLabelLanguage = true;
+                }
+                // if the language is set in the given Literal, this language-tag should be used and remain the same
+                // for example when you edit an label with an langauge-tag (no matter which language is selected globally)
+                if (editConfig != null && !StringUtils.isBlank(editConfig.getLiteralsInScope().get("label").get(0).getLanguage()) && getLabelLanguage) {
+                    lingCxt = editConfig.getLiteralsInScope().get("label").get(0).getLanguage();
+                } else { // if the literal has no langauge-tag, use the language which is globally selected
+                    lingCxt = vreq.getLocale().getLanguage();
+                    if (!vreq.getLocale().getCountry().isEmpty()) {
+                        lingCxt += "-" + vreq.getLocale().getCountry();
+                    }
                 }
             } catch (Exception e) {
             }
