@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.RDFFilesLoader.getEnabledLocales;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,6 +47,7 @@ public class FileGraphSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
 
 	private static final String RDF = "rdf";
+    private static final String I18N = "i18n";
     private static final String ABOX = "abox";
     private static final String TBOX = "tbox";
     private static final String FILEGRAPH = "filegraph";
@@ -76,6 +78,12 @@ public class FileGraphSetup implements ServletContextListener {
             // ABox files
             Set<Path> paths = getFilegraphPaths(ctx, RDF, ABOX, FILEGRAPH);
 
+            // Load ABox files from enabled languages
+            Set<String> enabledLocales = getEnabledLocales(ctx);
+            for (String locale : enabledLocales) {
+                paths.addAll(getFilegraphPaths(ctx, RDF, I18N, locale, ABOX, FILEGRAPH));
+            }
+
             cleanupDB(dataset, pathsToURIs(paths, ABOX), ABOX);
 
             // Just update the ABox filegraphs in the DB; don't attach them to a base model.
@@ -83,6 +91,11 @@ public class FileGraphSetup implements ServletContextListener {
 
             // TBox files
             paths = getFilegraphPaths(ctx, RDF, TBOX, FILEGRAPH);
+
+            // Load TBox files from enabled languages
+            for (String locale : enabledLocales) {
+                paths.addAll(getFilegraphPaths(ctx, RDF, I18N, locale, TBOX, FILEGRAPH));
+            }
 
             cleanupDB(dataset, pathsToURIs(paths, TBOX),TBOX);
 
