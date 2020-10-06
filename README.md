@@ -8,9 +8,6 @@ Available language files
 
 At present, VIVO has been translated into German, Spanish, and Portuguese. You may find the relevant files for each language by searching for files containing _de_DE, _es, and _pt_BR respectively. English uses the prefix _en_US.
 
-**Note**: Whenever a new language is added to this project the following file must be updated to include it:
-`core/webapp/src/main/webapp/i18n/available-langs.properties`
-
 Using the language files
 ------------------------
 
