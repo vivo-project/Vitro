@@ -312,9 +312,9 @@ public class SolrSearchEngine implements SearchEngine {
 		NamedList<Object> createCoreResponse = queryEngine.request(createCoreRequest);
 
 		if(Optional.ofNullable(createCoreResponse.get("core")).isPresent()) {
-			log.info(format("Created Solr core; response = '%s'.", createCoreResponse);
+			log.info(format("Created Solr core; response = '%s'.", createCoreResponse));
 		} else {
-			log.error(format("Failed to create Solr core; response = '%s'.", createCoreResponse);
+			log.error(format("Failed to create Solr core; response = '%s'.", createCoreResponse));
 		}
 	}
 
