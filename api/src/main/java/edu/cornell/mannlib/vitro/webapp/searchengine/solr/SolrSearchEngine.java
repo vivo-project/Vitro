@@ -2,12 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.servlet.ServletContext;
 
@@ -88,57 +91,35 @@ public class SolrSearchEngine implements SearchEngine {
 		}
 
 		try {
-
 			CloseableHttpClient httpClient = buildHttpClient();
 
 			queryEngine = buildSolrClient(httpClient);
 
 			updateEngine = buildConcurrentUpdateSolrClient();
 
-			log.info("Connect to Solr; URL = '" + solrServerUrl + "'.");
-			css.info("Connect to Solr; URL = '" + solrServerUrl + "'.");
+			css.info(format("Connect to Solr; URL = '%s'.", solrServerUrl));
 		} catch (Exception e) {
-			log.error("Could not connect to Solr", e);
-			css.fatal("Could not connect to Solr", e);
+			css.fatal(format("Could not connect to Solr; URL = '%s'.", solrServerUrl), e);
 		}
 
+		try {
+			if (coreExists()) {
+				return;
+			}
+		} catch (Exception e) {
+			css.fatal(format("Failed to check if core %s exists", solrCore), e);
+			return;
+		}
 
 		String contextPath = StringUtils.removeEnd(ctx.getRealPath(File.separator), File.separator);
 
 		try {
 			initializeCore(contextPath);
 
-			log.info("Initialized Solr core; URL = '" + solrCore + "'.");
-			css.info("Initialized Solr core; URL = '" + solrCore + "'.");
+			css.info(format("Created Solr core; core = '%s'.", solrCore));
 		} catch (Exception e) {
-			log.error("Could not initialize Solr core", e);
-			css.fatal("Could not initialize Solr core", e);
+			css.fatal(format("Failed to create Solr core; core = '%s'.", solrCore), e);
 		}
-	}
-
-	private void initializeCore(String contextPath) throws SolrServerException, IOException {
-		File solrConfDir = new File(contextPath + File.separator + "solr");
-
-		NamedList<String> params = new NamedList<>();
-		params.add("wt", "json");
-		
-		GenericSolrRequest systemRequest = new GenericSolrRequest(METHOD.GET, "/admin/info/system", params.toSolrParams());
-		NamedList<Object> systemResponse = queryEngine.request(systemRequest);
-		String solrHome = systemResponse.get("solr_home").toString();
-
-		File vitroCoreConfDir = new File(solrHome + File.separator + solrCore);
-
-		FileUtils.copyDirectory(solrConfDir, vitroCoreConfDir);
-
-		CoreAdminRequest.Create createCoreRequest = new CoreAdminRequest.Create();
-		createCoreRequest.setDataDir(solrHome + File.separator + solrCore + File.separator + "data");
-		createCoreRequest.setInstanceDir(solrHome + File.separator + solrCore);
-		createCoreRequest.setCoreName(solrCore);
-
-		NamedList<Object> createCoreResponse = queryEngine.request(createCoreRequest);
-
-		log.info("Create Solr core; response = '" + createCoreResponse + "'.");
-
 	}
 
 	@Override
@@ -288,6 +269,53 @@ public class SolrSearchEngine implements SearchEngine {
 		// no apparent 7.4.0 analogy to `setPollQueueTime(25)`
 
 		return updateBuilder.build();
+	}
+
+	private boolean coreExists() throws SolrServerException, IOException {
+		NamedList<String> params = new NamedList<>();
+		params.add("wt", "json");
+		params.add("action", "STATUS");
+		params.add("core", solrCore);
+		
+		GenericSolrRequest systemRequest = new GenericSolrRequest(METHOD.GET, "/admin/cores", params.toSolrParams());
+		NamedList<Object> systemResponse = queryEngine.request(systemRequest);
+
+		log.info(format("Solr core %s status; response = '%s'.", solrCore, systemResponse));
+
+		return Optional.ofNullable(systemResponse.get("status"))
+			.map(NamedList.class::cast)
+			.map(status -> status.get(solrCore))
+			.map(NamedList.class::cast)
+			.map(status -> status.get("name"))
+			.isPresent();
+	}
+
+	private void initializeCore(String contextPath) throws SolrServerException, IOException {
+		File solrConfDir = new File(contextPath + File.separator + "solr");
+
+		NamedList<String> params = new NamedList<>();
+		params.add("wt", "json");
+		
+		GenericSolrRequest systemRequest = new GenericSolrRequest(METHOD.GET, "/admin/info/system", params.toSolrParams());
+		NamedList<Object> systemResponse = queryEngine.request(systemRequest);
+		String solrHome = systemResponse.get("solr_home").toString();
+
+		File vitroCoreConfDir = new File(solrHome + File.separator + solrCore);
+
+		FileUtils.copyDirectory(solrConfDir, vitroCoreConfDir);
+
+		CoreAdminRequest.Create createCoreRequest = new CoreAdminRequest.Create();
+		createCoreRequest.setDataDir(solrHome + File.separator + solrCore + File.separator + "data");
+		createCoreRequest.setInstanceDir(solrHome + File.separator + solrCore);
+		createCoreRequest.setCoreName(solrCore);
+
+		NamedList<Object> createCoreResponse = queryEngine.request(createCoreRequest);
+
+		if(Optional.ofNullable(createCoreResponse.get("core")).isPresent()) {
+			log.info(format("Created Solr core; response = '%s'.", createCoreResponse);
+		} else {
+			log.error(format("Failed to create Solr core; response = '%s'.", createCoreResponse);
+		}
 	}
 
 	/**
