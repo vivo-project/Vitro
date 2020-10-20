@@ -1,0 +1,38 @@
+# Standard english stop words taken from Lucene's StopAnalyzer
+# Stopwords used in autocomplete (label-matching) fields, since full list in stopwords.txt may be too inclusive. Since label includes things like
+# book titles, we want a smaller set of stopwords.
+
+a
+an
+and
+are
+as
+at
+be
+but
+by
+for
+if
+in
+into
+is
+it
+no
+not
+of
+on
+or
+s
+t
+that
+the
+their
+then
+there
+these
+they
+this
+to
+was
+will
+with
