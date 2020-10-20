@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -10,14 +11,23 @@ import java.util.Collection;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
+import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.util.NamedList;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
@@ -35,8 +45,18 @@ import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
  * The Solr-based implementation of SearchEngine.
  */
 public class SolrSearchEngine implements SearchEngine {
+
+	private static final Log log = LogFactory.getLog(SolrSearchEngine.class);
+
 	private SolrClient queryEngine;
+
 	private ConcurrentUpdateSolrClient updateEngine;
+
+	// TODO: should be final
+	private String solrServerUrl;
+
+	// TODO: should be final
+	private String solrCore;
 
 	/**
 	 * Set up the http connection with the solr server
@@ -44,43 +64,81 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void startup(Application application, ComponentStartupStatus css) {
 		ServletContext ctx = application.getServletContext();
-		String solrServerUrlString = ConfigurationProperties.getBean(ctx)
+
+		solrServerUrl = ConfigurationProperties.getBean(ctx)
 				.getProperty("vitro.local.solr.url");
-		if (solrServerUrlString == null) {
+		if (solrServerUrl == null) {
+			log.error("Solr URL not configured");
 			css.fatal("Could not find vitro.local.solr.url in "
 					+ "runtime.properties.  Vitro application needs the URL of "
 					+ "a solr server that it can use to index its data. It "
-					+ "should be something like http://localhost:${port}"
-					+ ctx.getContextPath() + "solr");
+					+ "should be something like http://localhost:8983/solr");
+			return;
+		}
+
+		solrCore = ConfigurationProperties.getBean(ctx)
+				.getProperty("vitro.local.solr.core");
+		if (solrCore == null) {
+			log.error("Solr core not configured");
+			css.fatal("Could not find vitro.local.solr.core in "
+					+ "runtime.properties.  Vitro application needs the core of "
+					+ "a solr server that it can use to index its data. It "
+					+ "should be something like vitrocore");
 			return;
 		}
 
 		try {
-			HttpSolrClient.Builder builder = new HttpSolrClient.Builder(solrServerUrlString);
 
-			builder.withSocketTimeout(10000); // socket read timeout
-			builder.withConnectionTimeout(10000);
+			CloseableHttpClient httpClient = buildHttpClient();
 
-			HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-			httpClientBuilder.setMaxConnPerRoute(100);
-			httpClientBuilder.setMaxConnTotal(100);
-			httpClientBuilder.setRetryHandler(new StandardHttpRequestRetryHandler(1, false));
+			queryEngine = buildSolrClient(httpClient);
 
-			builder.withHttpClient(httpClientBuilder.build());
+			updateEngine = buildConcurrentUpdateSolrClient();
 
-			queryEngine = builder.build();
-
-			ConcurrentUpdateSolrClient.Builder updateBuilder =
-					new ConcurrentUpdateSolrClient.Builder(solrServerUrlString);
-			updateBuilder.withConnectionTimeout(10000);
-			// no apparent 7.4.0 analogy to `setPollQueueTime(25)`
-
-			updateEngine = updateBuilder.build();
-
-			css.info("Set up the Solr search engine; URL = '" + solrServerUrlString + "'.");
+			log.info("Connect to Solr; URL = '" + solrServerUrl + "'.");
+			css.info("Connect to Solr; URL = '" + solrServerUrl + "'.");
 		} catch (Exception e) {
-			css.fatal("Could not set up the Solr search engine", e);
+			log.error("Could not connect to Solr", e);
+			css.fatal("Could not connect to Solr", e);
 		}
+
+
+		String contextPath = StringUtils.removeEnd(ctx.getRealPath(File.separator), File.separator);
+
+		try {
+			initializeCore(contextPath);
+
+			log.info("Initialized Solr core; URL = '" + solrCore + "'.");
+			css.info("Initialized Solr core; URL = '" + solrCore + "'.");
+		} catch (Exception e) {
+			log.error("Could not initialize Solr core", e);
+			css.fatal("Could not initialize Solr core", e);
+		}
+	}
+
+	private void initializeCore(String contextPath) throws SolrServerException, IOException {
+		File solrConfDir = new File(contextPath + File.separator + "solr");
+
+		NamedList<String> params = new NamedList<>();
+		params.add("wt", "json");
+		
+		GenericSolrRequest systemRequest = new GenericSolrRequest(METHOD.GET, "/admin/info/system", params.toSolrParams());
+		NamedList<Object> systemResponse = queryEngine.request(systemRequest);
+		String solrHome = systemResponse.get("solr_home").toString();
+
+		File vitroCoreConfDir = new File(solrHome + File.separator + solrCore);
+
+		FileUtils.copyDirectory(solrConfDir, vitroCoreConfDir);
+
+		CoreAdminRequest.Create createCoreRequest = new CoreAdminRequest.Create();
+		createCoreRequest.setDataDir(solrHome + File.separator + solrCore + File.separator + "data");
+		createCoreRequest.setInstanceDir(solrHome + File.separator + solrCore);
+		createCoreRequest.setCoreName(solrCore);
+
+		NamedList<Object> createCoreResponse = queryEngine.request(createCoreRequest);
+
+		log.info("Create Solr core; response = '" + createCoreResponse + "'.");
+
 	}
 
 	@Override
@@ -96,7 +154,7 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void ping() throws SearchEngineException {
 		try {
-			queryEngine.ping();
+			queryEngine.ping(solrCore);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Solr server did not respond to ping.",
 					e);
@@ -117,7 +175,7 @@ public class SolrSearchEngine implements SearchEngine {
 	public void add(Collection<SearchInputDocument> docs)
 			throws SearchEngineException {
 		try {
-			updateEngine.add(SolrConversionUtils.convertToSolrInputDocuments(docs), 100);
+			updateEngine.add(solrCore, SolrConversionUtils.convertToSolrInputDocuments(docs), 100);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Solr server failed to add documents "
 					+ docs, e);
@@ -127,8 +185,8 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void commit() throws SearchEngineException {
 		try {
-			updateEngine.commit();
-			updateEngine.optimize();
+			updateEngine.commit(solrCore);
+			updateEngine.optimize(solrCore);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Failed to commit to Solr server.", e);
 		}
@@ -137,8 +195,8 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void commit(boolean wait) throws SearchEngineException {
 		try {
-			updateEngine.commit(wait, wait);
-			updateEngine.optimize(wait, wait);
+			updateEngine.commit(solrCore, wait, wait);
+			updateEngine.optimize(solrCore, wait, wait);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException("Failed to commit to Solr server.", e);
 		}
@@ -152,7 +210,7 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void deleteById(Collection<String> ids) throws SearchEngineException {
 		try {
-			updateEngine.deleteById(new ArrayList<>(ids), 100);
+			updateEngine.deleteById(solrCore, new ArrayList<>(ids), 100);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException(
 					"Solr server failed to delete documents: " + ids, e);
@@ -162,7 +220,7 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void deleteByQuery(String query) throws SearchEngineException {
 		try {
-			updateEngine.deleteByQuery(query, 100);
+			updateEngine.deleteByQuery(solrCore, query, 100);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException(
 					"Solr server failed to delete documents: " + query, e);
@@ -185,7 +243,7 @@ public class SolrSearchEngine implements SearchEngine {
 	public SearchResponse query(SearchQuery query) throws SearchEngineException {
 		try {
 			SolrQuery solrQuery = SolrConversionUtils.convertToSolrQuery(query);
-			QueryResponse response = queryEngine.query(solrQuery);
+			QueryResponse response = queryEngine.query(solrCore, solrQuery);
 			return SolrConversionUtils.convertToSearchResponse(response);
 		} catch (SolrServerException | IOException e) {
 			throw appropriateException(
@@ -197,6 +255,39 @@ public class SolrSearchEngine implements SearchEngine {
 	public int documentCount() throws SearchEngineException {
 		SearchResponse response = query(createQuery("*:*"));
 		return (int) response.getResults().getNumFound();
+	}
+
+	private CloseableHttpClient buildHttpClient() {
+		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+
+		// TODO: configure settings from properties
+		httpClientBuilder.setMaxConnPerRoute(100);
+		httpClientBuilder.setMaxConnTotal(100);
+		httpClientBuilder.setRetryHandler(new StandardHttpRequestRetryHandler(1, false));
+
+		return httpClientBuilder.build();
+	}
+
+	private SolrClient buildSolrClient(CloseableHttpClient httpClient) {
+		HttpSolrClient.Builder builder = new HttpSolrClient.Builder(solrServerUrl);
+
+		// TODO: configure settings from properties
+		builder.withSocketTimeout(10000); // socket read timeout
+		builder.withConnectionTimeout(10000);
+		builder.withHttpClient(httpClient);
+
+		return builder.build();
+	}
+
+	private ConcurrentUpdateSolrClient buildConcurrentUpdateSolrClient() {
+		ConcurrentUpdateSolrClient.Builder updateBuilder =
+				new ConcurrentUpdateSolrClient.Builder(solrServerUrl);
+
+		// TODO: configure settings from properties
+		updateBuilder.withConnectionTimeout(10000);
+		// no apparent 7.4.0 analogy to `setPollQueueTime(25)`
+
+		return updateBuilder.build();
 	}
 
 	/**
