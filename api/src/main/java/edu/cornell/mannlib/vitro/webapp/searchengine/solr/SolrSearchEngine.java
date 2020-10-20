@@ -137,8 +137,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			queryEngine.ping(solrCore);
 		} catch (SolrServerException | IOException e) {
-			throw appropriateException("Solr server did not respond to ping.",
-					e);
+			throw appropriateException("Solr server did not respond to ping.", e);
 		}
 	}
 
@@ -158,8 +157,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			updateEngine.add(solrCore, SolrConversionUtils.convertToSolrInputDocuments(docs), 100);
 		} catch (SolrServerException | IOException e) {
-			throw appropriateException("Solr server failed to add documents "
-					+ docs, e);
+			throw appropriateException("Solr server failed to add documents " + docs, e);
 		}
 	}
 
@@ -193,8 +191,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			updateEngine.deleteById(solrCore, new ArrayList<>(ids), 100);
 		} catch (SolrServerException | IOException e) {
-			throw appropriateException(
-					"Solr server failed to delete documents: " + ids, e);
+			throw appropriateException("Solr server failed to delete documents: " + ids, e);
 		}
 	}
 
@@ -203,8 +200,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			updateEngine.deleteByQuery(solrCore, query, 100);
 		} catch (SolrServerException | IOException e) {
-			throw appropriateException(
-					"Solr server failed to delete documents: " + query, e);
+			throw appropriateException("Solr server failed to delete documents: " + query, e);
 		}
 	}
 
@@ -227,8 +223,7 @@ public class SolrSearchEngine implements SearchEngine {
 			QueryResponse response = queryEngine.query(solrCore, solrQuery);
 			return SolrConversionUtils.convertToSearchResponse(response);
 		} catch (SolrServerException | IOException e) {
-			throw appropriateException(
-					"Solr server failed to execute the query" + query, e);
+			throw appropriateException("Solr server failed to execute the query" + query, e);
 		}
 	}
 
@@ -311,7 +306,7 @@ public class SolrSearchEngine implements SearchEngine {
 
 		NamedList<Object> createCoreResponse = queryEngine.request(createCoreRequest);
 
-		if(Optional.ofNullable(createCoreResponse.get("core")).isPresent()) {
+		if (Optional.ofNullable(createCoreResponse.get("core")).isPresent()) {
 			log.info(format("Created Solr core; response = '%s'.", createCoreResponse));
 		} else {
 			log.error(format("Failed to create Solr core; response = '%s'.", createCoreResponse));
@@ -323,8 +318,7 @@ public class SolrSearchEngine implements SearchEngine {
 	 * exception, then wrap it in a SearchEngineNotRespondingException instead
 	 * of a generic SearchEngineException.
 	 */
-	private SearchEngineException appropriateException(String message,
-			Exception e) {
+	private SearchEngineException appropriateException(String message, Exception e) {
 		Throwable cause = e;
 		while (cause != null) {
 			if (cause instanceof SocketTimeoutException) {
