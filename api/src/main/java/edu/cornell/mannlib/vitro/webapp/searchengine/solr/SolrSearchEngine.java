@@ -7,6 +7,12 @@ import static java.lang.String.format;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -286,7 +292,8 @@ public class SolrSearchEngine implements SearchEngine {
 	}
 
 	private void initializeCore(String contextPath) throws SolrServerException, IOException {
-		File solrConfDir = new File(contextPath + File.separator + "solr");
+		Path solrConfPath = Paths.get(contextPath + File.separator + "solr");
+		UserPrincipal solrConfPathOwner = Files.getOwner(solrConfPath);
 
 		NamedList<String> params = new NamedList<>();
 		params.add("wt", "json");
@@ -295,9 +302,11 @@ public class SolrSearchEngine implements SearchEngine {
 		NamedList<Object> systemResponse = queryEngine.request(systemRequest);
 		String solrHome = systemResponse.get("solr_home").toString();
 
-		File vitroCoreConfDir = new File(solrHome + File.separator + solrCore);
+		Path vitroCoreConfPath = Paths.get(solrHome + File.separator + solrCore);
 
-		FileUtils.copyDirectory(solrConfDir, vitroCoreConfDir);
+		FileUtils.copyDirectory(solrConfPath.toFile(), vitroCoreConfPath.toFile());
+
+		Files.setOwner(vitroCoreConfPath, solrConfPathOwner);
 
 		CoreAdminRequest.Create createCoreRequest = new CoreAdminRequest.Create();
 		createCoreRequest.setDataDir(solrHome + File.separator + solrCore + File.separator + "data");
