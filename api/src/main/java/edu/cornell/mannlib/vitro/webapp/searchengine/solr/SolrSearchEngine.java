@@ -57,10 +57,8 @@ public class SolrSearchEngine implements SearchEngine {
 
 	private ConcurrentUpdateSolrClient updateEngine;
 
-	// TODO: should be final
 	private String solrServerUrl;
 
-	// TODO: should be final
 	private String solrCore;
 
 	/**
