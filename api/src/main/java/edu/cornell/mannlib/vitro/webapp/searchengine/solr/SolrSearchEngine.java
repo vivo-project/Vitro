@@ -293,7 +293,9 @@ public class SolrSearchEngine implements SearchEngine {
 
 	private void initializeCore(String contextPath) throws SolrServerException, IOException {
 		Path solrConfPath = Paths.get(contextPath + File.separator + "solr");
-		UserPrincipal solrConfPathOwner = Files.getOwner(solrConfPath);
+		File solrConf = solrConfPath.toFile();
+
+		solrConf.setWritable(true, false);
 
 		NamedList<String> params = new NamedList<>();
 		params.add("wt", "json");
@@ -303,10 +305,9 @@ public class SolrSearchEngine implements SearchEngine {
 		String solrHome = systemResponse.get("solr_home").toString();
 
 		Path vitroCoreConfPath = Paths.get(solrHome + File.separator + solrCore);
+		File vitroCoreConf = vitroCoreConfPath.toFile();
 
-		FileUtils.copyDirectory(solrConfPath.toFile(), vitroCoreConfPath.toFile());
-
-		Files.setOwner(vitroCoreConfPath, solrConfPathOwner);
+		FileUtils.copyDirectory(solrConf, vitroCoreConf);
 
 		CoreAdminRequest.Create createCoreRequest = new CoreAdminRequest.Create();
 		createCoreRequest.setDataDir(solrHome + File.separator + solrCore + File.separator + "data");
