@@ -295,6 +295,7 @@ public class SolrSearchEngine implements SearchEngine {
 		Path solrConfPath = Paths.get(contextPath + File.separator + "solr");
 		File solrConf = solrConfPath.toFile();
 
+		solrConf.setReadable(true, false);
 		solrConf.setWritable(true, false);
 
 		NamedList<String> params = new NamedList<>();
