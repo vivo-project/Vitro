@@ -76,7 +76,7 @@ public class VitroHomeDirectory {
   }
 
     private InputStream getHomeDirTar() {
-        String tarLocation = "WEB-INF/resources/home-files/vivo-home.tar";
+        String tarLocation = "/WEB-INF/resources/home-files/vivo-home.tar";
         InputStream tar = ctx.getResourceAsStream(tarLocation);
         if (tar == null) {
             log.error("Application home tar not found in: " + tarLocation);
