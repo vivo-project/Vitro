@@ -59,20 +59,17 @@ public class VitroHomeDirectory {
 		return discoveryMessage;
 	}
 
-  public void populateIfEmpty() {
+  public void populate() {
       File vhdDir = getPath().toFile();
 
       if (!vhdDir.isDirectory() || vhdDir.list() == null) {
           throw new RuntimeException("Application home dir is not a directory! " + vhdDir);
       }
 
-      // Is Vitro home dir empty?
-      if (vhdDir.list().length == 0) {
-          InputStream homeDirTar = getHomeDirTar();
-          untar(homeDirTar, vhdDir);
-      } else {
-          log.info("Application home directory is not empty. Not overwriting: " + vhdDir);
-      }
+      InputStream homeDirTar = getHomeDirTar();
+
+      // The above InputStream is closed in the 'untar' method
+      untar(homeDirTar, vhdDir);
   }
 
     private InputStream getHomeDirTar() {
