@@ -49,6 +49,9 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 	/** Name of the file that contains runtime properties. */
 	private static final String FILE_RUNTIME_PROPERTIES = "runtime.properties";
 
+	/** Fall-back name of the file that contains runtime properties. */
+	private static final String FILE_DEFAULT_RUNTIME_PROPERTIES = "default.runtime.properties";
+
 	/** Configuration property to store the Vitro home directory */
 	private static final String VHD_CONFIGURATION_PROPERTY = "vitro.home";
 
@@ -95,15 +98,25 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 
 	private File locateRuntimePropertiesFile(File vitroHomeDirConfig, StartupStatus ss) {
 
+		// First look for the user-customized runtime.properties
 		File rpf = new File(vitroHomeDirConfig, FILE_RUNTIME_PROPERTIES);
 
+		// Have we found a suitable runtime.properties file?
+		if (!rpf.exists() || !rpf.isFile() || !rpf.canRead()) {
+
+			// If not... look for the default runtime.properties
+			rpf = new File(vitroHomeDirConfig, FILE_DEFAULT_RUNTIME_PROPERTIES);
+		}
+
 		if (!rpf.exists() || !rpf.isFile()) {
-			throw new IllegalStateException("'" + rpf.getPath()
-					+ "' does not exist or is not a file.");
+			throw new IllegalStateException("Neither '" + FILE_RUNTIME_PROPERTIES + "' nor '" +
+					FILE_DEFAULT_RUNTIME_PROPERTIES + "' were found in " +
+					vitroHomeDirConfig.getAbsolutePath());
 		}
 		if (!rpf.canRead()) {
-			throw new IllegalStateException("Cannot read '" + rpf.getPath()
-					+ "'.");
+			throw new IllegalStateException("No readable '" + FILE_RUNTIME_PROPERTIES + "' nor '" +
+					FILE_DEFAULT_RUNTIME_PROPERTIES + "' files were found in " +
+					vitroHomeDirConfig.getAbsolutePath());
 		}
 		ss.info(this, "Loading runtime properties from '" + rpf.getPath() + "'");
 		return rpf;
