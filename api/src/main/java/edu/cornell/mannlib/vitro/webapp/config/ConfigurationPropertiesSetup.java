@@ -77,7 +77,9 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 						VHD_CONFIGURATION_PROPERTY, vitroHomeDir);
 
 				ConfigurationPropertiesImpl bean = new ConfigurationPropertiesImpl(
-						stream, preempts, new BuildProperties(ctx).getMap());
+						stream, preempts,
+						new BuildProperties(ctx).getMap(),
+						new ContextProperties().getMap());
 
 				ConfigurationProperties.setBean(ctx, bean);
 				ss.info(this, "Loaded " + bean.getPropertyMap().size()

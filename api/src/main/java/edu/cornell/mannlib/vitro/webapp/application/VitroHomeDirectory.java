@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.config.ContextProperties;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
@@ -153,23 +154,12 @@ public class VitroHomeDirectory {
 		}
 
 		public void getVhdFromJndi() {
-			try {
-				String vhdPath = (String) new InitialContext()
-						.lookup(VHD_JNDI_PATH);
-				if (vhdPath == null) {
-					log.debug("Didn't find a JNDI value at '" + VHD_JNDI_PATH
-							+ "'.");
-				} else {
-					log.debug("'" + VHD_JNDI_PATH + "' as specified by JNDI: "
-							+ vhdPath);
-					String message = String.format(
-							"JNDI environment '%s' was set to '%s'",
-							VHD_JNDI_PATH, vhdPath);
-					foundLocations.add(new Found(Paths.get(vhdPath), message));
-				}
-			} catch (Exception e) {
-				log.debug("JNDI lookup failed. " + e);
-			}
+			String vhdPath = ContextProperties.findJndiProperty(VHD_JNDI_PATH);
+			log.debug("'" + VHD_JNDI_PATH + "' as specified by JNDI: " + vhdPath);
+			String message = String.format(
+					"JNDI environment '%s' was set to '%s'",
+					VHD_JNDI_PATH, vhdPath);
+			foundLocations.add(new Found(Paths.get(vhdPath), message));
 		}
 
 		private void getVhdFromSystemProperties() {
