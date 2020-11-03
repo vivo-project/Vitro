@@ -65,16 +65,16 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     	Model applicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
 		if (applicationMetadataModel.isEmpty()) {
 			firstTimeStartup = true;
-            initializeApplicationMetadata(ctx, applicationMetadataModel);
-            
-            // backup copy from firsttime files
-            OntModel applicationMetadataModelFirsttime = models.getOntModel(APPLICATION_METADATA_FIRSTTIME);
-            applicationMetadataModelFirsttime.add(applicationMetadataModel);
+			initializeApplicationMetadata(ctx, applicationMetadataModel);
+
+			// backup copy from firsttime files
+			OntModel applicationMetadataModelFirsttime = models.getOntModel(APPLICATION_METADATA_FIRSTTIME);
+			applicationMetadataModelFirsttime.add(applicationMetadataModel);
             
 		} else {
-            // check if some of the firsttime files have changed since the first start up and
-            // if they changed, apply these changes to the user models
-            applyFirstTimeChanges(ctx);
+			// check if some of the firsttime files have changed since the first start up and
+			// if they changed, apply these changes to the user models
+			applyFirstTimeChanges(ctx);
 
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );
 		}
