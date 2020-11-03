@@ -21,8 +21,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.util.iterator.ClosableIterator;
@@ -61,13 +63,8 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         ContextModelAccess models = ModelAccess.on(ctx);
         boolean firstTimeStartup = false;
 
-
-        log.info("Checken ob Firsttime geladen werden soll..-.");
-
-
     	Model applicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
 		if (applicationMetadataModel.isEmpty()) {
-            log.info("Ja firsttime sollte geladen werden");
 			firstTimeStartup = true;
             initializeApplicationMetadata(ctx, applicationMetadataModel);
             
@@ -76,10 +73,8 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             applicationMetadataModelFirsttime.add(applicationMetadataModel);
             
 		} else {
-            log.info("Nein firsttime sollte nicht geladen werden aber besser nochmal testen");
-
             // check if some of the firsttime files have changed since the first start up and
-            // if they changes, apply these changes
+            // if they changed, apply these changes
             applyFirstTimeChanges(ctx);
 
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );
@@ -219,126 +214,146 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         }
     }
 
+    /*
+     * Check if the firsttime files have changed since the firsttime startup,
+     * if so, then apply the changes but not overwrite the whole user model
+     */
     private void applyFirstTimeChanges(ServletContext ctx) {
+        log.info("Start with check: Reload firsttime files on start-up if changed");
+        boolean updatedFiles = false;
+
         // get configuration models from the firsttime start up (backup state)
         ContextModelAccess models = ModelAccess.on(ctx);
         OntModel applicationMetadataModel = models.getOntModel(APPLICATION_METADATA_FIRSTTIME);
         OntModel baseABoxModel = models.getOntModel(ABOX_ASSERTIONS_FIRSTTIME);
         OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS_FIRSTTIME);
 
+
         // check if ApplicationMetadataModel is the same in file and configuration models
+        log.info("compare firsttime files with configuration models (backup from first start) for Application Metadata Model");
         OntModel testApplicationMetadataModel = VitroModelFactory.createOntologyModel();
         RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", testApplicationMetadataModel, true);
         setPortalUriOnFirstTime(testApplicationMetadataModel, ctx); // muss das gemacht werden?
     
-
         if ( applicationMetadataModel.isIsomorphicWith(testApplicationMetadataModel) ) {
-            log.info("\n \n Test des ApplicationMetadataModel Models ergabt, das sie GLEICH sind");
+            log.info("They are the same, so do nothing");
         } else {
-            log.info("\n \n Test des ApplicationMetadataModel Models ergabt, das sie UNTERSCHIEDLICH sind");
-
-            log.info("ist ApplicationMetadataModel empty: " + applicationMetadataModel.isEmpty());
-            log.info("ist testApplicationMetadataModel empty: " + testApplicationMetadataModel.isEmpty());
+            log.info("they differ, compare values in configuration models with user's triplestore");
             
             OntModel userTriplestoreApplicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
 
             // ToDo there is a special case with this triple: "<https://some.othernamespace.edu/vivo/individual/portal1> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#rootTab> []  ."
             // it is always different but should no be changed and can maybe removed completely from the software
-
-            applyChanges(applicationMetadataModel, testApplicationMetadataModel, userTriplestoreApplicationMetadataModel, "applicationMetadata");
+            updatedFiles = applyChanges(applicationMetadataModel, testApplicationMetadataModel, userTriplestoreApplicationMetadataModel, "applicationMetadata");
+            if (updatedFiles) log.info("The applicationMetadata model was updated.");
         }
 
         // check if abox model is the same in file and configuration models
+        log.info("compare firsttime files with configuration models (backup from first start) for Base ABox Model");
         OntModel testBaseABoxModel = VitroModelFactory.createOntologyModel();
         RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", testBaseABoxModel, true);
 
         if ( baseABoxModel.isIsomorphicWith(testBaseABoxModel) ) {
-            log.info("\n \n Test des ABox Models ergabt, das sie GLEICH sind");
+            log.info("They are the same, so do nothing");
         } else {
-            log.info("\n \n Test des ABox Models ergabt, das sie UNTERSCHIEDLICH sind");
-
-            log.info("ist ABox alt empty: " + baseABoxModel.isEmpty());
-            log.info("ist ABox neu empty: " + testBaseABoxModel.isEmpty());
+            log.info("they differ, compare values in configuration models with user's triplestore");
             
             OntModel userTriplestoreABoxModel = models.getOntModel(ABOX_ASSERTIONS);
-
-            applyChanges(baseABoxModel, testBaseABoxModel, userTriplestoreABoxModel, "abox");
+            updatedFiles = applyChanges(baseABoxModel, testBaseABoxModel, userTriplestoreABoxModel, "abox");
+            if (updatedFiles) log.info("The ABox model was updated.");
         }
 
+
         // check if tbox model is the same in file and configuration models
+        log.info("compare firsttime files with configuration models (backup from first start) for Base TBox Model");
         OntModel testBaseTBoxModel = VitroModelFactory.createOntologyModel();
         RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", testBaseTBoxModel, true);
 
         if ( baseTBoxModel.isIsomorphicWith(testBaseTBoxModel) ) {
-            log.info("\n \n Test des TBox Models ergabt, das sie GLEICH sind");
+            log.info("They are the same, so do nothing");
         } else {
-            log.info("\n \n Test des TBox Models ergabt, das sie UNTERSCHIEDLICH sind");
-            log.info("ist tbox alt empty: " + baseTBoxModel.isEmpty());
-            log.info("ist tbox neu empty: " + testBaseTBoxModel.isEmpty());
+            log.info("they differ, compare values in configuration models with user's triplestore");
 
             OntModel userTriplestoreTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
-
-            applyChanges(baseTBoxModel, testBaseTBoxModel, userTriplestoreTBoxModel, "tbox");
+            updatedFiles = applyChanges(baseTBoxModel, testBaseTBoxModel, userTriplestoreTBoxModel, "tbox");
+            if (updatedFiles) log.info("The TBox model was updated.");
         }
     }
 
-    private void applyChanges(Model baseModel, Model newModel, Model userModel, String modelIdString) {
-            StringWriter out = new StringWriter();
-            StringWriter out2 = new StringWriter();
-            Model difOldNew = baseModel.difference(newModel);
-            Model difNewOld = newModel.difference(baseModel);
+    /*
+     *
+     * @param baseModel The backup firsttime model (from the first startup)
+     * @param newModel The current state of the firsttime files in the directory
+     * @param userModel The current state of the user model
+     * @param modelIdString Just an string for the output for better debugging (tbox, abox, applicationMetadata)
+     */
+    private boolean applyChanges(Model baseModel, Model newModel, Model userModel, String modelIdString) {
+        boolean updatedFiles = false;
+        StringWriter out = new StringWriter();
+        StringWriter out2 = new StringWriter();
+        Model difOldNew = baseModel.difference(newModel);
+        Model difNewOld = newModel.difference(baseModel);
+
+        // special case for "rootTab" triple, do not need an update (is it still used in general? if not remove this case)
+        if("applicationMetadata" == modelIdString) {
             
-            difOldNew.write(out, "TTL"); 
-            log.info("Unterschied für " + modelIdString + " (alt zu neu): " + out.toString());
-            difNewOld.write(out2, "TTL"); 
-            log.info("Unterschied für " + modelIdString + " (neu zu alt): " + out2.toString());
+            Property p = userModel.createProperty("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#", "rootTab");
+            difOldNew.removeAll(null, p, null);
+            difNewOld.removeAll(null, p, null);
+        }
 
-            if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
-                // if there is no difference, nothing needs to be done
-                log.info("Bei dem model " + modelIdString + " gibt es laut difference in beide Richtungen KEINEN Unterschied");
-            } else {
-                // if there is a difference, we need to remove the triples in difOldNew and 
-                // add the triples in difNewOld to the back up firsttime model
-                //OntModel userTriplestoreTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
+        if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
+            // if there is no difference, nothing needs to be done
+            log.info("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
+        } else {
+            // if there is a difference, we need to remove the triples in difOldNew and 
+            // add the triples in difNewOld to the back up firsttime model
 
-                if (!difOldNew.isEmpty()) {
-                    // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
-                    log.info("Bei dem Model" + modelIdString + " gibt es laut difference EINEN Unterschied von alt zu neu");
+            if (!difOldNew.isEmpty()) {
+                difOldNew.write(out, "TTL"); 
+                log.info("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
 
-                    // if the triples which should be removed are still in user´s triplestore, remove them
+                // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
+                // if the triples which should be removed are still in user´s triplestore, remove them
+                if (userModel.containsAny(difOldNew)) {
+                    log.info("Some of these triples are in the user triples store, so they will be removed now");
+                    userModel.remove(difOldNew);
+                    updatedFiles = true;
+
+                    // testing, remove me!!!!!!!!!!!
                     if (userModel.containsAny(difOldNew)) {
-                        log.info("Im User Triplestore sind noch welche von den entfernten Triples (alt zu neu), diese werden jetzt entfernt");
-                        userModel.remove(difOldNew);
-
-                        // testing, remove me!!!!!!!!!!!
-                        if (userModel.containsAny(difOldNew)) {
-                            log.info("ERROR: user triple store enthält trotzdem noch diese Triple");
-                        }
+                        log.info("ERROR: user triple store enthält trotzdem noch diese Triple");
                     }
-
-                    // remove the triples from the back up firsttime model for the next check
-                    baseModel.remove(difOldNew);
-
-                } else if (!difNewOld.isEmpty()) {
-                    log.info("Bei dem Model " + modelIdString + " gibt es laut difference EINEN Unterschied von neu zu alt");
-
-                    // if the triples which should be added are not already in user´s triplestore, add them
-                    if (!userModel.containsAll(difNewOld)) {
-                        log.info("Im User Triplestore sind noch welche von den neuen Triples nicht enthalten (alt zu neu), diese werden jetzt hinzugefügt");
-                        // but only the triples that are no already there
-                        Model tmp = difNewOld.difference(userModel);
-                        userModel.add(tmp);
-
-                        // testing, remove me
-                        if (!userModel.containsAll(difNewOld)) {
-                            log.info("ERROR: user triple store enthält trotzdem noch nicht alle von den Triplen");
-                        }
-                    }
-
-                    // add the triples from the back up firsttime model for the next check
-                    baseModel.add(difNewOld);
                 }
+
+                // remove the triples from the back up firsttime model for the next check
+                baseModel.remove(difOldNew);
+
             }
+            if (!difNewOld.isEmpty()) {
+                difNewOld.write(out2, "TTL"); 
+                log.info("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
+
+                // before we add the triples, we need to compare values in back up firsttime with user's triplestore
+                // if the triples which should be added are not already in user´s triplestore, add them
+                if (!userModel.containsAll(difNewOld)) {
+                    log.debug("Some of these triples are not in the user triples store, so they will be added now");
+                    // but only the triples that are no already there
+                    Model tmp = difNewOld.difference(userModel);
+                    userModel.add(tmp);
+                    updatedFiles = true;
+
+                    // testing, remove me
+                    if (!userModel.containsAll(difNewOld)) {
+                        log.info("ERROR: user triple store enthält trotzdem noch nicht alle von den Triplen");
+                    }
+                }
+
+                // add the triples from the back up firsttime model for the next check
+                baseModel.add(difNewOld);
+            }
+        }
+        return updatedFiles;
     }
 
     /* ===================================================================== */

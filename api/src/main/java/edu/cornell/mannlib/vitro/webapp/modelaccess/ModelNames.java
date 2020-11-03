@@ -27,9 +27,13 @@ public class ModelNames {
 	public static final String APPLICATION_METADATA = "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata";
 	public static final String APPLICATION_METADATA_FIRSTTIME = "vitro:applicationMetadataFirstime";
 	public static final String USER_ACCOUNTS = "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts";
+	public static final String USER_ACCOUNTS_FIRSTTIME = USER_ACCOUNTS + "Firsttime";
 	public static final String DISPLAY = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata";
+	public static final String DISPLAY_FIRSTTIME = DISPLAY + "Firsttime";
 	public static final String DISPLAY_TBOX = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
+	public static final String DISPLAY_TBOX_FIRSTTIME = DISPLAY_TBOX + "Firsttime";
 	public static final String DISPLAY_DISPLAY = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
+	public static final String DISPLAY_DISPLAY_FIRSTTIME = DISPLAY_DISPLAY + "Firsttime";
 
 	/**
 	 * A map of the URIS, keyed by their short names, intended only for display
@@ -53,9 +57,13 @@ public class ModelNames {
 		map.put("APPLICATION_METADATA", APPLICATION_METADATA);
 		map.put("APPLICATION_METADATA_FIRSTTIME", APPLICATION_METADATA_FIRSTTIME);
 		map.put("USER_ACCOUNTS", USER_ACCOUNTS);
+		map.put("USER_ACCOUNTS_FIRSTTIME", USER_ACCOUNTS_FIRSTTIME);
 		map.put("DISPLAY", DISPLAY);
+		map.put("DISPLAY_FIRSTTIME", DISPLAY_FIRSTTIME);
 		map.put("DISPLAY_TBOX", DISPLAY_TBOX);
+		map.put("DISPLAY_TBOX_FIRSTTIME", DISPLAY_TBOX_FIRSTTIME);
 		map.put("DISPLAY_DISPLAY", DISPLAY_DISPLAY);
+		map.put("DISPLAY_DISPLAY_FIRSTTIME", DISPLAY_DISPLAY_FIRSTTIME);
 		return Collections.unmodifiableMap(map);
 	}
 

@@ -12,15 +12,30 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 
 /**
  * Set up the models that use the CONFIGURATION RDFService. They are all mapped
  * to memory-based models.
  */
 public class ConfigurationModelsSetup implements ServletContextListener {
+	private static final Log log = LogFactory.getLog(ConfigurationModelsSetup.class);
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
@@ -31,34 +46,174 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			setupModel(ctx, DISPLAY_TBOX, "displayTbox");
 			setupModel(ctx, DISPLAY_DISPLAY, "displayDisplay");
 			setupModel(ctx, USER_ACCOUNTS, "auth");
-			ss.info(this,
-					"Set up the display models and the user accounts model.");
+			ss.info(this, "Set up the display models and the user accounts model.");
 		} catch (Exception e) {
 			ss.fatal(this, e.getMessage(), e.getCause());
 		}
 	}
 
-	private void setupModel(ServletContext ctx, String modelUri,
-			String modelPath) {
+	private void setupModel(ServletContext ctx, String modelUri, String modelPath) {
 		try {
 			OntModel ontModel = ModelAccess.on(ctx).getOntModel(modelUri);
-			loadFirstTimeFiles(ctx, modelPath, ontModel);
+			if (ontModel.isEmpty()) {
+				loadFirstTimeFiles(ctx, modelPath, ontModel);
+				// backup firsttime files
+				OntModel baseModelFirsttime = ModelAccess.on(ctx).getOntModel(modelUri + "Firsttime");
+				baseModelFirsttime.add(ontModel);
+			} else {
+				// Check if the firsttime files have changed since the firsttime startup,
+				// if so, then apply the changes but not overwrite the whole user model
+				applyFirstTimeChanges(ctx, modelPath, modelUri, ontModel);
+
+			}
+
 			loadEveryTimeFiles(ctx, modelPath, ontModel);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to create the '" + modelPath
-					+ "' model (" + modelUri + ").", e);
+			throw new RuntimeException("Failed to create the '" + modelPath + "' model (" + modelUri + ").", e);
 		}
 	}
 
-	private void loadFirstTimeFiles(ServletContext ctx, String modelPath,
-			OntModel baseModel) {
+	private void loadFirstTimeFiles(ServletContext ctx, String modelPath, OntModel baseModel) {
 		RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, baseModel, baseModel.isEmpty());
 	}
 
-	private void loadEveryTimeFiles(ServletContext ctx, String modelPath,
-			OntModel memoryModel) {
+	private void loadEveryTimeFiles(ServletContext ctx, String modelPath, OntModel memoryModel) {
 		RDFFilesLoader.loadEveryTimeFiles(ctx, modelPath, memoryModel);
 	}
+
+	/*
+	 * Check if the firsttime files have changed since the firsttime startup, if so,
+	 * then apply the changes but not overwrite the whole user model
+	 */
+	private void applyFirstTimeChanges(ServletContext ctx, String modelPath, String modelUri, OntModel userModel) {
+
+		log.info("Start with check: Reload firsttime files on start-up if changed");
+		boolean updatedFiles = false;
+
+		// get configuration models from the firsttime start up (backup state)
+		OntModel baseModelFirsttimeBackup = ModelAccess.on(ctx).getOntModel(modelUri + "Firsttime");
+
+		// check if ApplicationMetadataModel is the same in file and configuration
+		// models
+		log.info("compare firsttime files with configuration models (backup from first start) for " + modelPath);
+
+		OntModel baseModelFirsttime = VitroModelFactory.createOntologyModel();
+		RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, baseModelFirsttime, true);
+
+		if (baseModelFirsttime.isIsomorphicWith(baseModelFirsttimeBackup)) {
+			log.info("They are the same, so do nothing");
+		} else {
+			log.info("they differ, compare values in configuration models with user's triplestore");
+
+			updatedFiles = applyChanges(baseModelFirsttimeBackup, baseModelFirsttime, userModel, modelPath);
+			if (updatedFiles)
+				log.info("The model was updated, " + modelPath);
+		}
+	}
+
+	/*
+	 *
+	 * @param baseModel The backup firsttime model (from the first startup)
+	 * 
+	 * @param newModel The current state of the firsttime files in the directory
+	 * 
+	 * @param userModel The current state of the user model
+	 * 
+	 * @param modelIdString Just an string for the output for better debugging
+	 * (tbox, abox, applicationMetadata)
+	 */
+	private boolean applyChanges(Model baseModel, Model newModel, Model userModel, String modelIdString) {
+		boolean updatedFiles = false;
+		StringWriter out = new StringWriter();
+		StringWriter out2 = new StringWriter();
+		Model difOldNew = baseModel.difference(newModel);
+		Model difNewOld = newModel.difference(baseModel);
+
+		// remove special case for display, problem with quickView -triple
+		if (modelIdString == "display") {
+
+			StmtIterator iter = difOldNew.listStatements();
+			List<Statement> removeStatement = new ArrayList<Statement>();
+			while (iter.hasNext()) {
+				Statement stmt      = iter.nextStatement();  // get next statement
+    			Resource  subject   = stmt.getSubject();     // get the subject
+				RDFNode   object    = stmt.getObject();      // get the object			
+
+				if(subject.isAnon() || object.isAnon())
+				{
+					removeStatement.add(stmt);
+				}
+			}
+			difOldNew.remove(removeStatement);
+
+			StmtIterator iter2 = difNewOld.listStatements();
+			List<Statement> removeStatement2 = new ArrayList<Statement>();
+			while (iter2.hasNext()) {
+				Statement stmt      = iter2.nextStatement();  // get next statement
+    			Resource  subject   = stmt.getSubject();     // get the subject
+				RDFNode   object    = stmt.getObject();      // get the object
+
+				if(subject.isAnon() || object.isAnon())
+				{
+					removeStatement2.add(stmt);
+				}
+			}
+			difNewOld.remove(removeStatement2);
+		}
+
+        if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
+            // if there is no difference, nothing needs to be done
+            log.info("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
+        } else {
+            // if there is a difference, we need to remove the triples in difOldNew and 
+            // add the triples in difNewOld to the back up firsttime model
+
+            if (!difOldNew.isEmpty()) {
+                difOldNew.write(out, "N-TRIPLE"); 
+                log.info("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
+
+                // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
+                // if the triples which should be removed are still in user´s triplestore, remove them
+                if (userModel.containsAny(difOldNew)) {
+                    log.info("Some of these triples are in the user triples store, so they will be removed now");
+                    userModel.remove(difOldNew);
+                    updatedFiles = true;
+
+                    // testing, remove me!!!!!!!!!!!
+                    if (userModel.containsAny(difOldNew)) {
+                        log.info("ERROR: user triple store enthält trotzdem noch diese Triple");
+                    }
+                }
+
+                // remove the triples from the back up firsttime model for the next check
+                baseModel.remove(difOldNew);
+
+			}
+			if (!difNewOld.isEmpty()) {
+                difNewOld.write(out2, "N-TRIPLE"); 
+                log.info("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
+
+                // before we add the triples, we need to compare values in back up firsttime with user's triplestore
+                // if the triples which should be added are not already in user´s triplestore, add them
+                if (!userModel.containsAll(difNewOld)) {
+                    log.info("Some of these triples are not in the user triples store, so they will be added now");
+                    // but only the triples that are no already there
+                    Model tmp = difNewOld.difference(userModel);
+                    userModel.add(tmp);
+                    updatedFiles = true;
+
+                    // testing, remove me
+                    if (!userModel.containsAll(difNewOld)) {
+                        log.info("ERROR: user triple store enthält trotzdem noch nicht alle von den Triplen");
+                    }
+                }
+
+                // add the triples from the back up firsttime model for the next check
+                baseModel.add(difNewOld);
+            }
+        }
+        return updatedFiles;
+    }
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
