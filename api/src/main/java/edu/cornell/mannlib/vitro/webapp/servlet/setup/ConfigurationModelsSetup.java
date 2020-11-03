@@ -64,7 +64,6 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 				// Check if the firsttime files have changed since the firsttime startup,
 				// if so, then apply the changes but not overwrite the whole user model
 				applyFirstTimeChanges(ctx, modelPath, modelUri, ontModel);
-
 			}
 
 			loadEveryTimeFiles(ctx, modelPath, ontModel);
@@ -93,17 +92,16 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		// get configuration models from the firsttime start up (backup state)
 		OntModel baseModelFirsttimeBackup = ModelAccess.on(ctx).getOntModel(modelUri + "Firsttime");
 
-		// check if ApplicationMetadataModel is the same in file and configuration
-		// models
-		log.info("compare firsttime files with configuration models (backup from first start) for " + modelPath);
+		// check if ApplicationMetadataModel is the same in file and configuration models
+		log.debug("compare firsttime files with configuration models (backup from first start) for " + modelPath);
 
 		OntModel baseModelFirsttime = VitroModelFactory.createOntologyModel();
 		RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, baseModelFirsttime, true);
 
 		if (baseModelFirsttime.isIsomorphicWith(baseModelFirsttimeBackup)) {
-			log.info("They are the same, so do nothing");
+			log.debug("They are the same, so do nothing");
 		} else {
-			log.info("they differ, compare values in configuration models with user's triplestore");
+			log.debug("they differ, compare values in configuration models with user's triplestore");
 
 			updatedFiles = applyChanges(baseModelFirsttimeBackup, baseModelFirsttime, userModel, modelPath);
 			if (updatedFiles)
@@ -112,15 +110,13 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 	}
 
 	/*
-	 *
+	 * Double check the model difference for blank nodes and special cases and then apply the changes to the user models
+	 * 
 	 * @param baseModel The backup firsttime model (from the first startup)
-	 * 
 	 * @param newModel The current state of the firsttime files in the directory
-	 * 
 	 * @param userModel The current state of the user model
-	 * 
 	 * @param modelIdString Just an string for the output for better debugging
-	 * (tbox, abox, applicationMetadata)
+	 * (display, displayTbox, displayDisplay, auth)
 	 */
 	private boolean applyChanges(Model baseModel, Model newModel, Model userModel, String modelIdString) {
 		boolean updatedFiles = false;
@@ -129,7 +125,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		Model difOldNew = baseModel.difference(newModel);
 		Model difNewOld = newModel.difference(baseModel);
 
-		// remove special case for display, problem with quickView -triple
+		// remove special case for display, problem with quickView -triple and blank nodes
 		if (modelIdString == "display") {
 
 			StmtIterator iter = difOldNew.listStatements();
@@ -163,26 +159,21 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 
         if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
             // if there is no difference, nothing needs to be done
-            log.info("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
+            log.debug("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
         } else {
             // if there is a difference, we need to remove the triples in difOldNew and 
             // add the triples in difNewOld to the back up firsttime model
 
             if (!difOldNew.isEmpty()) {
-                difOldNew.write(out, "N-TRIPLE"); 
-                log.info("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
+                difOldNew.write(out, "TTL"); 
+                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
 
                 // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be removed are still in user´s triplestore, remove them
                 if (userModel.containsAny(difOldNew)) {
-                    log.info("Some of these triples are in the user triples store, so they will be removed now");
+                    log.debug("Some of these triples are in the user triples store, so they will be removed now");
                     userModel.remove(difOldNew);
                     updatedFiles = true;
-
-                    // testing, remove me!!!!!!!!!!!
-                    if (userModel.containsAny(difOldNew)) {
-                        log.info("ERROR: user triple store enthält trotzdem noch diese Triple");
-                    }
                 }
 
                 // remove the triples from the back up firsttime model for the next check
@@ -190,22 +181,17 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 
 			}
 			if (!difNewOld.isEmpty()) {
-                difNewOld.write(out2, "N-TRIPLE"); 
-                log.info("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
+                difNewOld.write(out2, "TTL"); 
+                log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
 
                 // before we add the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be added are not already in user´s triplestore, add them
                 if (!userModel.containsAll(difNewOld)) {
-                    log.info("Some of these triples are not in the user triples store, so they will be added now");
+                    log.debug("Some of these triples are not in the user triples store, so they will be added now");
                     // but only the triples that are no already there
                     Model tmp = difNewOld.difference(userModel);
                     userModel.add(tmp);
                     updatedFiles = true;
-
-                    // testing, remove me
-                    if (!userModel.containsAll(difNewOld)) {
-                        log.info("ERROR: user triple store enthält trotzdem noch nicht alle von den Triplen");
-                    }
                 }
 
                 // add the triples from the back up firsttime model for the next check

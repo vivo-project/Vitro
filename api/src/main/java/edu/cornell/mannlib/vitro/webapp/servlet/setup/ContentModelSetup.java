@@ -24,7 +24,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.util.iterator.ClosableIterator;
@@ -74,7 +73,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             
 		} else {
             // check if some of the firsttime files have changed since the first start up and
-            // if they changed, apply these changes
+            // if they changed, apply these changes to the user models
             applyFirstTimeChanges(ctx);
 
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );
@@ -230,58 +229,59 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
 
         // check if ApplicationMetadataModel is the same in file and configuration models
-        log.info("compare firsttime files with configuration models (backup from first start) for Application Metadata Model");
+        log.debug("compare firsttime files with configuration models (backup from first start) for Application Metadata Model");
         OntModel testApplicationMetadataModel = VitroModelFactory.createOntologyModel();
         RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", testApplicationMetadataModel, true);
         setPortalUriOnFirstTime(testApplicationMetadataModel, ctx); // muss das gemacht werden?
     
         if ( applicationMetadataModel.isIsomorphicWith(testApplicationMetadataModel) ) {
-            log.info("They are the same, so do nothing");
+            log.debug("They are the same, do nothing");
         } else {
-            log.info("they differ, compare values in configuration models with user's triplestore");
-            
+            log.debug("they differ, compare values in configuration models with user's triplestore");     
             OntModel userTriplestoreApplicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
 
-            // ToDo there is a special case with this triple: "<https://some.othernamespace.edu/vivo/individual/portal1> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#rootTab> []  ."
-            // it is always different but should no be changed and can maybe removed completely from the software
+            // double check the statements (blank notes, etc.) and apply the changes
             updatedFiles = applyChanges(applicationMetadataModel, testApplicationMetadataModel, userTriplestoreApplicationMetadataModel, "applicationMetadata");
             if (updatedFiles) log.info("The applicationMetadata model was updated.");
         }
 
         // check if abox model is the same in file and configuration models
-        log.info("compare firsttime files with configuration models (backup from first start) for Base ABox Model");
+        log.debug("compare firsttime files with configuration models (backup from first start) for Base ABox Model");
         OntModel testBaseABoxModel = VitroModelFactory.createOntologyModel();
         RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", testBaseABoxModel, true);
 
         if ( baseABoxModel.isIsomorphicWith(testBaseABoxModel) ) {
-            log.info("They are the same, so do nothing");
+            log.debug("They are the same, so do nothing");
         } else {
-            log.info("they differ, compare values in configuration models with user's triplestore");
-            
+            log.debug("they differ, compare values in configuration models with user's triplestore");
             OntModel userTriplestoreABoxModel = models.getOntModel(ABOX_ASSERTIONS);
+
+            // double check the statements (blank notes, etc.) and apply the changes
             updatedFiles = applyChanges(baseABoxModel, testBaseABoxModel, userTriplestoreABoxModel, "abox");
             if (updatedFiles) log.info("The ABox model was updated.");
         }
 
 
         // check if tbox model is the same in file and configuration models
-        log.info("compare firsttime files with configuration models (backup from first start) for Base TBox Model");
+        log.debug("compare firsttime files with configuration models (backup from first start) for Base TBox Model");
         OntModel testBaseTBoxModel = VitroModelFactory.createOntologyModel();
         RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", testBaseTBoxModel, true);
 
         if ( baseTBoxModel.isIsomorphicWith(testBaseTBoxModel) ) {
-            log.info("They are the same, so do nothing");
+            log.debug("They are the same, so do nothing");
         } else {
-            log.info("they differ, compare values in configuration models with user's triplestore");
-
+            log.debug("they differ, compare values in configuration models with user's triplestore");
             OntModel userTriplestoreTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
+
+            // double check the statements (blank notes, etc.) and apply the changes
             updatedFiles = applyChanges(baseTBoxModel, testBaseTBoxModel, userTriplestoreTBoxModel, "tbox");
             if (updatedFiles) log.info("The TBox model was updated.");
         }
     }
 
     /*
-     *
+     * Double check the model difference for blank nodes and special cases and then apply the changes to the user models
+     * 
      * @param baseModel The backup firsttime model (from the first startup)
      * @param newModel The current state of the firsttime files in the directory
      * @param userModel The current state of the user model
@@ -304,26 +304,21 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
         if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
             // if there is no difference, nothing needs to be done
-            log.info("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
+            log.debug("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
         } else {
             // if there is a difference, we need to remove the triples in difOldNew and 
             // add the triples in difNewOld to the back up firsttime model
 
             if (!difOldNew.isEmpty()) {
                 difOldNew.write(out, "TTL"); 
-                log.info("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
+                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
 
                 // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be removed are still in user´s triplestore, remove them
                 if (userModel.containsAny(difOldNew)) {
-                    log.info("Some of these triples are in the user triples store, so they will be removed now");
+                    log.debug("Some of these triples are in the user triples store, so they will be removed now");
                     userModel.remove(difOldNew);
                     updatedFiles = true;
-
-                    // testing, remove me!!!!!!!!!!!
-                    if (userModel.containsAny(difOldNew)) {
-                        log.info("ERROR: user triple store enthält trotzdem noch diese Triple");
-                    }
                 }
 
                 // remove the triples from the back up firsttime model for the next check
@@ -332,7 +327,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             }
             if (!difNewOld.isEmpty()) {
                 difNewOld.write(out2, "TTL"); 
-                log.info("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
+                log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
 
                 // before we add the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be added are not already in user´s triplestore, add them
@@ -342,11 +337,6 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
                     Model tmp = difNewOld.difference(userModel);
                     userModel.add(tmp);
                     updatedFiles = true;
-
-                    // testing, remove me
-                    if (!userModel.containsAll(difNewOld)) {
-                        log.info("ERROR: user triple store enthält trotzdem noch nicht alle von den Triplen");
-                    }
                 }
 
                 // add the triples from the back up firsttime model for the next check
