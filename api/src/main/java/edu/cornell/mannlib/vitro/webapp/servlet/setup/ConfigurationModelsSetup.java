@@ -13,7 +13,6 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -110,7 +109,12 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 	}
 
 	/*
-	 * Double check the model difference for blank nodes and special cases and then apply the changes to the user models
+	 * This method is designed to compare configuration models (baseModel) with firsttime files (newModel):
+	 * if they are the same, stop
+	 * else, if they differ, compare values in configuration models (baseModel) with user's triplestore
+	 *     if they are the same, update user's triplestore with value in new firsttime files
+	 *     else, if they differ, leave user's triplestore statement alone
+	 * finally, overwrite the configuration models with content of the updated firstime files
 	 * 
 	 * @param baseModel The backup firsttime model (from the first startup)
 	 * @param newModel The current state of the firsttime files in the directory
@@ -126,7 +130,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		Model difNewOld = newModel.difference(baseModel);
 
 		// remove special case for display, problem with quickView -triple and blank nodes
-		if (modelIdString == "display") {
+		if (modelIdString.equals("display")) {
 
 			StmtIterator iter = difOldNew.listStatements();
 			List<Statement> removeStatement = new ArrayList<Statement>();

@@ -232,7 +232,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         log.debug("compare firsttime files with configuration models (backup from first start) for Application Metadata Model");
         OntModel testApplicationMetadataModel = VitroModelFactory.createOntologyModel();
         RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", testApplicationMetadataModel, true);
-        setPortalUriOnFirstTime(testApplicationMetadataModel, ctx); // muss das gemacht werden?
+        setPortalUriOnFirstTime(testApplicationMetadataModel, ctx);
     
         if ( applicationMetadataModel.isIsomorphicWith(testApplicationMetadataModel) ) {
             log.debug("They are the same, do nothing");
@@ -280,7 +280,12 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     }
 
     /*
-     * Double check the model difference for blank nodes and special cases and then apply the changes to the user models
+	 * This method is designed to compare configuration models (baseModel) with firsttime files (newModel):
+	 * if they are the same, stop
+	 * else, if they differ, compare values in configuration models (baseModel) with user's triplestore
+	 *     if they are the same, update user's triplestore with value in new firsttime files
+	 *     else, if they differ, leave user's triplestore statement alone
+	 * finally, overwrite the configuration models with content of the updated firstime files
      * 
      * @param baseModel The backup firsttime model (from the first startup)
      * @param newModel The current state of the firsttime files in the directory
@@ -295,7 +300,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         Model difNewOld = newModel.difference(baseModel);
 
         // special case for "rootTab" triple, do not need an update (is it still used in general? if not remove this case)
-        if("applicationMetadata" == modelIdString) {
+        if(modelIdString.equals("applicationMetadata")) {
             
             Property p = userModel.createProperty("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#", "rootTab");
             difOldNew.removeAll(null, p, null);
