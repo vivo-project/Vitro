@@ -132,6 +132,11 @@ public class EditLiteral implements Literal {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean isStmtResource() {
+        throw new UnsupportedOperationException();
+    }
+
     public Literal inModel(Model model) {
         throw new UnsupportedOperationException();
     }
