@@ -346,7 +346,12 @@ public class ProcessRdfForm {
      */
     protected static List<Model> parseN3ToRDF(
             List<String> n3Strings, N3ParseType parseType, String linguisticContext ) throws Exception {
-       List<String> errorMessages = new ArrayList<String>();
+        // Use non-linguistic version of this method if no linguisticContext is provided
+        if (linguisticContext == null) {
+            return parseN3ToRDF(n3Strings, parseType);
+        }
+
+        List<String> errorMessages = new ArrayList<String>();
 
         List<Model> rdfModels = new ArrayList<Model>();
         for(String n3 : n3Strings){
