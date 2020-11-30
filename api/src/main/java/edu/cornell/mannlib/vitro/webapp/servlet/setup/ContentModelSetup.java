@@ -5,9 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS_FIRSTTIME;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS_FIRSTTIME;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA_FIRSTTIME;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA_FIRSTTIME_BACKUP;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +68,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 			initializeApplicationMetadata(ctx, applicationMetadataModel);
 
 			// backup copy from firsttime files
-			OntModel applicationMetadataModelFirsttime = models.getOntModel(APPLICATION_METADATA_FIRSTTIME);
+			OntModel applicationMetadataModelFirsttime = models.getOntModel(APPLICATION_METADATA_FIRSTTIME_BACKUP);
 			applicationMetadataModelFirsttime.add(applicationMetadataModel);
             
 		} else {
@@ -84,7 +84,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", baseABoxModel, true);
 
             // backup copy from firsttime files
-            OntModel baseABoxModelFirsttime = models.getOntModel(ABOX_ASSERTIONS_FIRSTTIME);
+            OntModel baseABoxModelFirsttime = models.getOntModel(ABOX_ASSERTIONS_FIRSTTIME_BACKUP);
             baseABoxModelFirsttime.add(baseABoxModel);
         }
         RDFFilesLoader.loadEveryTimeFiles(ctx, "abox", baseABoxModel);
@@ -94,7 +94,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", baseTBoxModel, true);
 
             // backup copy from firsttime files
-            OntModel baseTBoxModelFirsttime = models.getOntModel(TBOX_ASSERTIONS_FIRSTTIME);
+            OntModel baseTBoxModelFirsttime = models.getOntModel(TBOX_ASSERTIONS_FIRSTTIME_BACKUP);
             baseTBoxModelFirsttime.add(baseTBoxModel);
         }
         RDFFilesLoader.loadEveryTimeFiles(ctx, "tbox", baseTBoxModel);
@@ -219,11 +219,11 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
      */
     private void applyFirstTimeChanges(ServletContext ctx) {
 
-        applyFirstTimeChanges(ctx, "applicationMetadata", APPLICATION_METADATA_FIRSTTIME, APPLICATION_METADATA);
+        applyFirstTimeChanges(ctx, "applicationMetadata", APPLICATION_METADATA_FIRSTTIME_BACKUP, APPLICATION_METADATA);
 
-        applyFirstTimeChanges(ctx, "abox", ABOX_ASSERTIONS_FIRSTTIME, ABOX_ASSERTIONS);
+        applyFirstTimeChanges(ctx, "abox", ABOX_ASSERTIONS_FIRSTTIME_BACKUP, ABOX_ASSERTIONS);
 
-        applyFirstTimeChanges(ctx, "tbox", TBOX_ASSERTIONS_FIRSTTIME, TBOX_ASSERTIONS);
+        applyFirstTimeChanges(ctx, "tbox", TBOX_ASSERTIONS_FIRSTTIME_BACKUP, TBOX_ASSERTIONS);
     }
 
 
@@ -242,7 +242,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, firsttimeFilesModel, true);
 
         // special initialization for application metadata model
-        if (firsttimeBackupModelUri.equals(APPLICATION_METADATA_FIRSTTIME)) {
+        if (firsttimeBackupModelUri.equals(APPLICATION_METADATA_FIRSTTIME_BACKUP)) {
             setPortalUriOnFirstTime(firsttimeFilesModel, ctx);
         }
 
@@ -260,7 +260,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
     /*
 	 * This method is designed to compare configuration models (baseModel) with firsttime files (newModel):
-	 * if they are the same, stop
+	 * if they are the same, stopFirstTime
 	 * else, if they differ, compare values in configuration models (baseModel) with user's triplestore
 	 *     if they are the same, update user's triplestore with value in new firsttime files
 	 *     else, if they differ, leave user's triplestore statement alone

@@ -57,7 +57,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			if (ontModel.isEmpty()) {
 				loadFirstTimeFiles(ctx, modelPath, ontModel);
 				// backup firsttime files
-				OntModel baseModelFirsttime = ModelAccess.on(ctx).getOntModel(modelUri + "Firsttime");
+				OntModel baseModelFirsttime = ModelAccess.on(ctx).getOntModel(modelUri + "FirsttimeBackup");
 				baseModelFirsttime.add(ontModel);
 			} else {
 				// Check if the firsttime files have changed since the firsttime startup,
@@ -89,7 +89,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		boolean updatedFiles = false;
 
 		// get configuration models from the firsttime start up (backup state)
-		OntModel baseModelFirsttimeBackup = ModelAccess.on(ctx).getOntModel(modelUri + "Firsttime");
+		OntModel baseModelFirsttimeBackup = ModelAccess.on(ctx).getOntModel(modelUri + "FirsttimeBackup");
 
 		// compare firsttime files with configuration models
 		log.debug("compare firsttime files with configuration models (backup from first start) for " + modelPath);
