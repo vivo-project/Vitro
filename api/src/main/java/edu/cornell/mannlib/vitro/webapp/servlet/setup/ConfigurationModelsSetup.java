@@ -85,22 +85,22 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 	 */
 	private void applyFirstTimeChanges(ServletContext ctx, String modelPath, String modelUri, OntModel userModel) {
 
-		log.info("Start with check: Reload firsttime files on start-up if changed");
+		log.info("Reload firsttime files on start-up if changed: '" + modelPath +"', URI: '" + modelUri + "'");
 		boolean updatedFiles = false;
 
 		// get configuration models from the firsttime start up (backup state)
 		OntModel baseModelFirsttimeBackup = ModelAccess.on(ctx).getOntModel(modelUri + "Firsttime");
 
-		// check if ApplicationMetadataModel is the same in file and configuration models
+		// compare firsttime files with configuration models
 		log.debug("compare firsttime files with configuration models (backup from first start) for " + modelPath);
 
 		OntModel baseModelFirsttime = VitroModelFactory.createOntologyModel();
 		RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, baseModelFirsttime, true);
 
 		if (baseModelFirsttime.isIsomorphicWith(baseModelFirsttimeBackup)) {
-			log.debug("They are the same, so do nothing");
+			log.debug("They are the same, so do nothing: '" + modelPath + "'");
 		} else {
-			log.debug("they differ, compare values in configuration models with user's triplestore");
+			log.debug("They differ:" + modelPath + ", compare values in configuration models with user's triplestore");
 
 			updatedFiles = applyChanges(baseModelFirsttimeBackup, baseModelFirsttime, userModel, modelPath);
 			if (updatedFiles)
@@ -129,36 +129,11 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		Model difOldNew = baseModel.difference(newModel);
 		Model difNewOld = newModel.difference(baseModel);
 
-		// remove special case for display, problem with quickView -triple and blank nodes
+		// remove special cases for display, problem with blank nodes
 		if (modelIdString.equals("display")) {
 
-			StmtIterator iter = difOldNew.listStatements();
-			List<Statement> removeStatement = new ArrayList<Statement>();
-			while (iter.hasNext()) {
-				Statement stmt      = iter.nextStatement();  // get next statement
-    			Resource  subject   = stmt.getSubject();     // get the subject
-				RDFNode   object    = stmt.getObject();      // get the object			
-
-				if(subject.isAnon() || object.isAnon())
-				{
-					removeStatement.add(stmt);
-				}
-			}
-			difOldNew.remove(removeStatement);
-
-			StmtIterator iter2 = difNewOld.listStatements();
-			List<Statement> removeStatement2 = new ArrayList<Statement>();
-			while (iter2.hasNext()) {
-				Statement stmt      = iter2.nextStatement();  // get next statement
-    			Resource  subject   = stmt.getSubject();     // get the subject
-				RDFNode   object    = stmt.getObject();      // get the object
-
-				if(subject.isAnon() || object.isAnon())
-				{
-					removeStatement2.add(stmt);
-				}
-			}
-			difNewOld.remove(removeStatement2);
+			removeBlankTriples(difOldNew);
+			removeBlankTriples(difNewOld);
 		}
 
         if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
@@ -170,7 +145,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 
             if (!difOldNew.isEmpty()) {
                 difOldNew.write(out, "TTL"); 
-                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
+                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out);
 
                 // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be removed are still in user´s triplestore, remove them
@@ -186,7 +161,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			}
 			if (!difNewOld.isEmpty()) {
                 difNewOld.write(out2, "TTL"); 
-                log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
+                log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2);
 
                 // before we add the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be added are not already in user´s triplestore, add them
@@ -203,7 +178,26 @@ public class ConfigurationModelsSetup implements ServletContextListener {
             }
         }
         return updatedFiles;
-    }
+	}
+	
+	/**
+	 * Remove all triples where subject or object is blank (Anon)
+	 */
+	private void removeBlankTriples(Model model) {
+		StmtIterator iter = model.listStatements();
+		List<Statement> removeStatement = new ArrayList<Statement>();
+		while (iter.hasNext()) {
+			Statement stmt      = iter.nextStatement();  // get next statement
+			Resource  subject   = stmt.getSubject();     // get the subject
+			RDFNode   object    = stmt.getObject();      // get the object			
+
+			if(subject.isAnon() || object.isAnon())
+			{
+				removeStatement.add(stmt);
+			}
+		}
+		model.remove(removeStatement);
+	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
