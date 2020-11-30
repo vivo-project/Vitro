@@ -214,68 +214,47 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     }
 
     /*
-     * Check if the firsttime files have changed since the firsttime startup,
+     * Check if the firsttime files have changed since the firsttime startup for all ContentModels,
      * if so, then apply the changes but not overwrite the whole user model
      */
     private void applyFirstTimeChanges(ServletContext ctx) {
-        log.info("Start with check: Reload firsttime files on start-up if changed");
-        boolean updatedFiles = false;
 
-        // get configuration models from the firsttime start up (backup state)
+        applyFirstTimeChanges(ctx, "applicationMetadata", APPLICATION_METADATA_FIRSTTIME, APPLICATION_METADATA);
+
+        applyFirstTimeChanges(ctx, "abox", ABOX_ASSERTIONS_FIRSTTIME, ABOX_ASSERTIONS);
+
+        applyFirstTimeChanges(ctx, "tbox", TBOX_ASSERTIONS_FIRSTTIME, TBOX_ASSERTIONS);
+    }
+
+
+    /*
+     * Check if the firsttime files have changed since the firsttime startup for one ContentModel,
+     * if so, then apply the changes but not overwrite the whole user model
+     */
+    private void applyFirstTimeChanges(ServletContext ctx, String modelPath, String firsttimeBackupModelUri, String userModelUri) {
+        log.info("Reload firsttime files on start-up if changed: '" + modelPath +"', URI: '" +userModelUri+ "'");
         ContextModelAccess models = ModelAccess.on(ctx);
-        OntModel applicationMetadataModel = models.getOntModel(APPLICATION_METADATA_FIRSTTIME);
-        OntModel baseABoxModel = models.getOntModel(ABOX_ASSERTIONS_FIRSTTIME);
-        OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS_FIRSTTIME);
+        OntModel firsttimeBackupModel = models.getOntModel(firsttimeBackupModelUri);
 
+        // compare firsttime files with configuration models
+        log.debug("compare firsttime files with configuration models (backup from first start) for " + modelPath);
+        OntModel firsttimeFilesModel = VitroModelFactory.createOntologyModel();
+        RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, firsttimeFilesModel, true);
 
-        // check if ApplicationMetadataModel is the same in file and configuration models
-        log.debug("compare firsttime files with configuration models (backup from first start) for Application Metadata Model");
-        OntModel testApplicationMetadataModel = VitroModelFactory.createOntologyModel();
-        RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", testApplicationMetadataModel, true);
-        setPortalUriOnFirstTime(testApplicationMetadataModel, ctx);
-    
-        if ( applicationMetadataModel.isIsomorphicWith(testApplicationMetadataModel) ) {
-            log.debug("They are the same, do nothing");
-        } else {
-            log.debug("they differ, compare values in configuration models with user's triplestore");     
-            OntModel userTriplestoreApplicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
-
-            // double check the statements (blank notes, etc.) and apply the changes
-            updatedFiles = applyChanges(applicationMetadataModel, testApplicationMetadataModel, userTriplestoreApplicationMetadataModel, "applicationMetadata");
-            if (updatedFiles) log.info("The applicationMetadata model was updated.");
+        // special initialization for application metadata model
+        if (firsttimeBackupModelUri.equals(APPLICATION_METADATA_FIRSTTIME)) {
+            setPortalUriOnFirstTime(firsttimeFilesModel, ctx);
         }
 
-        // check if abox model is the same in file and configuration models
-        log.debug("compare firsttime files with configuration models (backup from first start) for Base ABox Model");
-        OntModel testBaseABoxModel = VitroModelFactory.createOntologyModel();
-        RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", testBaseABoxModel, true);
-
-        if ( baseABoxModel.isIsomorphicWith(testBaseABoxModel) ) {
-            log.debug("They are the same, so do nothing");
+        if ( firsttimeBackupModel.isIsomorphicWith(firsttimeFilesModel) ) {
+            log.debug("They are the same, so do nothing: '" + modelPath + "'");
         } else {
-            log.debug("they differ, compare values in configuration models with user's triplestore");
-            OntModel userTriplestoreABoxModel = models.getOntModel(ABOX_ASSERTIONS);
+            log.debug("They differ: '" + modelPath + "', compare values in configuration models with user's triplestore");     
+            OntModel userModel = models.getOntModel(userModelUri);
 
             // double check the statements (blank notes, etc.) and apply the changes
-            updatedFiles = applyChanges(baseABoxModel, testBaseABoxModel, userTriplestoreABoxModel, "abox");
-            if (updatedFiles) log.info("The ABox model was updated.");
-        }
-
-
-        // check if tbox model is the same in file and configuration models
-        log.debug("compare firsttime files with configuration models (backup from first start) for Base TBox Model");
-        OntModel testBaseTBoxModel = VitroModelFactory.createOntologyModel();
-        RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", testBaseTBoxModel, true);
-
-        if ( baseTBoxModel.isIsomorphicWith(testBaseTBoxModel) ) {
-            log.debug("They are the same, so do nothing");
-        } else {
-            log.debug("they differ, compare values in configuration models with user's triplestore");
-            OntModel userTriplestoreTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
-
-            // double check the statements (blank notes, etc.) and apply the changes
-            updatedFiles = applyChanges(baseTBoxModel, testBaseTBoxModel, userTriplestoreTBoxModel, "tbox");
-            if (updatedFiles) log.info("The TBox model was updated.");
+            boolean updatedFiles = applyChanges(firsttimeBackupModel, firsttimeFilesModel, userModel, modelPath);
+            if (updatedFiles) log.info("The model was updated, " + modelPath);
         }
     }
 
