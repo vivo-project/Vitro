@@ -45,6 +45,11 @@ public class LiteralStub implements Literal {
 	}
 
 	@Override
+	public boolean isStmtResource() {
+		return false;
+	}
+
+	@Override
 	public boolean isURIResource() {
 		return false;
 	}
