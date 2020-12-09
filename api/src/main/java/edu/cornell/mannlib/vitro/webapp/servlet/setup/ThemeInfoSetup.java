@@ -6,7 +6,6 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATIO
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;

@@ -23,10 +23,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
-
 import stubs.javax.servlet.http.HttpServletRequestStub;
 
-public class ProcessRdfFormTest extends AbstractTestClass{
+public class ProcessRdfFormTest extends AbstractTestClass {
 
     @Test
     public void basicNewStatementTest() throws Exception{

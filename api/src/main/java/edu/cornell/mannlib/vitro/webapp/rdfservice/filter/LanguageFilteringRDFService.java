@@ -8,8 +8,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -100,7 +102,16 @@ public class LanguageFilteringRDFService implements RDFService {
                 s.sparqlSelectQuery(query, RDFService.ResultFormat.JSON));
         List<QuerySolution> solnList = getSolutionList(resultSet);
         List<String> vars = resultSet.getResultVars();
+
+        // This block loops all of the Query variables;
+        //   for each QuerySolution, creates a map of the values of the other variables than the current
+        //   'variable' --> a list of RowIndexedLiterals.
+        // In this way, all of the QuerySolutions with equal values of their other variables are grouped.
+        // This map is used subsequently to filter Literals based on lang
         for (String var : vars) {
+            Map<List<RDFNode>, List<RowIndexedLiteral>> nonVarToRowIndexedLiterals = new HashMap<>();
+
+            // First pass of solnList to populate map
             for (int i = 0; i < solnList.size(); i++) {
                 QuerySolution s = solnList.get(i);
                 if (s == null) {
@@ -110,19 +121,28 @@ public class LanguageFilteringRDFService implements RDFService {
                 if (node == null || !node.isLiteral()) {
                     continue;
                 }
-                List<RowIndexedLiteral> candidatesForRemoval =
-                        new ArrayList<RowIndexedLiteral>();
-                candidatesForRemoval.add(new RowIndexedLiteral(node.asLiteral(), i));
-                for (int j = i + 1; j < solnList.size(); j++) {
-                    QuerySolution t = solnList.get(j);
-                    if (t == null) {
-                        continue;
-                    }
-                    if (matchesExceptForVar(s, t, var, vars)) {
-                        candidatesForRemoval.add(
-                                new RowIndexedLiteral(t.getLiteral(var), j));
+
+                // Create entry representing values other than current 'var' for this QuerySolution
+                List<RDFNode> nonVarList = new ArrayList(vars.size() - 1);
+                for (String v : vars) {
+                    if (!v.equals(var)) {
+                        nonVarList.add(s.get(v));
                     }
                 }
+
+                List<RowIndexedLiteral> rowIndexedLiterals = nonVarToRowIndexedLiterals.get(nonVarList);
+                if (rowIndexedLiterals == null) {
+                    rowIndexedLiterals = new ArrayList();
+                }
+                rowIndexedLiterals.add(new RowIndexedLiteral(node.asLiteral(), i));
+
+                // Add RowIndexedLiterals to the map
+                nonVarToRowIndexedLiterals.put(nonVarList, rowIndexedLiterals);
+            }
+
+            // Second pass of solnList (via the map) to evaluate candidatesForRemoval
+            for (List<RDFNode> key : nonVarToRowIndexedLiterals.keySet()) {
+                List<RowIndexedLiteral> candidatesForRemoval = nonVarToRowIndexedLiterals.get(key);
                 if (candidatesForRemoval.size() == 1) {
                     continue;
                 }
@@ -176,7 +196,7 @@ public class LanguageFilteringRDFService implements RDFService {
         log.debug("sparqlSelectQuery: " + query.replaceAll("\\s+", " "));
         s.sparqlSelectQuery(query, new ResultSetConsumer.Chaining(consumer) {
             List<String> vars;
-            List<QuerySolution> solnList = new ArrayList<QuerySolution>();
+            List<QuerySolution> solnList = new ArrayList<>();
 
             @Override
             protected void processQuerySolution(QuerySolution qs) {
@@ -192,7 +212,15 @@ public class LanguageFilteringRDFService implements RDFService {
             protected void endProcessing() {
                 chainStartProcessing();
 
+                // This block loops all of the Query variables;
+                //   for each QuerySolution, creates a map of the values of the other variables than the current
+                //   'variable' --> a list of RowIndexedLiterals.
+                // In this way, all of the QuerySolutions with equal values of their other variables are grouped.
+                // This map is used subsequently to filter Literals based on lang
                 for (String var : vars) {
+                    Map<List<RDFNode>, List<RowIndexedLiteral>> nonVarToRowIndexedLiterals = new HashMap<>();
+
+                    // First pass of solnList to populate map
                     for (int i = 0; i < solnList.size(); i++) {
                         QuerySolution s = solnList.get(i);
                         if (s == null) {
@@ -202,19 +230,28 @@ public class LanguageFilteringRDFService implements RDFService {
                         if (node == null || !node.isLiteral()) {
                             continue;
                         }
-                        List<RowIndexedLiteral> candidatesForRemoval =
-                                new ArrayList<RowIndexedLiteral>();
-                        candidatesForRemoval.add(new RowIndexedLiteral(node.asLiteral(), i));
-                        for (int j = i + 1; j < solnList.size(); j++) {
-                            QuerySolution t = solnList.get(j);
-                            if (t == null) {
-                                continue;
-                            }
-                            if (matchesExceptForVar(s, t, var, vars)) {
-                                candidatesForRemoval.add(
-                                        new RowIndexedLiteral(t.getLiteral(var), j));
+
+                        // Create entry representing values other than current 'var' for this QuerySolution
+                        List<RDFNode> nonVarList = new ArrayList(vars.size() - 1);
+                        for (String v : vars) {
+                            if (!v.equals(var)) {
+                                nonVarList.add(s.get(v));
                             }
                         }
+
+                        List<RowIndexedLiteral> rowIndexedLiterals = nonVarToRowIndexedLiterals.get(nonVarList);
+                        if (rowIndexedLiterals == null) {
+                            rowIndexedLiterals = new ArrayList();
+                        }
+                        rowIndexedLiterals.add(new RowIndexedLiteral(node.asLiteral(), i));
+
+                        // Add RowIndexedLiterals to the map
+                        nonVarToRowIndexedLiterals.put(nonVarList, rowIndexedLiterals);
+                    }
+
+                    // Second pass of solnList (via the map) to evaluate candidatesForRemoval
+                    for (List<RDFNode> key : nonVarToRowIndexedLiterals.keySet()) {
+                        List<RowIndexedLiteral> candidatesForRemoval = nonVarToRowIndexedLiterals.get(key);
                         if (candidatesForRemoval.size() == 1) {
                             continue;
                         }
@@ -274,34 +311,6 @@ public class LanguageFilteringRDFService implements RDFService {
             return index;
         }
 
-    }
-
-    private boolean matchesExceptForVar(QuerySolution a, QuerySolution b,
-            String varName, List<String> varList) {
-        if (varName == null) {
-            throw new RuntimeException("expected non-null variable nane");
-        }
-        for (String var : varList) {
-            RDFNode nodea = a.get(var);
-            RDFNode nodeb = b.get(var);
-            if (var.equals(varName)) {
-                if (nodea == null || !nodea.isLiteral() || nodeb == null || !nodeb.isLiteral()) {
-                    return false;
-                }
-            } else {
-                if (nodea == null && nodeb == null) {
-                    continue;
-                } else if (nodea == null && nodeb != null) {
-                    return false;
-                } else if (nodeb == null && nodea != null) {
-                    return false;
-                }
-                if (!a.get(var).equals(b.get(var))) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private List<QuerySolution> getSolutionList(ResultSet resultSet) {

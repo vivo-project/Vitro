@@ -6,6 +6,8 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.List;
 
 import static org.junit.Assert.*;
+
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Test;
 
 import org.apache.jena.ontology.ObjectProperty;
@@ -24,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  *
  */
 
-public class VClassDaoTest {
+public class VClassDaoTest extends AbstractTestClass {
 
 	@Test
 	// Test that the VClassDaoJena::updateVClass method will only update the jena model for

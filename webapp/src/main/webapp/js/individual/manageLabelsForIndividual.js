@@ -35,7 +35,6 @@ var manageLabels = {
     // Initial page setup. Called only at page load.
     initPage: function() {
 
-        var disableSubmit = true;
         if(this.submissionErrorsExist == "false") {
         	//hide the form to add label
         	this.addLabelForm.hide();
@@ -44,7 +43,11 @@ var manageLabels = {
         	if(this.numberAvailableLocales == 0) {
             	manageLabels.showFormButtonWrapper.hide();
             	this.showCancelOnlyButton.show();
-        	} else {
+        	} else if(manageLabels.localeEntryExisting == "true") { 
+        		// if there is already an label for the selected langauge hide the add button 
+        		manageLabels.showFormButtonWrapper.hide();
+        		this.showCancelOnlyButton.show();
+        	} else{
         		//if the add label button is visible, don't need cancel only link
         		this.showCancelOnlyButton.hide();
         	}
@@ -53,19 +56,6 @@ var manageLabels = {
         	//Display the form
         	this.onShowAddForm();
 
-        	//Also make sure the save button is enabled in case there is a value selected for the drop down
-        	if(this.labelLanguage.val() != "") {
-        		disableSubmit = false;
-        	}
-
-        }
-
-
-
-        if(disableSubmit) {
-        	//disable submit until user selects a language
-            this.submit.attr('disabled', 'disabled');
-            this.submit.addClass('disabledSubmit');
         }
 
         this.bindEventListeners();
@@ -73,18 +63,6 @@ var manageLabels = {
     },
 
     bindEventListeners: function() {
-
-        this.labelLanguage.change( function() {
-        	//if language selected, allow submission, otherwise disallow
-        	var selectedLanguage = manageLabels.labelLanguage.val();
-        	if(selectedLanguage != "") {
-        		manageLabels.submit.attr('disabled', false);
-        		manageLabels.submit.removeClass('disabledSubmit');
-        	} else {
-        		manageLabels.submit.attr('disabled', 'disabled');
-        		manageLabels.submit.addClass('disabledSubmit');
-        	}
-        });
 
         //enable form to add label to be displayed or hidden
         this.showFormButton.click(function() {
@@ -123,9 +101,6 @@ var manageLabels = {
     clearAddForm:function() {
     	//clear inputs and select
     	manageLabels.addLabelForm.find("input[type='text'],select").val("");
-    	//set the button for save to be disabled again
-    	manageLabels.submit.attr('disabled', 'disabled');
-		manageLabels.submit.addClass('disabledSubmit');
     },
     onShowAddForm:function() {
     	manageLabels.addLabelForm.show();
@@ -226,12 +201,14 @@ var manageLabels = {
     	var availableLocalesList = [];
     	var listLen = selectLocalesFullList.length;
     	var i;
+    	var showAddButton = false;
     	for(i = 0; i < listLen; i++) {
     		var possibleLanguageInfo = selectLocalesFullList[i];
     		var possibleLanguageCode = possibleLanguageInfo["code"];
     		var possibleLangaugeLabel = possibleLanguageInfo["label"];
     		if(!(possibleLanguageCode in existingLanguages)) {
     			//manageLabels.addLanguageCode(possibleLanguageCode, possibleLanguageLabel);
+    			if (possibleLanguageCode == manageLabels.currentSelectedLocale) showAddButton = true;
     			availableLocalesList.push(possibleLanguageInfo);
     		}
     	}
@@ -242,8 +219,9 @@ var manageLabels = {
     	        var compB = b["label"];
     	        return compA < compB ? -1 : 1;
     	    });
+
     	 //Re-show the add button and the form if they were hidden before
-    	 if(availableLocalesList.length > 0 && manageLabels.showFormButtonWrapper.is(":hidden")) {
+    	 if(availableLocalesList.length > 0 && manageLabels.showFormButtonWrapper.is(":hidden") && showAddButton) {
     		 manageLabels.showFormButtonWrapper.show();
     		 //hide the cancel only button
     		 manageLabels.showCancelOnlyButton.hide();

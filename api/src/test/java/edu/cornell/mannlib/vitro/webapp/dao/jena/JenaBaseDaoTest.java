@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -35,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 
-public class JenaBaseDaoTest {
+public class JenaBaseDaoTest extends AbstractTestClass {
 	String isDependentRelation =
 		" <"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
 

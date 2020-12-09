@@ -31,6 +31,14 @@
 <#else>
 <h2>${i18n().manage_labels_capitalized}</h2>
 </#if>
+<#assign localeEntryExisting = true />
+<#if editConfiguration.pageData.localeEntryExisting?has_content>
+	<#assign localeEntryExisting = editConfiguration.pageData.localeEntryExisting />
+</#if>
+<#assign currentSelectedLocale =" " />
+<#if editConfiguration.pageData.currentSelectedLocale?has_content>
+	<#assign currentSelectedLocale = editConfiguration.pageData.currentSelectedLocale />
+</#if>
 
 
 
@@ -94,11 +102,13 @@ var customFormData = {
     individualUri: '${subjectUri!}',
     submissionErrorsExist: '${submissionErrorsExist}',
     selectLocalesFullList: selectLocalesFullList,
-    numberAvailableLocales:${availableLocalesNumber}
+    numberAvailableLocales:${availableLocalesNumber},
+    localeEntryExisting : '${localeEntryExisting?c}',
+    currentSelectedLocale: '${currentSelectedLocale}'
 };
 var i18nStrings = {
-    errorProcessingLabels: '${i18n().error_processing_labels}',
-    selectLocaleOptionString : '${i18n().select_locale}'
+    errorProcessingLabels: '${i18n().error_processing_labels?js_string}',
+    selectLocaleOptionString : '${i18n().select_locale?js_string}'
 };
 </script>
 

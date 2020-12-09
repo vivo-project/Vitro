@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 /**
  * A minimal implementation of the WebappDaoFactory.
@@ -265,6 +266,11 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	@Override
 	public void close() {
 		throw new RuntimeException("WebappDaoFactory.close() not implemented.");
+	}
+
+	@Override
+	public I18nBundle getI18nBundle() {
+		throw new RuntimeException("WebappDaoFactory.getI18nBundle() not implemented.");
 	}
 
 }

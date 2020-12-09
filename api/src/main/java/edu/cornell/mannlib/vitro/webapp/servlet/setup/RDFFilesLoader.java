@@ -9,20 +9,13 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.i18n.VitroResourceBundle;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -43,13 +36,12 @@ public class RDFFilesLoader {
 
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
 	private static final String RDF = "rdf";
+	private static final String I18N = "i18n";
 	private static final String FIRST_TIME = "firsttime";
 	private static final String EVERY_TIME = "everytime";
 
-	private static List<String> omittedLocales;
-
 	/**
-	 * Path filter that ignores sub-directories, hidden files, markdown and non-enabled language
+	 * Path filter that ignores sub-directories, hidden files and markdown
 	 * files.
 	 */
 	private static final DirectoryStream.Filter<Path> RDF_FILE_FILTER = new DirectoryStream.Filter<Path>() {
@@ -65,15 +57,6 @@ public class RDFFilesLoader {
 			}
 			if (p.toString().endsWith(".md")) {
 				return false;
-			}
-			// Skip language files that are not enabled
-			// ..Assumes all language files take the form: path/to/file/name-<locale>.extension
-			String basename =  FilenameUtils.getBaseName(p.toString());
-			for (String omit : omittedLocales) {
-				if (basename.endsWith(omit)) {
-					log.info("Ignoring file not enabled in i18n configuration: " + p);
-					return false;
-				}
 			}
 			return true;
 		}
@@ -91,7 +74,16 @@ public class RDFFilesLoader {
 			boolean firstTime) {
 		if (firstTime) {
 			String home = locateHomeDirectory();
-			Set<Path> paths = getPaths(ctx, home, RDF, modelPath, FIRST_TIME);
+
+			// Load common files
+			Set<Path> paths = getPaths(home, RDF, modelPath, FIRST_TIME);
+
+			// Load enabled languages
+			Set<String> enabledLocales = getEnabledLocales(ctx);
+			for (String locale : enabledLocales) {
+				paths.addAll(getPaths(home, RDF, I18N, locale, modelPath, FIRST_TIME));
+			}
+
 			for (Path p : paths) {
 				log.info("Loading " + relativePath(p, home));
 				readOntologyFileIntoModel(p, model);
@@ -114,12 +106,38 @@ public class RDFFilesLoader {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
 		String home = locateHomeDirectory();
-		Set<Path> paths = getPaths(ctx, home, RDF, modelPath, EVERY_TIME);
+
+		// Load common files
+		Set<Path> paths = getPaths(home, RDF, modelPath, EVERY_TIME);
+
+		// Load enabled languages
+		Set<String> enabledLocales = getEnabledLocales(ctx);
+		for (String locale : enabledLocales) {
+			paths.addAll(getPaths(home, RDF, I18N, locale, modelPath, EVERY_TIME));
+		}
+
 		for (Path p : paths) {
 			log.info("Loading " + relativePath(p, home));
 			readOntologyFileIntoModel(p, everytimeModel);
 		}
 		model.addSubModel(everytimeModel);
+	}
+
+	public static Set<String> getEnabledLocales(ServletContext ctx) {
+		Set<String> enabledLocales = new HashSet<>();
+
+		// Which locales are enabled in runtime.properties?
+		List<Locale> locales = SelectedLocale.getSelectableLocales(ctx);
+		for (Locale locale : locales) {
+			enabledLocales.add(locale.toLanguageTag().replace('-', '_'));
+		}
+
+		// If no languages were enabled in runtime.properties, add 'en_US' as the default
+		if (enabledLocales.isEmpty()) {
+			enabledLocales.add("en_US");
+		}
+
+		return enabledLocales;
 	}
 
 	private static Path relativePath(Path p, String home) {
@@ -134,10 +152,7 @@ public class RDFFilesLoader {
 	 * Find the paths to RDF files in this directory. Sub-directories, hidden
 	 * files, markdown, and non-enabled language files are ignored.
 	 */
-	private static Set<Path> getPaths(ServletContext ctx, String parentDir, String... strings) {
-		// Ensure that omitted locales are loaded and available
-		loadOmittedLocales(ctx);
-
+	private static Set<Path> getPaths(String parentDir, String... strings) {
 		Path dir = Paths.get(parentDir, strings);
 
 		Set<Path> paths = new TreeSet<>();
@@ -156,49 +171,6 @@ public class RDFFilesLoader {
 		log.debug("Paths from '" + dir + "': " + paths);
 		return paths;
 	}
-
-    private static void loadOmittedLocales(ServletContext ctx) {
-        // Only load if 'omittedLocales' has not been initialized
-        if (omittedLocales == null) {
-            omittedLocales = new LinkedList<>();
-            List<String> enabledLocales = new LinkedList<>();
-
-            // Which locales are enabled in runtime.properties?
-            List<Locale> locales = SelectedLocale.getSelectableLocales(ctx);
-            for (Locale locale : locales) {
-                enabledLocales.add(locale.toLanguageTag().replace('-', '_'));
-            }
-
-            // Get ResourceBundle that contains listing of all available i18n languages
-            WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
-            ApplicationBean app = wadf.getApplicationDao().getApplicationBean();
-            String availableLangsFilename = app.getAvailableLangsFile();
-            String themeI18nPath = "/not-used";
-            String appI18nPath = "/i18n";
-            VitroResourceBundle bundle = VitroResourceBundle.getBundle(
-                    availableLangsFilename, ctx, appI18nPath, themeI18nPath,
-                    ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES));
-
-            // This should not happen
-            if (bundle == null) {
-                throw new RuntimeException("Unable to find bundle: " + availableLangsFilename);
-            }
-
-            // If no languages were enabled in runtime.properties, add 'en_US' as the default
-            if (enabledLocales.isEmpty()) {
-                enabledLocales.add("en_US");
-            }
-
-            // Omitted locales are the available locales minus the enabled locales
-            Enumeration langs = bundle.getKeys();
-            while (langs.hasMoreElements()) {
-                String available = (String) langs.nextElement();
-                if (!enabledLocales.contains(available)) {
-                    omittedLocales.add(available);
-                }
-            }
-        }
-    }
 
 	private static void readOntologyFileIntoModel(Path p, Model model) {
 		String format = getRdfFormat(p);

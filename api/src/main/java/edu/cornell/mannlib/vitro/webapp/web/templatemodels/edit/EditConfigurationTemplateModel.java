@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
@@ -112,8 +110,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    	field.setOptions(new ConstantFieldOptions());
 		    }
 		    //UQAM-Optimization changing signature for including internationalization in scroll-down menu
-		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);
-//		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, vreq);
+		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf, I18n.bundle(vreq));
 		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap, field.getFieldOptions().getCustomComparator(), vreq);
 		    if(pageData.containsKey(fieldName)) {
 		    	log.error("Check the edit configuration setup as pageData already contains " + fieldName + " and this will be overwritten now with empty collection");

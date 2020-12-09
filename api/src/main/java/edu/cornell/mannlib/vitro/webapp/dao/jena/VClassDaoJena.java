@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,15 +62,18 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 
     protected static final Log log = LogFactory.getLog(VClassDaoJena.class);
+    private final I18nBundle i18n;
     private boolean isUnderlyingStoreReasoned = false;
 
     public VClassDaoJena(WebappDaoFactoryJena wadf, boolean isUnderlyingStoreReasoned) {
         super(wadf);
+        this.i18n = wadf.getI18nBundle();
         this.isUnderlyingStoreReasoned = isUnderlyingStoreReasoned;
     }
 
@@ -91,17 +96,19 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     Restriction rest = cls.asRestriction();
                     OntProperty onProperty = rest.getOnProperty();
                     StringBuilder labelStr = new StringBuilder();
-                    labelStr.append("restriction on ").append(getLabelOrId(onProperty)).append(": ");
+                    labelStr.append(format("%s ", i18n.text("restriction_on")))
+                        .append(getLabelOrId(onProperty))
+                        .append(": ");
                     if (rest.isAllValuesFromRestriction() || rest.isSomeValuesFromRestriction()) {
                         Resource fillerRes = null;
                         if (rest.isAllValuesFromRestriction()) {
                             AllValuesFromRestriction avfRest = rest.asAllValuesFromRestriction();
                             fillerRes = avfRest.getAllValuesFrom();
-                            labelStr.append("all values from ");
+                            labelStr.append(format("%s ", i18n.text("all_values_from")));
                         } else {
                             SomeValuesFromRestriction svfRest = rest.asSomeValuesFromRestriction();
                             fillerRes = svfRest.getSomeValuesFrom();
-                            labelStr.append("some values from ");
+                            labelStr.append(format("%s ", i18n.text("some_values_from")));
                         }
                         if (fillerRes.canAs(OntClass.class)) {
                             OntClass avf = fillerRes.as(OntClass.class);
@@ -115,7 +122,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         }
                     } else if (rest.isHasValueRestriction()) {
                         HasValueRestriction hvRest = rest.asHasValueRestriction();
-                        labelStr.append("has value ");
+                        labelStr.append(format("%s ", i18n.text("has_value")));
                         RDFNode fillerNode = hvRest.getHasValue();
                         try {
                             if (fillerNode.isResource()) {
@@ -128,22 +135,22 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         }
                     } else if (rest.isMinCardinalityRestriction()) {
                         MinCardinalityRestriction mcRest = rest.asMinCardinalityRestriction();
-                        labelStr.append("minimum cardinality ");
+                        labelStr.append(format("%s ", i18n.text("minimum_cardinality")));
                         labelStr.append(mcRest.getMinCardinality());
                     } else if (rest.isMaxCardinalityRestriction()) {
                         MaxCardinalityRestriction mcRest = rest.asMaxCardinalityRestriction();
-                        labelStr.append("maximum cardinality ");
+                        labelStr.append(format("%s ", i18n.text("maximum_cardinality")));
                         labelStr.append(mcRest.getMaxCardinality());
                     } else if (rest.isCardinalityRestriction()) {
                         CardinalityRestriction cRest = rest.asCardinalityRestriction();
-                        labelStr.append("cardinality ");
+                        labelStr.append(format("%s ", i18n.text("cardinality")));
                         labelStr.append(cRest.getCardinality());
                     }
                     return labelStr.toString();
                 } else if (isBooleanClassExpression(cls)) {
                     StringBuilder labelStr = new StringBuilder("(");
                     if (cls.isComplementClass()) {
-                        labelStr.append("not ");
+                        labelStr.append(format("%s ", i18n.text("not")));
                         ComplementClass ccls = cls.as(ComplementClass.class);
                         labelStr.append(getLabelForClass(ccls.getOperand(), withPrefix, forPickList));
                     } else if (cls.isIntersectionClass()) {
@@ -153,7 +160,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             OntClass operand = operandIt.next();
                             labelStr.append(getLabelForClass(operand, withPrefix, forPickList));
                             if (operandIt.hasNext()) {
-                                labelStr.append(" and ");
+                                labelStr.append(format(" %s ", i18n.text("and")));
                             }
                         }
                     } else if (cls.isUnionClass()) {
@@ -163,7 +170,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             OntClass operand = operandIt.next();
                             labelStr.append(getLabelForClass(operand, withPrefix, forPickList));
                             if (operandIt.hasNext()) {
-                                labelStr.append(" or ");
+                                labelStr.append(format(" %s ", i18n.text("or")));
                             }
                         }
                     }
