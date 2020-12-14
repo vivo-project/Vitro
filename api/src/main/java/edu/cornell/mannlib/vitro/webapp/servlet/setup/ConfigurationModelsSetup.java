@@ -13,6 +13,7 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -136,48 +137,104 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			removeBlankTriples(difNewOld);
 		}
 
-        if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
-            // if there is no difference, nothing needs to be done
-            log.debug("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
-        } else {
-            // if there is a difference, we need to remove the triples in difOldNew and 
-            // add the triples in difNewOld to the back up firsttime model
+		if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
+			// if there is no difference, nothing needs to be done
+			log.debug("For the " + modelIdString + " model, there is no difference in both directions. So do nothing.");
+		} else {
+			// if there is a difference, we need to remove the triples in difOldNew and 
+			// add the triples in difNewOld to the back up firsttime model
 
-            if (!difOldNew.isEmpty()) {
-                difOldNew.write(out, "TTL"); 
-                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out);
+			if (!difOldNew.isEmpty()) {
+				difOldNew.write(out, "TTL"); 
+				log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out);
 
-                // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
-                // if the triples which should be removed are still in user´s triplestore, remove them
-                if (userModel.containsAny(difOldNew)) {
-                    log.debug("Some of these triples are in the user triples store, so they will be removed now");
-                    userModel.remove(difOldNew);
-                    updatedFiles = true;
-                }
+				// Check if the UI-changes Overlap with the changes made in the fristtime-files 
+				checkUiChangesOverlapWithFileChanges(baseModel, userModel, difOldNew);
 
-                // remove the triples from the back up firsttime model for the next check
-                baseModel.remove(difOldNew);
-
+				// before we remove the triples, we need to compare values in back up firsttime with user's triplestore
+				// if the triples which should be removed are still in user´s triplestore, remove them
+				if (userModel.containsAny(difOldNew)) {
+					log.debug("Some of these triples are in the user triples store, so they will be removed now");
+					userModel.remove(difOldNew);
+					updatedFiles = true;
+				}
+				
+				// remove the triples from the backup firsttime model for the next check
+				baseModel.remove(difOldNew);
 			}
 			if (!difNewOld.isEmpty()) {
-                difNewOld.write(out2, "TTL"); 
-                log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2);
+				difNewOld.write(out2, "TTL"); 
+				log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2);
 
-                // before we add the triples, we need to compare values in back up firsttime with user's triplestore
-                // if the triples which should be added are not already in user´s triplestore, add them
-                if (!userModel.containsAll(difNewOld)) {
-                    log.debug("Some of these triples are not in the user triples store, so they will be added now");
-                    // but only the triples that are no already there
-                    Model tmp = difNewOld.difference(userModel);
-                    userModel.add(tmp);
-                    updatedFiles = true;
-                }
+				// Check if the UI-changes Overlap with the changes made in the fristtime-files
+				checkUiChangesOverlapWithFileChanges(baseModel, userModel, difNewOld);
 
-                // add the triples from the back up firsttime model for the next check
-                baseModel.add(difNewOld);
-            }
-        }
-        return updatedFiles;
+				// before we add the triples, we need to compare values in back up firsttime with user's triplestore
+				// if the triples which should be added are not already in user´s triplestore, add them
+				if (!userModel.containsAll(difNewOld)) {
+					log.debug("Some of these triples are not in the user triples store, so they will be added now");
+					// but only the triples that are no already there
+					Model tmp = difNewOld.difference(userModel);
+					userModel.add(tmp);
+					updatedFiles = true;
+				}
+
+				// add the triples from the back up firsttime model for the next check
+				baseModel.add(difNewOld);
+			}
+		}
+		return updatedFiles;
+	}
+
+	/**
+	 * Check if the UI-changes Overlap with the changes made in the fristtime-files, if they overlap these changes are not applied to the user-model (UI)
+	 * 
+	 * @param baseModel firsttime backup model
+	 * @param userModel current state in the system (user/UI-model)
+	 * @param changesModel the changes between firsttime-files and firttime-backup
+	 */
+	private void checkUiChangesOverlapWithFileChanges(Model baseModel, Model userModel, Model changesModel) {
+		log.debug("Beginn check if subtractions from Backup-firsttime model to current state of firsttime-files were changed in user-model (via UI)");
+		Model changesUserModel = userModel.difference(baseModel);
+		List<Statement> changedInUIandFileStatements = new ArrayList<Statement>();
+
+		if(!changesUserModel.isEmpty())
+		{
+			removeBlankTriples(changesUserModel);
+
+			StringWriter out3 = new StringWriter();
+			changesUserModel.write(out3, "TTL"); 
+			log.debug("There were changes in the user-model via UI which have also changed in the firsttime files, the following triples will not be updated");
+
+			// iterate all statements and check if the ones which should be removed were not changed via the UI
+			StmtIterator iter = changesUserModel.listStatements();
+			while (iter.hasNext()) {
+				Statement stmt      = iter.nextStatement();  // get next statement
+				Resource  subject   = stmt.getSubject();     // get the subject
+				Property predicate  = stmt.getPredicate();    // get the predicate
+				RDFNode   object    = stmt.getObject();      // get the object			
+			
+				StmtIterator iter2 = changesModel.listStatements();
+
+				while (iter2.hasNext()) {
+					Statement stmt2      = iter2.nextStatement();  // get next statement
+					Resource  subject2   = stmt2.getSubject();     // get the subject
+					Property predicate2  = stmt2.getPredicate();    // get the predicate
+					RDFNode   object2    = stmt2.getObject();      // get the object
+
+					// if subject and predicate are equal but the object differs, do not update these triples
+					// this case indicates an change in the UI, which should not be overwriten from the firsttime files
+					if(subject.equals(subject2) && predicate.equals(predicate2) && !object.equals(object2)) {
+						log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+						changedInUIandFileStatements.add(stmt2);
+					}
+				}
+			}
+			// remove triples which were changed in the user model (UI) from the list
+			changesModel.remove(changedInUIandFileStatements);
+		} else {
+			log.debug("There were no changes in the user-model via UI compared to the backup-firsttime-model");
+		}
 	}
 	
 	/**

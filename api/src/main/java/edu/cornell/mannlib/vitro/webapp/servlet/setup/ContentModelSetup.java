@@ -28,6 +28,9 @@ import org.apache.jena.shared.Lock;
 import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.util.iterator.ClosableIterator;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
@@ -297,6 +300,9 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
                 difOldNew.write(out, "TTL"); 
                 log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
 
+                // Check if the UI-changes Overlap with the changes made in the fristtime-files 
+                checkUiChangesOverlapWithFileChanges(baseModel, userModel, difOldNew);
+
                 // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be removed are still in user´s triplestore, remove them
                 if (userModel.containsAny(difOldNew)) {
@@ -313,6 +319,9 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
                 difNewOld.write(out2, "TTL"); 
                 log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
 
+                // Check if the UI-changes Overlap with the changes made in the fristtime-files 
+                checkUiChangesOverlapWithFileChanges(baseModel, userModel, difNewOld);
+
                 // before we add the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be added are not already in user´s triplestore, add them
                 if (!userModel.containsAll(difNewOld)) {
@@ -328,6 +337,56 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             }
         }
         return updatedFiles;
+    }
+
+    /**
+     * Check if the UI-changes Overlap with the changes made in the fristtime-files, if they overlap these changes are not applied to the user-model (UI)
+     * 
+     * @param baseModel firsttime backup model
+     * @param userModel current state in the system (user/UI-model)
+     * @param changesModel the changes between firsttime-files and firttime-backup
+     */
+    private void checkUiChangesOverlapWithFileChanges(Model baseModel, Model userModel, Model changesModel) {
+        log.debug("Beginn check if subtractions from Backup-firsttime model to current state of firsttime-files were changed in user-model (via UI)");
+        Model changesUserModel = userModel.difference(baseModel);
+        List<Statement> changedInUIandFileStatements = new ArrayList<Statement>();
+
+        if(!changesUserModel.isEmpty())
+        {
+
+            StringWriter out3 = new StringWriter();
+            changesUserModel.write(out3, "TTL"); 
+            log.debug("There were changes in the user-model via UI which have also changed in the firsttime files, the following triples will not be updated");
+
+            // iterate all statements and check if the ones which should be removed were not changed via the UI
+            StmtIterator iter = changesUserModel.listStatements();
+            while (iter.hasNext()) {
+                Statement stmt      = iter.nextStatement();  // get next statement
+                Resource  subject   = stmt.getSubject();     // get the subject
+                Property predicate  = stmt.getPredicate();    // get the predicate
+                RDFNode   object    = stmt.getObject();      // get the object			
+
+                StmtIterator iter2 = changesModel.listStatements();
+
+                while (iter2.hasNext()) {
+                    Statement stmt2      = iter2.nextStatement();  // get next statement
+                    Resource  subject2   = stmt2.getSubject();     // get the subject
+                    Property predicate2  = stmt2.getPredicate();    // get the predicate
+                    RDFNode   object2    = stmt2.getObject();      // get the object
+
+                    // if subject and predicate are equal but the object differs, do not update these triples
+                    // this case indicates an change in the UI, which should not be overwriten from the firsttime files
+                    if(subject.equals(subject2) && predicate.equals(predicate2) && !object.equals(object2)) {
+                        log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+                        changedInUIandFileStatements.add(stmt2);
+                    }
+                }
+            }
+            // remove triples which were changed in the user model (UI) from the list
+            changesModel.remove(changedInUIandFileStatements);
+            } else {
+                log.debug("There were no changes in the user-model via UI compared to the backup-firsttime-model");
+        }
     }
 
     /* ===================================================================== */
