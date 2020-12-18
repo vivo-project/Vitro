@@ -374,11 +374,20 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
                     Property predicate2  = stmt2.getPredicate();    // get the predicate
                     RDFNode   object2    = stmt2.getObject();      // get the object
 
-                    // if subject and predicate are equal but the object differs, do not update these triples
+                    // if subject and predicate are equal but the object differs and the language tag is the same, do not update these triples
                     // this case indicates an change in the UI, which should not be overwriten from the firsttime files
-                    if(subject.equals(subject2) && predicate.equals(predicate2) && !object.equals(object2)) {
-                        log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
-                        changedInUIandFileStatements.add(stmt2);
+                    if(subject.equals(subject2) && predicate.equals(predicate2) && !object.equals(object2) ) {
+                        // if object is an literal, check the language tag
+                        if (object.isLiteral() && object2.isLiteral()) {
+                            // if the langauge tag is the same, remove this triple from the update list
+                            if(object.asLiteral().getLanguage().equals(object2.asLiteral().getLanguage())) {
+                                log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+                                changedInUIandFileStatements.add(stmt2);
+                            }
+                        } else {
+                            log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+                            changedInUIandFileStatements.add(stmt2);
+                        }
                     }
                 }
             }
