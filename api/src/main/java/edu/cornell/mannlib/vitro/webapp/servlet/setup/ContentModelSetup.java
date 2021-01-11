@@ -298,7 +298,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
             if (!difOldNew.isEmpty()) {
                 difOldNew.write(out, "TTL"); 
-                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toStringtoString());
+                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out);
 
                 // Check if the UI-changes Overlap with the changes made in the fristtime-files 
                 checkUiChangesOverlapWithFileChanges(baseModel, userModel, difOldNew);
