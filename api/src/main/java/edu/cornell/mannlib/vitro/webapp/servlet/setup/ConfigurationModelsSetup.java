@@ -229,11 +229,11 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 						if (object.isLiteral() && object2.isLiteral()) {
 							// if the langauge tag is the same, remove this triple from the update list
 							if(object.asLiteral().getLanguage().equals(object2.asLiteral().getLanguage())) {
-								log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+								log.debug("This two triples changed UI and files: \n UI: " + stmt + " \n file: " +stmt2);
 								changedInUIandFileStatements.add(stmt2);
 							}
 						} else {
-							log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+							log.debug("This two triples changed UI and files: \n UI: " + stmt + " \n file: " +stmt2);
 							changedInUIandFileStatements.add(stmt2);
 						}
 					}

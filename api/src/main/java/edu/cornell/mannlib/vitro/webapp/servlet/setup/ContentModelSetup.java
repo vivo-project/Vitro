@@ -298,7 +298,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
             if (!difOldNew.isEmpty()) {
                 difOldNew.write(out, "TTL"); 
-                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toString());
+                log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out.toStringtoString());
 
                 // Check if the UI-changes Overlap with the changes made in the fristtime-files 
                 checkUiChangesOverlapWithFileChanges(baseModel, userModel, difOldNew);
@@ -317,7 +317,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
             }
             if (!difNewOld.isEmpty()) {
                 difNewOld.write(out2, "TTL"); 
-                log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2.toString());
+                log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2);
 
                 // Check if the UI-changes Overlap with the changes made in the fristtime-files 
                 checkUiChangesOverlapWithFileChanges(baseModel, userModel, difNewOld);
@@ -381,11 +381,11 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
                         if (object.isLiteral() && object2.isLiteral()) {
                             // if the langauge tag is the same, remove this triple from the update list
                             if(object.asLiteral().getLanguage().equals(object2.asLiteral().getLanguage())) {
-                                log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+                                log.debug("This two triples changed UI and files: \n UI: " + stmt + " \n file: " +stmt2);
                                 changedInUIandFileStatements.add(stmt2);
                             }
                         } else {
-                            log.debug("This two triples changed UI and files: \n UI: " + stmt.toString() + " \n file: " +stmt2.toString());
+                            log.debug("This two triples changed UI and files: \n UI: " + stmt + " \n file: " +stmt2);
                             changedInUIandFileStatements.add(stmt2);
                         }
                     }
