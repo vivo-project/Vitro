@@ -6,6 +6,14 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY_FIRSTTIME_BACKUP;
+
 
 import org.apache.jena.rdf.model.ModelMaker;
 
@@ -18,7 +26,10 @@ public abstract class ConfigurationTripleSource implements TripleSource {
 	 * add memory-mapping.
 	 */
 	protected static final String[] CONFIGURATION_MODELS = { DISPLAY,
-			DISPLAY_TBOX, DISPLAY_DISPLAY, USER_ACCOUNTS };
+			DISPLAY_TBOX, DISPLAY_DISPLAY, USER_ACCOUNTS, ABOX_ASSERTIONS_FIRSTTIME_BACKUP,
+			TBOX_ASSERTIONS_FIRSTTIME_BACKUP, APPLICATION_METADATA_FIRSTTIME_BACKUP,
+			USER_ACCOUNTS_FIRSTTIME_BACKUP, DISPLAY_FIRSTTIME_BACKUP, 
+			DISPLAY_TBOX_FIRSTTIME_BACKUP, DISPLAY_DISPLAY_FIRSTTIME_BACKUP };
 
 	/**
 	 * These decorators are added to a Configuration ModelMaker, regardless of
