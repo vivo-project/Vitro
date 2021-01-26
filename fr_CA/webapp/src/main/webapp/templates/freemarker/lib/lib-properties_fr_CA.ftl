@@ -342,3 +342,6 @@ name will be used as the label. -->
     <#return groupName>
 </#function>
 
+<#function capitalizeGroupName propertyGroupName>
+    <#return propertyGroupName?cap_first>
+</#function>
