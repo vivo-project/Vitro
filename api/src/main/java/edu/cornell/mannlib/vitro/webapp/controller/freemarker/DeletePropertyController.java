@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.ResourceFactory;
+
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -25,6 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUti
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
+
+
 /*
  * Custom deletion controller to which deletion requests from default property form are sent. May be replaced
  * later with additional features in process rdf form controller or alternative location.
@@ -64,8 +69,8 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 		// TODO Auto-generated method stub
     	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-    	int hashIndex = predicateUri.lastIndexOf("#");
-    	String localName = predicateUri.substring(hashIndex + 1);
+		Property prop = ResourceFactory.createProperty(predicateUri);
+    	String localName = prop.getLocalName();
     	String redirectUrl =  "/entity?uri=" + URLEncoder.encode(subjectUri);
 		return redirectUrl + "#" + URLEncoder.encode(localName);
 	}
