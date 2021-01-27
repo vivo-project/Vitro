@@ -31,6 +31,9 @@ public class BasicValidationVTwo {
     public final static String REQUIRED_FIELD_EMPTY_MSG = "required_field_empty_msg";
 
     public final static String DATA_NOT_PAST_MSG = "data_not_past_msg";
+    public final static String INVALID_DATE_FORM_MSG = "invalid_date_form_msg";
+    public final static String FILE_MUST_BE_ENTERED_MSG = "file_must_be_entered_msg";
+    public final static String INVALID_URL_MSG = "invalid_url_msg";
 
     private I18nBundle i18n;
 
@@ -162,11 +165,11 @@ public class BasicValidationVTwo {
     private String validate(String validationType, List<FileItem> fileItems) {
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( fileItems == null || fileItems.size() == 0 ){
-                return "a file must be entered for this field.";
+                return i18n.text(FILE_MUST_BE_ENTERED_MSG);
             }else{
                 FileItem fileItem = fileItems.get(0);
                 if( fileItem == null || fileItem.getName() == null || fileItem.getName().length() < 1 || fileItem.getSize() < 0){
-                    return "a file must be entered for this field.";
+                    return i18n.text(FILE_MUST_BE_ENTERED_MSG);
                 }
             }
         }
@@ -189,7 +192,7 @@ public class BasicValidationVTwo {
             if( isDate( value))
                 return SUCCESS;
             else
-                return "must be in valid date format mm/dd/yyyy.";
+                return i18n.text(INVALID_DATE_FORM_MSG);
         }
         else if( validationType.indexOf("datatype:") == 0 ) {
             String datatypeURI = validationType.substring(9);
@@ -202,7 +205,7 @@ public class BasicValidationVTwo {
         } else if ("httpUrl".equalsIgnoreCase(validationType)){
         	//check if it has http or https, we could do more but for now this is all.
         	if(! value.startsWith("http://") && ! value.startsWith("https://") ){
-        		return "This URL must start with http:// or https://";
+                return i18n.text(INVALID_URL_MSG);
         	}else{
         		return SUCCESS;
         	}
