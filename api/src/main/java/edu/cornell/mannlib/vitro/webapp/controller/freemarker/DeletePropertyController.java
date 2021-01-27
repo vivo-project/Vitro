@@ -66,14 +66,14 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 
 
     private String getRedirectUrl(VitroRequest vreq) {
-		// TODO Auto-generated method stub
+    	// TODO Auto-generated method stub
     	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		Property prop = ResourceFactory.createProperty(predicateUri);
+    	Property prop = ResourceFactory.createProperty(predicateUri);
     	String localName = prop.getLocalName();
     	String redirectUrl =  "/entity?uri=" + URLEncoder.encode(subjectUri);
-		return redirectUrl + "#" + URLEncoder.encode(localName);
-	}
+    	return redirectUrl + "#" + URLEncoder.encode(localName);
+    }
 
 
 	private String handleErrors(VitroRequest vreq) {
