@@ -959,9 +959,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             } catch (Exception e) {
                 log.error("error linking class "+cls.getURI()+" to class group");
             }
-            addPropertyStringValue(ontCls,SHORTDEF,cls.getShortDef(),ontModel);
-            addPropertyStringValue(ontCls,EXAMPLE_ANNOT,cls.getExample(),ontModel);
-            addPropertyStringValue(ontCls,DESCRIPTION_ANNOT,cls.getDescription(),ontModel);
+            updatePlainLiteralValue(ontCls, SHORTDEF, cls.getShortDef());
+            updatePlainLiteralValue(ontCls, EXAMPLE_ANNOT, cls.getExample());
+            updatePlainLiteralValue(ontCls, DESCRIPTION_ANNOT, cls.getDescription());
             addPropertyIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
             addPropertyIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
 
@@ -1018,9 +1018,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             if (ontCls != null) {
                 updateRDFSLabel(ontCls, cls.getName());
                 updatePropertyResourceURIValue(ontCls,IN_CLASSGROUP,cls.getGroupURI(),ontModel);
-                updatePropertyStringValue(ontCls,SHORTDEF,cls.getShortDef(),ontModel);
-                updatePropertyStringValue(ontCls,EXAMPLE_ANNOT,cls.getExample(),ontModel);
-                updatePropertyStringValue(ontCls,DESCRIPTION_ANNOT,cls.getDescription(),ontModel);
+                updatePlainLiteralValue(ontCls, SHORTDEF, cls.getShortDef());
+                updatePlainLiteralValue(ontCls, EXAMPLE_ANNOT, cls.getExample());
+                updatePlainLiteralValue(ontCls, DESCRIPTION_ANNOT, cls.getDescription());
                 updatePropertyNonNegativeIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
                 updatePropertyNonNegativeIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
                 updatePropertyFloatValue(ontCls, SEARCH_BOOST_ANNOT, cls.getSearchBoost(), ontModel);

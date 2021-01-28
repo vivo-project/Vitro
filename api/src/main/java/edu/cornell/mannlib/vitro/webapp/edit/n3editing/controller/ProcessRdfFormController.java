@@ -6,16 +6,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.annotation.WebServlet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -37,8 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmis
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
-
-import javax.servlet.annotation.WebServlet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 
 /**
  * This servlet will convert a request to an EditSubmission,
@@ -104,6 +108,9 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		    changes = ProcessRdfForm.addDependentDeletes(changes, queryModel);
 
 		N3EditUtils.preprocessModels(changes, configuration, vreq);
+		
+		limitChangesToCurrentLocale(changes, vreq.getLocale());
+		
 		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, N3EditUtils.getEditorUri(vreq) );
 
 		//Here we are trying to get the entity to return to URL,
@@ -114,6 +121,36 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		N3EditUtils.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
         PostEditCleanupController.doPostEditCleanup(vreq);
         return PostEditCleanupController.doPostEditRedirect(vreq, entityToReturnTo);
+	}
+	
+	private void limitChangesToCurrentLocale(AdditionsAndRetractions changes, Locale locale) {	    
+	    String currentLanguage = LanguageFilteringUtils.localeToLanguage(locale);
+	    log.info("limiting changes to " + currentLanguage);
+	    List<Statement> eliminatedRetractions = new ArrayList<Statement>();
+	    StmtIterator sit = changes.getRetractions().listStatements();
+	    while(sit.hasNext()) {
+	        Statement stmt = sit.next();
+	        if(!stmt.getObject().isLiteral()) {
+                continue;
+	        } else {
+	            Literal lit = stmt.getObject().asLiteral();
+	            if(!StringUtils.isEmpty(lit.getLanguage()) 
+	                    && !lit.getLanguage().equals(currentLanguage)) {
+	                StmtIterator replacements = changes.getAdditions()
+	                        .listStatements(stmt.getSubject(), 
+	                                stmt.getPredicate(), (RDFNode) null);
+	                while(replacements.hasNext()) {
+	                    Statement replacement = replacements.next();
+	                    if(replacement.getObject().isLiteral() 
+	                            && currentLanguage.equals(
+	                                    replacement.getObject().asLiteral().getLanguage())) {
+	                        eliminatedRetractions.add(stmt);
+	                    }
+	                }
+	            }
+	        }
+	    }
+	    changes.getRetractions().remove(eliminatedRetractions);
 	}
 
 	//In case of back button confusion

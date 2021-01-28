@@ -106,7 +106,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 			this.epo = epo;
 
-			this.fpDao = ModelAccess.on(ctx).getWebappDaoFactory()
+			this.fpDao = ModelAccess.on(req).getWebappDaoFactory()
 					.getFauxPropertyDao();
 
 		}

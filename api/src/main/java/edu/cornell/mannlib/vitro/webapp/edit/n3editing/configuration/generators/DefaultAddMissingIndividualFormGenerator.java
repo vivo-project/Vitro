@@ -350,7 +350,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from
-		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
+		OntModel model = ModelAccess.on(vreq).getOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);

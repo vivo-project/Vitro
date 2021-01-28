@@ -51,8 +51,7 @@ public class ClassgroupRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassGroupDao cgDao = ModelAccess.on(
-                getServletContext()).getWebappDaoFactory().getVClassGroupDao();
+        VClassGroupDao cgDao = ModelAccess.on(request).getWebappDaoFactory().getVClassGroupDao();
 
         epo.setDataAccessObject(cgDao);
 

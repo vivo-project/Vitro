@@ -25,6 +25,24 @@ public class LanguageFilteringUtils {
 	private static final String HYPHEN = "-";
 	private static final String DEFAULT_LANG_STRING = "en";
 
+	public static String localeToLanguage(Locale locale) {
+        return locale.toString().replace(UNDERSCORE, HYPHEN);
+	}
+	
+	public static Locale languageToLocale(String langStr) {
+	    String[] langParts = langStr.split(HYPHEN);
+        if (langParts.length > 2) {
+            langStr = String.join(UNDERSCORE, langParts[0].toLowerCase(),
+                    langParts[1].toUpperCase(), langParts[2]);
+        } else if (langParts.length > 1) {
+            langStr = String.join(UNDERSCORE, langParts[0].toLowerCase(),
+                    langParts[1].toUpperCase());
+        } else {
+            langStr = langParts[0].toLowerCase();
+        }
+        return LocaleUtils.toLocale(langStr);
+	}
+	
 	/**
 	 * Take an Enumeration of Locale objects, such as we might get from a
 	 * request, and convert to a List of langauage strings, such as are needed

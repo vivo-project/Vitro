@@ -2,27 +2,29 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
-
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import org.junit.Assert;
-
-import org.junit.Test;
 
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.OntProperty;
+import org.apache.jena.ontology.OntResource;
 import org.apache.jena.ontology.Restriction;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+import org.junit.Assert;
+import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
@@ -457,6 +459,30 @@ public class JenaBaseDaoTest extends AbstractTestClass {
 		Assert.assertEquals(class1.listSuperClasses().toSet().size(), 0);
 		Assert.assertEquals(m.size(), 2); // just rdf:type for Class1 and Prop
 
+	}
+	
+	@Test
+    /**
+     * Test that a resource's labels in one language are correctly updated without
+     * affecting labels in other languages.
+     */
+    public void testUpdateRDFLabel() {
+	    OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+	    WebappDaoFactoryJena wadf = new WebappDaoFactoryJena(m);
+	    JenaBaseDao dao = new JenaBaseDao(wadf) { 
+	        
+//	        public void updateRDFSLabel(OntResource ontRes, String lexicalForm, String lang) {
+//	            updateRDFSLabel(ontRes, lexicalForm, lang);
+//	        }
+	        
+	    };
+	    OntResource ontRes = m.createOntResource("http://example.com/i/n1");
+	    m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel1", "en-US"));
+	    m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES"));
+	    dao.updateRDFSLabel(ontRes, "engLabel2", "en-US");
+	    assertEquals(2, m.size());
+	    Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel2", "en-US")));
+	    Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES")));
 	}
 
 	/**

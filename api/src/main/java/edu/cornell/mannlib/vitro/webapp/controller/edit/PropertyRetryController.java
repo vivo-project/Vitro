@@ -64,7 +64,7 @@ public class PropertyRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        ObjectPropertyDao propDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getObjectPropertyDao();
+        ObjectPropertyDao propDao = ModelAccess.on(req).getWebappDaoFactory().getObjectPropertyDao();
         epo.setDataAccessObject(propDao);
         OntologyDao ontDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
 

@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.RequestModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 /**
@@ -88,8 +89,10 @@ public class ModelSwitcher {
 
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
-			OntModel mainOntModel = ModelAccess.on(_context).getOntModel(DISPLAY);
-			OntModel tboxOntModel = ModelAccess.on(_context).getOntModel(DISPLAY_TBOX);
+			OntModel mainOntModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(
+			        ModelAccess.on(vreq).getOntModel(DISPLAY), vreq);
+			OntModel tboxOntModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(
+			        ModelAccess.on(vreq).getOntModel(DISPLAY_TBOX), vreq);
 	   		setSpecialWriteModel(vreq, mainOntModel);
 
 	   		vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, VitroModelSource.ModelName.DISPLAY.toString());

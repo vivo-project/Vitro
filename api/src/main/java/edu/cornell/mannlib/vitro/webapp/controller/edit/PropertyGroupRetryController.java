@@ -51,7 +51,7 @@ public class PropertyGroupRetryController extends BaseEditController {
         }
 
         PropertyGroupDao pgDao = ModelAccess.on(
-                getServletContext()).getWebappDaoFactory().getPropertyGroupDao();
+                req).getWebappDaoFactory().getPropertyGroupDao();
 
         epo.setDataAccessObject(pgDao);
 

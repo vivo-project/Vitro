@@ -9,6 +9,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
@@ -136,9 +137,9 @@ public class ObjectPropertyDaoJenaTest extends AbstractTestClass {
 
 		property1.setPropertyValue(RDFS.domain, subModel.createResource("http://thisIsTheDomainClassURI"));
 		property1.setPropertyValue(RDFS.range, subModel.createResource("http://thisIsTheRangeClassURI"));
-		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.EXAMPLE_ANNOT), subModel.createTypedLiteral("this is the example"));
-		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.DESCRIPTION_ANNOT), subModel.createTypedLiteral("this is the description"));
-		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PUBLIC_DESCRIPTION_ANNOT), subModel.createTypedLiteral("this is the public description"));
+		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.EXAMPLE_ANNOT), ResourceFactory.createLangLiteral("this is the example", lang));
+		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.DESCRIPTION_ANNOT), ResourceFactory.createLangLiteral("this is the description", lang));
+		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PUBLIC_DESCRIPTION_ANNOT), ResourceFactory.createLangLiteral("this is the public description", lang));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.DISPLAY_LIMIT), subModel.createTypedLiteral(6));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_ENTITYSORTFIELD), subModel.createTypedLiteral("this is the entity sort field"));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_ENTITYSORTDIRECTION), subModel.createTypedLiteral("this is the entity sort direction"));
