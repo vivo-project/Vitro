@@ -365,6 +365,11 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	}
 
 	@Override
+	public boolean hasNoMappings() {
+		return inner.hasNoMappings();
+	}
+
+	@Override
 	public boolean samePrefixMappingAs(PrefixMapping other) {
 		return inner.samePrefixMappingAs(other);
 	}
@@ -727,6 +732,11 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 	@Override
 	public Resource createResource(String uri) {
 		return inner.createResource(uri);
+	}
+
+	@Override
+	public Resource createResource(Statement statement) {
+		return inner.createResource(statement);
 	}
 
 	@Override

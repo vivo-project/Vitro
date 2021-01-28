@@ -4,32 +4,45 @@ package edu.cornell.mannlib.vitro.webapp.application;
 
 import static edu.cornell.mannlib.vitro.webapp.application.BuildProperties.WEBAPP_PATH_BUILD_PROPERTIES;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 
-import edu.cornell.mannlib.vitro.webapp.config.ContextProperties;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.config.ContextProperties;
+
 /**
- * Encapsulates some of the info relating to the Vitro home directory.
+ * Encapsulates some of the info relating to and initializes the Vitro home directory.
  */
 public class VitroHomeDirectory {
 	private static final Log log = LogFactory.getLog(VitroHomeDirectory.class);
+
+	private static final String DIGEST_FILE_NAME = "digest.md5";
+
+	private static final Pattern CHECKSUM_PATTERN = Pattern.compile("^[a-f0-9]{32} \\*.+$");
 
 	public static VitroHomeDirectory find(ServletContext ctx) {
 		HomeDirectoryFinder finder = new HomeDirectoryFinder(ctx);
@@ -60,59 +73,213 @@ public class VitroHomeDirectory {
 		return discoveryMessage;
 	}
 
-  public void populate() {
-      File vhdDir = getPath().toFile();
+	/**
+	 * Populates VIVO home directory with files required to run.
+	 * 
+	 * NOTE: Will not overwrite any modified files on redeploy.
+	 */
+	public void populate() {
+		File vhdDir = getPath().toFile();
 
-      if (!vhdDir.isDirectory() || vhdDir.list() == null) {
-          throw new RuntimeException("Application home dir is not a directory! " + vhdDir);
-      }
+		if (!vhdDir.isDirectory() || vhdDir.list() == null) {
+			throw new RuntimeException("Application home dir is not a directory! " + vhdDir);
+		}
 
-      InputStream homeDirTar = getHomeDirTar();
+		Map<String, String> digest = untar(vhdDir);
 
-      // The above InputStream is closed in the 'untar' method
-      untar(homeDirTar, vhdDir);
-  }
+		writeDigest(digest);
+	}
 
-    private InputStream getHomeDirTar() {
-        String tarLocation = "/WEB-INF/resources/home-files/vivo-home.tar";
-        InputStream tar = ctx.getResourceAsStream(tarLocation);
-        if (tar == null) {
-            log.error("Application home tar not found in: " + tarLocation);
-            throw new RuntimeException("Application home tar not found in: " + tarLocation);
-        }
+	/**
+	 * A non-destructive untar process that returns checksum digest of tarred files.
+	 * 
+	 * Checksum digest can be manually created with the following command.
+	 * 
+	 * `find /vivo/home -type f | cut -c3- | grep -E '^bin/|^config/|^rdf/' | xargs md5sum > /vivo/home/digest.md5`
+	 * 
+	 * @param destination VIVO home directory
+	 * @return digest of each files checksum
+	 */
+	private Map<String, String> untar(File destination) {
+		log.info("Populating VIVO home at: " + destination.getPath());
 
-        return tar;
-    }
+		Map<String, String> digest = new HashMap<>();
+		Map<String, String> storedDigest = loadDigest();
 
-    private void untar(InputStream tar, File destination) {
-        log.info("Populating VIVO home at: " + destination.getPath());
+		TarArchiveEntry tarEntry;
+		try (
+			InputStream homeDirTar = getHomeDirTar();
+			TarArchiveInputStream tarInput = new TarArchiveInputStream(homeDirTar);
+		) {
+			while ((tarEntry = tarInput.getNextTarEntry()) != null) {
 
-        TarArchiveEntry tarEntry;
-        try (TarArchiveInputStream tarInput = new TarArchiveInputStream(tar)) {
-            while ((tarEntry = tarInput.getNextTarEntry()) != null) {
+				// Use the example configurations
+				String outFilename = tarEntry.getName().replace("example.", "");
+				File outFile = new File(destination, outFilename);
 
-                // Use the example configurations
-                String outFilename = tarEntry.getName().replace("example.", "");
-                File outFile = new File(destination, outFilename);
+				// Is the entry a directory?
+				if (tarEntry.isDirectory()) {
+					if (!outFile.exists()) {
+						outFile.mkdirs();
+					}
+				} else {
+					// Entry is a File
+					boolean write = true;
 
-                // Is the entry a directory?
-                if (tarEntry.isDirectory()) {
-                    if (!outFile.exists()) {
-                        outFile.mkdirs();
-                    }
+					// reading bytes into memory to avoid having to unreliably reset stream
+					byte[] bytes = IOUtils.toByteArray(tarInput);
+					digest.put(outFilename, checksum(bytes));
 
-                } else {
-                    // Entry is a File
-                    outFile.getParentFile().mkdirs();
-                    try (FileOutputStream fos = new FileOutputStream(outFile)) {
-                        IOUtils.copy(tarInput, fos);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error creating home directory!", e);
-        }
-    }
+					// if file already exists and stored digest contains the file,
+					// check to determine if it has changed
+					if (outFile.exists() && storedDigest.containsKey(outFilename)) {
+						// if file has not changed, overwrite
+						write = storedDigest.get(outFilename).equals(checksum(outFile));
+					}
+
+					if (write) {
+						outFile.getParentFile().mkdirs();
+						try (
+							InputStream is = new ByteArrayInputStream(bytes);
+							FileOutputStream fos = new FileOutputStream(outFile);
+						) {
+							IOUtils.copy(is, fos);
+						}
+					} else {
+						log.info(outFile.getAbsolutePath() + " changes have been preserved.");
+					}
+				}
+			}
+		} catch (IOException | NoSuchAlgorithmException e) {
+			throw new RuntimeException("Error creating home directory!", e);
+		}
+
+		return digest;
+	}
+
+	/**
+	 * Load checksum digest of VIVO home directory.
+	 * 
+	 * @return checksum digest
+	 */
+	private Map<String, String> loadDigest() {
+		File storedDigest = new File(getPath().toFile(), DIGEST_FILE_NAME);
+		if (storedDigest.exists() && storedDigest.isFile()) {
+			log.info("Reading VIVO home digest: " + storedDigest.getPath());
+			try {
+				return FileUtils
+					.readLines(storedDigest, StandardCharsets.UTF_8)
+					.stream()
+					.filter(CHECKSUM_PATTERN.asPredicate())
+					.map(this::split)
+					.collect(Collectors.toMap(this::checksumFile, this::checksumValue));
+			} catch (IOException e) {
+				throw new RuntimeException("Error reading VIVO home checksum digest!", e);
+			}
+		}
+		log.info("VIVO home digest not found: " + storedDigest.getPath());
+
+		return new HashMap<>();
+	}
+
+	/**
+	 * Write VIVO home checksum digest following md5 format; `<checksum> *<file>`.
+	 * 
+	 * @param digest checksum digest to write
+	 */
+	private void writeDigest(Map<String, String> digest) {
+		File storedDigest = new File(getPath().toFile(), DIGEST_FILE_NAME);
+		try (
+			FileOutputStream fos = new FileOutputStream(storedDigest); 
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+		) {
+			for (Map.Entry<String, String> entry : digest.entrySet()) {
+				String filename = entry.getKey();
+				String checksum = entry.getValue();
+				osw.write(String.format("%s *%s\n", checksum, filename));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Error writing home directory checksum digest!", e);
+		}
+		log.info("VIVO home digest created: " + storedDigest.getPath());
+	}
+
+	/**
+	 * Split checksum.
+	 * 
+	 * @param checksum checksum delimited by space and asterisks `<checksum> *<file>`
+	 * @return split checksum
+	 */
+	private String[] split(String checksum) {
+		return checksum.split("\\s+");
+	}
+
+	/**
+	 * Get value from split checksum.
+	 * 
+	 * @param checksum split checksum
+	 * @return checksum value
+	 */
+	private String checksumValue(String[] checksum) {
+		return checksum[0];
+	}
+
+	/**
+	 * Return file from split checksum.
+	 * 
+	 * @param checksum split checksum
+	 * @return filename
+	 */
+	private String checksumFile(String[] checksum) {
+		return checksum[1].substring(1);
+	}
+
+	/**
+	 * Get md5 checksum from file.
+	 * 
+	 * @param file file
+	 * @return md5 checksum as string
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 */
+	private String checksum(File file) throws IOException, NoSuchAlgorithmException {
+		return checksum(FileUtils.readFileToByteArray(file));
+	}
+
+	/**
+	 * Get md5 checksum from bytes.
+	 * 
+	 * @param bytes bytes from file
+	 * @return md5 checksum as string
+	 * @throws NoSuchAlgorithmException
+	 */
+	private String checksum(byte[] bytes) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		md.update(bytes);
+		// bytes to hex
+		StringBuilder result = new StringBuilder();
+		for (byte b : md.digest()) {
+			result.append(String.format("%02x", b));
+		}
+
+		return result.toString();
+	}
+
+	/**
+	 * Get prepacked VIVO home tar file as input stream.
+	 * 
+	 * @return input stream of VIVO home tar file
+	 */
+	private InputStream getHomeDirTar() {
+		String tarLocation = "/WEB-INF/resources/home-files/vivo-home.tar";
+		InputStream tar = ctx.getResourceAsStream(tarLocation);
+		if (tar == null) {
+			log.error("Application home tar not found in: " + tarLocation);
+			throw new RuntimeException("Application home tar not found in: " + tarLocation);
+		}
+
+		return tar;
+	}
 
 	/**
 	 * Find something that specifies the location of the Vitro home directory.
