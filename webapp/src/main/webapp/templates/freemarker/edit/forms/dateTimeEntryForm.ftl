@@ -3,13 +3,13 @@
 <fieldset class="dateTime">
   <input type="hidden" id="literal" name="literal" value="${literalValues}" role="input"/>
   <#if datatype?contains("#date") || datatype?contains("Year") >
-    <label for="dateTimeField-year">Year</label>
+    <label for="dateTimeField-year">${i18n()[('label.dateTimeWithPrecision.year_capitalized')]}</label>
     <input class="text-field" name="dateTimeField-year" id="dateTimeField-year" type="text" value="" size="4" maxlength="4" />
   </#if>
   <#if datatype?contains("#date") || datatype?contains("Month") >
-    <label for="dateTimeField-month">Month</label>
+    <label for="dateTimeField-month">${i18n()[('label.dateTimeWithPrecision.month_capitalized')]}</label>
     <select name="dateTimeField-month" id="dateTimeField-month" >
-        <option value="">month</option>
+        <option value="">${i18n()[('label.dateTimeWithPrecision.month_capitalized')]}</option>
             <option value="01">${i18n().january}</option>
             <option value="02">${i18n().february}</option>
             <option value="03">${i18n().march}</option>
@@ -25,9 +25,9 @@
     </select>
   </#if>
   <#if datatype?contains("#date") >
-    <label for="dateTimeField-day">Day</label>
+    <label for="dateTimeField-day">${i18n()[('label.dateTimeWithPrecision.day_capitalized')]}</label>
     <select name="dateTimeField-day" id="dateTimeField-day" >
-        <option value="">day</option>
+        <option value="">${i18n()[('label.dateTimeWithPrecision.day_capitalized')]}</option>
             <option value="01">1</option>
             <option value="02">2</option>
             <option value="03">3</option>
@@ -62,9 +62,9 @@
     </select>
   </#if>
   <#if datatype?contains("#dateTime") || datatype?contains("#time") >
-    <label for="dateTimeField-hour">Hour</label>
+    <label for="dateTimeField-hour">${i18n()[('label.dateTimeWithPrecision.hour_capitalized')]}</label>
     <select name="dateTimeField-hour" id="dateTimeField-hour" >
-        <option value="">hour</option>
+        <option value="">${i18n()[('label.dateTimeWithPrecision.hour_capitalized')]}</option>
             <option value="00">12am</option>
             <option value="01">1am</option>
             <option value="02">2am</option>
@@ -91,9 +91,9 @@
             <option value="23">11pm</option>
     </select>
 
-    <label for="dateTimeField-minute">Minutes</label>
+    <label for="dateTimeField-minute">${i18n()[('label.dateTimeWithPrecision.minutes_capitalized')]}</label>
     <select name="dateTimeField-minute" id="dateTimeField-minute" >
-        <option value="">minutes</option>
+        <option value="">${i18n()[('label.dateTimeWithPrecision.minutes_capitalized')]}</option>
             <option value="01">1</option>
             <option value="02">2</option>
             <option value="03">3</option>
@@ -155,9 +155,9 @@
             <option value="59">59</option>
     </select>
 
-    <label for="dateTimeField-second">Seconds</label>
+    <label for="dateTimeField-second">${i18n()[('label.dateTimeWithPrecision.seconds_capitalized')]}</label>
     <select name="dateTimeField-second" id="dateTimeField-second" >
-        <option value="">seconds</option>
+        <option value="">${i18n()[('label.dateTimeWithPrecision.seconds_capitalized')]}</option>
             <option value="01">1</option>
             <option value="02">2</option>
             <option value="03">3</option>
