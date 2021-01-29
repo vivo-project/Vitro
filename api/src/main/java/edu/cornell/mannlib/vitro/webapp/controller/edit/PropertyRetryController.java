@@ -53,6 +53,7 @@ public class PropertyRetryController extends BaseEditController {
 
         /*for testing*/
         ObjectProperty testMask = new ObjectProperty();
+        epo.setImplementationClass(ObjectProperty.class);
         epo.setBeanClass(ObjectProperty.class);
         epo.setBeanMask(testMask);
 

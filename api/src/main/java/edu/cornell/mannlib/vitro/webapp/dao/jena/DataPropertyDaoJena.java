@@ -587,9 +587,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             	}
             }
 
-            updatePropertyStringValue(jDataprop, EXAMPLE, dtp.getExample(), ontModel);
-            updatePropertyStringValue(jDataprop, DESCRIPTION_ANNOT, dtp.getDescription(), ontModel);
-            updatePropertyStringValue(jDataprop, PUBLIC_DESCRIPTION_ANNOT, dtp.getPublicDescription(), ontModel);
+            updatePlainLiteralValue(jDataprop, EXAMPLE, dtp.getExample());
+            updatePlainLiteralValue(jDataprop, DESCRIPTION_ANNOT, dtp.getDescription());
+            updatePlainLiteralValue(jDataprop, PUBLIC_DESCRIPTION_ANNOT, dtp.getPublicDescription());
             updatePropertyStringValue(jDataprop, EDITING, dtp.getEditing(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_RANK_ANNOT, dtp.getDisplayTier(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_LIMIT, dtp.getDisplayLimit(), ontModel);

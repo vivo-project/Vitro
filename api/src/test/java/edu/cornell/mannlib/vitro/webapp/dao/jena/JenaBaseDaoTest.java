@@ -466,24 +466,47 @@ public class JenaBaseDaoTest extends AbstractTestClass {
      * Test that a resource's labels in one language are correctly updated without
      * affecting labels in other languages.
      */
-    public void testUpdateRDFLabel() {
+    public void testUpdateRDFSLabel() {
 	    OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 	    WebappDaoFactoryJena wadf = new WebappDaoFactoryJena(m);
-	    JenaBaseDao dao = new JenaBaseDao(wadf) { 
-	        
-//	        public void updateRDFSLabel(OntResource ontRes, String lexicalForm, String lang) {
-//	            updateRDFSLabel(ontRes, lexicalForm, lang);
-//	        }
-	        
-	    };
+	    JenaBaseDao dao = new JenaBaseDao(wadf);
 	    OntResource ontRes = m.createOntResource("http://example.com/i/n1");
+	    // update one language
 	    m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel1", "en-US"));
 	    m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES"));
 	    dao.updateRDFSLabel(ontRes, "engLabel2", "en-US");
 	    assertEquals(2, m.size());
 	    Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel2", "en-US")));
 	    Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES")));
-	}
+	    m.removeAll();
+	    // update language-less
+	    m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel1", "en-US"));
+        m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES"));
+        m.add(ontRes, RDFS.label, "languageLessLabel1");
+        dao.updateRDFSLabel(ontRes, "languageLessLabel2", null);
+        assertEquals(3, m.size());
+        Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel1", "en-US")));
+        Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES")));
+        Assert.assertTrue(m.contains(ontRes, RDFS.label, "languageLessLabel2"));
+        m.removeAll();
+        // remove a language
+        m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel1", "en-US"));
+        m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES"));
+        m.add(ontRes, RDFS.label, m.createTypedLiteral("stringLabel1"));
+        dao.updateRDFSLabel(ontRes, null, "en-US");
+        assertEquals(2, m.size());
+        Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES")));
+        Assert.assertTrue(m.contains(ontRes, RDFS.label, m.createTypedLiteral("stringLabel1")));
+        m.removeAll();
+        // remove language-less labels
+        m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel1", "en-US"));
+        m.add(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES"));
+        m.add(ontRes, RDFS.label, ResourceFactory.createPlainLiteral("languageLessLabel1"));
+        dao.updateRDFSLabel(ontRes, null, null);
+        assertEquals(2, m.size());
+        Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("engLabel1", "en-US")));
+        Assert.assertTrue(m.contains(ontRes, RDFS.label, ResourceFactory.createLangLiteral("esLabel1", "es-ES")));
+    }
 
 	/**
 	 * Compare the contents of the expected model with the actual model (not counting modification times).

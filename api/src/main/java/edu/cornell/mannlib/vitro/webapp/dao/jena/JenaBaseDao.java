@@ -754,43 +754,62 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 		}
 	}
 	
+	/**
+     * Add to an OntResource an rdfs:label value with lexical form and default
+     * language tag. Remove any other existing values in default language.
+     * If lexicalForm parameter is null, remove all plain literal values of 
+     * Property in default language.
+     * @param ontRes may not be null
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
+     */
 	protected void updateRDFSLabel(OntResource ontRes, String lexicalForm) {
         updatePlainLiteralValue(ontRes, RDFS.label, lexicalForm);
     }
 	
+	/**
+     * Add to an OntResource an rdfs:label value with lexical form and optional
+     * language tag. Remove any other existing plain literal values that match 
+     * specified language or lack language tags if no language is supplied.
+     * If lexicalForm parameter is null, remove all plain literal labels in 
+     * specified language, or all existing language-less labels
+     * if no language is specified.
+     * @param ontRes may not be null
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
+     * @param lang may be null.  If null, method acts on language-less plain 
+     *        literal labels and ignores those with language tags.
+     */	
 	protected void updateRDFSLabel(OntResource ontRes, String lexicalForm, String lang) {
 	    updatePlainLiteralValue(ontRes, RDFS.label, lexicalForm, lang);
 	}
 
     /**
-     * Add to an OntResource a Property value with lexical form and language
-     * tag matching the default language.  Remove any other existing values of
-     * Property in the default language or those that are non-literals.  
-     * If lexical form is null, remove all values of Property in the default 
-     * language and do not add a new one.
+     * Add to an OntResource a Property value with lexical form and default
+     * language tag. Remove any other existing values in default language.
+     * If lexicalForm parameter is null, remove all plain literal values of 
+     * Property in default language.
      * @param ontRes may not be null
-     * @param lexicalForm may be null.  If null, all values of Property in the 
-     *        default language will be removed from ontRes and none will be 
-     *        added. Empty lexicalForm strings will be treated as nulls and 
-     *        will not be added.
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
      */
-    protected void updatePlainLiteralValue(OntResource ontRes, Property property, 
+	protected void updatePlainLiteralValue(OntResource ontRes, Property property, 
             String lexicalForm) {
         updatePlainLiteralValue(ontRes, property, lexicalForm, getDefaultLanguage());
     }
     
     /**
-     * Add to an OntResource a Property value with lexical form and language
-     * tag.  Remove any other existing labels matching language tag or that are
-     * non-literals.  If lang is null, remove all other existing values for
-     * Property.  If lexical form is null, remove all values of Property and do
-     * not add a new one.
+     * Add to an OntResource a Property value with lexical form and optional
+     * language tag. Remove any other existing plain literal values that match 
+     * specified language or lack language tags if no language is supplied.
+     * If lexicalForm parameter is null, remove all plain literal values of 
+     * Property in specified language, or all existing language-less literals
+     * if no language is specified.
      * @param ontRes may not be null
-     * @param lexicalForm may be null.  If null, all values of Property will be 
-     *        removed from ontRes and none will be added.  Empty lexicalForm 
-     *        strings will be treated as nulls and will not be added.
-     * @param lang may be null.  If null, a plain literal value will be added
-     *        and all existing values of Property will be removed.
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
+     * @param lang may be null.  If null, method acts on language-less
+     *        plain literal values and ignores those with language tags.
      */
     protected void updatePlainLiteralValue(OntResource ontRes, Property property,
             String lexicalForm, String lang) {
@@ -802,21 +821,19 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         StmtIterator existingStmts = ontRes.listProperties(property);
         while(existingStmts.hasNext()) {
             Statement stmt = existingStmts.next();
-            if(!stmt.getObject().isLiteral()) {
-                // Delete any existing labels that are not literals.
-                // (There should be none.)
-                toRemove.add(stmt);
-            } else {
+            if(stmt.getObject().isLiteral()) {                
                 Literal lit = stmt.getObject().asLiteral();
-                if(StringUtils.isEmpty(lang) || lang.equals(lit.getLanguage())) {
+                if(StringUtils.isEmpty(lit.getLanguage())) {
+                    System.out.println(lit.getDatatypeURI());
+                }
+                if( (lang == null && isLanguageLessPlainLiteral(lit))  
+                        || (lang != null && lang.equals(lit.getLanguage())) ) {
                     if(!lit.getLexicalForm().equals(lexicalForm)) {
                         toRemove.add(stmt);
-                    } else if( (StringUtils.isEmpty(lang) 
-                            && StringUtils.isEmpty(lit.getLanguage()) ) 
-                                || lit.getLanguage().equals(lang)) {
-                        addNew = false;
+                    } else {
                         // New literal already exists in the model.
-                        // Do not add it again.                            
+                        // Do not add it again.
+                        addNew = false;
                     }
                 }
             }
@@ -824,7 +841,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         if(!toRemove.isEmpty()) {
             ontRes.getModel().remove(toRemove);
         }
-        if (addNew && !StringUtils.isEmpty(lexicalForm)) {
+        if (addNew && (lexicalForm != null)) {
             if(!StringUtils.isEmpty(lang)) {
                 ontRes.addProperty(property, ResourceFactory.createLangLiteral(
                         lexicalForm, lang));    
@@ -833,6 +850,17 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                         lexicalForm));
             }            
         }
+    }
+    
+    private boolean isLanguageLessPlainLiteral(Literal lit) {
+        // In RDF 1.1 all the language-less literals get datatype xsd:string.
+        // The null datatype check is here just in case this gets run on an older
+        // version of Jena.  rdf:PlainLiteral is also a datatype, but doesn't
+        // (yet) seem to be used by Jena.        
+        return StringUtils.isEmpty(lit.getLanguage()) 
+                && ((lit.getDatatype() == null) 
+                || XSDDatatype.XSDstring.equals(lit.getDatatype()) ||
+                (RDF.getURI() + "PlainLiteral").equals(lit.getDatatypeURI()));
     }
 
     private Literal getLabel(String lang, List<RDFNode>labelList) {

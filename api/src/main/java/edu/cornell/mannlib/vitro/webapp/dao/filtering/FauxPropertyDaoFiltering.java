@@ -26,47 +26,34 @@ public class FauxPropertyDaoFiltering extends BaseFiltering implements FauxPrope
 
 	@Override
 	public List<FauxProperty> getFauxPropertiesForBaseUri(String uri) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException(
-				"FauxPropertyDao.getFauxPropertiesForBaseUri() not implemented.");
+		return innerFauxPropertyDao.getFauxPropertiesForBaseUri(uri);
 	}
 
 	@Override
 	public FauxProperty getFauxPropertyFromContextUri(String contextUri) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException(
-				"FauxPropertyDaoFiltering.getFauxPropertyFromConfigContextUri() not implemented.");
-
+		return innerFauxPropertyDao.getFauxPropertyFromContextUri(contextUri);
 	}
 
 	@Override
 	public FauxProperty getFauxPropertyByUris(String domainUri, String baseUri,
 			String rangeUri) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException(
-				"FauxPropertyDaoFiltering.getFauxPropertyByUris() not implemented.");
-
+		return innerFauxPropertyDao.getFauxPropertyByUris(domainUri, baseUri, 
+		        rangeUri);
 	}
 
 	@Override
 	public void updateFauxProperty(FauxProperty fp) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("FauxPropertyDaoFiltering.updateFauxProperty() not implemented.");
-
+		innerFauxPropertyDao.updateFauxProperty(fp);
 	}
 
 	@Override
 	public void deleteFauxProperty(FauxProperty fp) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("FauxPropertyDao.deleteFauxProperty() not implemented.");
-
+		innerFauxPropertyDao.deleteFauxProperty(fp);
 	}
 
 	@Override
 	public void insertFauxProperty(FauxProperty fp) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("FauxPropertyDao.insertFauxProperty() not implemented.");
-
+		innerFauxPropertyDao.insertFauxProperty(fp);
 	}
 
 }

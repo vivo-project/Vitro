@@ -114,6 +114,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 		void populate() {
 			epo.setDataAccessObject(fpDao);
 			epo.setAction(determineAction());
+			epo.setImplementationClass(FauxProperty.class);
+			epo.setBeanClass(FauxProperty.class);
 
 			if (epo.getUseRecycledBean()) {
 				beanForEditing = (FauxProperty) epo.getNewBean();
