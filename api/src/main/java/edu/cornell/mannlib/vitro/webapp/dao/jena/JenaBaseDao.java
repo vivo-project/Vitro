@@ -823,9 +823,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             Statement stmt = existingStmts.next();
             if(stmt.getObject().isLiteral()) {                
                 Literal lit = stmt.getObject().asLiteral();
-                if(StringUtils.isEmpty(lit.getLanguage())) {
-                    System.out.println(lit.getDatatypeURI());
-                }
                 if( (lang == null && isLanguageLessPlainLiteral(lit))  
                         || (lang != null && lang.equals(lit.getLanguage())) ) {
                     if(!lit.getLexicalForm().equals(lexicalForm)) {
