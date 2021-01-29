@@ -62,6 +62,10 @@ public class EditConfigurationUtils {
         return vreq.getParameter("rangeUri");
     }
 
+    public static String getTypeOfNew(VitroRequest vreq) {
+        return vreq.getParameter("typeOfNew");
+    }
+
     public static VClass getRangeVClass(VitroRequest vreq) {
         WebappDaoFactory ctxDaoFact = ModelAccess.on(
                 vreq.getSession().getServletContext()).getWebappDaoFactory();
