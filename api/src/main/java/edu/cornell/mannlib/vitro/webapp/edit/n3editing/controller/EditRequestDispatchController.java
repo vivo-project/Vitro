@@ -72,7 +72,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		// If request is for new individual, return simple do back end editing action permission
-		if (StringUtils.isNoneEmpty(EditConfigurationUtils.getTypeOfNew(vreq))) {
+		if (StringUtils.isNotEmpty(EditConfigurationUtils.getTypeOfNew(vreq))) {
 			return SimplePermission.DO_BACK_END_EDITING.ACTION;
 		}
 		// Check if this statement can be edited here and return unauthorized if not
