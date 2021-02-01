@@ -59,9 +59,7 @@ public class LimitRemovalsToLanguage implements ModelChangePreprocessor {
         StmtIterator sit = retractionsModel.listStatements();
         while(sit.hasNext()) {
             Statement stmt = sit.next();
-            if(!stmt.getObject().isLiteral()) {
-                continue;
-            } else {
+            if(stmt.getObject().isLiteral()) {
                 Literal lit = stmt.getObject().asLiteral();
                 if(!StringUtils.isEmpty(lit.getLanguage()) 
                         && !lit.getLanguage().equals(language)) {
