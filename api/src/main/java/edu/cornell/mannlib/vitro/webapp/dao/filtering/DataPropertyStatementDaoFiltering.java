@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 
-class DataPropertyStatementDaoFiltering extends BaseFiltering implements DataPropertyStatementDao{
+public class DataPropertyStatementDaoFiltering extends BaseFiltering implements DataPropertyStatementDao{
 
     final DataPropertyStatementDao innerDataPropertyStatementDao;
     final VitroFilters filters;

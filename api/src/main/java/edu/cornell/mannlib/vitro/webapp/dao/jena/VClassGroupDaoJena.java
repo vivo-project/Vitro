@@ -276,7 +276,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         try {
             Individual groupInd = ontModel.getIndividual(vcg.getURI());
             try {
-                groupInd.setLabel(vcg.getPublicName(), getDefaultLanguage());
+                updateRDFSLabel(groupInd, vcg.getPublicName(), getDefaultLanguage());
             } catch (Exception e) {
                 log.error("error updating name for "+groupInd.getURI());
             }

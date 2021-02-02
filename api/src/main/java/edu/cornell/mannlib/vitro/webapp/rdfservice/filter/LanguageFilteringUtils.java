@@ -25,9 +25,41 @@ public class LanguageFilteringUtils {
 	private static final String HYPHEN = "-";
 	private static final String DEFAULT_LANG_STRING = "en";
 
+    /**
+     * Take a Locale object, such as we might get from a
+     * request, and convert to a language string used in RDF.
+     *
+     * While converting, change all underscores (as in Locale names) to hyphens
+     * (as in RDF language specifiers).
+     */
+    public static String localeToLanguage(Locale locale) {
+        return locale.toString().replace(UNDERSCORE, HYPHEN);
+    }
+	
+    /**
+     * Take a language string and convert to a Locale.
+     *
+     * While converting, change all hyphens (as in RDF language specifiers) to
+     * underscores (as in Locale names). Ensure language string is lowercase
+     * and country abbreviation is uppercase.
+     */
+    public static Locale languageToLocale(String langStr) {
+        String[] langParts = langStr.split(HYPHEN);
+        if (langParts.length > 2) {
+            langStr = String.join(UNDERSCORE, langParts[0].toLowerCase(),
+                    langParts[1].toUpperCase(), langParts[2]);
+        } else if (langParts.length > 1) {
+            langStr = String.join(UNDERSCORE, langParts[0].toLowerCase(),
+                    langParts[1].toUpperCase());
+        } else {
+            langStr = langParts[0].toLowerCase();
+        }
+        return LocaleUtils.toLocale(langStr);
+    }
+	
 	/**
 	 * Take an Enumeration of Locale objects, such as we might get from a
-	 * request, and convert to a List of langauage strings, such as are needed
+	 * request, and convert to a List of language strings, such as are needed
 	 * by the LanguageFilteringRDFService.
 	 *
 	 * While converting, change all underscores (as in Locale names) to hyphens
@@ -51,22 +83,12 @@ public class LanguageFilteringUtils {
 	 *
 	 * While converting, change all hyphens (as in RDF language specifiers) to
 	 * under scores (as in Locale names). Ensure language string is lowercase
-	 * and country abbriviation is uppercase.
+	 * and country abbreviation is uppercase.
 	 */
 	public static List<Locale> languagesToLocales(List<String> langs) {
 		Set<Locale> locales = new HashSet<>();
-		langs.forEach(langStr -> {
-			String[] langParts = langStr.split(HYPHEN);
-			if (langParts.length > 2) {
-				langStr = String.join(UNDERSCORE, langParts[0].toLowerCase(),
-						langParts[1].toUpperCase(), langParts[2]);
-			} else if (langParts.length > 1) {
-				langStr = String.join(UNDERSCORE, langParts[0].toLowerCase(),
-						langParts[1].toUpperCase());
-			} else {
-				langStr = langParts[0].toLowerCase();
-			}
-			locales.add(LocaleUtils.toLocale(langStr));
+		langs.forEach(langStr -> {			
+			locales.add(languageToLocale(langStr));
 		});
 		if (locales.isEmpty()) {
 			locales.add(LocaleUtils.toLocale(DEFAULT_LANG_STRING));

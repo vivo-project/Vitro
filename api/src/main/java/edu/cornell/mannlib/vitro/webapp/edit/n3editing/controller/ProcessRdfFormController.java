@@ -8,10 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.annotation.WebServlet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -37,8 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmis
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
-
-import javax.servlet.annotation.WebServlet;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.LimitRemovalsToLanguage;
 
 /**
  * This servlet will convert a request to an EditSubmission,
@@ -103,7 +103,11 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		if( configuration.isUseDependentResourceDelete() )
 		    changes = ProcessRdfForm.addDependentDeletes(changes, queryModel);
 
+		// prevent form from removing literals in languages other than the one
+		// associated with the current request
+		configuration.addModelChangePreprocessor(new LimitRemovalsToLanguage(vreq.getLocale()));
 		N3EditUtils.preprocessModels(changes, configuration, vreq);
+		
 		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, N3EditUtils.getEditorUri(vreq) );
 
 		//Here we are trying to get the entity to return to URL,

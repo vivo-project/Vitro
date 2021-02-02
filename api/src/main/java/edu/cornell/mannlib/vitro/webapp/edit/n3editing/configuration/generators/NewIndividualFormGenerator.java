@@ -233,7 +233,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from
-		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
+		OntModel model = ModelAccess.on(vreq).getOntModel();
     	//This form is always doing a non-update
     	editConfiguration.prepareForNonUpdate( model );
 
