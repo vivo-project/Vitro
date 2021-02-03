@@ -232,16 +232,6 @@ public class SparqlGraph implements GraphWithPerform {
             literalBuff.append("\"");
             pyString(literalBuff, node.getLiteralLexicalForm());
             literalBuff.append("\"");
-            /*
-             * UQAM-Bug-Correction
-             * reversing the condition tests.
-             * It is important to prioritize the language typology test in order to exploit the linguistic context in testing the type of data
-             */
-//          if (node.getLiteralDatatypeURI() != null) {
-//          literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-//      } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
-//          literalBuff.append("@").append(node.getLiteralLanguage());
-//      }
             if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             } else if (node.getLiteralDatatypeURI() != null) {
