@@ -128,13 +128,16 @@ public class VitroHomeDirectory {
 
 					// reading bytes into memory to avoid having to unreliably reset stream
 					byte[] bytes = IOUtils.toByteArray(tarInput);
-					digest.put(outFilename, checksum(bytes));
+					String newFileChecksum = checksum(bytes);
+					digest.put(outFilename, newFileChecksum);
 
 					// if file already exists and stored digest contains the file,
 					// check to determine if it has changed
 					if (outFile.exists() && storedDigest.containsKey(outFilename)) {
-						// if file has not changed, overwrite
-						write = storedDigest.get(outFilename).equals(checksum(outFile));
+						String existingFileChecksum = checksum(outFile);
+						// if file has not changed and is not the same as new file, overwrite
+						write = storedDigest.get(outFilename).equals(existingFileChecksum)
+							&& !existingFileChecksum.equals(newFileChecksum);
 					}
 
 					if (write) {
