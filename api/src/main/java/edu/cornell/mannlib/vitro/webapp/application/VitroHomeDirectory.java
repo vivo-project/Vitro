@@ -101,7 +101,7 @@ public class VitroHomeDirectory {
 	 * @return digest of each files checksum
 	 */
 	private Map<String, String> untar(File destination) {
-		log.info("Populating VIVO home at: " + destination.getPath());
+		log.info("Syncing VIVO home at: " + destination.getPath());
 
 		Map<String, String> digest = new HashMap<>();
 		Map<String, String> storedDigest = loadDigest();
@@ -135,7 +135,7 @@ public class VitroHomeDirectory {
 					// check to determine if it has changed
 					if (outFile.exists() && storedDigest.containsKey(outFilename)) {
 						String existingFileChecksum = checksum(outFile);
-						// if file has not changed and is not the same as new file, overwrite
+						// if file has not changed in home and is not the same as new file, overwrite
 						write = storedDigest.get(outFilename).equals(existingFileChecksum)
 							&& !existingFileChecksum.equals(newFileChecksum);
 					}
@@ -147,9 +147,11 @@ public class VitroHomeDirectory {
 							FileOutputStream fos = new FileOutputStream(outFile);
 						) {
 							IOUtils.copy(is, fos);
+							log.info(outFile.getAbsolutePath() + " source has changed and has not been "
+							         + "edited in home, updated file has been copied to home directory.");
 						}
 					} else {
-						log.info(outFile.getAbsolutePath() + " changes have been preserved.");
+						log.debug(outFile.getAbsolutePath() + " has been preserved.");
 					}
 				}
 			}
