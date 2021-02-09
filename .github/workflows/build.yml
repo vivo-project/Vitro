@@ -16,7 +16,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-cache-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-cache-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-cache-m2-
 
       - name: Setup Java
