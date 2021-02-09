@@ -1,6 +1,6 @@
 # What is Vitro?
 
-[![Build Status](https://travis-ci.org/vivo-project/Vitro.png?branch=develop)](https://travis-ci.org/vivo-project/Vitro)
+[![Build](https://github.com/vivo-project/Vitro/workflows/Build/badge.svg)](https://github.com/vivo-project/Vitro/actions?query=workflow%3ABuild)
 
 Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. 
 
