@@ -714,14 +714,14 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             }
         }
 
-        updatePropertyStringValue(p,EXAMPLE_ANNOT,prop.getExample(),getOntModel());
-        updatePropertyStringValue(p,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
-        updatePropertyStringValue(p,PUBLIC_DESCRIPTION_ANNOT,prop.getPublicDescription(),getOntModel());
+        updatePlainLiteralValue(p, EXAMPLE_ANNOT, prop.getExample());
+        updatePlainLiteralValue(p, DESCRIPTION_ANNOT, prop.getDescription());
+        updatePlainLiteralValue(p, PUBLIC_DESCRIPTION_ANNOT, prop.getPublicDescription());
         updatePropertyNonNegativeIntegerValue(p,DISPLAY_LIMIT,prop.getDomainDisplayLimitInteger(),getOntModel());
         updatePropertyStringValue(p,PROPERTY_ENTITYSORTDIRECTION,prop.getDomainEntitySortDirection(),getOntModel());
         if (inv != null) {
-            updatePropertyStringValue(inv,EXAMPLE_ANNOT,prop.getExample(),getOntModel());
-            updatePropertyStringValue(inv,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
+            updatePlainLiteralValue(inv, EXAMPLE_ANNOT, prop.getExample());
+            updatePlainLiteralValue(inv, DESCRIPTION_ANNOT, prop.getDescription());
             updatePropertyNonNegativeIntegerValue(inv,DISPLAY_LIMIT,prop.getRangeDisplayLimitInteger(),getOntModel());
             updatePropertyStringValue(inv,PROPERTY_ENTITYSORTDIRECTION,prop.getRangeEntitySortDirection(),getOntModel());
         }

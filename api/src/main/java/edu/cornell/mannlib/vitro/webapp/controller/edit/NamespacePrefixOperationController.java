@@ -71,7 +71,7 @@ public class NamespacePrefixOperationController extends BaseEditController {
 
         if (request.getParameter("_cancel") == null) {
 
-    		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
+    		OntModel ontModel = ModelAccess.on(req).getOntModel();
         	String namespaceStr = request.getParameter("namespace");
         	String prefixStr = request.getParameter("prefix");
 

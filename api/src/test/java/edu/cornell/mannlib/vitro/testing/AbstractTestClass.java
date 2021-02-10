@@ -56,6 +56,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import stubs.edu.cornell.mannlib.vitro.webapp.i18n.I18nStub;
 
 /**
  * A collection of useful routines to help when testing.
@@ -85,8 +86,21 @@ public abstract class AbstractTestClass {
 	 * {@link Level#INFO}.
 	 */
 	@Before
+	public void setUp() {
+		initializeLogging();
+		useI18nStubBundles();
+	}
+
 	@After
-	public void initializeLogging() {
+	public void tearDown() {
+		initializeLogging();
+	}
+
+	protected void useI18nStubBundles() {
+		I18nStub.setup();
+	}
+
+	private void initializeLogging() {
 		LogManager.resetConfiguration();
 		Logger.getRootLogger().addAppender(new ConsoleAppender(patternLayout));
 		Logger.getRootLogger().setLevel(Level.INFO);

@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
 
 import org.junit.Ignore;
@@ -28,11 +29,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author bjl23
  *
  */
-public class OntModelSegementationTest {
+public class OntModelSegementationTest extends AbstractTestClass {
 
 	private WebappDaoFactoryJena wadf;
 	@org.junit.Before
 	public void setUpWebappDaoFactoryJena() {
+		super.setUp();
 		wadf = new WebappDaoFactoryJena(new SimpleOntModelSelector());
 	}
 

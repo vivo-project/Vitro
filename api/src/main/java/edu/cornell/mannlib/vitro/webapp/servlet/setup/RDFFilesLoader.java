@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +9,13 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,6 +26,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 
+import javax.servlet.ServletContext;
+
 /**
  * Help to load RDF files on first time and on every startup.
  */
@@ -31,11 +36,12 @@ public class RDFFilesLoader {
 
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
 	private static final String RDF = "rdf";
+	private static final String I18N = "i18n";
 	private static final String FIRST_TIME = "firsttime";
 	private static final String EVERY_TIME = "everytime";
 
 	/**
-	 * Path filter that ignores sub-directories, hidden files, and markdown
+	 * Path filter that ignores sub-directories, hidden files and markdown
 	 * files.
 	 */
 	private static final DirectoryStream.Filter<Path> RDF_FILE_FILTER = new DirectoryStream.Filter<Path>() {
@@ -64,11 +70,20 @@ public class RDFFilesLoader {
 	 *
 	 * The files from the directory are added to the model.
 	 */
-	public static void loadFirstTimeFiles(String modelPath, Model model,
+	public static void loadFirstTimeFiles(ServletContext ctx, String modelPath, Model model,
 			boolean firstTime) {
 		if (firstTime) {
 			String home = locateHomeDirectory();
+
+			// Load common files
 			Set<Path> paths = getPaths(home, RDF, modelPath, FIRST_TIME);
+
+			// Load enabled languages
+			Set<String> enabledLocales = getEnabledLocales(ctx);
+			for (String locale : enabledLocales) {
+				paths.addAll(getPaths(home, RDF, I18N, locale, modelPath, FIRST_TIME));
+			}
+
 			for (Path p : paths) {
 				log.info("Loading " + relativePath(p, home));
 				readOntologyFileIntoModel(p, model);
@@ -87,16 +102,42 @@ public class RDFFilesLoader {
 	 *
 	 * The files from the directory become a sub-model of the model.
 	 */
-	public static void loadEveryTimeFiles(String modelPath, OntModel model) {
+	public static void loadEveryTimeFiles(ServletContext ctx, String modelPath, OntModel model) {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
 		String home = locateHomeDirectory();
+
+		// Load common files
 		Set<Path> paths = getPaths(home, RDF, modelPath, EVERY_TIME);
+
+		// Load enabled languages
+		Set<String> enabledLocales = getEnabledLocales(ctx);
+		for (String locale : enabledLocales) {
+			paths.addAll(getPaths(home, RDF, I18N, locale, modelPath, EVERY_TIME));
+		}
+
 		for (Path p : paths) {
 			log.info("Loading " + relativePath(p, home));
 			readOntologyFileIntoModel(p, everytimeModel);
 		}
 		model.addSubModel(everytimeModel);
+	}
+
+	public static Set<String> getEnabledLocales(ServletContext ctx) {
+		Set<String> enabledLocales = new HashSet<>();
+
+		// Which locales are enabled in runtime.properties?
+		List<Locale> locales = SelectedLocale.getSelectableLocales(ctx);
+		for (Locale locale : locales) {
+			enabledLocales.add(locale.toLanguageTag().replace('-', '_'));
+		}
+
+		// If no languages were enabled in runtime.properties, add 'en_US' as the default
+		if (enabledLocales.isEmpty()) {
+			enabledLocales.add("en_US");
+		}
+
+		return enabledLocales;
 	}
 
 	private static Path relativePath(Path p, String home) {
@@ -108,35 +149,8 @@ public class RDFFilesLoader {
 	}
 
 	/**
-	 * Create a model from all the RDF files in the specified directory.
-	 */
-	public static OntModel getModelFromDir(File dir) {
-		OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		if (dir == null) {
-			log.warn("Must pass a File to getModelFromDir()");
-			return model;
-		}
-		if (!dir.isDirectory()) {
-			log.warn("Directory must be a File object for a directory");
-			return model;
-		}
-		if (!dir.canRead()) {
-			log.warn("getModelFromDir(): Directory "
-					+ " must be readable, check permissions on "
-					+ dir.getAbsolutePath());
-			return model;
-		}
-
-		Set<Path> paths = getPaths(dir.getPath());
-		for (Path p : paths) {
-			readOntologyFileIntoModel(p, model);
-		}
-		return model;
-	}
-
-	/**
 	 * Find the paths to RDF files in this directory. Sub-directories, hidden
-	 * files, and markdown files are ignored.
+	 * files, markdown, and non-enabled language files are ignored.
 	 */
 	private static Set<Path> getPaths(String parentDir, String... strings) {
 		Path dir = Paths.get(parentDir, strings);

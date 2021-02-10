@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.io.StringReader;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,10 +15,12 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDFS;
 
-public class VClassGroupCacheTest {
+public class VClassGroupCacheTest extends AbstractTestClass {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
+        // Not calling super.setUp() because we do not want to change the logging level
+        super.useI18nStubBundles();
     }
 
     @Test

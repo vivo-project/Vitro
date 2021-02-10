@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 
-class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
+public class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
     IndividualDao innerIndividualDao;
     VitroFilters filters;
 

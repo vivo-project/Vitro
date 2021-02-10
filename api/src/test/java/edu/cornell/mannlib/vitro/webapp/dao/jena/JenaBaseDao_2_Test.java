@@ -48,6 +48,8 @@ public class JenaBaseDao_2_Test extends AbstractTestClass {
 
 	@Before
 	public void initializeThings() {
+		super.setUp();
+
 		ontModel = ModelFactory.createOntologyModel();
 
 		prop1 = ontModel.createProperty("property1");

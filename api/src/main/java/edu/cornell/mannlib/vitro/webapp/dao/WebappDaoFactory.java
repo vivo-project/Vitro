@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 import java.util.List;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
+
 public interface WebappDaoFactory {
 
     /**
@@ -131,5 +133,7 @@ public interface WebappDaoFactory {
     public PageDao getPageDao();
 
     public MenuDao getMenuDao();
+
+    public I18nBundle getI18nBundle();
 
 }

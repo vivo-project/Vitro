@@ -74,6 +74,8 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 
 	@Before
 	public void setup() throws IOException {
+		super.setUp();
+
 		InputStream stream = UserAccountsDaoJenaTest.class
 				.getResourceAsStream(N3_DATA_FILENAME);
 		Model model = ModelFactory.createDefaultModel();
@@ -90,6 +92,8 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 
 	@Before
 	public void createUserAccountValues() {
+		super.setUp();
+
 		user1 = userAccount(URI_USER1, "email@able.edu", "Zack", "Roberts",
 				"garbage", "" ,"", 0L, false, 5, 12345678L, Status.ACTIVE, "user1",
 				false, collection(URI_ROLE1), false, EMPTY);

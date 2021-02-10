@@ -50,11 +50,12 @@ public class DatapropRetryController extends BaseEditController {
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
+        epo.setImplementationClass(DataProperty.class);
         epo.setBeanClass(DataProperty.class);
 
         VitroRequest vreq = new VitroRequest(request);
 
-        WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
+        WebappDaoFactory wadf = ModelAccess.on(vreq).getWebappDaoFactory();
 
         DatatypeDao dDao = wadf.getDatatypeDao();
         DataPropertyDao dpDao = wadf.getDataPropertyDao();

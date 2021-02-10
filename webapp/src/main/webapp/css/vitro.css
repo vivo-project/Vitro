@@ -252,10 +252,11 @@ ul.dropdown li:hover > ul {
 /* ------------------------------------------------->  */
 ul.language-dropdown {
     position: relative;
+    min-width: 160px;
 }
 ul.language-dropdown li#language-menu {
     background: url(../images/arrowDownOverAccount.gif) right 9px no-repeat;
-    min-width:110px;
+    min-width: 170px;
     position: relative;
     margin-right: -10px !important;
 }

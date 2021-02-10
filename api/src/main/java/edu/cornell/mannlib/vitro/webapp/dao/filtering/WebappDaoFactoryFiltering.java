@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 /**
  * This wraps a WebappDaoFactory and applies filtering.
@@ -67,7 +68,7 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     transient private PropertyGroupDao filteringPropertyGroupDao=null;
     transient private PropertyInstanceDao filteringPropertyInstanceDao=null;
 
-    public WebappDaoFactoryFiltering( WebappDaoFactory innerDao, VitroFilters filters){
+    public WebappDaoFactoryFiltering(WebappDaoFactory innerDao, VitroFilters filters){
         if( innerDao == null )
             throw new Error("innerWebappDaoFactory must be non-null");
         this.filters = filters;
@@ -275,5 +276,10 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     @Override
     public void close() {
         innerWebappDaoFactory.close();
+    }
+
+    @Override
+    public I18nBundle getI18nBundle() {
+        return innerWebappDaoFactory.getI18nBundle();
     }
 }

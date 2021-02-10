@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -218,7 +219,20 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
 			return ToString.simpleName(this) + "[" + ToString.hashHex(this)
 					+ ", inner=" + s + "]";
 		}
+        /*
+         * UQAM-Linguistic-Management Useful among other things to transport the linguistic context in the service
+         * (non-Javadoc)
+         * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+         */
+        private VitroRequest vitroRequest;
 
+        public void setVitroRequest(VitroRequest vitroRequest) {
+            this.vitroRequest = vitroRequest;
+        }
+
+        public VitroRequest getVitroRequest() {
+            return vitroRequest;
+        }
     }
 
 }

@@ -19,11 +19,13 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import stubs.javax.servlet.http.HttpServletRequestStub;
 
-public class ProcessRdfFormTest extends AbstractTestClass{
+public class ProcessRdfFormTest extends AbstractTestClass {
 
     @Test
     public void basicNewStatementTest() throws Exception{
@@ -40,14 +42,16 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         values.put("test3", (new String[] {"http://test.com/uri3"}));
         values.put("editKey", (new String[] {"mockEditKey"}));
 
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+        VitroRequest vreq = createRequestWithParameters(values);
+
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, config);
 
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
 
         /* test just the N3 substitution part */
         List<String>req = config.getN3Required();
         List<String>opt = config.getN3Optional();
-        processor.subInValuesToN3( config , submission, req, opt, null , null);
+        processor.subInValuesToN3( config , submission, req, opt, null , null, vreq);
         assertNotNull(req);
         assertTrue( req.size() > 0);
         assertNotNull(req.get(0));
@@ -102,7 +106,10 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         Map<String,String[]> values = new HashMap<String, String[]>();
         values.put("testZ", (new String[] {testZURIChanged}));
         values.put("editKey", (new String[] {"mockEditKey"}));
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+
+        VitroRequest vreq = createRequestWithParameters(values);
+
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, config);
 
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
         AdditionsAndRetractions changes = processor.process( config, submission, null );
@@ -176,14 +183,17 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         values.put("test2", (new String[] {test2}));
         values.put("test3", (new String[] {test3}));
         values.put("editKey", (new String[] {"mockEditKey"}));
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+
+        VitroRequest vreq = createRequestWithParameters(values);
+
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, config);
 
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
 
         /* test just the N3 substitution part */
         List<String>req = config.getN3Required();
         List<String>opt = config.getN3Optional();
-        processor.subInValuesToN3( config , submission, req, opt, null , null);
+        processor.subInValuesToN3( config , submission, req, opt, null , null, vreq);
         assertNotNull(req);
         assertTrue( req.size() > 0);
         assertNotNull(req.get(0));
@@ -220,14 +230,16 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         values.put("test3", (new String[] {"http://test.com/uri3"}));
         values.put("editKey", (new String[] {"mockEditKey"}));
 
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+        VitroRequest vreq = createRequestWithParameters(values);
+
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, config);
 
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
 
         /* test just the N3 substitution part */
         List<String>req = config.getN3Required();
         List<String>opt = config.getN3Optional();
-        processor.subInValuesToN3( config , submission, req, opt, null , null);
+        processor.subInValuesToN3( config , submission, req, opt, null , null, vreq);
         assertNotNull(req);
         assertTrue( req.size() > 0);
         assertNotNull(req.get(0));
@@ -270,14 +282,16 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         values.put("test3", (new String[] {"http://test.com/uri3"}));
         values.put("editKey", (new String[] {"mockEditKey"}));
 
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+        VitroRequest vreq = createRequestWithParameters(values);
+
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, config);
 
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
 
         /* test just the N3 substitution part */
         List<String>req = config.getN3Required();
         List<String>opt = config.getN3Optional();
-        processor.subInValuesToN3( config , submission, req, opt, null , null);
+        processor.subInValuesToN3( config , submission, req, opt, null , null, vreq);
         assertNotNull(req);
         assertTrue( req.size() > 0);
         assertNotNull(req.get(0));
@@ -357,10 +371,13 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         values.put("testZ", (new String[] {testZURIChanged}));
         values.put("zLabel", (new String[] {"New Z Label"}));
         values.put("editKey", (new String[] {"mockEditKey"}));
-        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+
+        VitroRequest vreq = createRequestWithParameters(values);
+
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq, config);
 
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
-        AdditionsAndRetractions changes = processor.process( config, submission, null );
+        AdditionsAndRetractions changes = processor.process( config, submission, vreq );
 
         assertNotNull( changes );
         assertNotNull( changes.getAdditions() );
@@ -396,4 +413,16 @@ public class ProcessRdfFormTest extends AbstractTestClass{
             }
         };
     }
+
+    private VitroRequest createRequestWithParameters(Map<String, String[]> parameters) {
+        HttpServletRequestStub req = new HttpServletRequestStub();
+        for (String key : parameters.keySet()) {
+            for (String value : parameters.get(key)) {
+                req.addParameter(key, value);
+            }
+        }
+
+        return new VitroRequest(req);
+    }
+
 }

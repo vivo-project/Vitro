@@ -72,6 +72,7 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
         return getMenu( getOntModelSelector().getDisplayModel(), url );
     }
 
+    @Override
     public MainMenu getMainMenu( ServletRequest req, String url ) {
         OntModel displayModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(getOntModelSelector().getDisplayModel(), req );
         return getMenu(displayModel,  url) ;

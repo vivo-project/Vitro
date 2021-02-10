@@ -83,22 +83,21 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     	}
     	ontModel.enterCriticalSection(Lock.WRITE);
     	try {
-    		appInd.setLabel(application.getApplicationName(), null);
-	        updatePropertyStringValue(
-	        		appInd, APPLICATION_ABOUTTEXT, application.getAboutText(),
-	        		    ontModel);
-	        updatePropertyStringValue(
+    		updateRDFSLabel(appInd, application.getApplicationName());
+	        updatePlainLiteralValue(
+	        		appInd, APPLICATION_ABOUTTEXT, application.getAboutText());
+	        updatePlainLiteralValue(
 	        		appInd, APPLICATION_ACKNOWLEGETEXT,
-	        		    application.getAcknowledgeText(), ontModel);
+	        		    application.getAcknowledgeText());
 	        updatePropertyStringValue(
 	        		appInd, APPLICATION_CONTACTMAIL,
 	        		    application.getContactMail(), ontModel);
 	        updatePropertyStringValue(
 	        		appInd, APPLICATION_CORRECTIONMAIL,
 	        		    application.getCorrectionMail(), ontModel);
-	        updatePropertyStringValue(
+	        updatePlainLiteralValue(
 	        		appInd, APPLICATION_COPYRIGHTANCHOR,
-	        		    application.getCopyrightAnchor(), ontModel);
+	        		    application.getCopyrightAnchor());
             updatePropertyStringValue(
             		appInd, APPLICATION_COPYRIGHTURL,
             		    application.getCopyrightURL(), ontModel);

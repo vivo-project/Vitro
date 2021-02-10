@@ -230,10 +230,9 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					OBJECT_PROPERTY_DISPLAY_CONFIG);
 			addPropertyResourceURINotEmpty(config, PROPERTY_GROUP,
 					fp.getGroupURI());
-			addPropertyStringValue(config, DISPLAY_NAME, fp.getDisplayName(),
-					displayModel);
-			addPropertyStringValue(config, PUBLIC_DESCRIPTION_ANNOT,
-					fp.getPublicDescription(), displayModel);
+			updatePlainLiteralValue(config, DISPLAY_NAME, fp.getDisplayName());
+			updatePlainLiteralValue(config, PUBLIC_DESCRIPTION_ANNOT,
+					fp.getPublicDescription());
 			addPropertyIntValue(config, DISPLAY_RANK_ANNOT,
 					fp.getDisplayTier(), displayModel);
 			addPropertyIntValue(config, DISPLAY_LIMIT, fp.getDisplayLimit(),
@@ -328,10 +327,10 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					.getConfigUri());
 			updatePropertyResourceURIValue(config, PROPERTY_GROUP,
 					fp.getGroupURI());
-			updatePropertyStringValue(config, DISPLAY_NAME,
-					fp.getDisplayName(), displayModel);
-			updatePropertyStringValue(config, PUBLIC_DESCRIPTION_ANNOT,
-					fp.getPublicDescription(), displayModel);
+			updatePlainLiteralValue(config, DISPLAY_NAME,
+					fp.getDisplayName());
+			updatePlainLiteralValue(config, PUBLIC_DESCRIPTION_ANNOT,
+					fp.getPublicDescription());
 			updatePropertyIntValue(config, DISPLAY_RANK_ANNOT,
 					fp.getDisplayTier(), displayModel);
 			updatePropertyIntValue(config, DISPLAY_LIMIT, fp.getDisplayLimit(),

@@ -37,7 +37,7 @@ public class NamespacesListingController extends BaseEditController {
 
         VitroRequest vrequest = new VitroRequest(request);
 
-		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
+		OntModel ontModel = ModelAccess.on(vrequest).getOntModel();
 
         ArrayList results = new ArrayList();
         request.setAttribute("results",results);

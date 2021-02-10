@@ -78,9 +78,9 @@ precisionConstants.second -- URI for precision
         </#if>
 
         <#if precLevel gte 2>
-            <label for="${fieldName}-month">Month<#if reqLevel gte 2> <span class="requiredHint">*</span></#if></label>
+            <label for="${fieldName}-month">${i18n()[('label.dateTimeWithPrecision.month_capitalized')]}<#if reqLevel gte 2> <span class="requiredHint">*</span></#if></label>
             <select name="${fieldName}-month" id="${fieldName}-month" <#if reqLevel gte 2>required </#if>>
-                <option value=""<#if !month??> selected="selected"</#if>>month</option>
+                <option value=""<#if !month??> selected="selected"</#if>>${i18n()[('label.dateTimeWithPrecision.month_capitalized')]}</option>
                 <#assign numMonths = 12 />
                 <#list 1..numMonths as currentMonth>
                     <option value="${currentMonth?string('00')}"<#if month == "${currentMonth}"> selected="selected"</#if>>${currentMonth}</option>
@@ -89,9 +89,9 @@ precisionConstants.second -- URI for precision
         </#if>
 
         <#if precLevel gte 3>
-            <label for="${fieldName}-day">Day<#if reqLevel gte 3> <span class="requiredHint">*</span></#if></label>
+            <label for="${fieldName}-day">${i18n()[('label.dateTimeWithPrecision.day_capitalized')]}<#if reqLevel gte 3> <span class="requiredHint">*</span></#if></label>
             <select name="${fieldName}-day" id="${fieldName}-day" <#if reqLevel gte 3>required </#if>>
-                <option value=""<#if !day??> selected="selected"</#if>>day</option>
+                <option value=""<#if !day??> selected="selected"</#if>>${i18n()[('label.dateTimeWithPrecision.day_capitalized')]}</option>
                 <#assign numDays = 31 />
                 <#list 1..numDays as currentDay>
                     <option value="${currentDay?string('00')}"<#if day == "${currentDay}"> selected="selected"</#if>>${currentDay}</option>
@@ -101,9 +101,9 @@ precisionConstants.second -- URI for precision
 
         <#if precLevel gte 4>
             <#-- We'll need to make this more flexible to support 24 hour display down the road. For now assuming 12h with am/pm -->
-            <label for="${fieldName}-hour">Hour<#if reqLevel gte 4> <span class="requiredHint">*</span></#if></label>
+            <label for="${fieldName}-hour">${i18n()[('label.dateTimeWithPrecision.hour_capitalized')]}<#if reqLevel gte 4> <span class="requiredHint">*</span></#if></label>
             <select name="${fieldName}-hour" id="${fieldName}-hour" <#if reqLevel gte 3>required </#if>>
-                <option value=""<#if !hour??> selected="selected"</#if>>hour</option>
+                <option value=""<#if !hour??> selected="selected"</#if>>${i18n()[('label.dateTimeWithPrecision.hour_capitalized')]}</option>
                 <#assign numHours = 23 />
                 <#list 0..numHours as currentHour>
                     <#if currentHour_index == 0>
@@ -124,9 +124,9 @@ precisionConstants.second -- URI for precision
         </#if>
 
         <#if precLevel gte 5>
-            <label for="${fieldName}-minute">Minutes<#if reqLevel gte 5> <span class="requiredHint">*</span></#if></label>
+            <label for="${fieldName}-minute">${i18n()[('label.dateTimeWithPrecision.minutes_capitalized')]}<#if reqLevel gte 5> <span class="requiredHint">*</span></#if></label>
             <select name="${fieldName}-minute" id="${fieldName}-minute" <#if reqLevel gte 5>required </#if>>
-                <option value=""<#if !minute??> selected="selected"</#if>>minutes</option>
+                <option value=""<#if !minute??> selected="selected"</#if>>${i18n()[('label.dateTimeWithPrecision.minutes_capitalized')]}</option>
                 <#assign numMinutes = 59 />
                 <#list 1..numMinutes as currentMinute>
                     <option value="${currentMinute?string('00')}"<#if minute == "${currentMinute}"> selected="selected"</#if>>${currentMinute}</option>
@@ -135,9 +135,9 @@ precisionConstants.second -- URI for precision
         </#if>
 
         <#if precLevel gte 6>
-            <label for="${fieldName}-second">Seconds<#if reqLevel gte 6> <span class="requiredHint">*</span></#if></label>
+            <label for="${fieldName}-second">${i18n()[('label.dateTimeWithPrecision.seconds_capitalized')]}<#if reqLevel gte 6> <span class="requiredHint">*</span></#if></label>
             <select name="${fieldName}-second" id="${fieldName}-second" <#if reqLevel gte 6>required </#if>>
-                <option value=""<#if !second??> selected="selected"</#if>>seconds</option>
+                <option value=""<#if !second??> selected="selected"</#if>>${i18n()[('label.dateTimeWithPrecision.seconds_capitalized')]}</option>
                 <#assign numMinutes = 59 />
                 <#list 1..numMinutes as currentSecond>
                     <option value="${currentSecond?string('00')}"<#if second == "${currentSecond}"> selected="selected"</#if>>${currentSecond}</option>

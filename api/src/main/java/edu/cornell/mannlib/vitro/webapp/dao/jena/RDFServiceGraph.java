@@ -290,6 +290,11 @@ public class RDFServiceGraph implements GraphWithPerform {
             literalBuff.append("\"");
             pyString(literalBuff, node.getLiteralLexicalForm());
             literalBuff.append("\"");
+            /*
+             * UQAM-Bug-Correction
+             * reversing the condition tests.
+             * It is important to prioritize the language typology test in order to exploit the linguistic context in testing the type of data
+             */
             if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             } else if (node.getLiteralDatatypeURI() != null) {

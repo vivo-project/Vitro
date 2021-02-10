@@ -30,14 +30,13 @@
         defaultBrowseVClassUri: firstBrowseClass //'${firstNonEmptyVClass}'
     };
     var i18nStrings = {
-        pageString: '${i18n().page}',
-        viewPageString: '${i18n().view_page}',
-        ofTheResults: '${i18n().of_the_results}',
-        thereAreNo: '${i18n().there_are_no}',
-        indNamesStartWith: '${i18n().individuals_names_starting_with}',
-        tryAnotherLetter: '${i18n().try_another_letter}',
-        indsInSystem: '${i18n().individuals_in_system}',
-        selectAnotherClass: '${i18n().select_another_class}'
+        pageString: '${i18n().page?js_string}',
+        viewPageString: '${i18n().view_page?js_string}',
+        ofTheResults: '${i18n().of_the_results?js_string}',
+        thereAreNoEntriesStartingWith: '${i18n().there_are_no_entries_starting_with?js_string}',
+        tryAnotherLetter: '${i18n().try_another_letter?js_string}',
+        indsInSystem: '${i18n().individuals_in_system?js_string}',
+        selectAnotherClass: '${i18n().select_another_class?js_string}'
     };
 </script>
 

@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,7 +41,8 @@ public class ChildVClassesOptions implements FieldOptions {
     public Map<String, String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wDaoFact) throws Exception{
+            WebappDaoFactory wDaoFact,
+            I18nBundle i18n) throws Exception{
         // now create an empty HashMap to populate and return
         HashMap <String,String> optionsMap = new LinkedHashMap<String,String>();
 

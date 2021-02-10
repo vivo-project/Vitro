@@ -3,19 +3,25 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.StringWriter;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-
+import org.apache.jena.atlas.logging.Log;
 import org.apache.jena.ontology.ObjectProperty;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
+import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -24,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  *
  */
 
-public class VClassDaoTest {
+public class VClassDaoTest extends AbstractTestClass {
 
 	@Test
 	// Test that the VClassDaoJena::updateVClass method will only update the jena model for
@@ -62,9 +68,9 @@ public class VClassDaoTest {
 
 		class1.setLabel(rdfsLabel,lang);   //rdfs:label
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.IN_CLASSGROUP), subModel.createResource("http://thisIsTheClassGroupURI"));
-		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.SHORTDEF), subModel.createTypedLiteral("this is the short definition"));
-		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.EXAMPLE_ANNOT), subModel.createTypedLiteral("this is the example - why is this a string?"));
-		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.DESCRIPTION_ANNOT), subModel.createTypedLiteral("this is the description"));
+		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.SHORTDEF), ResourceFactory.createLangLiteral("this is the short definition", lang));
+		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.EXAMPLE_ANNOT), ResourceFactory.createLangLiteral("this is the example - why is this a string?", lang));
+		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.DESCRIPTION_ANNOT), ResourceFactory.createLangLiteral("this is the description", lang));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.DISPLAY_LIMIT), subModel.createTypedLiteral(-1));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.DISPLAY_RANK_ANNOT), subModel.createTypedLiteral(-11));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.SEARCH_BOOST_ANNOT), subModel.createTypedLiteral(2.4f));
@@ -120,7 +126,7 @@ public class VClassDaoTest {
 		wipeOutModTime(superModel);
 
 		assertTrue(subModel.isIsomorphicWith(origSubModel));
-	    assertTrue(superModel.isIsomorphicWith(origSuperModel));
+		assertTrue(superModel.isIsomorphicWith(origSuperModel));
 
 	}
 

@@ -54,7 +54,7 @@ public abstract class AbstractModelDecorator implements Model {
 
 	protected AbstractModelDecorator(Model m) {
 		if (m == null) {
-			throw new NullPointerException("m may not be null.");
+			throw new IllegalArgumentException("m may not be null.");
 		}
 		this.inner = m;
 	}
