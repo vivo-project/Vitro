@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.io.StringReader;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
 
 import org.apache.jena.rdf.model.Model;
@@ -16,7 +17,7 @@ import org.apache.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
-public class DependentResourceDeleteJenaTest {
+public class DependentResourceDeleteJenaTest extends AbstractTestClass {
 	String isDependentRelation =
 		" <"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
 

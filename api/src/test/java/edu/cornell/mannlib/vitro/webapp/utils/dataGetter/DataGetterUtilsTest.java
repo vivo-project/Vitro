@@ -32,7 +32,7 @@ public class DataGetterUtilsTest extends AbstractTestClass{
     String dataGetterX = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#pageDataGetterX";
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         // Suppress error logging.
         setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
 

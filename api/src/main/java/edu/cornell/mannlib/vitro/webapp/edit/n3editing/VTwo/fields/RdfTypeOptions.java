@@ -9,6 +9,7 @@ import java.util.Map;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 public class RdfTypeOptions implements FieldOptions {
 
@@ -29,7 +30,8 @@ public class RdfTypeOptions implements FieldOptions {
     public Map<String, String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wdf) {
+            WebappDaoFactory wdf,
+            I18nBundle i18n) {
         Map<String,String> uriToLabel = new HashMap<String,String>();
 
         for (String uri : typeURIs) {

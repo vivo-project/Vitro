@@ -6,6 +6,7 @@ import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 public class IndividualsViaClassGroupOptions implements FieldOptions {
 
@@ -27,7 +28,8 @@ public class IndividualsViaClassGroupOptions implements FieldOptions {
     public Map<String, String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wDaoFact) throws Exception {
+            WebappDaoFactory wDaoFact,
+            I18nBundle i18n) throws Exception {
         throw new Error("not implemented");
     }
 

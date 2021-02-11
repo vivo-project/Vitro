@@ -66,11 +66,10 @@ public class VclassRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
+        WebappDaoFactory wadf = ModelAccess.on(req).getWebappDaoFactory();
 
         VClassDao vcwDao = wadf.getVClassDao();
         epo.setDataAccessObject(vcwDao);
-        VClassGroupDao cgDao = wadf.getVClassGroupDao();
         OntologyDao oDao = wadf.getOntologyDao();
 
         VClass vclassForEditing = null;

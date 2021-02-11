@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,7 +27,8 @@ public class SelectListGeneratorVTwo {
     public static Map<String,String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
-            WebappDaoFactory wDaoFact){
+            WebappDaoFactory wDaoFact,
+            I18nBundle i18n){
 
 
         if( editConfig == null ){
@@ -48,12 +51,50 @@ public class SelectListGeneratorVTwo {
         }
 
         try {
-            return field.getFieldOptions().getOptions(editConfig,fieldName,wDaoFact);
+            return field.getFieldOptions().getOptions(editConfig,fieldName,wDaoFact,i18n);
         } catch (Exception e) {
             log.error("Error runing getFieldOptionis()",e);
             return Collections.emptyMap();
         }
     }
+
+    // UQAM Overcharge method for linguistic contexte processisng
+    // AWoods: This method appears to never be invoked.
+	public static Map<String,String> getOptions(
+			EditConfigurationVTwo editConfig,
+			String fieldName,
+			VitroRequest vreq){
+
+
+		if( editConfig == null ){
+			log.error( "fieldToSelectItemList() must be called with a non-null EditConfigurationVTwo ");
+			return Collections.emptyMap();
+		}
+		if( fieldName == null ){
+			log.error( "fieldToSelectItemList() must be called with a non-null fieldName");
+			return Collections.emptyMap();
+		}
+
+		FieldVTwo field = editConfig.getField(fieldName);
+		if (field==null) {
+			log.error("no field \""+fieldName+"\" found from editConfig.");
+			return Collections.emptyMap();
+		}
+
+		if( field.getFieldOptions() == null ){
+			return Collections.emptyMap();
+		}
+
+		try {
+			//UQAM need vreq instead of WebappDaoFactory
+			Map<String, String> parentClass = Collections.emptyMap();
+			FieldOptions fieldOptions = field.getFieldOptions();
+			return fieldOptions.getOptions(editConfig,fieldName,vreq.getWebappDaoFactory(), I18n.bundle(vreq));
+		} catch (Exception e) {
+			log.error("Error runing getFieldOptionis()",e);
+			return Collections.emptyMap();
+		}
+	}
 
 
     //Methods to sort the options map

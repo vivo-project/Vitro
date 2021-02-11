@@ -4,12 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import static org.junit.Assert.*;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Test;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
-public class ObjectPropertyStatementDaoJenaTest {
+public class ObjectPropertyStatementDaoJenaTest extends AbstractTestClass {
 
     /**
      * Test if jena lib can parse N3 that it generates.

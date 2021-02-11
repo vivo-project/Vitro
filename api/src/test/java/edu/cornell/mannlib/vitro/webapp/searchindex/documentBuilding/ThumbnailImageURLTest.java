@@ -37,7 +37,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
      * @throws java.lang.Exception
      */
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
         ApplicationStub.setup(new ServletContextStub(), new SearchEngineStub());
 

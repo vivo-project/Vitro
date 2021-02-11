@@ -75,7 +75,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		ServletContextStub ctx = new ServletContextStub();
 		PropertyRestrictionBeanStub.getInstance(new String[] { ADMIN_NS });
 

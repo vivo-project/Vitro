@@ -27,7 +27,9 @@ public class MenuDaoJenaTest extends AbstractTestClass {
     OntModel displayModel;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
+        super.setUp();
+
         // Suppress error logging.
         setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
 

@@ -48,7 +48,7 @@ public class RestrictionOperationController extends BaseEditController {
 		String defaultLandingPage = getDefaultLandingPage(request);
 
 	    try {
-			OntModel ontModel = ModelAccess.on(getServletContext())
+			OntModel ontModel = ModelAccess.on(req)
 					.getOntModel(TBOX_ASSERTIONS);
 
             HashMap epoHash = null;

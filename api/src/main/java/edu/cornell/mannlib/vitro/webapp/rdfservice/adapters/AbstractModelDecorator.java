@@ -54,7 +54,7 @@ public abstract class AbstractModelDecorator implements Model {
 
 	protected AbstractModelDecorator(Model m) {
 		if (m == null) {
-			throw new NullPointerException("m may not be null.");
+			throw new IllegalArgumentException("m may not be null.");
 		}
 		this.inner = m;
 	}
@@ -323,6 +323,11 @@ public abstract class AbstractModelDecorator implements Model {
 	@Override
 	public PrefixMapping lock() {
 		return inner.lock();
+	}
+
+	@Override
+	public boolean hasNoMappings() {
+		return inner.hasNoMappings();
 	}
 
 	@Override
@@ -682,6 +687,11 @@ public abstract class AbstractModelDecorator implements Model {
 	@Override
 	public Resource createResource(String uri) {
 		return inner.createResource(uri);
+	}
+
+	@Override
+	public Resource createResource(Statement statement) {
+		return inner.createResource(statement);
 	}
 
 	@Override

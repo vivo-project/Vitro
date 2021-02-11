@@ -48,7 +48,7 @@ public class VclassEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         request.setAttribute("epoKey", epo.getKey());
 
-        VClassDao vcwDao = ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
+        VClassDao vcwDao = ModelAccess.on(req).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
 
         if (vcl == null) {
@@ -152,8 +152,8 @@ public class VclassEditController extends BaseEditController {
         request.setAttribute("formSelect",formSelect);
 
         // if supported, we want to show only the asserted superclasses and subclasses.
-        VClassDao vcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
-        VClassDao displayVcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getVClassDao();
+        VClassDao vcDao = ModelAccess.on(req).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
+        VClassDao displayVcDao = ModelAccess.on(req).getWebappDaoFactory().getVClassDao();
 
         List<VClass> superVClasses = getVClassesForURIList(
                 vcDao.getSuperClassURIs(vcl.getURI(),false), displayVcDao);

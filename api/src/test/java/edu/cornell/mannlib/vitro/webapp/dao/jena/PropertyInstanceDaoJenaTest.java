@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
 
 import org.apache.jena.ontology.OntModel;
@@ -20,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
-public class PropertyInstanceDaoJenaTest {
+public class PropertyInstanceDaoJenaTest extends AbstractTestClass {
 	String isDependentRelation =
 		" <"+VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT+"> \"true\"^^xsd:boolean .\n" ;
 

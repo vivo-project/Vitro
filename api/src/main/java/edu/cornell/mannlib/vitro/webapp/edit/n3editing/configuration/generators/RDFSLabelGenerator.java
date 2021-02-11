@@ -298,7 +298,7 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from
-		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
+		OntModel model = ModelAccess.on(vreq).getOntModel();
 		if( editConfiguration.isDataPropertyUpdate() ){
     		editConfiguration.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());
 		}

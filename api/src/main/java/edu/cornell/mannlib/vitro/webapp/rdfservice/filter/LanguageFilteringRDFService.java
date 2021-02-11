@@ -7,14 +7,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
@@ -22,11 +22,9 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -39,26 +37,12 @@ public class LanguageFilteringRDFService implements RDFService {
     private static final Log log = LogFactory.getLog(LanguageFilteringRDFService.class);
     private RDFService s;
     private List<String> langs;
+    private LanguageFilterModel filterModel = new LanguageFilterModel();
 
     public LanguageFilteringRDFService(RDFService service, List<String> langs) {
         this.s = service;
-        this.langs = normalizeLangs(langs);
+        this.langs = new AcceptableLanguages(langs);
     }
-
-	private List<String> normalizeLangs(List<String> langs) {
-		log.debug("Preferred languages:" + langs);
-
-		List<String> normalizedLangs = new ArrayList<String>(langs);
-		for (String lang : langs) {
-			String baseLang = lang.split("-")[0];
-			if (!normalizedLangs.contains(baseLang)) {
-				normalizedLangs.add(baseLang);
-			}
-		}
-
-		log.debug("Normalized languages:" + normalizedLangs);
-		return normalizedLangs;
-	}
 
     @Override
     public boolean changeSetUpdate(ChangeSet changeSet)
@@ -83,23 +67,17 @@ public class LanguageFilteringRDFService implements RDFService {
     public InputStream sparqlConstructQuery(String query,
             ModelSerializationFormat resultFormat)
             throws RDFServiceException {
-        Model m = RDFServiceUtils.parseModel(s.sparqlConstructQuery(query, resultFormat), resultFormat);
-        InputStream in = outputModel(filterModel(m), resultFormat);
+        Model m = RDFServiceUtils.parseModel(s.sparqlConstructQuery(
+                query, resultFormat), resultFormat);
+        InputStream in = outputModel(filterModel.filterModel(
+                m, langs), resultFormat);
         return in;
     }
 
     @Override
     public void sparqlConstructQuery(String query, Model model)
             throws RDFServiceException {
-        if (model.isEmpty()) {
-            s.sparqlConstructQuery(query, model);
-            filterModel(model);
-        } else {
-            Model constructedModel = ModelFactory.createDefaultModel();
-            s.sparqlConstructQuery(query, constructedModel);
-            filterModel(constructedModel);
-            model.add(constructedModel);
-        }
+        s.sparqlConstructQuery(query, model);
     }
 
     @Override
@@ -107,7 +85,7 @@ public class LanguageFilteringRDFService implements RDFService {
             ModelSerializationFormat resultFormat)
             throws RDFServiceException {
         Model m = RDFServiceUtils.parseModel(s.sparqlDescribeQuery(query, resultFormat), resultFormat);
-        return outputModel(filterModel(m), resultFormat);
+        return outputModel(filterModel.filterModel(m, langs), resultFormat);
     }
 
     private InputStream outputModel(Model m, ModelSerializationFormat resultFormat) {
@@ -115,62 +93,6 @@ public class LanguageFilteringRDFService implements RDFService {
         m.write(out, RDFServiceUtils.getSerializationFormatString(resultFormat));
         return new ByteArrayInputStream(out.toByteArray());
     }
-
-    private Model filterModel(Model m) {
-    	log.debug("filterModel");
-        List<Statement> retractions = new ArrayList<Statement>();
-        StmtIterator stmtIt = m.listStatements();
-        while (stmtIt.hasNext()) {
-            Statement stmt = stmtIt.nextStatement();
-            if (stmt.getObject().isLiteral()) {
-                List<Statement> candidatesForRemoval = m.listStatements(
-                        stmt.getSubject(), stmt.getPredicate(), (RDFNode) null).toList();
-                if (candidatesForRemoval.size() == 1) {
-                    continue;
-                }
-                candidatesForRemoval.sort(new StatementSortByLang());
-                log.debug("sorted statements: " + showSortedStatements(candidatesForRemoval));
-                Iterator<Statement> candIt = candidatesForRemoval.iterator();
-                String langRegister = null;
-                boolean chuckRemaining = false;
-                while(candIt.hasNext()) {
-                    Statement s = candIt.next();
-                    if (!s.getObject().isLiteral()) {
-                        continue;
-                    } else if (chuckRemaining) {
-                        retractions.add(s);
-                    }
-                    String lang = s.getObject().asLiteral().getLanguage();
-                    if (langRegister == null) {
-                        langRegister = lang;
-                    } else if (!langRegister.equals(lang)) {
-                        chuckRemaining = true;
-                        retractions.add(s);
-                    }
-                }
-            }
-
-        }
-        m.remove(retractions);
-        return m;
-    }
-
-	private String showSortedStatements(List<Statement> candidatesForRemoval) {
-		List<String> langStrings = new ArrayList<String>();
-		for (Statement stmt: candidatesForRemoval) {
-			if (stmt == null) {
-				langStrings.add("null stmt");
-			} else {
-				RDFNode node = stmt.getObject();
-				if (!node.isLiteral()) {
-					langStrings.add("not literal");
-				} else {
-					langStrings.add(node.asLiteral().getLanguage());
-				}
-			}
-		}
-		return langStrings.toString();
-	}
 
 	@Override
     public InputStream sparqlSelectQuery(String query,
@@ -180,7 +102,16 @@ public class LanguageFilteringRDFService implements RDFService {
                 s.sparqlSelectQuery(query, RDFService.ResultFormat.JSON));
         List<QuerySolution> solnList = getSolutionList(resultSet);
         List<String> vars = resultSet.getResultVars();
+
+        // This block loops all of the Query variables;
+        //   for each QuerySolution, creates a map of the values of the other variables than the current
+        //   'variable' --> a list of RowIndexedLiterals.
+        // In this way, all of the QuerySolutions with equal values of their other variables are grouped.
+        // This map is used subsequently to filter Literals based on lang
         for (String var : vars) {
+            Map<List<RDFNode>, List<RowIndexedLiteral>> nonVarToRowIndexedLiterals = new HashMap<>();
+
+            // First pass of solnList to populate map
             for (int i = 0; i < solnList.size(); i++) {
                 QuerySolution s = solnList.get(i);
                 if (s == null) {
@@ -190,23 +121,32 @@ public class LanguageFilteringRDFService implements RDFService {
                 if (node == null || !node.isLiteral()) {
                     continue;
                 }
-                List<RowIndexedLiteral> candidatesForRemoval =
-                        new ArrayList<RowIndexedLiteral>();
-                candidatesForRemoval.add(new RowIndexedLiteral(node.asLiteral(), i));
-                for (int j = i + 1; j < solnList.size(); j++) {
-                    QuerySolution t = solnList.get(j);
-                    if (t == null) {
-                        continue;
-                    }
-                    if (matchesExceptForVar(s, t, var, vars)) {
-                        candidatesForRemoval.add(
-                                new RowIndexedLiteral(t.getLiteral(var), j));
+
+                // Create entry representing values other than current 'var' for this QuerySolution
+                List<RDFNode> nonVarList = new ArrayList(vars.size() - 1);
+                for (String v : vars) {
+                    if (!v.equals(var)) {
+                        nonVarList.add(s.get(v));
                     }
                 }
+
+                List<RowIndexedLiteral> rowIndexedLiterals = nonVarToRowIndexedLiterals.get(nonVarList);
+                if (rowIndexedLiterals == null) {
+                    rowIndexedLiterals = new ArrayList();
+                }
+                rowIndexedLiterals.add(new RowIndexedLiteral(node.asLiteral(), i));
+
+                // Add RowIndexedLiterals to the map
+                nonVarToRowIndexedLiterals.put(nonVarList, rowIndexedLiterals);
+            }
+
+            // Second pass of solnList (via the map) to evaluate candidatesForRemoval
+            for (List<RDFNode> key : nonVarToRowIndexedLiterals.keySet()) {
+                List<RowIndexedLiteral> candidatesForRemoval = nonVarToRowIndexedLiterals.get(key);
                 if (candidatesForRemoval.size() == 1) {
                     continue;
                 }
-                candidatesForRemoval.sort(new RowIndexedLiteralSortByLang());
+                candidatesForRemoval.sort(new RowIndexedLiteralSortByLang(langs));
                 log.debug("sorted RowIndexedLiterals: " + showSortedRILs(candidatesForRemoval));
                 Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
                 String langRegister = null;
@@ -254,10 +194,9 @@ public class LanguageFilteringRDFService implements RDFService {
     @Override
     public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException {
         log.debug("sparqlSelectQuery: " + query.replaceAll("\\s+", " "));
-
         s.sparqlSelectQuery(query, new ResultSetConsumer.Chaining(consumer) {
             List<String> vars;
-            List<QuerySolution> solnList = new ArrayList<QuerySolution>();
+            List<QuerySolution> solnList = new ArrayList<>();
 
             @Override
             protected void processQuerySolution(QuerySolution qs) {
@@ -273,7 +212,15 @@ public class LanguageFilteringRDFService implements RDFService {
             protected void endProcessing() {
                 chainStartProcessing();
 
+                // This block loops all of the Query variables;
+                //   for each QuerySolution, creates a map of the values of the other variables than the current
+                //   'variable' --> a list of RowIndexedLiterals.
+                // In this way, all of the QuerySolutions with equal values of their other variables are grouped.
+                // This map is used subsequently to filter Literals based on lang
                 for (String var : vars) {
+                    Map<List<RDFNode>, List<RowIndexedLiteral>> nonVarToRowIndexedLiterals = new HashMap<>();
+
+                    // First pass of solnList to populate map
                     for (int i = 0; i < solnList.size(); i++) {
                         QuerySolution s = solnList.get(i);
                         if (s == null) {
@@ -283,23 +230,32 @@ public class LanguageFilteringRDFService implements RDFService {
                         if (node == null || !node.isLiteral()) {
                             continue;
                         }
-                        List<RowIndexedLiteral> candidatesForRemoval =
-                                new ArrayList<RowIndexedLiteral>();
-                        candidatesForRemoval.add(new RowIndexedLiteral(node.asLiteral(), i));
-                        for (int j = i + 1; j < solnList.size(); j++) {
-                            QuerySolution t = solnList.get(j);
-                            if (t == null) {
-                                continue;
-                            }
-                            if (matchesExceptForVar(s, t, var, vars)) {
-                                candidatesForRemoval.add(
-                                        new RowIndexedLiteral(t.getLiteral(var), j));
+
+                        // Create entry representing values other than current 'var' for this QuerySolution
+                        List<RDFNode> nonVarList = new ArrayList(vars.size() - 1);
+                        for (String v : vars) {
+                            if (!v.equals(var)) {
+                                nonVarList.add(s.get(v));
                             }
                         }
+
+                        List<RowIndexedLiteral> rowIndexedLiterals = nonVarToRowIndexedLiterals.get(nonVarList);
+                        if (rowIndexedLiterals == null) {
+                            rowIndexedLiterals = new ArrayList();
+                        }
+                        rowIndexedLiterals.add(new RowIndexedLiteral(node.asLiteral(), i));
+
+                        // Add RowIndexedLiterals to the map
+                        nonVarToRowIndexedLiterals.put(nonVarList, rowIndexedLiterals);
+                    }
+
+                    // Second pass of solnList (via the map) to evaluate candidatesForRemoval
+                    for (List<RDFNode> key : nonVarToRowIndexedLiterals.keySet()) {
+                        List<RowIndexedLiteral> candidatesForRemoval = nonVarToRowIndexedLiterals.get(key);
                         if (candidatesForRemoval.size() == 1) {
                             continue;
                         }
-                        candidatesForRemoval.sort(new RowIndexedLiteralSortByLang());
+                        candidatesForRemoval.sort(new RowIndexedLiteralSortByLang(langs));
                         log.debug("sorted RowIndexedLiterals: " + showSortedRILs(candidatesForRemoval));
                         Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
                         String langRegister = null;
@@ -355,34 +311,6 @@ public class LanguageFilteringRDFService implements RDFService {
             return index;
         }
 
-    }
-
-    private boolean matchesExceptForVar(QuerySolution a, QuerySolution b,
-            String varName, List<String> varList) {
-        if (varName == null) {
-            throw new RuntimeException("expected non-null variable nane");
-        }
-        for (String var : varList) {
-            RDFNode nodea = a.get(var);
-            RDFNode nodeb = b.get(var);
-            if (var.equals(varName)) {
-                if (nodea == null || !nodea.isLiteral() || nodeb == null || !nodeb.isLiteral()) {
-                    return false;
-                }
-            } else {
-                if (nodea == null && nodeb == null) {
-                    continue;
-                } else if (nodea == null && nodeb != null) {
-                    return false;
-                } else if (nodeb == null && nodea != null) {
-                    return false;
-                }
-                if (!a.get(var).equals(b.get(var))) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private List<QuerySolution> getSolutionList(ResultSet resultSet) {
@@ -489,52 +417,12 @@ public class LanguageFilteringRDFService implements RDFService {
         s.close();
     }
 
-    private class LangSort {
-    	// any inexact match is worse than any exact match
-    	private int inexactMatchPenalty = langs.size();
-    	// no language is worse than any inexact match (if the preferred list does not include "").
-    	private int noLanguage = 2 * inexactMatchPenalty;
-    	// no match is worse than no language.
-    	private int noMatch = noLanguage + 1;
-
-        protected int compareLangs(String t1lang, String t2lang) {
-        	return languageIndex(t1lang) - languageIndex(t2lang);
-        }
-
-		/**
-		 * Return index of exact match, or index of partial match, or
-		 * language-free, or no match.
-		 */
-		private int languageIndex(String lang) {
-			if (lang == null) {
-				lang = "";
-			}
-
-			int index = langs.indexOf(lang);
-			if (index >= 0) {
-				log.debug("languageIndex for '" + lang + "' is " + index);
-				return index;
-			}
-
-			if (lang.length() > 2) {
-				index = langs.indexOf(lang.substring(0, 2));
-				if (index >= 0) {
-					log.debug("languageIndex for '" + lang + "' is " + index + inexactMatchPenalty);
-					return index + inexactMatchPenalty;
-				}
-			}
-
-			if (lang.isEmpty()) {
-				log.debug("languageIndex for '" + lang + "' is " + noLanguage);
-				return noLanguage;
-			}
-
-			return noMatch;
-		}
-    }
-
     private class RowIndexedLiteralSortByLang extends LangSort implements Comparator<RowIndexedLiteral> {
 
+        public RowIndexedLiteralSortByLang(List<String> langs) {            
+            super(langs);
+        }
+        
         public int compare(RowIndexedLiteral rilit1, RowIndexedLiteral rilit2) {
             if (rilit1 == null || rilit2 == null) {
                 return 0;
@@ -547,21 +435,20 @@ public class LanguageFilteringRDFService implements RDFService {
         }
     }
 
-    private class StatementSortByLang extends LangSort implements Comparator<Statement> {
+	/*
+	 * UQAM-Linguistic-Management Useful among other things to transport the linguistic context in the service
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
 
-        public int compare(Statement s1, Statement s2) {
-            if (s1 == null || s2 == null) {
-                return 0;
-            } else if (!s1.getObject().isLiteral() || !s2.getObject().isLiteral()) {
-                return 0;
-            }
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
 
-            String s1lang = s1.getObject().asLiteral().getLanguage();
-            String s2lang = s2.getObject().asLiteral().getLanguage();
-
-            return compareLangs(s1lang, s2lang);
-        }
-    }
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}
 
 }
 

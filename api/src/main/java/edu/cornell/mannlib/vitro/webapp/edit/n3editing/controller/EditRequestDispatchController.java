@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.ontology.OntModel;
@@ -68,9 +69,13 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     final String RDFS_LABEL_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator";
     final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
 
-    @Override
-    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-    	//Check if this statement can be edited here and return unauthorized if not
+	@Override
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+		// If request is for new individual, return simple do back end editing action permission
+		if (StringUtils.isNotEmpty(EditConfigurationUtils.getTypeOfNew(vreq))) {
+			return SimplePermission.DO_BACK_END_EDITING.ACTION;
+		}
+		// Check if this statement can be edited here and return unauthorized if not
 		String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
 		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
@@ -148,7 +153,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          templateData.put("editConfiguration", etm);
          templateData.put("editSubmission", submissionTemplateModel);
          //Corresponding to original note for consistency with selenium tests and 1.1.1
-         templateData.put("title", "Edit");
+         templateData.put("title", etm.getPageTitle());
          templateData.put("submitUrl", getSubmissionUrl(vreq));
          templateData.put("cancelUrl", etm.getCancelUrl());
          templateData.put("editKey", editConfig.getEditKey());

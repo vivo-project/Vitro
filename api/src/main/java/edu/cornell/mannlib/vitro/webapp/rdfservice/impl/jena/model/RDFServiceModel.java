@@ -13,6 +13,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
@@ -119,4 +120,18 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
 
         return true;
     }
+	/*
+	 * UQAM-Linguistic-Management Useful among other things to transport the linguistic context in the service
+	 * (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
+	 */
+	private VitroRequest vitroRequest;
+
+	public void setVitroRequest(VitroRequest vitroRequest) {
+		this.vitroRequest = vitroRequest;
+	}
+
+	public VitroRequest getVitroRequest() {
+		return vitroRequest;
+	}
 }

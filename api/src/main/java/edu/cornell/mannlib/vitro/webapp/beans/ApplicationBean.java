@@ -20,6 +20,7 @@ public class ApplicationBean {
     public final static int      VIVO_SEARCHBOX_SIZE         = 20;
 
     private final static String  DEFAULT_APPLICATION_NAME     = "Vitro";
+    private final static String  DEFAULT_APPLICATION_AVAILABLE_LANGS_FILE = "available-langs";
     private final static String  DEFAULT_ROOT_LOGOTYPE_IMAGE  = "";
     private final static int     DEFAULT_ROOT_LOGOTYPE_WIDTH  = 0;
     private final static int     DEFAULT_ROOT_LOGOTYPE_HEIGHT = 0;
@@ -33,6 +34,7 @@ public class ApplicationBean {
     private boolean   initialized             = false;
     private String    sessionIdStr            = null;
     private String    applicationName         = DEFAULT_APPLICATION_NAME;
+    private String    availableLangsFile      = DEFAULT_APPLICATION_AVAILABLE_LANGS_FILE;
 
     private String    rootLogotypeImage       = DEFAULT_ROOT_LOGOTYPE_IMAGE;
     private int       rootLogotypeWidth       = DEFAULT_ROOT_LOGOTYPE_WIDTH;
@@ -52,6 +54,7 @@ public class ApplicationBean {
         output += "  initialized from DB:    [" + initialized             + "]\n";
         output += "  session id:             [" + sessionIdStr            + "]\n";
         output += "  application name:       [" + applicationName         + "]\n";
+        output += "  available langs file:   [" + availableLangsFile      + "]\n";
         output += "  root logotype image:    [" + rootLogotypeImage       + "]\n";
         output += "  root logotype width:    [" + rootLogotypeWidth       + "]\n";
         output += "  root logotype height:   [" + rootLogotypeHeight      + "]\n";
@@ -175,6 +178,10 @@ public class ApplicationBean {
 
     public String getShortHand() {
     	return "";
+    }
+
+    public String getAvailableLangsFile() {
+        return availableLangsFile;
     }
 
     /**

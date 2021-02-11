@@ -28,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
 import freemarker.template.Configuration;
 
 public class EditConfigurationUtils {
@@ -61,18 +62,24 @@ public class EditConfigurationUtils {
         return vreq.getParameter("rangeUri");
     }
 
+    public static String getTypeOfNew(VitroRequest vreq) {
+        return vreq.getParameter("typeOfNew");
+    }
+
     public static VClass getRangeVClass(VitroRequest vreq) {
-        // This needs a WebappDaoFactory with no filtering/RDFService
-        // funny business because it needs to be able to retrieve anonymous union
-        // classes by their "pseudo-bnode URIs".
-        // Someday we'll need to figure out a different way of doing this.
         WebappDaoFactory ctxDaoFact = ModelAccess.on(
                 vreq.getSession().getServletContext()).getWebappDaoFactory();
         return ctxDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
     }
 
+    public static VClass getLangAwardRangeVClass(VitroRequest vreq) {
+        // UQAM-Linguistic-Management
+        WebappDaoFactory vreqDaoFact = ModelAccess.on(vreq).getWebappDaoFactory(
+                LanguageOption.LANGUAGE_AWARE);
+        return vreqDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
+    }
+    
     //get individual
-
     public static Individual getSubjectIndividual(VitroRequest vreq) {
     	Individual subject = null;
     	String subjectUri = getSubjectUri(vreq);
@@ -122,12 +129,24 @@ public class EditConfigurationUtils {
 
     public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq,
             String predicateUri, String domainUri, String rangeUri) {
-    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	// WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	// UQAM-Linguistic-Management Use linguistic context
+        WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
     	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
     	        predicateUri, domainUri, rangeUri);
     	return objectProp;
     }
 
+	// UQAM Use linguistic context
+    public static ObjectProperty getObjectPropertyForPredicateLangAware(VitroRequest vreq,
+            String predicateUri, String domainUri, String rangeUri) {
+    	// WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	// UQAM Use linguistic context
+        WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory(LanguageOption.LANGUAGE_AWARE);
+    	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
+    	        predicateUri, domainUri, rangeUri);
+    	return objectProp;
+    }
     public static DataProperty getDataPropertyForPredicate(VitroRequest vreq, String predicateUri) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	//TODO: Check reason for employing unfiltered webapp dao factory and note if using a different version
@@ -204,6 +223,7 @@ public class EditConfigurationUtils {
     	log.debug("For " + predicateUri + ", object property from dao null? " + (op == null) + " and data property  null?" + (dp == null));
     	return (op != null && dp == null);
     }
+
 
 	private static boolean isVitroLabel(String predicateUri) {
 		return predicateUri.equals(VitroVocabulary.LABEL);

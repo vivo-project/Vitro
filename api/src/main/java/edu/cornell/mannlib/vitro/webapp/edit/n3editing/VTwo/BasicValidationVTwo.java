@@ -24,15 +24,25 @@ import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatatypeDaoJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
-
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 public class BasicValidationVTwo {
+
+    public final static String REQUIRED_FIELD_EMPTY_MSG = "required_field_empty_msg";
+
+    public final static String DATA_NOT_PAST_MSG = "data_not_past_msg";
+    public final static String INVALID_DATE_FORM_MSG = "invalid_date_form_msg";
+    public final static String FILE_MUST_BE_ENTERED_MSG = "file_must_be_entered_msg";
+    public final static String INVALID_URL_MSG = "invalid_url_msg";
+
+    private I18nBundle i18n;
 
     Map<String, List<String>> varsToValidations;
     EditConfigurationVTwo editConfig;
 
-    public BasicValidationVTwo(EditConfigurationVTwo editConfig, MultiValueEditSubmission editSub){
+    public BasicValidationVTwo(EditConfigurationVTwo editConfig, I18nBundle i18n){
         this.editConfig = editConfig;
+        this.i18n = i18n;
         Map<String,List<String>> validatorsForFields = new HashMap<String,List<String>>();
         for(String fieldName: editConfig.getFields().keySet()){
             FieldVTwo field = editConfig.getField(fieldName);
@@ -42,8 +52,9 @@ public class BasicValidationVTwo {
         checkValidations();
     }
 
-    public BasicValidationVTwo(Map<String, List<String>> varsToValidations){
+    public BasicValidationVTwo(Map<String, List<String>> varsToValidations, I18nBundle i18n){
         this.varsToValidations = varsToValidations;
+        this.i18n = i18n;
         checkValidations();
     }
 
@@ -94,7 +105,7 @@ public class BasicValidationVTwo {
                     //If no literals and this field was required, this is an error message
                     //and can return
                     if((literals == null || literals.size() == 0) && isRequiredField) {
-                    	errors.put(name, REQUIRED_FIELD_EMPTY_MSG);
+                    	errors.put(name, i18n.text(REQUIRED_FIELD_EMPTY_MSG));
                         break;
                     }
                     //Loop through literals if literals exist
@@ -113,7 +124,7 @@ public class BasicValidationVTwo {
 		                    // incorrectly generate errors.
 		                    if (isEmpty(value)) {
 		                        if (isRequiredField) {
-		                           errors.put(name, REQUIRED_FIELD_EMPTY_MSG);
+		                           errors.put(name, i18n.text(REQUIRED_FIELD_EMPTY_MSG));
 		                        }
 		                        break;
 		                    }
@@ -154,11 +165,11 @@ public class BasicValidationVTwo {
     private String validate(String validationType, List<FileItem> fileItems) {
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( fileItems == null || fileItems.size() == 0 ){
-                return "a file must be entered for this field.";
+                return i18n.text(FILE_MUST_BE_ENTERED_MSG);
             }else{
                 FileItem fileItem = fileItems.get(0);
                 if( fileItem == null || fileItem.getName() == null || fileItem.getName().length() < 1 || fileItem.getSize() < 0){
-                    return "a file must be entered for this field.";
+                    return i18n.text(FILE_MUST_BE_ENTERED_MSG);
                 }
             }
         }
@@ -174,14 +185,14 @@ public class BasicValidationVTwo {
         // This case may be needed for validation of other field types.
         if( "nonempty".equalsIgnoreCase(validationType)){
             if( isEmpty(value) )
-                return REQUIRED_FIELD_EMPTY_MSG;
+                return i18n.text(REQUIRED_FIELD_EMPTY_MSG);
         }
         // Format validation
         else if("isDate".equalsIgnoreCase(validationType)){
             if( isDate( value))
                 return SUCCESS;
             else
-                return "must be in valid date format mm/dd/yyyy.";
+                return i18n.text(INVALID_DATE_FORM_MSG);
         }
         else if( validationType.indexOf("datatype:") == 0 ) {
             String datatypeURI = validationType.substring(9);
@@ -194,7 +205,7 @@ public class BasicValidationVTwo {
         } else if ("httpUrl".equalsIgnoreCase(validationType)){
         	//check if it has http or https, we could do more but for now this is all.
         	if(! value.startsWith("http://") && ! value.startsWith("https://") ){
-        		return "This URL must start with http:// or https://";
+                return i18n.text(INVALID_URL_MSG);
         	}else{
         		return SUCCESS;
         	}
@@ -216,7 +227,7 @@ public class BasicValidationVTwo {
         		dayParamStr = value.substring(monthDash + 1, value.length());
         		inputC.set(Integer.parseInt(yearParamStr), Integer.parseInt(monthParamStr) - 1, Integer.parseInt(dayParamStr));
         		if(inputC.before(c)) {
-            		return this.DATE_NOT_PAST_MSG;
+            		return i18n.text(DATA_NOT_PAST_MSG);
             		//Returning null makes the error message "field is empty" display instead
             		//return null;
             	} else {
@@ -278,14 +289,9 @@ public class BasicValidationVTwo {
         return (value == null || value.trim().length() == 0);
     }
 
-
-
-    private static Pattern urlRX = Pattern.compile("(([a-zA-Z][0-9a-zA-Z+\\-\\.]*:)/{0,2}[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)(#[0-9a-zA-Z;/?:@&=+$\\.\\-_!~*'()%]+)?");
-
     /** we use null to indicate success */
     public final static String SUCCESS = null;
-    public final static String REQUIRED_FIELD_EMPTY_MSG = "This field must not be empty.";
-    public final static String DATE_NOT_PAST_MSG = "Please enter a future target date for publication (past dates are invalid).";
+
     //public final static String MIN_FIELDS_NOT_POPULATED = "Please enter values for at least ";
     //public final static String FORM_ERROR_FIELD_ID = "formannotationerrors";
     /** regex for strings like "12/31/2004" */

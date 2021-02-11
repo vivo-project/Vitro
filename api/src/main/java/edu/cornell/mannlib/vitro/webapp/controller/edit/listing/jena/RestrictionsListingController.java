@@ -54,7 +54,7 @@ public class RestrictionsListingController extends BaseEditController {
 
         epo = super.createEpo(request);
 
-		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
+		OntModel ontModel = ModelAccess.on(vrequest).getOntModel();
 
         ObjectPropertyDao opDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         VClassDao vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();

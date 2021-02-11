@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
@@ -14,14 +14,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.iri.IRI;
-import org.apache.jena.iri.IRIFactory;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.iri.IRI;
+import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.ObjectProperty;
 import org.apache.jena.ontology.OntClass;
@@ -39,6 +39,7 @@ import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
@@ -752,22 +753,111 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 			}
 		}
 	}
+	
+	/**
+     * Add to an OntResource an rdfs:label value with lexical form and default
+     * language tag. Remove any other existing values in default language.
+     * If lexicalForm parameter is null, remove all plain literal values of 
+     * Property in default language.
+     * @param ontRes may not be null
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
+     */
+	protected void updateRDFSLabel(OntResource ontRes, String lexicalForm) {
+        updatePlainLiteralValue(ontRes, RDFS.label, lexicalForm);
+    }
+	
+	/**
+     * Add to an OntResource an rdfs:label value with lexical form and optional
+     * language tag. Remove any other existing plain literal values that match 
+     * specified language or lack language tags if no language is supplied.
+     * If lexicalForm parameter is null, remove all plain literal labels in 
+     * specified language, or all existing language-less labels
+     * if no language is specified.
+     * @param ontRes may not be null
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
+     * @param lang may be null.  If null, method acts on language-less plain 
+     *        literal labels and ignores those with language tags.
+     */	
+	protected void updateRDFSLabel(OntResource ontRes, String lexicalForm, String lang) {
+	    updatePlainLiteralValue(ontRes, RDFS.label, lexicalForm, lang);
+	}
 
     /**
-     * convenience method for updating the RDFS label
+     * Add to an OntResource a Property value with lexical form and default
+     * language tag. Remove any other existing values in default language.
+     * If lexicalForm parameter is null, remove all plain literal values of 
+     * Property in default language.
+     * @param ontRes may not be null
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
      */
-    protected void updateRDFSLabel(OntResource ontRes, String label) {
-
-    	if (label != null && label.length() > 0) {
-
-    		String existingValue = ontRes.getLabel(getDefaultLanguage());
-
-    		if (existingValue == null || !existingValue.equals(label)) {
-    			ontRes.setLabel(label, getDefaultLanguage());
-    	    }
-    	} else {
-    		ontRes.removeAll(RDFS.label);
-    	}
+	protected void updatePlainLiteralValue(OntResource ontRes, Property property, 
+            String lexicalForm) {
+        updatePlainLiteralValue(ontRes, property, lexicalForm, getDefaultLanguage());
+    }
+    
+    /**
+     * Add to an OntResource a Property value with lexical form and optional
+     * language tag. Remove any other existing plain literal values that match 
+     * specified language or lack language tags if no language is supplied.
+     * If lexicalForm parameter is null, remove all plain literal values of 
+     * Property in specified language, or all existing language-less literals
+     * if no language is specified.
+     * @param ontRes may not be null
+     * @param lexicalForm may be null.  If null, existing values will be deleted
+     *        but none will be added.
+     * @param lang may be null.  If null, method acts on language-less
+     *        plain literal values and ignores those with language tags.
+     */
+    protected void updatePlainLiteralValue(OntResource ontRes, Property property,
+            String lexicalForm, String lang) {
+        if(ontRes == null) {
+            throw new IllegalArgumentException("ontRes may not be null.");
+        }
+        boolean addNew = true;
+        List<Statement> toRemove = new ArrayList<Statement>();
+        StmtIterator existingStmts = ontRes.listProperties(property);
+        while(existingStmts.hasNext()) {
+            Statement stmt = existingStmts.next();
+            if(stmt.getObject().isLiteral()) {                
+                Literal lit = stmt.getObject().asLiteral();
+                if( (lang == null && isLanguageLessPlainLiteral(lit))  
+                        || (lang != null && lang.equals(lit.getLanguage())) ) {
+                    if(!lit.getLexicalForm().equals(lexicalForm)) {
+                        toRemove.add(stmt);
+                    } else {
+                        // New literal already exists in the model.
+                        // Do not add it again.
+                        addNew = false;
+                    }
+                }
+            }
+        }
+        if(!toRemove.isEmpty()) {
+            ontRes.getModel().remove(toRemove);
+        }
+        if (addNew && (lexicalForm != null)) {
+            if(!StringUtils.isEmpty(lang)) {
+                ontRes.addProperty(property, ResourceFactory.createLangLiteral(
+                        lexicalForm, lang));    
+            } else {
+                ontRes.addProperty(property, ResourceFactory.createPlainLiteral(
+                        lexicalForm));
+            }            
+        }
+    }
+    
+    private boolean isLanguageLessPlainLiteral(Literal lit) {
+        // In RDF 1.1 all the language-less literals get datatype xsd:string.
+        // The null datatype check is here just in case this gets run on an older
+        // version of Jena.  rdf:PlainLiteral is also a datatype, but doesn't
+        // (yet) seem to be used by Jena.        
+        return StringUtils.isEmpty(lit.getLanguage()) 
+                && ((lit.getDatatype() == null) 
+                || XSDDatatype.XSDstring.equals(lit.getDatatype()) ||
+                (RDF.getURI() + "PlainLiteral").equals(lit.getDatatypeURI()));
     }
 
     private Literal getLabel(String lang, List<RDFNode>labelList) {
@@ -779,6 +869,13 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                     return labelLit;
                 }
                 if ((lang != null) && (lang.equals(labelLanguage))) {
+                    return labelLit;
+                } else
+                    /*
+                     * UQAM-Linguistic-Management
+                     * Check for country-part of lang (ex: 'en' for default consideration of labelLanguage in english but not encoded by 'en-US' most case of labels in vivo.owl)
+                     */
+                	if ((lang != null) && (Arrays.asList(lang.split("-")).get(0).equals(labelLanguage))) {
                     return labelLit;
                 }
             }

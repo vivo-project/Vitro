@@ -106,7 +106,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 			this.epo = epo;
 
-			this.fpDao = ModelAccess.on(ctx).getWebappDaoFactory()
+			this.fpDao = ModelAccess.on(req).getWebappDaoFactory()
 					.getFauxPropertyDao();
 
 		}
@@ -114,6 +114,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 		void populate() {
 			epo.setDataAccessObject(fpDao);
 			epo.setAction(determineAction());
+			epo.setImplementationClass(FauxProperty.class);
+			epo.setBeanClass(FauxProperty.class);
 
 			if (epo.getUseRecycledBean()) {
 				beanForEditing = (FauxProperty) epo.getNewBean();

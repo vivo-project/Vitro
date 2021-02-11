@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 
-class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectPropertyDao{
+public class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectPropertyDao{
     final ObjectPropertyDao innerObjectPropertyDao;
     final VitroFilters filters;
 
