@@ -91,7 +91,9 @@ public abstract class SelectedLocale {
 			}
 		}
 
-		return null;
+		Locale fallbackLocale = getFallbackLocale();
+        log.debug("Using fallback locale as default: " + fallbackLocale);
+        return fallbackLocale;
 	}
 
 	/**
@@ -134,7 +136,17 @@ public abstract class SelectedLocale {
 			return preferredLocal;
 		}
 
-		return null;
+		Locale fallbackLocale = getFallbackLocale();
+		log.debug("Using fallback locale as default: " + fallbackLocale);
+		return fallbackLocale;
+	}
+	
+	/**
+	 * @return a default locale to use if no other criteria for selecting a 
+	 * different one exist.
+	 */
+	public static Locale getFallbackLocale() {
+	    return new Locale("en", "US");
 	}
 
 	/**
