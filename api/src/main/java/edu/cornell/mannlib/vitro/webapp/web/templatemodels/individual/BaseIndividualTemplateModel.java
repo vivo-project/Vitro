@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAct
 import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -37,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(BaseIndividualTemplateModel.class);
+    private static final String EDIT_PATH = "editRequestDispatch";
 
     protected final Individual individual;
     protected final LoginStatusBean loginStatusBean;
@@ -147,6 +150,22 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 
     public String getName() {
         return individual.getName();
+    }
+    
+    public String getDeleteUrl() {
+      Collection<String> types = getMostSpecificTypes();
+      ParamMap params = new ParamMap(
+          "objectUri", individual.getURI(), 
+          "cmd", "delete", 
+          "statement_label", getNameStatement().getValue(), 
+          "statement_object", individual.getURI());
+      Iterator<String> typesIterator = types.iterator();
+      if (types.iterator().hasNext()) {
+        String type = typesIterator.next();
+        params.put("statement_type", type);
+      }
+
+      return UrlBuilder.getUrl(EDIT_PATH, params);
     }
 
     public Collection<String> getMostSpecificTypes() {

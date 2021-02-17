@@ -28,7 +28,9 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
 	private Integer dataHash = 0;
 	private DataPropertyStatement dps = null;
 	private String dataLiteral = null;
-	private String template = "confirmDeletePropertyForm.ftl";
+  private String propertyTemplate = "confirmDeletePropertyForm.ftl";
+  private String individualTemplate = "confirmDeleteIndividualForm.ftl";
+
 
 	//In this case, simply return the edit configuration currently saved in session
 	//Since this is forwarding from another form, an edit configuration should already exist in session
@@ -43,11 +45,23 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     	if(editConfiguration == null) {
     		editConfiguration = setupEditConfiguration(vreq, session);
     	}
-    	editConfiguration.setTemplate(template);
     	//prepare update?
     	prepare(vreq, editConfiguration);
+      if (editConfiguration.getPredicateUri() == null && editConfiguration.getSubjectUri() == null) {
+        editConfiguration.setTemplate(individualTemplate);
+        addRedirectUrl(vreq, editConfiguration);
+      } else {
+        editConfiguration.setTemplate(propertyTemplate);
+      }
     	return editConfiguration;
     }
+
+  private void addRedirectUrl(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
+    String redirectUrl = vreq.getParameter("redirectUrl");
+    if (redirectUrl != null) {
+      editConfiguration.addFormSpecificData("redirectUrl", redirectUrl);
+    }
+  }
 
 	private EditConfigurationVTwo  setupEditConfiguration(VitroRequest vreq, HttpSession session) {
 		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();

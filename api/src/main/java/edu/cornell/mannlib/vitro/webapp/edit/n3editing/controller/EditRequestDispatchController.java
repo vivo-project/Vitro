@@ -363,7 +363,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
          String formParam = getFormParam(vreq);
          //if no form parameter, then predicate uri and subject uri must both be populated
-    	if (formParam == null || "".equals(formParam)) {
+         if ((formParam == null || "".equals(formParam)) && !isDeleteForm(vreq)) {
             if ((predicateUri == null || predicateUri.trim().length() == 0)) {
             	return true;
             }
