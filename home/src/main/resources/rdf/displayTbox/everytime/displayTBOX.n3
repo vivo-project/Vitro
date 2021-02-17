@@ -204,6 +204,9 @@ vitro:additionalLink
 display:hasElement
       a       owl:ObjectProperty .
 
+display:hasDeleteQuery
+      a       owl:DataProperty .
+
 display:excludeClass
       a       owl:ObjectProperty .
 
