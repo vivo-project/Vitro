@@ -132,9 +132,9 @@ public class RDFFilesLoader {
 			enabledLocales.add(locale.toLanguageTag().replace('-', '_'));
 		}
 
-		// If no languages were enabled in runtime.properties, add 'en_US' as the default
+		// If no languages were enabled in runtime.properties, add a fallback as the default
 		if (enabledLocales.isEmpty()) {
-			enabledLocales.add("en_US");
+			enabledLocales.add(SelectedLocale.getFallbackLocale().toString());
 		}
 
 		return enabledLocales;
