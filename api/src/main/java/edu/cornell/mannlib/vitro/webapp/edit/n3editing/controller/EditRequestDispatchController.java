@@ -78,6 +78,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		} else if(MANAGE_MENUS_FORM.equals(vreq.getParameter("editForm"))) {
 		    return SimplePermission.MANAGE_MENUS.ACTION;
 		}
+		if (isIndividualDeletion(vreq)) {
+			return SimplePermission.DO_BACK_END_EDITING.ACTION;
+		}
 		// Check if this statement can be edited here and return unauthorized if not
 		String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
@@ -104,6 +107,16 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 				or(objectPropertyAction));
 
 		return isAuthorized? SimplePermission.DO_FRONT_END_EDITING.ACTION: AuthorizationRequest.UNAUTHORIZED;
+	}
+
+	private boolean isIndividualDeletion(VitroRequest vreq) {
+		String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
+		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+		if (objectUri != null && subjectUri == null && predicateUri == null && isDeleteForm(vreq)) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
