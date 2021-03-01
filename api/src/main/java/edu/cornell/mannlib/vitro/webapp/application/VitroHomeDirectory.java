@@ -40,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ContextProperties;
 public class VitroHomeDirectory {
 	private static final Log log = LogFactory.getLog(VitroHomeDirectory.class);
 
+	private static final String TAR_LOCATION = "/WEB-INF/resources/home-files/vivo-home.tar";
 	private static final String DIGEST_FILE_NAME = "digest.md5";
 
 	private static final Pattern CHECKSUM_PATTERN = Pattern.compile("^[a-f0-9]{32} \\*.+$");
@@ -85,9 +86,13 @@ public class VitroHomeDirectory {
 			throw new RuntimeException("Application home dir is not a directory! " + vhdDir);
 		}
 
-		Map<String, String> digest = untar(vhdDir);
-
-		writeDigest(digest);
+		if(!Files.exists(Paths.get(TAR_LOCATION))) {
+		    log.info("No home directory tar file found at " + TAR_LOCATION  
+		            + ". Not populating or updating any home directory files.");
+		} else {
+		    Map<String, String> digest = untar(vhdDir);
+		    writeDigest(digest);
+		}
 	}
 
 	/**
@@ -276,11 +281,10 @@ public class VitroHomeDirectory {
 	 * @return input stream of VIVO home tar file
 	 */
 	private InputStream getHomeDirTar() {
-		String tarLocation = "/WEB-INF/resources/home-files/vivo-home.tar";
-		InputStream tar = ctx.getResourceAsStream(tarLocation);
+		InputStream tar = ctx.getResourceAsStream(TAR_LOCATION);
 		if (tar == null) {
-			log.error("Application home tar not found in: " + tarLocation);
-			throw new RuntimeException("Application home tar not found in: " + tarLocation);
+			log.error("Application home tar not found in: " + TAR_LOCATION);
+			throw new RuntimeException("Application home tar not found in: " + TAR_LOCATION);
 		}
 
 		return tar;
