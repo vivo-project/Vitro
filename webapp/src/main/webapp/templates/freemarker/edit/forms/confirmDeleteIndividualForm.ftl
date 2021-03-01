@@ -1,11 +1,14 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
-<#assign statement = editConfiguration.objectStatementDisplay />
-<#assign deletionTemplateName = editConfiguration.deleteTemplate/>
-
 <#if editConfiguration.pageData.redirectUrl??>
 	<#assign redirectUrl = editConfiguration.pageData.redirectUrl />
 <#else>
 	<#assign redirectUrl = "/" />
+</#if>
+<#if editConfiguration.pageData.individualName??>
+	<#assign individualName = editConfiguration.pageData.individualName />
+</#if>
+<#if editConfiguration.pageData.individualType??>
+	<#assign individualType = editConfiguration.pageData.individualType />
 </#if>
 
 <form action="${editConfiguration.deleteIndividualProcessingUrl}" method="get">
@@ -13,10 +16,14 @@
 
     <input type="hidden" name="individualUri"    value="${editConfiguration.objectUri}" role="input" />
     <input type="hidden" name="redirectUrl"    value="${redirectUrl}" role="input" />
-  
-    <#if statement?has_content>
-       <#include deletionTemplateName />
-    </#if>
+    <p>
+      <#if individualType??>
+       ${individualType}
+      </#if>
+      <#if individualName??>
+       ${individualName} 
+      </#if>
+    </p>
    <br />
     <p class="submit">
         <input type="submit" id="submit" value="${i18n().delete_button}" role="button"/>
