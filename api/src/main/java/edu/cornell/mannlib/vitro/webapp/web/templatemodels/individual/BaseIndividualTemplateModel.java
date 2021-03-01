@@ -153,20 +153,20 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     }
     
     public String getDeleteUrl() {
-      Collection<String> types = getMostSpecificTypes();
-      ParamMap params = new ParamMap(
-          "objectUri", individual.getURI(), 
-          "cmd", "delete", 
-          "statement_label", getNameStatement().getValue(), 
-          "statement_object", individual.getURI());
-      Iterator<String> typesIterator = types.iterator();
-      if (types.iterator().hasNext()) {
-        String type = typesIterator.next();
-        params.put("statement_type", type);
-      }
+    	Collection<String> types = getMostSpecificTypes();
+    	ParamMap params = new ParamMap(
+          "objectUri", individual.getURI(),
+          "cmd", "delete",
+          "individualName",getNameStatement().getValue()
+          );
+    	Iterator<String> typesIterator = types.iterator();
+    	if (types.iterator().hasNext()) {
+				String type = typesIterator.next();
+				params.put("individualType", type);
+			}
 
-      return UrlBuilder.getUrl(EDIT_PATH, params);
-    }
+			return UrlBuilder.getUrl(EDIT_PATH, params);
+		}
 
     public Collection<String> getMostSpecificTypes() {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();

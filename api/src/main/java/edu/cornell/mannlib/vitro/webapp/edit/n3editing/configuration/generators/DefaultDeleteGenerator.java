@@ -47,21 +47,29 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     	}
     	//prepare update?
     	prepare(vreq, editConfiguration);
-      if (editConfiguration.getPredicateUri() == null && editConfiguration.getSubjectUri() == null) {
-        editConfiguration.setTemplate(individualTemplate);
-        addRedirectUrl(vreq, editConfiguration);
-      } else {
-        editConfiguration.setTemplate(propertyTemplate);
-      }
+    	if (editConfiguration.getPredicateUri() == null && editConfiguration.getSubjectUri() == null) {
+    		editConfiguration.setTemplate(individualTemplate);
+    		addDeleteParams(vreq, editConfiguration);
+    	}else {
+    		editConfiguration.setTemplate(propertyTemplate);
+    	}
     	return editConfiguration;
     }
 
-  private void addRedirectUrl(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    String redirectUrl = vreq.getParameter("redirectUrl");
-    if (redirectUrl != null) {
-      editConfiguration.addFormSpecificData("redirectUrl", redirectUrl);
-    }
-  }
+	private void addDeleteParams(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
+		String redirectUrl = vreq.getParameter("redirectUrl");
+		if (redirectUrl != null) {
+			editConfiguration.addFormSpecificData("redirectUrl", redirectUrl);
+		}
+		String individualName = vreq.getParameter("individualName");
+		if (redirectUrl != null) {
+			editConfiguration.addFormSpecificData("individualName", individualName);
+		}
+		String individualType = vreq.getParameter("individualType");
+		if (redirectUrl != null) {
+			editConfiguration.addFormSpecificData("individualType", individualType);
+		}
+	}
 
 	private EditConfigurationVTwo  setupEditConfiguration(VitroRequest vreq, HttpSession session) {
 		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
