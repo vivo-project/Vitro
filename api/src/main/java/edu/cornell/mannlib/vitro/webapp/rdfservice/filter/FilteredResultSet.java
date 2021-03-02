@@ -9,6 +9,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingUtils;
 
 public class FilteredResultSet implements ResultSet {
 
@@ -53,7 +54,7 @@ public class FilteredResultSet implements ResultSet {
 
     @Override
     public Binding nextBinding() {
-        throw new UnsupportedOperationException("Can we ignore this?");
+        return BindingUtils.asBinding(nextSolution());
     }
 
     @Override
