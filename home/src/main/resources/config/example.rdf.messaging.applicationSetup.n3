@@ -26,7 +26,9 @@
     :hasSearchIndexer             :basicSearchIndexer ;
     :hasImageProcessor            :iioImageProcessor ;
     :hasFileStorage               :ptiFileStorage ;
-    :hasContentTripleSource       :sdbContentTripleSource ;
+    :hasRDFDeltaDatasetFactory    :rdfDeltaDatasetFactory ;
+    :hasJMSMessagingClient        :jmsMessagingClient ;
+    :hasContentTripleSource       :tdbRDFDeltaMessagingContentTripleSource ;
     :hasConfigurationTripleSource :tdbConfigurationTripleSource ;
     :hasTBoxReasonerModule        :jfactTBoxReasonerModule .
 
@@ -89,15 +91,25 @@
 #    endpoint, or a Virtuoso endpoint, with parameters as shown.
 #
 
-:sdbContentTripleSource
-    a   vitroWebapp:triplesource.impl.sdb.ContentTripleSourceSDB ,
-        vitroWebapp:modules.tripleSource.ContentTripleSource .
+#:sdbContentTripleSource
+#    a   vitroWebapp:triplesource.impl.sdb.ContentTripleSourceSDB ,
+#        vitroWebapp:modules.tripleSource.ContentTripleSource .
 
 #:tdbContentTripleSource
 #    a   vitroWebapp:triplesource.impl.tdb.ContentTripleSourceTDB ,
 #        vitroWebapp:modules.tripleSource.ContentTripleSource ;
 #    # May be an absolute path, or relative to the Vitro home directory.
 #    :hasTdbDirectory "tdbContentModels" .
+
+:tdbRDFDeltaMessagingContentTripleSource
+    a   vitroWebapp:triplesource.impl.tdb.ContentTripleSourceTDB ,
+        vitroWebapp:modules.tripleSource.ContentTripleSource ;
+    # May be an absolute path, or relative to the Vitro home directory.
+    :hasTdbDirectory "/opt/vivo/vivo-data" ;
+    # Name of the RDF Delta Patch Log Datasource
+    :hasRDFDeltaDatasource "vivo-patches" ;
+    # Whether or not a triple change should be published, requires jmsMessagingClient
+    :shouldEmitPatches "true" .
 
 #:sparqlContentTripleSource
 #    a   vitroWebapp:triplesource.impl.virtuoso.ContentTripleSourceSPARQL ,
@@ -137,3 +149,39 @@
 :jfactTBoxReasonerModule
     a   vitroWebapp:tboxreasoner.impl.jfact.JFactTBoxReasonerModule ,
         vitroWebapp:modules.tboxreasoner.TBoxReasonerModule .
+
+# ----------------------------
+#
+# JMS Messaging Client Module:
+#    JNDI implementation of a messaging client used to publish messages
+#    to a broker. Requires an external message broker. Has been tested
+#    against Artemis ActiveMQ topic. https://activemq.apache.org/components/artemis/
+#
+
+:jmsMessagingClient
+    a   vitroWebapp:modules.messaging.JMSMessagingClient ;
+    # JNDI property java.naming.factory.initial
+    :hasFactoryInitial "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory" ;
+    # JNDI property java.naming.provider.url
+    :hasProviderURL "tcp://localhost:61616?type=TOPIC_CF" ;
+    :hasConnectionFactory "TopicConnectionFactory" ;
+    :hasBrokerDestination "topic/rdf-delta-patch" ;
+    :hasBrokerType "topic" ;
+    :hasBrokerUsername "artemis" ;
+    :hasBrokerPassword "artemis" .
+
+# ----------------------------
+#
+# RDF Delta Dataset Factory Module:
+#    Dataset factory implementation in which connects to an external RDF Delta Patch Log service
+#    and affords wrapping TDB datasets. The returned dataset produces RDF Delta Patch Logs for
+#    each write to the triplestore. These patches can be read from the logs or used to emit
+#    the change event.
+#    https://afs.github.io/rdf-delta/
+#
+
+:rdfDeltaDatasetFactory
+    a   vitroWebapp:modules.rdfDelta.RDFDeltaDatasetFactory ;
+    # becomes an absolute path
+    :hasDeltaServerURL "http://localhost:1066/" ;
+    :hasDeltaClientZone "/opt/vivo/Zone" .

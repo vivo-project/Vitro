@@ -15,6 +15,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.messaging.JMSMessagingClient;
+import edu.cornell.mannlib.vitro.webapp.modules.rdfDelta.RDFDeltaDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
@@ -41,6 +43,8 @@ public class ApplicationImpl implements Application {
 	private SearchIndexer searchIndexer;
 	private ImageProcessor imageProcessor;
 	private FileStorage fileStorage;
+	private RDFDeltaDatasetFactory rdfDeltaDatasetFactory;
+	private JMSMessagingClient jmsMessagingClient;
 	private ContentTripleSource contentTripleSource;
 	private ConfigurationTripleSource configurationTripleSource;
 	private TBoxReasonerModule tboxReasonerModule;
@@ -104,6 +108,26 @@ public class ApplicationImpl implements Application {
 	}
 
 	@Override
+	public JMSMessagingClient getJMSMessagingClient() {
+		return jmsMessagingClient;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasJMSMessagingClient", minOccurs = 0, maxOccurs = 1)
+	public void setJMSMessagingClient(JMSMessagingClient jmsMessagingClient) {
+		this.jmsMessagingClient = jmsMessagingClient;
+	}
+
+	@Override
+	public RDFDeltaDatasetFactory getRDFDeltaDatasetFactory() {
+		return rdfDeltaDatasetFactory;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasRDFDeltaDatasetFactory", minOccurs = 0, maxOccurs = 1)
+	public void setRDFDeltaDatasetFactory(RDFDeltaDatasetFactory rdfDeltaDatasetFactory) {
+		this.rdfDeltaDatasetFactory = rdfDeltaDatasetFactory;
+	}
+
+	@Override
 	public ContentTripleSource getContentTripleSource() {
 		return contentTripleSource;
 	}
@@ -150,8 +174,7 @@ public class ApplicationImpl implements Application {
 			ServletContext ctx = sce.getServletContext();
 			Application app = ApplicationUtils.instance();
 			StartupStatus ss = StartupStatus.getBean(ctx);
-			ComponentStartupStatus css = new ComponentStartupStatusImpl(this,
-					ss);
+			ComponentStartupStatus css = new ComponentStartupStatusImpl(this, ss);
 
 			SearchEngine searchEngine = app.getSearchEngine();
 			searchEngine.startup(app, css);
@@ -165,19 +188,27 @@ public class ApplicationImpl implements Application {
 			fileStorage.startup(app, css);
 			ss.info(this, "Started the FileStorage system: " + fileStorage);
 
-			ContentTripleSource contentTripleSource = app
-					.getContentTripleSource();
+			JMSMessagingClient jmsMessagingClient = app.getJMSMessagingClient();
+			if (jmsMessagingClient != null) {
+				jmsMessagingClient.startup(app, css);
+				ss.info(this, "Started the JMSMessagingClient: " + jmsMessagingClient);
+			}
+
+			RDFDeltaDatasetFactory rdfDeltaDatasetFactory = app.getRDFDeltaDatasetFactory();
+			if (rdfDeltaDatasetFactory != null) {
+				rdfDeltaDatasetFactory.startup(app, css);
+				ss.info(this, "Started the RDFDeltaDatasetFactory: " + rdfDeltaDatasetFactory);
+			}
+
+			ContentTripleSource contentTripleSource = app.getContentTripleSource();
 			contentTripleSource.startup(app, css);
-			ss.info(this, "Started the ContentTripleSource: "
-					+ contentTripleSource);
+			ss.info(this, "Started the ContentTripleSource: " + contentTripleSource);
 
 			// Ensure that we haven't failed setting up the content triple store before continuing
 			if (!ss.isStartupAborted()) {
-				ConfigurationTripleSource configurationTripleSource = app
-						.getConfigurationTripleSource();
+				ConfigurationTripleSource configurationTripleSource = app.getConfigurationTripleSource();
 				configurationTripleSource.startup(app, css);
-				ss.info(this, "Started the ConfigurationTripleSource: "
-						+ configurationTripleSource);
+				ss.info(this, "Started the ConfigurationTripleSource: " + configurationTripleSource);
 
 				configureJena();
 				prepareCombinedTripleSource(app, ctx);
@@ -189,18 +220,13 @@ public class ApplicationImpl implements Application {
 			OntDocumentManager.getInstance().setProcessImports(false);
 		}
 
-		private void prepareCombinedTripleSource(Application app,
-				ServletContext ctx) {
+		private void prepareCombinedTripleSource(Application app, ServletContext ctx) {
 			ContentTripleSource contentSource = app.getContentTripleSource();
-			ConfigurationTripleSource configurationSource = app
-					.getConfigurationTripleSource();
-			BasicCombinedTripleSource source = new BasicCombinedTripleSource(
-					contentSource, configurationSource);
+			ConfigurationTripleSource configurationSource = app.getConfigurationTripleSource();
+			BasicCombinedTripleSource source = new BasicCombinedTripleSource(contentSource, configurationSource);
 
-			RDFServiceUtils.setRDFServiceFactory(ctx,
-					contentSource.getRDFServiceFactory());
-			RDFServiceUtils.setRDFServiceFactory(ctx,
-					configurationSource.getRDFServiceFactory(), CONFIGURATION);
+			RDFServiceUtils.setRDFServiceFactory(ctx, contentSource.getRDFServiceFactory());
+			RDFServiceUtils.setRDFServiceFactory(ctx, configurationSource.getRDFServiceFactory(), CONFIGURATION);
 
 			ModelAccess.setCombinedTripleSource(source);
 		}
@@ -228,8 +254,7 @@ public class ApplicationImpl implements Application {
 			ServletContext ctx = sce.getServletContext();
 			Application app = ApplicationUtils.instance();
 			StartupStatus ss = StartupStatus.getBean(ctx);
-			ComponentStartupStatus css = new ComponentStartupStatusImpl(this,
-					ss);
+			ComponentStartupStatus css = new ComponentStartupStatusImpl(this, ss);
 
 			TBoxReasonerModule tboxReasoner = app.getTBoxReasonerModule();
 			tboxReasoner.startup(app, css);
