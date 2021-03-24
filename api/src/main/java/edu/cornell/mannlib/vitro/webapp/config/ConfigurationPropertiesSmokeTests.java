@@ -48,6 +48,7 @@ public class ConfigurationPropertiesSmokeTests implements
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		checkDefaultNamespace(ctx, props, ss);
+		checkMultipleRPFs(ctx, props, ss);
 		checkLanguages(ctx, props, ss);
 		checkEncryptionParameters(props, ss);
 
@@ -82,6 +83,32 @@ public class ConfigurationPropertiesSmokeTests implements
 					"Default namespace does not match the expected form "
 							+ "(does not end with '" + suffix + "'): '" + ns
 							+ "'");
+		}
+	}
+
+	/**
+	 * Warn if runtime.properties exists in multiple locations
+	 * or is located vivo.home instead of vivo.home/config
+	 */
+	private void checkMultipleRPFs(ServletContext ctx,
+			ConfigurationProperties props, StartupStatus ss) {
+		String rpfStatus = props.getProperty(ConfigurationPropertiesSetup.RP_MULTIPLE);
+
+		if (rpfStatus.equals("both")) {
+			ss.warning(this,
+					"Deprecation warning: Files matching the name 'runtime.properties' "
+							+ "were found in both vivo.home and vivo.home/config. Using "
+							+ "the file in vivo.home. Future releases may require "
+							+ "runtime.properties be placed in vivo.home/config.");
+		}
+
+		if (rpfStatus.equals("home")) {
+			ss.warning(this,
+					"Deprecation warning: runtime.properties was found in the "
+							+ "vivo.home directory. The recommended directory for "
+							+ "runtime.properties is now vivo.home/config. Future releases "
+							+ "may require runtime.properties be placed in "
+							+ "vivo.home/config.");
 		}
 	}
 

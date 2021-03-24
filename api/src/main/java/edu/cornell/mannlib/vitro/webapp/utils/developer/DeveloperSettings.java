@@ -202,23 +202,18 @@ public class DeveloperSettings {
 			File dsFile = homeDir.resolve("config/developer.properties")
 					.toFile();
 
-			if (!dsFile.exists()) {
-				dsFile = homeDir.resolve("config/default.developer.properties").toFile();
-			}
-
 			try (FileReader reader = new FileReader(dsFile)) {
 				Properties dsProps = new Properties();
 				dsProps.load(reader);
 				devSettings.updateFromProperties(dsProps);
 				log.info(devSettings);
-				ss.info(this, "Loaded the '" + dsFile.getName() + "' file: "
+				ss.info(this, "Loaded the 'developer.properties' file: "
 						+ devSettings);
 			} catch (FileNotFoundException e) {
-				ss.info(this, "Neither 'developer.properties' nor 'default.developer.properties' " +
-						"files exist.");
+				ss.info(this, "'developer.properties' file does not exist.");
 			} catch (Exception e) {
 				ss.warning(this,
-						"Failed to load the '" + dsFile.getAbsolutePath() + "' file.", e);
+						"Failed to load the 'developer.properties' file.", e);
 			}
 		}
 

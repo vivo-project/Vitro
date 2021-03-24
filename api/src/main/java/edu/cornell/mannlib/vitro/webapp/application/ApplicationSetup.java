@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel
  */
 public class ApplicationSetup implements ServletContextListener {
 	private static final String APPLICATION_SETUP_PATH = "config/applicationSetup.n3";
-	private static final String APPLICATION_SETUP_DEFAULT_PATH = "config/default.applicationSetup.n3";
 
 	private ServletContext ctx;
 	private StartupStatus ss;
@@ -46,8 +45,6 @@ public class ApplicationSetup implements ServletContextListener {
 			this.vitroHomeDir = VitroHomeDirectory.find(ctx);
 			ss.info(this, vitroHomeDir.getDiscoveryMessage());
 
-			this.vitroHomeDir.populate();
-
 			locateApplicationConfigFile();
 			loadApplicationConfigFile();
 			createConfigurationBeanLoader();
@@ -66,19 +63,11 @@ public class ApplicationSetup implements ServletContextListener {
 	private void locateApplicationConfigFile() {
 		Path path = this.vitroHomeDir.getPath().resolve(APPLICATION_SETUP_PATH);
 
-		if (!Files.exists(path) || !Files.isReadable(path)) {
-			path = this.vitroHomeDir.getPath().resolve(APPLICATION_SETUP_DEFAULT_PATH);
-		}
-
 		if (!Files.exists(path)) {
-			throw new IllegalStateException("Neither '" + APPLICATION_SETUP_PATH + "' nor '" +
-					APPLICATION_SETUP_DEFAULT_PATH + "' were found in " +
-					this.vitroHomeDir.getPath());
+			throw new IllegalStateException("'" + path + "' does not exist.");
 		}
 		if (!Files.isReadable(path)) {
-			throw new IllegalStateException("No readable '" + APPLICATION_SETUP_PATH + "' nor '" +
-					APPLICATION_SETUP_DEFAULT_PATH + "' files were found in " +
-					this.vitroHomeDir.getPath());
+			throw new IllegalStateException("Can't read '" + path + "'");
 		}
 		this.configFile = path;
 	}
