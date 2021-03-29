@@ -93,6 +93,10 @@ public class RDFServiceTDB extends RDFServiceJena {
 		}
 	}
 
+        @Override
+        public boolean preferPreciseOptionals() {
+            return true;
+        }
 
 	@Override
 	public void close() {
