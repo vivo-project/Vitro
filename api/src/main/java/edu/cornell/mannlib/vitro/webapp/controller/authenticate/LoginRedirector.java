@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 
 /**
  * A user has just completed the login process. What page do we direct them to?
@@ -76,7 +77,7 @@ public class LoginRedirector {
 
 		if (!canSeeSiteAdminPage()) {
 			log.debug("User not recognized. Going to application home.");
-			return getApplicationHomePageUrl();
+			return UrlBuilder.getHomeUrl();
 		}
 
 		if (isLoginPage(afterLoginPage)) {
@@ -87,20 +88,20 @@ public class LoginRedirector {
 			return afterLoginPage;
 		} else {
 			log.debug("Don't know what to do. Go home.");
-			return getApplicationHomePageUrl();
+			return UrlBuilder.getHomeUrl();
 		}
 	}
 
 	public String getRedirectionUriForCancellingUser() {
 		if (isLoginPage(afterLoginPage)) {
 			log.debug("Coming from /login. Going to home.");
-			return getApplicationHomePageUrl();
+			return UrlBuilder.getHomeUrl();
 		} else if (null != afterLoginPage) {
 			log.debug("Returning to requested page: " + afterLoginPage);
 			return afterLoginPage;
 		} else {
 			log.debug("Don't know what to do. Go home.");
-			return getApplicationHomePageUrl();
+			return UrlBuilder.getHomeUrl();
 		}
 	}
 
@@ -108,10 +109,12 @@ public class LoginRedirector {
 			throws IOException {
 		try {
 			DisplayMessage.setMessage(request, assembleWelcomeMessage());
-			response.sendRedirect(getRedirectionUriForLoggedInUser());
+			String redirectUrl = getRedirectionUriForLoggedInUser();
+			log.debug("Sending redirect to path: " + redirectUrl);
+			response.sendRedirect(redirectUrl);
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
-			response.sendRedirect(getApplicationHomePageUrl());
+			response.sendRedirect(UrlBuilder.getHomeUrl());
 		}
 	}
 
@@ -143,7 +146,7 @@ public class LoginRedirector {
 			response.sendRedirect(getRedirectionUriForCancellingUser());
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
-			response.sendRedirect(getApplicationHomePageUrl());
+			response.sendRedirect(UrlBuilder.getHomeUrl());
 		}
 	}
 
@@ -173,23 +176,5 @@ public class LoginRedirector {
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException("No UTF-8 encoding? Really?", e);
 		}
-	}
-
-	/**
-	 * The application home page can be overridden by an attribute in the
-	 * ServletContext. Further, it can either be an absolute URL, or it can be
-	 * relative to the application. Weird.
-	 */
-	private String getApplicationHomePageUrl() {
-		String contextRedirect = (String) session.getServletContext()
-				.getAttribute("postLoginRequest");
-		if (contextRedirect != null) {
-			if (contextRedirect.indexOf(":") == -1) {
-				return request.getContextPath() + contextRedirect;
-			} else {
-				return contextRedirect;
-			}
-		}
-		return request.getContextPath();
 	}
 }
