@@ -68,12 +68,15 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     //TODO: Create this generator
     final String RDFS_LABEL_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator";
     final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
-
+    final String MANAGE_MENUS_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator";
+    
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		// If request is for new individual, return simple do back end editing action permission
 		if (StringUtils.isNotEmpty(EditConfigurationUtils.getTypeOfNew(vreq))) {
 			return SimplePermission.DO_BACK_END_EDITING.ACTION;
+		} else if(MANAGE_MENUS_FORM.equals(vreq.getParameter("editForm"))) {
+		    return SimplePermission.MANAGE_MENUS.ACTION;
 		}
 		// Check if this statement can be edited here and return unauthorized if not
 		String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
