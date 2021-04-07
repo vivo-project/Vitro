@@ -108,7 +108,9 @@ public class LoginRedirector {
 			throws IOException {
 		try {
 			DisplayMessage.setMessage(request, assembleWelcomeMessage());
-			response.sendRedirect(getRedirectionUriForLoggedInUser());
+			String redirectUrl = getRedirectionUriForLoggedInUser();
+			log.debug("Sending redirect to path: " + redirectUrl);
+			response.sendRedirect(redirectUrl);
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
