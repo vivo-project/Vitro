@@ -90,13 +90,14 @@ public class AdditionalURIsForObjectPropertiesTest {
         Assert.assertTrue("uris was empty", uris.size() > 0 );
 
         Assert.assertTrue("uris didn't not contain test:cheese", uris.contains(testNS+"cheese"));
+        Assert.assertTrue("uris didn't not contain test:bob", uris.contains(testNS+"bob"));
 
         Assert.assertTrue("uris contained test:Person", !uris.contains(testNS+"Person"));
         Assert.assertTrue("uris contained owl:Thing", !uris.contains( OWL.Thing.getURI() ));
         Assert.assertTrue("uris contained test:onions", !uris.contains(testNS+"onions"));
         Assert.assertTrue("uris contained test:icecream", !uris.contains(testNS+"icecream"));
 
-        Assert.assertEquals(1, uris.size());
+        Assert.assertEquals(2, uris.size());
     }
 
     @Test
