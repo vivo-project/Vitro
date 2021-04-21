@@ -4,7 +4,7 @@
 <#import "lib-home-page.ftl" as lh>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${country}">
     <head>
         <#include "head.ftl">
     </head>
