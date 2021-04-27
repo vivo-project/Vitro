@@ -177,10 +177,6 @@ public class LoginRedirector {
 		}
 	}
 
-	/**
-	 * The application home page can either be an absolute URL, or it can be
-	 * relative to the application. Weird.
-	 */
 	private String getApplicationHomePageUrl() {
 		String contextPath = request.getContextPath();
 		if (contextPath.equals("")) {
