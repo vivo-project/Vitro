@@ -44,12 +44,11 @@ public class DeleteIndividualController extends FreemarkerHttpServlet{
   private static final boolean BEGIN = true;
   private static final boolean END = !BEGIN;
 	
-  private static String TYPE_QUERY_START = ""
+  private static String TYPE_QUERY = ""
       + "PREFIX vitro:    <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>"
       + "SELECT ?type "
       + "WHERE"
-      + "{ <";
-  private static String TYPE_QUERY_END = "> vitro:mostSpecificType ?type ." 
+      + "{ ?individualURI vitro:mostSpecificType ?type ." 
       +	"}";
   private static String queryForDeleteQuery = 
  		    "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
@@ -139,7 +138,12 @@ public class DeleteIndividualController extends FreemarkerHttpServlet{
   private String getObjectMostSpecificType(String individualURI, VitroRequest vreq) {
     String type = "";
     try {
-      ResultSet results = QueryUtils.getLanguageNeutralQueryResults(makeTypeQuery(individualURI), vreq);
+      Query typeQuery = QueryFactory.create(TYPE_QUERY);
+      QuerySolutionMap bindings = new QuerySolutionMap();
+      bindings.add("individualURI", ResourceFactory.createResource(individualURI));
+      Model ontModel = vreq.getJenaOntModel();
+      QueryExecution qexec = QueryExecutionFactory.create(typeQuery, ontModel, bindings);
+      ResultSet results = qexec.execSelect();
       while (results.hasNext()) {
         QuerySolution solution = results.nextSolution();
         type = solution.get("type").toString();
@@ -154,12 +158,12 @@ public class DeleteIndividualController extends FreemarkerHttpServlet{
   
   private byte[] getIndividualsToDelete(String targetIndividual, String deleteQuery, VitroRequest vreq) {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    Query queryForTypeSpecificDeleteQuery = QueryFactory.create(deleteQuery);
-    QuerySolutionMap initialBindings = new QuerySolutionMap();
-    initialBindings.add("individualURI", ResourceFactory.createResource(targetIndividual));
-    Model ontModel = vreq.getJenaOntModel();
     try {
-      QueryExecution qexec = QueryExecutionFactory.create(queryForTypeSpecificDeleteQuery, ontModel, initialBindings);
+    	Query queryForTypeSpecificDeleteQuery = QueryFactory.create(deleteQuery);
+    	QuerySolutionMap bindings = new QuerySolutionMap();
+    	bindings.add("individualURI", ResourceFactory.createResource(targetIndividual));
+    	Model ontModel = vreq.getJenaOntModel();
+      QueryExecution qexec = QueryExecutionFactory.create(queryForTypeSpecificDeleteQuery, ontModel, bindings);
       Model results = qexec.execDescribe();
       results.write(out, "N3");
 
@@ -170,10 +174,6 @@ public class DeleteIndividualController extends FreemarkerHttpServlet{
     return out.toByteArray();
   }
 
-  private String makeTypeQuery(String objectURI) {
-    return TYPE_QUERY_START + objectURI + TYPE_QUERY_END;
-  }
-	
   private void deleteIndividuals(byte[] toRemove, VitroRequest vreq) {
     String removingString = new String(toRemove, StandardCharsets.UTF_8);
     RDFService rdfService = vreq.getRDFService();
