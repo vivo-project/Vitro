@@ -134,8 +134,8 @@ public class UserAccount {
 	}
 
 	public String getPasswordLinkExpiresHash() {
-		return limitStringLength(8, Authenticator.applyArgon2iEncoding(String
-				.valueOf(passwordLinkExpires)));
+		return Authenticator.applyArgon2iEncoding(String.valueOf(
+		        passwordLinkExpires));
 	}
 
 	public void setPasswordLinkExpires(long passwordLinkExpires) {
@@ -227,16 +227,6 @@ public class UserAccount {
 
 	private <T> T nonNull(T value, T defaultValue) {
 		return (value == null) ? defaultValue : value;
-	}
-
-	private String limitStringLength(int limit, String s) {
-		if (s == null) {
-			return "";
-		} else if (s.length() <= limit) {
-			return s;
-		} else {
-			return s.substring(0, limit);
-		}
 	}
 
 	@Override
