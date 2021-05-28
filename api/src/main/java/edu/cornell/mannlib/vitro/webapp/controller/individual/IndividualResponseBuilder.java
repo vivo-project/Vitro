@@ -282,6 +282,14 @@ class IndividualResponseBuilder {
     	return map;
     }
 
+    private static String LABEL_QUERY = ""
+            + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+            + "SELECT ?label WHERE { \n"
+            + "    ?subject rdfs:label ?label \n"
+            + "    FILTER isLiteral(?label) \n"
+            + "}" ;
+    
+    // Query that was previously used for a count of labels in all languages 
     private static String LABEL_COUNT_QUERY = ""
         + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
         + "SELECT ( str(COUNT(?label)) AS ?labelCount ) WHERE { \n"
@@ -297,19 +305,20 @@ class IndividualResponseBuilder {
             + "}" ;
 
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
-        String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
+        // 1.12.0 Now filtering to only the labels for the current locale so as
+        // to be consistent with other editing forms.  Because the language
+        // filter can only act on a result set containing actual literals,
+        // we can't do the counting with a COUNT() in the query itself.  So
+        // we will now use the LABEL_QUERY instead of LABEL_COUNT_QUERY and 
+        // count the rows.
+        String queryStr = QueryUtils.subUriForQueryVar(LABEL_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
         int theCount = 0;
-        try {
-            //ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
-            //Get query results across all languages in order for template to show manage labels link correctly
-            ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
-            if (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                RDFNode labelCount = soln.get("labelCount");
-                if (labelCount != null && labelCount.isLiteral()) {
-                    theCount = labelCount.asLiteral().getInt();
-                }
+        try {   
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            while(results.hasNext()) {
+                results.next();
+                theCount++;
             }
         } catch (Exception e) {
             log.error(e, e);
