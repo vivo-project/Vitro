@@ -373,8 +373,9 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 
         ArrayList<Literal>  labels = new ArrayList<Literal>();
         try {
-        	//We want to get the labels for all the languages, not just the display language
-            ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
+        	// Get results filtered to current locale so as to be consistent
+            // with other editing forms.
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 Literal nodeLiteral = soln.get("label").asLiteral();

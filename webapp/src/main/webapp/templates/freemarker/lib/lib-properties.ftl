@@ -307,16 +307,22 @@ name will be used as the label. -->
     		<#assign linkTitle = "${i18n().manage_list_of_labels}">
     		<#assign labelLink= "${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=${generators.ManageLabelsGenerator}&predicateUri=${labelPropertyUri}${extraParameters}">
     	<#else>
+	    <#-- For consistency of behavior, don't show view labels link to users without editing privileges .
 			<#assign linkTitle = "${i18n().view_list_of_labels}">
 			<#assign imageAlt = "${i18n().view}" />
 			<#assign labelLink= "${urls.base}/viewLabels?subjectUri=${individualUri}${extraParameters}">
+            -->
     	</#if>
 
+        <#if editable>
+	<#-- Render the link only if editable. See comment above. -->
         <span class="inline">
             <a class="add-label" href="${labelLink}"
              title="${linkTitle}">
         	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${imageAlt}" /></a>
         </span>
+        </#if>
+
     </#if>
 </#macro>
 
