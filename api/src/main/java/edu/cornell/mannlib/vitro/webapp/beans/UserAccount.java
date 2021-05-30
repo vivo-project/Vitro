@@ -145,6 +145,13 @@ public class UserAccount {
 	public boolean isPasswordChangeRequired() {
 		return passwordChangeRequired;
 	}
+	
+	public boolean isHashValid(String hashKey) {
+		if (Authenticator.verifyArgon2iHash(hashKey, String.valueOf(passwordLinkExpires))) {
+			return true;
+		}
+		return false;
+	}
 
 	public void setPasswordChangeRequired(Boolean passwordChangeRequired) {
 		this.passwordChangeRequired = nonNull(passwordChangeRequired,

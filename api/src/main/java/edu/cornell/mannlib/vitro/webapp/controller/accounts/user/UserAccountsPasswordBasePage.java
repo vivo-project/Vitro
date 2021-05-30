@@ -103,11 +103,9 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 			return;
 		}
 
-		String expectedKey = userAccount.getPasswordLinkExpiresHash();
-		if (!key.equals(expectedKey)) {
-			log.warn("Password request for '" + userEmail + "' is bogus: key ("
-					+ key + ") doesn't match expected key (" + expectedKey
-					+ ")");
+		if (!userAccount.isHashValid(key)) {
+			log.warn("Password request for '" + userEmail + "' is bogus: hash ("
+					+ key + ") doesn't match key.");
 			bogusMessage = passwordChangeNotPendingMessage();
 			return;
 		}
