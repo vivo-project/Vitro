@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -98,6 +97,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			u.setOldPassword(getPropertyStringValue(r, USERACCOUNT_OLD_PASSWORD));
 			u.setPasswordLinkExpires(getPropertyLongValue(r,
 					USERACCOUNT_PASSWORD_LINK_EXPIRES));
+			u.setEmailKey(getPropertyStringValue(r,USERACCOUNT_EMAIL_KEY));
+			
 			u.setPasswordChangeRequired(getPropertyBooleanValue(r,
 					USERACCOUNT_PASSWORD_CHANGE_REQUIRED));
 			u.setExternalAuthOnly(getPropertyBooleanValue(r,
@@ -240,6 +241,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					userAccount.getLoginCount(), model);
 			addPropertyLongValue(res, USERACCOUNT_LAST_LOGIN_TIME,
 					userAccount.getLastLoginTime(), model);
+			addPropertyStringValue(res, USERACCOUNT_EMAIL_KEY,
+					userAccount.getEmailKey(), model);
 			if (userAccount.getStatus() != null) {
 				addPropertyStringValue(res, USERACCOUNT_STATUS, userAccount
 						.getStatus().toString(), model);
@@ -306,6 +309,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					userAccount.getLoginCount(), model);
 			updatePropertyLongValue(res, USERACCOUNT_LAST_LOGIN_TIME,
 					userAccount.getLastLoginTime(), model);
+			updatePropertyStringValue(res, USERACCOUNT_EMAIL_KEY,
+					userAccount.getEmailKey(), model);
 			if (userAccount.getStatus() == null) {
 				updatePropertyStringValue(res, USERACCOUNT_STATUS, null, model);
 			} else {

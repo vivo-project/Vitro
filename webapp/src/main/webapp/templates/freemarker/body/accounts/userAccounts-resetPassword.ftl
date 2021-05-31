@@ -26,7 +26,7 @@
 <section id="reset-password" role="region">
     <form method="POST" action="${formUrls.resetPassword}" class="customForm" role="create password">
         <input type="hidden" name="user" value="${userAccount.emailAddress}" />
-        <input type="hidden" name="key"  value="${userAccount.passwordLinkExpiresHash}" />
+        <input type="hidden" name="key"  value="${userAccount.emailKey}" />
 
         <label for="new-password">${strings.new_password}<span class="requiredHint"> *</span></label>
         <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />

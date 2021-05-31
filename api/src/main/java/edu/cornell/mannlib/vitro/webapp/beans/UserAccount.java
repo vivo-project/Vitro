@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import org.apache.commons.lang3.RandomStringUtils;
 
 /**
  * Information about the account of a user. URI, email, password, etc.
@@ -52,6 +52,7 @@ public class UserAccount {
 	private String md5Password = ""; // Never null.
 	private String oldPassword = ""; // Never null.
 	private long passwordLinkExpires = 0L; // Never negative.
+	private String emailKey = "";
 	private boolean passwordChangeRequired = false;
 
 	private int loginCount = 0; // Never negative.
@@ -133,13 +134,23 @@ public class UserAccount {
 		return passwordLinkExpires;
 	}
 
-	public String getPasswordLinkExpiresHash() {
-		return limitStringLength(8, Authenticator.applyArgon2iEncoding(String
-				.valueOf(passwordLinkExpires)));
-	}
-
 	public void setPasswordLinkExpires(long passwordLinkExpires) {
 		this.passwordLinkExpires = Math.max(0, passwordLinkExpires);
+	}
+
+	public void generateEmailKey() {
+		boolean useLetters = true;
+		boolean useNumbers = true;
+		int length = 64;
+		emailKey = RandomStringUtils.random(length, useLetters, useNumbers);
+	}
+	
+	public void setEmailKey(String emailKey) {
+		this.emailKey = emailKey;	
+	}
+	
+	public String getEmailKey() {
+		return emailKey;
 	}
 
 	public boolean isPasswordChangeRequired() {
@@ -247,6 +258,7 @@ public class UserAccount {
 				+ (", oldPassword=" + oldPassword)
 				+ (", argon2password=" + argon2Password)
 				+ (", passwordLinkExpires=" + passwordLinkExpires)
+				+ (", emailKey =" + emailKey)
 				+ (", passwordChangeRequired=" + passwordChangeRequired)
 				+ (", externalAuthOnly=" + externalAuthOnly)
 				+ (", loginCount=" + loginCount) + (", status=" + status)

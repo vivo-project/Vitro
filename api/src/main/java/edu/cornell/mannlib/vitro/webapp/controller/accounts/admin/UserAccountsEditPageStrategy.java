@@ -82,6 +82,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		protected void setAdditionalProperties(UserAccount u) {
 			if (resetPassword && !page.isExternalAuthOnly()) {
 				u.setPasswordLinkExpires(figureExpirationDate().getTime());
+				u.generateEmailKey();
 			}
 		}
 
@@ -121,10 +122,8 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		private String buildResetPasswordLink() {
 			try {
 				String email = page.getUpdatedAccount().getEmailAddress();
-				String hash = page.getUpdatedAccount()
-						.getPasswordLinkExpiresHash();
-				String relativeUrl = UrlBuilder.getUrl(RESET_PASSWORD_URL,
-						"user", email, "key", hash);
+				String key = page.getUpdatedAccount().getEmailKey();
+				String relativeUrl = UrlBuilder.getUrl(RESET_PASSWORD_URL, "user", email, "key", key);
 
 				URL context = new URL(vreq.getRequestURL().toString());
 				URL url = new URL(context, relativeUrl);

@@ -84,6 +84,7 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 				u.setStatus(Status.ACTIVE);
 			} else {
 				u.setPasswordLinkExpires(figureExpirationDate().getTime());
+				u.generateEmailKey();
 				u.setStatus(Status.INACTIVE);
 			}
 		}
@@ -119,10 +120,8 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 		private String buildCreatePasswordLink() {
 			try {
 				String email = page.getAddedAccount().getEmailAddress();
-				String hash = page.getAddedAccount()
-						.getPasswordLinkExpiresHash();
-				String relativeUrl = UrlBuilder.getUrl(CREATE_PASSWORD_URL,
-						"user", email, "key", hash);
+				String hash = page.getAddedAccount().getEmailKey();
+				String relativeUrl = UrlBuilder.getUrl(CREATE_PASSWORD_URL,	"user", email, "key", hash);
 
 				URL context = new URL(vreq.getRequestURL().toString());
 				URL url = new URL(context, relativeUrl);

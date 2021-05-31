@@ -36,6 +36,7 @@ public class UserAccountsCreatePasswordPage extends
 		userAccount.setArgon2Password(Authenticator.applyArgon2iEncoding(newPassword));
 		userAccount.setMd5Password("");
 		userAccount.setPasswordLinkExpires(0L);
+		userAccount.setEmailKey("");
 		userAccount.setPasswordChangeRequired(false);
 		userAccount.setStatus(Status.ACTIVE);
 		userAccountsDao.updateUserAccount(userAccount);
