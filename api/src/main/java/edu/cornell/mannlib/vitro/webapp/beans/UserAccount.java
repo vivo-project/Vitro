@@ -12,12 +12,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 /**
  * Information about the account of a user. URI, email, password, etc.
  *
- * The "password link expires hash" is just a string that is derived from the
- * value in the passwordLinkExpires field. It doesn't have to be a hash, and
- * there is no need for it to be cryptographic, but it seems embarrassing to
- * just send the value as a clear string. There is no real need for security
- * here, except that a brute force attack would allow someone to change the
- * password on an account that they know has a password change pending.
  */
 public class UserAccount {
 	public static final int MIN_PASSWORD_LENGTH = 6;
@@ -146,7 +140,9 @@ public class UserAccount {
 	}
 	
 	public void setEmailKey(String emailKey) {
-		this.emailKey = emailKey;	
+		if (emailKey != null) {
+			this.emailKey = emailKey;	
+		}
 	}
 	
 	public String getEmailKey() {
