@@ -120,8 +120,8 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 		private String buildCreatePasswordLink() {
 			try {
 				String email = page.getAddedAccount().getEmailAddress();
-				String hash = page.getAddedAccount().getEmailKey();
-				String relativeUrl = UrlBuilder.getUrl(CREATE_PASSWORD_URL,	"user", email, "key", hash);
+				String key = page.getAddedAccount().getEmailKey();
+				String relativeUrl = UrlBuilder.getUrl(CREATE_PASSWORD_URL,	"user", email, "key", key);
 
 				URL context = new URL(vreq.getRequestURL().toString());
 				URL url = new URL(context, relativeUrl);
