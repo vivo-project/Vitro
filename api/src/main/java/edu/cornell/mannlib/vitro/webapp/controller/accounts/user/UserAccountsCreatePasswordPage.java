@@ -54,6 +54,11 @@ public class UserAccountsCreatePasswordPage extends
 	protected String passwordChangeNotPendingMessage() {
 		return i18n.text("account_already_activated", userEmail);
 	}
+	
+	@Override
+	protected String passwordChangeInavlidKeyMessage() {
+		return i18n.text("password_change_invalid_key", userEmail);
+	}
 
 	@Override
 	protected String templateName() {

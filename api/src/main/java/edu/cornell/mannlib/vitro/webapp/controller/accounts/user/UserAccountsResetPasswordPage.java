@@ -55,6 +55,11 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 	protected String passwordChangeNotPendingMessage() {
 		return i18n.text("password_change_not_pending", userEmail);
 	}
+	
+	@Override
+	protected String passwordChangeInavlidKeyMessage() {
+		return i18n.text("password_change_invalid_key", userEmail);
+	}
 
 	@Override
 	protected String templateName() {

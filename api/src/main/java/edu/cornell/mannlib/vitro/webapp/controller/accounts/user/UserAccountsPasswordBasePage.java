@@ -108,7 +108,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 			log.warn("Password request for '" + userEmail + "' is bogus: key ("
 					+ key + ") doesn't match expected key (" + expectedKey
 					+ ")");
-			bogusMessage = passwordChangeNotPendingMessage();
+			bogusMessage = passwordChangeInavlidKeyMessage();
 			return;
 		}
 
@@ -176,6 +176,8 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 	protected abstract String alreadyLoggedInMessage(String currentUserEmail);
 
 	protected abstract String passwordChangeNotPendingMessage();
+	
+	protected abstract String passwordChangeInavlidKeyMessage();
 
 	protected abstract String templateName();
 }
