@@ -76,11 +76,19 @@ public class RDFServiceTDB extends RDFServiceJena {
 			}
 			notifyListenersOfPreChangeEvents(changeSet);
 
-			dataset.begin(ReadWrite.WRITE);
-			try {
-				applyChangeSetToModel(changeSet, dataset);
-				dataset.commit();
-			} finally {
+			dataset.begin(ReadWrite.WRITE);          
+            try {
+                boolean committed = false;
+                try {                   
+                    applyChangeSetToModel(changeSet, dataset);
+                    dataset.commit();
+                    committed = true;
+                } finally {
+                    if(!committed) {
+                        dataset.abort();
+                    }
+                }
+            } finally {                
 				dataset.end();
 			}
 
