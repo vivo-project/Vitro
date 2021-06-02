@@ -183,16 +183,16 @@ name will be used as the label. -->
 	<#local url = statement.editUrl>
 	<#if url?has_content>
 		<#if propertyLocalName?contains("ARG_2000028")>
-		    <#if rangeUri?contains("Address")>
-		        <#local url = url + "&addressUri=" + "${statement.address!}">
-		    <#elseif rangeUri?contains("Telephone") || rangeUri?contains("Fax")>
-		        <#local url = url + "&phoneUri=" + "${statement.phone!}">
-		    <#elseif rangeUri?contains("Work") || rangeUri?contains("Email")>
-		        <#local url = url + "&emailUri=" + "${statement.email!}">
-		    <#elseif rangeUri?contains("Name")>
-		        <#local url = url + "&fullNameUri=" + "${statement.fullName!}">
-		    <#elseif rangeUri?contains("Title")>
-		        <#local url = url + "&titleUri=" + "${statement.title!}">
+		    <#if rangeUri?contains("Address") && statement.address??>
+		        <#local url = url + "&addressUri=" + "${statement.address?url}">
+		    <#elseif (rangeUri?contains("Telephone") || rangeUri?contains("Fax")) && statement.phone??>
+		        <#local url = url + "&phoneUri=" + "${statement.phone?url}">
+		    <#elseif (rangeUri?contains("Work") || rangeUri?contains("Email")) && statement.email??>
+		        <#local url = url + "&emailUri=" + "${statement.email?url}">
+		    <#elseif rangeUri?contains("Name") && statement.fullName??>
+		        <#local url = url + "&fullNameUri=" + "${statement.fullName?url}">
+		    <#elseif rangeUri?contains("Title") && statement.title??>
+		        <#local url = url + "&titleUri=" + "${statement.title?url}">
 		    </#if>
 		</#if>
         <@showEditLink propertyLocalName rangeUri url />
