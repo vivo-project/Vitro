@@ -33,7 +33,7 @@
             restablecer tu contraseña usando nuestro servidor seguro.
         </p>
         
-        <p>${passwordLink}</p>
+        <p><a href="${passwordLink}" title="password">${passwordLink}</a> </p>
         
         <p>¡Gracias!</p>
     </body>

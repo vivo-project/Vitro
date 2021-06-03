@@ -33,7 +33,7 @@
 			um Ihr Passwort über unseren Server zurückzusetzen. 
         </p>
         
-        <p>${passwordLink}</p>
+        <p><a href="${passwordLink}" title="password">${passwordLink}</a> </p>
         
         <p>Vielen Dank!</p>
     </body>

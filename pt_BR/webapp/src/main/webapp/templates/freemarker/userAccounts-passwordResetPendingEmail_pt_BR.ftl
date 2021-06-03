@@ -33,7 +33,7 @@
             redefinir sua senha usando o nosso servidor seguro.
         </p>
         
-        <p>${passwordLink}</p>
+        <p><a href="${passwordLink}" title="password">${passwordLink}</a> </p>
         
         <p>Obrigado!</p>
     </body>

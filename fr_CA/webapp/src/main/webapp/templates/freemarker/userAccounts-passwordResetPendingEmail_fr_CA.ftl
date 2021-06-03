@@ -32,7 +32,7 @@
             using our secure server.
         </p>
         
-        <p>${passwordLink}</p>
+        <p><a href="${passwordLink}" title="password">${passwordLink}</a> </p>
         
         <p>Thank you!</p>
     </body>
