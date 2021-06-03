@@ -109,7 +109,7 @@ public abstract class ConfigurationProperties {
 			throw new NullPointerException("bean may not be null.");
 		}
 		context.setAttribute(ATTRIBUTE_NAME, bean);
-		log.info(bean);
+		log.debug(bean);
 	}
 
 	/** Package access, so unit tests can call it. */
