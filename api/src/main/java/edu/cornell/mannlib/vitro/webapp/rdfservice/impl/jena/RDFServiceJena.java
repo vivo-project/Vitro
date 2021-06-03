@@ -201,8 +201,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         log.debug("blank node model size " + blankNodeModel.size());
 
         if (blankNodeModel.size() == 1) {
-            log.warn("Deleting single triple with blank node: " + blankNodeModel);
-            log.warn("This likely indicates a problem; excessive data may be deleted.");
+            log.debug("Deleting single triple with blank node: " + blankNodeModel);
+            log.debug("This likely indicates a problem; excessive data may be deleted.");
         }
 
         Query rootFinderQuery = QueryFactory.create(BNODE_ROOT_QUERY);
