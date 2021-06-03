@@ -249,6 +249,7 @@ public class UserAccountsSelector {
 			user.setMd5Password(ifLiteralPresent(solution, "md5pwd", ""));
 			user.setArgon2Password(ifLiteralPresent(solution, "a2pwd", ""));
 			user.setPasswordLinkExpires(ifLongPresent(solution, "expire", 0L));
+			user.setEmailKey(ifLiteralPresent(solution, "emailKey", ""));
 			user.setLoginCount(ifIntPresent(solution, "count", 0));
 			user.setLastLoginTime(ifLongPresent(solution, "lastLogin", 0));
 			user.setStatus(parseStatus(solution, "status", null));

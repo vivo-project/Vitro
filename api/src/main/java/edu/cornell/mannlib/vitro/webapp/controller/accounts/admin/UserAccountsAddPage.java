@@ -156,6 +156,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		u.setOldPassword("");
 		u.setPasswordChangeRequired(false);
 		u.setPasswordLinkExpires(0);
+		u.setEmailKey("");
 		u.setLoginCount(0);
 		u.setLastLoginTime(0L);
 		u.setStatus(Status.INACTIVE);

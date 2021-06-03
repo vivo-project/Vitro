@@ -274,6 +274,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			userAccount.setOldPassword("");
 			userAccount.setPasswordChangeRequired(false);
 			userAccount.setPasswordLinkExpires(0L);
+			userAccount.setEmailKey("");
 		}
 
 		if (isRootUser()) {
