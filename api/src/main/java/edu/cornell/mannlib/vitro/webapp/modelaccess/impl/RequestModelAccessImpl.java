@@ -202,7 +202,7 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 
 	@Override
 	public OntModel getOntModel(String name, LanguageOption... options) {
-		return addLanguageAwareness(getOntModel(new OntModelKey(name, options)));
+		return getOntModel(new OntModelKey(name, options));
 	}
 
 	private OntModel getOntModel(OntModelKey key) {
