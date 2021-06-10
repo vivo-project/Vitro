@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.IdModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
 
 public abstract class BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 
@@ -63,6 +64,7 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
         setupModelSelectorsFromVitroRequest(vreq, editConfig);
 
         OntModel queryModel = ModelAccess.on(vreq).getOntModel();
+        OntModel languageNeutralModel = vreq.getLanguageNeutralUnionFullModel();
 
         if( editConfig.getSubjectUri() == null)
             editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));
@@ -78,7 +80,10 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
             editConfig.prepareForObjPropUpdate(queryModel);
         } else if( dataKey != null ) { // edit of a data prop statement
             //do nothing since the data prop form generator must take care of it
-            editConfig.prepareForDataPropUpdate(queryModel, vreq.getWebappDaoFactory().getDataPropertyDao());
+            // Use language-neutral model to ensure that a data property statement
+            // is found for any literal hash, even if the UI locale is changed.
+            editConfig.prepareForDataPropUpdate(languageNeutralModel,
+                    vreq.getWebappDaoFactory().getDataPropertyDao());
         } else{
             //this might be a create new or a form
             editConfig.prepareForNonUpdate(queryModel);
