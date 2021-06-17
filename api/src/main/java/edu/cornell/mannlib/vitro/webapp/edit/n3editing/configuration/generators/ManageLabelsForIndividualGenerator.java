@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -41,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.FoafNameToRdfsLabelPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ManageLabelsForIndividualPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
 
 /**
@@ -202,12 +204,12 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 
 	private void addFormSpecificData(EditConfigurationVTwo config,
 			VitroRequest vreq) {
-		//Get all language codes/labels in the system, and this list is sorted by language name
-        List<HashMap<String, String>> locales = this.getLocales(vreq);
+	    //the labels already added by the user
+        ArrayList<Literal> existingLabels = this.getExistingLabels(config.getSubjectUri(), vreq);
+		//Get language codes/labels for languages present in the existing labels
+        List<HashMap<String, String>> locales = this.getLocales(vreq, existingLabels);
         //Get code to label hashmap - we use this to get the language name for the language code returned in the rdf literal
-        HashMap<String, String> localeCodeToNameMap = this.getFullCodeToLanguageNameMap(locales);
-		//the labels already added by the user
-		ArrayList<Literal> existingLabels = this.getExistingLabels(config.getSubjectUri(), vreq);
+        HashMap<String, String> localeCodeToNameMap = this.getFullCodeToLanguageNameMap(locales);		
 		int numberExistingLabels = existingLabels.size();
 		//existing labels keyed by language name and each of the list of labels is sorted by language name
 		HashMap<String, List<LabelInformation>> existingLabelsByLanguageName = this.getLabelsSortedByLanguageName(existingLabels, localeCodeToNameMap, config, vreq);
@@ -373,8 +375,9 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 
         ArrayList<Literal>  labels = new ArrayList<Literal>();
         try {
-        	//We want to get the labels for all the languages, not just the display language
-            ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
+        	// Get results filtered to current locale so as to be consistent
+            // with other editing forms.
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 Literal nodeLiteral = soln.get("label").asLiteral();
@@ -401,29 +404,31 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
     	return template;
     }
 
+    //get locales present in list of literals
+    public List<HashMap<String, String>> getLocales(VitroRequest vreq, 
+            List<Literal> existingLiterals) {
+        Set<Locale> locales = new HashSet<Locale>();
+        for(Literal literal : existingLiterals) {
+            String language = literal.getLanguage();
+            if(!StringUtils.isEmpty(language)) {
+                locales.add(LanguageFilteringUtils.languageToLocale(language));
+            }
+        }
+        if (locales.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+        Locale currentLocale = SelectedLocale.getCurrentLocale(vreq);
+        for (Locale locale : locales) {
+            try {
+                list.add(buildLocaleMap(locale, currentLocale));
+            } catch (FileNotFoundException e) {
+                log.warn("Can't show locale '" + locale + "': " + e);
+            }
+        }
 
-
-    //get locales
-    public List<HashMap<String, String>> getLocales(VitroRequest vreq) {
-    	List<Locale> selectables = SelectedLocale.getSelectableLocales(vreq);
-		if (selectables.isEmpty()) {
-			return Collections.emptyList();
-		}
-		List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-		Locale currentLocale = SelectedLocale.getCurrentLocale(vreq);
-		for (Locale locale : selectables) {
-			try {
-				list.add(buildLocaleMap(locale, currentLocale));
-			} catch (FileNotFoundException e) {
-				log.warn("Can't show the Locale selector for '" + locale
-						+ "': " + e);
-			}
-		}
-
-		return list;
+        return list;
     }
-
-
 
     public HashMap<String, String> getFullCodeToLanguageNameMap(List<HashMap<String, String>> localesList) {
     	HashMap<String, String> codeToLanguageMap = new HashMap<String, String>();
