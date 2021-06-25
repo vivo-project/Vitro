@@ -131,21 +131,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
-        return innerObjectProperty.getHiddenFromDisplayBelowRoleLevel();
-    }
-
-    @Override
-    public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-        return innerObjectProperty.getProhibitedFromUpdateBelowRoleLevel();
-    }
-
-    @Override
-    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
-        return innerObjectProperty.getHiddenFromPublishBelowRoleLevel();
-    }
-
-    @Override
     public boolean getInverseFunctional() {
         return innerObjectProperty.getInverseFunctional();
     }
@@ -351,36 +336,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     @Override
     public void setGroupURI(String in) {
         innerObjectProperty.setGroupURI(in);
-    }
-
-    @Override
-    public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
-        innerObjectProperty.setHiddenFromDisplayBelowRoleLevel(eR);
-    }
-
-    @Override
-    public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
-        innerObjectProperty.setHiddenFromDisplayBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
-    }
-
-    @Override
-    public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
-        innerObjectProperty.setProhibitedFromUpdateBelowRoleLevel(eR);
-    }
-
-    @Override
-    public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
-        innerObjectProperty.setProhibitedFromUpdateBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
-    }
-
-    @Override
-    public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
-        innerObjectProperty.setHiddenFromPublishBelowRoleLevel(eR);
-    }
-
-    @Override
-    public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
-        innerObjectProperty.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
     }
 
     @Override

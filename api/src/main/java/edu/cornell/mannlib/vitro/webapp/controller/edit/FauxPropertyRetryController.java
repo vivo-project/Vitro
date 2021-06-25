@@ -37,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -70,6 +69,9 @@ public class FauxPropertyRetryController extends BaseEditController {
 		req.setAttribute("scripts", "/templates/edit/formBasic.js");
 		req.setAttribute("title", "Faux Property Editing Form");
 		req.setAttribute("_action", epo.getAction());
+
+		addPermissionAttributes(req, populator.beanForEditing.getConfigUri());
+
 		setRequestAttributes(req, epo);
 
 		try {
@@ -172,12 +174,6 @@ public class FauxPropertyRetryController extends BaseEditController {
 			fp.setGroupURI(base.getGroupURI());
 			fp.setRangeURI(base.getRangeVClassURI());
 			fp.setDomainURI(base.getDomainVClassURI());
-			fp.setHiddenFromDisplayBelowRoleLevel(base
-					.getHiddenFromDisplayBelowRoleLevel());
-			fp.setHiddenFromPublishBelowRoleLevel(base
-					.getHiddenFromPublishBelowRoleLevel());
-			fp.setProhibitedFromUpdateBelowRoleLevel(base
-					.getProhibitedFromUpdateBelowRoleLevel());
 			fp.setCustomEntryForm(base.getCustomEntryForm());
 			log.debug("Created new FauxProperty: " + fp);
 			return fp;
@@ -234,12 +230,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 			map.put("GroupURI", createClassGroupOptionList());
 			map.put("DomainURI", buildDomainOptionList());
 			map.put("RangeURI", buildRangeOptionList());
-			map.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",
-					RoleLevelOptionsSetup.getDisplayOptionsList(beanForEditing));
-			map.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",
-					RoleLevelOptionsSetup.getUpdateOptionsList(beanForEditing));
-			map.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",
-					RoleLevelOptionsSetup.getPublishOptionsList(beanForEditing));
+
 			return map;
 		}
 
@@ -346,5 +337,4 @@ public class FauxPropertyRetryController extends BaseEditController {
 		}
 
 	}
-
 }

@@ -95,7 +95,7 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 	 */
 	private boolean mayEditIndividual(VitroRequest vreq, String individualUri) {
 		RequestedAction action = new EditObjectPropertyStatement(
-				vreq.getJenaOntModel(), individualUri,
+				vreq, vreq.getJenaOntModel(), individualUri,
 				SOME_PREDICATE, SOME_URI);
 		return PolicyHelper.isAuthorizedForActions(vreq, action);
 	}

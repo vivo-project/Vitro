@@ -11,13 +11,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.UnionClass;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -297,112 +293,8 @@ public class VClassJena extends VClass {
             } finally {
                 cls.getOntModel().leaveCriticalSection();
             }
-        }
-    }
-
-    @Override
-    public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
-
-        if (this.hiddenFromDisplayBelowRoleLevel != null) {
-            return this.hiddenFromDisplayBelowRoleLevel;
-        } else {
-            cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                //There might be multiple HIDDEN_FROM_EDIT_DISPLAY_ANNOT properties, only use the highest
-                StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-                BaseResourceBean.RoleLevel hiddenRoleLevel = null;
-
-                while( it.hasNext() ){
-                    Statement stmt = it.nextStatement();
-                    RDFNode obj;
-                    if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = obj.as(Resource.class);
-                        if( res != null && res.getURI() != null ){
-                            BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null &&
-                                (hiddenRoleLevel == null || roleFromModel.compareTo(hiddenRoleLevel) > 0 )){
-                                hiddenRoleLevel = roleFromModel;
-                            }
-                        }
-                    }
-                }
-
-                setHiddenFromDisplayBelowRoleLevel(hiddenRoleLevel); //this might get set to null
-            	return this.hiddenFromDisplayBelowRoleLevel;
-            } finally {
-                cls.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    @Override
-    public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-
-        if (this.prohibitedFromUpdateBelowRoleLevel != null) {
-            return this.prohibitedFromUpdateBelowRoleLevel;
-        } else {
-            cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                //There might be multiple PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-            	StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-                BaseResourceBean.RoleLevel prohibitedRoleLevel = null;
-                while( it.hasNext() ){
-                    Statement stmt = it.nextStatement();
-                    RDFNode obj;
-                    if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = obj.as(Resource.class);
-                        if( res != null && res.getURI() != null ){
-                            BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null &&
-                                (prohibitedRoleLevel == null || roleFromModel.compareTo(prohibitedRoleLevel) > 0 )){
-                                prohibitedRoleLevel = roleFromModel;
-                            }
-                        }
-                    }
-                }
-
-                setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel); //this might get set to null
-            	return this.prohibitedFromUpdateBelowRoleLevel;
-            } finally {
-                cls.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    @Override
-    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
-
-        if (this.hiddenFromPublishBelowRoleLevel != null) {
-            return this.hiddenFromPublishBelowRoleLevel;
-        } else {
-            cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                //There might be multiple HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-                StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
-                BaseResourceBean.RoleLevel publishRoleLevel = null;
-
-                while( it.hasNext() ){
-                    Statement stmt = it.nextStatement();
-                    RDFNode obj;
-                    if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = obj.as(Resource.class);
-                        if( res != null && res.getURI() != null ){
-                            BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                            if( roleFromModel != null &&
-                                (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
-                                publishRoleLevel = roleFromModel;
-                            }
-                        }
-                    }
-                }
-
-                setHiddenFromPublishBelowRoleLevel(publishRoleLevel); //this might get set to null
-            	return this.hiddenFromPublishBelowRoleLevel;
-            } finally {
-                cls.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
+        }		 	    
+    } 
 
     @Override
     public boolean isUnion() {

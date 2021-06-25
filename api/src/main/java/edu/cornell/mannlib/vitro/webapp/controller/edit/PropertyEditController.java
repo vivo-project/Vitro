@@ -43,7 +43,7 @@ public class PropertyEditController extends BaseEditController {
         	return;
         }
 
-        final int NUM_COLS=26;
+        final int NUM_COLS=23;
 
         VitroRequest vreq = new VitroRequest(request);
 
@@ -72,17 +72,14 @@ public class PropertyEditController extends BaseEditController {
         results.add("public description");    // column 13
         results.add("example");               // column 14
         results.add("editor description");    // column 15
-        results.add("display level");         // column 16
-        results.add("update level");          // column 17
-        results.add("display tier");          // column 18
-        results.add("display limit");         // column 15
-        results.add("collate by subclass");   // column 19
-        results.add("custom entry form");     // column 20
-        results.add("select from existing");  // column 21
-        results.add("offer create new");      // column 22
-        results.add("sort direction");        // column 23
-        results.add("URI");                   // column 24
-        results.add("publish level");         // column 25
+        results.add("display tier");          // column 16
+        results.add("display limit");         // column 17
+        results.add("collate by subclass");   // column 18
+        results.add("custom entry form");     // column 19
+        results.add("select from existing");  // column 20
+        results.add("offer create new");      // column 21
+        results.add("sort direction");        // column 22
+        results.add("URI");                   // column 23
 
         results.add(p.getPickListName()); // column 1
 
@@ -170,25 +167,18 @@ public class PropertyEditController extends BaseEditController {
         results.add(exampleStr);               // column 14
         String descriptionStr = (p.getDescription() == null) ? "" : p.getDescription();
         results.add(descriptionStr);           // column 15
+        
+        results.add("property: "+p.getDomainDisplayTier() + ", inverse: "+p.getRangeDisplayTier()); // column 16
+        results.add("property: "+p.getDomainDisplayLimitInteger() + ", inverse: "+p.getRangeDisplayLimit()); // column 17
+        results.add(p.getCollateBySubclass() ? "true" : "false"); // column 18
 
-		results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)"
-				: p.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel()); // column 16
-		results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)"
-				: p.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel()); // column 17
+        results.add(p.getCustomEntryForm() == null ? "(unspecified)" : p.getCustomEntryForm()); // column 19
+        results.add(p.getSelectFromExisting() ? "true" : "false");   // column 20
+        results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 21
 
-        results.add("property: "+p.getDomainDisplayTier() + ", inverse: "+p.getRangeDisplayTier()); // column 18
-        results.add("property: "+p.getDomainDisplayLimitInteger() + ", inverse: "+p.getRangeDisplayLimit());
-        results.add(p.getCollateBySubclass() ? "true" : "false"); // column 19
+        results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 22
 
-        results.add(p.getCustomEntryForm() == null ? "(unspecified)" : p.getCustomEntryForm()); // column 20
-        results.add(p.getSelectFromExisting() ? "true" : "false");   // column 21
-        results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 22
-
-        results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 23
-
-        results.add(p.getURI()); // column 24
-		results.add(p.getHiddenFromPublishBelowRoleLevel() == null ? "(unspecified)"
-				: p.getHiddenFromPublishBelowRoleLevel().getDisplayLabel()); // column 25
+        results.add(p.getURI()); // column 23
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");

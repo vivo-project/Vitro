@@ -46,7 +46,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 	private String makeDeleteUrl() {
         // Determine whether the statement can be deleted
 		DataPropertyStatement dps = makeStatement();
-        RequestedAction action = new DropDataPropertyStatement(vreq.getJenaOntModel(), dps);
+        RequestedAction action = new DropDataPropertyStatement(vreq, vreq.getJenaOntModel(), dps);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }
@@ -72,7 +72,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 
         // Determine whether the statement can be edited
 		DataPropertyStatement dps = makeStatement();
-        RequestedAction action = new EditDataPropertyStatement(vreq.getJenaOntModel(), dps);
+        RequestedAction action = new EditDataPropertyStatement(vreq, vreq.getJenaOntModel(), dps);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }

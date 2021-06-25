@@ -6,6 +6,8 @@ import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * A base class for requested actions that involve adding, editing, or deleting
  * object property statements from a model.
@@ -16,9 +18,9 @@ public abstract class AbstractObjectPropertyStatementAction extends
 	private final Property predicate;
 	private final String objectUri;
 
-	public AbstractObjectPropertyStatementAction(OntModel ontModel,
-			String subjectUri, Property predicate, String objectUri) {
-		super(ontModel);
+	public AbstractObjectPropertyStatementAction(HttpServletRequest request, OntModel ontModel,
+												 String subjectUri, Property predicate, String objectUri) {
+		super(request, ontModel);
 		this.subjectUri = subjectUri;
 		this.predicate = predicate;
 		this.objectUri = objectUri;

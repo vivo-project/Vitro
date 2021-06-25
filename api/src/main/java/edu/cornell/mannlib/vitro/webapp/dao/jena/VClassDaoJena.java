@@ -965,33 +965,6 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             addPropertyIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
             addPropertyIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
 
-            ontCls.removeAll(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-            if (HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT != null && cls.getHiddenFromDisplayBelowRoleLevel() != null) { // only need to add if present
-                try {
-                    ontCls.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getHiddenFromDisplayBelowRoleLevel().getURI()));
-                } catch (Exception e) {
-                    log.error("error adding HiddenFromDisplayBelowRoleLevel annotation to class "+cls.getURI());
-                }
-            }
-
-            ontCls.removeAll(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-            if (PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT != null && cls.getProhibitedFromUpdateBelowRoleLevel() != null) { // only need to add if present
-                try {
-                    ontCls.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getProhibitedFromUpdateBelowRoleLevel().getURI()));
-                } catch (Exception e) {
-                    log.error("error adding ProhibitedFromUpdateBelowRoleLevel annotation to class "+cls.getURI());
-                }
-            }
-
-            ontCls.removeAll(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
-            if (HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT != null && cls.getHiddenFromPublishBelowRoleLevel() != null) { // only need to add if present
-                try {
-                    ontCls.addProperty(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getHiddenFromPublishBelowRoleLevel().getURI()));
-                } catch (Exception e) {
-                    log.error("error adding HiddenFromPublishBelowRoleLevel annotation to class "+cls.getURI());
-                }
-            }
-
             /* OPTIONAL annotation properties */
             addPropertyStringValue(ontCls,PROPERTY_CUSTOMENTRYFORMANNOT,cls.getCustomEntryForm(),ontModel);
             addPropertyStringValue(ontCls,PROPERTY_CUSTOMDISPLAYVIEWANNOT,cls.getCustomDisplayView(),ontModel);
@@ -1024,18 +997,6 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 updatePropertyNonNegativeIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
                 updatePropertyNonNegativeIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
                 updatePropertyFloatValue(ontCls, SEARCH_BOOST_ANNOT, cls.getSearchBoost(), ontModel);
-
-                if (cls.getHiddenFromDisplayBelowRoleLevel() != null) {
-                    updatePropertyResourceURIValue(ontCls,HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT,cls.getHiddenFromDisplayBelowRoleLevel().getURI(),ontModel);
-                }
-
-                if (cls.getProhibitedFromUpdateBelowRoleLevel() != null) {
-                    updatePropertyResourceURIValue(ontCls,PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT,cls.getProhibitedFromUpdateBelowRoleLevel().getURI(),ontModel);
-                }
-
-                if (cls.getHiddenFromPublishBelowRoleLevel() != null) {
-                    updatePropertyResourceURIValue(ontCls,HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT,cls.getHiddenFromPublishBelowRoleLevel().getURI(),ontModel);
-                }
 
                 updatePropertyStringValue(ontCls,PROPERTY_CUSTOMENTRYFORMANNOT,cls.getCustomEntryForm(),ontModel);
                 updatePropertyStringValue(ontCls,PROPERTY_CUSTOMDISPLAYVIEWANNOT,cls.getCustomDisplayView(),ontModel);

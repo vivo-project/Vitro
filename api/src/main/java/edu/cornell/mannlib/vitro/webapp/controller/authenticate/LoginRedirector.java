@@ -74,15 +74,17 @@ public class LoginRedirector {
 			return getAssociatedIndividualHomePage();
 		}
 
-		if (!canSeeSiteAdminPage()) {
-			log.debug("User not recognized. Going to application home.");
-			return getApplicationHomePageUrl();
-		}
+		if (null != afterLoginPage) {
+			if (isLoginPage(afterLoginPage)) {
+				if (canSeeSiteAdminPage()) {
+					log.debug("Coming from /login. Going to site admin page.");
+					return getSiteAdminPageUrl();
+				} else {
+					log.debug("User not recognized. Going to application home.");
+					return getApplicationHomePageUrl();
+				}
+			}
 
-		if (isLoginPage(afterLoginPage)) {
-			log.debug("Coming from /login. Going to site admin page.");
-			return getSiteAdminPageUrl();
-		} else if (null != afterLoginPage) {
 			log.debug("Returning to requested page: " + afterLoginPage);
 			return afterLoginPage;
 		} else {

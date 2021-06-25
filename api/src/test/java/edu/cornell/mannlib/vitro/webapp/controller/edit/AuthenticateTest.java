@@ -509,7 +509,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		assertNoProcessBean();
 		assertNewLoginSessions(OLD_STRANGER_NAME);
-		assertRedirect(URL_HOME);
+		assertRedirect(URL_WITH_LINK);
 	}
 
 	@Test

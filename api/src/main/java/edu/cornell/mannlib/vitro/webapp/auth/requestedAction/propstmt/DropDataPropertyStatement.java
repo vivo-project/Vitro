@@ -6,6 +6,8 @@ import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Should we allow the user to delete this DataPropertyStatement from this
  * model?
@@ -13,13 +15,13 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 public class DropDataPropertyStatement extends
 		AbstractDataPropertyStatementAction {
 
-	public DropDataPropertyStatement(OntModel ontModel, String subjectUri,
+	public DropDataPropertyStatement(HttpServletRequest request, OntModel ontModel, String subjectUri,
 			String predicateUri, String dataValue) {
-		super(ontModel, subjectUri, predicateUri, dataValue);
+		super(request, ontModel, subjectUri, predicateUri, dataValue);
 	}
 
-	public DropDataPropertyStatement(OntModel ontModel,
-			DataPropertyStatement dps) {
-		super(ontModel, dps);
+	public DropDataPropertyStatement(HttpServletRequest request, OntModel ontModel,
+									 DataPropertyStatement dps) {
+		super(request, ontModel, dps);
 	}
 }

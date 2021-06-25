@@ -7,7 +7,6 @@ import java.util.Objects;
 
 import org.apache.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
@@ -74,10 +73,6 @@ public interface PropertyDao {
 		}
 
 		public FullPropertyKey(Property p) {
-			this(p.getDomainVClassURI(), p.getURI(), p.getRangeVClassURI());
-		}
-
-		public FullPropertyKey(RoleRestrictedProperty p) {
 			this(p.getDomainVClassURI(), p.getURI(), p.getRangeVClassURI());
 		}
 

@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 
+import java.util.List;
+
 /**
  * Interface that describes a unit of authorization, or permission to perform
  * requested actions.
@@ -28,8 +30,11 @@ public abstract class Permission implements Comparable<Permission> {
 	/**
 	 * Is a user with this Permission authorized to perform this
 	 * RequestedAction?
+	 *
+	 * @param personUris Any Uris of people in the data that are associated with this user. May be null / empty.
+	 * @param whatToAuth The action to authorise
 	 */
-	public abstract boolean isAuthorized(RequestedAction whatToAuth);
+	public abstract boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth);
 
 	@Override
 	public int compareTo(Permission that) {
@@ -68,7 +73,7 @@ public abstract class Permission implements Comparable<Permission> {
 			+ Permission.class.getName() + "#NOT_AUTHORIZED") {
 
 		@Override
-		public boolean isAuthorized(RequestedAction whatToAuth) {
+		public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
 			return false;
 		}
 

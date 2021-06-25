@@ -9,6 +9,8 @@ import org.apache.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Should we publish this ObjectPropertyStatement in a Linked Open Data request
  * from the current user?
@@ -16,19 +18,19 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 public class PublishObjectPropertyStatement extends
 		AbstractObjectPropertyStatementAction {
-	public PublishObjectPropertyStatement(OntModel ontModel, String subjectUri,
-			Property keywordPred, String objectUri) {
-		super(ontModel, subjectUri, keywordPred, objectUri);
+	public PublishObjectPropertyStatement(HttpServletRequest request, OntModel ontModel, String subjectUri,
+										  Property keywordPred, String objectUri) {
+		super(request, ontModel, subjectUri, keywordPred, objectUri);
 	}
 
 	/**
 	 * We don't need to know range and domain because publishing never involves
 	 * faux properties.
 	 */
-	public PublishObjectPropertyStatement(OntModel ontModel,
+	public PublishObjectPropertyStatement(HttpServletRequest request, OntModel ontModel,
 			String subjectUri,
 			String predicateUri, String objectUri) {
-		this(ontModel, subjectUri, populateProperty(predicateUri), objectUri);
+		this(request, ontModel, subjectUri, populateProperty(predicateUri), objectUri);
 	}
 
 	private static Property populateProperty(String predicateUri) {

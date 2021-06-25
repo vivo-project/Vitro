@@ -50,6 +50,10 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 	}
 
 	@Override
+	public void setEntityPermissions(String entityKey, Collection<PermissionSet> displaySets, Collection<PermissionSet> editSets, Collection<PermissionSet> publishSets) {
+	}
+
+	@Override
 	public PermissionSet getPermissionSetByUri(String uri) {
 		return permissionSetsByUri.get(uri);
 	}

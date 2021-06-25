@@ -269,7 +269,7 @@ public class HasPermissionFactoryTest extends AbstractTestClass {
 		}
 
 		@Override
-		public boolean isAuthorized(RequestedAction whatToAuth) {
+		public boolean isAuthorized(List<String> personUris, RequestedAction whatToAuth) {
 			return false;
 		}
 

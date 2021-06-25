@@ -7,20 +7,22 @@ import org.apache.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Should we publish this DataPropertyStatement in a Linked Open Data request
  * from the current user?
  */
 public class PublishDataPropertyStatement extends
 		AbstractDataPropertyStatementAction {
-	public PublishDataPropertyStatement(OntModel ontModel, String subjectUri,
+	public PublishDataPropertyStatement(HttpServletRequest request, OntModel ontModel, String subjectUri,
 			String predicateUri, String dataValue) {
-		super(ontModel, subjectUri, predicateUri, dataValue);
+		super(request, ontModel, subjectUri, predicateUri, dataValue);
 	}
 
-	public PublishDataPropertyStatement(OntModel ontModel,
-			DataPropertyStatement dps) {
-		super(ontModel, dps);
+	public PublishDataPropertyStatement(HttpServletRequest request, OntModel ontModel,
+										DataPropertyStatement dps) {
+		super(request, ontModel, dps);
 	}
 
 }
