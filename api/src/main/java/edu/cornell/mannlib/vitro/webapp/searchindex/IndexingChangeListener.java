@@ -58,6 +58,7 @@ public class IndexingChangeListener extends StatementListener
 	private final Ticker ticker;
 	private volatile boolean rebuildScheduled;
     private final Model defaultModel;
+    public static volatile boolean enabled = true;
 
 	/** All access to the list must be synchronized. */
 	private final List<Statement> changes;
@@ -103,15 +104,19 @@ public class IndexingChangeListener extends StatementListener
 
 	@Override
 	public void addedStatement(Statement stmt) {
-		if (!rebuildScheduled) {
-			noteChange(stmt);
+		if (enabled) {
+		    if (!rebuildScheduled) {
+		    	noteChange(stmt);
+		    }
 		}
 	}
 
 	@Override
 	public void removedStatement(Statement stmt) {
-		if (!rebuildScheduled) {
-			noteChange(stmt);
+		if (enabled) {
+		    if (!rebuildScheduled) {
+		    	noteChange(stmt);
+		    }
 		}
 	}
 

@@ -32,6 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.searchindex.IndexingChangeListener;
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl;
 
 /**
  * Process SPARQL Updates, as an API.
@@ -105,6 +107,9 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	    try {
 	        if(indexer != null) {
 	            indexer.pause();
+	            if("s".equals(req.getParameter("firsttime"))) {
+					IndexingChangeListener.enabled = false;
+				}
 	        }
 	        if(ds.supportsTransactions()) {
 			    ds.begin(ReadWrite.WRITE);
@@ -117,6 +122,10 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		    }
 			if(indexer != null) {
 			    indexer.unpause();
+				if("s".equals(req.getParameter("firsttime"))) {
+					IndexingChangeListener.enabled = true;
+					indexer.rebuildIndex();
+				}
 			}
 		}
 	}
