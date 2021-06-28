@@ -718,6 +718,10 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return vreq.getContextPath() + "/deletePropertyController";
     }
 
+    public String getDeleteIndividualProcessingUrl() {
+      return vreq.getContextPath() + "/deleteIndividualController";
+    }
+
     //TODO: Check if this logic is correct and delete prohibited does not expect a specific value
     public boolean isDeleteProhibited() {
     	String deleteProhibited = vreq.getParameter("deleteProhibited");

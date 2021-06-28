@@ -203,6 +203,16 @@ name will be used as the label. -->
     <a class="edit-${propertyLocalName}" href="${url}" title="${i18n().edit_entry}"><img class="edit-individual" data-range="${rangeUri}" src="${urls.images}/individual/editIcon.gif" alt="${i18n().edit_entry}" /></a>
 </#macro>
 
+<#macro deleteIndividualLink individual redirectUrl="/">
+    <#local url = individual.deleteUrl + "&redirectUrl=" + "${redirectUrl}">
+    <@showDeleteIndividualLink url />
+</#macro>
+
+
+<#macro showDeleteIndividualLink url>
+	<a class="delete-individual" href="${url}" title="${i18n().delete_entry}"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="${i18n().delete_entry}" /></a>
+</#macro>
+
 <#macro deleteLink propertyLocalName propertyName statement rangeUri="">
     <#local url = statement.deleteUrl>
     <#if url?has_content>
