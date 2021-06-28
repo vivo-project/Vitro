@@ -6,8 +6,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 
 import java.util.List;
+
+import javax.annotation.concurrent.ThreadSafe;
+
 import java.util.Collection;
 
+@ThreadSafe
 public interface DataPropertyDao extends PropertyDao {
 
     public abstract List<DataProperty> getAllDataProperties();

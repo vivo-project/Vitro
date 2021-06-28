@@ -4,10 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
+@ThreadSafe
 public interface ObjectPropertyDao extends PropertyDao {
 
     public abstract List<ObjectProperty> getAllObjectProperties();
