@@ -12,6 +12,8 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.Scanner;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -40,11 +42,18 @@ import freemarker.template.Configuration;
  * syntactically invalid, an exception is thrown and startup is aborted.
  */
 public class FreemarkerEmailFactory {
+
 	private static final Log log = LogFactory
 			.getLog(FreemarkerEmailFactory.class);
 
+	private static final int DEFAULT_SMTP_PORT = 25;
+	private static final int TLS_PORT = 587;
+	private static final int SSL_PORT = 465;
 	public static final String SMTP_HOST_PROPERTY = "email.smtpHost";
 	public static final String REPLY_TO_PROPERTY = "email.replyTo";
+	public static final String EMAIL_PASSWORD = "email.password";
+	public static final String EMAIL_USERNAME = "email.username";
+	public static final String EMAIL_PORT = "email.port";
 
 	private static final String ATTRIBUTE_NAME = FreemarkerEmailFactory.class
 			.getName();
@@ -91,12 +100,19 @@ public class FreemarkerEmailFactory {
 	private final String smtpHost;
 	private final InternetAddress replyToAddress;
 	private final Session emailSession;
+	private final String password;
+	private final String userName;
+	private final int emailPort;
+
 
 	public FreemarkerEmailFactory(ServletContext ctx) {
 		this.smtpHost = getSmtpHostFromConfig(ctx);
 		new SmtpHostTester().test(this.smtpHost);
 
 		this.replyToAddress = getReplyToAddressFromConfig(ctx);
+		this.password = getPasswordFromConfig(ctx);
+		this.userName = getUserNameFromConfig(ctx);
+		this.emailPort = getPortFromConfig(ctx);
 		this.emailSession = createEmailSession(smtpHost);
 	}
 
@@ -111,7 +127,7 @@ public class FreemarkerEmailFactory {
 	Session getEmailSession() {
 		return emailSession;
 	}
-
+	
 	private String getSmtpHostFromConfig(ServletContext ctx) {
 		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
 		String hostName = config.getProperty(SMTP_HOST_PROPERTY, "");
@@ -121,6 +137,28 @@ public class FreemarkerEmailFactory {
 		return hostName;
 	}
 
+	private String getPasswordFromConfig(ServletContext ctx) {
+		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
+		String password = config.getProperty(EMAIL_PASSWORD, "");
+		return password;
+	}
+	
+	private String getUserNameFromConfig(ServletContext ctx) {
+		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
+		String userName = config.getProperty(EMAIL_USERNAME, "");
+		return userName;
+	}
+	
+	private int getPortFromConfig(ServletContext ctx) {
+		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
+		String port = config.getProperty(EMAIL_PORT, Integer.toString(DEFAULT_SMTP_PORT));
+		try {
+			return Integer.parseInt(port);
+		} catch (NumberFormatException e) {
+			return DEFAULT_SMTP_PORT;
+		}
+	}
+	
 	private InternetAddress getReplyToAddressFromConfig(ServletContext ctx) {
 		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
 		String rawAddress = config.getProperty(REPLY_TO_PROPERTY, "");
@@ -150,7 +188,28 @@ public class FreemarkerEmailFactory {
 	private Session createEmailSession(String hostName) {
 		Properties props = new Properties(System.getProperties());
 		props.put("mail.smtp.host", hostName);
-		return Session.getDefaultInstance(props, null);
+		props.put("mail.smtp.port", emailPort);
+		if (emailPort == TLS_PORT) {
+			props.put("mail.smtp.starttls.enable", "true");
+		}
+		if (emailPort == SSL_PORT) {
+			props.put("mail.smtp.socketFactory.port", emailPort);
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		}
+		Authenticator auth = null;
+		if (!password.isEmpty() && !userName.isEmpty()) {
+			props.put("mail.smtp.auth", "true");
+			auth = getAuthenticator();
+		}
+		return Session.getDefaultInstance(props, auth);
+	}
+
+	private Authenticator getAuthenticator() {
+		return new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(userName, password);
+			}
+		};
 	}
 
 	// ----------------------------------------------------------------------
