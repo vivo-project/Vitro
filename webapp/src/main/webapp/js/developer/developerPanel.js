@@ -52,6 +52,7 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developer_pageContents_logCustomShortView").disabled = !developerEnabled;
 		document.getElementById("developer_i18n_defeatCache").disabled = !developerEnabled;
 		document.getElementById("developer_i18n_logStringRequests").disabled = !developerEnabled;
+		document.getElementById("developer_i18n_onlineTranslation").disabled = !developerEnabled;
 		document.getElementById("developer_loggingRDFService_enable").disabled = !developerEnabled;
 		document.getElementById("developer_searchIndex_enable").disabled = !developerEnabled;
 		document.getElementById("developer_searchIndex_logIndexingBreakdownTimings").disabled = !developerEnabled;

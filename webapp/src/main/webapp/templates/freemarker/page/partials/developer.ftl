@@ -7,3 +7,5 @@
 </script>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/developer/developerPanel.js"></script>')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/developer/FileSaver.js"></script>')}
+${scripts.add('<script defer type="text/javascript" src="${urls.base}/js/developer/translations.js"></script>')}
