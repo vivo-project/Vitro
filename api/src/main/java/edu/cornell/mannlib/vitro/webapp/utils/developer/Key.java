@@ -43,7 +43,10 @@ public enum Key {
 	 * Load language property files every time they are requested.
 	 */
 	I18N_DEFEAT_CACHE("developer.i18n.defeatCache", true),
-
+	/**
+	 * Enable online translations.
+	 */
+	I18N_ONLINE_TRANSLATION("developer.i18n.onlineTranslation", true),
 	/**
 	 * Enable the I18nLogger to log each string request.
 	 */

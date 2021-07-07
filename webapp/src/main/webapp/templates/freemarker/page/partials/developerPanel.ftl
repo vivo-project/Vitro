@@ -19,6 +19,9 @@
 <#elseif !settings.mayControl>
 	<div class="developer">
 		<h1>${siteName} is running in developer mode.</h1>
+		<div id="publicSettings" style="display:none;">
+			<@showCheckbox "developer_i18n_onlineTranslation","Enable online translation" />
+		</div>
 	</div>
 <#else>
 	<div class="developer">
@@ -56,6 +59,8 @@
 									"Defeat the cache of language property files" />
 							<@showCheckbox "developer_i18n_logStringRequests",
 									"Log the retrieval of language strings" />
+							<@showCheckbox "developer_i18n_onlineTranslation",
+									"Enable online translation" />
 						</div>
 
 						<div class="container">
