@@ -121,13 +121,13 @@ class PropInfo {
 						if (followLine) {
 							followLine = isNextLineFollow(lines[i]);
 							var lineValue = lines[i].replace(/\\$/, "");
-							overridenTranslations.set(lineKey, overridenTranslations.get(lineKey) + lineValue);
+							overridenTranslations.set(lineKey, overridenTranslations.get(lineKey) + unescapeHTML(lineValue));
 						} else {
 							followLine = isNextLineFollow(lines[i]);
 							lineKey = getLineKey(lines[i]);
 							if (lineKey.trim() != "") {
 								let lineValue = getLineValue(lines[i]);
-								overridenTranslations.set(lineKey, lineValue);
+								overridenTranslations.set(lineKey, unescapeHTML(lineValue));
 							}
 						}
 					}
@@ -186,7 +186,7 @@ class PropInfo {
 		var fileName = "export_" + date.toLocaleString() + "_all.properties";
 		var lines = [];
 		for (let [key, value] of overridenTranslations) {
-			lines.push(key + " = " + value);
+			lines.push(key + " = " + escapeHTML(value));
 		}
 		saveFile(fileName, lines);
 	}
@@ -266,7 +266,7 @@ class PropInfo {
 				var value = input.nextSibling.value;
 			} else {
 				var value = input.value;
-				if (pageTranslations.get(key).rawText != value) {
+				if (pageTranslations.get(key).rawText != escapeHTML(value)) {
 					input.style.backgroundColor = "#8BAB2E";
 					overridenTranslations.set(key, value);
 				} else {
@@ -437,6 +437,26 @@ class PropInfo {
 			propInfo = new PropInfo(rawText, formText, address);
 			pageTranslations.set(key, propInfo);
 		}
+	}
+	function escapeHTML(input) {
+		return input
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;")
+		.replace(/‘/g, "&lsquo;")
+		.replace(/’/g, "&rsquo;");
+	}
+	function unescapeHTML(input) {
+		return input
+		.replace(/&amp;/g, "&")
+		.replace(/&lt;/g, "<")
+		.replace(/&gt;/g, ">")
+		.replace(/&quot;/g, "\"")
+		.replace(/&#039;/g, "'")
+		.replace(/&lsquo;/g, "‘")
+		.replace(/&rsquo;/g, "’");
 	}
 
 window.addEventListener('load', function() {
