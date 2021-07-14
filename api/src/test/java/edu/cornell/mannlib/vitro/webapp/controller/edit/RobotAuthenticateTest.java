@@ -339,7 +339,7 @@ public class RobotAuthenticateTest extends AbstractTestClass {
 
 		assertProcessBean(LOGGING_IN, NO_USER, NO_MSG,
 				"error_no_email_address", URL_LOGIN, URL_WITH_LINK);
-		assertRedirectToLoginProcessPage();
+//		assertRedirectToLoginProcessPage(); no redirection with ROBOT
 	}
 
 	@Test
@@ -351,7 +351,7 @@ public class RobotAuthenticateTest extends AbstractTestClass {
 
 		assertProcessBean(LOGGING_IN, "unknownBozo", NO_MSG,
 				"error_incorrect_credentials", URL_LOGIN, URL_WITH_LINK);
-		assertRedirectToLoginProcessPage();
+//		assertRedirectToLoginProcessPage(); no redirection with ROBOT
 	}
 
 	@Test
@@ -363,7 +363,7 @@ public class RobotAuthenticateTest extends AbstractTestClass {
 
 		assertProcessBean(LOGGING_IN, NEW_DBA_NAME, NO_MSG,
 				"error_no_password", URL_LOGIN, URL_WITH_LINK);
-		assertRedirectToLoginProcessPage();
+//		assertRedirectToLoginProcessPage(); no redirection with ROBOT
 	}
 
 	@Test
@@ -375,7 +375,7 @@ public class RobotAuthenticateTest extends AbstractTestClass {
 
 		assertProcessBean(LOGGING_IN, NEW_DBA_NAME, NO_MSG,
 				"error_incorrect_credentials", URL_LOGIN, URL_WITH_LINK);
-		assertRedirectToLoginProcessPage();
+//		assertRedirectToLoginProcessPage(); no redirection with ROBOT
 	}
 
 	@Test
@@ -584,7 +584,7 @@ public class RobotAuthenticateTest extends AbstractTestClass {
 	private void doTheRequest() {
 		String callerMethod = Thread.currentThread().getStackTrace()[2].getMethodName();
 		auth.doPost(request, response);
-		System.out.println(callerMethod +": "+ response.getStatus() + " " + response.getErrorMessage());
+		System.out.println(callerMethod +": "+ response.getStatus() + " " + response.getErrorMessage() );
 	}
 
 	private void assertNoProcessBean() {
