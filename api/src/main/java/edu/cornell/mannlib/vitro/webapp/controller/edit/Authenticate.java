@@ -151,7 +151,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * step in the process. If we see either of them, we conclude that the user
 	 * has re-started the login.
 	 */
-	private boolean loginProcessIsRestarting(HttpServletRequest request) {
+	protected boolean loginProcessIsRestarting(HttpServletRequest request) {
 		if (isAfterLoginParameterSet(request)) {
 			log.debug("after-login parameter is set: restarting the login.");
 			return true;
@@ -166,7 +166,7 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * Once these URLs have been set, don't change them.
 	 */
-	private boolean loginProcessPagesAreEmpty(HttpServletRequest request) {
+	protected boolean loginProcessPagesAreEmpty(HttpServletRequest request) {
 		LoginProcessBean bean = LoginProcessBean.getBean(request);
 		return ((bean.getAfterLoginUrl() == null) && (bean.getLoginPageUrl() == null));
 	}
@@ -183,7 +183,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * The "current page" is the referrer, unless there is no referrer for some
 	 * reason. In that case, pretend it's the login page.
 	 */
-	private void recordLoginProcessPages(HttpServletRequest request) {
+	protected void recordLoginProcessPages(HttpServletRequest request) {
 		LoginProcessBean bean = LoginProcessBean.getBean(request);
 
 		String afterLoginUrl = decodeAfterLoginParameter(request);
@@ -237,7 +237,7 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * Where are we in the process? Logged in? Not? Somewhere in between?
 	 */
-	private State getCurrentLoginState(HttpServletRequest request) {
+	protected State getCurrentLoginState(HttpServletRequest request) {
 		State currentState;
 
 		HttpSession session = request.getSession(false);
@@ -293,7 +293,7 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * They just got here. Start the process.
 	 */
-	private void processInputNowhere(HttpServletRequest request) {
+	protected void processInputNowhere(HttpServletRequest request) {
 		transitionToLoggingIn(request);
 	}
 
@@ -301,7 +301,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * They are logging in. If they get it wrong, let them know. If they get it
 	 * right, record it.
 	 */
-	private void processInputLoggingIn(HttpServletRequest request) {
+	protected void processInputLoggingIn(HttpServletRequest request) {
 		String username = request.getParameter(PARAMETER_USERNAME);
 		String password = request.getParameter(PARAMETER_PASSWORD);
 
@@ -386,7 +386,7 @@ public class Authenticate extends VitroHttpServlet {
 	 *   - If they get it right, record it.
 	 * </pre>
 	 */
-	private void processInputChangePassword(HttpServletRequest request) {
+	protected void processInputChangePassword(HttpServletRequest request) {
 		String newPassword = request.getParameter(PARAMETER_NEW_PASSWORD);
 		String confirm = request.getParameter(PARAMETER_CONFIRM_PASSWORD);
 		String cancel = request.getParameter(PARAMETER_CANCEL);
@@ -441,7 +441,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * They are already logged in.
 	 */
 	@SuppressWarnings("unused")
-	private void processInputLoggedIn(HttpServletRequest request) {
+	protected void processInputLoggedIn(HttpServletRequest request) {
 		// Nothing to do. No transition.
 	}
 
@@ -496,7 +496,7 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * Exit: there has been an unexpected exception, so show it.
 	 */
-	private void showSystemError(Exception e, HttpServletResponse response) {
+	protected void showSystemError(Exception e, HttpServletResponse response) {
 		log.error("Unexpected error in login process", e);
 		try {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -508,7 +508,7 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * Exit: user is still logging in, so go back to the page they were on.
 	 */
-	private void showLoginScreen(VitroRequest vreq, HttpServletResponse response)
+	protected void showLoginScreen(VitroRequest vreq, HttpServletResponse response)
 			throws IOException {
 		log.debug("logging in.");
 
@@ -523,7 +523,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * Exit: user has completed the login. Redirect appropriately and clear the
 	 * bean.
 	 */
-	private void showLoginComplete(HttpServletResponse response,
+	protected void showLoginComplete(HttpServletResponse response,
 			VitroRequest vreq) throws IOException {
 		getLoginRedirector(vreq).redirectLoggedInUser(response);
 		LoginProcessBean.removeBean(vreq);
@@ -532,7 +532,7 @@ public class Authenticate extends VitroHttpServlet {
 	/**
 	 * Exit: user has canceled. Redirect and clear the bean.
 	 */
-	private void showLoginCanceled(HttpServletResponse response,
+	protected void showLoginCanceled(HttpServletResponse response,
 			VitroRequest vreq) throws IOException {
 		getLoginRedirector(vreq).redirectCancellingUser(response);
 		LoginProcessBean.removeBean(vreq);
@@ -584,7 +584,7 @@ public class Authenticate extends VitroHttpServlet {
 		jenaOntModel.getBaseModel().notifyEvent(event);
 	}
 
-	private void dumpStateToLog(String label, State state, VitroRequest vreq) {
+	protected void dumpStateToLog(String label, State state, VitroRequest vreq) {
 		log.debug("State on " + label + ": " + state);
 
 		if (log.isTraceEnabled()) {

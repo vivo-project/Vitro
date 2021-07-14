@@ -159,6 +159,10 @@ public class LoginProcessBean {
 	/** What message should we display on the screen? */
 	private Message message = Message.NO_MESSAGE;
 
+	public Message getMessage() {
+		return message;
+	}
+
 	/** What arguments are needed to format the message? */
 	private Object[] messageArguments = NO_ARGUMENTS;
 
