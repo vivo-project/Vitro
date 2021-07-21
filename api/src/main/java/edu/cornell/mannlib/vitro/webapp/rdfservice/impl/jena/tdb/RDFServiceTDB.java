@@ -13,6 +13,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -74,11 +76,19 @@ public class RDFServiceTDB extends RDFServiceJena {
 			}
 			notifyListenersOfPreChangeEvents(changeSet);
 
-			dataset.begin(ReadWrite.WRITE);
-			try {
-				applyChangeSetToModel(changeSet, dataset);
-				dataset.commit();
-			} finally {
+			dataset.begin(ReadWrite.WRITE);          
+            try {
+                boolean committed = false;
+                try {                   
+                    applyChangeSetToModel(changeSet, dataset);
+                    dataset.commit();
+                    committed = true;
+                } finally {
+                    if(!committed) {
+                        dataset.abort();
+                    }
+                }
+            } finally {                
 				dataset.end();
 			}
 
@@ -93,6 +103,10 @@ public class RDFServiceTDB extends RDFServiceJena {
 		}
 	}
 
+        @Override
+        public boolean preferPreciseOptionals() {
+            return true;
+        }
 
 	@Override
 	public void close() {
@@ -232,6 +246,28 @@ public class RDFServiceTDB extends RDFServiceJena {
 		return isEquivalentGraph(graphURI, inStream, ModelSerializationFormat.NTRIPLE);
 	}
 
+	@Override
+    public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object)
+            throws RDFServiceException {
+	    dataset.begin(ReadWrite.READ);
+        try {
+            return super.countTriples(subject, predicate, object);
+        } finally {
+            dataset.end();
+        }
+	}
+	
+	@Override
+    public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, 
+            long limit, long offset) throws RDFServiceException {
+	    dataset.begin(ReadWrite.READ);
+	    try {
+	        return super.getTriples(subject, predicate, object, limit, offset);
+	    } finally {
+	        dataset.end();
+	    }	    
+	}
+	
 	/**
 	 * Convert all of the references to integer compatible type to "integer" in the serialized graph.
 	 *

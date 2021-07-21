@@ -36,6 +36,7 @@ public class UserAccountsCreatePasswordPage extends
 		userAccount.setArgon2Password(Authenticator.applyArgon2iEncoding(newPassword));
 		userAccount.setMd5Password("");
 		userAccount.setPasswordLinkExpires(0L);
+		userAccount.setEmailKey("");
 		userAccount.setPasswordChangeRequired(false);
 		userAccount.setStatus(Status.ACTIVE);
 		userAccountsDao.updateUserAccount(userAccount);
@@ -52,6 +53,11 @@ public class UserAccountsCreatePasswordPage extends
 	@Override
 	protected String passwordChangeNotPendingMessage() {
 		return i18n.text("account_already_activated", userEmail);
+	}
+	
+	@Override
+	protected String passwordChangeInavlidKeyMessage() {
+		return i18n.text("password_change_invalid_key", userEmail);
 	}
 
 	@Override

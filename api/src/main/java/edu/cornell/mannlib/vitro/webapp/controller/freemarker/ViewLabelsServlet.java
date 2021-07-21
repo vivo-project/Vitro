@@ -11,28 +11,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 
 
 /*Servlet to view all labels in various languages for individual*/
@@ -47,12 +48,13 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
 		String subjectUri = vreq.getParameter("subjectUri");
 		body.put("subjectUri", subjectUri);
 		try {
-			//Get all language codes/labels in the system, and this list is sorted by language name
-	        List<HashMap<String, String>> locales = this.getLocales(vreq);
+	        //the labels already added by the user
+            ArrayList<Literal> existingLabels = this.getExistingLabels(subjectUri, vreq);
+			//Get all language codes/labels used in the list of existing labels
+	        List<HashMap<String, String>> locales = this.getLocales(vreq, existingLabels);
 	        //Get code to label hashmap - we use this to get the language name for the language code returned in the rdf literal
 	        HashMap<String, String> localeCodeToNameMap = this.getFullCodeToLanguageNameMap(locales);
-			//the labels already added by the user
-			ArrayList<Literal> existingLabels = this.getExistingLabels(subjectUri, vreq);
+
 			//existing labels keyed by language name and each of the list of labels is sorted by language name
 			HashMap<String, List<LabelInformation>> existingLabelsByLanguageName = this.getLabelsSortedByLanguageName(existingLabels, localeCodeToNameMap, vreq, subjectUri);
 			//Get available locales for the drop down for adding a new label, also sorted by language name
@@ -137,20 +139,26 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
 		doGet(request, response);
 	}
 
-    //get locales
-    public List<HashMap<String, String>> getLocales(VitroRequest vreq) {
-    	List<Locale> selectables = SelectedLocale.getSelectableLocales(vreq);
-		if (selectables.isEmpty()) {
+    //get locales present in list of literals
+    public List<HashMap<String, String>> getLocales(VitroRequest vreq, 
+            List<Literal> existingLiterals) {
+        Set<Locale> locales = new HashSet<Locale>();
+        for(Literal literal : existingLiterals) {
+            String language = literal.getLanguage();
+            if(!StringUtils.isEmpty(language)) {
+                locales.add(LanguageFilteringUtils.languageToLocale(language));
+            }
+        }
+		if (locales.isEmpty()) {
 			return Collections.emptyList();
 		}
 		List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 		Locale currentLocale = SelectedLocale.getCurrentLocale(vreq);
-		for (Locale locale : selectables) {
+		for (Locale locale : locales) {
 			try {
 				list.add(buildLocaleMap(locale, currentLocale));
 			} catch (FileNotFoundException e) {
-				log.warn("Can't show the Locale selector for '" + locale
-						+ "': " + e);
+				log.warn("Can't show locale '" + locale + "': " + e);
 			}
 		}
 
@@ -188,8 +196,8 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
 
         ArrayList<Literal>  labels = new ArrayList<Literal>();
         try {
-        	//We want to get the labels for all the languages, not just the display language
-            ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
+        	// Show only labels with current language filtering
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 Literal nodeLiteral = soln.get("label").asLiteral();

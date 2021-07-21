@@ -159,6 +159,7 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 				userAccount.setMd5Password("");
 				userAccount.setPasswordChangeRequired(false);
 				userAccount.setPasswordLinkExpires(0L);
+				userAccount.setEmailKey("");
 			}
 		}
 

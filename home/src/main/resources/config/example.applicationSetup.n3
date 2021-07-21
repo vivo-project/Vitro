@@ -26,7 +26,7 @@
     :hasSearchIndexer             :basicSearchIndexer ;
     :hasImageProcessor            :iioImageProcessor ;
     :hasFileStorage               :ptiFileStorage ;
-    :hasContentTripleSource       :sdbContentTripleSource ;
+    :hasContentTripleSource       :tdbContentTripleSource ;
     :hasConfigurationTripleSource :tdbConfigurationTripleSource ;
     :hasTBoxReasonerModule        :jfactTBoxReasonerModule .
 
@@ -82,22 +82,22 @@
 # ----------------------------
 #
 # Content triples source module: holds data contents
-#    The SDB-based implementation is the default option. It reads its parameters
+#    The TDB-based implementation is the default option. It reads its parameters
 #    from the runtime.properties file, for backward compatibility.
 #
-#    Other implementations are based on a local TDB instance, a "standard" SPARQL
+#    Other implementations are based on an SDB instance, a "standard" SPARQL
 #    endpoint, or a Virtuoso endpoint, with parameters as shown.
 #
 
-:sdbContentTripleSource
-    a   vitroWebapp:triplesource.impl.sdb.ContentTripleSourceSDB ,
-        vitroWebapp:modules.tripleSource.ContentTripleSource .
+#:sdbContentTripleSource
+#    a   vitroWebapp:triplesource.impl.sdb.ContentTripleSourceSDB ,
+#        vitroWebapp:modules.tripleSource.ContentTripleSource .
 
-#:tdbContentTripleSource
-#    a   vitroWebapp:triplesource.impl.tdb.ContentTripleSourceTDB ,
-#        vitroWebapp:modules.tripleSource.ContentTripleSource ;
-#    # May be an absolute path, or relative to the Vitro home directory.
-#    :hasTdbDirectory "tdbContentModels" .
+:tdbContentTripleSource
+    a   vitroWebapp:triplesource.impl.tdb.ContentTripleSourceTDB ,
+        vitroWebapp:modules.tripleSource.ContentTripleSource ;
+    # May be an absolute path, or relative to the Vitro home directory.
+    :hasTdbDirectory "tdbContentModels" .
 
 #:sparqlContentTripleSource
 #    a   vitroWebapp:triplesource.impl.virtuoso.ContentTripleSourceSPARQL ,

@@ -103,12 +103,12 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 			return;
 		}
 
-		String expectedKey = userAccount.getPasswordLinkExpiresHash();
-		if (!key.equals(expectedKey)) {
+		String expectedKey = userAccount.getEmailKey();
+		if (key.isEmpty() || !key.equals(expectedKey)) {
 			log.warn("Password request for '" + userEmail + "' is bogus: key ("
 					+ key + ") doesn't match expected key (" + expectedKey
 					+ ")");
-			bogusMessage = passwordChangeNotPendingMessage();
+			bogusMessage = passwordChangeInavlidKeyMessage();
 			return;
 		}
 
@@ -153,7 +153,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 		body.put("minimumLength", UserAccount.MIN_PASSWORD_LENGTH);
 		body.put("maximumLength", UserAccount.MAX_PASSWORD_LENGTH);
 		body.put("userAccount", userAccount);
-		body.put("key", userAccount.getPasswordLinkExpiresHash());
+		body.put("key", userAccount.getEmailKey());
 		body.put("newPassword", newPassword);
 		body.put("confirmPassword", confirmPassword);
 		body.put("formUrls", buildUrlsMap());
@@ -176,6 +176,8 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 	protected abstract String alreadyLoggedInMessage(String currentUserEmail);
 
 	protected abstract String passwordChangeNotPendingMessage();
+	
+	protected abstract String passwordChangeInavlidKeyMessage();
 
 	protected abstract String templateName();
 }

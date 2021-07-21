@@ -12,10 +12,10 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.graph.Capabilities;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.GraphEventManager;
+import org.apache.jena.graph.GraphListener;
 import org.apache.jena.graph.GraphStatisticsHandler;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.TransactionHandler;
@@ -23,7 +23,6 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.graph.impl.GraphWithPerform;
 import org.apache.jena.graph.impl.SimpleEventManager;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -409,7 +408,18 @@ public class RDFServiceGraph implements GraphWithPerform {
     @Override
     public GraphEventManager getEventManager() {
         if (eventManager == null) {
-            eventManager = new SimpleEventManager(this);
+            eventManager = new SimpleEventManager() {                
+                @Override
+                public void notifyEvent(Graph g, Object event) {
+                    ChangeSet changeSet = rdfService.manufactureChangeSet();
+                    changeSet.addPreChangeEvent(event);
+                    try {
+                        rdfService.changeSetUpdate(changeSet);
+                    } catch (RDFServiceException e) {
+                        throw new RuntimeException(e);
+                    }   
+                }                
+            };
         }
         return eventManager;
     }
@@ -595,21 +605,7 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
 
     public static Model createRDFServiceModel(final RDFServiceGraph g) {
-        Model m = VitroModelFactory.createModelForGraph(g);
-        m.register(new StatementListener() {
-            @Override
-            public void notifyEvent(Model m, Object event) {
-                ChangeSet changeSet = g.getRDFService().manufactureChangeSet();
-                changeSet.addPreChangeEvent(event);
-                try {
-                    g.getRDFService().changeSetUpdate(changeSet);
-                } catch (RDFServiceException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-        });
-        return m;
+        return VitroModelFactory.createModelForGraph(g);
     }
 
 	@Override

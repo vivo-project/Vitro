@@ -134,6 +134,7 @@ public class BasicAuthenticator extends Authenticator {
 		userAccount.setMd5Password("");
 		userAccount.setPasswordChangeRequired(false);
 		userAccount.setPasswordLinkExpires(0L);
+		userAccount.setEmailKey("");
 		getUserAccountsDao().updateUserAccount(userAccount);
 	}
 

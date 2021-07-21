@@ -36,7 +36,13 @@ public class LangSort {
     }
     
     protected int compareLangs(String t1lang, String t2lang) {
-        return languageIndex(t1lang) - languageIndex(t2lang);
+        int index1 = languageIndex(t1lang);
+        int index2 = languageIndex(t2lang);
+        if(index1 == index2) {
+            return t1lang.compareTo(t2lang);
+        } else {
+            return languageIndex(t1lang) - languageIndex(t2lang);
+        }
     }
 
     /**

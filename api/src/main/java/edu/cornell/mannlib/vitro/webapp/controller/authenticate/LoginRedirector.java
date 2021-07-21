@@ -108,7 +108,9 @@ public class LoginRedirector {
 			throws IOException {
 		try {
 			DisplayMessage.setMessage(request, assembleWelcomeMessage());
-			response.sendRedirect(getRedirectionUriForLoggedInUser());
+			String redirectUrl = getRedirectionUriForLoggedInUser();
+			log.debug("Sending redirect to path: " + redirectUrl);
+			response.sendRedirect(redirectUrl);
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
@@ -175,21 +177,13 @@ public class LoginRedirector {
 		}
 	}
 
-	/**
-	 * The application home page can be overridden by an attribute in the
-	 * ServletContext. Further, it can either be an absolute URL, or it can be
-	 * relative to the application. Weird.
-	 */
 	private String getApplicationHomePageUrl() {
-		String contextRedirect = (String) session.getServletContext()
-				.getAttribute("postLoginRequest");
-		if (contextRedirect != null) {
-			if (contextRedirect.indexOf(":") == -1) {
-				return request.getContextPath() + contextRedirect;
-			} else {
-				return contextRedirect;
-			}
+		String contextPath = request.getContextPath();
+		if (contextPath.equals("")) {
+			return "/";
 		}
-		return request.getContextPath();
+		else {
+			return contextPath;
+		}
 	}
 }

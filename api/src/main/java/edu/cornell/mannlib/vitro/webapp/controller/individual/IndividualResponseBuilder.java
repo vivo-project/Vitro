@@ -6,14 +6,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.jena.rdf.model.RDFNode;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 
@@ -36,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ExecuteDataRetrieval;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import edu.ucsf.vitro.opensocial.OpenSocialManager;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
@@ -123,8 +123,10 @@ class IndividualResponseBuilder {
 		 * into the data model: no real data can be modified.
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
-	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
-	    body.put("languageCount", getLanguagesRepresentedCount(itm.getUri(), vreq));
+		LabelAndLanguageCount labelAndLanguageCount = getLabelAndLanguageCount(
+		        itm.getUri(), vreq);
+	    body.put("labelCount", labelAndLanguageCount.getLabelCount());
+	    body.put("languageCount", labelAndLanguageCount.getLanguageCount());
 	    //We also need to know the number of available locales
 	    body.put("localesCount", SelectedLocale.getSelectableLocales(vreq).size());
 	    body.put("profileType", getProfileType(itm.getUri(), vreq));
@@ -282,61 +284,103 @@ class IndividualResponseBuilder {
     	return map;
     }
 
-    private static String LABEL_COUNT_QUERY = ""
-        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
-        + "SELECT ( str(COUNT(?label)) AS ?labelCount ) WHERE { \n"
-        + "    ?subject rdfs:label ?label \n"
-        + "    FILTER isLiteral(?label) \n"
-        + "}" ;
-
-    private static String DISTINCT_LANGUAGE_QUERY = ""
+    private static String LABEL_QUERY = ""
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
-            + "SELECT ( str(COUNT(DISTINCT lang(?label))) AS ?languageCount ) WHERE { \n"
+            + "SELECT ?label WHERE { \n"
             + "    ?subject rdfs:label ?label \n"
             + "    FILTER isLiteral(?label) \n"
             + "}" ;
+    
+//    Queries that were previously used for counts via RDFService that didn't
+//        filter results by language.  With language filtering, aggregate 
+//        functions like COUNT() cannot be used.
+    
+//    private static String LABEL_COUNT_QUERY = ""
+//        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+//        + "SELECT ( str(COUNT(?label)) AS ?labelCount ) WHERE { \n"
+//        + "    ?subject rdfs:label ?label \n"
+//        + "    FILTER isLiteral(?label) \n"
+//        + "}" ;
 
-    private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
-        String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
+//    private static String DISTINCT_LANGUAGE_QUERY = ""
+//            + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+//            + "SELECT ( str(COUNT(DISTINCT lang(?label))) AS ?languageCount ) WHERE { \n"
+//            + "    ?subject rdfs:label ?label \n"
+//            + "    FILTER isLiteral(?label) \n"
+//            + "}" ;
+
+    private static LabelAndLanguageCount getLabelAndLanguageCount(
+            String subjectUri, VitroRequest vreq) {
+        // 1.12.0 Now filtering to only the labels for the current locale so as
+        // to be consistent with other editing forms.  Because the language
+        // filter can only act on a result set containing actual literals,
+        // we can't do the counting with a COUNT() in the query itself.  So
+        // we will now use the LABEL_QUERY instead of LABEL_COUNT_QUERY and 
+        // count the rows and the number of distinct languages represented.
+        Set<String> distinctLanguages = new HashSet<String>();
+        String queryStr = QueryUtils.subUriForQueryVar(LABEL_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
-        int theCount = 0;
-        try {
-            //ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
-            //Get query results across all languages in order for template to show manage labels link correctly
-            ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
-            if (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                RDFNode labelCount = soln.get("labelCount");
-                if (labelCount != null && labelCount.isLiteral()) {
-                    theCount = labelCount.asLiteral().getInt();
+        int labelCount = 0;
+        try {   
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            while(results.hasNext()) {
+                QuerySolution qsoln = results.next();
+                labelCount++;
+                String lang = qsoln.getLiteral("label").getLanguage();
+                if(lang == null) {
+                    lang = "";
                 }
+                distinctLanguages.add(lang);
             }
         } catch (Exception e) {
             log.error(e, e);
         }
-        return theCount;
+        return new LabelAndLanguageCount(labelCount, distinctLanguages.size());
+    }
+    
+    private static class LabelAndLanguageCount {
+        
+        private Integer labelCount;
+        private Integer languageCount;
+        
+        public LabelAndLanguageCount(Integer labelCount, Integer languageCount) {
+            this.labelCount = labelCount;
+            this.languageCount = languageCount;
+        }
+        
+        public Integer getLabelCount() {
+            return this.labelCount;
+        }
+        
+        public Integer getLanguageCount() {
+            return this.languageCount;
+        }
+        
     }
 
     //what is the number of languages represented across the labels
-    private static Integer getLanguagesRepresentedCount(String subjectUri, VitroRequest vreq) {
-    	   String queryStr = QueryUtils.subUriForQueryVar(DISTINCT_LANGUAGE_QUERY, "subject", subjectUri);
-           log.debug("queryStr = " + queryStr);
-           int theCount = 0;
-           try {
-
-               ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
-               if (results.hasNext()) {
-                   QuerySolution soln = results.nextSolution();
-                   RDFNode languageCount = soln.get("languageCount");
-                   if (languageCount != null && languageCount.isLiteral()) {
-                       theCount = languageCount.asLiteral().getInt();
-                   }
-               }
-           } catch (Exception e) {
-               log.error(e, e);
-           }
-           return theCount;
-    }
+    // This version not compatible with language-filtering RDF services
+//    private static Integer getLanguagesRepresentedCount(String subjectUri, VitroRequest vreq) {
+//    	   String queryStr = QueryUtils.subUriForQueryVar(DISTINCT_LANGUAGE_QUERY, "subject", subjectUri);
+//           log.debug("queryStr = " + queryStr);
+//           int theCount = 0;
+//           try {
+//
+//               ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
+//               if (results.hasNext()) {
+//                   QuerySolution soln = results.nextSolution();
+//                   RDFNode languageCount = soln.get("languageCount");
+//                   if (languageCount != null && languageCount.isLiteral()) {
+//                       theCount = languageCount.asLiteral().getInt();
+//                       log.info("Language count is " + theCount);
+//                   }
+//               }
+//           } catch (Exception e) {
+//               log.error(e, e);
+//           }
+//           log.info("Returning language count " + theCount);
+//           return theCount;
+//    }
 
     private static String PROFILE_TYPE_QUERY = ""
         + "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n"

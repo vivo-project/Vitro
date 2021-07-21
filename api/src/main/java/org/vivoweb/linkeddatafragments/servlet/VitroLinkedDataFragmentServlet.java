@@ -1,15 +1,24 @@
 package org.vivoweb.linkeddatafragments.servlet;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.riot.Lang;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jena.riot.Lang;
 import org.linkeddatafragments.config.ConfigReader;
 import org.linkeddatafragments.datasource.DataSourceFactory;
 import org.linkeddatafragments.datasource.DataSourceTypesRegistry;
@@ -22,26 +31,19 @@ import org.linkeddatafragments.fragments.ILinkedDataFragment;
 import org.linkeddatafragments.fragments.ILinkedDataFragmentRequest;
 import org.linkeddatafragments.util.MIMEParse;
 import org.linkeddatafragments.views.ILinkedDataFragmentWriter;
-import org.vivoweb.linkeddatafragments.views.HtmlTriplePatternFragmentWriterImpl;
-import org.vivoweb.linkeddatafragments.views.LinkedDataFragmentWriterFactory;
 import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceBasedRequestProcessorForTPFs;
 import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceDataSourceType;
+import org.vivoweb.linkeddatafragments.views.HtmlTriplePatternFragmentWriterImpl;
+import org.vivoweb.linkeddatafragments.views.LinkedDataFragmentWriterFactory;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /**
  * Servlet that responds with a Linked Data Fragment.
@@ -52,28 +54,12 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
 	private final static long serialVersionUID = 1L;
 	
 	private static final String PROPERTY_TPF_ACTIVE_FLAG = "tpf.activeFlag";
+	private static final Log log = LogFactory.getLog(VitroLinkedDataFragmentServlet.class);
 	
     private ConfigReader config;
     private final HashMap<String, IDataSource> dataSources = new HashMap<>();
-    private final Collection<String> mimeTypes = new ArrayList<>();
     private ConfigurationProperties configProps;
     private String tpfActiveFlag;
-
-    private File getConfigFile(ServletConfig config) throws IOException {
-        String path = config.getServletContext().getRealPath("/");
-        if (path == null) {
-            // this can happen when running standalone
-            path = System.getProperty("user.dir");
-        }
-        File cfg = new File(path, "config-example.json");
-        if (!cfg.exists()) {
-            throw new IOException("Configuration file " + cfg + " not found.");
-        }
-        if (!cfg.isFile()) {
-            throw new IOException("Configuration file " + cfg + " is not a file.");
-        }
-        return cfg;
-    }
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
@@ -82,11 +68,11 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             configProps = ConfigurationProperties.getBean(ctx);
             
             if (!configurationPresent()) {
-            	throw new ServletException("TPF is currently disabled. To enable, add 'tpfActive.flag=true' to the runtime.properties.");
-            } else {
-            	if (!tpfActiveFlag.equalsIgnoreCase("true")) {
-            		throw new ServletException("TPF is currently disabled. To enable, set 'tpfActive.flag=true' in runtime.properties.");
-            	}
+            	throw new ServletException("TPF is currently disabled. To enable, add '" 
+                        + PROPERTY_TPF_ACTIVE_FLAG + " = true' to runtime.properties.");
+            } else if (!tpfActiveFlag.equalsIgnoreCase("true")) {
+        		throw new ServletException("TPF is currently disabled. To enable, set '" 
+        	            + PROPERTY_TPF_ACTIVE_FLAG + " = true' in runtime.properties.");
             }
             
             RDFService rdfService = ModelAccess.on(ctx).getRDFService();
@@ -215,18 +201,18 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
                 writer.writeFragment(response.getOutputStream(), dataSource, fragment, ldfRequest);
 
             } catch (DataSourceNotFoundException ex) {
+                log.error(ex, ex);
                 try {
                     response.setStatus(404);
                     writer.writeNotFound(response.getOutputStream(), request);
                 } catch (Exception ex1) {
+                    log.error(ex1, ex1);
                     throw new ServletException(ex1);
                 }
-            } catch (Exception e) {
-                response.setStatus(500);
-                writer.writeError(response.getOutputStream(), e);
-            }
+            } 
 
         } catch (Exception e) {
+            log.error(e, e);
             throw new ServletException(e);
         }
         finally {
