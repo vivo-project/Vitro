@@ -6,7 +6,7 @@ if  [ -z "$1" ]
     exit 1
 fi
 
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$1
+mvn -T 1C versions:set -DgenerateBackupPoms=false -DnewVersion=$1
 cd installer
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$1
+mvn -T 1C versions:set -DgenerateBackupPoms=false -DnewVersion=$1
 cd ..
