@@ -405,8 +405,22 @@ class PropInfo {
 	}
 
 	function parsePropsInNode(node) {
-		var textString = node.textContent;
+     
+		if (node.nodeType === 1){
+			var childs = node.childNodes;
+			childs.forEach(function(child){
+				if (child.nodeType === 3){
+					parsePropsInTextNode(child);
+				}
+			});
+		}else if(node.nodeType === 2){
+			parsePropsInTextNode(node);	
+		}
+		
+	}
+	function parsePropsInTextNode(node){
 		var i = 0;
+		var textString = node.textContent;
 		while (textString.indexOf(startSep) >= 0) {
 			textString = textString.substring(textString.indexOf(startSep) + startSep.length);
 			var prop = textString.substring(0, textString.indexOf(endSep));
