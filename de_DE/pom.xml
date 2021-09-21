@@ -4,7 +4,7 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-languages-de_DE</artifactId>
-    <version>1.12.0-SNAPSHOT</version>
+    <version>1.12.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Vitro Languages de_DE</name>
@@ -218,6 +218,6 @@
     <parent>
     	<artifactId>vitro-languages</artifactId>
     	<groupId>org.vivoweb</groupId>
-    	<version>1.12.0-SNAPSHOT</version>
+    	<version>1.12.1-SNAPSHOT</version>
     </parent>
 </project>
