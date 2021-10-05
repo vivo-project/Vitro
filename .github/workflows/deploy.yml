@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - rel-1.12.0-RC-workflow
+      - oct-2021-sprint-workflows
   workflow_dispatch:
 
 jobs:
