@@ -21,7 +21,7 @@
     <#if user.loggedIn>
         <#if user.authorizedToRebuildSearchIndex>
             <span class="contentNote">
-                <h4>Expecting content?</h4>
+                <h4>${i18n().expecting_content}</h4>
                 <p><a title="${i18n().try_rebuilding_index}" href="${urls.base}/SearchIndex">${i18n().try_rebuilding_index}</a>.</p>
             </span>
         </#if>
