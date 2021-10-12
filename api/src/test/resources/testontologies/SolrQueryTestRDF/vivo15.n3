@@ -33,7 +33,7 @@
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>.
 
 <http://vivo.cornell.edu/individual/individualIssueVivo15> vivo:overview "There is a form feed in the following text. Hex 0c, that sometimes displays as ^L. Star Award for excellence in scientic publication and for productive collaborations with other Center scientists, U.S. Department of the Interior, 2009. Publications Award for scientist at Florida Integrated Science Center with highest annual scien-tic productivity as measured by number, quality, and impact of publications., U.S. Department of the Interior, 2009.";
-	vivo:webpage <https://jira.duraspace.org/browse/VIVO-15>;
+	vivo:webpage <https://jira.lyrasis.org/browse/VIVO-15>;
 	a mann:CornellNonAcademicStaff,
 		local:InternalThing,
 		vivoc:CornellAffiliatedPerson,
