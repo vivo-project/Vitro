@@ -24,3 +24,6 @@ utilities/sdb_to_tdb/.work
 **/.classpath
 **/.project
 **/bin/
+
+.fake
+.ionide

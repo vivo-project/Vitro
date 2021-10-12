@@ -9,7 +9,7 @@ import java.util.Map;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
-
+import org.junit.Before;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
@@ -19,6 +19,8 @@ import org.apache.jena.vocabulary.XSD;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
+import stubs.javax.servlet.ServletContextStub;
 
 
 public class PropertyInstanceDaoJenaTest extends AbstractTestClass {
@@ -37,7 +39,16 @@ public class PropertyInstanceDaoJenaTest extends AbstractTestClass {
         "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"+
         "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n";
 
+    private WebappDaoFactoryJena wadf;
 
+  	@Before
+  	public void setUpWebappDaoFactoryJena() {
+  		super.setUp();
+  		wadf = new WebappDaoFactoryJena(new SimpleOntModelSelector());
+  		ServletContextStub ctx = new ServletContextStub();
+  		new ModelAccessFactoryStub().get(ctx).setWebappDaoFactory(wadf);
+  	}
+  	
     void printModels(Model expected, Model result){
     	System.out.println("Expected:");
     	expected.write(System.out);

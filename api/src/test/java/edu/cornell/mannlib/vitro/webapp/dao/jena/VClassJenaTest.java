@@ -7,8 +7,8 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.jena.ontology.AllValuesFromRestriction;
@@ -38,11 +38,15 @@ import org.apache.jena.shared.Lock;
 import org.apache.jena.util.iterator.ClosableIterator;
 import org.apache.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
+import stubs.javax.servlet.ServletContextStub;
 
 /**
  *
@@ -51,7 +55,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  */
 
 public class VClassJenaTest extends AbstractTestClass {
-
+	
+	@Before
+	public void setup() {
+		WebappDaoFactoryStub wdf = new WebappDaoFactoryStub();
+		ServletContextStub ctx = new ServletContextStub();
+		new ModelAccessFactoryStub().get(ctx).setWebappDaoFactory(wdf);
+	}
+	
 	@Test
 	// NIHVIVO-1157 introduced VClassJena.java, a lazy-loading version of VClass.java.
 	// Per instructions from Brian L., this test tests that for one randomly selected Class,
