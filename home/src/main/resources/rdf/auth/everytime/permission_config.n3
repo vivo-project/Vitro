@@ -15,6 +15,8 @@ auth:ADMIN
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
    	auth:hasPermission simplePermission:EnableDeveloperPanel ;
     auth:hasPermission simplePermission:LoginDuringMaintenance ;
+    auth:hasPermission simplePermission:ManageDataDistributors ;
+    auth:hasPermission simplePermission:ManageReports ;
     auth:hasPermission simplePermission:ManageMenus ;
     auth:hasPermission simplePermission:ManageProxies ;
     auth:hasPermission simplePermission:ManageSearchIndex ;
@@ -41,6 +43,7 @@ auth:ADMIN
 
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:DoBackEndEditing ;
+    auth:hasPermission simplePermission:ExecuteReports ;
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
@@ -78,6 +81,7 @@ auth:CURATOR
     auth:hasPermission simplePermission:PageViewableCurator ;
 
     # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:ExecuteReports ;
     auth:hasPermission simplePermission:DoBackEndEditing ;
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
@@ -109,6 +113,7 @@ auth:EDITOR
     rdfs:label "Editor" ;
 
     # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:ExecuteReports ;
     auth:hasPermission simplePermission:DoBackEndEditing ;
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;

@@ -136,4 +136,7 @@ public interface WebappDaoFactory {
 
     public I18nBundle getI18nBundle();
 
+    public DataDistributorDao getDataDistributorDao();
+
+    public ReportingDao getReportingDao();
 }
