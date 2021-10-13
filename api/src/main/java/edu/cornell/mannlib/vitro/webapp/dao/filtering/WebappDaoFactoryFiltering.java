@@ -5,24 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 import java.util.List;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
-import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.*;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
@@ -272,6 +255,12 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     public DisplayModelDao getDisplayModelDao(){
         return innerWebappDaoFactory.getDisplayModelDao();
     }
+
+    @Override
+    public DataDistributorDao getDataDistributorDao() { return innerWebappDaoFactory.getDataDistributorDao(); }
+
+    @Override
+    public ReportingDao getReportingDao() { return innerWebappDaoFactory.getReportingDao(); }
 
     @Override
     public void close() {
