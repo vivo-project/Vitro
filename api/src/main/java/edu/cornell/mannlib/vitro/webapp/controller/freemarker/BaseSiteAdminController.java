@@ -72,6 +72,8 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         registerSiteConfigData("userAccounts", "/accountsAdmin", null, SimplePermission.MANAGE_USER_ACCOUNTS.ACTION);
         registerSiteConfigData("manageProxies", "/manageProxies", null, SimplePermission.MANAGE_PROXIES.ACTION);
+        registerSiteConfigData("manageDataDistributors", "/admin/datadistributor", null, SimplePermission.MANAGE_DATA_DISTRIBUTORS.ACTION);
+        registerSiteConfigData("manageReports", "/admin/reporting", null, SimplePermission.MANAGE_REPORTS.ACTION);
 
         registerSiteConfigData("siteInfo", "/editForm", new ParamMap(new String[] {"controller", "ApplicationBean"}), SimplePermission.EDIT_SITE_INFORMATION.ACTION);
 

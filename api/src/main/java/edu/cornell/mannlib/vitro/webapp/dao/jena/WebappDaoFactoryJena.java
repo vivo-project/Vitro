@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.dao.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.iri.IRI;
@@ -30,26 +31,6 @@ import org.apache.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
-import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
-import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -441,6 +422,12 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     public DisplayModelDao getDisplayModelDao(){
         return new DisplayModelDaoJena( this );
     }
+
+    @Override
+    public DataDistributorDao getDataDistributorDao() { return new DataDistributorDaoJena(this); }
+
+    @Override
+    public ReportingDao getReportingDao() { return new ReportingDaoJena(this); }
 
     @Override
     public void close() {

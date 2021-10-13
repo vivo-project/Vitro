@@ -36,6 +36,8 @@ public class WrappedInstance<T> {
 		this.validationMethods = validationMethods;
 	}
 
+	public Map<String, PropertyMethod> getPropertyMethods() { return propertyMethods; }
+
 	/**
 	 * The loader calls this as soon as the instance is created.
 	 *
@@ -164,7 +166,7 @@ public class WrappedInstance<T> {
 		return instance;
 	}
 
-	public static class ResourceUnavailableException extends Exception {
+    public static class ResourceUnavailableException extends Exception {
 		public ResourceUnavailableException(String message) {
 			super(message);
 		}
