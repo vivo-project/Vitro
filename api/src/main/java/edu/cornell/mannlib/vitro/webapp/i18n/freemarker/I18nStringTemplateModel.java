@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.i18n.freemarker;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -92,15 +91,26 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	 * @param arguments that should be listed before message and substituted in the message itself 
 	 * @return
 	 */
-	private String getOnlineTranslationsFormattedMessage(String preProcessed, Object[] unwrappedArgs) {
+	private String getOnlineTranslationsFormattedMessage(String preProcessed, Object[] args) {
 		String[] parts = preProcessed.split(I18nBundle.intSep);
 		final int messageIndex = parts.length -1;
-		String message = MessageFormat.format(parts[messageIndex], unwrappedArgs);
-		String[] arguments = Arrays.copyOf(unwrappedArgs, unwrappedArgs.length, String[].class);
+		String message = MessageFormat.format(parts[messageIndex], args);
+		String[] arguments = convertToArrayOfStrings(args);
 		parts[messageIndex] = "";
 		String result = String.join(I18nBundle.intSep, parts) + 
 				            String.join(I18nBundle.intSep, arguments) + 
 				            I18nBundle.intSep + message ;
+		return result;
+	}
+
+	private String[] convertToArrayOfStrings(Object[] args) {
+		String[] result = new String[args.length];
+		for (int i = 0; i < result.length; i++)
+			if (args[i] != null) {
+				result[i] = args[i].toString();	
+			} else {
+				result[i] = "";
+			}
 		return result;
 	}
 
