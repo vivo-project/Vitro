@@ -116,18 +116,23 @@ class PropInfo {
 				var lines = this.result.split(/\r\n|\n\r|\n|\r/);
 				var followLine = false;
 				var lineKey = null;
+				var lineValue = null;
 				for (var i = 0; i < lines.length; i++) {
 					if (!isCommentLine(lines[i])) {
 						if (followLine) {
 							followLine = isNextLineFollow(lines[i]);
-							var lineValue = lines[i].replace(/\\$/, "");
-							overridenTranslations.set(lineKey, overridenTranslations.get(lineKey) + unescapeHTML(lineValue));
+							lineValue = lines[i].replace(/\\$/, "");
+							lineValue = unescapeHTML(lineValue);
+							lineValue = charCodesToString(lineValue);
+							overridenTranslations.set(lineKey, overridenTranslations.get(lineKey) + lineValue);
 						} else {
 							followLine = isNextLineFollow(lines[i]);
 							lineKey = getLineKey(lines[i]);
 							if (lineKey.trim() != "") {
-								let lineValue = getLineValue(lines[i]);
-								overridenTranslations.set(lineKey, unescapeHTML(lineValue));
+								lineValue = getLineValue(lines[i]);
+								lineValue = unescapeHTML(lineValue);
+								lineValue = charCodesToString(lineValue);
+								overridenTranslations.set(lineKey, lineValue);
 							}
 						}
 					}
@@ -169,6 +174,8 @@ class PropInfo {
 							lineKey = getLineKey(lines[i]);
 							if (overridenTranslations.has(lineKey)) {
 								var value = overridenTranslations.get(lineKey);
+								value = toCharCodes(value);
+								value = escapeHTML(value);
 								lines[i] = lineKey + " = " + value;
 								keyLineHasChanged = true;
 							}
@@ -185,8 +192,11 @@ class PropInfo {
 		var date = new Date;
 		var fileName = "export_" + date.toLocaleString() + "_all.properties";
 		var lines = [];
+		var storeValue = null;
 		for (let [key, value] of overridenTranslations) {
-			lines.push(key + " = " + escapeHTML(value));
+			storeValue = toCharCodes(value);
+			storeValue = escapeHTML(storeValue);
+			lines.push(key + " = " + storeValue);
 		}
 		saveFile(fileName, lines);
 	}
@@ -452,6 +462,17 @@ class PropInfo {
 			pageTranslations.set(key, propInfo);
 		}
 	}
+	function toCharCodes(input) {
+		return input
+			.replace(/^\ /, "\\u0020")
+			.replace(/\ $/, "\\u0020");
+	}
+	function charCodesToString(input) {
+		return input.replace(/\\u[\dA-F]{4}/gi,
+			function(match) {
+				return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
+			});
+	}
 	function escapeHTML(input) {
 		return input
 		.replace(/&/g, "&amp;")
@@ -472,6 +493,7 @@ class PropInfo {
 		.replace(/&lsquo;/g, "‘")
 		.replace(/&rsquo;/g, "’");
 	}
+	
 
 window.addEventListener('load', function() {
 	setTimeout(function() {
