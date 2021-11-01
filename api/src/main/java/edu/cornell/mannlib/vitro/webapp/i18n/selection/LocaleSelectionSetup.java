@@ -10,12 +10,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.utils.LocaleUtility;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Check the ConfigurationProperties for a forced locale, or for a
@@ -24,6 +28,10 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * Create the appropriate Locale objects and store them in the ServletContext.
  */
 public class LocaleSelectionSetup implements ServletContextListener {
+
+	private static final Log log = LogFactory
+			.getLog(LocaleSelectionSetup.class);
+
 	/**
 	 * If this is set, the locale is forced. No selection will be offered to the
 	 * user, and browser locales will be ignored.
@@ -143,12 +151,13 @@ public class LocaleSelectionSetup implements ServletContextListener {
 			throw new IllegalArgumentException("Invalid locale format");
 		}
 
-		Locale locale = LocaleUtils.toLocale(localeString);
+		Locale locale = LocaleUtility.languageStringToLocale(localeString);
 
 		if (!"es_GO".equals(localeString) && // No complaint about bogus locale
 				!LocaleUtils.isAvailableLocale(locale)) {
 			ssWarning("'" + locale + "' is not a recognized locale.");
 		}
+
 		return locale;
 	}
 
