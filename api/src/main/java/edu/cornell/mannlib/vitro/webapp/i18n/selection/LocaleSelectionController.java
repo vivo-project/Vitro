@@ -74,7 +74,7 @@ public class LocaleSelectionController extends HttpServlet {
 		Locale locale = null;
 
 		try {
-			locale = LocaleUtils.toLocale(selectedLocale.trim());
+			locale = LocaleSelectionSetup.languageStringToLocale(selectedLocale.trim());
 			log.debug("Locale selection is " + locale);
 		} catch (IllegalArgumentException e) {
 			log.error("Failed to convert the selection to a Locale", e);
