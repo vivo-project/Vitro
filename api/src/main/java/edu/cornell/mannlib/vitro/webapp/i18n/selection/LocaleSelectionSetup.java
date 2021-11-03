@@ -10,6 +10,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.utils.LocaleUtility;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Check the ConfigurationProperties for a forced locale, or for a
@@ -144,33 +146,22 @@ public class LocaleSelectionSetup implements ServletContextListener {
 	private Locale buildLocale(String localeString)
 			throws IllegalArgumentException {
 
-		log.debug(localeString);
 		// Replicate exception from lang2 with empty strings
 		if ("".equals(localeString)) {
 			throw new IllegalArgumentException("Invalid locale format");
 		}
 
-		Locale locale = languageStringToLocale(localeString);
+		//Locale locale = LocaleUtils.toLocale(localeString);
+		Locale locale = LocaleUtility.languageStringToLocale(localeString);
 
 		if (!"es_GO".equals(localeString) && // No complaint about bogus locale
 				!LocaleUtils.isAvailableLocale(locale)) {
 			ssWarning("'" + locale + "' is not a recognized locale.");
 		}
 
-		log.debug("Disp. name " + locale.getDisplayName(locale));
-		log.debug("Locale.toString() " + locale.toString());
-		log.debug("Locale.toLanguageType() " + locale.toLanguageTag().replace('-','_'));
 		return locale;
 	}
 
-	public static Locale languageStringToLocale(String localeString){
-		String[] parsedLoc = localeString.split("_", -1);
-		//regex pattern for locale tag with script specified
-		Locale locale = localeString.matches("^[a-z]{1,3}_[A-Z][a-z]{3}_[A-Z]{2}") ?
-			new Locale.Builder().setLanguage(parsedLoc[0]).setRegion(parsedLoc[2]).setScript(parsedLoc[1]).build() :
-			LocaleUtils.toLocale(localeString);
-		return locale;
-	}
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// Nothing to do at shutdown.

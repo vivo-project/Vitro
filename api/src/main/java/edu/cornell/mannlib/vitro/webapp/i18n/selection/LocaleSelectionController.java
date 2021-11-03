@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.LocaleUtility;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -74,7 +75,7 @@ public class LocaleSelectionController extends HttpServlet {
 		Locale locale = null;
 
 		try {
-			locale = LocaleSelectionSetup.languageStringToLocale(selectedLocale.trim());
+			locale = LocaleUtility.languageStringToLocale(selectedLocale);
 			log.debug("Locale selection is " + locale);
 		} catch (IllegalArgumentException e) {
 			log.error("Failed to convert the selection to a Locale", e);
