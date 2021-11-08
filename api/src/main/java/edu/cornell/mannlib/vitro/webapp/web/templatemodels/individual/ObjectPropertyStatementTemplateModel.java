@@ -113,8 +113,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         if (VitroVocabulary.IND_MAIN_IMAGE.equals(property.getURI())) {
             return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
         }
-        if (property.getRangeVClassURI() != null &&
-        		property.getRangeVClassURI().equals(VitroVocabulary.FS_FILE_CLASS)) {
+        if (ObjectPropertyTemplateModel.isFileStoreProperty(property)) {
           //Disable file editing
         	return "";
         }
