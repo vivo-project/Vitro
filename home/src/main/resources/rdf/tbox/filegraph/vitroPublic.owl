@@ -43,6 +43,11 @@
 	<rdfs:range rdf:resource="&xsd;string"/>
 </owl:DatatypeProperty>
 
+<owl:DatatypeProperty rdf:about="#publicFilename">
+    <rdfs:domain><owl:Class rdf:about="#File"/></rdfs:domain>
+    <rdfs:range rdf:resource="&xsd;string"/>
+</owl:DatatypeProperty>
+
 <owl:DatatypeProperty rdf:about="#attribution">
 	<rdfs:domain><owl:Class rdf:about="#File"/></rdfs:domain>
 	<rdfs:range rdf:resource="&xsd;string"/>
@@ -65,6 +70,10 @@
 
 <owl:ObjectProperty rdf:about="#mainImage">
 	<rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#storedFile">
+    <rdfs:range><owl:Class rdf:about="#File"/></rdfs:range>
 </owl:ObjectProperty>
 
 <owl:ObjectProperty rdf:about="#image">

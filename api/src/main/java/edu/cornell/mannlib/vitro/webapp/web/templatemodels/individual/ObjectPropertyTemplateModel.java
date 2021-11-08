@@ -39,6 +39,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private static final String TYPE = "object";
     private static final String EDIT_PATH = "editRequestDispatch";
     private static final String IMAGE_UPLOAD_PATH = "/uploadImages";
+    private static final String FILE_UPLOAD_PATH = "/uploadFile";
 
     private static final String END_DATE_TIME_VARIABLE = "dateTimeEnd";
     private static final Pattern ORDER_BY_END_DATE_TIME_PATTERN =
@@ -131,6 +132,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
         if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
             addUrl = getImageUploadUrl(subjectUri, "add");
+        } else if (isFileStoreProperty(property)) {
+          addUrl = getFileUploadUrl(subjectUri,property.getURI());
         } else {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
@@ -149,7 +152,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
 
-    /**
+		/**
      * Pull this into a protected method so we can stub it out in the unit tests.
      * Other options:
      * 1) receive a TemplateLoader into the constructor of ObjectPropertyTemplateModel,
@@ -377,5 +380,21 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
 
     public abstract boolean isCollatedBySubclass();
+
+
+		protected static boolean isFileStoreProperty(Property property) {
+			return property.getRangeVClassURI() != null && property.getRangeVClassURI().equals(VitroVocabulary.FS_FILE_CLASS);
+		}
+
+		public static String getDeleteFileUrl(String subjectUri, String predicateUri, String objectUri) {
+			ParamMap params = new ParamMap("subjectUri", subjectUri, "predicateUri", predicateUri, "fileUri", objectUri,
+					"action", "delete");
+			return UrlBuilder.getUrl(FILE_UPLOAD_PATH, params);
+		}
+
+		private static String getFileUploadUrl(String subjectUri, String predicateUri) {
+			ParamMap params = new ParamMap("subjectUri", subjectUri, "predicateUri", predicateUri, "action", "upload");
+			return UrlBuilder.getUrl(FILE_UPLOAD_PATH, params);
+		}
 
 }
