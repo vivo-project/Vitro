@@ -4,15 +4,14 @@ package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.startup.StartupManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -24,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
  * Load one or more Configuration beans from a specified model.
  */
 public class ConfigurationBeanLoader {
+	private static final Log log = LogFactory.getLog(ConfigurationBeanLoader.class);
 
 	private static final String JAVA_URI_PREFIX = "java:";
 
@@ -45,8 +45,11 @@ public class ConfigurationBeanLoader {
 
 	public static Set<String> toPossibleJavaUris(Class<?> clazz) {
 		Set<String> set = new TreeSet<>();
+		log.debug("clazz: "+clazz.getName());
+		log.debug("toPossibleJavaUris: "+ Arrays.toString(toJavaUri(clazz).split("\\.")));
 		String[] uriPieces = toJavaUri(clazz).split("\\.");
 		for (int hashIndex = 0; hashIndex < uriPieces.length; hashIndex++) {
+			log.debug("for hashIndex "+hashIndex+": "+joinWithPeriodsAndAHash(uriPieces, hashIndex));
 			set.add(joinWithPeriodsAndAHash(uriPieces, hashIndex));
 		}
 		return set;
@@ -166,6 +169,7 @@ public class ConfigurationBeanLoader {
 				List<Resource> resources = m.listResourcesWithProperty(RDF.type,
 						createResource(typeUri)).toList();
 				for (Resource r : resources) {
+					log.debug("resource: "+r.getURI());
 					if (r.isURIResource()) {
 						uris.add(r.getURI());
 					}

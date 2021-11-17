@@ -16,6 +16,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Selector;
@@ -33,6 +35,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
  * ConfigurationRdf object.
  */
 public class ConfigurationRdfParser {
+	private static final Log log = LogFactory.getLog(ConfigurationRdfParser.class);
+
+
 	public static <T> ConfigurationRdf<T> parse(LockableModel locking,
 			String uri, Class<T> resultClass)
 			throws InvalidConfigurationRdfException {
@@ -49,6 +54,7 @@ public class ConfigurationRdfParser {
 		Class<? extends T> concreteClass = determineConcreteClass(locking, uri,
 				resultClass);
 
+		log.debug("concrete class: " + concreteClass.getName());
 		return new ConfigurationRdf<T>(concreteClass, properties);
 	}
 
@@ -106,6 +112,13 @@ public class ConfigurationRdfParser {
 								e);
 					}
 				}
+			}
+
+			//TODO FOR DEBUGGING
+			for (PropertyStatement ps : set){
+				log.debug(ps.getType());
+				log.debug(ps.getPredicateUri());
+				log.debug(ps.getValue());
 			}
 			return set;
 		}

@@ -64,6 +64,7 @@ public class RequestModelsPrep implements Filter {
 		}
 	}
 
+	//TODO Does this method do anything?
 	private void setCollator(VitroRequest vreq) {
 		@SuppressWarnings("unchecked")
 		Enumeration<Locale> locales = vreq.getLocales();

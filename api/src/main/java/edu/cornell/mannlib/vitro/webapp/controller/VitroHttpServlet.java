@@ -58,16 +58,22 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	@Override
 	public final void service(ServletRequest req, ServletResponse resp)
 			throws ServletException, IOException {
+		log.debug("service");
 		if ((req instanceof HttpServletRequest)
 				&& (resp instanceof HttpServletResponse)) {
 			HttpServletRequest hreq = (HttpServletRequest) req;
 
 			hreq = MultipartRequestWrapper.parse(hreq, this);
 
+			StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+			for(StackTraceElement ste: Arrays.copyOfRange(stackTraceElements, 2, stackTraceElements.length)){
+				log.debug("STACK:" + ste.getClassName() + " " + ste.getMethodName());
+			}
+			/*
 			if (log.isTraceEnabled()) {
 				dumpRequestHeaders(hreq);
 			}
-
+			*/
 			super.service(hreq, resp);
 		} else {
 			super.service(req, resp);
@@ -99,6 +105,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		log.debug("doGET");
 		// nothing to do
 	}
 
@@ -108,6 +115,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		log.debug("doPost");
 		doGet(request, response);
 	}
 

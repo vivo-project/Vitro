@@ -30,6 +30,7 @@ public class HomePageController extends FreemarkerHttpServlet {
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 
+        log.debug("processRequest" + vreq.getRequestURI());
         Map<String, Object> body = new HashMap<String, Object>();
 
         List<DataGetter> dgList = DataGetterUtils.getDataGettersForPage(vreq, vreq.getDisplayModel(), DisplayVocabulary.HOME_PAGE_URI);

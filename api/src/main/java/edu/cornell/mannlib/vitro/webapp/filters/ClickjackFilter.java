@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  * decide to implement) not to display this content in a frame.
  *
  * For details, refer to
+ * TODO the first link is broken, should be removed
  * http://blogs.msdn.com/sdl/archive/2009/02/05/clickjacking-defense-in-ie8.aspx,
  * https://www.owasp.org/index.php/ClickjackFilter_for_Java_EE
  */

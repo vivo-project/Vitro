@@ -95,7 +95,8 @@ public class PageRoutingFilter implements Filter{
                 }
 
                 rd.forward(req, response);
-            }else if( "/".equals( path ) || path.isEmpty() ){
+            }
+            else if( "/".equals( path ) || path.isEmpty() ){
                 log.debug("url '" +path + "' is being forward to home controller" );
                 RequestDispatcher rd = ctx.getNamedDispatcher( HOME_CONTROLLER_NAME );
                 rd.forward(req, response);
