@@ -72,8 +72,11 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 				String rpfLocation = findMultipleRuntimePropertiesFiles(
 						vitroHomeDir, vitroHomeDirConfig);
 
+				log.debug(rpfLocation);
+
 				File runtimePropertiesFile = locateRuntimePropertiesFile(
 					vitroHomeDir, vitroHomeDirConfig, ss);
+
 				stream = new FileInputStream(runtimePropertiesFile);
 
 				Map<String, String> preempts = createPreemptiveProperties(

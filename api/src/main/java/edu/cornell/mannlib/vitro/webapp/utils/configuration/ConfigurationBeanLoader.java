@@ -151,6 +151,7 @@ public class ConfigurationBeanLoader {
 			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
 			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
 			wrapper.validate();
+			log.debug("wrapper vraca instancu " + wrapper.getInstance().toString());
 			return wrapper.getInstance();
 		} catch (Exception e) {
 			throw new ConfigurationBeanLoaderException(

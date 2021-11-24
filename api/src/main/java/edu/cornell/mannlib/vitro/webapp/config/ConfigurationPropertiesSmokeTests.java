@@ -130,6 +130,7 @@ public class ConfigurationPropertiesSmokeTests implements
 				"false");
 		boolean languageFilter = Boolean.valueOf(filterString);
 		String i18nDirPath = ctx.getRealPath("/i18n");
+		log.debug("i18nDirPath: " + i18nDirPath);
 
 		if (i18nDirPath == null) {
 			throw new IllegalStateException(
