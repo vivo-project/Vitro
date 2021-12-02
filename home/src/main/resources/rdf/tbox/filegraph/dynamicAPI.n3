@@ -1,0 +1,24 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix dynapiimpl: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+
+
+dynapiimpl:Action 
+    a owl:Class ;
+    rdfs:comment "Processing flow logic" .
+
+dynapi:Action rdfs:subClassOf dynapiimpl:Action .
+
+dynapiimpl:ExecutionStep
+    a owl:Class ;
+    rdfs:comment "Processing flow execution unit" .
+
+dynapi:executionStep rdfs:subClassOf dynapiimpl:ExecutionStep .
+
+dynapiimpl:Conditional
+    a owl:Class ;
+    rdfs:comment "Processing flow conditional" .
+
+dynapi:Conditional rdfs:subClassOf dynapiimpl:Conditional .
