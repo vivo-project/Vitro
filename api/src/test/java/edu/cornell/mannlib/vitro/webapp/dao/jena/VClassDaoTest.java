@@ -19,11 +19,16 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
+import stubs.javax.servlet.ServletContextStub;
+
 
 /**
  *
@@ -31,7 +36,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  */
 
 public class VClassDaoTest extends AbstractTestClass {
-
+	
+	@Before
+	public void setup() {
+		WebappDaoFactoryStub wdf = new WebappDaoFactoryStub();
+		ServletContextStub ctx = new ServletContextStub();
+		new ModelAccessFactoryStub().get(ctx).setWebappDaoFactory(wdf);
+	}
+	
 	@Test
 	// Test that the VClassDaoJena::updateVClass method will only update the jena model for
 	// those properties in VClass that have a different value from what is already in the
@@ -45,7 +57,9 @@ public class VClassDaoTest extends AbstractTestClass {
 	// it will migrate to the super-model) because of the way jena handles additions and
 	// deletions with respect to super and sub models. This migration of statements may cause
 	// undesirable behavior in the vivo/vitro application.
+	
 
+	
 	public void modelIsolation(){
 
 		// 1. create two models and attach one as a sub-model of the other
