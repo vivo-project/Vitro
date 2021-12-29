@@ -124,7 +124,7 @@ public class FreemarkerEmailFactory {
 		return replyToAddress;
 	}
 
-	Session getEmailSession() {
+	private Session getEmailSession() {
 		return emailSession;
 	}
 	
