@@ -44,15 +44,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 
 @WebServlet(name = "FileUploadController", urlPatterns = { "/uploadFile" })
 public class FileUploadController extends FreemarkerHttpServlet {
+	private static final String REFERER_HEADER = "Referer";
 	private static final String TEMPLATE_VAR_FORM_ACTION = "formAction";
 	private static final String TEMPLATE_VAR_MAX_FILE_SIZE = "maxFileSize";
 	private static final String PARAM_REFERRER = "referrer";
-	private static final String TEMPLATE_VAR_SUPPORTED_TYPES = "supportedTypes";
-	private static final String TEMPLATE_VAR_SUPPORTED_MIME_TYPES = "supportedMIMETypes";
+	private static final String TEMPLATE_VAR_SUPPORTED_MEDIA_TYPES = "supportedMediaTypes";
 
 	private static final String TEMPLATE_VAR_ERROR_MESSAGE = "errorMessage";
 	private static final String DEFAULT_FILE_NAME = "fileName";
@@ -67,20 +68,20 @@ public class FileUploadController extends FreemarkerHttpServlet {
 	private static final String PARAMETER_FILE_URI = "fileUri";
 	private static final String PARAMETER_SUBJECT_URI = "subjectUri";
 	private static final String CONFIG_MAX_FILE_SIZE = "fileUpload.maxFileSize";
-	private static final String ALLOWED_MIME_TYPES = "fileUpload.allowedMIMETypes";
+	private static final String ALLOWED_MEDIA_TYPES = "fileUpload.allowedMIMETypes";
 	private static final Long DEFAULT_FILE_SIZE = (long) (10 * 1024 * 1024);
 	private static final String PARAMETER_PREDICATE_URI = "predicateUri";
 	private static final String DEFAULT_TEMPLATE = "fileUpload-default.ftl";
 	private static Long maxFileSize = DEFAULT_FILE_SIZE;
 	private FileStorage fileStorage;
-	private Set<String> allowedMimeTypes;
+	private Set<String> allowedMediaTypes;
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
 		fileStorage = ApplicationUtils.instance().getFileStorage();
 		setMaxFileSize();
-		setAllowedMimeTypes();
+		setAllowedMediaTypes();
 	}
 
 	@Override
@@ -107,6 +108,7 @@ public class FileUploadController extends FreemarkerHttpServlet {
 
 	@Override
 	protected ResponseValues processRequest(VitroRequest vreq) {
+		
 		try {
 			getReferrer(vreq);
 			validateRequest(vreq);
@@ -132,8 +134,7 @@ public class FileUploadController extends FreemarkerHttpServlet {
 			rv.put(TEMPLATE_VAR_ERROR_MESSAGE, error);
 		}
 		rv.put(PARAM_REFERRER,getReferrer(vreq));
-		rv.put(TEMPLATE_VAR_SUPPORTED_TYPES, printAllowedFileExtensions());
-		rv.put(TEMPLATE_VAR_SUPPORTED_MIME_TYPES, printAllowedMimeTypes());
+		rv.put(TEMPLATE_VAR_SUPPORTED_MEDIA_TYPES, printAllowedMediaTypes());
 		rv.put(TEMPLATE_VAR_MAX_FILE_SIZE, maxFileSizeInMegabytes());
 		return rv;
 	}
@@ -160,93 +161,67 @@ public class FileUploadController extends FreemarkerHttpServlet {
 	}
 
 	private void validateRequest(VitroRequest vreq) throws FileUploadException {
+		I18nBundle i18nBundle = I18n.bundle(vreq);
 		if (isUpload(vreq)) {
-			validateUploadRequest(vreq);
+			validateUploadRequest(vreq,i18nBundle);
 		} else if (isDelete(vreq)) {
-			validateDeleteRequest(vreq);
+			validateDeleteRequest(vreq,i18nBundle);
 		} else if (hasAction(vreq)) {
-			throw new FileUploadException("Only delete and upload actions supported");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_supported_actions"));
 		} else {
-			throw new FileUploadException("No action specified");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_no_action"));
 		}
 	}
 
-	private void validateDeleteRequest(VitroRequest vreq) throws FileUploadException {
-		validateSubjectUri(vreq);
-		validatePredicateUri(vreq);
-		validateFileUri(vreq);
+	private void validateDeleteRequest(VitroRequest vreq, I18nBundle i18nBundle) throws FileUploadException {
+		validateSubjectUri(vreq, i18nBundle);
+		validatePredicateUri(vreq, i18nBundle);
+		validateFileUri(vreq,i18nBundle);
 	}
 
-	private void validateUploadRequest(VitroRequest vreq) throws FileUploadException {
-		validateSubjectUri(vreq);
-		validatePredicateUri(vreq);
-		validateFile(vreq);
+	private void validateUploadRequest(VitroRequest vreq, I18nBundle i18nBundle) throws FileUploadException {
+		validateSubjectUri(vreq ,i18nBundle);
+		validatePredicateUri(vreq , i18nBundle);
+		validateFile(vreq, i18nBundle);
 	}
 
-	private void validateFile(VitroRequest vreq) throws FileUploadException {
+	private void validateFile(VitroRequest vreq, I18nBundle i18nBundle) throws FileUploadException {
 		Map<String, List<FileItem>> map = vreq.getFiles();
 		if (map == null) {
-			throw new FileUploadException("File to upload not found");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_file_not_found"));
 		}
 		List<FileItem> list = map.get(PARAMETER_UPLOADED_FILE);
 		if ((list == null) || list.isEmpty()) {
-			throw new FileUploadException("No file uploaded");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_file_not_found"));
 		}
 		FileItem file = list.get(0);
 		if (file.getSize() == 0) {
-			throw new FileUploadException("Uploaded file size is 0");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_file_size_is_zero"));
 		}
 		if (file.getSize() > maxFileSize) {
-			throw new FileUploadException("Uploaded file is too big. Maximum file size is " + maxFileSize
-					+ " bytes. Uploaded file is " + file.getSize() + " bytes.");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_file_is_too_big", maxFileSize, file.getSize()));
 		}
-		validateMimeType(file);
+		validateMediaType(file, i18nBundle);
 	}
 
-	private void validateMimeType(FileItem file) throws FileUploadException {
-		String mime = getMimeType(file);
-		if (mime.isEmpty()) {
-			throw new FileUploadException("File type is unrecognized");
+	private void validateMediaType(FileItem file, I18nBundle i18nBundle) throws FileUploadException {
+		String mediaType = getMediaType(file);
+		if (mediaType.isEmpty()) {
+			throw new FileUploadException(i18nBundle.text("file_upload_error_file_type_not_recognized"));
 		}
-		String extension = null;
-		MimeTypes types = MimeTypes.getDefaultMimeTypes();
-		try {
-			MimeType mimeType = types.forName(mime);
-			extension = mimeType.getExtension();
-		} catch (MimeTypeException e) {
-			log.error(e.getLocalizedMessage());
-		}
-		if (extension == null || extension.isEmpty()) {
-			throw new FileUploadException("Extension for mime type " + mime + " not found");
-		}
-		if (!allowedMimeTypes.contains(mime.toLowerCase())) {
-			log.error("File mime type is not allowed. " + printAllowedMimeTypes() + " Current mime type is " + mime);
-			throw new FileUploadException(
-					"File type is not allowed. Allowed file types: " + printAllowedFileExtensions() + 
-					" Current file type is " + getExtension(mime).replaceAll("\\.", ""));
+		
+		if (!allowedMediaTypes.contains(mediaType.toLowerCase())) {
+			String errorMessage = i18nBundle.text("file_upload_error_media_type_not_allowed", mediaType);
+			log.error(errorMessage);
+			throw new FileUploadException(errorMessage);
 		}
 	}
 
-	private String printAllowedFileExtensions() {
+	private String printAllowedMediaTypes() {
 		StringBuilder sb = new StringBuilder();
-		for (Iterator<String> it = allowedMimeTypes.iterator(); it.hasNext();) {
-			String mimeType = (String) it.next();
-			String extension = getExtension(mimeType);
-			sb.append(extension.replaceAll("\\.", ""));
-			if (it.hasNext()) {
-				sb.append(", ");
-			} else {
-				sb.append(".");
-			}
-		}
-		return sb.toString();
-	}
-	
-	private String printAllowedMimeTypes() {
-		StringBuilder sb = new StringBuilder();
-		for (Iterator<String> it = allowedMimeTypes.iterator(); it.hasNext();) {
-			String mimeType = (String) it.next();
-			sb.append(mimeType);
+		for (Iterator<String> it = allowedMediaTypes.iterator(); it.hasNext();) {
+			String mediaType = (String) it.next();
+			sb.append(mediaType);
 			if (it.hasNext()) {
 				sb.append(", ");
 			} else {
@@ -286,7 +261,7 @@ public class FileUploadController extends FreemarkerHttpServlet {
 			throws FileUploadException {
 		FileInfo fileInfo = null;
 		try {
-			fileInfo = fileHelper.createFile(storedFileName, getMimeType(file), file.getInputStream());
+			fileInfo = fileHelper.createFile(storedFileName, getMediaType(file), file.getInputStream());
 		} catch (Exception e) {
 			log.error(e.getLocalizedMessage());
 			throw new FileUploadException(e.getLocalizedMessage());
@@ -295,20 +270,20 @@ public class FileUploadController extends FreemarkerHttpServlet {
 	}
 
 	private String createStoredFileName(FileItem file) {
-		String mimeString = getMimeType(file);
+		String mediaType = getMediaType(file);
 		int length = 64;
 		boolean useLetters = true;
 		boolean useNumbers = true;
-		String storedFileName = RandomStringUtils.random(length, useLetters, useNumbers) + getExtension(mimeString);
+		String storedFileName = RandomStringUtils.random(length, useLetters, useNumbers) + getExtension(mediaType);
 		return storedFileName;
 	}
 
-	private String getExtension(String mimeString) {
+	private String getExtension(String mediaType) {
 		String extension = "";
 		MimeTypes types = MimeTypes.getDefaultMimeTypes();
 		try {
-			MimeType mime = types.forName(mimeString);
-			extension = mime.getExtension();
+			MimeType mimeType = types.forName(mediaType);
+			extension = mimeType.getExtension();
 		} catch (MimeTypeException e) {
 			log.error(e.getLocalizedMessage());
 		}
@@ -324,48 +299,48 @@ public class FileUploadController extends FreemarkerHttpServlet {
 		}
 	}
 
-	private String getMimeType(FileItem file) {
+	private String getMediaType(FileItem file) {
 		Tika tika = new Tika();
 		InputStream is;
-		String mime = "";
+		String mediaType = "";
 		try {
 			is = file.getInputStream();
-			mime = tika.detect(is);
+			mediaType = tika.detect(is);
 		} catch (IOException e) {
 			log.error(e.getLocalizedMessage());
 		}
-		return mime;
+		return mediaType;
 	}
 
-	private void validateFileUri(VitroRequest vreq) throws FileUploadException {
+	private void validateFileUri(VitroRequest vreq, I18nBundle i18nBundle) throws FileUploadException {
 		String fileUri = getFileUri(vreq);
-		validateUriNotEmpty(fileUri,"file");
-		validateIndividual(vreq, fileUri);
+		validateUriNotEmpty(fileUri, i18nBundle.text("file_upload_file"), i18nBundle);
+		validateIndividual(vreq, fileUri, i18nBundle);
 	}
 
-	private void validateSubjectUri(VitroRequest vreq) throws FileUploadException {
+	private void validateSubjectUri(VitroRequest vreq, I18nBundle i18nBundle) throws FileUploadException {
 		String subjectUri = getSubjectUri(vreq);
-		validateUriNotEmpty(subjectUri,"subject");
-		validateIndividual(vreq, subjectUri);
+		validateUriNotEmpty(subjectUri, i18nBundle.text("file_upload_subject"), i18nBundle);
+		validateIndividual(vreq, subjectUri, i18nBundle);
 	}
 	
-	private void validatePredicateUri(VitroRequest vreq) throws FileUploadException {
+	private void validatePredicateUri(VitroRequest vreq, I18nBundle i18nBundle) throws FileUploadException {
 		String predicateUri = getPredicateUri(vreq);
-		validateUriNotEmpty(predicateUri,"predicate");
-		validateIndividual(vreq, predicateUri);
+		validateUriNotEmpty(predicateUri, i18nBundle.text("file_upload_predicate"), i18nBundle);
+		validateIndividual(vreq, predicateUri, i18nBundle);
 	}
 
-	private void validateIndividual(VitroRequest vreq, String subjectUri) throws FileUploadException {
+	private void validateIndividual(VitroRequest vreq, String name, I18nBundle i18nBundle) throws FileUploadException {
 		Individual subject = vreq.getUnfilteredWebappDaoFactory().getIndividualDao()
-				.getIndividualByURI(subjectUri);
+				.getIndividualByURI(name);
 		if (subject == null) {
-			throw new FileUploadException("Uri " + subjectUri + "doesn't exist");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_uri_not_exists", name));
 		}
 	}
 
-	private void validateUriNotEmpty(String predicateUri,String name) throws FileUploadException {
+	private void validateUriNotEmpty(String predicateUri, String name, I18nBundle i18nBundle) throws FileUploadException {
 		if (predicateUri == null || predicateUri.trim().isEmpty()) {
-			throw new FileUploadException("No " + name + " uri was given");
+			throw new FileUploadException(i18nBundle.text("file_upload_error_uri_not_given", name));
 		}
 	}
 
@@ -391,16 +366,16 @@ public class FileUploadController extends FreemarkerHttpServlet {
 		return ACTION_DELETE.equals(action);
 	}
 
-	private void setAllowedMimeTypes() {
+	private void setAllowedMediaTypes() {
 		ConfigurationProperties config = ConfigurationProperties.getBean(getServletContext());
-		String allowedTypes = config.getProperty(ALLOWED_MIME_TYPES, "");
-		allowedMimeTypes = new HashSet<String>(Arrays.asList(allowedTypes.toLowerCase().trim().split("\\s*,\\s*")));
+		String allowedTypes = config.getProperty(ALLOWED_MEDIA_TYPES, "");
+		allowedMediaTypes = new HashSet<String>(Arrays.asList(allowedTypes.toLowerCase().trim().split("\\s*,\\s*")));
 	}
 
 	private String getReferrer(VitroRequest vreq) {
 		String referrer = vreq.getParameter(PARAM_REFERRER);
 		if (referrer == null) {
-			referrer = vreq.getHeader("Referer");
+			referrer = vreq.getHeader(REFERER_HEADER);
 		}
 		if (referrer == null) {
 			referrer =  "/";

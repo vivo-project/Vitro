@@ -112,5 +112,5 @@ ${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/i
 
 <script type="text/javascript">
     i18n_confirmDelete = "${i18n().confirm_delete?js_string}";
-    i18n_confirmDeleteUploadedFile = "${i18n().confirm_delete_uploaded_file?js_string}";
+    i18n_confirmDeleteUploadedFile = "${i18n().file_upload_confirm_delete?js_string}";
 </script>
