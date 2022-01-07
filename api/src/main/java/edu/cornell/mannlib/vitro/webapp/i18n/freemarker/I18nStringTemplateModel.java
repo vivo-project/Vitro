@@ -92,14 +92,14 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	 * @return
 	 */
 	private String getOnlineTranslationsFormattedMessage(String preProcessed, Object[] args) {
-		String[] parts = preProcessed.split(I18nBundle.intSep);
+		String[] parts = preProcessed.split(I18nBundle.INT_SEP);
 		final int messageIndex = parts.length -1;
 		String message = MessageFormat.format(parts[messageIndex], args);
 		String[] arguments = convertToArrayOfStrings(args);
 		parts[messageIndex] = "";
-		String result = String.join(I18nBundle.intSep, parts) + 
-				            String.join(I18nBundle.intSep, arguments) + 
-				            I18nBundle.intSep + message ;
+		String result = String.join(I18nBundle.INT_SEP, parts) + 
+				            String.join(I18nBundle.INT_SEP, arguments) + 
+				            I18nBundle.INT_SEP + message ;
 		return result;
 	}
 

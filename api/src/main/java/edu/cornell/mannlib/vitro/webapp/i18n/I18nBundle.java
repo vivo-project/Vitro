@@ -23,9 +23,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
  */
 public class I18nBundle {
 	private static final Log log = LogFactory.getLog(I18nBundle.class);
-	private static final String startSep = "\u25a4";
-	private static final String endSep = "\u25a5";
-	public static final String intSep = "\u25a6";
+	private static final String START_SEP = "\u25a4";
+	private static final String END_SEP = "\u25a5";
+	public static final String INT_SEP = "\u25a6";
 	private static final String MESSAGE_BUNDLE_NOT_FOUND = "Text bundle ''{0}'' not found.";
 	private static final String MESSAGE_KEY_NOT_FOUND = "Text bundle ''{0}'' has no text for ''{1}''";
 
@@ -89,10 +89,10 @@ public class I18nBundle {
 		if (isNeedExportInfo()) {
 			String separatedArgs = "";
 			for (int i = 0; i < parameters.length; i++) {
-				separatedArgs += parameters[i] + intSep;
+				separatedArgs += parameters[i] + INT_SEP;
 			}
 			
-			return startSep + key + intSep + textString + intSep + separatedArgs + message + endSep;
+			return START_SEP + key + INT_SEP + textString + INT_SEP + separatedArgs + message + END_SEP;
 		} else {
 			return message;	
 		}
