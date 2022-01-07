@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
-import java.util.HashMap;
-
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
@@ -21,15 +19,15 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
  */
 public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 
-	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
+	private static final Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
+	private static final String PROPERTY_TEMPLATE = "confirmDeletePropertyForm.ftl";
+	private static final String INDIVIDUAL_TEMPLATE = "confirmDeleteIndividualForm.ftl";
+
 	private String subjectUri = null;
 	private String predicateUri = null;
 	private String objectUri = null;
 	private Integer dataHash = 0;
 	private DataPropertyStatement dps = null;
-	private String dataLiteral = null;
-  private String propertyTemplate = "confirmDeletePropertyForm.ftl";
-  private String individualTemplate = "confirmDeleteIndividualForm.ftl";
 
 
 	//In this case, simply return the edit configuration currently saved in session
@@ -48,10 +46,10 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     	//prepare update?
     	prepare(vreq, editConfiguration);
     	if (editConfiguration.getPredicateUri() == null && editConfiguration.getSubjectUri() == null) {
-    		editConfiguration.setTemplate(individualTemplate);
+    		editConfiguration.setTemplate(INDIVIDUAL_TEMPLATE);
     		addDeleteParams(vreq, editConfiguration);
     	}else {
-    		editConfiguration.setTemplate(propertyTemplate);
+    		editConfiguration.setTemplate(PROPERTY_TEMPLATE);
     	}
     	return editConfiguration;
     }
@@ -75,7 +73,7 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
 		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
 		initProcessParameters(vreq, session, editConfiguration);
 		//set edit key for this as well
-		editConfiguration.setEditKey(editConfiguration.newEditKey(session));
+		editConfiguration.setEditKey(EditConfigurationVTwo.newEditKey(session));
 		return editConfiguration;
 
 	}
