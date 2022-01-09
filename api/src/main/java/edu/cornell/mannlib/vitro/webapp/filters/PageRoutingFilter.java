@@ -16,7 +16,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +25,11 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.PageController;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+
 /**
  * This filter is intended to route requests to pages defined in the display model.
  *
@@ -34,7 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  *
  * It should only be applied to requests, not forwards, includes or errors.
  */
-@WebFilter(filterName = "PageRoutingFilter", urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.REQUEST})
+@Configuration
+@Order(10)
 public class PageRoutingFilter implements Filter{
     protected FilterConfig filterConfig;
 
@@ -45,6 +50,17 @@ public class PageRoutingFilter implements Filter{
     protected final static String HOME_CONTROLLER_NAME = "HomePageController";
 
     protected final Pattern urlPartPattern = Pattern.compile(URL_PART_PATTERN);
+
+    @Bean(value = "PageRoutingFilter")
+    public FilterRegistrationBean<PageRoutingFilter> loggingFilter(){
+        FilterRegistrationBean<PageRoutingFilter> registrationBean
+                = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new PageRoutingFilter());
+        registrationBean.setDispatcherTypes(DispatcherType.REQUEST);
+
+        return registrationBean;
+    }
 
     @Override
     public void init(FilterConfig arg0) throws ServletException {

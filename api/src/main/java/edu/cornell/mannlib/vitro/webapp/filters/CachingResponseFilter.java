@@ -34,6 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.utils.searchengine.FieldMap;
 import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResultsParser;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * Assist in cache management for individual profile pages.
@@ -68,7 +70,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResultsParser;
  * An unconditional request may mean that there is no external cache, or that
  * the cache doesn't have a copy of this particular page.
  */
-@WebFilter(filterName = "Caching Response filter", urlPatterns = {"/*"})
+@Component(value="CachingResponseFilter")
+@Order(5)
 public class CachingResponseFilter implements Filter {
 	private static final Log log = LogFactory
 			.getLog(CachingResponseFilter.class);

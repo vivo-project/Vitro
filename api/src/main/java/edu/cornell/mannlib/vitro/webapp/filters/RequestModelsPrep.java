@@ -14,16 +14,17 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 /**
  * This used to set up a lot of request-based objects. Now, most of them are
@@ -32,13 +33,24 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  *
  * This is done in a filter, so it applies to both Servlets and JSPs.
  */
-@WebFilter(filterName = "RequestModelsPrep", urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD})
+@Configuration
+@Order(8)
 public class RequestModelsPrep implements Filter {
-	private final static Log log = LogFactory.getLog(RequestModelsPrep.class);
 
 	@Override
 	public void init(FilterConfig fc) throws ServletException {
 		// Nothing to do
+	}
+
+	@Bean(value = "RequestModelsPrep")
+	public FilterRegistrationBean<RequestModelsPrep> loggingFilter(){
+		FilterRegistrationBean<RequestModelsPrep> registrationBean
+				= new FilterRegistrationBean<>();
+
+		registrationBean.setFilter(new RequestModelsPrep());
+		registrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.FORWARD);
+
+		return registrationBean;
 	}
 
 	@Override
