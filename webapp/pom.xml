@@ -42,6 +42,18 @@
             <groupId>org.vivoweb</groupId>
             <artifactId>vitro-api</artifactId>
             <version>1.12.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
         </dependency>
     </dependencies>
 </project>
