@@ -92,12 +92,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 	public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws IOException, ServletException {
 
-        log.debug("DoGet() "+request.getRequestURI());
+        //TODO why is this even called
         super.doGet(request,response);
 //UQAM-Optimization set for UTF-8
         response.setCharacterEncoding("UTF-8");
 
-        if(request instanceof VitroRequest){log.debug("jeste instance");}
         VitroRequest vreq = new VitroRequest(request);
         ResponseValues responseValues = null;
 
