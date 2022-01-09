@@ -1,0 +1,523 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+/****************************************
+ Vitro base styles
+
+ Styles declared here are intended for
+ application-wide use.
+
+ Original version
+ 2011-01-12 UI Team
+
+ Last updated
+ 2011-01-13
+*****************************************/
+
+/* <------ MISCELLANEOUS*/
+.clear {
+    clear: both;
+}
+.hidden {
+    display: none !important;
+}
+.disabledSubmit {
+	cursor:default ! important;
+}
+/* <------ USER FEEDBACK*/
+#error-alert {
+    color: #900;
+    padding: 10px;
+    margin-bottom: 5px;
+    height: auto;
+}
+#error-alert img,
+#confirmation-alert img {
+    float:left;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+#error-alert p,
+#confirmation-alert p {
+    padding-left: 30px;
+    font-size: .9em;
+    line-height: 30px;
+}
+#error-alert p.login-alert {
+    padding-top: 0;
+}
+#confirmation-alert {
+    color: #169f43;
+    padding: 0;
+    margin-bottom: 5px;
+    height: 30px;
+}
+#flash-message {
+    background-color: #7285a0;
+    padding: .5em;
+    margin-bottom: 10px;
+}
+.contentNote {
+    float: right;
+    padding: .6em;
+    background: #ffc;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+.contentNote h4,
+.contentNote p {
+    margin: 0;
+    padding: 0;
+}
+.contentNote p {
+    font-size: .8em;
+}
+
+
+/* <------ INDEX PAGE*/
+.siteMap h2 {
+    padding-bottom: 0;
+}
+.class-group {
+    margin-right:25px;
+}
+#isotope-container {
+    overflow:visible !important;
+}
+#isotope-container li {
+    width:290px;
+}
+/* <------ SEARCH RESULTS PAGE*/
+.searchTOC {
+    margin-bottom: 1.5em;
+    float:right;
+    margin-right:35px;
+    margin-left:45px;
+    width:182px;
+    text-align:center;
+/*    border: 1px solid #dde4e3;*/
+    padding-top:4px;
+    color: #fff;
+    background: #5e6363;
+}
+.searchTOC h4 {
+    color: #fff;
+    padding: .2em 0 .2em 0;
+}
+.searchTOC ul {
+    width: 180px;
+    border: 1px solid #dde4e3;
+    background: #f1f2ee;
+    padding: 0;
+    margin-top: 4px;
+    text-align: left;
+}
+.searchTOC ul li {
+    border-bottom: 1px solid #dde4e3;
+    display: block;
+    font-size: 14px;
+    margin-left: 20px;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    width: 150px;
+}
+.searchTOC ul li:hover {
+    background-color:#f7f9f9;
+}
+.searchTOC ul li:last-child {
+    border-bottom: none
+}
+.searchTOC ul a {
+    display: inline;
+}
+
+.searchTOC ul span {
+	float:right;
+	padding-right: 10px;
+	color:gray;
+	font-size:smaller;
+}
+.contentsBrowseGroup  {
+    clear:both;
+    padding-top: 5px;
+}
+.searchResultsHeader {
+    width: 675px;
+    float:left;
+}
+a.close {
+    float: right;
+    margin-right: .3em;
+    font-size: .8em;
+}
+
+/* ------------------------------------------------->  */
+/* DROP DOWN USER MENU  ---------------------------->  */
+/* ------------------------------------------------->  */
+
+/* LEVEL ONE */
+ul.dropdown {
+    position: relative;
+}
+ul.dropdown li,
+ul.language-dropdown li {
+    float: left;
+    zoom: 1;
+    padding: 0 !important;
+}
+ul.dropdown li a,
+ul.language-dropdown li a {
+    display: block;
+    font-size: 1.4em;
+}
+ul.dropdown li#user-menu {
+    background: url(../images/arrowDownOverAccount.gif) right 9px no-repeat;
+    min-width:110px;
+    position: relative;
+}
+ul.dropdown li#user-menu a {
+    margin-right: 28px;
+    margin-left:10px;
+}
+ul.dropdown li#user-menu.hover,
+ul.dropdown li#user-menu:hover,
+ul.language-dropdown li#language-menu.hover,
+ul.language-dropdown li#language-menu:hover {
+    color: #000 !important;
+    position: relative;
+    background: #fff url(../images/arrowDownAccount.gif) right 9px no-repeat;
+    border-bottom: 1px solid #cdcfcf;
+}
+ul.dropdown li.hover a,
+ul.dropdown li:hover a,
+ul.language-dropdown li.hover a,
+ul.language-dropdown li:hover a {
+    color: #000 !important;
+    margin-left:10px;
+}
+/* LEVEL TWO */
+ul.dropdown ul.sub_menu {
+    background-color: #fff;
+    font-size: 1.4em;
+    visibility: hidden;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 999;
+    color: #000;
+}
+ul.dropdown ul.sub_menu li {
+    float: none;
+    clear: both;
+    padding-left: 14px !important;
+    width: 96px;
+    border-right: none !important;
+    border-bottom: 1px solid #cdcfcf;
+    background: #fff url(../images/arrowMenuAccount.gif) 7px 8px no-repeat;
+}
+ul.dropdown ul.sub_menu li:last-child {
+    width: 96px;
+}
+/* IE 6 & 7 Needs Inline Block */
+/* ADD IN IE6.css and IE7.css*/
+ul.dropdown ul.sub_menu li a {
+    width: 90%;
+    display: inline-block;
+    color: #000 !important;
+    background-color: #fff;
+    padding: 0;
+    padding-left: 0px;
+    height: 24px;
+}
+ul.dropdown ul.sub_menu li.inactive {
+    color: #aab0ae !important;
+    font-size: 1em !important;
+    padding-left: 22px !important;
+    width: 88px;
+}
+ul.dropdown ul.sub_menu li a:hover,
+ul.dropdown ul.sub_menu li a.hover {
+    color: #999 !important;
+}
+/*  LEVEL THREE */
+ul.dropdown ul ul {
+    left: 100%; top: 0;
+}
+ul.dropdown li:hover > ul {
+    visibility: visible;
+}
+/* ------------------------------------------------->  */
+/* DROP DOWN LANGUAGE MENU  ------------------------>  */
+/* ------------------------------------------------->  */
+ul.language-dropdown {
+    position: relative;
+    min-width: 160px;
+}
+ul.language-dropdown li#language-menu {
+    background: url(../images/arrowDownOverAccount.gif) right 9px no-repeat;
+    min-width: 170px;
+    position: relative;
+    margin-right: -10px !important;
+}
+ul.language-dropdown li#language-menu a {
+    margin-right: 28px;
+    margin-left:10px;
+}
+/* LEVEL TWO */
+ul.language-dropdown ul.sub_menu {
+    font-size: 1.4em;
+    visibility: hidden;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 999;
+    color: #000;
+    width: 100%;
+}
+ul.language-dropdown ul.sub_menu li {
+    float: none;
+    clear: both;
+    padding-left: 14px !important;
+    width: 100%;
+    border-right: none !important;
+    border-bottom: 1px solid #cdcfcf;
+    background: #fff url('../images/arrowMenuAccount.gif') no-repeat scroll 7px 8px ;
+}
+/* IE 6 & 7 Needs Inline Block */
+/* ADD IN IE6.css and IE7.css*/
+ul.language-dropdown ul.sub_menu li a {
+    width: 90%;
+    display: inline-block;
+    color: #000 !important;
+    background-color: #fff url('../images/arrowMenuAccount.gif') no-repeat scroll 7px 8px ;
+    padding: 0;
+    padding-left: 0;
+    height: 24px;
+}
+ul.language-dropdown ul.sub_menu li.inactive {
+    color: #aab0ae !important;
+    font-size: 1em !important;
+    width: 88px;
+}
+ul.language-dropdown ul.sub_menu li a:hover,
+ul.language-dropdown ul.sub_menu li a.hover {
+    color: #999 !important;
+	opacity: 0.6;
+	filter: alpha(opacity=60); /* For IE8 and earlier */
+}
+/* ------ MANAGE LABELS ------ */
+section#rdfsLabels {
+    margin-left:20px;
+}
+section#rdfsLabels li:first-child {
+    margin-top:20px;
+}
+section#rdfsLabels li {
+    margin-bottom:15px;
+}
+section#rdfsLabels li label {
+    font-size:1em;
+    padding-left:5px;
+}
+section#rdfsLabels a.cancel {
+    color:#F70;
+}
+p#mngLabelsText {
+    margin-left:25px;
+    margin-bottom:12px;
+}
+
+/* SEARCH HOME------>  */
+#search-home {
+		margin-top: 2em;
+		width: 570px;
+}
+
+#search-home h3 {
+		padding-left: 24px;
+}
+#search-homepage {
+		position: relative;
+		padding-left: 24px;
+}
+#search-home-field {
+		width: 530px;
+		height: 44px;
+}
+#search-home-field input.search {
+	 	text-decoration: none;
+		font-size: 18px;
+		border: none;
+	  padding-left: 13px;
+	  padding-top: 8px;
+	  cursor: pointer;
+}
+span.search-filter-selected {
+		display: none;
+}
+input.search-homepage {
+		float: left;
+		height: 20px;
+		border: 0;
+		font-size: 18px;
+		margin-left: 4px;
+		margin-top: 2px;
+		margin-right: 40px;
+		margin-top: 2px;
+		width: 351px;
+		background-position: right;
+}
+a.filter-search {
+		position: absolute;
+		vertical-align: middle;
+		display: inline-block;
+		width: 39px;
+		height: 43px;
+		z-index: 9999;
+		top: 0;
+		right: 135px;
+		z-index: 9999;
+}
+.filter-default {
+
+}
+.filter-active {
+
+}
+#filter-search-nav {
+		position: absolute;
+		width: 184px;
+		top: 0;
+		right: 135px;
+		z-index: 9998;
+		display: none;
+		list-style-type: none;
+}
+#filter-search-nav li {
+		padding-left: 0;
+		margin-left: 0;
+		list-style-type: none;
+		background-image: none;
+}
+#filter-search-nav {
+		z-index: 9998;
+}
+#filter-search-nav a.active {
+
+}
+#filter-search-nav a {
+		font-size: 17px;
+		display: block;
+		margin-left: 15px;
+		margin-right: 15px;
+		padding-top: 8px;
+		padding-bottom: 8px;
+		text-decoration: none;
+
+}
+
+/* HOME STATS----->  */
+#home-stats {
+		margin-top: 1em;
+		width: 921px;
+		height: 213px;
+		clear: both;
+}
+.home-sections h4 {
+		margin-top: 0;
+		height: 34px;
+		font-size: 18px;
+		text-align: center;
+		margin-left: 35px;
+		padding: 0;
+		line-height: 35px;
+}
+#home-stats h4 {
+    display: inline;
+    padding: 3px 10px;
+}
+#stats {
+		margin: 0 auto;
+		width: 875px;
+}
+#stats li {
+		float: left;
+		width: 108px;
+		height: 102px;
+		margin-top: 35px;
+		margin-right: 25px;
+}
+#stats p {
+
+}
+#stats li a {
+		text-decoration: none;
+}
+#stats li a:hover {
+
+}
+#stats li:first-child {
+		margin-left: 50px;
+}
+#stats .stats-count {
+		text-align: center;
+		font-size: 42px;
+		margin: 0;
+		padding-top: 30px;
+}
+#stats .stats-count span {
+		font-size: 18px;
+		padding-left: 2px;
+}
+#stats .stats-type {
+		font-size: 13px;
+		text-align: center;
+		margin: 0;
+		margin-top: 13px;
+}
+/* contact form security field */
+div .realperson-challenge {
+	width: 250px;
+        margin-right: 20px;
+}
+div .realperson-text {
+	text-align: center;
+}
+/* TABLE STYLES USED IN ACCOUNTS AND PAGE MANAGEMENT */
+table#table-listing {
+	border-collapse: collapse;
+	caption-side: top;
+	empty-cells: show;
+	margin: 0 auto;
+	margin: 20px 0 20px 0;
+	table-layout: auto;
+	text-align: left;
+	width: 930px;
+}
+table#table-listing tr:nth-child(2n) {
+	background-color: rgba(200, 200, 180,.25);
+}
+table#table-listing caption {
+	display: none;
+}
+table#table-listing th {
+	background-color: #F7F9F9;
+	border-bottom: none;
+	border: 1px solid #d9e4ea;
+	color: #064D68;
+	font-size: .9em;
+	height: 40px;
+	padding-left: 6px;
+	padding-top: 7px;
+	text-align: left;
+}
+table#table-listing td {
+	border: 1px solid #d9e4ea;
+	font-size: .825em;
+	padding: .5em;
+	vertical-align: top;
+}
+table#table-listing td  a {
+	word-wrap: break-word;
+}

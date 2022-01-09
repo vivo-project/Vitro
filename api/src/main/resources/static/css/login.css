@@ -1,0 +1,90 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+/* styles for log in */
+
+#login-form label,
+#login-form input.text,
+#login-form #password,
+#login-form #confirmPassword,
+#login-form label.label-remember-me,
+#vivoAccountError {
+    display: block;
+}
+#login-form p.submit {
+    float: left;
+    margin-bottom: 0;
+}
+#login-form input.checkbox-remember-me {
+    float: left;
+    height: 14px;
+    padding: 0;
+    margin-top: 13px;
+    margin-left: 20px;
+}
+#newPassword {
+    margin-bottom: 0;
+}
+#login-form .label-remember-me {
+    display: block;
+    float: left;
+    width: 100px;
+    margin: 0;
+    padding: 0;
+    margin-top: 10px;
+    margin-right: 25px;
+    padding-right: 10px;
+}
+p.forgot-password {
+    clear:both;
+    margin-bottom: 0;
+}
+p.request-account {
+    width: 219px;
+    float: left;
+}
+#login-form p.external-auth {
+    margin-top: 1em;
+    text-align: center;
+}
+.or-auth {
+    margin-left: 135px;
+    width: 30px;
+    height: 30px;
+    background: #fff 0 0 url(../images/login-or.png) no-repeat;
+    margin-bottom: 0;
+    padding-left: 9px;
+    padding-top: 3px;
+    color: #fff;
+    font-size: .8em;
+}
+h3.internal-auth {
+    margin-left: 20px;
+    font-size: 1em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    text-decoration: none;
+    cursor: hand;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.4em;
+}
+.vivoAccount {
+    display: none;
+}
+.formFieldAlert {
+    border: 2px solid #900;
+}
+.red {
+    color: #900;
+}
+p.password-note {
+    margin: 0;
+    padding: 0;
+    font-size: 0.8em;
+    color: #615e5e;
+    padding-top: 3px;
+}
+.or {
+    display: inline;
+    vertical-align: middle;
+}
