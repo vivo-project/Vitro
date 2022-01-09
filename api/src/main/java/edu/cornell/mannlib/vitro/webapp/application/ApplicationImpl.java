@@ -204,7 +204,6 @@ public class ApplicationImpl implements Application {
 				ss.info(this, "Started the ConfigurationTripleSource: "
 						+ configurationTripleSource);
 
-				//TODO ovde sam stao
 				configureJena();
 				prepareCombinedTripleSource(app, ctx);
 			}

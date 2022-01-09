@@ -4,12 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.config;
 
 import static edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.DUMMY_BEAN;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import org.springframework.util.ResourceUtils;
 
 /**
  * <pre>
@@ -54,7 +50,7 @@ public class RevisionInfoSetup implements ServletContextListener {
 			.compile("(.+) ~ (.+) ~ (.+)");
 
 	static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	static final String RESOURCE_PATH = "/WEB-INF/resources/revisionInfo.txt";
+	static final String RESOURCE_NAME = "revisionInfo.txt";
 
 	/**
 	 * On startup, read the revision info from the resource file in the
@@ -93,13 +89,12 @@ public class RevisionInfoSetup implements ServletContextListener {
 
 	private BufferedReader openRevisionInfoReader(ServletContext context)
 			throws FileNotFoundException {
-		InputStream stream = context.getResourceAsStream(RESOURCE_PATH);
-		if (stream == null) {
+		File file = ResourceUtils.getFile("classpath:"+RESOURCE_NAME);
+		if (file == null) {
 			throw new FileNotFoundException(
-					"Can't find a resource in the webapp at '" + RESOURCE_PATH
-							+ "'.");
+					"Can't find a resource named '" + RESOURCE_NAME + "' in resources directory.");
 		} else {
-			return new BufferedReader(new InputStreamReader(stream));
+			return new BufferedReader(new FileReader(file));
 		}
 	}
 

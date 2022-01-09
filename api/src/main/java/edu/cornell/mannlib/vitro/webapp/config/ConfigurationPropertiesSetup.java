@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * resources directory of the webapp, and a file called 'runtime.properties' in
  * the Vitro home directory. In case of conflict, runtime.properties wins.
  *
- * The path to the Vitro home directory can be specifed by an JNDI value, or by
+ * The path to the Vitro home directory can be specified by an JNDI value, or by
  * a System property, or by a property in build.properties, in that order. If
  * the Vitro home directory is specified in more than one way, a warning is
  * issued and the first value is used.

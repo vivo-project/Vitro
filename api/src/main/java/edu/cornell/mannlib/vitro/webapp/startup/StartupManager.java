@@ -2,10 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.startup;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,9 +10,11 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Instantiate and run the ServletContextListeners for Vitro, while accumulating
@@ -29,10 +28,12 @@ import org.apache.commons.logging.LogFactory;
  * StartupStatusDisplayFilter to disply the problem instead of showing the home
  * page (or any other requested page).
  */
+
+@WebListener
 public class StartupManager implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(StartupManager.class);
 
-	public static final String FILE_OF_STARTUP_LISTENERS = "/WEB-INF/resources/startup_listeners.txt";
+	public static final String STARTUP_LISTENERS_RESOURCE_NAME = "startup_listeners.txt";
 
 	private final List<ServletContextListener> initializeList = new ArrayList<ServletContextListener>();
 
@@ -104,8 +105,10 @@ public class StartupManager implements ServletContextListener {
 		InputStream is = null;
 		BufferedReader br = null;
 		try {
-			is = ctx.getResourceAsStream(FILE_OF_STARTUP_LISTENERS);
-			br = new BufferedReader(new InputStreamReader(is));
+
+			File file = ResourceUtils.getFile("classpath:"+STARTUP_LISTENERS_RESOURCE_NAME);
+
+			br = new BufferedReader(new FileReader(file));
 
 			String line;
 			while (null != (line = br.readLine())) {
@@ -115,12 +118,12 @@ public class StartupManager implements ServletContextListener {
 				}
 			}
 		} catch (NullPointerException e) {
-			ss.fatal(this, "Unable to locate the list of startup listeners: "
-					+ FILE_OF_STARTUP_LISTENERS);
+			ss.fatal(this, "Unable to locate the resource with the list of startup listeners: "
+					+ STARTUP_LISTENERS_RESOURCE_NAME);
 		} catch (IOException e) {
 			ss.fatal(this,
 					"Failed while processing the list of startup listeners:  "
-							+ FILE_OF_STARTUP_LISTENERS, e);
+							+ STARTUP_LISTENERS_RESOURCE_NAME, e);
 		} finally {
 			if (br != null) {
 				try {

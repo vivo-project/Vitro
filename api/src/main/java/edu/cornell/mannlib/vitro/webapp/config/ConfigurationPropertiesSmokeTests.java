@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.config;
 
+import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -21,6 +24,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Test that gets run at servlet context startup to check for the existence and
@@ -30,6 +38,8 @@ public class ConfigurationPropertiesSmokeTests implements
 		ServletContextListener {
 	private static final Log log = LogFactory
 			.getLog(ConfigurationPropertiesSmokeTests.class);
+
+	private static final String I18N_RESOURCE_PATH="";
 
 	private static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 	private static final String PROPERTY_LANGUAGE_SELECTABLE = "languages.selectableLocales";
@@ -129,24 +139,25 @@ public class ConfigurationPropertiesSmokeTests implements
 		String filterString = props.getProperty(PROPERTY_LANGUAGE_FILTER,
 				"false");
 		boolean languageFilter = Boolean.valueOf(filterString);
-		String i18nDirPath = ctx.getRealPath("/i18n");
-		log.debug("i18nDirPath: " + i18nDirPath);
+		//This line does not work when we create an app with spring boot
+		//String i18nDirPath = ctx.getRealPath("/i18n");
+		log.debug("Name of a resource folder containing i18n properties: " + I18N_RESOURCE_PATH);
 
-		if (i18nDirPath == null) {
+		if (I18N_RESOURCE_PATH == null) {
 			throw new IllegalStateException(
-					"Application does not have an /i18n directory.");
+					"Application does not have a i18n resource name defined");
 		}
 
 		List<String> i18nNames = null;
 
-		i18nNames = geti18nNames(i18nDirPath);
+		i18nNames = geti18nNames();
 
 		log.debug("i18nNames: " + i18nNames);
 
 		if (i18nNames.isEmpty()) {
 			ss.fatal(this, "The application found no files in '"
-					+ i18nDirPath
-					+ "' .");
+					+ I18N_RESOURCE_PATH
+					+ "' resource folder.");
 		}
 		else {
 			ss.info(this, "Base language files loaded: " + i18nNames);
@@ -190,12 +201,12 @@ public class ConfigurationPropertiesSmokeTests implements
 	}
 
 	/** Create a list of the names of available language files. */
-	private List<String> geti18nNames(String i18nBaseDirPath) {
+	private List<String> geti18nNames() {
 		try {
-			return Files.walk(Paths.get(i18nBaseDirPath))
+			return Files.walk(ResourceUtils.getFile("classpath:"+I18N_RESOURCE_PATH).toPath())
 					.filter(Files::isRegularFile)
 					.map(Path::getFileName)
-					.map(p -> {return p.toString();})
+					.map(p -> p.toString())
 					.collect(Collectors.toList());
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to find language files", e);

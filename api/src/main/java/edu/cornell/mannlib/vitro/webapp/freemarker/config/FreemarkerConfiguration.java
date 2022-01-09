@@ -3,10 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.freemarker.config;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -42,6 +42,7 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Access point for a singleton Configuration instance.
@@ -143,15 +144,20 @@ public abstract class FreemarkerConfiguration {
 		List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
 
 		// Theme template loader - only if the theme has a template directory.
-		String themeTemplatePath = ctx.getRealPath("/" + themeDir) + "/templates";
-		File themeTemplateDir = new File(themeTemplatePath);
-		if (themeTemplateDir.exists()) {
+		try {
+			File themeTemplateDir = ResourceUtils.getFile("classpath:" + themeDir + "/templates");
 			loaders.add(new FreemarkerTemplateLoader(themeTemplateDir));
-		}
+		}catch(Exception ignored){}
+
 
 		// Vitro template loader
-		String vitroTemplatePath = ctx.getRealPath("/templates/freemarker");
-		loaders.add(new FreemarkerTemplateLoader(new File(vitroTemplatePath)));
+		try {
+			File vitroTemplateDir = ResourceUtils.getFile("classpath:templates/freemarker");
+			loaders.add(new FreemarkerTemplateLoader(vitroTemplateDir));
+		}catch(FileNotFoundException e){
+			throw new IllegalArgumentException("Template directory 'templates/freemarker' does not exist " +
+					"inside the resources folder");
+		}
 
 		// TODO VIVO-243 Why is this here?
 		loaders.add(new ClassTemplateLoader(FreemarkerConfiguration.class, ""));
