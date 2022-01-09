@@ -41,7 +41,7 @@ public class UserMailController extends VitroHttpServlet{
             ApplicationBean appBean=vreq.getAppBean();
 
             request.setAttribute("siteName", appBean.getApplicationName());
-            request.setAttribute("scripts","/js/commentsForm.js");
+            request.setAttribute("scripts", "/static/js/commentsForm.js");
 
             if (request.getHeader("Referer") == null)
                 request.getSession().setAttribute("commentsFormReferer","none");

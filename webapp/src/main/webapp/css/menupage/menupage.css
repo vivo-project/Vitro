@@ -96,7 +96,7 @@ ul#find-filters a {
     font-size: 1.25em;
     color: #2485ae;
     font-weight: normal;
-    background: url(../images/arrow.gif) 140px 27px no-repeat;
+    background: url(../../../../../../api/src/main/resources/static/images/arrow.gif) 140px 27px no-repeat;
 }
 #researchers p {
     padding: 17px 15px 15px 175px;

@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.images;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import org.springframework.util.ResourceUtils;
 
 /**
  * A utility for finding the URL of the correct Placeholder image.
@@ -35,8 +37,8 @@ public class PlaceholderUtil {
 
 	private static final String ATTRIBUTE_NAME = PlaceholderUtil.class
 			.getName();
-	private static final String PROPERTIES_FILE_PATH = "/images/placeholders/placeholders.properties";
-	private static final String DEFAULT_IMAGE_PATH = "/images/placeholders/thumbnail.jpg";
+	private static final String PROPERTIES_FILE_PATH = "static/images/placeholders/placeholders.properties";
+	private static final String DEFAULT_IMAGE_PATH = "static/images/placeholders/thumbnail.jpg";
 
 	// ----------------------------------------------------------------------
 	// Static methods
@@ -153,9 +155,9 @@ public class PlaceholderUtil {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
-				File propertiesFile = confirmRealPath(ctx, PROPERTIES_FILE_PATH);
+				File propertiesFile = confirmRealPath(PROPERTIES_FILE_PATH);
 				Map<String, String> map = loadPropertiesToMap(propertiesFile);
-				confirmImagesArePresent(ctx, map);
+				confirmImagesArePresent(map);
 				ctx.setAttribute(ATTRIBUTE_NAME, new PlaceholderUtil(map));
 			} catch (SetupException e) {
 				if (e.getCause() == null) {
@@ -189,31 +191,29 @@ public class PlaceholderUtil {
 			return map;
 		}
 
-		private void confirmImagesArePresent(ServletContext ctx,
-				Map<String, String> map) throws SetupException {
+		private void confirmImagesArePresent(Map<String, String> map) throws SetupException {
 			Set<String> imageUrls = new HashSet<String>();
 			imageUrls.add(DEFAULT_IMAGE_PATH);
 			imageUrls.addAll(map.values());
 			for (String imageUrl : imageUrls) {
-				confirmRealPath(ctx, imageUrl);
+				confirmRealPath(imageUrl);
 			}
 
 		}
 
-		private File confirmRealPath(ServletContext ctx, String url)
+		private File confirmRealPath(String url)
 				throws SetupException {
-			String path = ctx.getRealPath(url);
-			if (path == null) {
-				throw new SetupException("Can't translate to real path: '"
-						+ url + "'");
+			File file;
+			try{
+				file = ResourceUtils.getFile("classpath:"+url);
+			}catch(FileNotFoundException e){
+				throw new SetupException("No file found at '" + url +
+						"' within resources folder.");
 			}
-			File file = new File(path);
-			if (!file.exists()) {
-				throw new SetupException("No file found at '" + url + "'.");
-			}
+
 			if (!file.canRead()) {
 				throw new SetupException("Can't read the file at '" + url
-						+ "'.");
+						+ "' within resources folder.");
 			}
 			return file;
 		}
