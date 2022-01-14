@@ -1,6 +1,7 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<@widget name="login" include="assets" />
+<#--<@widget name="login" include="assets" /-->
+<#import "widget-login.ftl" as login>
 <#import "lib-home-page.ftl" as lh>
 
 <!DOCTYPE html>
@@ -11,6 +12,7 @@
 
     <body class="${bodyClasses!}">
         <header id="branding" role="banner">
+            <@login.assets/>
             <#include "identity.ftl">
         </header>
         <#include "menu.ftl">
@@ -53,7 +55,8 @@
 
             </section> <!-- #intro -->
 
-            <@widget name="login" />
+            <@login.loginForm/>
+
 
             <!-- Statistical information relating to property groups and their classes; displayed horizontally, not vertically-->
             <@lh.allClassGroups vClassGroups! />
