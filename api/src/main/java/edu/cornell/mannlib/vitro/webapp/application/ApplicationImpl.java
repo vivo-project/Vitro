@@ -176,14 +176,6 @@ public class ApplicationImpl implements Application {
 					.getContentTripleSource();
 			contentTripleSource.startup(app, css);
 
-			//TODO debug part
-			/*ResIterator resIt = contentTripleSource.getDataset().getDefaultModel().listSubjects();
-			log.debug("All resources in defaultModel of contentTripleStore");
-			while(resIt.hasNext()){
-				Resource res =resIt.nextResource();
-				log.debug(res.getURI());
-			}*/
-
 			ss.info(this, "Started the ContentTripleSource: "
 					+ contentTripleSource);
 
@@ -192,14 +184,6 @@ public class ApplicationImpl implements Application {
 				ConfigurationTripleSource configurationTripleSource = app
 						.getConfigurationTripleSource();
 				configurationTripleSource.startup(app, css);
-
-				//TODO debug part
-				/*resIt = configurationTripleSource.getDataset().getDefaultModel().listSubjects();
-				log.debug("All resources in defaultModel of configurationTripleSource");
-				while(resIt.hasNext()){
-					Resource res =resIt.nextResource();
-					log.debug(res.getURI());
-				}*/
 
 				ss.info(this, "Started the ConfigurationTripleSource: "
 						+ configurationTripleSource);
