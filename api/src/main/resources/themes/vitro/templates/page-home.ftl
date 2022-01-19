@@ -55,8 +55,10 @@
 
             </section> <!-- #intro -->
 
-            <@login.loginForm/>
-
+            <#if user.loggedIn>
+            <#else>
+                <@login.loginForm/>
+            </#if>
 
             <!-- Statistical information relating to property groups and their classes; displayed horizontally, not vertically-->
             <@lh.allClassGroups vClassGroups! />
