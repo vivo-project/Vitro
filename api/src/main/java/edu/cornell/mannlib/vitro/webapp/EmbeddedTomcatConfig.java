@@ -6,6 +6,7 @@ import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.embedded.tomcat.TomcatWebServer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
@@ -14,8 +15,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class EmbeddedTomcatConfig {
-    private static final Logger logger= LoggerFactory.getLogger(EmbeddedTomcatConfig.class);
 
+    @Value("${home.dir.path}")
+    private String homeDirPath;
 
     @Bean
     public ServletWebServerFactory serverFactory(){
@@ -34,7 +36,7 @@ public class EmbeddedTomcatConfig {
 
                 environment.setType(java.lang.String.class.getName());
                 environment.setName("vitro/home");
-                environment.setValue("/home/veljkomaksimovic/Lyrasis/Vitro/home");
+                environment.setValue(homeDirPath);
                 environment.setOverride(true);
 
                 context.getNamingResources().addEnvironment(environment);
