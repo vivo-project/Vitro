@@ -4,7 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 /**
  * No matter what URL is requested, check to see whether the StartupStatus
@@ -46,7 +48,8 @@ import org.springframework.stereotype.Component;
 @Component(value="StartupStatusDisplayFilter")
 @Order(1)
 public class StartupStatusDisplayFilter implements Filter {
-	private static final String TEMPLATE_PATH = "/templates/freemarker/body/admin/startupStatus-displayRaw.ftl";
+	Logger logger = LoggerFactory.getLogger(StartupStatusDisplayFilter.class);
+	private static final String TEMPLATE_PATH = "templates/freemarker/body/admin/startupStatus-displayRaw.ftl";
 
 	private ServletContext ctx;
 	private StartupStatus ss;
@@ -140,8 +143,19 @@ public class StartupStatusDisplayFilter implements Filter {
 
 	private Template loadFreemarkerTemplate() throws IOException {
 		Configuration cfg = new Configuration();
-		cfg.setTemplateLoader(new WebappTemplateLoader(ctx));
-		return cfg.getTemplate(TEMPLATE_PATH);
+		try{
+			File file = ResourceUtils.getFile("classpath:"+TEMPLATE_PATH);
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String[] templatePath = TEMPLATE_PATH.split("/");
+			String templateName = templatePath[templatePath.length-1];
+			return new Template(templateName,br,cfg);
+		}catch(FileNotFoundException e){
+			logger.error("Unable to locate freemarker template '"+TEMPLATE_PATH+"' within resource folder.");
+			throw new IOException("Unable to locate freemarker template '"+TEMPLATE_PATH+"' within resource folder.");
+		}catch(IOException e){
+			logger.error("Error while creating Template object from '"+TEMPLATE_PATH+"' template");
+			throw e;
+		}
 	}
 
 	private boolean isFatal() {
