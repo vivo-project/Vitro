@@ -172,13 +172,10 @@ public class I18n {
 		I18nLogger i18nLogger = new I18nLogger();
 		try {
 			String dir = themeDirectory.get();
-			/*TODO Not sure why, but ResourceBundler cant find any of the resources with the ThemeBasedControl object
-			   present. Once I removed the control object, it worked fine
+			
 			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
-					locale, control);*/
-			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
-					locale);
+					locale, control);
 
 			return new I18nBundle(bundleName, rb, i18nLogger);
 		} catch (MissingResourceException e) {
