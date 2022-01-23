@@ -495,18 +495,31 @@ public class UpdateKnowledgeBase {
 
 	}
 
+	/*
+	Util method that will look for a File both within classpath and local file system.
+	Returns null if File wasn't found.
+	 */
+	private File findFile(String directoryPath){
+		File file;
+		try{
+			file = ResourceUtils.getFile("classpath:"+directoryPath);
+		}catch(FileNotFoundException ignore){
+			try{
+				file = ResourceUtils.getFile(directoryPath);
+			}catch(FileNotFoundException e){
+				log.error("Could not find directory '" + directoryPath + "' inside the classpath" +
+						" nor the local file system");
+				return null;
+			}
+		}
+		return file;
+	}
 
 	private OntModel loadModelFromDirectory(String directoryPath) {
 		log.debug("Loading model from directory " + directoryPath);
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		File directory;
-		try{
-			directory = ResourceUtils.getFile("classpath:"+directoryPath);
-		}catch(FileNotFoundException e){
-			log.error("Could not find directory '" + directoryPath + "' inside 'resources' folder");
-			throw new ModelDirectoryNotFoundException(directoryPath + " does not exist within 'resources' folder");
-		}
-		if (!directory.isDirectory()) {
+		File directory = findFile(directoryPath);
+		if (directory==null || !directory.isDirectory()) {
 			throw new ModelDirectoryNotFoundException(directoryPath + " must be a directory " +
 					"containing RDF files.");
 		}
@@ -521,8 +534,8 @@ public class UpdateKnowledgeBase {
 	private OntModel loadModelFromFile(String filePath) {
 		log.debug("Load model from file " + filePath);
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		File file = new File(filePath);
-		if (!file.isFile()) {
+		File file = findFile(filePath);
+		if (file==null || !file.isFile()) {
 			throw new ModelFileNotFoundException(filePath + " must be a file " +
 					"containing RDF files.");
 		}

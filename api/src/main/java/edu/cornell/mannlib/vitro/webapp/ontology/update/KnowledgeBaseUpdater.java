@@ -40,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Performs knowledge base updates necessary to align with a
@@ -366,8 +367,10 @@ public class KnowledgeBaseUpdater {
 	 */
 	public static String loadSparqlQuery(String filePath) throws IOException {
 
-		File file = new File(filePath);
-		if (!file.exists()) {
+		File file;
+		try{
+			file = ResourceUtils.getFile("classpath:"+filePath);
+		}catch(FileNotFoundException ignore) {
 			throw new RuntimeException("SPARQL file not found at " + filePath);
 		}
 		BufferedReader reader = new BufferedReader(new FileReader(file));
