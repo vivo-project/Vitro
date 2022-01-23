@@ -107,7 +107,6 @@ public class StartupManager implements ServletContextListener {
 		try {
 
 			File file = ResourceUtils.getFile("classpath:"+STARTUP_LISTENERS_RESOURCE_NAME);
-
 			br = new BufferedReader(new FileReader(file));
 
 			String line;

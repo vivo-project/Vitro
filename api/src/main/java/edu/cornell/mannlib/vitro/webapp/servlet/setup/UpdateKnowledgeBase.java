@@ -6,11 +6,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.Reasoning
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.INFERENCES_ONLY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -50,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Invokes process to test whether the knowledge base needs any updating
@@ -76,11 +73,11 @@ public class UpdateKnowledgeBase {
 	private String oldTBoxAnnotationsDir() { return dataDir + "oldAnnotations/"; }
 	//For display model migration
 	private String oldDisplayModelTBoxPath() { return dataDir + "oldDisplayModel/displayTBOX.n3"; }
-	private static final String NEW_DISPLAYMODEL_TBOX_PATH = "/WEB-INF/ontologies/app/menuload/displayTBOX.n3";
+	private static final String NEW_DISPLAYMODEL_TBOX_PATH = "ontologies/app/menuload/displayTBOX.n3";
 	private String oldDisplayModelDisplayMetadataPath() { return dataDir + "oldDisplayModel/displayDisplay.n3"; }
-	private static final String NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH = "/WEB-INF/ontologies/app/menuload/displayDisplay.n3";
-	private static final String NEW_DISPLAYMODEL_PATH = "/WEB-INF/ontologies/app/menu.n3";
-	private static final String LOADED_STARTUPT_DISPLAYMODEL_DIR = "/WEB-INF/ontologies/app/loadedAtStartup/";
+	private static final String NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH = "ontologies/app/menuload/displayDisplay.n3";
+	private static final String NEW_DISPLAYMODEL_PATH = "ontologies/app/menu.n3";
+	private static final String LOADED_STARTUPT_DISPLAYMODEL_DIR = "ontologies/app/loadedAtStartup/";
 	private String oldDisplayModelVivoListViewPath() { return dataDir + "oldDisplayModel/vivoListViewConfig.rdf"; }
 
 	public void contextInitialized(ServletContextEvent sce) {
@@ -108,11 +105,11 @@ public class UpdateKnowledgeBase {
 
 		    Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
 			settings.setDisplayModel(ModelAccess.on(ctx).getOntModel(DISPLAY));
-			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxModelDir()));
+			OntModel oldTBoxModel = loadModelFromDirectory(oldTBoxModelDir());
 			settings.setOldTBoxModel(oldTBoxModel);
 			OntModel newTBoxModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "filegraph").toString());
 			settings.setNewTBoxModel(newTBoxModel);
-			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxAnnotationsDir()));
+			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(oldTBoxAnnotationsDir());
 			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
 			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "firsttime").toString());
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
@@ -122,23 +119,23 @@ public class UpdateKnowledgeBase {
 			try {
 			    //Display model tbox and display metadata
 			    //old display model tbox model
-			    OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(oldDisplayModelTBoxPath()));
+			    OntModel oldDisplayModelTboxModel = loadModelFromFile(oldDisplayModelTBoxPath());
 			    settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
 			    //new display model tbox model
-			    OntModel newDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_TBOX_PATH));
+			    OntModel newDisplayModelTboxModel = loadModelFromFile(NEW_DISPLAYMODEL_TBOX_PATH);
 			    settings.setNewDisplayModelTboxModel(newDisplayModelTboxModel);
 			    //old display model display model metadata
-			    OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(oldDisplayModelDisplayMetadataPath()));
+			    OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(oldDisplayModelDisplayMetadataPath());
 			    settings.setOldDisplayModelDisplayMetadataModel(oldDisplayModelDisplayMetadataModel);
 			    //new display model display model metadata
-			    OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+			    OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH);
 			    settings.setNewDisplayModelDisplayMetadataModel(newDisplayModelDisplayMetadataModel);
 			    //Get new display model
-			    OntModel newDisplayModelFromFile = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_PATH));
+			    OntModel newDisplayModelFromFile = loadModelFromFile(NEW_DISPLAYMODEL_PATH);
 			    settings.setNewDisplayModelFromFile(newDisplayModelFromFile);
-			    OntModel loadedAtStartupFiles = loadModelFromDirectory(ctx.getRealPath(LOADED_STARTUPT_DISPLAYMODEL_DIR));
+			    OntModel loadedAtStartupFiles = loadModelFromDirectory(LOADED_STARTUPT_DISPLAYMODEL_DIR);
 			    settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
-			    OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(oldDisplayModelVivoListViewPath()));
+			    OntModel oldDisplayModelVivoListView = loadModelFromFile(oldDisplayModelVivoListViewPath());
 			    settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
 			} catch (ModelFileNotFoundException e) {
 			    // expected if no display migration was intended
@@ -197,11 +194,11 @@ public class UpdateKnowledgeBase {
 	 * Set the paths for the files that specify how to perform the update
 	 */
 	private void putNonReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) {
-        settings.setAskUpdatedQueryFile(ctx.getRealPath(askQueryFile()));
-        settings.setDiffFile(ctx.getRealPath(diffFile()));
-        settings.setSparqlConstructAdditionsDir(ctx.getRealPath(dataDir + "sparqlConstructs/additions"));
-        settings.setSparqlConstructDeletionsDir(ctx.getRealPath(dataDir + "sparqlConstructs/deletions"));
-        settings.setSuccessAssertionsFile(ctx.getRealPath(successAssertionsFile()));
+        settings.setAskUpdatedQueryFile(askQueryFile());
+        settings.setDiffFile(diffFile());
+        settings.setSparqlConstructAdditionsDir(dataDir + "sparqlConstructs/additions");
+        settings.setSparqlConstructDeletionsDir(dataDir + "sparqlConstructs/deletions");
+        settings.setSuccessAssertionsFile(successAssertionsFile());
         settings.setSuccessRDFFormat("N3");
 	}
 
@@ -502,7 +499,13 @@ public class UpdateKnowledgeBase {
 	private OntModel loadModelFromDirectory(String directoryPath) {
 		log.debug("Loading model from directory " + directoryPath);
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		File directory = new File(directoryPath);
+		File directory;
+		try{
+			directory = ResourceUtils.getFile("classpath:"+directoryPath);
+		}catch(FileNotFoundException e){
+			log.error("Could not find directory '" + directoryPath + "' inside 'resources' folder");
+			throw new ModelDirectoryNotFoundException(directoryPath + " does not exist within 'resources' folder");
+		}
 		if (!directory.isDirectory()) {
 			throw new ModelDirectoryNotFoundException(directoryPath + " must be a directory " +
 					"containing RDF files.");
