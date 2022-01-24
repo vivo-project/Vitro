@@ -219,9 +219,7 @@ public class VitroResourceBundle extends ResourceBundle {
 
 	private File locateFile(String path) {
 		try {
-			String test = path.substring(1);
-			File f = ResourceUtils.getFile("classpath:" + test);
-			log.debug("Located file '" + path + "'.");
+			File f = ResourceUtils.getFile("classpath:" + path.substring(1));
 			return f;
 		}catch(FileNotFoundException e){
 			log.debug("No file at '" + path + "' within resources folder");
