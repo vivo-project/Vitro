@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdateTime;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -71,7 +72,11 @@ public enum PropertyType {
 		if (object.isLiteral()) {
 			Literal literal = object.asLiteral();
 			RDFDatatype datatype = literal.getDatatype();
-			if (datatype == null || datatype.equals(XSDstring) || datatype.equals(RDFLangString.rdfLangString)) {
+			if (datatype == null || 
+					datatype.equals(XSDstring) || 
+					datatype.equals(RDFLangString.rdfLangString) ||
+					//TODO: Until more suitable type defined 
+					datatype.equals(XSDdateTime)) {
 				return STRING;
 			}
 			if (datatype.equals(XSDfloat)) {
