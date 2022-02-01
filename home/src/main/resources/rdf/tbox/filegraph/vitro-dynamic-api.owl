@@ -21,23 +21,13 @@
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasConditional -->
-
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasConditional">
-        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Conditional"/>
-        <rdfs:label xml:lang="en">hasConditional</rdfs:label>
-    </owl:ObjectProperty>
-    
-
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasSPARQLQuery -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasSPARQLQuery">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SPARQLQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#executionStep"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
         <rdfs:label xml:lang="en">hasSPARQLQuery</rdfs:label>
     </owl:ObjectProperty>
     
@@ -47,8 +37,8 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasSolrQuery">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SolrQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#executionStep"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
         <rdfs:label xml:lang="en">hasSolrQuery</rdfs:label>
     </owl:ObjectProperty>
     
@@ -58,8 +48,8 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasTemplate">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Template"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#executionStep"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
         <rdfs:label xml:lang="en">hasTemplate</rdfs:label>
     </owl:ObjectProperty>
     
@@ -69,8 +59,8 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Parameter"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
         <rdfs:label xml:lang="en">hasValidator</rdfs:label>
     </owl:ObjectProperty>
     
@@ -80,8 +70,8 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#next">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Action"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en">next</rdfs:label>
     </owl:ObjectProperty>
     
@@ -91,8 +81,8 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#nextIfFalse">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Conditional"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#conditional"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en">nextIfFalse</rdfs:label>
     </owl:ObjectProperty>
     
@@ -102,8 +92,8 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#nextIfTrue">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Conditional"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#conditional"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en">nextIfTrue</rdfs:label>
     </owl:ObjectProperty>
     
@@ -113,10 +103,10 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SPARQLQuery"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SolrQuery"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Template"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Parameter"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:label xml:lang="en">providesParameter</rdfs:label>
     </owl:ObjectProperty>
     
@@ -126,8 +116,8 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#requireAccess">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Action"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Role"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#role"/>
         <rdfs:label xml:lang="en">requireAccess</rdfs:label>
     </owl:ObjectProperty>
     
@@ -137,10 +127,10 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#requireParameter">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SPARQLQuery"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SolrQuery"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Template"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Parameter"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:label xml:lang="en">requiresParameter</rdfs:label>
     </owl:ObjectProperty>
     
@@ -161,7 +151,7 @@
 
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasClass">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
         <rdfs:label xml:lang="en">hasClass</rdfs:label>
     </owl:DatatypeProperty>
@@ -172,7 +162,7 @@
 
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasN3Text">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Template"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en">hasN3Text</rdfs:label>
     </owl:DatatypeProperty>
@@ -183,8 +173,8 @@
 
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasQuery">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SPARQLQuery"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#SolrQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en">hasQuery</rdfs:label>
     </owl:DatatypeProperty>
@@ -195,7 +185,7 @@
 
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasQuestion">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Conditional"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#conditional"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en">hasQuestion</rdfs:label>
     </owl:DatatypeProperty>
@@ -206,7 +196,7 @@
 
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#isOptional">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
         <rdfs:label xml:lang="en">isOptional</rdfs:label>
     </owl:DatatypeProperty>
@@ -214,7 +204,7 @@
 
  <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#rpcName">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Action"/>
+    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
     <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:label xml:lang="en-US">RPC Name</rdfs:label>
   </owl:DatatypeProperty>
@@ -230,82 +220,82 @@
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Action -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#action -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Action">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#action">
         <rdfs:label xml:lang="en">Action</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Conditional -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#conditional -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Conditional">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#conditional">
         <rdfs:label xml:lang="en">Conditional</rdfs:label>
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
     </owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Parameter -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#parameter -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Parameter">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#parameter">
         <rdfs:label xml:lang="en">Parameter</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Role -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#role -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Role">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#role">
         <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:label xml:lang="en">Role</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#SPARQLQuery -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#SPARQLQuery">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery">
         <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:label xml:lang="en">SPARQLQuery</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#SolrQuery -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#SolrQuery">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery">
         <rdfs:label xml:lang="en">SolrQuery</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Step -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#step -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Step">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#step">
         <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:label xml:lang="en">Step</rdfs:label>
     </owl:Class>
 
 	<owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#executionStep">
-		<rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
+		<rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
 		<rdfs:label xml:lang="en-US">Execution step</rdfs:label>
 	</owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Template -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#template -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Template">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#template">
         <rdfs:label xml:lang="en">Template</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Validator -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#validator -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Validator">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#validator">
         <rdfs:label xml:lang="en">Validator</rdfs:label>
     </owl:Class>
 	

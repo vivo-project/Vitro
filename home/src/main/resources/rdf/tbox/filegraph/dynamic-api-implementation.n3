@@ -9,7 +9,7 @@ dynapiimpl:Action
     a owl:Class ;
     rdfs:comment "Processing flow logic" .
 
-dynapi:Action rdfs:subClassOf dynapiimpl:Action .
+dynapi:action rdfs:subClassOf dynapiimpl:Action .
 
 dynapiimpl:ExecutionStep
     a owl:Class ;
@@ -21,4 +21,4 @@ dynapiimpl:Conditional
     a owl:Class ;
     rdfs:comment "Processing flow conditional" .
 
-dynapi:Conditional rdfs:subClassOf dynapiimpl:Conditional .
+dynapi:conditional rdfs:subClassOf dynapiimpl:Conditional .
