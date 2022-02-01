@@ -112,20 +112,20 @@
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#requireAccess -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#requireAccess">
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#role"/>
-        <rdfs:label xml:lang="en">requireAccess</rdfs:label>
+        <rdfs:label xml:lang="en">requiresAccess</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#requireParameter -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#requireParameter">
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
