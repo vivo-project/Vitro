@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdateTime;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDboolean;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -62,6 +63,19 @@ public enum PropertyType {
 				Property annotation) {
 			return new FloatPropertyMethod(method, annotation);
 		}
+	}, 
+	BOOLEAN{
+		@Override
+		public PropertyStatement buildPropertyStatement(Statement s) {
+			return new BooleanPropertyStatement(s.getPredicate().getURI(), s
+					.getObject().asLiteral().getBoolean());
+		}
+
+		@Override
+		protected PropertyMethod buildPropertyMethod(Method method,
+				Property annotation) {
+			return new BooleanPropertyMethod(method, annotation);
+		}
 	};
 
 	public static PropertyType typeForObject(RDFNode object)
@@ -82,6 +96,9 @@ public enum PropertyType {
 			if (datatype.equals(XSDfloat)) {
 				return FLOAT;
 			}
+			if (datatype.equals(XSDboolean)) {
+				return BOOLEAN;
+			}
 		}
 		throw new PropertyTypeException("Unsupported datatype on object: "
 				+ object);
@@ -91,6 +108,9 @@ public enum PropertyType {
 			throws PropertyTypeException {
 		if (Float.TYPE.equals(parameterType)) {
 			return FLOAT;
+		}
+		if (Boolean.TYPE.equals(parameterType)) {
+			return BOOLEAN;
 		}
 		if (String.class.equals(parameterType)) {
 			return STRING;
@@ -181,6 +201,20 @@ public enum PropertyType {
 			return f;
 		}
 	}
+	
+	public static class BooleanPropertyStatement extends PropertyStatement {
+		private final Boolean bool;
+
+		public BooleanPropertyStatement(String predicateUri, Boolean b) {
+			super(BOOLEAN, predicateUri);
+			this.bool = b;
+		}
+
+		@Override
+		public Boolean getValue() {
+			return bool;
+		}
+	}
 
 	public static abstract class PropertyMethod {
 		protected final PropertyType type;
@@ -260,6 +294,12 @@ public enum PropertyType {
 	public static class FloatPropertyMethod extends PropertyMethod {
 		public FloatPropertyMethod(Method method, Property annotation) {
 			super(FLOAT, method, annotation);
+		}
+	}
+	
+	public static class BooleanPropertyMethod extends PropertyMethod {
+		public BooleanPropertyMethod(Method method, Property annotation) {
+			super(BOOLEAN, method, annotation);
 		}
 	}
 
