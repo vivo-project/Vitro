@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcessResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 
 @WebServlet(name = "DynamicAPIEndpoint", urlPatterns = { "/dynapi/*" })
 public class DynamicAPIEndpoint extends VitroHttpServlet  {
@@ -35,8 +35,8 @@ public class DynamicAPIEndpoint extends VitroHttpServlet  {
 		log.debug(actionName);
 		actionPool.printActionNames();
 		Action action = actionPool.getByName(actionName);
-		ProcessInput input = new ProcessInput(request);
-		ProcessResult result = action.run(input);
+		OperationData input = new OperationData(request);
+		OperationResult result = action.run(input);
 		result.prepareResponse(response);
 	}
 }

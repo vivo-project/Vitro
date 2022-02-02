@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.ProcessInput;
+import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 
 public class ConditionalStep implements Step {
 
@@ -11,7 +11,7 @@ public class ConditionalStep implements Step {
 	}
 
 	@Override
-	public ProcessResult run(ProcessInput input) {
+	public OperationResult run(OperationData input) {
 		return null;
 	}
 

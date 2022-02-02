@@ -11,7 +11,7 @@ public class DefaultAction extends Action {
 
  	private static final Log log = LogFactory.getLog(DefaultAction.class);
 
-	public ProcessResult run(Map<String, String[]> map) {
+	public OperationResult run(Map<String, String[]> map) {
 		for (Map.Entry<String, String[]> entry : map.entrySet()) {
 			log.debug("param name " + entry.getKey() );
 			String[] values = entry.getValue();
@@ -19,7 +19,7 @@ public class DefaultAction extends Action {
 				log.debug("param value " + value);
 			}
 		}
-		ProcessResult result = new ProcessResult(HttpServletResponse.SC_BAD_REQUEST);
+		OperationResult result = new OperationResult(HttpServletResponse.SC_BAD_REQUEST);
 		return result;
 	}
 }

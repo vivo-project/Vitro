@@ -4,11 +4,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class ProcessInput {
+public class OperationData {
 
 	private Map<String, String[]> params;
 
-	public ProcessInput(HttpServletRequest request) {
+	public OperationData(HttpServletRequest request) {
 		params = request.getParameterMap();
 	}
 

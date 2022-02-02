@@ -11,14 +11,14 @@ dynapiimpl:Action
 
 dynapi:action rdfs:subClassOf dynapiimpl:Action .
 
-dynapiimpl:ExecutionStep
+dynapiimpl:OperationalStep
     a owl:Class ;
     rdfs:comment "Processing flow execution unit" .
 
-dynapi:executionStep rdfs:subClassOf dynapiimpl:ExecutionStep .
+dynapi:operationalStep rdfs:subClassOf dynapiimpl:OperationalStep .
 
-dynapiimpl:Conditional
+dynapiimpl:ConditionalStep
     a owl:Class ;
     rdfs:comment "Processing flow conditional" .
 
-dynapi:conditional rdfs:subClassOf dynapiimpl:Conditional .
+dynapi:conditionalStep rdfs:subClassOf dynapiimpl:ConditionalStep .
