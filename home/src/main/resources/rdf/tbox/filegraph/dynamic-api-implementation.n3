@@ -22,3 +22,9 @@ dynapiimpl:ConditionalStep
     rdfs:comment "Processing flow conditional" .
 
 dynapi:conditionalStep rdfs:subClassOf dynapiimpl:ConditionalStep .
+
+dynapiimpl:N3Template
+    a owl:Class ;
+    rdfs:comment "Processing flow conditional" .
+
+dynapi:n3Template rdfs:subClassOf dynapiimpl:N3Template .

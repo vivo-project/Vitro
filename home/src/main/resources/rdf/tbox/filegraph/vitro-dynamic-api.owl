@@ -278,6 +278,13 @@
     </owl:Class>
     
 
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#n3Template -->
+
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#n3Template">
+		<rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
+        <rdfs:label xml:lang="en">N3 template</rdfs:label>
+    </owl:Class>
+
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#validator -->
 
