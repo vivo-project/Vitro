@@ -42,7 +42,7 @@ public class Action implements RunnableComponent{
 	}	 
 	
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rpcName", minOccurs = 1, maxOccurs = 1)
-	public void setName(String name) {
+	public void setRPCName(String name) {
 		this.rpcName = name;
 	}
 	
