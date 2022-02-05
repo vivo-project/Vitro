@@ -10,9 +10,11 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 
@@ -23,6 +25,8 @@ public class ActionPool {
 	private ConfigurationBeanLoader loader;
 	private static ActionPool INSTANCE = null;
  	private static final Log log = LogFactory.getLog(ActionPool.class);
+	private ContextModelAccess modelAccess;
+	private OntModel dynamicAPIModel;
 
 	private ActionPool(){
 		this.actions = new HashMap<String,Action>();
@@ -74,7 +78,9 @@ public class ActionPool {
 
 	public void init(ServletContext ctx) {
 		this.ctx = ctx;
-		loader = new ConfigurationBeanLoader(	ModelAccess.on(ctx).getOntModel(FULL_UNION), ctx);
+		modelAccess = ModelAccess.on(ctx);
+		dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
+		loader = new ConfigurationBeanLoader(	dynamicAPIModel, ctx);
 		log.debug("Context Initialization ...");
 		loadActions();
 	}

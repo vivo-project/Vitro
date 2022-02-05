@@ -50,6 +50,7 @@ public class OperationalStep implements Step{
 		log.debug("Processing in STEP");
 		log.debug("Execution step is optional? " + optional);
 		if (operation != null) {
+			log.debug("Operation not null");
 			result = operation.run(data);
 			if (!optional && result.hasError()) {
 				return result;

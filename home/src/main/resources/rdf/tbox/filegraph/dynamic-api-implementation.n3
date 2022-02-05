@@ -5,26 +5,15 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 
 
-dynapiimpl:Action 
-    a owl:Class ;
-    rdfs:comment "Processing flow logic" .
-
 dynapi:action rdfs:subClassOf dynapiimpl:Action .
-
-dynapiimpl:OperationalStep
-    a owl:Class ;
-    rdfs:comment "Processing flow execution unit" .
 
 dynapi:operationalStep rdfs:subClassOf dynapiimpl:OperationalStep .
 
-dynapiimpl:ConditionalStep
-    a owl:Class ;
-    rdfs:comment "Processing flow conditional" .
-
 dynapi:conditionalStep rdfs:subClassOf dynapiimpl:ConditionalStep .
 
-dynapiimpl:N3Template
-    a owl:Class ;
-    rdfs:comment "Processing flow conditional" .
-
 dynapi:n3Template rdfs:subClassOf dynapiimpl:N3Template .
+
+dynapi:sparqlQuery rdfs:subClassOf dynapiimpl:SPARQLQuery .
+dynapi:sparqlQuery rdfs:subClassOf dynapiimpl:Operation .
+
+dynapi:model rdfs:subClassOf dynapiimpl:ModelComponent .
