@@ -16,10 +16,6 @@ public class Action implements RunnableComponent{
 	private Step firstStep = null;
 	private String rpcName = null;
 
-	public Action(){
-
-	}
-
 	@Override
 	public void dereference() {
 		if (firstStep != null) {
@@ -49,5 +45,8 @@ public class Action implements RunnableComponent{
 	public String getName() {
 		return rpcName;
 	}
-	
+
+	public boolean isValid() {
+		return true;
+	}
 }

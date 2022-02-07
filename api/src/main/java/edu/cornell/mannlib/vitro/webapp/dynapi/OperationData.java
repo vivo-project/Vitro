@@ -19,8 +19,15 @@ public class OperationData {
 		return context;
 	}
 
-	public Map<String, String[]> getParams() {
-		return params;
+	public boolean has(String paramName) {
+		if (params.containsKey(paramName)) {
+			return true;
+		}
+		return false;
+	}
+
+	public String[] get(String paramName) {
+		return params.get(paramName);
 	}
 
 }

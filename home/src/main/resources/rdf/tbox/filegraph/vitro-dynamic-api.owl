@@ -221,6 +221,14 @@
 		<rdfs:label xml:lang="en-US">Model name</rdfs:label>
 	  </owl:DatatypeProperty>
 
+
+	 <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#paramName">
+		<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+		<rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+		<rdfs:label xml:lang="en-US">Parameter name</rdfs:label>
+	  </owl:DatatypeProperty>
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //

@@ -20,11 +20,12 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 
 public class ActionPool {
 
+	private static ActionPool INSTANCE = null;
+ 	private static final Log log = LogFactory.getLog(ActionPool.class);
+ 	
 	private Map<String,Action> actions;
 	private ServletContext ctx;
 	private ConfigurationBeanLoader loader;
-	private static ActionPool INSTANCE = null;
- 	private static final Log log = LogFactory.getLog(ActionPool.class);
 	private ContextModelAccess modelAccess;
 	private OntModel dynamicAPIModel;
 
@@ -51,12 +52,6 @@ public class ActionPool {
 	public void printActionNames() {
 		for (Map.Entry<String,Action> entry : actions.entrySet()) {
 			log.debug("Action in pool: '" + entry.getKey() + "'");
-		}
-	}
-	
-	public void add(Set<Action> actionSet) {
-		for (Action action : actionSet) {
-			actions.put(action.getName(), action);
 		}
 	}
 	
@@ -88,8 +83,17 @@ public class ActionPool {
 	private void loadActions() {
 		Set<Action> actions = loader.loadEach(Action.class);
 		log.debug("Context Initialization. actions loaded: " + actions.size());
-		add(actions);
-		log.debug("Context Initialization finished");
+		for (Action action : actions) {
+			if (action.isValid()) {
+				add(action);
+			} else {
+				log.error("Action with rpcName " + action.getName() + " is invalid.");
+			}
+		}
+		log.debug("Context Initialization finished. " + actions.size() + " actions loaded.");
 	}
 
+	private void add(Action action) {
+		actions.put(action.getName(), action);
+	}
 }

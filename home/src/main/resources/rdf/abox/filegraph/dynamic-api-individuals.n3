@@ -1,0 +1,12 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapiimpl: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/isNotBlankValidator>
+        a                       dynapi:validator , owl:Thing ;
+        rdfs:label              "Is not blank"@en-US ;
+		rdf:type                dynapiimpl:validators.IsNotBlank ;
+        vitro:mostSpecificType  dynapi:validator .

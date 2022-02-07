@@ -17,3 +17,7 @@ dynapi:sparqlQuery rdfs:subClassOf dynapiimpl:SPARQLQuery .
 dynapi:sparqlQuery rdfs:subClassOf dynapiimpl:Operation .
 
 dynapi:model rdfs:subClassOf dynapiimpl:ModelComponent .
+
+dynapi:parameter rdfs:subClassOf dynapiimpl:Parameter .
+
+

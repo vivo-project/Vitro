@@ -23,10 +23,22 @@ public class SPARQLQuery implements Operation{
 
 	private String queryText;
 	private ModelComponent modelComponent;
+	private Parameters requiredParams = new Parameters();
+	private Parameters providedParams = new Parameters();
 
 	@Override
 	public void dereference() {
-		
+		//TODO
+	}
+	
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+	public void addRequiredParameter(Parameter param) {
+		requiredParams.add(param);	
+	}
+	
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
+	public void addProvidedParameter(Parameter param) {
+		providedParams.add(param);
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText", minOccurs = 1, maxOccurs = 1)
@@ -39,8 +51,19 @@ public class SPARQLQuery implements Operation{
 		this.modelComponent = model;
 	}
 	
+	public Parameters getRequiredParams() {
+		return requiredParams;
+	}
+
+	public Parameters getProvidedParams() {
+		return providedParams;
+	}
+	
 	@Override
 	public OperationResult run(OperationData input) {
+		if (!isInputValid(input)) {
+			return new OperationResult(500);
+		}
 		int resultCode = 200;
 		Model queryModel = ModelAccess.on(input.getContext()).getOntModel(modelComponent.getName());
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
@@ -74,8 +97,20 @@ public class SPARQLQuery implements Operation{
 		} finally {
 			queryModel.leaveCriticalSection();
 		}
-		
 		return new OperationResult(resultCode);
 	}
 
+	private boolean isInputValid(OperationData input) {
+		for (String name : requiredParams.getNames()) {
+			if (!input.has(name)) {
+				return false;
+			}
+			Parameter param = requiredParams.get(name);
+			String[] inputValues = input.get(name);
+			if (!param.isValid(name, inputValues)){;
+				return false;
+			}
+		}
+		return true;
+	}
 }

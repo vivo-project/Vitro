@@ -23,4 +23,28 @@ public class N3Template implements Template{
 		return null;
 	}
 
+	@Override
+	public void addRequiredParameter(Parameter param) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addProvidedParameter(Parameter param) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Parameters getRequiredParams() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Parameters getProvidedParams() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
