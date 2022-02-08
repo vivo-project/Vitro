@@ -29,6 +29,12 @@
 # Parameter types
 #
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDint>
+		a	                    dynapi:parameterType ,
+								dynapi_java:ParameterType;
+		dynapi:typeName 		"integer" ;        
+		rdfs:label              "Integer type"@en-US ;
+        vitro:mostSpecificType  dynapi:parameterType .
 
 #-------------------------------------------------------------------------------
 #
@@ -37,43 +43,43 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_assertions>
 		a	                    dynapi:model ;
-		dynapi:modelName 		"TBOX_ASSERTIONS"@en-US ;        
+		dynapi:modelName 		"TBOX_ASSERTIONS" ;        
 		rdfs:label              "tbox assertions model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions>
 		a	                    dynapi:model ;
-		dynapi:modelName 		"ABOX_ASSERTIONS"@en-US ;        
+		dynapi:modelName 		"ABOX_ASSERTIONS";        
 		rdfs:label              "abox assertions model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_union>
 		a	                    dynapi:model ;
-		dynapi:modelName 		"ABOX_UNION"@en-US ;        
+		dynapi:modelName 		"ABOX_UNION" ;        
 		rdfs:label              "abox union model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_union>
 		a	                    dynapi:model ;
-		dynapi:modelName 		"TBOX_UNION"@en-US ;        
+		dynapi:modelName 		"TBOX_UNION" ;        
 		rdfs:label              "tbox union model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union>
 		a	                    dynapi:model ;
-		dynapi:modelName 		"FULL_UNION"@en-US ;        
+		dynapi:modelName 		"FULL_UNION" ;        
 		rdfs:label              "full union model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/application_metadata>
 		a	                    dynapi:model ;
-		dynapi:modelName 		"APPLICATION_METADATA"@en-US ;        
+		dynapi:modelName 		"APPLICATION_METADATA" ;        
 		rdfs:label              "application metadata model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/user_accounts>
 		a	                    dynapi:model ;
-		dynapi:modelName 		"USER_ACCOUNTS"@en-US ;        
+		dynapi:modelName 		"USER_ACCOUNTS" ;        
 		rdfs:label              "user accounts model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 

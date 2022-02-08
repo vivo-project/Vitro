@@ -26,5 +26,6 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>
 		a 						dynapi:parameter;
 		dynapi:paramName		"limit";
+		dynapi:hasParameterType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDint> ;
 		dynapi:hasValidator		<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger> ;
         rdfs:label              "Test parameter 1 for query 1"@en-US .

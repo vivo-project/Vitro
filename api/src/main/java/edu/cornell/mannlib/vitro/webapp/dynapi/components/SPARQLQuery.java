@@ -68,7 +68,7 @@ public class SPARQLQuery implements Operation{
 		Model queryModel = ModelAccess.on(input.getContext()).getOntModel(modelComponent.getName());
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
 		for (String paramName : requiredParams.getNames()) {
-			pss.setLiteral(paramName, Integer.parseInt(input.get(paramName)[0]));	
+			pss.setLiteral(paramName, input.get(paramName)[0],requiredParams.get(paramName).getRDFDataType());	
 		}
 		pss.setCommandText(queryText);
 		queryModel.enterCriticalSection(Lock.READ);

@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import org.apache.jena.datatypes.RDFDatatype;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
@@ -13,7 +15,14 @@ public class Parameter implements Removable{
 		return name;
 	}
 	
+	public RDFDatatype getRDFDataType() {
+		return type.getRDFDataType();
+	}
 	
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasParameterType", minOccurs = 1, maxOccurs = 1)
+	public void setParamType(ParameterType type) {
+		this.type = type;
+	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#paramName", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {

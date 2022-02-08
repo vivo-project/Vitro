@@ -19,6 +19,8 @@ dynapi:model rdfs:subClassOf dynapi_java:ModelComponent .
 
 dynapi:parameter rdfs:subClassOf dynapi_java:Parameter .
 
+dynapi:parameterType rdfs:subClassOf dynapi_java:ParameterType .
+
 
 
 
