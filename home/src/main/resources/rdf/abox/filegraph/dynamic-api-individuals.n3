@@ -3,10 +3,78 @@
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
-@prefix dynapiimpl: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/isNotBlankValidator>
-        a                       dynapi:validator , owl:Thing ;
+#-------------------------------------------------------------------------------
+#
+# Validators
+#
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/isNotBlank>
+		a	                    dynapi:validator ,
+								dynapi_java:validators.Validator ,
+								dynapi_java:validators.IsNotBlank ;
         rdfs:label              "Is not blank"@en-US ;
-		rdf:type                dynapiimpl:validators.IsNotBlank ;
         vitro:mostSpecificType  dynapi:validator .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger>
+		a	                    dynapi:validator ,
+								dynapi_java:validators.Validator ,
+								dynapi_java:validators.IsInteger;
+        rdfs:label              "Is integer"@en-US ;
+        vitro:mostSpecificType  dynapi:validator .
+
+#-------------------------------------------------------------------------------
+#
+# Parameter types
+#
+
+
+#-------------------------------------------------------------------------------
+#
+# Models
+#
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_assertions>
+		a	                    dynapi:model ;
+		dynapi:modelName 		"TBOX_ASSERTIONS"@en-US ;        
+		rdfs:label              "tbox assertions model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions>
+		a	                    dynapi:model ;
+		dynapi:modelName 		"ABOX_ASSERTIONS"@en-US ;        
+		rdfs:label              "abox assertions model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_union>
+		a	                    dynapi:model ;
+		dynapi:modelName 		"ABOX_UNION"@en-US ;        
+		rdfs:label              "abox union model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_union>
+		a	                    dynapi:model ;
+		dynapi:modelName 		"TBOX_UNION"@en-US ;        
+		rdfs:label              "tbox union model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union>
+		a	                    dynapi:model ;
+		dynapi:modelName 		"FULL_UNION"@en-US ;        
+		rdfs:label              "full union model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/application_metadata>
+		a	                    dynapi:model ;
+		dynapi:modelName 		"APPLICATION_METADATA"@en-US ;        
+		rdfs:label              "application metadata model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/user_accounts>
+		a	                    dynapi:model ;
+		dynapi:modelName 		"USER_ACCOUNTS"@en-US ;        
+		rdfs:label              "user accounts model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+

@@ -2,6 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
 public abstract class AbstractValidator implements Validator {
 
+	
 	private String name;
 	
 	@Override

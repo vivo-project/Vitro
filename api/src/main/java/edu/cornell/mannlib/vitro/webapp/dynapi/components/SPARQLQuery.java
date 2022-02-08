@@ -67,6 +67,9 @@ public class SPARQLQuery implements Operation{
 		int resultCode = 200;
 		Model queryModel = ModelAccess.on(input.getContext()).getOntModel(modelComponent.getName());
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
+		for (String paramName : requiredParams.getNames()) {
+			pss.setLiteral(paramName, Integer.parseInt(input.get(paramName)[0]));	
+		}
 		pss.setCommandText(queryText);
 		queryModel.enterCriticalSection(Lock.READ);
 		try {
@@ -88,11 +91,15 @@ public class SPARQLQuery implements Operation{
 				}
 				
 			} catch(Exception e) {
+				log.error(e.getLocalizedMessage());
+				e.printStackTrace();
 				resultCode = 500;
 			}finally {
 				qexec.close();
 			}
 		} catch(Exception e) {
+			log.error(e.getLocalizedMessage());
+			e.printStackTrace();
 			resultCode = 500;
 		} finally {
 			queryModel.leaveCriticalSection();
@@ -103,11 +110,12 @@ public class SPARQLQuery implements Operation{
 	private boolean isInputValid(OperationData input) {
 		for (String name : requiredParams.getNames()) {
 			if (!input.has(name)) {
+				log.error("Parameter " + name + " not found");
 				return false;
 			}
 			Parameter param = requiredParams.get(name);
 			String[] inputValues = input.get(name);
-			if (!param.isValid(name, inputValues)){;
+			if (!param.isValid(name, inputValues)){
 				return false;
 			}
 		}

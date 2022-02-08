@@ -15,12 +15,13 @@ public class Validators implements Removable {
 	List <Validator> validators = new LinkedList<Validator>();
  			
 	public void add(Validator validator) {
+		validators.add(validator);
 	}
 
 	public boolean isAllValid(String name, String[] values) {
 		for (Validator validator: validators) {
 			if (!validator.isValid(name, values)) {
-				log.error("Parameter " + name + " is invalid. Validator failed " + validator.getName() );
+				log.error("Parameter " + name + " is invalid. Validator failed " + validator.getClass().getSimpleName());
 				return false;
 			}
 		}

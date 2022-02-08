@@ -1,17 +1,19 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Parameter implements Removable {
+public class Parameter implements Removable{
 
 	String name;
 	Validators validators = new Validators();
+	ParameterType type;
 	
 	public String getName() {
 		return name;
 	}
+	
+	
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#paramName", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
@@ -29,9 +31,6 @@ public class Parameter implements Removable {
 
 	@Override
 	public void dereference() {
-		// TODO Auto-generated method stub
 	}
-	
-	
-	
+
 }
