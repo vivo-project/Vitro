@@ -14,7 +14,7 @@ public class Action implements RunnableComponent{
  	private static final Log log = LogFactory.getLog(Action.class);
 
 	private Step firstStep = null;
-	private String rpcName = null;
+	private RPC rpc;
 
 	@Override
 	public void dereference() {
@@ -22,7 +22,8 @@ public class Action implements RunnableComponent{
 			firstStep.dereference();
 			firstStep = null;
 		}
-		rpcName = null;
+		rpc.dereference();
+		rpc = null;
 	}
 	
 	public OperationResult run(OperationData input) {
@@ -37,13 +38,13 @@ public class Action implements RunnableComponent{
 		this.firstStep = step;
 	}	 
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rpcName", minOccurs = 1, maxOccurs = 1)
-	public void setRPCName(String name) {
-		this.rpcName = name;
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#assignedRPC", minOccurs = 1, maxOccurs = 1)
+	public void setRPC(RPC rpc) {
+		this.rpc = rpc;
 	}
 	
 	public String getName() {
-		return rpcName;
+		return rpc.getName();
 	}
 
 	public boolean isValid() {
