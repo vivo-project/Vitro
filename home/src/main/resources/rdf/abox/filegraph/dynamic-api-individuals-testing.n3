@@ -35,12 +35,18 @@
         a                        dynapi:rpc ;
         dynapi:resourceName      "Test rpc individual" ;
         dynapi:rpcName           "test_action"@en-US ;
-        dynapi:rpcAPIVersionMin "00.00.01" .
+        dynapi:rpcAPIVersionMin  "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resource/testResource1>
         a                        dynapi:resource ;
         dynapi:resourceName      "test_resource" ;
         rdfs:label               "Test resource 1"@en-US ;
         dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>;
-        dynapi:restAPIVersionMin "00.00.01" .
+        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>;
+        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>;
+        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>;
+        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>;
+        dynapi:customAction      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>;
+        dynapi:restAPIVersionMin "0.1.0" .
+
 

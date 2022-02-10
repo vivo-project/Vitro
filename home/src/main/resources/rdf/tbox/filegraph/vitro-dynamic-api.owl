@@ -191,6 +191,16 @@
     </owl:ObjectProperty>
 
 
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#customAction -->
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#customAction">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+        <rdfs:label xml:lang="en-US">custom REST action</rdfs:label>
+    </owl:ObjectProperty>
+
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#assignedRPC -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#assignedRPC">

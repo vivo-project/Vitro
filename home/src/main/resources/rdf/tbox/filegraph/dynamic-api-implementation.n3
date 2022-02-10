@@ -21,7 +21,7 @@ dynapi:parameter rdfs:subClassOf dynapi_java:Parameter .
 
 dynapi:parameterType rdfs:subClassOf dynapi_java:ParameterType .
 
-dynapi:resource rdfs:subClassOf dynapi_java:rest.Resource .
+dynapi:resource rdfs:subClassOf dynapi_java:Resource .
 
 dynapi:rpc rdfs:subClassOf dynapi_java:RPC .
 

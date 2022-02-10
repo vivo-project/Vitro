@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 
-@WebServlet(name = "DynamicAPIEndpoint", urlPatterns = { "/dynapi/*" })
+@WebServlet(name = "RPCEndpoint", urlPatterns = { "/api/rpc/*" })
 public class RPCEndpoint extends VitroHttpServlet  {
 
 	private static final long serialVersionUID = 1L;
