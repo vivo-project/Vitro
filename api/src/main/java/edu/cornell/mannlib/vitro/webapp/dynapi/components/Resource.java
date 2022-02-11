@@ -19,7 +19,7 @@ public class Resource implements Removable {
 	private RPC rpcOnDelete;
 	private RPC rpcOnPut;
 	private RPC rpcOnPatch;
-	private List<RPC> customActions = new LinkedList<RPC>();
+	private List<CustomAction> customActions = new LinkedList<CustomAction>();
 
 	public String getVersionMin() {
 		return versionMin;
@@ -93,9 +93,9 @@ public class Resource implements Removable {
 		this.rpcOnPatch = rpcOnPatch;
 	}
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#customAction")
-	public void addCustomAction(RPC rpc) {
-		customActions.add(rpc);
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomAction")
+	public void addCustomAction(CustomAction customAction) {
+		customActions.add(customAction);
 	}
 
 	@Override
