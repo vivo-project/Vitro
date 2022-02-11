@@ -107,13 +107,13 @@ public class FreemarkerEmailFactory {
 
 	public FreemarkerEmailFactory(ServletContext ctx) {
 		this.smtpHost = getSmtpHostFromConfig(ctx);
-		new SmtpHostTester().test(this.smtpHost);
-
+		this.emailPort = getPortFromConfig(ctx);
+		new SmtpHostTester().test(this.smtpHost, emailPort);
 		this.replyToAddress = getReplyToAddressFromConfig(ctx);
 		this.password = getPasswordFromConfig(ctx);
 		this.userName = getUserNameFromConfig(ctx);
-		this.emailPort = getPortFromConfig(ctx);
 		this.emailSession = createEmailSession(smtpHost);
+
 	}
 
 	String getSmtpHost() {
@@ -191,6 +191,7 @@ public class FreemarkerEmailFactory {
 		props.put("mail.smtp.port", emailPort);
 		if (emailPort == TLS_PORT) {
 			props.put("mail.smtp.starttls.enable", "true");
+			props.put("mail.smtp.ssl.protocols", "TLSv1.3 TLSv1.2");
 		}
 		if (emailPort == SSL_PORT) {
 			props.put("mail.smtp.socketFactory.port", emailPort);
@@ -247,17 +248,18 @@ public class FreemarkerEmailFactory {
 		/**
 		 * Try to open a connection to the SMTP host and conduct an "empty"
 		 * conversation using SMTP.
+		 * @param emailPort 
 		 *
 		 * @throws InvalidSmtpHost
 		 *             If anything goes wrong.
 		 */
-		public void test(String smtpHost) throws InvalidSmtpHost {
+		public void test(String smtpHost, int emailPort) throws InvalidSmtpHost {
 			Socket socket = null;
 			PrintStream out = null;
 			Scanner in = null;
 			try {
 				InetAddress hostAddr = InetAddress.getByName(smtpHost);
-				socket = new Socket(hostAddr, SMTP_PORT);
+				socket = new Socket(hostAddr, emailPort);
 
 				out = new PrintStream(socket.getOutputStream());
 				in = new Scanner(new InputStreamReader(socket.getInputStream()));
@@ -275,7 +277,7 @@ public class FreemarkerEmailFactory {
 						"host name is not recognized");
 			} catch (ConnectException e) {
 				throw new InvalidSmtpHost(smtpHost,
-						"refused connection on port " + SMTP_PORT);
+						"refused connection on port " + emailPort);
 			} catch (IOException e) {
 				throw new RuntimeException("unrecognized problem: ", e);
 			} finally {
