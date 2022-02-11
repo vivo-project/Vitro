@@ -83,4 +83,49 @@
         rdfs:label              "user accounts model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
+#-------------------------------------------------------------------------------
+#
+# HTTP Methods
+#
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get>
+        a                       dynapi:httpMethod ;
+        dynapi:methodName       "GET" ;        
+        rdfs:label              "HTTP GET method"@en-US ;
+        vitro:mostSpecificType  dynapi:httpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post>
+        a                       dynapi:httpMethod ;
+        dynapi:methodName       "POST" ;        
+        rdfs:label              "HTTP POST method"@en-US ;
+        vitro:mostSpecificType  dynapi:httpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put>
+        a                       dynapi:httpMethod ;
+        dynapi:methodName       "PUT" ;        
+        rdfs:label              "HTTP PUT method"@en-US ;
+        vitro:mostSpecificType  dynapi:httpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch>
+        a                       dynapi:httpMethod ;
+        dynapi:methodName       "PATCH" ;        
+        rdfs:label              "HTTP PATCH method"@en-US ;
+        vitro:mostSpecificType  dynapi:httpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete>
+        a                       dynapi:httpMethod ;
+        dynapi:methodName       "DELETE" ;        
+        rdfs:label              "HTTP DELETE method"@en-US ;
+        vitro:mostSpecificType  dynapi:httpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/options>
+        a                       dynapi:httpMethod ;
+        dynapi:methodName       "OPTIONS" ;        
+        rdfs:label              "HTTP OPTIONS method"@en-US ;
+        vitro:mostSpecificType  dynapi:httpMethod .
+
+
+
+
+
 

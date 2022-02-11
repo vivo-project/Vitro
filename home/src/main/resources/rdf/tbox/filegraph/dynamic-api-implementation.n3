@@ -25,3 +25,5 @@ dynapi:resource rdfs:subClassOf dynapi_java:Resource .
 
 dynapi:rpc rdfs:subClassOf dynapi_java:RPC .
 
+dynapi:httpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
+

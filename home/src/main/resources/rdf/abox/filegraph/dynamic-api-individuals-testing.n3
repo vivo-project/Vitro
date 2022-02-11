@@ -35,6 +35,7 @@
         a                        dynapi:rpc ;
         dynapi:resourceName      "Test rpc individual" ;
         dynapi:rpcName           "test_action"@en-US ;
+        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:rpcAPIVersionMin  "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resource/testResource1>

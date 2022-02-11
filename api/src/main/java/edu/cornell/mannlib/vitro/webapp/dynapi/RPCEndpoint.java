@@ -19,7 +19,26 @@ public class RPCEndpoint extends VitroHttpServlet  {
 	private ActionPool actionPool = ActionPool.getInstance();
 	
 	@Override
+	public void doGet( HttpServletRequest request, HttpServletResponse response ) {
+		process(request, response);
+	}
+	
+	@Override
 	public void doPost( HttpServletRequest request, HttpServletResponse response ) {
+		process(request, response);
+	}
+	
+	@Override
+	public void doDelete( HttpServletRequest request, HttpServletResponse response ) {
+		process(request, response);
+	}
+	
+	@Override
+	public void doPut( HttpServletRequest request, HttpServletResponse response ) {
+		process(request, response);
+	}
+	
+	private void process(HttpServletRequest request, HttpServletResponse response) {
 		String requestURL = request.getRequestURI();
 		String actionName = requestURL.substring(requestURL.lastIndexOf("/") + 1 );
 		log.debug(actionName);
