@@ -44,12 +44,20 @@
     </owl:ObjectProperty>
     
 
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#firstStep -->
 
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#firstStep">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
+        <rdfs:label xml:lang="en-US">first step</rdfs:label>
+    </owl:ObjectProperty>
+    
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#next -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#next">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en-US">next</rdfs:label>
     </owl:ObjectProperty>

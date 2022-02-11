@@ -33,7 +33,7 @@ public class Action implements RunnableComponent{
 		return firstStep.run(input);
 	}
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#next", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#firstStep", minOccurs = 1, maxOccurs = 1)
 	public void setStep(OperationalStep step) {
 		this.firstStep = step;
 	}	 

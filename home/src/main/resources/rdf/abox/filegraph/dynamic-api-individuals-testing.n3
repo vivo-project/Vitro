@@ -10,7 +10,7 @@
         a                        dynapi:action ;
         rdfs:label               "Test action"@en-US ;
         dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
-        dynapi:next              <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
+        dynapi:firstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1>
         a                        dynapi:step, dynapi:operationalStep ;
