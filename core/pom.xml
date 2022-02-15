@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>vitro-languages-core</artifactId>
-    <version>1.12.2-SNAPSHOT</version>
+    <version>1.12.2</version>
     <packaging>pom</packaging>
 
     <name>Vitro Languages CORE</name>
@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.vivoweb</groupId>
         <artifactId>vitro-languages</artifactId>
-        <version>1.12.2-SNAPSHOT</version>
+        <version>1.12.2</version>
     </parent>
 
     <licenses>
@@ -54,7 +54,7 @@
         <connection>scm:git:git@github.com:vivo-project/Vitro-languages.git</connection>
         <developerConnection>scm:git:git@github.com:vivo-project/Vitro-languages.git</developerConnection>
         <url>git@github.com:vivo-project/Vitro-languages.git</url>
-        <tag>HEAD</tag>
+        <tag>vitro-languages-1.12.2</tag>
     </scm>
 
     <properties>
