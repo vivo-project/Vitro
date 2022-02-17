@@ -19,6 +19,7 @@
 
     <name>Vitro API</name>
 
+
     <properties>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
@@ -107,7 +108,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

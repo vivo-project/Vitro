@@ -16,7 +16,7 @@
         <version>1.12.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-
+  
     <name>Vitro Installer</name>
 
     <properties>

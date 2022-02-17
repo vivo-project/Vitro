@@ -2,7 +2,7 @@
 # ServletContextListeners for Vitro, to be instantiated and run by the StartupManager.
 #
 # For more information,
-#     https://wiki.duraspace.org/display/VIVO/The+StartupManager
+#     https://wiki.lyrasis.org/display/VIVODOC112x/The+StartupManager
 #
 
 edu.cornell.mannlib.vitro.webapp.servlet.setup.JvmSmokeTests
@@ -69,3 +69,5 @@ edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache$Setup
 
 # This should be near the end, because it will issue a warning if the connection to Solr or ElasticSearch times out.
 edu.cornell.mannlib.vitro.webapp.servlet.setup.SearchEngineSmokeTest
+
+edu.cornell.mannlib.vitro.webapp.dynapi.Initializer
