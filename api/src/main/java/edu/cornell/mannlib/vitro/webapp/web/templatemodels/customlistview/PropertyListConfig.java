@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -22,12 +23,13 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectProp
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel.ConfigError;
 import freemarker.cache.TemplateLoader;
+import org.springframework.util.ResourceUtils;
 
 public class PropertyListConfig {
     private static final Log log = LogFactory.getLog(PropertyListConfig.class);
 
 
-    private static final String CONFIG_FILE_PATH = "/config/";
+    private static final String CONFIG_FILE_PATH = "config/";
     private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
 
     /* NB The default post-processor is not the same as the post-processor for the default view. The latter
@@ -69,12 +71,12 @@ public class PropertyListConfig {
         String configFilePath = getConfigFilePath(configFileName);
 
         try {
-            File config = new File(configFilePath);
-            if ( ! isDefaultConfig(configFileName) && ! config.exists() ) {
+            try{
+                File config = ResourceUtils.getFile("classpath:"+configFilePath);
+            }catch(FileNotFoundException e){
                 log.warn("Can't find config file " + configFilePath + " for object property " + op.getURI() + "\n" +
                         ". Using default config file instead.");
                 configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                // Should we test for the existence of the default, and throw an error if it doesn't exist?
             }
             setValuesFromConfigFile(configFilePath, wadf, editing);
 
@@ -136,7 +138,7 @@ public class PropertyListConfig {
     private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf,
             boolean editing) {
 		try {
-			FileReader reader = new FileReader(configFilePath);
+			FileReader reader = new FileReader(ResourceUtils.getFile("classpath:"+configFilePath));
 			CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
 
 			boolean collated = optm instanceof CollatedObjectPropertyTemplateModel;
@@ -191,7 +193,7 @@ public class PropertyListConfig {
 	}
 
     private String getConfigFilePath(String filename) {
-        return vreq.getSession().getServletContext().getRealPath(CONFIG_FILE_PATH + filename);
+        return CONFIG_FILE_PATH + filename;
     }
 
 	public String getSelectQuery() {
