@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;

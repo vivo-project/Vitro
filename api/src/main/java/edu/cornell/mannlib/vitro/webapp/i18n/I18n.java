@@ -172,6 +172,7 @@ public class I18n {
 		I18nLogger i18nLogger = new I18nLogger();
 		try {
 			String dir = themeDirectory.get();
+			
 			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
 					locale, control);

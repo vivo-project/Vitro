@@ -15,7 +15,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Obtains and provides the contents of the build.properties file.
+ * Obtains and provides the contents of the build.properties file from server (tomcat) configuration.
+ * This will probably be empty
  */
 public class BuildProperties {
 	private static final Log log = LogFactory.getLog(BuildProperties.class);
@@ -34,6 +35,7 @@ public class BuildProperties {
 				log.debug("Didn't find a resource at '"
 						+ WEBAPP_PATH_BUILD_PROPERTIES + "'.");
 			} else {
+				log.debug("Usao");
 				Properties props = new Properties();
 				props.load(stream);
 				for (String key : props.stringPropertyNames()) {
@@ -41,6 +43,7 @@ public class BuildProperties {
 				}
 			}
 		} catch (IOException e) {
+			log.debug("Catch IOException");
 			throw new RuntimeException("Failed to load from '"
 					+ WEBAPP_PATH_BUILD_PROPERTIES + "'.", e);
 		}

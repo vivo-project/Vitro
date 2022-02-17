@@ -7,9 +7,16 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-installer</artifactId>
-    <version>1.12.2-SNAPSHOT</version>
+    <version>1.12.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <parent>
+        <groupId>org.vivoweb</groupId>
+        <artifactId>vitro-project</artifactId>
+        <version>1.12.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+  
     <name>Vitro Installer</name>
 
     <properties>

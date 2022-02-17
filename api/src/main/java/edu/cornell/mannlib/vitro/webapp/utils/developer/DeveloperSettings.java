@@ -210,6 +210,7 @@ public class DeveloperSettings {
 				ss.info(this, "Loaded the 'developer.properties' file: "
 						+ devSettings);
 			} catch (FileNotFoundException e) {
+				log.debug(devSettings);
 				ss.info(this, "'developer.properties' file does not exist.");
 			} catch (Exception e) {
 				ss.warning(this,

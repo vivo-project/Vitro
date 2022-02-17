@@ -63,6 +63,8 @@ public class DataGetterUtils {
 	    }else{
     		List<String> dgUris = getDataGetterURIsForAssociatedURI(displayModel, pageURI);
     		List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
+            log.debug("DgUris");
+            log.debug(dgUris);
     		log.debug("getDataGettersForPage: " + dgList);
     		vreq.setAttribute( DATA_GETTERS_FOR_PAGE , dgList );
     		return dgList;

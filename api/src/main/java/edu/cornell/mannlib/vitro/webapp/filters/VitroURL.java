@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
  * Before 2010-11 this was a private class of URLRewritingHttpServletResponse.java.
  *
  * Useful reference:
+ * TODO The link doesn't work anymore
  * http://labs.apache.org/webarch/uri/rfc/rfc3986.html
  */
 class VitroURL {

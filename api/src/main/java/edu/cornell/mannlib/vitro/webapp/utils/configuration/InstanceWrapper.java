@@ -80,6 +80,7 @@ public class InstanceWrapper {
 
 		public PropertyAnnotationsMap(Class<?> clazz)
 				throws InstanceWrapperException {
+			log.debug(clazz.toString());
 			if (!Object.class.equals(clazz)) {
 				populateTheMaps(clazz);
 			}

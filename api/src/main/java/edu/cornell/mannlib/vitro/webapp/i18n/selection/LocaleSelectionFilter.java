@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * Check for a Locale in the ServletContext or the Session that should override
@@ -30,7 +32,8 @@ import org.apache.commons.logging.LogFactory;
  *
  * Otherwise, just process the request as usual.
  */
-@WebFilter(filterName = "Locale selection filter", urlPatterns = {"/*"})
+@Component(value="LocaleSelectionFilter")
+@Order(4)
 public class LocaleSelectionFilter implements Filter {
 	private static final Log log = LogFactory
 			.getLog(LocaleSelectionFilter.class);

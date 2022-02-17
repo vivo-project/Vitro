@@ -1,0 +1,306 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+/* ADMIN PANEL------>  */
+#admin {
+    font-size: .8em;
+    padding-top: 0;
+}
+#admin h3 {
+    display: inline-block;
+    padding: 3px 6px 3px 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    float: left;
+}
+#admin .uri-link {
+    padding-left: 11px;
+    padding-bottom: 5px;
+    clear: left;
+}
+#admin a.edit-individual {
+    padding-left: 0;
+    border-left: none;
+    padding-top: 8px;
+}
+#verbose-mode {
+    float: right;
+    padding-left: 10px;
+}
+#verbose-mode .small {
+    padding: 5px 6px 4px;
+}
+/* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
+#individual-intro {
+    margin-top: 15px;
+    margin-bottom: 0;
+    position: relative;
+    overflow: hidden;
+}
+#individual-intro h1 {
+    padding-bottom: 8px;
+}
+#individual-intro span.display-title {
+    padding-left: 10px;
+    margin-left: 10px;
+}
+#individual-info.withThumb {
+    width: 78%;
+}
+#individual-info h3 {
+    padding-bottom: 5px;
+    margin-top: 5px;
+    clear: left;
+}
+#individual-intro a.icon-rdf {
+    font-size: 1.125em;
+}
+img#uriIcon {
+    cursor: pointer;
+}
+/* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
+#share-contact {
+    position: relative;
+    width: 166px;
+    float: left;
+    padding-right: 1.5em;
+    margin-bottom: 0;
+}
+#share-contact h3 {
+    margin-top: 15px;
+    padding-bottom: .3em;
+    font-size: 1em;
+    line-height: 1.2em;
+    padding-top: 0;
+}
+img.individual-photo {
+    width: 160px;
+    margin-left: 0;
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+#mainImage {
+    position: absolute;
+    padding: 5px 5px 8px 5px;
+    background-color: rgba(255, 255, 255, 0.6);
+    top: 6px;
+    left: 6px;
+}
+h2#mainImage, #share-contact h2 {
+    font-size: 1em;
+    line-height: 1em;
+    padding-bottom: 0.6em
+}
+#photo-wrapper {
+    position: relative;
+    float: left;
+}
+/* <------ INDIVIDUAL INTRO - RIGHT SIDE CONTENT */
+#individual-info {
+    padding: 0;
+    float: left;
+    width: 98%;
+}
+h1.fn .display-title {
+    padding-left: 10px;
+    margin-left: 10px;
+}
+#individual-info h2 {
+    padding-bottom: 6px;
+    padding-top: 18px;
+}
+#individual-info nav {
+    float: left;
+    width: 74%;
+    clear: left;
+}
+/* PROPERTY GROUP MENU------>  */
+#property-group-menu {
+    clear: both;
+    width: 95%;;
+    border: 1px solid #dfebe5;
+    margin: 0 0 0 4px;;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    float: left;
+}
+#property-group-menu ul {
+    display: block;
+    list-style-type: none;
+}
+#property-group-menu li {
+    float: left;
+    padding-right: 15px;
+    padding-top: .6em;
+    padding-left: 15px;
+}
+#property-group-menu li:last-child {
+    margin-bottom: 7px;
+}
+#property-group-menu li:first-child {
+     padding-left: 10px;
+}
+/* PROPERTY GROUP------>  */
+.property-group {
+    position: relative;
+    clear: both;
+    width: 95%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #dfebe5;
+}
+.scroll-up {
+   position: absolute;
+   width: 21px;
+   height: 30px;
+   top: 0;
+   right: -21px;
+}
+section.property-group h2 {
+    padding: 20px 25px 12px 35px;
+}
+article.property {
+    width: 93%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    border: 1px solid #dfe6e5;
+}
+article.property h3 {
+    border-bottom: 1px solid #dfe6e5;
+    padding: 10px 20px 10px 20px;
+}
+article.property ul.property-list li.subclass h3 {
+    border-bottom: none;
+    padding: 10px 10px 10px 0;
+    background-color: #fff;
+    margin-bottom: 0;
+}
+article.property .data-property-statement {
+    padding: 10px 20px 10px 20px;
+    line-height: 1.2em;
+    margin-bottom: 0;
+}
+article.property ul.property-list {
+    background: #fff;
+    padding-bottom: 20px;
+    list-style-type: none;
+}
+article.property ul.property-list li {
+    line-height: 1.2em;
+    padding: 10px 20px 5px 20px;
+    background-color: #fff;
+}
+article.property ul.subclass-property-list {
+    margin-left: 0;
+    list-style-position: inside;
+}
+article.property ul.subclass-property-list li {
+    line-height: 1.2em;
+    padding: 0 20px 10px 20px;
+}
+/* EDITING DISPLAY------>  */
+.add-individual {
+    vertical-align: middle;
+    margin-left: 2px;
+}
+.edit-individual {
+    margin-left: 10px;
+    padding-left: 8px;
+    padding-right: 1px;
+    vertical-align: middle;
+}
+.edit-mainImage {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 0 6px 0 0;
+    top: 6px;
+    left: 6px;
+}
+a.edit-mainImage img.edit-individual {
+    border: 0;
+    padding-left: 0px;
+    margin-left: 8px;
+}
+.delete-mainImage {
+    position: absolute;
+    top: 6px;
+    left: 36px;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 0 6px 0 8px;
+}
+.middle,
+.delete-individual {
+    vertical-align: middle;
+}
+a.more-less {
+    margin-left: 1.5em;
+    padding: .3em .8em;
+    font-size: .8em;
+    text-decoration: none;
+    color: #666;
+    background: #eee;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+a:hover.more-less {
+    color: #fff;
+    background: #888;
+}
+/* VERBOSE DISPLAY------>  */
+section.verbosePropertyListing {
+    display: inline-block;
+    background-color: #eaebec;
+    padding: 10px;
+}
+h2#overview .verbosePropertyListing {
+    display: block;
+}
+/* URI/RDF ICON DISPLAY ------->  */
+.qtip-content h5 {
+    margin: 0;
+    padding: 0;
+}
+input#uriLink {
+    margin: 0;
+    width: 350px;
+    font-size: .8em;
+}
+.rdf-url {
+    display: block;
+    padding-top: 0.8em;
+}
+/* <---- Manage Prop Link, individual-properties.ftl -----*/
+a.manageLinks {
+    display:none;
+}
+a#manageLabels {
+    margin-left:20px;
+    font-size:0.7em;
+}
+/* <---- OpenSocial -----*/
+div#openSocial {
+    display:inline-block;
+}
+/* MISC */
+ul.tinyMCEDisc {
+    list-style-type: disc;
+    margin-bottom: 10px;
+}
+ol.tinyMCENumeric {
+    list-style-type: decimal;
+}
+ul.tinyMCEDisc li,
+ol.tinyMCENumeric li {
+    padding: 0 !important;
+    margin-left: 30px;
+}
+img.invalidFormatImg {
+	 padding-left:8px;
+	 vertical-align:middle;
+}
+.invalidFormatText {
+	 font-size:10px;
+	 color:#A12424;
+}

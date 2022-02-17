@@ -7,59 +7,61 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-api</artifactId>
-    <version>1.12.2-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <version>1.12.1-SNAPSHOT</version>
+    <packaging>${packaging}</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
         <artifactId>vitro-project</artifactId>
-        <version>1.12.2-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <version>1.12.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>Vitro API</name>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <runOrder>alphabetical</runOrder>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.5</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <threshold>Low</threshold>
-                    <failOnError>true</failOnError>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.h3xstream.findsecbugs</groupId>
-                            <artifactId>findsecbugs-plugin</artifactId>
-                            <version>LATEST</version> <!-- Auto-update to the latest stable -->
-                        </plugin>
-                    </plugins>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
+    <properties>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>jar</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <packaging>jar</packaging>
+            </properties>
+            <build>
+
+            </build>
+        </profile>
+        <profile>
+            <id>war</id>
+            <properties>
+                <packaging>war</packaging>
+                <vitro-dir>/home/Lyrasis/Vitro/home</vitro-dir>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.2.4.RELEASE</version>
+        </dependency>
+
         <dependency>
             <groupId>de.mkammerer</groupId>
             <artifactId>argon2-jvm</artifactId>
@@ -70,12 +72,26 @@
             <artifactId>fluent-hc</artifactId>
             <version>4.5.6</version>
         </dependency>
+
         <dependency>
             <groupId>org.vivoweb</groupId>
             <artifactId>vitro-dependencies</artifactId>
-            <version>1.12.2-SNAPSHOT</version>
+            <version>1.12.1-SNAPSHOT</version>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -108,4 +124,43 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.2.4.RELEASE</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>3.0.5</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                    <failOnError>true</failOnError>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.h3xstream.findsecbugs</groupId>
+                            <artifactId>findsecbugs-plugin</artifactId>
+                            <version>LATEST</version> <!-- Auto-update to the latest stable -->
+                        </plugin>
+                    </plugins>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

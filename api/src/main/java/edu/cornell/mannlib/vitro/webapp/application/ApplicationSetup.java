@@ -11,6 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
@@ -23,6 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel
  * Read the application setup file and create the components it describes.
  */
 public class ApplicationSetup implements ServletContextListener {
+	private static final Log log = LogFactory.getLog(ApplicationSetup.class);
+
 	private static final String APPLICATION_SETUP_PATH = "config/applicationSetup.n3";
 
 	private ServletContext ctx;
@@ -90,6 +94,7 @@ public class ApplicationSetup implements ServletContextListener {
 	private void instantiateTheApplication() {
 		try {
 			Set<ApplicationImpl> apps = loader.loadAll(ApplicationImpl.class);
+			log.debug("apps size: " + apps.size());
 			if (apps.isEmpty()) {
 				throw new IllegalStateException("'" + this.configFile
 						+ "' does not define an instance of "

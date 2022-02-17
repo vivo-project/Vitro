@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
@@ -22,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.tdb.TDBFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -48,9 +51,25 @@ public class RDFServiceTDB extends RDFServiceJena {
 								+ "': parent directory does not exist.");
 			}
 			Files.createDirectory(tdbDir);
+		}else{
+			log.debug("No files exist at given path - "+directoryPath);
 		}
 
 		this.dataset = TDBFactory.createDataset(directoryPath);
+		//TODO debug part
+		ResIterator resIt = this.dataset.getDefaultModel().listSubjects();
+		log.debug("All resources in defaultModel of dataset:");
+		while(resIt.hasNext()){
+			Resource res =resIt.nextResource();
+			log.debug(res.getURI());
+		}
+		//TODO debug part
+		Iterator<String> modelNames = this.dataset.listNames();
+		log.debug("Named models in dataset:");
+		while(modelNames.hasNext()){
+			String name = modelNames.next();
+			log.debug(name);
+		}
 	}
 
 	@Override
