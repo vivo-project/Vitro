@@ -1,0 +1,61 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1>
+        a                        dynapi:action ;
+        rdfs:label               "Test action"@en-US ;
+        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:firstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1>
+        a                        dynapi:step, dynapi:operationalStep ;
+        rdfs:label               "Test operational step 1"@en-US ;
+        dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1>
+        a                        dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label               "Test sparql query 1"@en-US ;
+        dynapi:hasQueryModel     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1> ;
+        dynapi:sparqlQueryText   "SELECT ?geoLocation ?label\nWHERE\n{\n      ?geoLocation <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation>\n       OPTIONAL { ?geoLocation <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>
+        a                        dynapi:parameter;
+        dynapi:paramName         "limit";
+        dynapi:hasParameterType  <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        dynapi:hasValidator      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger> ;
+        rdfs:label               "Test parameter 1 for query 1"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>
+        a                        dynapi:rpc ;
+        dynapi:resourceName      "Test rpc individual" ;
+        dynapi:rpcName           "test_action"@en-US ;
+        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:rpcAPIVersionMin  "0.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_custom_action1>
+        a                        dynapi:customAction ;
+        dynapi:resourceName      "Test custom action" ;
+        dynapi:customActionName  "test_custom_action_name" ;
+        dynapi:forwardTo         <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:rpcAPIVersionMin  "0.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/resource/testResource1>
+        a                        dynapi:resource ;
+        dynapi:resourceName      "test_resource" ;
+        rdfs:label               "Test resource 1"@en-US ;
+        dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:hasCustomAction   <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_custom_action1> ;
+        dynapi:restAPIVersionMin "0.1.0" .
+
+
