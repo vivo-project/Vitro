@@ -106,12 +106,32 @@ public class ActionPoolTest {
 
         assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
 
-        // reloading action reuses testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-reloading.n3")
-        );
+        loadReloadAction();
 
         actionPool.reload();
+
+        assertActionByName(actionPool.getByName(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+    }
+
+    @Test
+    public void testReloadThreadSafety() throws IOException {
+        loadDefaultModel();
+
+        ActionPool actionPool = ActionPool.getInstance();
+
+        actionPool.init(servletContext);
+
+        assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
+
+        loadReloadAction();
+
+        CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> actionPool.reload());
+
+        while (!reloadFuture.isDone()) {
+            assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        }
+
+        assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
 
         assertActionByName(actionPool.getByName(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
     }
@@ -121,6 +141,13 @@ public class ActionPoolTest {
         assertFalse(format("%s not loaded!", name), action instanceof DefaultAction);
         assertTrue(action.isValid());
         assertEquals(name, action.getName());
+    }
+
+    private void loadReloadAction() throws IOException {
+        // reloading action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-reloading.n3")
+        );
     }
 
     private void loadDefaultModel() throws IOException {
