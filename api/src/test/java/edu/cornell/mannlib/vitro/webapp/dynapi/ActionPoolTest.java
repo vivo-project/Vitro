@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -111,6 +112,38 @@ public class ActionPoolTest {
         );
 
         actionPool.reload();
+
+        String name = "test_reload";
+        assertActionByName(actionPool.getByName(name), name);
+    }
+
+    @Test
+    public void testReloadConcurrently() throws IOException {
+        loadModel(
+            new RDFFile("N3", "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3"),
+            new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3"),
+            new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals-testing.n3")
+        );
+
+        ActionPool actionPool = ActionPool.getInstance();
+
+        actionPool.init(servletContext);
+
+        String testName = "test_action";
+        assertActionByName(actionPool.getByName(testName), testName);
+
+        // reloading action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-reloading.n3")
+        );
+
+        CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> actionPool.reload());
+
+        while (!reloadFuture.isDone()) {
+            assertActionByName(actionPool.getByName(testName), testName);
+        }
+
+        assertActionByName(actionPool.getByName(testName), testName);
 
         String name = "test_reload";
         assertActionByName(actionPool.getByName(name), name);
