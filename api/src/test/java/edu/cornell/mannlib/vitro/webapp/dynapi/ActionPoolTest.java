@@ -135,6 +135,66 @@ public class ActionPoolTest {
 
         assertActionByName(actionPool.getByName(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
     }
+    
+    @Test
+    public void testRealodOfActionInUse() throws IOException {
+      loadDefaultModel();
+
+      ActionPool actionPool = ActionPool.getInstance();
+
+      actionPool.init(servletContext);
+
+      loadReloadAction();
+
+      Action action = actionPool.getByName(TEST_ACTION_NAME);
+
+      CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> actionPool.reload());
+
+      while (!reloadFuture.isDone()) {
+        assertEquals(TEST_ACTION_NAME, action.getName());
+      }
+
+      action.removeClient();
+    }
+
+    @Test
+    public void testClientsManagement() throws IOException, InterruptedException {
+      loadDefaultModel();
+
+      ActionPool actionPool = ActionPool.getInstance();
+
+      actionPool.init(servletContext);
+      actionPool.reload();
+
+      long initalCount = actionPool.obsoletActionsCount();
+      Action action = actionPool.getByName(TEST_ACTION_NAME);
+
+      action.removeClient();
+
+      assertEquals(action.hasClients(), false);
+
+      Thread t1 = getActionInThread(actionPool, TEST_ACTION_NAME);
+
+      t1.join();
+
+      assertEquals(action.hasClients(), true);
+
+      actionPool.reload();
+
+      assertEquals(initalCount, actionPool.obsoletActionsCount());
+    }
+
+    private Thread getActionInThread(ActionPool actionPool, String name) {
+      Runnable client = new Runnable() {
+        @Override
+        public void run() {
+          Action action = actionPool.getByName(name);
+        }
+      };
+      Thread thread = new Thread(client);
+      thread.start();
+      return thread;
+    }
 
     private void assertActionByName(Action action, String name) {
         assertNotNull(action);
