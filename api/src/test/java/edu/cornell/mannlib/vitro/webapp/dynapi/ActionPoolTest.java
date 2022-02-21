@@ -44,7 +44,7 @@ public class ActionPoolTest extends ServletContextTest {
     @Test
     public void testPrintActionNamesBeforeInit() {
         ActionPool actionPool = ActionPool.getInstance();
-        actionPool.printActionNames();
+        actionPool.printNames();
         // nothing to assert
     }
 
@@ -66,7 +66,7 @@ public class ActionPoolTest extends ServletContextTest {
     public void testPrintActionNames() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        actionPool.printActionNames();
+        actionPool.printNames();
         // nothing to assert
     }
 
@@ -125,7 +125,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.reload();
 
-        long initalCount = actionPool.obsoleteActionsCount();
+        long initalCount = actionPool.obsoleteCount();
         Action action = actionPool.getByName(TEST_ACTION_NAME);
 
         action.removeClient();
@@ -140,7 +140,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.reload();
 
-        assertEquals(initalCount, actionPool.obsoleteActionsCount());
+        assertEquals(initalCount, actionPool.obsoleteCount());
     }
 
     private Thread getActionInThread(ActionPool actionPool, String name) {

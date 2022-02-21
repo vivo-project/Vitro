@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class Action implements RunnableComponent {
+public class Action implements RunnableComponent, Poolable {
 
 	private static final Log log = LogFactory.getLog(Action.class);
 
@@ -49,22 +49,27 @@ public class Action implements RunnableComponent {
 		this.rpc = rpc;
 	}
 
+	@Override
 	public String getName() {
 		return rpc.getName();
 	}
 
+	@Override
 	public boolean isValid() {
 		return true;
 	}
 
+	@Override
 	public void addClient() {
 		clients.add(Thread.currentThread().getId());
 	}
 
+	@Override
 	public void removeClient() {
 		clients.remove(Thread.currentThread().getId());
 	}
 
+	@Override
 	public void removeDeadClients() {
 		Map<Long, Boolean> currentThreadIds = Thread
 				.getAllStackTraces()
@@ -78,7 +83,9 @@ public class Action implements RunnableComponent {
 		}
 	}
 
+	@Override
 	public boolean hasClients() {
 		return !clients.isEmpty();
 	}
+
 }

@@ -12,9 +12,10 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Resource implements Removable {
+public class Resource implements Poolable {
 
- 	private static final Log log = LogFactory.getLog(Resource.class);
+	private static final Log log = LogFactory.getLog(Resource.class);
+
 	private String name;
 	private String versionMin;
 	private String versionMax;
@@ -49,9 +50,15 @@ public class Resource implements Removable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
+	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public boolean isValid() {
+		return true;
 	}
 
 	public RPC getRpcOnGet() {
@@ -98,7 +105,7 @@ public class Resource implements Removable {
 	public void setRpcOnPatch(RPC rpcOnPatch) {
 		this.rpcOnPatch = rpcOnPatch;
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomAction")
 	public void addCustomAction(CustomAction customAction) {
 		customActions.add(customAction);
@@ -110,14 +117,17 @@ public class Resource implements Removable {
 		
 	}
 
+	@Override
 	public void addClient() {
 		clients.add(Thread.currentThread().getId());
 	}
 
+	@Override
 	public void removeClient() {
 		clients.remove(Thread.currentThread().getId());
 	}
 
+	@Override
 	public void removeDeadClients() {
 		Map<Long, Boolean> currentThreadIds = Thread
 				.getAllStackTraces()
@@ -131,6 +141,7 @@ public class Resource implements Removable {
 		}
 	}
 
+	@Override
 	public boolean hasClients() {
 		return !clients.isEmpty();
 	}

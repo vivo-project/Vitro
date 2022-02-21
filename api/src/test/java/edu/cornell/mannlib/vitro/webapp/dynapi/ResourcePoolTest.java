@@ -48,7 +48,7 @@ public class ResourcePoolTest extends ServletContextTest {
     @Test
     public void testPrintActionNamesBeforeInit() {
         ResourcePool resourcePool = ResourcePool.getInstance();
-        resourcePool.printResourceNames();
+        resourcePool.printNames();
         // nothing to assert
     }
 
@@ -70,7 +70,7 @@ public class ResourcePoolTest extends ServletContextTest {
     public void testPrintActionNames() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        resourcePool.printResourceNames();
+        resourcePool.printNames();
         // nothing to assert
     }
 
@@ -129,7 +129,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         resourcePool.reload();
 
-        long initalCount = resourcePool.obsoleteResourcesCount();
+        long initalCount = resourcePool.obsoleteCount();
         Resource resource = resourcePool.getByName(TEST_RESOURCE_NAME);
 
         resource.removeClient();
@@ -144,7 +144,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         resourcePool.reload();
 
-        assertEquals(initalCount, resourcePool.obsoleteResourcesCount());
+        assertEquals(initalCount, resourcePool.obsoleteCount());
     }
 
     private Thread getResourceInThread(ResourcePool resourcePool, String name, String actionName) {

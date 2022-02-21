@@ -1,0 +1,21 @@
+package edu.cornell.mannlib.vitro.webapp.dynapi;
+
+import javax.servlet.ServletContext;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
+
+public interface Pool<C extends Poolable> { 
+
+    public C getByName(String name);
+
+    public void printNames();
+
+    public void reload();
+
+    public void init(ServletContext ctx);
+
+    public long obsoleteCount();
+
+    public long count();
+
+}
