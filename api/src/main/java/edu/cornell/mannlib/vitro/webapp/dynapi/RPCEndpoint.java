@@ -41,11 +41,18 @@ public class RPCEndpoint extends VitroHttpServlet  {
 	private void process(HttpServletRequest request, HttpServletResponse response) {
 		String requestURL = request.getRequestURI();
 		String actionName = requestURL.substring(requestURL.lastIndexOf("/") + 1 );
+		Action action = null;
 		log.debug(actionName);
-		actionPool.printActionNames();
-		Action action = actionPool.getByName(actionName);
-		OperationData input = new OperationData(request);
-		OperationResult result = action.run(input);
-		result.prepareResponse(response);
+		try {
+  		actionPool.printActionNames();
+  		action = actionPool.getByName(actionName);
+  		OperationData input = new OperationData(request);
+  		OperationResult result = action.run(input);
+  		result.prepareResponse(response);
+		} finally {
+			if (action != null) {
+				action.removeClient();
+			}
+		}
 	}
 }
