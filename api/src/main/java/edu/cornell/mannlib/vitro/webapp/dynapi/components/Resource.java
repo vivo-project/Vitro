@@ -2,6 +2,10 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +24,8 @@ public class Resource implements Removable {
 	private RPC rpcOnPut;
 	private RPC rpcOnPatch;
 	private List<CustomAction> customActions = new LinkedList<CustomAction>();
+
+	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
 	public String getVersionMin() {
 		return versionMin;
@@ -103,5 +109,30 @@ public class Resource implements Removable {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	public void addClient() {
+		clients.add(Thread.currentThread().getId());
+	}
+
+	public void removeClient() {
+		clients.remove(Thread.currentThread().getId());
+	}
+
+	public void removeDeadClients() {
+		Map<Long, Boolean> currentThreadIds = Thread
+				.getAllStackTraces()
+				.keySet()
+				.stream()
+				.collect(Collectors.toMap(Thread::getId, Thread::isAlive));
+		for (Long client : clients) {
+			if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
+				clients.remove(client);
+			}
+		}
+	}
+
+	public boolean hasClients() {
+		return !clients.isEmpty();
+	}
+
 }

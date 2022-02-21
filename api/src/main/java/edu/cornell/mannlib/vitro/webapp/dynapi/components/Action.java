@@ -79,6 +79,6 @@ public class Action implements RunnableComponent {
 	}
 
 	public boolean hasClients() {
-		return clients.size() != 0;
+		return !clients.isEmpty();
 	}
 }

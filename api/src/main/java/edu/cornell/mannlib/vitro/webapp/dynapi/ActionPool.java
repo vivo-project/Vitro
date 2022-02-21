@@ -21,21 +21,22 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 
 public class ActionPool {
 
+	private static final Log log = LogFactory.getLog(ActionPool.class);
+
 	private static ActionPool INSTANCE = null;
- 	private static final Log log = LogFactory.getLog(ActionPool.class);
+	
 	private static Object mutex = new Object();
 	
-	private ConcurrentHashMap<String,Action> actions;
+	private ConcurrentHashMap<String, Action> actions;
 	private ServletContext ctx;
 	private ConfigurationBeanLoader loader;
 	private ContextModelAccess modelAccess;
 	private OntModel dynamicAPIModel;
 	private ConcurrentLinkedQueue<Action> obsoleteActions;
 
-
 	private ActionPool(){
-		actions = new ConcurrentHashMap<String,Action>();
-		obsoleteActions = new ConcurrentLinkedQueue<Action>();
+		actions = new ConcurrentHashMap<>();
+		obsoleteActions = new ConcurrentLinkedQueue<>();
 		INSTANCE = this;
 	}
 	
@@ -63,13 +64,13 @@ public class ActionPool {
 		if (action == null) {
 			action = new DefaultAction();
 		} else {
-			action.addClient();	
+			action.addClient();
 		}
 		return action;
 	}
 	
 	public void printActionNames() {
-		for (Map.Entry<String,Action> entry : actions.entrySet()) {
+		for (Map.Entry<String, Action> entry : actions.entrySet()) {
 			log.debug("Action in pool: '" + entry.getKey() + "'");
 		}
 	}
@@ -83,9 +84,9 @@ public class ActionPool {
 			log.error("Loader is null. Can't reload action pool.");
 			return;
 		}
-		ConcurrentHashMap<String,Action> newActions = new ConcurrentHashMap<String,Action>();
+		ConcurrentHashMap<String, Action> newActions = new ConcurrentHashMap<>();
 		loadActions(newActions);
-		ConcurrentHashMap<String,Action> oldActions = this.actions;
+		ConcurrentHashMap<String, Action> oldActions = this.actions;
 		actions = newActions;
 		for (Map.Entry<String, Action> action : oldActions.entrySet()) {
 			obsoleteActions.add(action.getValue());
@@ -98,20 +99,20 @@ public class ActionPool {
 		this.ctx = ctx;
 		modelAccess = ModelAccess.on(ctx);
 		dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
-		loader = new ConfigurationBeanLoader(	dynamicAPIModel, ctx);
+		loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
 		log.debug("Context Initialization ...");
 		loadActions(actions);
 	}
 
-	public long obsoletActionsCount() {
+	public long obsoleteActionsCount() {
 		return obsoleteActions.size();
 	}
-	
+
 	public long actionsCount() {
 		return actions.size();
 	}
-	
-	private void loadActions(ConcurrentHashMap<String,Action> actions) {
+
+	private void loadActions(ConcurrentHashMap<String, Action> actions) {
 		Set<Action> newActions = loader.loadEach(Action.class);
 		log.debug("Context Initialization. actions loaded: " + actions.size());
 		for (Action action : newActions) {
@@ -123,16 +124,16 @@ public class ActionPool {
 		}
 		log.debug("Context Initialization finished. " + actions.size() + " actions loaded.");
 	}
-	
+
 	private void unloadObsoleteActions() {
 		for (Action action : obsoleteActions) {
 			if (!isActionInUse(action)) {
 				action.dereference();
-				obsoleteActions.remove(action);	
+				obsoleteActions.remove(action);
 			} 
 		}
 	}
-	
+
 	private boolean isActionInUse(Action action) {
 		if (!action.hasClients()) {
 			return false;
@@ -143,6 +144,5 @@ public class ActionPool {
 		}
 		return true;
 	}
-
 
 }
