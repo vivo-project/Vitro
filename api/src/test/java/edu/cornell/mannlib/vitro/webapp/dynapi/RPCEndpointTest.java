@@ -3,19 +3,19 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replay;
 import static org.powermock.api.easymock.PowerMock.verify;
 
-import java.io.IOException;
+import java.util.Map;
 
-import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.annotation.Mock;
@@ -29,86 +29,95 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 @PrepareForTest(ActionPool.class)
 public class RPCEndpointTest {
 
-	final static String URI_TEST = "/api/rpc/test";
+	final private static String URI_TEST = "/api/rpc/test";
 
-	private static RESTEndpoint restEndpoint;
+	private static RPCEndpoint rpcEndpoint;
 
 	@Mock
 	private static ActionPool actionPool;
 
 	@Mock
-	private Action action;
+	private static Action action;
 
 	@Mock
-	private OperationResult operationResult;
+	private static OperationResult operationResult;
 
 	@Mock
-	private HttpServletRequest request;
+	private static HttpServletRequest request;
 
 	@Mock
-	private HttpServletResponse response;
+	private static HttpServletResponse response;
 
-	@BeforeClass
-	public static void beforeAll()  throws IOException, ServletException {
+	@Mock
+	private static Map<String, String[]> params;
+
+	@Mock
+	private static ServletContext context;
+
+	@Before
+	public void beforeEach() {
+		operationResult = createMock(OperationResult.class);
+		action = createMock(Action.class);
+		actionPool = createMock(ActionPool.class);
+		request = createMock(HttpServletRequest.class);
+		response = createMock(HttpServletResponse.class);
+
+		// The order of where mockStatic (and possibly all mocks herein) matters and should only be changed cautiously.
 		mockStatic(ActionPool.class);
 		expect(ActionPool.getInstance()).andReturn(actionPool).anyTimes();
 		replay(ActionPool.class);
 
-		restEndpoint = new RESTEndpoint();
-	}
+		rpcEndpoint = new RPCEndpoint();
 
-	@Before
-	public void beforeEach() {
-		actionPool = createMock(ActionPool.class);
-		action = createMock(Action.class);
-
-		operationResult = createMock(OperationResult.class);
-
-		request = createMock(HttpServletRequest.class);
-		response = createMock(HttpServletResponse.class);
-
-		expect(action.run(anyObject())).andReturn(operationResult);
-		replay(action);
-
-		expect(actionPool.getByName(anyString())).andReturn(action);
+		actionPool.printActionNames();
+		expectLastCall().anyTimes();
+		expect(actionPool.getByName(anyString())).andReturn(action).anyTimes();
 		replay(actionPool);
 
-		expect(request.getRequestURI()).andReturn(URI_TEST);
+		operationResult.prepareResponse(response);
+		expectLastCall().anyTimes();
+		replay(operationResult);
+
+		expect(request.getParameterMap()).andReturn(params).anyTimes();
+		expect(request.getServletContext()).andReturn(context).anyTimes();
+		expect(request.getRequestURI()).andReturn(URI_TEST).anyTimes();
+		replay(request);
+
+		action.removeClient();
+		expectLastCall().anyTimes();
+		expect(action.run(anyObject())).andReturn(operationResult).once();
+		replay(action);
 	}
 
 	@Test
 	public void doGetTest() {
-		expect(request.getMethod()).andReturn("GET").atLeastOnce();
-		replay(request);
-
-		restEndpoint.doGet(request, response);
+		rpcEndpoint.doGet(request, response);
 		verify(request);
+		verify(action);
+		verify(actionPool);
 	}
 
 	@Test
 	public void doPostTest() {
-		expect(request.getMethod()).andReturn("POST").atLeastOnce();
-		replay(request);
-
-		restEndpoint.doPost(request, response);
+		rpcEndpoint.doPost(request, response);
 		verify(request);
+		verify(action);
+		verify(actionPool);
 	}
 
 	@Test
 	public void doDeleteTest() {
-		expect(request.getMethod()).andReturn("DELETE").atLeastOnce();
-		replay(request);
-
-		restEndpoint.doDelete(request, response);
+		rpcEndpoint.doDelete(request, response);
 		verify(request);
+		verify(action);
+		verify(actionPool);
 	}
 
 	@Test
 	public void doPutTest() {
-		expect(request.getMethod()).andReturn("PUT").atLeastOnce();
-		replay(request);
-
-		restEndpoint.doPut(request, response);
+		rpcEndpoint.doPut(request, response);
 		verify(request);
+		verify(action);
+		verify(actionPool);
 	}
 }
