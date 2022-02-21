@@ -199,12 +199,12 @@
     </owl:ObjectProperty>
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomAction -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomAction">
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customAction"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
         <rdfs:label xml:lang="en-US">has custom action</rdfs:label>
     </owl:ObjectProperty>
 
@@ -214,7 +214,7 @@
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#forwardTo">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customAction"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:label xml:lang="en-US">forward to RPC</rdfs:label>
     </owl:ObjectProperty>
@@ -378,9 +378,9 @@
         <rdfs:label xml:lang="en-US">http method name</rdfs:label>
       </owl:DatatypeProperty>
 
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#customActionName">
+     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTActionName">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customAction"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">custom action name</rdfs:label>
       </owl:DatatypeProperty>
@@ -524,9 +524,9 @@
         <rdfs:label xml:lang="en-US">HTTP method</rdfs:label>
     </owl:Class>
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#customAction -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#customAction">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction">
         <rdfs:label xml:lang="en-US">Custom action</rdfs:label>
     </owl:Class>
 

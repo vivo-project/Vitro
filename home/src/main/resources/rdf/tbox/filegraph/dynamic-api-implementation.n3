@@ -27,5 +27,5 @@ dynapi:rpc rdfs:subClassOf dynapi_java:RPC .
 
 dynapi:httpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
 
-dynapi:customAction rdfs:subClassOf dynapi_java:CustomAction .
+dynapi:customRESTAction rdfs:subClassOf dynapi_java:CustomRESTAction .
 
