@@ -44,7 +44,7 @@ public class RPCEndpoint extends VitroHttpServlet  {
 		Action action = null;
 		log.debug(actionName);
 		try {
-  		actionPool.printActionNames();
+  		actionPool.printNames();
   		action = actionPool.getByName(actionName);
   		OperationData input = new OperationData(request);
   		OperationResult result = action.run(input);

@@ -2,15 +2,20 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Resource implements Removable {
+public class Resource implements Poolable {
 
- 	private static final Log log = LogFactory.getLog(Resource.class);
+	private static final Log log = LogFactory.getLog(Resource.class);
+
 	private String name;
 	private String versionMin;
 	private String versionMax;
@@ -20,6 +25,8 @@ public class Resource implements Removable {
 	private RPC rpcOnPut;
 	private RPC rpcOnPatch;
 	private List<CustomAction> customActions = new LinkedList<CustomAction>();
+
+	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
 	public String getVersionMin() {
 		return versionMin;
@@ -43,9 +50,15 @@ public class Resource implements Removable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
+	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public boolean isValid() {
+		return true;
 	}
 
 	public RPC getRpcOnGet() {
@@ -92,7 +105,7 @@ public class Resource implements Removable {
 	public void setRpcOnPatch(RPC rpcOnPatch) {
 		this.rpcOnPatch = rpcOnPatch;
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomAction")
 	public void addCustomAction(CustomAction customAction) {
 		customActions.add(customAction);
@@ -103,5 +116,34 @@ public class Resource implements Removable {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
+	public void addClient() {
+		clients.add(Thread.currentThread().getId());
+	}
+
+	@Override
+	public void removeClient() {
+		clients.remove(Thread.currentThread().getId());
+	}
+
+	@Override
+	public void removeDeadClients() {
+		Map<Long, Boolean> currentThreadIds = Thread
+				.getAllStackTraces()
+				.keySet()
+				.stream()
+				.collect(Collectors.toMap(Thread::getId, Thread::isAlive));
+		for (Long client : clients) {
+			if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
+				clients.remove(client);
+			}
+		}
+	}
+
+	@Override
+	public boolean hasClients() {
+		return !clients.isEmpty();
+	}
+
 }

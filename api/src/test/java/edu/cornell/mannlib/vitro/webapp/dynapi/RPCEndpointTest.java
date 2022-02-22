@@ -69,7 +69,7 @@ public class RPCEndpointTest {
 
 		rpcEndpoint = new RPCEndpoint();
 
-		actionPool.printActionNames();
+		actionPool.printNames();
 		expectLastCall().anyTimes();
 		expect(actionPool.getByName(anyString())).andReturn(action).anyTimes();
 		replay(actionPool);
