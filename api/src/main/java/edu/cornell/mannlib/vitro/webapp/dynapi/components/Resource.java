@@ -24,7 +24,7 @@ public class Resource implements Poolable {
 	private RPC rpcOnDelete;
 	private RPC rpcOnPut;
 	private RPC rpcOnPatch;
-	private List<CustomAction> customActions = new LinkedList<CustomAction>();
+	private List<CustomRESTAction> customRESTActions = new LinkedList<CustomRESTAction>();
 
 	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
@@ -105,10 +105,10 @@ public class Resource implements Poolable {
 	public void setRpcOnPatch(RPC rpcOnPatch) {
 		this.rpcOnPatch = rpcOnPatch;
 	}
-
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomAction")
-	public void addCustomAction(CustomAction customAction) {
-		customActions.add(customAction);
+	
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction")
+	public void addCustomRESTAction(CustomRESTAction customRESTAction) {
+		customRESTActions.add(customRESTAction);
 	}
 
 	@Override
