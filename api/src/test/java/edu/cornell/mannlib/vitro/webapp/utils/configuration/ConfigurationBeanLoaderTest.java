@@ -390,18 +390,18 @@ public class ConfigurationBeanLoaderTest extends
 		// Nothing of interest.
 	}
 	
-  public static class Friend {
+	public static class Friend {
 
-    public Friend() {
-      
-    }
-    Friend friend;
+		public Friend() {
 
-    @Property(uri = "http://set.friend/property")
-    public void setFriend(Friend friend) {
-      this.friend = friend;
-    }
-  }
+		}
+		Friend friend;
+
+		@Property(uri = "http://set.friend/property")
+		public void setFriend(Friend friend) {
+			this.friend = friend;
+		}
+	}
 
 	// --------------------------------------------
 

@@ -140,13 +140,13 @@ public class ConfigurationBeanLoader {
 	/**
 	 * Load the instance with this URI, if it is assignable to this class.
 	 */
-  public <T> T loadInstance(String uri, Class<T> resultClass) throws ConfigurationBeanLoaderException {
-    instancesMap.clear();
-    T result = loadSubordinateInstance(uri, resultClass);
-    instancesMap.clear();
-    return result;
-  }
-	
+	public <T> T loadInstance(String uri, Class<T> resultClass) throws ConfigurationBeanLoaderException {
+		instancesMap.clear();
+		T result = loadSubordinateInstance(uri, resultClass);
+		instancesMap.clear();
+		return result;
+	}
+
 	protected <T> T loadSubordinateInstance(String uri, Class<T> resultClass)
 			throws ConfigurationBeanLoaderException {
 		if (uri == null) {
@@ -156,9 +156,9 @@ public class ConfigurationBeanLoader {
 			throw new NullPointerException("resultClass may not be null.");
 		}
 		if (instancesMap.containsKey(uri)) {
-		  try {
-		    T t = (T) instancesMap.get(uri);
-        return t;
+			try {
+				T t = (T) instancesMap.get(uri);
+				return t;
 		  } catch (ClassCastException e) {
 		    throw new ConfigurationBeanLoaderException(uri, e);
 		  }
