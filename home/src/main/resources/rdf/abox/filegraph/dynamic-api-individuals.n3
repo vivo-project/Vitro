@@ -24,34 +24,6 @@
         rdfs:label              "Is integer"@en-US ;
         vitro:mostSpecificType  dynapi:validator .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsMaxLength>
-        a                       dynapi:validator ,
-                                dynapi_java:validators.Validator ,
-                                dynapi_java:validators.IsMaxLength ;
-        rdfs:label              "Is max length"@en-US ;
-        vitro:mostSpecificType  dynapi:validator .
-
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsMaxValue>
-        a                       dynapi:validator ,
-                                dynapi_java:validators.Validator ,
-                                dynapi_java:validators.IsMaxValue ;
-        rdfs:label              "Is max value"@en-US ;
-        vitro:mostSpecificType  dynapi:validator .
-
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsMinValue>
-        a                       dynapi:validator ,
-                                dynapi_java:validators.Validator ,
-                                dynapi_java:validators.IsMinValue ;
-        rdfs:label              "Is min value"@en-US ;
-        vitro:mostSpecificType  dynapi:validator .
-
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsRegex>
-        a                       dynapi:validator ,
-                                dynapi_java:validators.Validator ,
-                                dynapi_java:validators.IsRegex ;
-        rdfs:label              "Is regular expression"@en-US ;
-        vitro:mostSpecificType  dynapi:validator .
-
 #-------------------------------------------------------------------------------
 #
 # Parameter types
