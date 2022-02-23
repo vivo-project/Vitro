@@ -2,11 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdateTime;
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDboolean;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -15,6 +10,8 @@ import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
+
+import static org.apache.jena.datatypes.xsd.XSDDatatype.*;
 
 /**
  * An enumeration of the types of properties that the ConfigurationBeanLoader
@@ -60,10 +57,23 @@ public enum PropertyType {
 
 		@Override
 		protected PropertyMethod buildPropertyMethod(Method method,
-				Property annotation) {
+													 Property annotation) {
 			return new FloatPropertyMethod(method, annotation);
 		}
-	}, 
+	},
+	INTEGER {
+		@Override
+		public PropertyStatement buildPropertyStatement(Statement s) {
+			return new IntegerPropertyStatement(s.getPredicate().getURI(), s
+					.getObject().asLiteral().getInt());
+		}
+
+		@Override
+		protected PropertyMethod buildPropertyMethod(Method method,
+													 Property annotation) {
+			return new IntegerPropertyMethod(method, annotation);
+		}
+	},
 	BOOLEAN{
 		@Override
 		public PropertyStatement buildPropertyStatement(Statement s) {
@@ -93,8 +103,13 @@ public enum PropertyType {
 					datatype.equals(XSDdateTime)) {
 				return STRING;
 			}
-			if (datatype.equals(XSDfloat)) {
+			if (datatype.equals(XSDfloat) ||
+					datatype.equals(XSDdecimal)){
 				return FLOAT;
+			}
+			if (datatype.equals(XSDint) ||
+					datatype.equals(XSDinteger)) {
+				return INTEGER;
 			}
 			if (datatype.equals(XSDboolean)) {
 				return BOOLEAN;
@@ -108,6 +123,9 @@ public enum PropertyType {
 			throws PropertyTypeException {
 		if (Float.TYPE.equals(parameterType)) {
 			return FLOAT;
+		}
+		if (Integer.class.equals(parameterType)) {
+			return INTEGER;
 		}
 		if (Boolean.TYPE.equals(parameterType)) {
 			return BOOLEAN;
@@ -201,6 +219,20 @@ public enum PropertyType {
 			return f;
 		}
 	}
+
+	public static class IntegerPropertyStatement extends PropertyStatement {
+		private final int i;
+
+		public IntegerPropertyStatement(String predicateUri, int i) {
+			super(INTEGER, predicateUri);
+			this.i = i;
+		}
+
+		@Override
+		public Integer getValue() {
+			return i;
+		}
+	}
 	
 	public static class BooleanPropertyStatement extends PropertyStatement {
 		private final Boolean bool;
@@ -260,11 +292,18 @@ public enum PropertyType {
 
 		public void confirmCompatible(PropertyStatement ps)
 				throws PropertyTypeException {
-			if (type != ps.getType()) {
+			if (type != ps.getType() &&
+					! (isSubtype(ps.getType(), type))){
 				throw new PropertyTypeException(
 						"Can't apply statement of type " + ps.getType()
 								+ " to a method of type " + type);
 			}
+		}
+
+		private boolean isSubtype(PropertyType subType, PropertyType superType){
+			if (subType.equals(INTEGER) && superType.equals(FLOAT))
+				return true;
+			return false;
 		}
 
 		public void invoke(Object instance, Object value)
@@ -294,6 +333,12 @@ public enum PropertyType {
 	public static class FloatPropertyMethod extends PropertyMethod {
 		public FloatPropertyMethod(Method method, Property annotation) {
 			super(FLOAT, method, annotation);
+		}
+	}
+
+	public static class IntegerPropertyMethod extends PropertyMethod {
+		public IntegerPropertyMethod(Method method, Property annotation) {
+			super(INTEGER, method, annotation);
 		}
 	}
 	

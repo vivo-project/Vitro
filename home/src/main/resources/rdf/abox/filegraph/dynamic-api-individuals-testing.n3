@@ -2,6 +2,7 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -28,8 +29,18 @@
         a                        dynapi:parameter;
         dynapi:paramName         "limit";
         dynapi:hasParameterType  <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
-        dynapi:hasValidator      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger> ;
+        dynapi:hasValidator      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger>,
+                                    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator> ;
         rdfs:label               "Test parameter 1 for query 1"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator>
+        a                                   dynapi:validator ,
+                                            dynapi_java:validators.Validator ,
+                                            dynapi_java:validators.NumericRangeValidator;
+        dynapi:validatorName                "Test numeric [10-30.5] range validator";
+        dynapi:validatorMinNumericValue     10;
+        dynapi:validatorMaxNumericValue     30.5;
+        rdfs:label                           "Test range validator for parameter 1"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>
         a                        dynapi:rpc ;
