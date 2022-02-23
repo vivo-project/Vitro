@@ -10,7 +10,13 @@ public interface Pool<C extends Poolable> {
 
     public void printNames();
 
+    public void add(String uri, C component);
+
+    public void remove(String uri, String name);
+
     public void reload();
+
+    public void reload(String uri);
 
     public void init(ServletContext ctx);
 

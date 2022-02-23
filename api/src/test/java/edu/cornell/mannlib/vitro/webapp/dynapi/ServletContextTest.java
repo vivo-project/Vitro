@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Before;
 
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.ServletContextStub;
@@ -29,6 +31,8 @@ public abstract class ServletContextTest {
     protected ContextModelAccessStub contentModelAccess;
     protected OntModel ontModel;
 
+    protected ConfigurationBeanLoader loader;
+
     @Before
     public void setup() {
         servletContext = new ServletContextStub();
@@ -39,6 +43,8 @@ public abstract class ServletContextTest {
         ontModel = ModelFactory.createOntologyModel();
 
         contentModelAccess.setOntModel(FULL_UNION, ontModel);
+
+        loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
     protected void loadReloadModel() throws IOException {
