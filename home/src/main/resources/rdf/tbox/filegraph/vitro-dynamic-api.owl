@@ -90,7 +90,7 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:label xml:lang="en-US">provides parameter</rdfs:label>
     </owl:ObjectProperty>
@@ -112,7 +112,7 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:label xml:lang="en-US">requires parameter</rdfs:label>
     </owl:ObjectProperty>
@@ -399,6 +399,8 @@
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#action -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#action">
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
+		<rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider"/>
         <rdfs:label xml:lang="en-US">Action</rdfs:label>
     </owl:Class>
     
@@ -436,11 +438,23 @@
         <rdfs:label xml:lang="en-US">Role</rdfs:label>
     </owl:Class>
     
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider -->
 
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider">
+        <rdfs:label xml:lang="en-US">Parameter provider interface</rdfs:label>
+    </owl:Class>
+
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver -->
+
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver">
+        <rdfs:label xml:lang="en-US">Parameter receiver interface</rdfs:label>
+    </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery">
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver"/>
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
         <rdfs:label xml:lang="en-US">SPARQLQuery</rdfs:label>
     </owl:Class>
@@ -450,6 +464,8 @@
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery">
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver"/>
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
         <rdfs:label xml:lang="en-US">SolrQuery</rdfs:label>
     </owl:Class>
@@ -472,13 +488,14 @@
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#operation -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#operation">
-        <rdfs:label xml:lang="en-US">Operation</rdfs:label>
+        <rdfs:label xml:lang="en-US">Operation interface</rdfs:label>
     </owl:Class>
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#template -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#template">
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver"/>
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
         <rdfs:label xml:lang="en-US">Template</rdfs:label>
     </owl:Class>
@@ -527,7 +544,7 @@
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction">
-        <rdfs:label xml:lang="en-US">Custom action</rdfs:label>
+        <rdfs:label xml:lang="en-US">Custom REST action</rdfs:label>
     </owl:Class>
 
 </rdf:RDF>
