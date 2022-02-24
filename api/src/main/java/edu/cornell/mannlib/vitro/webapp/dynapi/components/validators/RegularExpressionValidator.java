@@ -23,11 +23,18 @@ public class RegularExpressionValidator extends AbstractValidator {
 
 	@Override
 	public boolean isValid(String name, String[] values) {
+		if (values.length == 0) {
+			log.debug("No values of " + name + " found. Validation failed.");
+			return false;
+		}
+
 		for (String value : values) {
 			if (!isLengthInRange(value)) {
+				log.debug("Value of " + name + " is not in accordance with the pattern \"" + regularExpression + "\"");
 				return false;
 			}
 		}
+
 		return true;
 	}
 

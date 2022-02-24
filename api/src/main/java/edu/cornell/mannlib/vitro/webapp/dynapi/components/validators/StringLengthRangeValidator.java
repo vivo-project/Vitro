@@ -8,26 +8,26 @@ public class StringLengthRangeValidator extends IsNotBlank {
 	
 	private static final Log log = LogFactory.getLog(StringLengthRangeValidator.class);
 
-	private Integer minValue;
+	private Integer minLength;
 
-	private Integer maxValue;
+	private Integer maxLength;
 
-	public Integer getMinValue() {
-		return minValue;
+	public Integer getMinLength() {
+		return minLength;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMinNumericValue", minOccurs = 1, maxOccurs = 1)
-	public void setMinValue(int minValue) {
-		this.minValue = minValue;
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMinLengthValue", maxOccurs = 1)
+	public void setMinLength(int minLength) {
+		this.minLength = minLength;
 	}
 
-	public Integer getMaxValue() {
-		return maxValue;
+	public Integer getMaxLength() {
+		return maxLength;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMaxNumericValue", minOccurs = 1, maxOccurs = 1)
-	public void setMaxValue(int maxValue) {
-		this.maxValue = maxValue;
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMaxLengthValue", maxOccurs = 1)
+	public void setMaxLength(int maxValue) {
+		this.maxLength = maxValue;
 	}
 
 	@Override
@@ -38,6 +38,7 @@ public class StringLengthRangeValidator extends IsNotBlank {
 
 		for (String value : values) {
 			if (!isLengthInRange(value)) {
+				log.debug("Length of " + name + " is not in range [" + ((minLength != null)?minLength:" ") + "-" + ((maxLength != null)?maxLength:" ")+"].");
 				return false;
 			}
 		}
@@ -47,10 +48,10 @@ public class StringLengthRangeValidator extends IsNotBlank {
 	private boolean isLengthInRange(String string) {
 		int length = string.length();
 
-		if ((minValue != null) && (length < minValue))
+		if ((minLength != null) && (length < minLength))
 			return false;
 
-		if ((maxValue != null) && (length > maxValue))
+		if ((maxLength != null) && (length > maxLength))
 			return false;
 
 		return true;
