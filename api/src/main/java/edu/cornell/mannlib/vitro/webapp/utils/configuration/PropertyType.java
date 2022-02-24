@@ -124,7 +124,7 @@ public enum PropertyType {
 		if (Float.TYPE.equals(parameterType)) {
 			return FLOAT;
 		}
-		if (Integer.class.equals(parameterType)) {
+		if (Integer.TYPE.equals(parameterType)) {
 			return INTEGER;
 		}
 		if (Boolean.TYPE.equals(parameterType)) {

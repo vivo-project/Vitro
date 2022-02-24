@@ -24,6 +24,14 @@
         rdfs:label              "Is integer"@en-US ;
         vitro:mostSpecificType  dynapi:validator .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>
+        a                                       dynapi:validator ,
+                                                dynapi_java:validators.Validator ,
+                                                dynapi_java:validators.RegularExpressionValidator ;
+        dynapi:validatorRegularExpressionValue  "^(.+)@(\\S+)$" ;
+        rdfs:label                              "Is email"@en-US ;
+        vitro:mostSpecificType                  dynapi:validator .
+
 #-------------------------------------------------------------------------------
 #
 # Parameter types
