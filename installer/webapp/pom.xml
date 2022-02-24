@@ -8,7 +8,7 @@
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-installer-webapp</artifactId>
     <version>1.12.3-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>war</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
