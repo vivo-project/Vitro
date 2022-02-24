@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.searchengine.solr.SolrSearchEngine;
 import org.easymock.Mock;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -82,7 +83,8 @@ public class SolrQueryTest {
         verify(parameter1);
     }
 
-    //@Test
+    @Test
+    @Ignore
     public void parsingQueryTest(){
         expect(mockSearchEngine.createQuery()).andReturn(new BaseSearchQuery()).times(1);
         replay(mockSearchEngine);
