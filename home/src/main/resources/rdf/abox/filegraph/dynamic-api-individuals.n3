@@ -36,6 +36,13 @@
         rdfs:label              "Integer type"@en-US ;
         vitro:mostSpecificType  dynapi:parameterType .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring>
+        a                       dynapi:parameterType ,
+                                dynapi_java:ParameterType;
+        dynapi:typeName         "string" ;        
+        rdfs:label              "String type"@en-US ;
+        vitro:mostSpecificType  dynapi:parameterType .
+        
 #-------------------------------------------------------------------------------
 #
 # Models
