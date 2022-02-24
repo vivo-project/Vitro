@@ -13,6 +13,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NE
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 
 import java.text.Collator;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,15 @@ public class VitroRequest extends HttpServletRequestWrapper {
 
     public VitroRequest(HttpServletRequest _req) {
         super(_req);
+		if(_req instanceof VitroRequest){
+			log.debug("jeste");
+		}
+		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+		for(StackTraceElement ste: Arrays.copyOfRange(stackTraceElements, 2, stackTraceElements.length)){
+			log.debug("STACK:" + ste.getClassName() + " " + ste.getMethodName());
+		}
+		log.debug(_req.getDispatcherType());
+		log.debug(_req.getRequestURI());
         this._req = _req;
     }
 

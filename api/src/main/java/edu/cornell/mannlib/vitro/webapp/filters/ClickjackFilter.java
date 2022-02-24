@@ -2,6 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+
 import java.io.IOException;
 
 import javax.servlet.DispatcherType;
@@ -11,7 +16,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -19,11 +23,25 @@ import javax.servlet.http.HttpServletResponse;
  * decide to implement) not to display this content in a frame.
  *
  * For details, refer to
+ * TODO the first link is broken, should be removed
  * http://blogs.msdn.com/sdl/archive/2009/02/05/clickjacking-defense-in-ie8.aspx,
  * https://www.owasp.org/index.php/ClickjackFilter_for_Java_EE
  */
-@WebFilter(filterName = "ClickjackFilter", urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD})
+@Configuration
+@Order(9)
 public class ClickjackFilter implements Filter {
+
+	@Bean(value = "ClickjackFilter")
+	public FilterRegistrationBean<ClickjackFilter> loggingFilter(){
+		FilterRegistrationBean<ClickjackFilter> registrationBean
+				= new FilterRegistrationBean<>();
+
+		registrationBean.setFilter(new ClickjackFilter());
+		registrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.FORWARD);
+
+		return registrationBean;
+	}
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {

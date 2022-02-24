@@ -26,4 +26,5 @@ public class ResourcePool extends AbstractPool<ResourcePool, Resource> {
 		return Resource.class;
 	}
 
+
 }

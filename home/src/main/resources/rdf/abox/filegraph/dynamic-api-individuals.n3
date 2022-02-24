@@ -70,7 +70,6 @@
         dynapi:typeName         "string" ;
         rdfs:label              "String type"@en-US ;
         vitro:mostSpecificType  dynapi:parameterType .
-
 #-------------------------------------------------------------------------------
 #
 # Models

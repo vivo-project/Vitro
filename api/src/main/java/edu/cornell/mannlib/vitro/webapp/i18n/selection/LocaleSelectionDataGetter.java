@@ -88,7 +88,8 @@ public class LocaleSelectionDataGetter implements DataGetter {
 	private Map<String, Object> buildLocaleMap(Locale locale,
 			Locale currentLocale) throws FileNotFoundException {
 		Map<String, Object> map = new HashMap<>();
-		map.put("code", locale.toString());
+        
+		map.put("code", locale.toLanguageTag().replace('-','_'));
 		map.put("label", locale.getDisplayLanguage(locale));
 		map.put("country", locale.getDisplayCountry(locale));
 		map.put("selected", currentLocale.equals(locale));

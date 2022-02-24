@@ -15,7 +15,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class Resource implements Poolable {
 
 	private static final Log log = LogFactory.getLog(Resource.class);
-
 	private String name;
 	private String versionMin;
 	private String versionMax;

@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,22 +28,27 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean.ThemeInfo;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import org.springframework.util.ResourceUtils;
 
 public class ThemeInfoSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(ThemeInfoSetup.class);
 
+	private static final String THEMES_RESOURCE_FOLDER = "themes";
 	// Set default theme based on themes present on the file system
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
-		String themeDirPath = ctx.getRealPath("/themes");
-		if (themeDirPath == null) {
-			throw new IllegalStateException(
-					"Application does not have a /themes directory.");
+		File themesBaseDir;
+
+		try {
+			themesBaseDir = ResourceUtils.getFile("classpath:"+THEMES_RESOURCE_FOLDER);
+		}catch(FileNotFoundException e){
+			log.error("Cant find directory '" + THEMES_RESOURCE_FOLDER + "' inside 'resources' folder");
+			ss.fatal(this, "The application does not contain a folder with themes");
+			return;
 		}
-		File themesBaseDir = new File(themeDirPath);
 
 		List<String> themeNames = getThemeNames(themesBaseDir);
 		log.debug("themeNames: " + themeNames);

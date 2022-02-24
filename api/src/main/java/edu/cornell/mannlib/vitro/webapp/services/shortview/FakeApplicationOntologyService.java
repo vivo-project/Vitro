@@ -4,8 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.services.shortview;
 
 import static edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService.ShortViewContext.BROWSE;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService.ShortViewContext;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Read a config file that describes the short views. Read it into a model and
@@ -55,7 +55,7 @@ public class FakeApplicationOntologyService {
 	private static final Log log = LogFactory
 			.getLog(FakeApplicationOntologyService.class);
 
-	public static final String FILE_OF_SHORT_VIEW_INFO = "/WEB-INF/resources/shortview_config.n3";
+	public static final String FILE_OF_SHORT_VIEW_INFO = "shortview_config.n3";
 
 	private static final String NS = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#";
 	private static final String HAS_TEMPLATE = NS + "hasTemplate";
@@ -104,11 +104,14 @@ public class FakeApplicationOntologyService {
 	 */
 	private OntModel createModelFromFile(ServletContext ctx)
 			throws ShortViewConfigException {
-		InputStream stream = ctx.getResourceAsStream(FILE_OF_SHORT_VIEW_INFO);
-		if (stream == null) {
+		InputStream stream;
+
+		try {
+			stream = new FileInputStream(ResourceUtils.getFile("classpath:"
+					+ FILE_OF_SHORT_VIEW_INFO));
+		}catch (FileNotFoundException e){
 			throw new ShortViewConfigException("The short view config file "
-					+ "doesn't exist in the servlet context: '"
-					+ FILE_OF_SHORT_VIEW_INFO + "'");
+					+ "named '" + FILE_OF_SHORT_VIEW_INFO + "'doesn't exist in the resources folder");
 		}
 
 		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);

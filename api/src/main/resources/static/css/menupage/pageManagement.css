@@ -1,0 +1,146 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+.pageContent {
+    padding-left:6px;
+    padding-top:2px;
+}
+
+.pageContentContainer {
+    background-color:#f5f5f5;
+    border-color:#ccc;
+    border-width:1px;
+    border-style:solid;
+    margin-bottom:4px;
+}
+
+.pageContentTypeLabel {
+    padding-left:6px;
+    color:#064D68;
+}
+
+.pageContentWrapper {
+    background-color:#f9f9f9;
+    padding-left:6px;
+    padding-top:2px;
+    border-top-width:1px;
+    border-style:solid;
+    border-color:#ccc;
+}
+
+.pageContentExpand {
+    float:right;
+    padding-right:5px;
+}
+.contentSectionContainer {
+    background-color:#f9f9f9;
+    padding-left:6px;
+    padding-top:2px;
+    border-width:1px;
+    border-style:solid;
+    border-color:#ccc;
+}
+.arrow {
+	width:13px;
+	height:9px;
+	display:block;
+}
+.expandArrow {
+    background:url(../../images/vitro_plus_sign.gif) right center no-repeat;
+    min-height:18px;
+}
+.collapseArrow {
+    background:url(../../images/vitro_minus_sign.gif) right center no-repeat;
+    min-height:18px;
+}
+
+.deleteButton {
+    margin-bottom:5px;
+}
+
+section#floatRight {
+    margin-top:0px;
+    float:right;
+    background-color:#fff;
+    width:580px;
+    margin-right:-4px;
+}
+select#typeSelect {
+    margin-top:0px;
+    margin-bottom:20px;
+}
+section#headerBar {
+    background-color:#f5f5f5;
+    border-color:#ccc;
+    border-width:1px;
+    border-style:solid;
+    border-bottom-width:0px;
+    padding-left:6px;
+    color:#064D68;
+}
+input#moreContent {
+    margin-top:8px;
+}
+section#pageDetails {
+    background-color:#fff;
+}
+p#templatePTag {
+    margin-top:8px;
+    margin-bottom:2px;
+}
+p#menuCheckboxPTag {
+    margin-top:15px;
+    margin-bottom:3px;
+}
+section.hideMenuSection {
+    margin-top:10px;
+    display:none;
+}
+section.showMenuSection {
+    margin-top:10px;
+}
+section#addPageOne  {
+    margin-bottom:-12px;
+    margin-top:8px;
+}
+input.doneWithContent {
+    display: inline;
+    padding: 5px 18px 7px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    border: 0;
+    margin: 0;
+    background-color: #398aac;
+    color: #fff;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    margin-right: .6em;
+    margin-bottom:8px;
+    margin-top:0px;
+}
+input#contentCheckbox {
+    margin-left:30px;
+    margin-top:5px;
+    vertical-align:top;
+    padding: 0;
+}
+span.deleteLinkContainer {
+    float:left;
+    margin-left:170px;
+    margin-top:-36px;
+}
+form#managePage textarea {
+    width:98.5%;
+}
+#internal-class {
+    padding: 10px 0 2px 10px;
+    background: #f0f0f0;
+    margin-right: .4em;
+    margin-bottom: .8em;
+    width: 65%;
+}

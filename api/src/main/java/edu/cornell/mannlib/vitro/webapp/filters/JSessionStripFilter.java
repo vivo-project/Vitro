@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * Replaces the Response with one that will never put in a jsession.
@@ -26,7 +28,8 @@ import org.apache.commons.logging.LogFactory;
  * {@code
     <filter>
         <filter-name>JSession Strip Filter</filter-name>
-        <filter-class>edu.cornell.mannlib.vitro.filters.JSessionStripFilter</filter-class>
+        <filter-class>edu.cornell.mannlib.vitro.filters.JSessionStripFilter</filter-class>@Configuration
+
     </filter>
 
     <filter-mapping>
@@ -37,7 +40,8 @@ import org.apache.commons.logging.LogFactory;
     }
  * some of this code is from URLRewriteFilter
  */
-@WebFilter(filterName = "JSession Strip Filter", urlPatterns = {"/*"})
+@Component(value="JSessionStripFilter")
+@Order(6)
 public class JSessionStripFilter implements Filter {
     private FilterConfig filterConfig = null;
 

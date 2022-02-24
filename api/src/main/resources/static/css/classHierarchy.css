@@ -1,0 +1,96 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+table.classHierarchy {
+    margin-left:25px;
+    margin-right:25px;
+    margin-bottom:22px;
+    font-size:.8em;
+    min-width:900px;
+    max-width:900px;
+    background-color:#f8f8f8;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #f0f0f0;
+}
+table.classHierarchy td {
+    padding-left:6px;
+}
+table.classHierarchy .classDetail,
+td.classDetail {
+    width:90px;
+    color:#064D68;
+    white-space: nowrap;
+}
+table.subclassTable {
+    margin-left:15px;
+    margin-bottom:4px;
+    margin-top:-4px;
+    display:none;
+}
+td.subclassCell {
+    width:810px;
+    font-size:1.2em;
+    padding-bottom:4px;
+}
+section#container div {
+    width:925px;
+    background-color:#f2f2f2;
+    vertical-align:middle;
+    height:26px;
+}
+section#container div a {
+    margin-left: 6px;
+    font-weight: bold;
+}
+section#container div span {
+    padding-right: 10px;
+    float: right;
+}
+span.headerSpanPlus {
+    width: 12px;
+    background: url(../images/vitro_plus_sign.gif) left center no-repeat;
+    cursor:default;
+}
+span.headerSpanMinus {
+    width: 12px;
+    background: url(../images/vitro_minus_sign.gif) left center no-repeat;
+    cursor:default;
+}
+span.subclassExpandPlus {
+    padding-right: 14px;
+    background: url(../images/vitro_plus_sign.gif) left center no-repeat;
+    cursor:default;
+}
+span.subclassExpandMinus {
+    padding-right: 14px;
+    background: url(../images/vitro_minus_sign.gif) left center no-repeat;
+    cursor:default;
+}
+span#expandAll {
+    margin-right: 10px;
+    float: right;
+    font-size: 0.85em;
+}
+span.rangeClass {
+    color:#064D68;
+    padding-left:22px;
+    padding-right:8px;
+}
+div#expandLink {
+    margin-top:-10px;
+    width:100%;
+    margin-bottom:24px;
+}
+label#displayOptions {
+    display:inline-block;
+    padding-right:6px;
+    margin-top:20px;
+}
+table.innerDefinition {
+    margin-top:-5px;
+    margin-left:4px;
+    margin-right:4px;
+    margin-bottom:4px;
+    line-height:20px;
+}
+

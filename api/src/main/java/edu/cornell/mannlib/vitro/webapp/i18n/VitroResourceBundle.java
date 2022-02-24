@@ -20,6 +20,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.ResourceUtils;
 
 /**
  * Works like a PropertyResourceBundle with two exceptions:
@@ -217,23 +218,13 @@ public class VitroResourceBundle extends ResourceBundle {
 	}
 
 	private File locateFile(String path) {
-		String realPath = ctx.getRealPath(path);
-		if (realPath == null) {
-			log.debug("No real path for '" + path + "'");
+		try {
+			File f = ResourceUtils.getFile("classpath:" + path.substring(1));
+			return f;
+		}catch(FileNotFoundException e){
+			log.debug("No file at '" + path + "' within resources folder");
 			return null;
 		}
-
-		File f = new File(realPath);
-		if (!f.isFile()) {
-			log.debug("No file at '" + realPath + "'");
-			return null;
-		}
-		if (!f.canRead()) {
-			log.error("Can't read the file at '" + realPath + "'");
-			return null;
-		}
-		log.debug("Located file '" + path + "' at '" + realPath + "'");
-		return f;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,14 +1,25 @@
 <settings xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
 
+    <proxies>
+        <proxy>
+            <id>httpproxy</id>
+            <active>true</active>
+            <protocol>http</protocol>
+            <host>proxy.uns.ac.rs</host>
+            <port>8080</port>
+            <nonProxyHosts>localhost</nonProxyHosts>
+        </proxy>
+    </proxies>
+
     <profiles>
         <profile>
             <id>defaults</id>
             <properties>
                 <app-name>vitro</app-name>
 
-                <vitro-dir>/usr/local/vitro/home</vitro-dir>
-                <tomcat-dir>/usr/local/tomcat</tomcat-dir>
+                <vitro-dir>/home/veljkomaksimovic/Lyrasis/Vitro/home</vitro-dir>
+                <tomcat-dir>/home/veljkomaksimovic/tomcat/apache-tomcat-9.0.52</tomcat-dir>
 
                 <default-theme>vitro</default-theme>
             </properties>

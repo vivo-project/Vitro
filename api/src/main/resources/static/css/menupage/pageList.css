@@ -1,0 +1,13 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+.menuFlag {
+	width:67px;
+	height:18px;
+	background: url("../../images/checkMark.png") no-repeat left center;
+}
+th#isMenuPage {
+    width: 86px;
+}
+th#iconColumns {
+    width: 90px;
+}

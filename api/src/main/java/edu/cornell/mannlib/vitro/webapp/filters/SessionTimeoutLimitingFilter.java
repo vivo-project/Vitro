@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * Manipulate the maximum inactive interval on sessions.
@@ -24,7 +28,8 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
  * <li>Other sessions are trivial, and should have a short interval.</li>
  * </ul>
  */
-@WebFilter(filterName = "Session Timeout Limiting Filter", urlPatterns = {"/*"})
+@Component(value="SessionTimeoutLimitingFilter")
+@Order(2)
 public class SessionTimeoutLimitingFilter implements Filter {
 	/** Maximum inactive interval for a trivial session object, in seconds. */
 	private static final int TRIVIAL_SESSION_LIFETIME = 120;

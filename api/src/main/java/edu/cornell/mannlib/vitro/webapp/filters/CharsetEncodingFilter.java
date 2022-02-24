@@ -15,8 +15,13 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
-@WebFilter(filterName = "Character Set Encoding Filter", urlPatterns = {"/*"})
+@Component(value="CharsetEncodingFilter")
+@Order(3)
 public class CharsetEncodingFilter implements Filter {
 
 	@Override

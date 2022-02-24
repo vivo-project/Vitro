@@ -8,6 +8,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.triplesource.impl.tdb.ContentTripleSourceTDB;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.ontology.OntDocumentManager;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -25,6 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.triplesource.impl.BasicCombinedTripleSource;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * The basic implementation of the Application interface.
@@ -33,6 +38,8 @@ public class ApplicationImpl implements Application {
 	// ----------------------------------------------------------------------
 	// The instance
 	// ----------------------------------------------------------------------
+	private static final Log log = LogFactory
+			.getLog(ApplicationImpl.class);
 
 	private ServletContext ctx;
 	private VitroHomeDirectory homeDirectory;
@@ -168,6 +175,7 @@ public class ApplicationImpl implements Application {
 			ContentTripleSource contentTripleSource = app
 					.getContentTripleSource();
 			contentTripleSource.startup(app, css);
+
 			ss.info(this, "Started the ContentTripleSource: "
 					+ contentTripleSource);
 
@@ -176,6 +184,7 @@ public class ApplicationImpl implements Application {
 				ConfigurationTripleSource configurationTripleSource = app
 						.getConfigurationTripleSource();
 				configurationTripleSource.startup(app, css);
+
 				ss.info(this, "Started the ConfigurationTripleSource: "
 						+ configurationTripleSource);
 

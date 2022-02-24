@@ -1,0 +1,16 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+# This file is for the portions of the pageList that should not be editable, i.e.#
+# that it cannot be deleted and that it requires certain permissions #
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix action: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+
+### This file defines the page list menu for vitro. ###
+
+display:pageListPage
+    display:requiresAction <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#ManageMenus> ;
+    display:cannotDeletePage "true" .

@@ -22,6 +22,7 @@ public class Action implements RunnableComponent, Poolable {
 
 	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
+
 	@Override
 	public void dereference() {
 		if (firstStep != null) {

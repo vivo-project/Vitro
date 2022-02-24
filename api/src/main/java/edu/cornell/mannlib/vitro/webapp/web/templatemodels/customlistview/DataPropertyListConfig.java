@@ -18,12 +18,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyTemplateModel.ConfigError;
 import freemarker.cache.TemplateLoader;
+import org.springframework.util.ResourceUtils;
 
 public class DataPropertyListConfig {
     private static final Log log = LogFactory.getLog(DataPropertyListConfig.class);
 
 
-    private static final String CONFIG_FILE_PATH = "/config/";
+    private static final String CONFIG_FILE_PATH = "config/";
     private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-dataDefault.xml";
 
     /* NB The default post-processor is not the same as the post-processor for the default view. The latter
@@ -122,7 +123,7 @@ public class DataPropertyListConfig {
     private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf,
             boolean editing) {
 		try {
-			FileReader reader = new FileReader(configFilePath);
+			FileReader reader = new FileReader(ResourceUtils.getFile("classpath:"+configFilePath));
 			CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
 
 			selectQuery = configFileContents.getSelectQuery(false, editing, ListConfigUtils.getUsePreciseSubquery(vreq));
@@ -135,7 +136,7 @@ public class DataPropertyListConfig {
     }
 
     private String getConfigFilePath(String filename) {
-        return vreq.getSession().getServletContext().getRealPath(CONFIG_FILE_PATH + filename);
+        return CONFIG_FILE_PATH + filename;
     }
 
 	public String getSelectQuery() {

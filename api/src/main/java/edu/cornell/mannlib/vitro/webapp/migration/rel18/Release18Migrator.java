@@ -17,7 +17,7 @@ public class Release18Migrator implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
 
-		new UpdateKnowledgeBase("/WEB-INF/ontologies/update17to18/", this).contextInitialized(sce);
+		new UpdateKnowledgeBase("ontologies/update17to18/", this).contextInitialized(sce);
 
 		new FauxPropertiesUpdater(ctx, this).migrate();
 		new RemoveObsoleteMetadataGraphs(ctx, this).migrate();

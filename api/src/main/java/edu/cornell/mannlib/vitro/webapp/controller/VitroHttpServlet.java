@@ -58,16 +58,17 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	@Override
 	public final void service(ServletRequest req, ServletResponse resp)
 			throws ServletException, IOException {
+
 		if ((req instanceof HttpServletRequest)
 				&& (resp instanceof HttpServletResponse)) {
 			HttpServletRequest hreq = (HttpServletRequest) req;
 
 			hreq = MultipartRequestWrapper.parse(hreq, this);
-
+			/*
 			if (log.isTraceEnabled()) {
 				dumpRequestHeaders(hreq);
 			}
-
+			*/
 			super.service(hreq, resp);
 		} else {
 			super.service(req, resp);
