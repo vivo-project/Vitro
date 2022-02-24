@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class N3Template implements Template{
+public class N3Template extends AbstractOperation implements Template{
 
 	private String n3Text;
 

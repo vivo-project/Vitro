@@ -8,7 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class ParameterType implements Removable {
 
 	String name;
-	
+
 	public RDFDatatype getRDFDataType() {
 		return new XSDDatatype(name);
 	}
