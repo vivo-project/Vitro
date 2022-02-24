@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase;
 public class Release16Migrator implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		new UpdateKnowledgeBase("/WEB-INF/ontologies/update15to16/", this).contextInitialized(sce);
+		new UpdateKnowledgeBase("ontologies/update15to16/", this).contextInitialized(sce);
 	}
 
 	@Override

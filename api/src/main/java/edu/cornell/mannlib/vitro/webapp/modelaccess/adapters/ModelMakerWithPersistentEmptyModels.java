@@ -18,7 +18,7 @@ import org.apache.jena.util.iterator.WrappedIterator;
  * forgets.
  *
  * This is a useful decorator for some triple stores which do not remember empty
- * models. SDB, for example. With this decorator, a GUI can offer to let you
+ * models. SDB, for example. With this decorator, a GUIApache can offer to let you
  * create a model, and then offer to let you add triples to it. Without this
  * decorator, you would need to do that in a single step.
  *

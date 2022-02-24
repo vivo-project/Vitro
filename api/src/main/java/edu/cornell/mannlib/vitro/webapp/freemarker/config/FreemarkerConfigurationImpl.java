@@ -293,6 +293,10 @@ public class FreemarkerConfigurationImpl extends Configuration {
 			sharedVariables.put("currentTheme", wrap(currentTheme));
 			sharedVariables.put("siteTagline", wrap(tagLine));
 			sharedVariables.put("urls", wrap(siteUrls));
+			//TODO This was added to make login work without macro. Should probably be deleted at
+			// some point (when we separate frontend and backend)
+			sharedVariables.put("formAction",wrap("/authenticate"));
+
 		}
 
 		private Map<String, String> getSiteUrls(ServletContext ctx,

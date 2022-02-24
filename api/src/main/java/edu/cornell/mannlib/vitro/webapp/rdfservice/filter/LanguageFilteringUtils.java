@@ -11,7 +11,10 @@ import java.util.Set;
 
 import javax.servlet.ServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.selection.LocaleSelectionSetup;
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -20,6 +23,8 @@ import org.apache.jena.rdf.model.ModelFactory;
  * Some methods that will come in handy when dealing with Language Filtering
  */
 public class LanguageFilteringUtils {
+	private static final Log log = LogFactory
+			.getLog(LanguageFilteringUtils.class);
 
 	private static final String UNDERSCORE = "_";
 	private static final String HYPHEN = "-";
@@ -44,6 +49,7 @@ public class LanguageFilteringUtils {
      * and country abbreviation is uppercase.
      */
     public static Locale languageToLocale(String langStr) {
+    	log.debug(langStr);
         String[] langParts = langStr.split(HYPHEN);
         if (langParts.length > 2) {
             langStr = String.join(UNDERSCORE, langParts[0].toLowerCase(),

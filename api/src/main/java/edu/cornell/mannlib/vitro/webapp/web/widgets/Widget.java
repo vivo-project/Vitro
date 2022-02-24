@@ -13,6 +13,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
+import freemarker.template.TemplateSequenceModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -111,7 +112,10 @@ public abstract class Widget {
         StringWriter out = new StringWriter();
 
         try {
-            String templateString = macro.getChildNodes().get(0).toString();
+            String templateString = "";
+            for(int i=0;i<macro.getChildNodes().size();i++){
+                templateString=templateString.concat(macro.getChildNodes().get(i).toString());
+            }
             // NB Using this method of creating a template from a string does not allow the widget template to import
             // other templates (but it can include other templates). We'd need to use a StringTemplateLoader
             // in the config instead. See StringTemplateLoader API doc.

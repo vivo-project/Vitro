@@ -1,0 +1,7 @@
+<Context>
+    <Environment
+            type="java.lang.String"
+            name="vitro/home"
+            value="/home/veljkomaksimovic/Lyrasis/Vitro/home" override="true"/>
+    <Manager pathname=""/>
+</Context>

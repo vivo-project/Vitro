@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -24,7 +27,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author bjl23
  *
  */
-@WebFilter(filterName = "URL Rewriter Filter", urlPatterns = {"/*"})
+@Component(value="URLRewriterFilter")
+@Order(7)
 public class URLRewriterFilter implements Filter {
 
 	private ServletContext _context;

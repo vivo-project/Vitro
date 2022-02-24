@@ -269,7 +269,7 @@ public class StartupManagerTest extends AbstractTestClass {
 
 	private void assertStartupFails(String fileContents) {
 		if (fileContents != null) {
-			ctx.setMockResource(StartupManager.FILE_OF_STARTUP_LISTENERS,
+			ctx.setMockResource(StartupManager.STARTUP_LISTENERS_RESOURCE_NAME,
 					fileContents);
 		}
 		sm.contextInitialized(sce);
@@ -282,7 +282,7 @@ public class StartupManagerTest extends AbstractTestClass {
 
 	private void assertStartupSucceeds(String fileContents) {
 		if (fileContents != null) {
-			ctx.setMockResource(StartupManager.FILE_OF_STARTUP_LISTENERS,
+			ctx.setMockResource(StartupManager.STARTUP_LISTENERS_RESOURCE_NAME,
 					fileContents);
 		}
 		sm.contextInitialized(sce);

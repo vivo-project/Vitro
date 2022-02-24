@@ -173,7 +173,7 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 	 */
 	private void testThisResourceFile(String message, String fileContents,
 			RevisionInfoBean expected) {
-		context.setMockResource(RevisionInfoSetup.RESOURCE_PATH, fileContents);
+		context.setMockResource(RevisionInfoSetup.RESOURCE_NAME, fileContents);
 
 		listener.contextInitialized(event);
 		assertEquals(message, expected, RevisionInfoBean.getBean(session));

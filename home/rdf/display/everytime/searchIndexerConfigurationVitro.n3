@@ -1,0 +1,85 @@
+@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix searchIndex: <java:edu.cornell.mannlib.vitro.webapp.searchindex#> .
+
+
+#
+# configure the SearchIndexer
+#
+
+# Individuals with these types will be excluded from the search index
+:searchExcluder_typeExcluder
+    a   searchIndex:exclusions.ExcludeBasedOnType ,
+        searchIndex:exclusions.SearchIndexExcluder ;
+    :excludes
+        "http://www.w3.org/2002/07/owl#AnnotationProperty" ,
+        "http://www.w3.org/2002/07/owl#DatatypeProperty" ,
+        "http://www.w3.org/2002/07/owl#ObjectProperty" .
+
+# Individuals with types from these namespaces will be excluded from the search index.
+:searchExcluder_namespaceExcluder
+    a   searchIndex:exclusions.ExcludeBasedOnNamespace ,
+        searchIndex:exclusions.SearchIndexExcluder ;
+    :excludes
+        "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ,
+        "http://vitro.mannlib.cornell.edu/ns/vitro/public#" ,
+        "http://vitro.mannlib.cornell.edu/ns/bnode#" ,
+        "http://www.w3.org/2002/07/owl#" .
+
+# Individuals with URIs in these namespaces will be excluded from the search index.
+:searchExcluder_typeNamespaceExcluder
+    a   searchIndex:exclusions.ExcludeBasedOnTypeNamespace ,
+        searchIndex:exclusions.SearchIndexExcluder ;
+    :excludes
+        "http://vitro.mannlib.cornell.edu/ns/vitro/role#public" .
+
+:searchExcluder_syncingTypeExcluder
+    a   searchIndex:exclusions.SyncingExcludeBasedOnType ,
+        searchIndex:exclusions.SearchIndexExcluder .
+
+# ------------------------------------
+
+:uriFinder_forDataProperties
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.AdditionalURIsForDataProperties .
+
+:uriFinder_forObjectProperties
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.AdditionalURIsForObjectProperties .
+
+:uriFinder_forTypeStatements
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.AdditionalURIsForTypeStatements .
+
+:uriFinder_forClassGroupChange
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.URIsForClassGroupChange .
+
+# ------------------------------------
+
+:documentModifier_AllNames
+    a   searchIndex:documentBuilding.SelectQueryDocumentModifier ,
+        searchIndex:documentBuilding.DocumentModifier ;
+    rdfs:label "All labels are added to name fields." ;
+    :hasTargetField "nameRaw" ;
+    :hasSelectQuery """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+		SELECT ?label
+		WHERE {
+			?uri rdfs:label ?label .
+	    }
+        """ .
+
+:documentModifier_NameFieldBooster
+    a   searchIndex:documentBuilding.FieldBooster ,
+        searchIndex:documentBuilding.DocumentModifier ;
+    :hasTargetField "nameRaw" ;
+    :hasTargetField "nameLowercase" ;
+    :hasTargetField "nameUnstemmed" ;
+    :hasTargetField "nameStemmed" ;
+    :hasBoost "1.2"^^xsd:float .
+
+:documentModifier_thumbnailImageUrl
+    a   searchIndex:documentBuilding.ThumbnailImageURL ,
+        searchIndex:documentBuilding.DocumentModifier .

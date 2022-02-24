@@ -4,6 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.triplesource.impl.tdb;
 
 import java.io.IOException;
 
+import edu.cornell.mannlib.vitro.webapp.searchengine.InstrumentedSearchEngineWrapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.ModelMaker;
 import org.apache.jena.tdb.TDB;
@@ -40,6 +43,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * Memory-map the small content models, and add the standard decorators.
  */
 public class ContentTripleSourceTDB extends ContentTripleSource {
+	private static final Log log = LogFactory
+			.getLog(ContentTripleSourceTDB.class);
+
 	private String tdbPath;
 
 	private volatile RDFService rdfService;
@@ -71,10 +77,13 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	}
 
 	private String resolveTdbPath(Application application) {
+		log.debug("resolve relative path: " + application.getHomeDirectory().getPath().resolve(tdbPath));
 		return application.getHomeDirectory().getPath().resolve(tdbPath)
 				.toString();
 	}
 
+	/*TODO not sure what this does. I mean a get what it does, sets Union graph as the default
+	*  graph for all queries, but how does it do that. I could not find the answer*/
 	private void configureTDB() {
 		TDB.getContext().setTrue(TDB.symUnionDefaultGraph);
 	}

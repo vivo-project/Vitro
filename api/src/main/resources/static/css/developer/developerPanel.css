@@ -1,0 +1,76 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+/* Styles for the developer panel. */
+
+div.developer {
+	background-color: #f7dd8a;
+	padding: 0px 10px 0px 10px;
+	font-variant: small-caps;
+}
+
+div.developer #developerPanelBody {
+	display: none;
+}
+
+#developerPanelBody * {
+	line-height: 1em;
+	font-size: small;
+}
+
+div.developer div.devleft {
+	width: 49%
+}
+
+div.developer div.devright {
+	float: right;
+	width: 49%
+}
+
+div.developer div.container {
+	border: thin groove black;
+	padding: 3px 10px 3px 10px;
+	margin: 3px 0px 3px 0px;
+}
+
+div.developer div.within {
+	padding-left: 1.5em;
+}
+
+div.developer input[type="text"] {
+	padding: 2px 10px 2px 10px;
+	line-height: 1em;
+	margin: 2px 2px 2px 2px;
+}
+
+div.developer input[type="text"]:disabled {
+	background-color: #f8eeae;
+}
+
+div.developer a {
+	margin: 3px;
+}
+
+#developerPanelBody ul.ui-tabs-nav li a {
+	padding: 0em 1em;
+}
+
+#developerPanelBody .ui-widget-header {
+	background-image: none;
+	background-color: #CC9900;
+}
+
+#developerPanelBody .ui-widget-content {
+	background-image: none;
+	background-color: #f7dd8a;
+}
+
+#developerPanelBody .ui-widget-header .ui-state-default {
+	background-image: none;
+	background-color: #f7cc33;
+}
+
+#developerPanelBody .ui-widget-header li.ui-state-active {
+	background-image: none;
+	background-color: #f7dd8a;
+}
+

@@ -597,29 +597,29 @@ public class URLRewritingHttpServletResponseTest {
 
 
     @Test
-    public void test35560(){ urlEncodingStyleB( "/js/jquery-1.12.4.min.js",
-    "/js/jquery-1.12.4.min.js"); }
+    public void test35560(){ urlEncodingStyleB("/static/js/jquery-1.12.4.min.js",
+            "/static/js/jquery-1.12.4.min.js"); }
     @Test
     public void test35562(){ urlEncodingStyleB(
-    "/js/jquery_plugins/getURLParam.js",
-    "/js/jquery_plugins/getURLParam.js"); }
+            "/static/js/jquery_plugins/getURLParam.js",
+            "/static/js/jquery_plugins/getURLParam.js"); }
     @Test
     public void test35564(){ urlEncodingStyleB(
-    "/js/jquery_plugins/colorAnimations.js",
-    "/js/jquery_plugins/colorAnimations.js"); }
+            "/static/js/jquery_plugins/colorAnimations.js",
+            "/static/js/jquery_plugins/colorAnimations.js"); }
     @Test
     public void test35568(){ urlEncodingStyleB(
-    "/js/propertyGroupSwitcher.js", "/js/propertyGroupSwitcher.js"); }
+            "/static/js/propertyGroupSwitcher.js", "/static/js/propertyGroupSwitcher.js"); }
     @Test
-    public void test35617(){ urlEncodingStyleB( "/js/controls.js",
-    "/js/controls.js"); }
+    public void test35617(){ urlEncodingStyleB("/static/js/controls.js",
+            "/static/js/controls.js"); }
     @Test
     public void test35618(){ urlEncodingStyleB(
-    "/js/jquery_plugins/jquery.form.js",
-    "/js/jquery_plugins/jquery.form.js"); }
+            "/static/js/jquery_plugins/jquery.form.js",
+            "/static/js/jquery_plugins/jquery.form.js"); }
     @Test
     public void test356180(){ urlEncodingStyleB(
-    "/js/tiny_mce/tiny_mce.js", "/js/tiny_mce/tiny_mce.js"); }
+            "/static/js/tiny_mce/tiny_mce.js", "/static/js/tiny_mce/tiny_mce.js"); }
     @Test
     public void test37150(){ urlEncodingStyleB(
     "/entityEdit?uri=http%3a%2f%2fbogus.com%2findividual%2fn3671",
@@ -635,8 +635,8 @@ public class URLRewritingHttpServletResponseTest {
     }
     @Test
     public void test38667(){ urlEncodingStyleB(
-    "/js/imageUpload/imageUploadUtils.js",
-    "/js/imageUpload/imageUploadUtils.js"); }
+            "/static/js/imageUpload/imageUploadUtils.js",
+            "/static/js/imageUpload/imageUploadUtils.js"); }
     @Test
     public void test47087(){ urlEncodingStyleB(
     "entityEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
