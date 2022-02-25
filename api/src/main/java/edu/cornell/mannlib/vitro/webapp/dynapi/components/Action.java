@@ -8,12 +8,13 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class Action implements RunnableComponent, Poolable {
+public class Action implements RunnableComponent, Poolable, Operation, Link {
 
 	private static final Log log = LogFactory.getLog(Action.class);
 
@@ -21,6 +22,10 @@ public class Action implements RunnableComponent, Poolable {
 	private RPC rpc;
 
 	private Set<Long> clients = ConcurrentHashMap.newKeySet();
+
+  private Parameters providedParams = new Parameters();
+  private Parameters requiredParams;
+
 
 	@Override
 	public void dereference() {
@@ -48,6 +53,11 @@ public class Action implements RunnableComponent, Poolable {
 	public void setRPC(RPC rpc) {
 		this.rpc = rpc;
 	}
+	
+  @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
+  public void addProvidedParameter(Parameter param) {
+    providedParams.add(param);
+  }
 
 	@Override
 	public String getName() {
@@ -87,5 +97,29 @@ public class Action implements RunnableComponent, Poolable {
 	public boolean hasClients() {
 		return !clients.isEmpty();
 	}
+
+  @Override
+  public Set<Link> getNextLinks() {
+    return Collections.singleton(firstStep);
+  }
+
+  @Override
+  public Parameters getRequiredParams() {
+    return requiredParams;
+  }
+  
+  public void computeScopes() {
+    requiredParams = Scopes.computeInitialRequirements(this);  
+  }
+
+  @Override
+  public Parameters getProvidedParams() {
+    return providedParams;
+  }
+
+  @Override
+  public boolean isRoot() {
+    return true;
+  }
 
 }

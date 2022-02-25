@@ -6,6 +6,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class N3Template implements Template{
 
 	private String n3Text;
+  private Parameters requiredParams = new Parameters();
 
 	@Override
 	public void dereference() {
@@ -23,28 +24,19 @@ public class N3Template implements Template{
 		return null;
 	}
 
-	@Override
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
 	public void addRequiredParameter(Parameter param) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addProvidedParameter(Parameter param) {
-		// TODO Auto-generated method stub
-		
+	  requiredParams.add(param);
 	}
 
 	@Override
 	public Parameters getRequiredParams() {
-		// TODO Auto-generated method stub
-		return null;
+		return requiredParams;
 	}
 
-	@Override
-	public Parameters getProvidedParams() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public Parameters getProvidedParams() {
+    return new Parameters();
+  }
 
 }
