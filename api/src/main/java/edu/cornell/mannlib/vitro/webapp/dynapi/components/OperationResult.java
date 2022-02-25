@@ -27,5 +27,9 @@ public class OperationResult {
 	public static OperationResult notImplemented() {
 		return new OperationResult(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
+
+	public static OperationResult notFound() {
+		return new OperationResult(HttpServletResponse.SC_NOT_FOUND);
+	}
 	
 }
