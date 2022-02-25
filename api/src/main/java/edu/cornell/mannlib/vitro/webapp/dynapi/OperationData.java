@@ -7,12 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 
 public class OperationData {
 
-	private Map<String, String[]> params;
-	private ServletContext context;
+	private final Map<String, String[]> params;
+	private final ServletContext context;
+	private final String method;
 
 	public OperationData(HttpServletRequest request) {
 		params = request.getParameterMap();
 		context = request.getServletContext();
+		method = request.getMethod();
 	}
 
 	public ServletContext getContext() {
@@ -28,6 +30,10 @@ public class OperationData {
 
 	public String[] get(String paramName) {
 		return params.get(paramName);
+	}
+
+	public String getMethod() {
+		return method;
 	}
 
 }

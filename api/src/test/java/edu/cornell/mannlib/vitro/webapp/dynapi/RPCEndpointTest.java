@@ -3,8 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.powermock.api.easymock.PowerMock.createMock;
+import static org.powermock.api.easymock.PowerMock.expectLastCall;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
 import static org.powermock.api.easymock.PowerMock.replay;
 import static org.powermock.api.easymock.PowerMock.verify;
@@ -29,38 +28,31 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 @PrepareForTest(ActionPool.class)
 public class RPCEndpointTest {
 
-	final private static String URI_TEST = "/api/rpc/test";
+	private final static String URI_TEST = "/api/rpc/test";
 
-	private static RPCEndpoint rpcEndpoint;
+	private RPCEndpoint rpcEndpoint;
 
-	@Mock
-	private static ActionPool actionPool;
+	private Map<String, String[]> params;
 
-	@Mock
-	private static Action action;
+	private ServletContext context;
 
 	@Mock
-	private static OperationResult operationResult;
+	private ActionPool actionPool;
 
 	@Mock
-	private static HttpServletRequest request;
+	private Action action;
 
 	@Mock
-	private static HttpServletResponse response;
+	private OperationResult operationResult;
 
 	@Mock
-	private static Map<String, String[]> params;
+	private HttpServletRequest request;
 
 	@Mock
-	private static ServletContext context;
+	private HttpServletResponse response;
 
 	@Before
 	public void beforeEach() {
-		operationResult = createMock(OperationResult.class);
-		action = createMock(Action.class);
-		actionPool = createMock(ActionPool.class);
-		request = createMock(HttpServletRequest.class);
-		response = createMock(HttpServletResponse.class);
 
 		// The order of where mockStatic (and possibly all mocks herein) matters and should only be changed cautiously.
 		mockStatic(ActionPool.class);
@@ -81,6 +73,7 @@ public class RPCEndpointTest {
 		expect(request.getParameterMap()).andReturn(params).anyTimes();
 		expect(request.getServletContext()).andReturn(context).anyTimes();
 		expect(request.getRequestURI()).andReturn(URI_TEST).anyTimes();
+		expect(request.getMethod()).andReturn("POST").anyTimes();
 		replay(request);
 
 		action.removeClient();

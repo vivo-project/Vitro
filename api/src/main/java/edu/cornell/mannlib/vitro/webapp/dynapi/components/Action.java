@@ -1,5 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -7,12 +13,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class Action implements RunnableComponent, Poolable, Operation, Link {
 
@@ -38,7 +38,7 @@ public class Action implements RunnableComponent, Poolable, Operation, Link {
 	}
 
 	public OperationResult run(OperationData input) {
-		if (firstStep == null) {
+		if (firstStep == null || rpcMethodUnsupported(input.getMethod())) {
 			return new OperationResult(HttpServletResponse.SC_NOT_IMPLEMENTED);
 		}
 		return firstStep.run(input);
@@ -121,5 +121,13 @@ public class Action implements RunnableComponent, Poolable, Operation, Link {
   public boolean isRoot() {
     return true;
   }
+
+	private boolean rpcMethodUnsupported(String method) {
+		if (rpc == null || rpc.getHttpMethod() == null || rpc.getHttpMethod().getName() == null) {
+			return false;
+		}
+
+		return rpc.getHttpMethod().getName().equalsIgnoreCase(method);
+	}
 
 }
