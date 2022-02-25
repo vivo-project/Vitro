@@ -25,14 +25,25 @@ public class RPCEndpoint extends VitroHttpServlet {
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		String requestURL = request.getRequestURI();
-		String actionName = requestURL.substring(requestURL.lastIndexOf("/") + 1);
+		if (request.getPathInfo() == null) {
+			OperationResult.notFound().prepareResponse(response);
+			return;
+		}
+
+		String[] paths = request.getPathInfo().split("/");
+
+		if (paths.length < 2) {
+			OperationResult.notFound().prepareResponse(response);
+			return;
+		}
+
+		String actionName = paths[1];
 
 		actionPool.printNames();
 		Action action = actionPool.getByName(actionName);
+		OperationData input = new OperationData(request);
 
 		try {
-			OperationData input = new OperationData(request);
 			OperationResult result = action.run(input);
 			result.prepareResponse(response);
 		} finally {

@@ -22,11 +22,12 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RPCEndpointTest {
 
-	private final static String URI_TEST = "/api/rpc/test";
+	private final static String URI_TEST = "/test";
 
 	private Map<String, String[]> params;
 
@@ -52,11 +53,10 @@ public class RPCEndpointTest {
 	public void beforeEach() {
 		actionPoolStatic = mockStatic(ActionPool.class);
 		when(ActionPool.getInstance()).thenReturn(actionPool);
-		when(actionPool.getByName(any())).thenReturn(action);
+		when(actionPool.getByName(any(String.class))).thenReturn(action);
 
 		when(request.getParameterMap()).thenReturn(params);
 		when(request.getServletContext()).thenReturn(context);
-		when(request.getRequestURI()).thenReturn(URI_TEST);
 
 		rpcEndpoint = new RPCEndpoint();
 	}
@@ -70,23 +70,41 @@ public class RPCEndpointTest {
 	public void doGetTest() {
 		rpcEndpoint.doGet(request, response);
 		verify(action, times(0)).run(any());
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 
 	@Test
 	public void doPostTest() {
+		OperationResult result = new OperationResult(HttpServletResponse.SC_OK);
+
+		when(request.getPathInfo()).thenReturn(URI_TEST);
+		when(action.run(any(OperationData.class))).thenReturn(result);
+
 		rpcEndpoint.doPost(request, response);
 		verify(action, times(1)).run(any());
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
+	}
+
+	@Test
+	public void doPostTestOnMissing() {
+		when(request.getPathInfo()).thenReturn("");
+
+		rpcEndpoint.doPost(request, response);
+		verify(action, times(0)).run(any());
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_FOUND);
 	}
 
 	@Test
 	public void doDeleteTest() {
 		rpcEndpoint.doDelete(request, response);
 		verify(action, times(0)).run(any());
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 
 	@Test
 	public void doPutTest() {
 		rpcEndpoint.doPut(request, response);
 		verify(action, times(0)).run(any());
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 }
