@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-public class SolrQuery extends AbstractOperation{
+public class SolrQuery extends AbstractQueryOperation{
 
     private static final Log log = LogFactory.getLog(ActionPool.class);
 

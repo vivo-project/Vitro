@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class SPARQLQuery extends AbstractOperation{
+public class SPARQLQuery extends AbstractQueryOperation{
 
  	private static final Log log = LogFactory.getLog(SPARQLQuery.class);
 

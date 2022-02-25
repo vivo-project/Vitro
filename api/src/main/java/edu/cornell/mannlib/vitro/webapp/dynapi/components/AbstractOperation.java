@@ -8,26 +8,15 @@ import org.apache.commons.logging.Log;
 
 public abstract class AbstractOperation implements Operation{
 
-
     protected Parameters requiredParams = new Parameters();
-    protected Parameters providedParams = new Parameters();
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
     public void addRequiredParameter(Parameter param) {
         requiredParams.add(param);
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
-    public void addProvidedParameter(Parameter param) {
-        providedParams.add(param);
-    }
-
     public Parameters getRequiredParams() {
         return requiredParams;
-    }
-
-    public Parameters getProvidedParams() {
-        return providedParams;
     }
 
     protected boolean isInputValid(OperationData input) {
