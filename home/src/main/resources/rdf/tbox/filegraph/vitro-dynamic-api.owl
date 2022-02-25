@@ -400,7 +400,7 @@
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#action">
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
-		<rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider"/>
         <rdfs:label xml:lang="en-US">Action</rdfs:label>
     </owl:Class>
     
