@@ -29,8 +29,7 @@ public enum PropertyType {
 		}
 
 		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-				Property annotation) {
+		protected PropertyMethod buildPropertyMethod(Method method, Property annotation) {
 			return new ResourcePropertyMethod(method, annotation);
 		}
 
@@ -43,8 +42,7 @@ public enum PropertyType {
 		}
 
 		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-				Property annotation) {
+		protected PropertyMethod buildPropertyMethod(Method method, Property annotation) {
 			return new StringPropertyMethod(method, annotation);
 		}
 	},
@@ -56,8 +54,7 @@ public enum PropertyType {
 		}
 
 		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-													 Property annotation) {
+		protected PropertyMethod buildPropertyMethod(Method method, Property annotation) {
 			return new FloatPropertyMethod(method, annotation);
 		}
 	},
@@ -69,8 +66,7 @@ public enum PropertyType {
 		}
 
 		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-													 Property annotation) {
+		protected PropertyMethod buildPropertyMethod(Method method, Property annotation) {
 			return new IntegerPropertyMethod(method, annotation);
 		}
 	},
@@ -82,8 +78,7 @@ public enum PropertyType {
 		}
 
 		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-				Property annotation) {
+		protected PropertyMethod buildPropertyMethod(Method method, Property annotation) {
 			return new BooleanPropertyMethod(method, annotation);
 		}
 	};
@@ -146,8 +141,7 @@ public enum PropertyType {
 		return type.buildPropertyStatement(s);
 	}
 
-	public static PropertyMethod createPropertyMethod(Method method,
-			Property annotation) throws PropertyTypeException {
+	public static PropertyMethod createPropertyMethod(Method method, Property annotation) throws PropertyTypeException {
 		Class<?> parameterType = method.getParameterTypes()[0];
 		PropertyType type = PropertyType.typeForParameterType(parameterType);
 		return type.buildPropertyMethod(method, annotation);
