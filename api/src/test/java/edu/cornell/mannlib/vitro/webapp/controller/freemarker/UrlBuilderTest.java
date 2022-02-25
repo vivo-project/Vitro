@@ -3,7 +3,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.mock;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -114,7 +114,7 @@ public class UrlBuilderTest extends AbstractTestClass {
     }
 
     protected VitroRequest makeMockVitroRequest( final String defaultNS){
-        HttpServletRequest req = createMock( HttpServletRequest.class );
+        HttpServletRequest req = mock(HttpServletRequest.class);
         return new VitroRequest(req){
 
             @Override
