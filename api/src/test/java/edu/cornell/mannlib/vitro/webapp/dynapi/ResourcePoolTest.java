@@ -378,20 +378,19 @@ public class ResourcePoolTest extends ServletContextTest {
         assertTrue(actualResource.hasClients());
 
         assertEquals(expectedActionName, actualResource.getRpcOnGet().getName());
-        // TODO: figure out why these are all POST
-        // assertEquals("GET", resource.getRpcOnGet().getHttpMethod().getName());
+        assertEquals("GET", actualResource.getRpcOnGet().getHttpMethod().getName());
         assertEquals(expctedResourceKey.getVersion().toString(), actualResource.getRpcOnGet().getMinVersion());
         assertEquals(expectedActionName, actualResource.getRpcOnPost().getName());
         assertEquals("POST", actualResource.getRpcOnPost().getHttpMethod().getName());
         assertEquals(expctedResourceKey.getVersion().toString(), actualResource.getRpcOnPost().getMinVersion());
         assertEquals(expectedActionName, actualResource.getRpcOnDelete().getName());
-        // assertEquals("DELETE", resource.getRpcOnDelete().getHttpMethod().getName());
+        assertEquals("DELETE", actualResource.getRpcOnDelete().getHttpMethod().getName());
         assertEquals(expctedResourceKey.getVersion().toString(), actualResource.getRpcOnDelete().getMinVersion());
         assertEquals(expectedActionName, actualResource.getRpcOnPut().getName());
-        // assertEquals("PUT", resource.getRpcOnPut().getHttpMethod().getName());
+        assertEquals("PUT", actualResource.getRpcOnPut().getHttpMethod().getName());
         assertEquals(expctedResourceKey.getVersion().toString(), actualResource.getRpcOnPut().getMinVersion());
         assertEquals(expectedActionName, actualResource.getRpcOnPatch().getName());
-        // assertEquals("PATCH", resource.getRpcOnPatch().getHttpMethod().getName());
+        assertEquals("PATCH", actualResource.getRpcOnPatch().getHttpMethod().getName());
         assertEquals(expctedResourceKey.getVersion().toString(), actualResource.getRpcOnPatch().getMinVersion());
 
         actualResource.removeClient();

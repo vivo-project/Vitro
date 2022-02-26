@@ -9,7 +9,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testReloadAction1_1>
         a                        dynapi:action ;
         rdfs:label               "Test reload action 1.1"@en-US ;
-        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1> ;
+        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC1_1> ;
         dynapi:firstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/testReloadStep1_1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testReloadStep1_1>
@@ -17,18 +17,46 @@
         rdfs:label               "Test operational step 1.1"@en-US ;
         dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1_1> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1>
-        a                        dynapi:rpc ;
-        dynapi:resourceName      "Test rpc individual reload 1.1" ;
-        dynapi:rpcName           "test_reload"@en-US ;
-        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
-        dynapi:rpcAPIVersionMin  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC1_1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc create individual reload 1.1" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:rpcAPIVersionMin             "1.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC1_1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc get individual reload 1.1" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:rpcAPIVersionMin             "1.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC1_1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc update individual reload 1.1" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:rpcAPIVersionMin             "1.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC1_1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc patch individual reload 1.1" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
+        dynapi:rpcAPIVersionMin             "1.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC1_1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc delete individual reload 1" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:rpcAPIVersionMin             "1.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action1_1>
         a                        dynapi:customRESTAction ;
         dynapi:resourceName      "Test reload custom action 1.1" ;
         dynapi:customRESTActionName  "test_reload_custom_action_name" ;
-        dynapi:forwardTo         <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1> ;
+        dynapi:forwardTo         <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC1_1> ;
         dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:rpcAPIVersionMin  "1.1.0" .
 
@@ -36,16 +64,24 @@
         a                        dynapi:resource ;
         dynapi:resourceName      "test_reload_resource" ;
         rdfs:label               "Test reload resource 1.1"@en-US ;
-        dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1> ;
-        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1> ;
-        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1> ;
-        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1> ;
-        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1> ;
+        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC1_1> ;
+        dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC1_1> ;
+        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC1_1> ;
+        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC1_1> ;
+        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC1_1> ;
         dynapi:hasCustomRESTAction   <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action1_1> ;
         dynapi:restAPIVersionMin "1.1.0" .
 
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1>
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC1>
         dynapi:rpcAPIVersionMax  "1.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action1>
@@ -59,7 +95,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testReloadAction2>
         a                        dynapi:action ;
         rdfs:label               "Test reload action 2"@en-US ;
-        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2> ;
+        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC2> ;
         dynapi:firstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/testReloadStep2> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testReloadStep2>
@@ -67,34 +103,70 @@
         rdfs:label               "Test operational step 2"@en-US ;
         dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery2> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2>
-        a                        dynapi:rpc ;
-        dynapi:resourceName      "Test rpc individual reload 2" ;
-        dynapi:rpcName           "test_reload"@en-US ;
-        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
-        dynapi:rpcAPIVersionMin  "2.0.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC2>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc create individual reload 2" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:rpcAPIVersionMin             "2.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC2>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc get individual reload 2" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:rpcAPIVersionMin             "2.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC2>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc update individual reload 2" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:rpcAPIVersionMin             "2.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC2>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc patch individual reload 2" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
+        dynapi:rpcAPIVersionMin             "2.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC2>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc delete individual reload 2" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:rpcAPIVersionMin             "2.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action2>
         a                        dynapi:customRESTAction ;
         dynapi:resourceName      "Test reload custom action 2" ;
         dynapi:customRESTActionName  "test_reload_custom_action_name" ;
-        dynapi:forwardTo         <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2> ;
-        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:forwardTo         <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC2> ;
+        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
         dynapi:rpcAPIVersionMin  "2.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resource/testReloadResource2>
         a                        dynapi:resource ;
         dynapi:resourceName      "test_reload_resource" ;
         rdfs:label               "Test reload resource 2"@en-US ;
-        dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2> ;
-        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2> ;
-        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2> ;
-        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2> ;
-        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2> ;
+        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC2> ;
+        dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC2> ;
+        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC2> ;
+        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC2> ;
+        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC2> ;
         dynapi:hasCustomRESTAction   <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action2> ;
         dynapi:restAPIVersionMin "2.0.0" .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC1_1>
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC1_1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC1_1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC1_1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC1_1>
+        dynapi:rpcAPIVersionMax  "1.1.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC1_1>
         dynapi:rpcAPIVersionMax  "1.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action1_1>
@@ -108,7 +180,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testReloadAction4>
         a                        dynapi:action ;
         rdfs:label               "Test reload action 4"@en-US ;
-        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4> ;
+        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC4> ;
         dynapi:firstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/testReloadStep4> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testReloadStep4>
@@ -116,34 +188,70 @@
         rdfs:label               "Test operational step 4"@en-US ;
         dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery4> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4>
-        a                        dynapi:rpc ;
-        dynapi:resourceName      "Test rpc individual reload 4" ;
-        dynapi:rpcName           "test_reload"@en-US ;
-        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
-        dynapi:rpcAPIVersionMin  "4.3.7" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC4>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc create individual reload 4" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:rpcAPIVersionMin             "4.3.7" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC4>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc get individual reload 4" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:rpcAPIVersionMin             "4.3.7" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC4>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc update individual reload 4" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:rpcAPIVersionMin             "4.3.7" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC4>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc patch individual reload 4" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
+        dynapi:rpcAPIVersionMin             "4.3.7" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC4>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc delete individual reload 4" ;
+        dynapi:rpcName                      "test_reload"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:rpcAPIVersionMin             "4.3.7" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action4>
         a                        dynapi:customRESTAction ;
         dynapi:resourceName      "Test reload custom action 4" ;
         dynapi:customRESTActionName  "test_reload_custom_action_name" ;
-        dynapi:forwardTo         <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4> ;
-        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:forwardTo         <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC4> ;
+        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
         dynapi:rpcAPIVersionMin  "4.3.7" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resource/testReloadResource4>
         a                        dynapi:resource ;
         dynapi:resourceName      "test_reload_resource" ;
         rdfs:label               "Test reload resource 4"@en-US ;
-        dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4> ;
-        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4> ;
-        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4> ;
-        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4> ;
-        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC4> ;
+        dynapi:onPost            <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC4> ;
+        dynapi:onGet             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC4> ;
+        dynapi:onPut             <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC4> ;
+        dynapi:onPatch           <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC4> ;
+        dynapi:onDelete          <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC4> ;
         dynapi:hasCustomRESTAction   <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action4> ;
         dynapi:restAPIVersionMin "4.3.7" .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testReloadRPC2>
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateReloadRPC2>
+        dynapi:rpcAPIVersionMax  "2.0.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetReloadRPC2>
+        dynapi:rpcAPIVersionMax  "2.0.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateReloadRPC2>
+        dynapi:rpcAPIVersionMax  "2.0.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchReloadRPC2>
+        dynapi:rpcAPIVersionMax  "2.0.0" .
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteReloadRPC2>
         dynapi:rpcAPIVersionMax  "2.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_reload_custom_action2>
