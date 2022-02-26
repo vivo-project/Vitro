@@ -23,7 +23,9 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versionable;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versioned;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
@@ -59,6 +61,13 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
             Entry<K, C> entry = components.floorEntry(key);
             if (entry != null) {
                 component = entry.getValue();
+                if (key instanceof Versioned && ((Versionable) component).getVersionMax() != null) {
+                    Version version = ((Versioned) key).getVersion();
+                    Version versionMax = Version.exact(((Versionable) component).getVersionMax());
+                    if (version.getMajor().compareTo(versionMax.getMajor()) > 0) {
+                        component = null;
+                    }
+                }
             }
         } else {
             component = components.get(key);

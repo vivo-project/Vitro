@@ -115,9 +115,10 @@ public class ResourcePoolTest extends ServletContextTest {
         assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
         assertResource(erv1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
         assertResource(erv2, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv2));
-        // NOTE: even though skipped a version from 2 to 4
-        // TODO: this should likely be a default resource but unlikely to skip a version
-        assertResource(erv2, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv3));
+
+        // NOTE: skipped a version from 2 to 4 and 2 has max of 2
+        assertTrue(resourcePool.get(rv3) instanceof DefaultResource);
+
         assertResource(erv4, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv4));
         assertResource(erv4, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv5));
     }

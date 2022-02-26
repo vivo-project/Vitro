@@ -23,6 +23,7 @@ public class Resource implements Poolable<ResourceKey>, Versionable {
 
 	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
+	@Override
 	public String getVersionMin() {
 		return versionMin;
 	}
@@ -32,6 +33,7 @@ public class Resource implements Poolable<ResourceKey>, Versionable {
 		this.versionMin = versionMin;
 	}
 
+	@Override
 	public String getVersionMax() {
 		return versionMax;
 	}

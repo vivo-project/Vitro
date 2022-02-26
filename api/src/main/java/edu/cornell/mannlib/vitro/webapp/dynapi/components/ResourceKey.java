@@ -2,22 +2,23 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import static java.lang.String.format;
 
-public class ResourceKey implements Comparable<ResourceKey> {
+public class ResourceKey implements Comparable<ResourceKey>, Versioned {
 
     private final String name;
 
-    private final ResourceVersion version;
+    private final Version version;
 
     private ResourceKey(String name, String version, boolean ceiling) {
         this.name = name;
-        this.version = ceiling ? ResourceVersion.ceiling(version) : ResourceVersion.exact(version);
+        this.version = ceiling ? Version.ceiling(version) : Version.exact(version);
     }
 
     public String getName() {
         return name;
     }
 
-    public ResourceVersion getVersion() {
+    @Override
+    public Version getVersion() {
         return version;
     }
 

@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import static java.lang.String.format;
 import static java.util.regex.Pattern.quote;
 
-public class ResourceVersion implements Comparable<ResourceVersion> {
+public class Version implements Comparable<Version> {
 
     private final static String PERIOD_PATTERN = quote(".");
 
@@ -13,7 +13,7 @@ public class ResourceVersion implements Comparable<ResourceVersion> {
 
     private final Integer patch;
 
-    private ResourceVersion(String version, boolean ceiling) {
+    private Version(String version, boolean ceiling) {
         String[] parts = version.split(PERIOD_PATTERN);
         major = parts.length > 0 ? Integer.parseInt(parts[0]) : 0;
         minor = ceiling ? Integer.MAX_VALUE : parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
@@ -53,7 +53,7 @@ public class ResourceVersion implements Comparable<ResourceVersion> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        ResourceVersion other = (ResourceVersion) obj;
+        Version other = (Version) obj;
         if (major == null) {
             if (other.major != null) {
                 return false;
@@ -79,7 +79,7 @@ public class ResourceVersion implements Comparable<ResourceVersion> {
     }
 
     @Override
-    public int compareTo(ResourceVersion o) {
+    public int compareTo(Version o) {
         int majorCompare = this.major.compareTo(o.major);
         if (majorCompare == 0) {
             int minorCompare = this.minor.compareTo(o.minor);
@@ -96,12 +96,12 @@ public class ResourceVersion implements Comparable<ResourceVersion> {
         return format("%s.%s.%s", major, minor, patch);
     }
 
-    public static ResourceVersion exact(String version) {
-        return new ResourceVersion(version, false);
+    public static Version exact(String version) {
+        return new Version(version, false);
     }
 
-    public static ResourceVersion ceiling(String version) {
-        return new ResourceVersion(version, true);
+    public static Version ceiling(String version) {
+        return new Version(version, true);
     }
 
 }
