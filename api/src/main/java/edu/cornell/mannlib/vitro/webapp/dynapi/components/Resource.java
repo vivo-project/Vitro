@@ -50,7 +50,7 @@ public class Resource implements Poolable<ResourceKey>, Versionable {
 
 	@Override
 	public ResourceKey getKey() {
-		return ResourceKey.from(name, versionMin);
+		return ResourceKey.of(name, versionMin);
 	}
 
 	@Override

@@ -63,8 +63,14 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
                 component = entry.getValue();
                 if (key instanceof Versioned && ((Versionable) component).getVersionMax() != null) {
                     Version version = ((Versioned) key).getVersion();
-                    Version versionMax = Version.exact(((Versionable) component).getVersionMax());
+                    Version versionMax = Version.of(((Versionable) component).getVersionMax());
                     if (version.getMajor().compareTo(versionMax.getMajor()) > 0) {
+                        component = null;
+                    }
+                    if (!version.getMinor().equals(Integer.MAX_VALUE) && version.getMinor().compareTo(versionMax.getMinor()) > 0) {
+                        component = null;
+                    }
+                    if (!version.getPatch().equals(Integer.MAX_VALUE) && version.getPatch().compareTo(versionMax.getPatch()) > 0) {
                         component = null;
                     }
                 }

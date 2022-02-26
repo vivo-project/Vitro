@@ -8,9 +8,9 @@ public class ResourceKey implements Comparable<ResourceKey>, Versioned {
 
     private final Version version;
 
-    private ResourceKey(String name, String version, boolean ceiling) {
+    private ResourceKey(String name, String version) {
         this.name = name;
-        this.version = ceiling ? Version.ceiling(version) : Version.exact(version);
+        this.version = Version.of(version);
     }
 
     public String getName() {
@@ -74,12 +74,8 @@ public class ResourceKey implements Comparable<ResourceKey>, Versioned {
         return format("%s (%s)", name, version.toString());
     }
 
-    public static ResourceKey from(String name, String version) {
-        return new ResourceKey(name, version, false);
-    }
-
-    public static ResourceKey ceiling(String name, String version) {
-        return new ResourceKey(name, version, true);
+    public static ResourceKey of(String name, String version) {
+        return new ResourceKey(name, version);
     }
 
 }

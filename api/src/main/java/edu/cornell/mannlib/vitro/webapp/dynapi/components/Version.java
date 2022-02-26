@@ -13,11 +13,11 @@ public class Version implements Comparable<Version> {
 
     private final Integer patch;
 
-    private Version(String version, boolean ceiling) {
+    private Version(String version) {
         String[] parts = version.split(PERIOD_PATTERN);
         major = parts.length > 0 ? Integer.parseInt(parts[0]) : 0;
-        minor = ceiling ? Integer.MAX_VALUE : parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
-        patch = ceiling ? Integer.MAX_VALUE : parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+        minor = parts.length > 1 ? Integer.parseInt(parts[1]) : Integer.MAX_VALUE;
+        patch = parts.length > 2 ? Integer.parseInt(parts[2]) : Integer.MAX_VALUE;
     }
 
     public Integer getMajor() {
@@ -96,12 +96,8 @@ public class Version implements Comparable<Version> {
         return format("%s.%s.%s", major, minor, patch);
     }
 
-    public static Version exact(String version) {
-        return new Version(version, false);
-    }
-
-    public static Version ceiling(String version) {
-        return new Version(version, true);
+    public static Version of(String version) {
+        return new Version(version);
     }
 
 }

@@ -80,15 +80,16 @@ public class ResourcePoolTest extends ServletContextTest {
     public void testVersioning() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        ResourceKey v0 = ResourceKey.ceiling("test_resource", "0");
-        ResourceKey v1 = ResourceKey.ceiling("test_resource", "1");
+        ResourceKey v0 = ResourceKey.of("test_resource", "0");
+        ResourceKey v1 = ResourceKey.of("test_resource", "1");
 
-        ResourceKey rv0 = ResourceKey.ceiling("test_reload_resource", "0");
-        ResourceKey rv1 = ResourceKey.ceiling("test_reload_resource", "1");
-        ResourceKey rv2 = ResourceKey.ceiling("test_reload_resource", "2");
-        ResourceKey rv3 = ResourceKey.ceiling("test_reload_resource", "3");
-        ResourceKey rv4 = ResourceKey.ceiling("test_reload_resource", "4");
-        ResourceKey rv5 = ResourceKey.ceiling("test_reload_resource", "5");
+        ResourceKey rv0 = ResourceKey.of("test_reload_resource", "0");
+        ResourceKey rv1 = ResourceKey.of("test_reload_resource", "1");
+        ResourceKey rv1_0 = ResourceKey.of("test_reload_resource", "1.0");
+        ResourceKey rv2 = ResourceKey.of("test_reload_resource", "2");
+        ResourceKey rv3 = ResourceKey.of("test_reload_resource", "3");
+        ResourceKey rv4 = ResourceKey.of("test_reload_resource", "4");
+        ResourceKey rv5 = ResourceKey.of("test_reload_resource", "5");
 
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
@@ -111,15 +112,17 @@ public class ResourcePoolTest extends ServletContextTest {
         loadVersionedModel();
         resourcePool.reload();
 
-        ResourceKey erv1 = ResourceKey.from("test_reload_resource", "1.1.0");
-        ResourceKey erv2 = ResourceKey.from("test_reload_resource", "2.0.0");
-        ResourceKey erv4 = ResourceKey.from("test_reload_resource", "4.3.7");
+        ResourceKey erv1 = ResourceKey.of("test_reload_resource", "1.0.0");
+        ResourceKey erv1_1 = ResourceKey.of("test_reload_resource", "1.1.0");
+        ResourceKey erv2 = ResourceKey.of("test_reload_resource", "2.0.0");
+        ResourceKey erv4 = ResourceKey.of("test_reload_resource", "4.3.7");
 
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
 
         assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
-        assertResource(erv1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
+        assertResource(erv1_1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
+        assertResource(erv1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1_0));
         assertResource(erv2, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv2));
 
         // NOTE: skipped a version from 2 to 4 and 2 has max of 2
