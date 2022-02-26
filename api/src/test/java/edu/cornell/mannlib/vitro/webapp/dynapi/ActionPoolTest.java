@@ -40,7 +40,7 @@ public class ActionPoolTest extends ServletContextTest {
     }
 
     @Test
-    public void testGetByNameBeforeInit() {
+    public void testGetBeforeInit() {
         ActionPool actionPool = ActionPool.getInstance();
         Action action = actionPool.get(TEST_ACTION_NAME);
         assertNotNull(action);
@@ -48,7 +48,7 @@ public class ActionPoolTest extends ServletContextTest {
     }
 
     @Test
-    public void testPrintNamesBeforeInit() {
+    public void testPrintKeysBeforeInit() {
         ActionPool actionPool = ActionPool.getInstance();
         actionPool.printKeys();
         // nothing to assert
@@ -67,11 +67,11 @@ public class ActionPoolTest extends ServletContextTest {
         assertEquals(1, actionPool.count());
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertActionByName(actionPool.get(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
     }
 
     @Test
-    public void testPrintNames() throws IOException {
+    public void testPrintKeys() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
         actionPool.printKeys();
@@ -90,7 +90,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertActionByName(actionPool.get(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_RELOAD_ACTION_NAME, actionPool.get(TEST_RELOAD_ACTION_NAME));
     }
 
     @Test
@@ -200,14 +200,14 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.reload(TEST_RELOAD_ACTION_URI);
 
-        assertActionByName(actionPool.get(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_RELOAD_ACTION_NAME, actionPool.get(TEST_RELOAD_ACTION_NAME));
     }
 
     @Test
     public void testReload() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        assertActionByName(actionPool.get(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
         loadReloadModel();
 
@@ -216,26 +216,26 @@ public class ActionPoolTest extends ServletContextTest {
         assertEquals(2, actionPool.count());
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertActionByName(actionPool.get(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_RELOAD_ACTION_NAME, actionPool.get(TEST_RELOAD_ACTION_NAME));
     }
 
     @Test
     public void testReloadThreadSafety() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        assertActionByName(actionPool.get(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
         loadReloadModel();
 
         CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> actionPool.reload());
 
         while (!reloadFuture.isDone()) {
-            assertActionByName(actionPool.get(TEST_ACTION_NAME), TEST_ACTION_NAME);
+            assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
         }
 
-        assertActionByName(actionPool.get(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        assertActionByName(actionPool.get(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_RELOAD_ACTION_NAME, actionPool.get(TEST_RELOAD_ACTION_NAME));
     }
 
     @Test
@@ -303,13 +303,13 @@ public class ActionPoolTest extends ServletContextTest {
         return actionPool;
     }
 
-    private void assertActionByName(Action action, String name) {
-        assertNotNull(action);
-        assertFalse(format("%s not loaded!", name), action instanceof DefaultAction);
-        assertTrue(action.isValid());
-        assertEquals(name, action.getKey());
-        assertTrue(action.hasClients());
-        action.removeClient();
+    private void assertAction(String expectedName, Action actualAction) {
+        assertNotNull(actualAction);
+        assertFalse(format("%s not loaded!", expectedName), actualAction instanceof DefaultAction);
+        assertTrue(actualAction.isValid());
+        assertEquals(expectedName, actualAction.getKey());
+        assertTrue(actualAction.hasClients());
+        actualAction.removeClient();
     }
 
 }
