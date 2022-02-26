@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 
 public class ResourcePoolTest extends ServletContextTest {
 
-    protected final static String TEST_RELOAD_RESOURCE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/resource/testReloadResource1";
+    protected final static String TEST_PERSON_RESOURCE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/resource/testPersonResource1";
 
     @After
     public void reset() {
@@ -80,56 +80,192 @@ public class ResourcePoolTest extends ServletContextTest {
     public void testVersioning() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        ResourceKey v0 = ResourceKey.of("test_resource", "0");
-        ResourceKey v1 = ResourceKey.of("test_resource", "1");
+        ResourceKey resouce_v0 = ResourceKey.of("test_resource", "0");
+        ResourceKey resource_v1 = ResourceKey.of("test_resource", "1");
 
-        ResourceKey rv0 = ResourceKey.of("test_reload_resource", "0");
-        ResourceKey rv1 = ResourceKey.of("test_reload_resource", "1");
-        ResourceKey rv1_0 = ResourceKey.of("test_reload_resource", "1.0");
-        ResourceKey rv2 = ResourceKey.of("test_reload_resource", "2");
-        ResourceKey rv3 = ResourceKey.of("test_reload_resource", "3");
-        ResourceKey rv4 = ResourceKey.of("test_reload_resource", "4");
-        ResourceKey rv5 = ResourceKey.of("test_reload_resource", "5");
+        ResourceKey document_v0 = ResourceKey.of("test_document_resource", "0");
+        ResourceKey document_v1 = ResourceKey.of("test_document_resource", "1");
 
-        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
-        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
+        String testDocumentActionName = "test_document";
 
-        assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
-        assertTrue(resourcePool.get(rv1) instanceof DefaultResource);
-        assertTrue(resourcePool.get(rv2) instanceof DefaultResource);
+        ResourceKey person_v0 = ResourceKey.of("test_person_resource", "0");
+        ResourceKey person_v1 = ResourceKey.of("test_person_resource", "1");
+        ResourceKey person_v1_0 = ResourceKey.of("test_person_resource", "1.0");
+        ResourceKey person_v1_0_0 = ResourceKey.of("test_person_resource", "1.0.0");
+        ResourceKey person_v1_1 = ResourceKey.of("test_person_resource", "1.1");
+        ResourceKey person_v1_1_0 = ResourceKey.of("test_person_resource", "1.1.0");
+        ResourceKey person_v1_2 = ResourceKey.of("test_person_resource", "1.2");
+        ResourceKey person_v2 = ResourceKey.of("test_person_resource", "2");
+        ResourceKey person_v3 = ResourceKey.of("test_person_resource", "3");
+        ResourceKey person_v4 = ResourceKey.of("test_person_resource", "4");
+        ResourceKey person_v4_2 = ResourceKey.of("test_person_resource", "4.2");
+        ResourceKey person_v4_3 = ResourceKey.of("test_person_resource", "4.3");
+        ResourceKey person_v4_3_6 = ResourceKey.of("test_person_resource", "4.3.6");
+        ResourceKey person_v4_3_7 = ResourceKey.of("test_person_resource", "4.3.7");
+        ResourceKey person_v4_3_8 = ResourceKey.of("test_person_resource", "4.3.8");
+        ResourceKey person_v4_4 = ResourceKey.of("test_person_resource", "4.4");
+        ResourceKey person_v5 = ResourceKey.of("test_person_resource", "5");
 
-        loadReloadModel();
+        ResourceKey expectedDocument_v1_0_0 = ResourceKey.of("test_document_resource", "1.0.0");
+
+        ResourceKey expectedPerson_v1_0_0 = TEST_PERSON_RESOURCE_KEY; // "test_person_resource", "1.0.0"
+        ResourceKey expectedPerson_v1_1_0 = ResourceKey.of("test_person_resource", "1.1.0");
+        ResourceKey expectedPerson_v2_0_0 = ResourceKey.of("test_person_resource", "2.0.0");
+        ResourceKey expectedPerson_v4_3_7 = ResourceKey.of("test_person_resource", "4.3.7");
+
+
+        // base test for test_resource
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resouce_v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resource_v1));
+        // base test for test_document
+        assertTrue(resourcePool.get(document_v0) instanceof DefaultResource);
+        assertTrue(resourcePool.get(document_v1) instanceof DefaultResource);
+        // demonstrate no person resources in resource pool
+        assertTrue(resourcePool.get(person_v0) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v1) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v1_0) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v1_1) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v1_1_0) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v1_2) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v2) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v3) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v4) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v4_2) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v4_3) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v4_3_6) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v4_3_7) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v4_3_8) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v4_4) instanceof DefaultResource);
+        assertTrue(resourcePool.get(person_v5) instanceof DefaultResource);
+
+        loadTestModel();
         resourcePool.reload();
+        // base test for test_resource
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resouce_v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resource_v1));
+        // base test for test_document
+        assertTrue(resourcePool.get(document_v0) instanceof DefaultResource);
+        assertResource(expectedDocument_v1_0_0, testDocumentActionName, resourcePool.get(document_v1));
 
-        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
-        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
+        // no person version 0 in pool
+        assertTrue(resourcePool.get(person_v0) instanceof DefaultResource);
+        // person resource version 1.0.0 has no max version, any major version request greater than 1 should return version 1.0.0
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1));
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v2));
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v3));
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v4));
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v5));
 
-        assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
-        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
-        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv2));
 
-
-        loadVersionedModel();
+        loadPersonVersion1_1Model();
         resourcePool.reload();
+        // base test for test_resource
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resouce_v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resource_v1));
+        // base test for test_document
+        assertTrue(resourcePool.get(document_v0) instanceof DefaultResource);
+        assertResource(expectedDocument_v1_0_0, testDocumentActionName, resourcePool.get(document_v1));
 
-        ResourceKey erv1 = ResourceKey.of("test_reload_resource", "1.0.0");
-        ResourceKey erv1_1 = ResourceKey.of("test_reload_resource", "1.1.0");
-        ResourceKey erv2 = ResourceKey.of("test_reload_resource", "2.0.0");
-        ResourceKey erv4 = ResourceKey.of("test_reload_resource", "4.3.7");
+        // no person version 0 in pool
+        assertTrue(resourcePool.get(person_v0) instanceof DefaultResource);
+        // still able to get person version 1.0.0
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_0));
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_0_0));
 
-        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
-        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
+        // able to get person version 1.1.0 from varying levels of specificity
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_1));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_1_0));
 
-        assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
-        assertResource(erv1_1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
-        assertResource(erv1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1_0));
-        assertResource(erv2, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv2));
+        // person version 1 does not have specific minor version 2
+        assertTrue(resourcePool.get(person_v1_2) instanceof DefaultResource);
 
-        // NOTE: skipped a version from 2 to 4 and 2 has max of 2
-        assertTrue(resourcePool.get(rv3) instanceof DefaultResource);
+        // person resource version 1.1.0 has no max version, any major version request greater than 1 should return version 1.1.0
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v2));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v3));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v4));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v5));
 
-        assertResource(erv4, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv4));
-        assertResource(erv4, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv5));
+
+        loadPersonVersion2Model();
+        resourcePool.reload();
+        // base test for test_resource
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resouce_v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resource_v1));
+        // base test for test_document
+        assertTrue(resourcePool.get(document_v0) instanceof DefaultResource);
+        assertResource(expectedDocument_v1_0_0, testDocumentActionName, resourcePool.get(document_v1));
+
+         // no person version 0 in pool
+         assertTrue(resourcePool.get(person_v0) instanceof DefaultResource);
+         // still able to get person version 1.0.0
+         assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_0));
+         assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_0_0));
+ 
+         // able to get person version 1.1.0 from varying levels of specificity
+         assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1));
+         assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_1));
+         assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_1_0));
+ 
+         // person version 1 does not have specific minor version 2
+         assertTrue(resourcePool.get(person_v1_2) instanceof DefaultResource);
+
+         // able to get person version 2.0.0
+         assertResource(expectedPerson_v2_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v2));
+
+         // person resource version 2.0.0 has no max version, any major version request greater than 2 should return version 2.0.0
+         assertResource(expectedPerson_v2_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v3));
+         assertResource(expectedPerson_v2_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v4));
+         assertResource(expectedPerson_v2_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v5));
+
+
+        loadPersonVersion4_3_7Model();
+        resourcePool.reload();
+        // base test for test_resource
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resouce_v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(resource_v1));
+        // base test for test_document
+        assertTrue(resourcePool.get(document_v0) instanceof DefaultResource);
+        assertResource(expectedDocument_v1_0_0, testDocumentActionName, resourcePool.get(document_v1));
+
+
+        // no person version 0 in pool
+        assertTrue(resourcePool.get(person_v0) instanceof DefaultResource);
+        // still able to get person version 1.0.0
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_0));
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_0_0));
+
+        // able to get person version 1.1.0 from varying levels of specificity
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_1));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v1_1_0));
+
+        // person version 1 does not have specific minor version 2
+        assertTrue(resourcePool.get(person_v1_2) instanceof DefaultResource);
+
+        // still able to get person version 2.0.0
+        assertResource(expectedPerson_v2_0_0, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v2));
+
+        // skipped a version from 2.0.0 to 4.3.7 and 2.0.0 has max of 2.0.0
+        assertTrue(resourcePool.get(person_v3) instanceof DefaultResource);
+
+        // no version 4.2 exists
+        assertTrue(resourcePool.get(person_v4_2) instanceof DefaultResource);
+        // version 4.3.6 does not exist
+        assertTrue(resourcePool.get(person_v4_3_6) instanceof DefaultResource);
+        // version 4.3.8 does not exist
+        assertTrue(resourcePool.get(person_v4_3_8) instanceof DefaultResource);
+
+        // no version 4.4 exists
+        assertTrue(resourcePool.get(person_v4_4) instanceof DefaultResource);
+
+        // able to get person version 4.3.7 at varying levels of specificity
+        assertResource(expectedPerson_v4_3_7, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v4));
+        assertResource(expectedPerson_v4_3_7, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v4_3));
+        assertResource(expectedPerson_v4_3_7, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v4_3_7));
+
+        // person resource version 4.3.7 has no max version, any major version request greater than 4 should return version 2.0.0
+        assertResource(expectedPerson_v4_3_7, TEST_PERSON_ACTION_NAME, resourcePool.get(person_v5));
     }
 
     @Test
@@ -144,32 +280,32 @@ public class ResourcePoolTest extends ServletContextTest {
     public void testAdd() throws IOException, ConfigurationBeanLoaderException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
-        Resource resource = loader.loadInstance(TEST_RELOAD_RESOURCE_URI, Resource.class);
+        Resource resource = loader.loadInstance(TEST_PERSON_RESOURCE_URI, Resource.class);
 
-        resourcePool.add(TEST_RELOAD_RESOURCE_URI, resource);
+        resourcePool.add(TEST_PERSON_RESOURCE_URI, resource);
 
         assertEquals(0, resourcePool.obsoleteCount());
 
-        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(TEST_RELOAD_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_ACTION_NAME, resourcePool.get(TEST_PERSON_RESOURCE_KEY));
     }
 
     @Test
     public void testAddHasClient() throws IOException, ConfigurationBeanLoaderException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         resourcePool.reload();
 
-        Resource resource = loader.loadInstance(TEST_RELOAD_RESOURCE_URI, Resource.class);
+        Resource resource = loader.loadInstance(TEST_PERSON_RESOURCE_URI, Resource.class);
 
         assertEquals(0, resourcePool.obsoleteCount());
 
-        Resource resourceHasClient = resourcePool.get(TEST_RELOAD_RESOURCE_KEY);
+        Resource resourceHasClient = resourcePool.get(TEST_PERSON_RESOURCE_KEY);
 
-        resourcePool.add(TEST_RELOAD_RESOURCE_URI, resource);
+        resourcePool.add(TEST_PERSON_RESOURCE_URI, resource);
 
         assertEquals(1, resourcePool.obsoleteCount());
 
@@ -180,26 +316,26 @@ public class ResourcePoolTest extends ServletContextTest {
     public void testAddWithoutModelLoaded() throws IOException, ConfigurationBeanLoaderException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
-        Resource resource = loader.loadInstance(TEST_RELOAD_RESOURCE_URI, Resource.class);
+        Resource resource = loader.loadInstance(TEST_PERSON_RESOURCE_URI, Resource.class);
 
         reset();
 
-        assertTrue(resourcePool.get(TEST_RELOAD_RESOURCE_KEY) instanceof DefaultResource);
+        assertTrue(resourcePool.get(TEST_PERSON_RESOURCE_KEY) instanceof DefaultResource);
 
-        resourcePool.add(TEST_RELOAD_RESOURCE_URI, resource);
+        resourcePool.add(TEST_PERSON_RESOURCE_URI, resource);
     }
 
     @Test
     public void testRemove() throws IOException, ConfigurationBeanLoaderException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         resourcePool.reload();
 
-        Resource resource = resourcePool.get(TEST_RELOAD_RESOURCE_KEY);
+        Resource resource = resourcePool.get(TEST_PERSON_RESOURCE_KEY);
 
         assertFalse(resource instanceof DefaultResource);
 
@@ -207,22 +343,22 @@ public class ResourcePoolTest extends ServletContextTest {
 
         reset();
 
-        resourcePool.remove(TEST_RELOAD_RESOURCE_URI, TEST_RELOAD_RESOURCE_KEY);
+        resourcePool.remove(TEST_PERSON_RESOURCE_URI, TEST_PERSON_RESOURCE_KEY);
 
         assertEquals(0, resourcePool.obsoleteCount());
 
-        assertTrue(resourcePool.get(TEST_RELOAD_RESOURCE_KEY) instanceof DefaultResource);
+        assertTrue(resourcePool.get(TEST_PERSON_RESOURCE_KEY) instanceof DefaultResource);
     }
 
     @Test
     public void testRemoveHasClient() throws IOException, ConfigurationBeanLoaderException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         resourcePool.reload();
 
-        Resource resourceHasClient = resourcePool.get(TEST_RELOAD_RESOURCE_KEY);
+        Resource resourceHasClient = resourcePool.get(TEST_PERSON_RESOURCE_KEY);
 
         assertFalse(resourceHasClient instanceof DefaultResource);
 
@@ -230,11 +366,11 @@ public class ResourcePoolTest extends ServletContextTest {
 
         resourcePool.init(servletContext);
 
-        resourcePool.remove(TEST_RELOAD_RESOURCE_URI, TEST_RELOAD_RESOURCE_KEY);
+        resourcePool.remove(TEST_PERSON_RESOURCE_URI, TEST_PERSON_RESOURCE_KEY);
 
         assertEquals(1, resourcePool.obsoleteCount());
 
-        assertTrue(resourcePool.get(TEST_RELOAD_RESOURCE_KEY) instanceof DefaultResource);
+        assertTrue(resourcePool.get(TEST_PERSON_RESOURCE_KEY) instanceof DefaultResource);
 
         resourceHasClient.removeClient();
     }
@@ -243,26 +379,26 @@ public class ResourcePoolTest extends ServletContextTest {
     public void testRemoveWithModelLoaded() throws IOException, ConfigurationBeanLoaderException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         resourcePool.reload();
 
-        resourcePool.remove(TEST_RELOAD_RESOURCE_URI, TEST_RELOAD_RESOURCE_KEY);
+        resourcePool.remove(TEST_PERSON_RESOURCE_URI, TEST_PERSON_RESOURCE_KEY);
     }
 
     @Test
     public void testReloadSingle() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
-        Resource resource = resourcePool.get(TEST_RELOAD_RESOURCE_KEY);
+        Resource resource = resourcePool.get(TEST_PERSON_RESOURCE_KEY);
 
         assertTrue(resource instanceof DefaultResource);
 
-        resourcePool.reload(TEST_RELOAD_RESOURCE_URI);
+        resourcePool.reload(TEST_PERSON_RESOURCE_URI);
 
-        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(TEST_RELOAD_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_ACTION_NAME, resourcePool.get(TEST_PERSON_RESOURCE_KEY));
     }
 
     @Test
@@ -271,14 +407,14 @@ public class ResourcePoolTest extends ServletContextTest {
 
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(TEST_RESOURCE_KEY));
 
-        loadReloadModel();
+        loadTestModel();
 
         resourcePool.reload();
 
-        assertEquals(2, resourcePool.count());
+        assertEquals(8, resourcePool.count());
         assertEquals(0, resourcePool.obsoleteCount());
 
-        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(TEST_RELOAD_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_ACTION_NAME, resourcePool.get(TEST_PERSON_RESOURCE_KEY));
     }
 
     @Test
@@ -287,7 +423,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(TEST_RESOURCE_KEY));
 
-        loadReloadModel();
+        loadTestModel();
 
         CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> resourcePool.reload());
 
@@ -297,14 +433,14 @@ public class ResourcePoolTest extends ServletContextTest {
 
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(TEST_RESOURCE_KEY));
 
-        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(TEST_RELOAD_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_ACTION_NAME, resourcePool.get(TEST_PERSON_RESOURCE_KEY));
     }
 
     @Test
     public void testRealodOfResourceHasClient() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         Resource resource = resourcePool.get(TEST_RESOURCE_KEY);
 
@@ -367,10 +503,24 @@ public class ResourcePoolTest extends ServletContextTest {
         return resourcePool;
     }
 
-    private void loadVersionedModel() throws IOException {
+    private void loadPersonVersion1_1Model() throws IOException {
         // versioning action reuses testSparqlQuery1 from testing action
         loadModel(
-            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-versioning.n3")
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person1_1.n3")
+        );
+    }
+
+    private void loadPersonVersion2Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person2.n3")
+        );
+    }
+
+    private void loadPersonVersion4_3_7Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person4_3_7.n3")
         );
     }
 

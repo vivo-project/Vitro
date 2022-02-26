@@ -21,10 +21,10 @@ import stubs.javax.servlet.ServletContextStub;
 public abstract class ServletContextTest {
 
     protected final static String TEST_ACTION_NAME = "test_action";
-    protected final static String TEST_RELOAD_ACTION_NAME = "test_reload";
-
     protected final static ResourceKey TEST_RESOURCE_KEY = ResourceKey.of("test_resource", "0.1.0");
-    protected final static ResourceKey TEST_RELOAD_RESOURCE_KEY = ResourceKey.of("test_reload_resource", "1.0.0");
+
+    protected final static String TEST_PERSON_ACTION_NAME = "test_person";
+    protected final static ResourceKey TEST_PERSON_RESOURCE_KEY = ResourceKey.of("test_person_resource", "1.0.0");
 
     protected ServletContextStub servletContext;
     protected ModelAccessFactoryStub modelAccessFactory;
@@ -47,10 +47,16 @@ public abstract class ServletContextTest {
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
-    protected void loadReloadModel() throws IOException {
-        // reloading action reuses testSparqlQuery1 from testing action
+    protected void loadTestModel() throws IOException {
+        // all actions reuse testSparqlQuery1 from testing action
         loadModel(
-            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-reloading.n3")
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-collection.n3"),
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-concept.n3"),
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-document.n3"),
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-organization.n3"),
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person.n3"),
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-process.n3"),
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-relationship.n3")
         );
     }
 

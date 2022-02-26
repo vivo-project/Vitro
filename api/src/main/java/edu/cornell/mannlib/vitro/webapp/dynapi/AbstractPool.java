@@ -61,17 +61,34 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
             Entry<K, C> entry = components.floorEntry(key);
             if (entry != null) {
                 component = entry.getValue();
-                if (key instanceof Versioned && ((Versionable) component).getVersionMax() != null) {
-                    Version version = ((Versioned) key).getVersion();
-                    Version versionMax = Version.of(((Versionable) component).getVersionMax());
-                    if (version.getMajor().compareTo(versionMax.getMajor()) > 0) {
+                if (key instanceof Versioned) {
+                    String keyName = ((Versioned) key).getName();
+                    Version keyVersion = ((Versioned) key).getVersion();
+                    // ensure key name matches component key name
+                    if (!keyName.equals(((Versioned) component.getKey()).getName())) {
                         component = null;
-                    }
-                    if (!version.getMinor().equals(Integer.MAX_VALUE) && version.getMinor().compareTo(versionMax.getMinor()) > 0) {
-                        component = null;
-                    }
-                    if (!version.getPatch().equals(Integer.MAX_VALUE) && version.getPatch().compareTo(versionMax.getPatch()) > 0) {
-                        component = null;
+                    } else {
+                        boolean hasVersionMax = ((Versionable) component).getVersionMax() != null;
+                        boolean hasVersionMin = ((Versionable) component).getVersionMin() != null;
+                        if (hasVersionMax) {
+                            // ensure key version is not greater than component version max
+                            Version componentVersionMax = Version.of(((Versionable) component).getVersionMax());
+                            if (keyVersion.getMajor().compareTo(componentVersionMax.getMajor()) > 0) {
+                                component = null;
+                            } else if (!keyVersion.getMinor().equals(Integer.MAX_VALUE) && keyVersion.getMinor().compareTo(componentVersionMax.getMinor()) > 0) {
+                                component = null;
+                            } else if (!keyVersion.getPatch().equals(Integer.MAX_VALUE) && keyVersion.getPatch().compareTo(componentVersionMax.getPatch()) > 0) {
+                                component = null;
+                            }
+                        } else if (hasVersionMin) {
+                            // ensure key version specific values are respected
+                            Version componentVersionMin = Version.of(((Versionable) component).getVersionMin());
+                            if (!keyVersion.getMinor().equals(Integer.MAX_VALUE) && !keyVersion.getMinor().equals(componentVersionMin.getMinor())) {
+                                component = null;
+                            } else if (!keyVersion.getPatch().equals(Integer.MAX_VALUE) && !keyVersion.getPatch().equals(componentVersionMin.getPatch())) {
+                                component = null;
+                            }
+                        }
                     }
                 }
             }

@@ -13,6 +13,7 @@ public class ResourceKey implements Comparable<ResourceKey>, Versioned {
         this.version = Version.of(version);
     }
 
+    @Override
     public String getName() {
         return name;
     }
