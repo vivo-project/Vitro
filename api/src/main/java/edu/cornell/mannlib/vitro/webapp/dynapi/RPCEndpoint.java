@@ -15,7 +15,9 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 public class RPCEndpoint extends VitroHttpServlet {
 
 	private static final long serialVersionUID = 1L;
+
 	private static final Log log = LogFactory.getLog(RPCEndpoint.class);
+
 	private ActionPool actionPool = ActionPool.getInstance();
 
 	@Override
@@ -39,8 +41,8 @@ public class RPCEndpoint extends VitroHttpServlet {
 
 		String actionName = paths[1];
 
-		actionPool.printNames();
-		Action action = actionPool.getByName(actionName);
+		actionPool.printKeys();
+		Action action = actionPool.get(actionName);
 		OperationData input = new OperationData(request);
 
 		try {
@@ -55,7 +57,7 @@ public class RPCEndpoint extends VitroHttpServlet {
 	public void doDelete(HttpServletRequest request, HttpServletResponse response) {
 		OperationResult.notImplemented().prepareResponse(response);
 	}
-	
+
 	@Override
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
 		OperationResult.notImplemented().prepareResponse(response);

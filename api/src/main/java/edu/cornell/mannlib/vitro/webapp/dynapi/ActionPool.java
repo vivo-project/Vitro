@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
 
-public class ActionPool extends AbstractPool<ActionPool, Action> {
+public class ActionPool extends AbstractPool<String, ActionPool, Action> {
 
 	private static ActionPool INSTANCE = new ActionPool();
 

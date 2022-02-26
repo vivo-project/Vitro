@@ -49,7 +49,7 @@ public class ResourcePoolTest extends ServletContextTest {
     @Test
     public void testGetByNameBeforeInit() {
         ResourcePool resourcePool = ResourcePool.getInstance();
-        Resource resource = resourcePool.getByName(TEST_RESOURCE_NAME);
+        Resource resource = resourcePool.get(TEST_RESOURCE_NAME);
         assertNotNull(resource);
         assertTrue(resource instanceof DefaultResource);
     }
@@ -57,7 +57,7 @@ public class ResourcePoolTest extends ServletContextTest {
     @Test
     public void testPrintNamesBeforeInit() {
         ResourcePool resourcePool = ResourcePool.getInstance();
-        resourcePool.printNames();
+        resourcePool.printKeys();
         // nothing to assert
     }
 
@@ -74,14 +74,14 @@ public class ResourcePoolTest extends ServletContextTest {
         assertEquals(1, resourcePool.count());
         assertEquals(0, resourcePool.obsoleteCount());
 
-        assertResourceByName(resourcePool.getByName(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
     }
 
     @Test
     public void testPrintNames() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        resourcePool.printNames();
+        resourcePool.printKeys();
         // nothing to assert
     }
 
@@ -97,7 +97,8 @@ public class ResourcePoolTest extends ServletContextTest {
 
         assertEquals(0, resourcePool.obsoleteCount());
 
-        assertResourceByName(resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME, TEST_RELOAD_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME,
+                TEST_RELOAD_ACTION_NAME);
     }
 
     @Test
@@ -112,7 +113,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         assertEquals(0, resourcePool.obsoleteCount());
 
-        Resource resourceHasClient = resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME);
+        Resource resourceHasClient = resourcePool.get(TEST_RELOAD_RESOURCE_NAME);
 
         resourcePool.add(TEST_RELOAD_RESOURCE_URI, resource);
 
@@ -131,7 +132,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         reset();
 
-        assertTrue(resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME) instanceof DefaultResource);
+        assertTrue(resourcePool.get(TEST_RELOAD_RESOURCE_NAME) instanceof DefaultResource);
 
         resourcePool.add(TEST_RELOAD_RESOURCE_URI, resource);
     }
@@ -144,7 +145,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         resourcePool.reload();
 
-        Resource resource = resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME);
+        Resource resource = resourcePool.get(TEST_RELOAD_RESOURCE_NAME);
 
         assertFalse(resource instanceof DefaultResource);
 
@@ -156,7 +157,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         assertEquals(0, resourcePool.obsoleteCount());
 
-        assertTrue(resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME) instanceof DefaultResource);
+        assertTrue(resourcePool.get(TEST_RELOAD_RESOURCE_NAME) instanceof DefaultResource);
     }
 
     @Test
@@ -167,7 +168,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         resourcePool.reload();
 
-        Resource resourceHasClient = resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME);
+        Resource resourceHasClient = resourcePool.get(TEST_RELOAD_RESOURCE_NAME);
 
         assertFalse(resourceHasClient instanceof DefaultResource);
 
@@ -179,7 +180,7 @@ public class ResourcePoolTest extends ServletContextTest {
 
         assertEquals(1, resourcePool.obsoleteCount());
 
-        assertTrue(resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME) instanceof DefaultResource);
+        assertTrue(resourcePool.get(TEST_RELOAD_RESOURCE_NAME) instanceof DefaultResource);
 
         resourceHasClient.removeClient();
     }
@@ -201,20 +202,21 @@ public class ResourcePoolTest extends ServletContextTest {
 
         loadReloadModel();
 
-        Resource resource = resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME);
+        Resource resource = resourcePool.get(TEST_RELOAD_RESOURCE_NAME);
 
         assertTrue(resource instanceof DefaultResource);
 
         resourcePool.reload(TEST_RELOAD_RESOURCE_URI);
 
-        assertResourceByName(resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME, TEST_RELOAD_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME,
+                TEST_RELOAD_ACTION_NAME);
     }
 
     @Test
     public void testReload() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        assertResourceByName(resourcePool.getByName(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
 
         loadReloadModel();
 
@@ -223,26 +225,28 @@ public class ResourcePoolTest extends ServletContextTest {
         assertEquals(2, resourcePool.count());
         assertEquals(0, resourcePool.obsoleteCount());
 
-        assertResourceByName(resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME, TEST_RELOAD_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME,
+                TEST_RELOAD_ACTION_NAME);
     }
 
     @Test
     public void testReloadThreadSafety() throws IOException {
         ResourcePool resourcePool = initWithDefaultModel();
 
-        assertResourceByName(resourcePool.getByName(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
 
         loadReloadModel();
 
         CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> resourcePool.reload());
 
         while (!reloadFuture.isDone()) {
-            assertResourceByName(resourcePool.getByName(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
+            assertResourceByName(resourcePool.get(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
         }
 
-        assertResourceByName(resourcePool.getByName(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RESOURCE_NAME), TEST_RESOURCE_NAME, TEST_ACTION_NAME);
 
-        assertResourceByName(resourcePool.getByName(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME, TEST_RELOAD_ACTION_NAME);
+        assertResourceByName(resourcePool.get(TEST_RELOAD_RESOURCE_NAME), TEST_RELOAD_RESOURCE_NAME,
+                TEST_RELOAD_ACTION_NAME);
     }
 
     @Test
@@ -251,12 +255,12 @@ public class ResourcePoolTest extends ServletContextTest {
 
         loadReloadModel();
 
-        Resource resource = resourcePool.getByName(TEST_RESOURCE_NAME);
+        Resource resource = resourcePool.get(TEST_RESOURCE_NAME);
 
         CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> resourcePool.reload());
 
         while (!reloadFuture.isDone()) {
-            assertEquals(TEST_RESOURCE_NAME, resource.getName());
+            assertEquals(TEST_RESOURCE_NAME, resource.getKey());
         }
 
         resource.removeClient();
@@ -269,7 +273,7 @@ public class ResourcePoolTest extends ServletContextTest {
         resourcePool.reload();
 
         long initalCount = resourcePool.obsoleteCount();
-        Resource resource = resourcePool.getByName(TEST_RESOURCE_NAME);
+        Resource resource = resourcePool.get(TEST_RESOURCE_NAME);
 
         resource.removeClient();
 
@@ -290,8 +294,8 @@ public class ResourcePoolTest extends ServletContextTest {
         Runnable client = new Runnable() {
             @Override
             public void run() {
-                Resource resource = resourcePool.getByName(resourceName);
-                assertEquals(resourceName, resource.getName());
+                Resource resource = resourcePool.get(resourceName);
+                assertEquals(resourceName, resource.getKey());
                 assertTrue(resource.hasClients());
             }
         };
@@ -315,7 +319,7 @@ public class ResourcePoolTest extends ServletContextTest {
     private void assertResourceByName(Resource resource, String resourceName, String actionName) {
         assertNotNull(resource);
         assertFalse(format("%s not loaded!", resourceName), resource instanceof DefaultResource);
-        assertEquals(resourceName, resource.getName());
+        assertEquals(resourceName, resource.getKey());
         assertTrue(resource.hasClients());
 
         String minVer = "0.1.0";

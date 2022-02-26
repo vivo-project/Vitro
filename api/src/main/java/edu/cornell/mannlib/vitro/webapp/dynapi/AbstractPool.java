@@ -26,13 +26,13 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
-public abstract class AbstractPool<P extends Pool<C>, C extends Poolable> implements Pool<C> {
+public abstract class AbstractPool<K, P extends Pool<K, C>, C extends Poolable<K>> implements Pool<K, C> {
 
     private final Log log = LogFactory.getLog(this.getClass());
 
     private static final Object mutex = new Object();
 
-    private ConcurrentHashMap<String, C> components;
+    private ConcurrentHashMap<K, C> components;
     private ServletContext ctx;
     private ConfigurationBeanLoader loader;
     private ContextModelAccess modelAccess;
@@ -50,8 +50,8 @@ public abstract class AbstractPool<P extends Pool<C>, C extends Poolable> implem
 
     public abstract Class<C> getType();
 
-    public C getByName(String name) {
-        C component = components.get(name);
+    public C get(K key) {
+        C component = components.get(key);
         if (component == null) {
             component = getDefault();
         } else {
@@ -60,40 +60,42 @@ public abstract class AbstractPool<P extends Pool<C>, C extends Poolable> implem
         return component;
     }
 
-    public void printNames() {
-        for (Map.Entry<String, C> entry : components.entrySet()) {
+    public void printKeys() {
+        for (Map.Entry<K, C> entry : components.entrySet()) {
             log.debug(format("%s in pool: '%s'", getType().getName(), entry.getKey()));
         }
     }
 
     public void add(String uri, C component) {
-        String name = component.getName();
-        log.info(format("Adding component %s with URI %s", name, uri));
+        K key = component.getKey();
+        log.info(format("Adding component %s with URI %s", key, uri));
         if (isInModel(uri)) {
             synchronized (mutex) {
-                C oldComponent = components.put(name, component);
+                C oldComponent = components.put(key, component);
                 if (oldComponent != null) {
                     obsoleteComponents.add(oldComponent);
                     unloadObsoleteComponents();
                 }
             }
         } else {
-            throw new RuntimeException(format("%s %s with URI %s not found in model. Not adding to pool.", getType().getName(), name, uri));
+            throw new RuntimeException(format("%s %s with URI %s not found in model. Not adding to pool.",
+                    getType().getName(), key, uri));
         }
     }
 
-    public void remove(String uri, String name) {
-        log.info(format("Removing component %s with URI %s", name, uri));
+    public void remove(String uri, K key) {
+        log.info(format("Removing component %s with URI %s", key, uri));
         if (!isInModel(uri)) {
             synchronized (mutex) {
-                C oldComponent = components.remove(name);
+                C oldComponent = components.remove(key);
                 if (oldComponent != null) {
                     obsoleteComponents.add(oldComponent);
                     unloadObsoleteComponents();
                 }
             }
         } else {
-            throw new RuntimeException(format("%s %s with URI %s still exists in model. Not removing from pool.", getType().getName(), name, uri));
+            throw new RuntimeException(format("%s %s with URI %s still exists in model. Not removing from pool.",
+                    getType().getName(), key, uri));
         }
     }
 
@@ -114,11 +116,11 @@ public abstract class AbstractPool<P extends Pool<C>, C extends Poolable> implem
             log.error(format("Loader is null. Can't reload %s.", this.getClass().getName()));
             return;
         }
-        ConcurrentHashMap<String, C> newActions = new ConcurrentHashMap<>();
+        ConcurrentHashMap<K, C> newActions = new ConcurrentHashMap<>();
         loadComponents(newActions);
-        ConcurrentHashMap<String, C> oldActions = this.components;
+        ConcurrentHashMap<K, C> oldActions = this.components;
         components = newActions;
-        for (Map.Entry<String, C> component : oldActions.entrySet()) {
+        for (Map.Entry<K, C> component : oldActions.entrySet()) {
             obsoleteComponents.add(component.getValue());
             oldActions.remove(component.getKey());
         }
@@ -142,14 +144,14 @@ public abstract class AbstractPool<P extends Pool<C>, C extends Poolable> implem
         return components.size();
     }
 
-    private void loadComponents(ConcurrentHashMap<String, C> components) {
+    private void loadComponents(ConcurrentHashMap<K, C> components) {
         Set<C> newActions = loader.loadEach(getType());
         log.debug(format("Context Initialization. %s %s(s) currently loaded.", components.size(), getType().getName()));
         for (C component : newActions) {
             if (component.isValid()) {
-                components.put(component.getName(), component);
+                components.put(component.getKey(), component);
             } else {
-                log.error(format("%s with rpcName %s is invalid.", getType().getName(), component.getName()));
+                log.error(format("%s with rpcName %s is invalid.", getType().getName(), component.getKey()));
             }
         }
         log.debug(format("Context Initialization finished. %s %s(s) loaded.", components.size(), getType().getName()));
@@ -177,7 +179,7 @@ public abstract class AbstractPool<P extends Pool<C>, C extends Poolable> implem
 
     private boolean isInModel(String uri) {
         Resource s = dynamicAPIModel.getResource(uri);
-        Property p = dynamicAPIModel.getProperty(RDF_TYPE); 
+        Property p = dynamicAPIModel.getProperty(RDF_TYPE);
 
         String javaUri = toJavaUri(getType());
 

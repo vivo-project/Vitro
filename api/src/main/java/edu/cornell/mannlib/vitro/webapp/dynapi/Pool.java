@@ -4,15 +4,15 @@ import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
 
-public interface Pool<C extends Poolable> { 
+public interface Pool<K, C extends Poolable<K>> { 
 
-    public C getByName(String name);
+    public C get(K key);
 
-    public void printNames();
+    public void printKeys();
 
     public void add(String uri, C component);
 
-    public void remove(String uri, String name);
+    public void remove(String uri, K key);
 
     public void reload();
 

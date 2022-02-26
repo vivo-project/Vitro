@@ -7,14 +7,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Resource implements Poolable {
-
-	private static final Log log = LogFactory.getLog(Resource.class);
+public class Resource implements Poolable<String> {
 
 	private String name;
 	private String versionMin;
@@ -31,7 +26,7 @@ public class Resource implements Poolable {
 	public String getVersionMin() {
 		return versionMin;
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMin", minOccurs = 0, maxOccurs = 1)
 	public void setVersionMin(String versionMin) {
 		this.versionMin = versionMin;
@@ -52,7 +47,7 @@ public class Resource implements Poolable {
 	}
 
 	@Override
-	public String getName() {
+	public String getKey() {
 		return name;
 	}
 
@@ -105,7 +100,7 @@ public class Resource implements Poolable {
 	public void setRpcOnPatch(RPC rpcOnPatch) {
 		this.rpcOnPatch = rpcOnPatch;
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction")
 	public void addCustomRESTAction(CustomRESTAction customRESTAction) {
 		customRESTActions.add(customRESTAction);
@@ -114,7 +109,7 @@ public class Resource implements Poolable {
 	@Override
 	public void dereference() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
