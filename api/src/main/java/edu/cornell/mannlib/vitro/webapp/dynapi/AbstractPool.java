@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
-public abstract class AbstractPool<K, P extends Pool<K, C>, C extends Poolable<K>> implements Pool<K, C> {
+public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C>> implements Pool<K, C> {
 
     private final Log log = LogFactory.getLog(this.getClass());
 
