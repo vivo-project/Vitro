@@ -100,6 +100,9 @@ public class ResourcePoolTest extends ServletContextTest {
         loadReloadModel();
         resourcePool.reload();
 
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
+
         assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
         assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
         assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv2));
@@ -111,6 +114,9 @@ public class ResourcePoolTest extends ServletContextTest {
         ResourceKey erv1 = ResourceKey.from("test_reload_resource", "1.1.0");
         ResourceKey erv2 = ResourceKey.from("test_reload_resource", "2.0.0");
         ResourceKey erv4 = ResourceKey.from("test_reload_resource", "4.3.7");
+
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
 
         assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
         assertResource(erv1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
