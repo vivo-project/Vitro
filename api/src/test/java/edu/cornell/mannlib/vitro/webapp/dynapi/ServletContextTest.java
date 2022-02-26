@@ -1,7 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
-import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +12,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Before;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
@@ -23,8 +23,8 @@ public abstract class ServletContextTest {
     protected final static String TEST_ACTION_NAME = "test_action";
     protected final static String TEST_RELOAD_ACTION_NAME = "test_reload";
 
-    protected final static String TEST_RESOURCE_NAME = "test_resource";
-    protected final static String TEST_RELOAD_RESOURCE_NAME = "test_reload_resource";
+    protected final static ResourceKey TEST_RESOURCE_KEY = ResourceKey.from("test_resource", "0.1.0");
+    protected final static ResourceKey TEST_RELOAD_RESOURCE_KEY = ResourceKey.from("test_reload_resource", "0.1.0");
 
     protected ServletContextStub servletContext;
     protected ModelAccessFactoryStub modelAccessFactory;

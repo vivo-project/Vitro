@@ -7,8 +7,9 @@ import static java.lang.String.format;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.servlet.ServletContext;
 
@@ -32,7 +33,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     private static final Object mutex = new Object();
 
-    private ConcurrentHashMap<K, C> components;
+    private ConcurrentNavigableMap<K, C> components;
     private ServletContext ctx;
     private ConfigurationBeanLoader loader;
     private ContextModelAccess modelAccess;
@@ -40,7 +41,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     private ConcurrentLinkedQueue<C> obsoleteComponents;
 
     protected AbstractPool() {
-        components = new ConcurrentHashMap<>();
+        components = new ConcurrentSkipListMap<>();
         obsoleteComponents = new ConcurrentLinkedQueue<>();
     }
 
@@ -116,9 +117,9 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
             log.error(format("Loader is null. Can't reload %s.", this.getClass().getName()));
             return;
         }
-        ConcurrentHashMap<K, C> newActions = new ConcurrentHashMap<>();
+        ConcurrentNavigableMap<K, C> newActions = new ConcurrentSkipListMap<>();
         loadComponents(newActions);
-        ConcurrentHashMap<K, C> oldActions = this.components;
+        ConcurrentNavigableMap<K, C> oldActions = this.components;
         components = newActions;
         for (Map.Entry<K, C> component : oldActions.entrySet()) {
             obsoleteComponents.add(component.getValue());
@@ -144,7 +145,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         return components.size();
     }
 
-    private void loadComponents(ConcurrentHashMap<K, C> components) {
+    private void loadComponents(ConcurrentNavigableMap<K, C> components) {
         Set<C> newActions = loader.loadEach(getType());
         log.debug(format("Context Initialization. %s %s(s) currently loaded.", components.size(), getType().getName()));
         for (C component : newActions) {

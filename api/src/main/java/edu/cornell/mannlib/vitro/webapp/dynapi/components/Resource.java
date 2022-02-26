@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Resource implements Poolable<String> {
+public class Resource implements Poolable<ResourceKey> {
 
 	private String name;
 	private String versionMin;
@@ -47,8 +47,8 @@ public class Resource implements Poolable<String> {
 	}
 
 	@Override
-	public String getKey() {
-		return name;
+	public ResourceKey getKey() {
+		return ResourceKey.from(name, versionMin);
 	}
 
 	@Override
