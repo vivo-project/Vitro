@@ -50,9 +50,7 @@ public class ResourcePoolTest extends ServletContextTest {
     @Test
     public void testGetBeforeInit() {
         ResourcePool resourcePool = ResourcePool.getInstance();
-        Resource resource = resourcePool.get(TEST_RESOURCE_KEY);
-        assertNotNull(resource);
-        assertTrue(resource instanceof DefaultResource);
+        assertTrue(resourcePool.get(TEST_RESOURCE_KEY) instanceof DefaultResource);
     }
 
     @Test
@@ -76,6 +74,52 @@ public class ResourcePoolTest extends ServletContextTest {
         assertEquals(0, resourcePool.obsoleteCount());
 
         assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(TEST_RESOURCE_KEY));
+    }
+
+    @Test
+    public void testVersioning() throws IOException {
+        ResourcePool resourcePool = initWithDefaultModel();
+
+        ResourceKey v0 = ResourceKey.ceiling("test_resource", "0");
+        ResourceKey v1 = ResourceKey.ceiling("test_resource", "1");
+
+        ResourceKey rv0 = ResourceKey.ceiling("test_reload_resource", "0");
+        ResourceKey rv1 = ResourceKey.ceiling("test_reload_resource", "1");
+        ResourceKey rv2 = ResourceKey.ceiling("test_reload_resource", "2");
+        ResourceKey rv3 = ResourceKey.ceiling("test_reload_resource", "3");
+        ResourceKey rv4 = ResourceKey.ceiling("test_reload_resource", "4");
+        ResourceKey rv5 = ResourceKey.ceiling("test_reload_resource", "5");
+
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v0));
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourcePool.get(v1));
+
+        assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
+        assertTrue(resourcePool.get(rv1) instanceof DefaultResource);
+        assertTrue(resourcePool.get(rv2) instanceof DefaultResource);
+
+        loadReloadModel();
+        resourcePool.reload();
+
+        assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
+        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
+        assertResource(TEST_RELOAD_RESOURCE_KEY, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv2));
+
+
+        loadVersionedModel();
+        resourcePool.reload();
+
+        ResourceKey erv1 = ResourceKey.from("test_reload_resource", "1.1.0");
+        ResourceKey erv2 = ResourceKey.from("test_reload_resource", "2.0.0");
+        ResourceKey erv4 = ResourceKey.from("test_reload_resource", "4.3.7");
+
+        assertTrue(resourcePool.get(rv0) instanceof DefaultResource);
+        assertResource(erv1, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv1));
+        assertResource(erv2, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv2));
+        // NOTE: even though skipped a version from 2 to 4
+        // TODO: this should likely be a default resource but unlikely to skip a version
+        assertResource(erv2, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv3));
+        assertResource(erv4, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv4));
+        assertResource(erv4, TEST_RELOAD_ACTION_NAME, resourcePool.get(rv5));
     }
 
     @Test
@@ -311,6 +355,13 @@ public class ResourcePoolTest extends ServletContextTest {
         actionPool.init(servletContext);
 
         return resourcePool;
+    }
+
+    private void loadVersionedModel() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-versioning.n3")
+        );
     }
 
     private void assertResource(ResourceKey expctedResourceKey, String expectedActionName, Resource actualResource) {

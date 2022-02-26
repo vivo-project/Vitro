@@ -24,7 +24,7 @@ public abstract class ServletContextTest {
     protected final static String TEST_RELOAD_ACTION_NAME = "test_reload";
 
     protected final static ResourceKey TEST_RESOURCE_KEY = ResourceKey.from("test_resource", "0.1.0");
-    protected final static ResourceKey TEST_RELOAD_RESOURCE_KEY = ResourceKey.from("test_reload_resource", "0.1.0");
+    protected final static ResourceKey TEST_RELOAD_RESOURCE_KEY = ResourceKey.from("test_reload_resource", "1.0.0");
 
     protected ServletContextStub servletContext;
     protected ModelAccessFactoryStub modelAccessFactory;
@@ -79,7 +79,7 @@ public abstract class ServletContextTest {
         private final String format;
         private final String path;
 
-        private RDFFile(String format, String path) {
+        protected RDFFile(String format, String path) {
             this.format = format;
             this.path = path;
         }

@@ -15,9 +15,9 @@ public class ResourceVersion implements Comparable<ResourceVersion> {
 
     private ResourceVersion(String version, boolean ceiling) {
         String[] parts = version.split(PERIOD_PATTERN);
-        major = parts.length > 1 ? Integer.parseInt(parts[0]) : 0;
-        minor = ceiling ? Integer.MAX_VALUE : parts.length > 2 ? Integer.parseInt(parts[1]) : 0;
-        patch = ceiling ? Integer.MAX_VALUE : parts.length > 3 ? Integer.parseInt(parts[2]) : 0;
+        major = parts.length > 0 ? Integer.parseInt(parts[0]) : 0;
+        minor = ceiling ? Integer.MAX_VALUE : parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+        patch = ceiling ? Integer.MAX_VALUE : parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
     }
 
     public Integer getMajor() {

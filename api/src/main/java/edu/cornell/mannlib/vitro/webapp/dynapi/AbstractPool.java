@@ -6,6 +6,7 @@ import static edu.cornell.mannlib.vitro.webapp.utils.configuration.Configuration
 import static java.lang.String.format;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -22,6 +23,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versionable;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
@@ -52,12 +54,21 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     public abstract Class<C> getType();
 
     public C get(K key) {
-        C component = components.get(key);
-        if (component == null) {
-            component = getDefault();
+        C component = null;
+        if (Versionable.class.isAssignableFrom(getType())) {
+            Entry<K, C> entry = components.floorEntry(key);
+            if (entry != null) {
+                component = entry.getValue();
+            }
         } else {
-            component.addClient();
+            component = components.get(key);
         }
+
+        if (component == null) {
+            return getDefault();
+        }
+
+        component.addClient();
         return component;
     }
 
