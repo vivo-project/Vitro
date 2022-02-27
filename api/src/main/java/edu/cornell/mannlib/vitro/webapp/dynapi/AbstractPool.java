@@ -65,30 +65,22 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
                     String keyName = ((Versioned) key).getName();
                     Version keyVersion = ((Versioned) key).getVersion();
                     // ensure key name matches component key name
-                    if (!keyName.equals(((Versioned) component.getKey()).getName())) {
-                        component = null;
-                    } else {
+                    if (keyName.equals(((Versioned) component.getKey()).getName())) {
                         boolean hasVersionMax = ((Versionable) component).getVersionMax() != null;
                         boolean hasVersionMin = ((Versionable) component).getVersionMin() != null;
                         if (hasVersionMax) {
                             // ensure key version is not greater than component version max
-                            Version componentVersionMax = Version.of(((Versionable) component).getVersionMax());
-                            if (keyVersion.getMajor().compareTo(componentVersionMax.getMajor()) > 0) {
-                                component = null;
-                            } else if (!keyVersion.getMinor().equals(Integer.MAX_VALUE) && keyVersion.getMinor().compareTo(componentVersionMax.getMinor()) > 0) {
-                                component = null;
-                            } else if (!keyVersion.getPatch().equals(Integer.MAX_VALUE) && keyVersion.getPatch().compareTo(componentVersionMax.getPatch()) > 0) {
+                            if (greaterThanVersionMax(component, keyVersion)) {
                                 component = null;
                             }
                         } else if (hasVersionMin) {
                             // ensure key version specific values are respected
-                            Version componentVersionMin = Version.of(((Versionable) component).getVersionMin());
-                            if (!keyVersion.getMinor().equals(Integer.MAX_VALUE) && !keyVersion.getMinor().equals(componentVersionMin.getMinor())) {
-                                component = null;
-                            } else if (!keyVersion.getPatch().equals(Integer.MAX_VALUE) && !keyVersion.getPatch().equals(componentVersionMin.getPatch())) {
+                            if (mismatchSpecificVersion(component, keyVersion)) {
                                 component = null;
                             }
                         }
+                    } else {
+                        component = null;
                     }
                 }
             }
@@ -102,6 +94,39 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
         component.addClient();
         return component;
+    }
+
+    private boolean greaterThanVersionMax(C component, Version keyVersion) {
+        Version componentVersionMax = Version.of(((Versionable) component).getVersionMax());
+        boolean majorVersionGreater = keyVersion.getMajor().compareTo(componentVersionMax.getMajor()) > 0;
+
+        boolean minorVersionGreater = minorVersionSpecific(keyVersion)
+                && keyVersion.getMinor().compareTo(componentVersionMax.getMinor()) > 0;
+
+        boolean patchVersionGreater = patchVersionSpecific(keyVersion)
+                && keyVersion.getPatch().compareTo(componentVersionMax.getPatch()) > 0;
+
+        return majorVersionGreater || minorVersionGreater || patchVersionGreater;
+    }
+
+    private boolean mismatchSpecificVersion(C component, Version keyVersion) {
+        Version componentVersionMin = Version.of(((Versionable) component).getVersionMin());
+
+        boolean mismatchMinorVersion = minorVersionSpecific(keyVersion)
+                && !keyVersion.getMinor().equals(componentVersionMin.getMinor());
+
+        boolean mismatchPatchVersion = patchVersionSpecific(keyVersion)
+                && !keyVersion.getPatch().equals(componentVersionMin.getPatch());
+
+        return mismatchMinorVersion || mismatchPatchVersion;
+    }
+
+    private boolean minorVersionSpecific(Version keyVersion) {
+        return !keyVersion.getMinor().equals(Integer.MAX_VALUE);
+    }
+
+    private boolean patchVersionSpecific(Version keyVersion) {
+        return !keyVersion.getPatch().equals(Integer.MAX_VALUE);
     }
 
     public void printKeys() {
@@ -143,6 +168,23 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         }
     }
 
+    private boolean isInModel(String uri) {
+        Resource s = dynamicAPIModel.getResource(uri);
+        Property p = dynamicAPIModel.getProperty(RDF_TYPE);
+
+        String javaUri = toJavaUri(getType());
+
+        NodeIterator nit = dynamicAPIModel.listObjectsOfProperty(s, p);
+        while (nit.hasNext()) {
+            RDFNode node = nit.next();
+            if (node.isResource() && node.toString().replace("#", ".").equals(javaUri)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void reload(String uri) {
         try {
             add(uri, loader.loadInstance(uri, getType()));
@@ -180,14 +222,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         loadComponents(components);
     }
 
-    public long obsoleteCount() {
-        return obsoleteComponents.size();
-    }
-
-    public long count() {
-        return components.size();
-    }
-
     private void loadComponents(ConcurrentNavigableMap<K, C> components) {
         Set<C> newActions = loader.loadEach(getType());
         log.debug(format("Context Initialization. %s %s(s) currently loaded.", components.size(), getType().getName()));
@@ -221,21 +255,12 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         return true;
     }
 
-    private boolean isInModel(String uri) {
-        Resource s = dynamicAPIModel.getResource(uri);
-        Property p = dynamicAPIModel.getProperty(RDF_TYPE);
+    public long obsoleteCount() {
+        return obsoleteComponents.size();
+    }
 
-        String javaUri = toJavaUri(getType());
-
-        NodeIterator nit = dynamicAPIModel.listObjectsOfProperty(s, p);
-        while (nit.hasNext()) {
-            RDFNode node = nit.next();
-            if (node.isResource() && node.toString().replace("#", ".").equals(javaUri)) {
-                return true;
-            }
-        }
-
-        return false;
+    public long count() {
+        return components.size();
     }
 
 }
