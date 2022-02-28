@@ -10,7 +10,14 @@
         a                        dynapi:operation, dynapi:solrQuery ;
         rdfs:label               "Test solr query 1"@en-US ;
         dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam> ;
-        dynapi:solrQueryText   "q=?searchText" .
+        dynapi:solrQueryText   "http" ;
+        dynapi:solrFilter   "Field2:?textSearchParam" ;
+        dynapi:solrFilter   "ALTTEXT:get" ;
+        dynapi:solrOffset   "3" ;
+        dynapi:solrLimit   "10" ;
+        dynapi:solrField   "mostSpecificTypeURIs" ;
+        dynapi:solrField   "mostSpecificTypeURIs" ;
+        dynapi:solrField   "ALLTEXT" .
     
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam>
         a                        dynapi:parameter;
