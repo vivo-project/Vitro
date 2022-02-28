@@ -53,7 +53,7 @@ public class RPCEndpointTest {
 	public void beforeEach() {
 		actionPoolStatic = mockStatic(ActionPool.class);
 		when(ActionPool.getInstance()).thenReturn(actionPool);
-		when(actionPool.getByName(any(String.class))).thenReturn(action);
+		when(actionPool.get(any(String.class))).thenReturn(action);
 
 		when(request.getParameterMap()).thenReturn(params);
 		when(request.getServletContext()).thenReturn(context);
