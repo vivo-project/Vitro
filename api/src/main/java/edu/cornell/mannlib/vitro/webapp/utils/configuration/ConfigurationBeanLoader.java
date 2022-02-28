@@ -4,8 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -32,6 +34,9 @@ public class ConfigurationBeanLoader {
 
 	private static final String JAVA_URI_PREFIX = "java:";
 
+  Map<String, Object> instancesMap = new HashMap<String,Object>();
+
+	
 	// ----------------------------------------------------------------------
 	// utility methods
 	// ----------------------------------------------------------------------
@@ -135,7 +140,14 @@ public class ConfigurationBeanLoader {
 	/**
 	 * Load the instance with this URI, if it is assignable to this class.
 	 */
-	public <T> T loadInstance(String uri, Class<T> resultClass)
+	public <T> T loadInstance(String uri, Class<T> resultClass) throws ConfigurationBeanLoaderException {
+		instancesMap.clear();
+		T result = loadSubordinateInstance(uri, resultClass);
+		instancesMap.clear();
+		return result;
+	}
+
+	protected <T> T loadSubordinateInstance(String uri, Class<T> resultClass)
 			throws ConfigurationBeanLoaderException {
 		if (uri == null) {
 			throw new NullPointerException("uri may not be null.");
@@ -143,7 +155,15 @@ public class ConfigurationBeanLoader {
 		if (resultClass == null) {
 			throw new NullPointerException("resultClass may not be null.");
 		}
-
+		if (instancesMap.containsKey(uri)) {
+			try {
+				T t = (T) instancesMap.get(uri);
+				return t;
+		  } catch (ClassCastException e) {
+		    throw new ConfigurationBeanLoaderException(uri, e);
+		  }
+		}
+		
 		try {
 			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
 					.parse(locking, uri, resultClass);
@@ -151,6 +171,7 @@ public class ConfigurationBeanLoader {
 					.wrap(parsedRdf.getConcreteClass());
 			wrapper.satisfyInterfaces(ctx, req);
 			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
+			instancesMap.put(uri, wrapper.getInstance());
 			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
 			wrapper.validate();
 			return wrapper.getInstance();

@@ -9,6 +9,7 @@ import static edu.cornell.mannlib.vitro.webapp.utils.configuration.Configuration
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -24,6 +25,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationRdfParser.InvalidConfigurationRdfException;
@@ -31,13 +33,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.InstanceWrapper.Inst
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyTypeException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.ResourceUnavailableException;
 
-/**
- * TODO
- *
- * Circularity prevention. Before setting properties, create a WeakMap of
- * instances by URIs, so if a property refers to a created instance, we just
- * pass it in.
- */
 public class ConfigurationBeanLoaderTest extends
 		ConfigurationBeanLoaderTestBase {
 
@@ -394,6 +389,19 @@ public class ConfigurationBeanLoaderTest extends
 	public static class SimpleSuccess {
 		// Nothing of interest.
 	}
+	
+	public static class Friend {
+
+		public Friend() {
+
+		}
+		Friend friend;
+
+		@Property(uri = "http://set.friend/property")
+		public void setFriend(Friend friend) {
+			this.friend = friend;
+		}
+	}
 
 	// --------------------------------------------
 
@@ -673,6 +681,21 @@ public class ConfigurationBeanLoaderTest extends
 		Set<SimpleSuccess> instances = loader.loadAll(SimpleSuccess.class);
 		assertEquals(1, instances.size());
 	}
+	
+	// --------------------------------------------
+	
+	 @Test
+	  public void loop_test() throws ConfigurationBeanLoaderException {
+	    model.add(new Statement[] {
+	        typeStatement("http://friend.instance/one", toJavaUri(Friend.class)),
+	        typeStatement("http://friend.instance/two", toJavaUri(Friend.class)),
+	        objectProperty("http://friend.instance/one", "http://set.friend/property", "http://friend.instance/two"),
+	        objectProperty("http://friend.instance/two", "http://set.friend/property", "http://friend.instance/one") });
+
+	    Friend friend = loader.loadInstance("http://friend.instance/one", Friend.class);
+	    assertNotEquals(friend, friend.friend);
+	    assertEquals(friend, friend.friend.friend);
+	  }
 
 	// --------------------------------------------
 

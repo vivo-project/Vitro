@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class SPARQLQuery extends AbstractQueryOperation{
+public class SPARQLQuery implements Operation {
 
  	private static final Log log = LogFactory.getLog(SPARQLQuery.class);
 
@@ -37,6 +37,16 @@ public class SPARQLQuery extends AbstractQueryOperation{
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasQueryModel", minOccurs = 1, maxOccurs = 1)
 	public void setQueryModel(ModelComponent model) {
 		this.modelComponent = model;
+	}
+	 
+	@Override
+	public Parameters getRequiredParams() {
+		return requiredParams;
+	}
+
+	@Override
+	public Parameters getProvidedParams() {
+		return providedParams;
 	}
 	
 	@Override

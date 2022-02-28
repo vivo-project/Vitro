@@ -6,6 +6,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class N3Template extends AbstractOperation implements Template{
 
 	private String n3Text;
+  private Parameters requiredParams = new Parameters();
 
 	@Override
 	public void dereference() {
@@ -23,5 +24,19 @@ public class N3Template extends AbstractOperation implements Template{
 		return null;
 	}
 
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+	public void addRequiredParameter(Parameter param) {
+	  requiredParams.add(param);
+	}
+
+	@Override
+	public Parameters getRequiredParams() {
+		return requiredParams;
+	}
+
+  @Override
+  public Parameters getProvidedParams() {
+    return new Parameters();
+  }
 
 }

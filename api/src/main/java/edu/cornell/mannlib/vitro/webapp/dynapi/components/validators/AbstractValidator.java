@@ -1,22 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+
 public abstract class AbstractValidator implements Validator {
 
-	
-	private String name;
-	
 	@Override
 	public void dereference() {
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setName(String name) {
-		this.name = name;
 	}
 
 }
