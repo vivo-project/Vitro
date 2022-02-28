@@ -4,7 +4,7 @@ import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
 
-public interface Pool<K, C extends Poolable<K>> { 
+public interface Pool<K, C extends Poolable<K>> {
 
     public C get(K key);
 

@@ -6,7 +6,6 @@ import static edu.cornell.mannlib.vitro.webapp.utils.configuration.Configuration
 import static java.lang.String.format;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -23,9 +22,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versionable;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versioned;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
@@ -49,6 +45,10 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         obsoleteComponents = new ConcurrentLinkedQueue<>();
     }
 
+    protected ConcurrentNavigableMap<K, C> getComponents() {
+        return components;
+    }
+
     public abstract P getPool();
 
     public abstract C getDefault();
@@ -56,37 +56,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     public abstract Class<C> getType();
 
     public C get(K key) {
-        C component = null;
-        if (Versionable.class.isAssignableFrom(getType())) {
-            Entry<K, C> entry = components.floorEntry(key);
-            if (entry != null) {
-                component = entry.getValue();
-                if (key instanceof Versioned) {
-                    String keyName = ((Versioned) key).getName();
-                    Version keyVersion = ((Versioned) key).getVersion();
-                    // ensure key name matches component key name
-                    if (keyName.equals(((Versioned) component.getKey()).getName())) {
-                        boolean hasVersionMax = ((Versionable) component).getVersionMax() != null;
-                        boolean hasVersionMin = ((Versionable) component).getVersionMin() != null;
-                        if (hasVersionMax) {
-                            // ensure key version is not greater than component version max
-                            if (greaterThanVersionMax(component, keyVersion)) {
-                                component = null;
-                            }
-                        } else if (hasVersionMin) {
-                            // ensure key version specific values are respected
-                            if (mismatchSpecificVersion(component, keyVersion)) {
-                                component = null;
-                            }
-                        }
-                    } else {
-                        component = null;
-                    }
-                }
-            }
-        } else {
-            component = components.get(key);
-        }
+        C component = components.get(key);
 
         if (component == null) {
             return getDefault();
@@ -94,39 +64,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
         component.addClient();
         return component;
-    }
-
-    private boolean greaterThanVersionMax(C component, Version keyVersion) {
-        Version componentVersionMax = Version.of(((Versionable) component).getVersionMax());
-        boolean majorVersionGreater = keyVersion.getMajor().compareTo(componentVersionMax.getMajor()) > 0;
-
-        boolean minorVersionGreater = minorVersionSpecific(keyVersion)
-                && keyVersion.getMinor().compareTo(componentVersionMax.getMinor()) > 0;
-
-        boolean patchVersionGreater = patchVersionSpecific(keyVersion)
-                && keyVersion.getPatch().compareTo(componentVersionMax.getPatch()) > 0;
-
-        return majorVersionGreater || minorVersionGreater || patchVersionGreater;
-    }
-
-    private boolean mismatchSpecificVersion(C component, Version keyVersion) {
-        Version componentVersionMin = Version.of(((Versionable) component).getVersionMin());
-
-        boolean mismatchMinorVersion = minorVersionSpecific(keyVersion)
-                && !keyVersion.getMinor().equals(componentVersionMin.getMinor());
-
-        boolean mismatchPatchVersion = patchVersionSpecific(keyVersion)
-                && !keyVersion.getPatch().equals(componentVersionMin.getPatch());
-
-        return mismatchMinorVersion || mismatchPatchVersion;
-    }
-
-    private boolean minorVersionSpecific(Version keyVersion) {
-        return !keyVersion.getMinor().equals(Integer.MAX_VALUE);
-    }
-
-    private boolean patchVersionSpecific(Version keyVersion) {
-        return !keyVersion.getPatch().equals(Integer.MAX_VALUE);
     }
 
     public void printKeys() {
