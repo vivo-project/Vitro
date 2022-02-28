@@ -3,9 +3,10 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static org.easymock.EasyMock.expect;
 import static org.powermock.api.easymock.PowerMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertTrue;
 import static org.powermock.api.easymock.PowerMock.createMock;
 import static org.powermock.api.easymock.PowerMock.mockStatic;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
@@ -18,7 +19,6 @@ import edu.cornell.mannlib.vitro.webapp.searchengine.solr.SolrSearchEngine;
 import org.easymock.Mock;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -84,13 +84,12 @@ public class SolrQueryTest {
     }
 
     @Test
-    @Ignore
     public void parsingQueryTest(){
         expect(mockSearchEngine.createQuery()).andReturn(new BaseSearchQuery()).times(1);
         replay(mockSearchEngine);
 
-        solrQuery.setQueryText("{query:\"http,test\", fluter: [\"prvo:true\",\"drugo:false\"]}");
-        solrQuery.run(new OperationData(new HttpServletRequestStub()));
+        solrQuery.setQueryText("{query:\"http,test\", fluter: [\"first:true\",\"second:false\"]}");
+        assertFalse(solrQuery.run(new OperationData(new HttpServletRequestStub())).hasError());
         verify(mockSearchEngine);
     }
 }
