@@ -6,7 +6,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class N3Template implements Template{
 
 	private String n3Text;
-  private Parameters requiredParams = new Parameters();
+  	private Parameters requiredParams = new Parameters();
 
 	@Override
 	public void dereference() {
@@ -34,8 +34,8 @@ public class N3Template implements Template{
 		return requiredParams;
 	}
 
-  @Override
-  public Parameters getProvidedParams() {
+  	@Override
+  	public Parameters getProvidedParams() {
     return new Parameters();
   }
 
