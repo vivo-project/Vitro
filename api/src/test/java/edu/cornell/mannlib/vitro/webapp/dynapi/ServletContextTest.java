@@ -70,15 +70,19 @@ public abstract class ServletContextTest {
 
     protected void loadModel(RDFFile... rdfFiles) throws IOException {
         for (RDFFile rdfFile : rdfFiles) {
-            String rdf = readRdf(rdfFile.path);
+            String rdf = readFile(rdfFile.path);
             ontModel.read(new StringReader(rdf), null, rdfFile.format);
         }
     }
 
-    protected String readRdf(String rdfPath) throws IOException {
-        Path path = new File(rdfPath).toPath();
+    protected String readMockFile(String path) throws IOException {
+        return readFile("src/test/resources/dynapi/mock/" + path);
+    }
 
-        return new String(Files.readAllBytes(path));
+    protected String readFile(String path) throws IOException {
+        Path p = new File(path).toPath();
+
+        return new String(Files.readAllBytes(p));
     }
 
     protected class RDFFile {

@@ -118,10 +118,10 @@ public class RPCEndpointIT extends ServletContextTest {
     }
 
     @Test
-    public void doPostTest() throws MalformedURLException {
+    public void doPostTest() throws IOException {
 
         // Prevent SPARQL from actually running by returning a mocked response.
-        String json = "{ \"head\": { \"vars\": [ \"title\" ] }, \"results\": { \"bindings\": [ ] } }";
+        String json = readMockFile("json/sparql-empty-success.json");
         InputStream stream = new ByteArrayInputStream(json.getBytes());
         when(queryExecution.execSelect()).thenReturn(ResultSetFactory.fromJSON(stream));
 
