@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -69,7 +68,7 @@ public class RPCEndpointIT extends ServletContextTest {
     @Before
     public void beforeEach() throws IOException {
         queryExecution = mock(QueryExecution.class);
-        actionPool = spy(new ActionPool());
+        actionPool = new ActionPool();
 
         actionPoolStatic = mockStatic(ActionPool.class);
         when(ActionPool.getInstance()).thenReturn(actionPool);
