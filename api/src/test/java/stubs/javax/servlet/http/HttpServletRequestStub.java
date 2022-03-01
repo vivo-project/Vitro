@@ -51,6 +51,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	private String remoteAddr = "127.0.0.1";
 
 	private HttpSession session;
+	private ServletContext servletContext;
 	private final Map<String, List<String>> parameters;
 	private final Map<String, Object> attributes;
 	private final Map<String, List<String>> headers;
@@ -90,10 +91,17 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	}
 
 	/**
+	 * Manually set the pathInfo for mocking purposes.
+	 */
+	public void setPathInfo(String pathInfo) {
+		this.pathInfo = pathInfo;
+	}
+
+	/**
 	 * Supply the pieces of the request URL, so we can respond correctly when
 	 * asked for a piece. Don't include a query string. Instead, set parameters.
 	 */
-	public void setRequestUrlByParts(String shemeHostPort, String contextPath,
+	public void setRequestUrlByParts(String schemeHostPort, String contextPath,
 			String servletPath, String pathInfo) {
 		if (contextPath == null) {
 			throw new NullPointerException("contextPath may not be null.");
@@ -114,14 +122,14 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		this.requestUri = contextPath + servletPath
 				+ ((pathInfo == null) ? "" : pathInfo);
 
-		if (shemeHostPort == null) {
-			throw new NullPointerException("shemeHostPort may not be null.");
+		if (schemeHostPort == null) {
+			throw new NullPointerException("schemeHostPort may not be null.");
 		}
-		if (!shemeHostPort.contains("://")) {
+		if (!schemeHostPort.contains("://")) {
 			throw new IllegalArgumentException(
-					"schemeHostPort must be sheme://host[:port]");
+					"schemeHostPort must be scheme://host[:port]");
 		}
-		this.requestUrl = shemeHostPort + this.requestUri;
+		this.requestUrl = schemeHostPort + this.requestUri;
 	}
 
 	/** Set to "GET" or "POST", etc. */
@@ -139,6 +147,10 @@ public class HttpServletRequestStub implements HttpServletRequest {
 			headers.put(name, new ArrayList<String>());
 		}
 		headers.get(name).add(value);
+	}
+
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 
 	public void addParameter(String name, String value) {
@@ -475,7 +487,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 
 	@Override
 	public ServletContext getServletContext() {
-		return null;
+		return servletContext;
 	}
 
 	@Override

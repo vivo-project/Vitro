@@ -36,11 +36,11 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam2>
         a                                   dynapi:parameter ;
-        dynapi:paramName                    "limit" ;
+        dynapi:paramName                    "email" ;
         dynapi:hasParameterType             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
         dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator> ;
-        rdfs:label                          "Test parameter 1 for query 1"@en-US .
+        rdfs:label                          "Test parameter 2 for query 1"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator>
         a                                   dynapi:validator ,
