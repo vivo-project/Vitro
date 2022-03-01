@@ -1,95 +1,185 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static org.easymock.EasyMock.expect;
-import static org.powermock.api.easymock.PowerMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.powermock.api.easymock.PowerMock.createMock;
-import static org.powermock.api.easymock.PowerMock.mockStatic;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SolrQuery;
-import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
-import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
-import edu.cornell.mannlib.vitro.webapp.searchengine.solr.SolrSearchEngine;
-import org.easymock.Mock;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import stubs.javax.servlet.http.HttpServletRequestStub;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@PowerMockIgnore("javax.management.*")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ApplicationUtils.class)
+@RunWith(MockitoJUnitRunner.class)
 public class SolrQueryTest {
 
-    public static SearchEngine mockSearchEngine;
-
+    @Spy
     private SolrQuery solrQuery;
+
+    private static MockedStatic<ApplicationUtils> applicationUtils;
+
+    @Mock
+    ApplicationImpl application;
 
     @Mock
     private Parameter parameter1;
 
+    @Mock
+    private OperationData input;
+
+    @Mock
+    private SearchEngine searchEngine;
+
+    @Mock
+    private SearchQuery searchQuery;
 
     @BeforeClass
-    public static void setupSolrMock(){
+    public static void setupStaticObjects() {
+        applicationUtils = mockStatic(ApplicationUtils.class);
 
     }
 
     @Before
-    public void setupObjects() {
-        mockSearchEngine = createMock(SolrSearchEngine.class);
-
-        Application application =  createMock(ApplicationImpl.class);
-        expect(application.getSearchEngine()).andReturn(mockSearchEngine).anyTimes();
-        replay(application);
-
-        mockStatic(ApplicationUtils.class);
-        expect(ApplicationUtils.instance()).andReturn(application).anyTimes();
-        replay(ApplicationUtils.class);
-
+    public void setupQuery(){
+        when(ApplicationUtils.instance()).thenReturn(application);
+        when(application.getSearchEngine()).thenReturn(searchEngine);
+        when(searchEngine.createQuery()).thenReturn(searchQuery);
         this.solrQuery = new SolrQuery();
     }
 
     @Test
     public void requiredParameterMissingFromInput(){
-        parameter1 = createMock(Parameter.class);
-        expect(parameter1.getName()).andReturn("testParameter").times(1);
-        replay(parameter1);
+        when(parameter1.getName()).thenReturn("testParameter");
         solrQuery.addRequiredParameter(parameter1);
-        assertTrue(solrQuery.run(new OperationData(new HttpServletRequestStub())).hasError());
-        verify(parameter1);
+        when(input.has("testParameter")).thenReturn(false);
+        assertTrue(solrQuery.run(input).hasError());
+        verify(parameter1, times(1)).getName();
+        verify(input,times(1)).has("testParameter");
     }
 
     @Test
     public void requiredParameterPresentButInvalid(){
-        parameter1 = createMock(Parameter.class);
-        expect(parameter1.getName()).andReturn("testParameter").times(1);
-        expect(parameter1.isValid("testParameter", new String[]{"testValue"}))
-            .andReturn(false).times(1);
-        replay(parameter1);
+        when(parameter1.getName()).thenReturn("testParameter");
+        when(parameter1.isValid(eq("testParameter"), any(String[].class))).thenReturn(false);
         solrQuery.addRequiredParameter(parameter1);
-        HttpServletRequestStub httpReq = new HttpServletRequestStub();
-        httpReq.addParameter("testParameter","testValue");
-        assertTrue(solrQuery.run(new OperationData(httpReq)).hasError());
-        verify(parameter1);
+        when(input.has("testParameter")).thenReturn(true);
+        when(input.get("testParameter")).thenReturn(new String[]{"testValue"});
+        assertTrue(solrQuery.run(input).hasError());
+
+        verify(parameter1,times(1)).getName();
+        verify(parameter1,times(1)).isValid(eq("testParameter"), any(String[].class));
     }
 
     @Test
-    public void parsingQueryTest(){
-        expect(mockSearchEngine.createQuery()).andReturn(new BaseSearchQuery()).times(1);
-        replay(mockSearchEngine);
+    public void requiredParameterPresentAndValid(){
+        when(parameter1.getName()).thenReturn("testParameter");
+        when(parameter1.isValid(eq("testParameter"), any(String[].class))).thenReturn(true);
+        solrQuery.addRequiredParameter(parameter1);
+        when(input.has("testParameter")).thenReturn(true);
+        when(input.get("testParameter")).thenReturn(new String[]{"testValue"});
+        assertFalse(solrQuery.run(input).hasError());
 
-        solrQuery.setQueryText("{query:\"http,test\", fluter: [\"first:true\",\"second:false\"]}");
-        assertFalse(solrQuery.run(new OperationData(new HttpServletRequestStub())).hasError());
-        verify(mockSearchEngine);
+        verify(parameter1,times(1)).getName();
+        verify(parameter1,times(1)).isValid(eq("testParameter"), any(String[].class));
+    }
+
+    @Test
+    public void queryWithOnlySimpleTextSearch(){
+        when(searchQuery.setQuery("testSearchText")).thenReturn(searchQuery);
+        solrQuery.setQueryText("testSearchText");
+
+        assertFalse(solrQuery.run(input).hasError());
+        verify(searchQuery,times(1)).setQuery("testSearchText");
+    }
+
+    @Test
+    public void queryWithVariableInsideTextSearch(){
+        when(input.has("testParameter")).thenReturn(false);
+        solrQuery.setQueryText("testSearchText OR ?testParameter");
+
+        assertTrue(solrQuery.run(input).hasError());
+        verify(searchQuery,times(0)).setQuery(any());
+        verify(input,times(1)).has(any());
+    }
+
+    @Test
+    public void queryWithVariableInsideTextSearchWithSubstitution(){
+        when(searchQuery.setQuery(any(String.class))).thenReturn(searchQuery);
+        when(input.has("testParameter")).thenReturn(true);
+        when(input.get("testParameter")).thenReturn(new String[]{"testValue"});
+        solrQuery.setQueryText("testSearchText OR ?testParameter");
+
+        assertFalse(solrQuery.run(input).hasError());
+        verify(searchQuery,times(1)).setQuery("testSearchText OR testValue");
+    }
+
+    @Test
+    public void queryWithMultipleVariableInsideTextSearchWithSubstitution(){
+        when(searchQuery.setQuery(any(String.class))).thenReturn(searchQuery);
+        when(input.has(anyString())).thenReturn(true);
+        when(input.get("testParam1")).thenReturn(new String[]{"testValue1"});
+        when(input.get("testParam2")).thenReturn(new String[]{"testValue2"});
+        solrQuery.setQueryText("?testParam1 OR ?testParam2");
+
+        assertFalse(solrQuery.run(input).hasError());
+        verify(searchQuery,times(1)).setQuery("testValue1 OR testValue2");
+    }
+
+    @Test
+    public void queryWithLimitAndOffsetWrongValue(){
+        when(searchQuery.setStart(anyInt())).thenReturn(searchQuery);
+        when(input.has(anyString())).thenReturn(true);
+        when(input.get("testParam1")).thenReturn(new String[]{"11"});
+        when(input.get("testParam2")).thenReturn(new String[]{"testValue2"});
+        solrQuery.setOffset("?testParam1");
+        solrQuery.setLimit("?testParam2");
+
+        assertTrue(solrQuery.run(input).hasError());
+        verify(searchQuery,times(0)).setQuery(any());
+        verify(searchQuery,times(1)).setStart(11);
+        verify(searchQuery,times(0)).setRows(anyInt());
+    }
+
+    @Test
+    public void queryWithMultipleSortsBadInput(){
+        when(input.has(anyString())).thenReturn(true);
+        when(input.get("testParam1")).thenReturn(new String[]{"field1"});
+        when(input.get("testParam2")).thenReturn(new String[]{"field2"});
+        //Should fail because in this case testParam3 must be keyword desc or asc
+        when(input.get("testParam3")).thenReturn(new String[]{"field3"});
+        //more spaces are added on purpose to simulate RDF input that's not well formatted
+        solrQuery.addSort("   ?testParam1    desc ");
+        solrQuery.addSort("?testParam2  ?testParam3");
+
+        assertTrue(solrQuery.run(input).hasError());
+        assertEquals(solrQuery.getSorts().size(),2);
+        verify(searchQuery,times(1)).addSortField(anyString(),any());
+    }
+
+    @Test
+    public void queryWithMultipleSorts(){
+        when(searchQuery.addSortField(anyString(),any())).thenReturn(searchQuery);
+        when(input.has(anyString())).thenReturn(true);
+        when(input.get("testParam1")).thenReturn(new String[]{"field1"});
+        when(input.get("testParam2")).thenReturn(new String[]{"field2"});
+        //Should fail because in this case testParam3 must be keyword desc or asc
+        when(input.get("testParam3")).thenReturn(new String[]{"asc"});
+        //more spaces are added on purpose to simulate RDF input that's not well formatted
+        solrQuery.addSort("   ?testParam1    desc ");
+        solrQuery.addSort("?testParam2  ?testParam3");
+
+        assertFalse(solrQuery.run(input).hasError());
+        assertEquals(solrQuery.getSorts().size(),2);
+        verify(searchQuery,times(2)).addSortField(anyString(),any());
     }
 }
