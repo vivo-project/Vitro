@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.mockito.MockedStatic;
 
 import stubs.javax.servlet.http.HttpServletRequestStub;
@@ -51,19 +52,20 @@ public class RPCEndpointIT extends ServletContextTest {
 
     private QueryExecution queryExecution;
 
-    private String testAction;
-    private String testLimit;
-    private String testEmail;
-    private Integer testStatus;
-    private String testMessage;
+    @Parameter(0)
+    public String testAction;
 
-    public RPCEndpointIT(String testAction, String testLimit, String testEmail, Integer testStatus, String testMessage) {
-        this.testAction = testAction;
-        this.testLimit = testLimit;
-        this.testEmail = testEmail;
-        this.testStatus = testStatus;
-        this.testMessage = testMessage;
-    }
+    @Parameter(1)
+    public String testLimit;
+
+    @Parameter(2)
+    public String testEmail;
+
+    @Parameter(3)
+    public Integer testStatus;
+
+    @Parameter(4)
+    public String testMessage;
 
     @Before
     public void beforeEach() throws IOException {
