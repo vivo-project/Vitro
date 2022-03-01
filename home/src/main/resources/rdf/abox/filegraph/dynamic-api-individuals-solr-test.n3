@@ -15,15 +15,27 @@
         dynapi:solrFilter   "ALTTEXT:get" ;
         dynapi:solrOffset   "3" ;
         dynapi:solrLimit   "10" ;
-        dynapi:solrField   "mostSpecificTypeURIs" ;
-        dynapi:solrField   "mostSpecificTypeURIs" ;
-        dynapi:solrField   "ALLTEXT" .
+        dynapi:solrSort   "testField   ASC" ;
+        dynapi:solrSort   "?sortFieldParam ?sortFieldDirection" ;
+        dynapi:solrFacet   "ALLTEXT" .
     
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam>
         a                        dynapi:parameter;
         dynapi:paramName         "searchText";
         dynapi:hasParameterType  <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
-        rdfs:label               "Search text for solr query 1"@en-US . 
+        rdfs:label               "Search text for solr query 1"@en-US .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortFieldParam>
+        a                        dynapi:parameter;
+        dynapi:paramName         "fildForSorting";
+        dynapi:hasParameterType  <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               "Choose document field for sorting"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortFieldDirection>
+        a                        dynapi:parameter;
+        dynapi:paramName         "sordDirection";
+        dynapi:hasParameterType  <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               "Choose sort direction"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/solrTestAction>
         a                        dynapi:action ;
