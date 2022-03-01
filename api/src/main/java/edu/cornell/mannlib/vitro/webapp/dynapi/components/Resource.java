@@ -43,6 +43,10 @@ public class Resource implements Versionable<ResourceKey> {
 		this.versionMax = versionMax;
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#resourceName", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
@@ -141,6 +145,41 @@ public class Resource implements Versionable<ResourceKey> {
 	@Override
 	public boolean hasClients() {
 		return !clients.isEmpty();
+	}
+
+	public String getCustomRestActionByName(String name) {
+		for (CustomRESTAction customRestAction : customRESTActions) {
+			if (customRestAction.getName().equals(name)) {
+				return customRestAction.getTargetRPC().getName();
+			}
+		}
+		throw new UnsupportedOperationException("Unsupported custom action");
+	}
+
+	public String getActionNameByMethod(String method) {
+		System.out.println("\nget action name: " + method + "\n");
+		switch (method.toUpperCase()) {
+			case "POST":
+				return getNameOfRpc(rpcOnPost);
+			case "GET":
+				return getNameOfRpc(rpcOnGet);
+			case "DELETE":
+				return getNameOfRpc(rpcOnDelete);
+			case "PUT":
+				return getNameOfRpc(rpcOnPut);
+			case "PATCH":
+				return getNameOfRpc(rpcOnPatch);
+			default:
+				throw new UnsupportedOperationException("Unsupported method");
+		}
+	}
+
+	private String getNameOfRpc(RPC rpc) {
+		System.out.println("\nget name of rpc: " + rpc + "\n");
+		if (rpc != null) {
+			return rpc.getName();
+		}
+		throw new UnsupportedOperationException("Unable to determine action");
 	}
 
 }

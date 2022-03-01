@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_BASE_PATH;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
@@ -27,7 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 @RunWith(MockitoJUnitRunner.class)
 public class RPCEndpointTest {
 
-	private final static String URI_TEST = "/test";
+	private final static String PATH_INFO = "/test";
+	private final static String CONTEXT_PATH = RPC_BASE_PATH + PATH_INFO;
 
 	private Map<String, String[]> params;
 
@@ -77,7 +80,8 @@ public class RPCEndpointTest {
 	public void doPostTest() {
 		OperationResult result = new OperationResult(HttpServletResponse.SC_OK);
 
-		when(request.getPathInfo()).thenReturn(URI_TEST);
+		when(request.getContextPath()).thenReturn(CONTEXT_PATH);
+		when(request.getPathInfo()).thenReturn(PATH_INFO);
 		when(action.run(any(OperationData.class))).thenReturn(result);
 
 		rpcEndpoint.doPost(request, response);
@@ -87,7 +91,7 @@ public class RPCEndpointTest {
 
 	@Test
 	public void doPostTestOnMissing() {
-		when(request.getPathInfo()).thenReturn("");
+		when(request.getPathInfo()).thenReturn(EMPTY);
 
 		rpcEndpoint.doPost(request, response);
 		verify(action, times(0)).run(any());
