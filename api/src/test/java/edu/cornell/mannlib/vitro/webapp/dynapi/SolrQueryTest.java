@@ -11,9 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SolrQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -48,7 +46,10 @@ public class SolrQueryTest {
         applicationUtils = mockStatic(ApplicationUtils.class);
 
     }
-
+    @AfterClass
+    public static void afterEach() {
+        applicationUtils.close();
+    }
     @Before
     public void setupQuery(){
         when(ApplicationUtils.instance()).thenReturn(application);
