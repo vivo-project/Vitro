@@ -1,8 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-public interface Poolable extends Removable {
+public interface Poolable<K> extends Removable {
 
-    public String getName();
+    public K getKey();
 
     public boolean isValid();
 

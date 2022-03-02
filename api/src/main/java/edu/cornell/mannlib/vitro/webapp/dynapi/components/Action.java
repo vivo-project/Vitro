@@ -1,31 +1,25 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class Action implements RunnableComponent, Poolable, Operation, Link {
+import javax.servlet.http.HttpServletResponse;
 
-	private static final Log log = LogFactory.getLog(Action.class);
+import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+
+public class Action implements Poolable<String>, Operation, Link {
 
 	private Step firstStep = null;
 	private RPC rpc;
 
 	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
-  private Parameters providedParams = new Parameters();
-  private Parameters requiredParams;
-
+	private Parameters providedParams = new Parameters();
+	private Parameters requiredParams;
 
 	@Override
 	public void dereference() {
@@ -53,14 +47,14 @@ public class Action implements RunnableComponent, Poolable, Operation, Link {
 	public void setRPC(RPC rpc) {
 		this.rpc = rpc;
 	}
-	
-  @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
-  public void addProvidedParameter(Parameter param) {
-    providedParams.add(param);
-  }
+
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
+	public void addProvidedParameter(Parameter param) {
+		providedParams.add(param);
+	}
 
 	@Override
-	public String getName() {
+	public String getKey() {
 		return rpc.getName();
 	}
 
@@ -89,7 +83,7 @@ public class Action implements RunnableComponent, Poolable, Operation, Link {
 		for (Long client : clients) {
 			if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
 				clients.remove(client);
-			} 
+			}
 		}
 	}
 
@@ -98,28 +92,28 @@ public class Action implements RunnableComponent, Poolable, Operation, Link {
 		return !clients.isEmpty();
 	}
 
-  @Override
-  public Set<Link> getNextLinks() {
-    return Collections.singleton(firstStep);
-  }
+	@Override
+	public Set<Link> getNextLinks() {
+		return Collections.singleton(firstStep);
+	}
 
-  @Override
-  public Parameters getRequiredParams() {
-    return requiredParams;
-  }
-  
-  public void computeScopes() {
-    requiredParams = Scopes.computeInitialRequirements(this);  
-  }
+	@Override
+	public Parameters getRequiredParams() {
+		return requiredParams;
+	}
 
-  @Override
-  public Parameters getProvidedParams() {
-    return providedParams;
-  }
+	public void computeScopes() {
+		requiredParams = Scopes.computeInitialRequirements(this);
+	}
 
-  @Override
-  public boolean isRoot() {
-    return true;
-  }
+	@Override
+	public Parameters getProvidedParams() {
+		return providedParams;
+	}
+
+	@Override
+	public boolean isRoot() {
+		return true;
+	}
 
 }

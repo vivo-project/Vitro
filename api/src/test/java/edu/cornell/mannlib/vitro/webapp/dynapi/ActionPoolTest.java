@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 
 public class ActionPoolTest extends ServletContextTest {
 
-    protected final static String TEST_RELOAD_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testReloadAction1";
+    protected final static String TEST_PERSON_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1";
 
     @After
     public void reset() {
@@ -40,17 +40,17 @@ public class ActionPoolTest extends ServletContextTest {
     }
 
     @Test
-    public void testGetByNameBeforeInit() {
+    public void testGetBeforeInit() {
         ActionPool actionPool = ActionPool.getInstance();
-        Action action = actionPool.getByName(TEST_ACTION_NAME);
+        Action action = actionPool.get(TEST_ACTION_NAME);
         assertNotNull(action);
         assertTrue(action instanceof DefaultAction);
     }
 
     @Test
-    public void testPrintNamesBeforeInit() {
+    public void testPrintKeysBeforeInit() {
         ActionPool actionPool = ActionPool.getInstance();
-        actionPool.printNames();
+        actionPool.printKeys();
         // nothing to assert
     }
 
@@ -67,14 +67,14 @@ public class ActionPoolTest extends ServletContextTest {
         assertEquals(1, actionPool.count());
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
     }
 
     @Test
-    public void testPrintNames() throws IOException {
+    public void testPrintKeys() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        actionPool.printNames();
+        actionPool.printKeys();
         // nothing to assert
     }
 
@@ -82,32 +82,32 @@ public class ActionPoolTest extends ServletContextTest {
     public void testAdd() throws IOException, ConfigurationBeanLoaderException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
-        Action action = loader.loadInstance(TEST_RELOAD_ACTION_URI, Action.class);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
 
-        actionPool.add(TEST_RELOAD_ACTION_URI, action);
+        actionPool.add(TEST_PERSON_ACTION_URI, action);
 
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertActionByName(actionPool.getByName(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_PERSON_ACTION_NAME, actionPool.get(TEST_PERSON_ACTION_NAME));
     }
 
     @Test
     public void testAddHasClient() throws IOException, ConfigurationBeanLoaderException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         actionPool.reload();
 
-        Action action = loader.loadInstance(TEST_RELOAD_ACTION_URI, Action.class);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
 
         assertEquals(0, actionPool.obsoleteCount());
 
-        Action actionHasClient = actionPool.getByName(TEST_RELOAD_ACTION_NAME);
+        Action actionHasClient = actionPool.get(TEST_PERSON_ACTION_NAME);
 
-        actionPool.add(TEST_RELOAD_ACTION_URI, action);
+        actionPool.add(TEST_PERSON_ACTION_URI, action);
 
         assertEquals(1, actionPool.obsoleteCount());
 
@@ -118,26 +118,26 @@ public class ActionPoolTest extends ServletContextTest {
     public void testAddWithoutModelLoaded() throws IOException, ConfigurationBeanLoaderException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
-        Action action = loader.loadInstance(TEST_RELOAD_ACTION_URI, Action.class);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
 
         reset();
 
-        assertTrue(actionPool.getByName(TEST_RELOAD_ACTION_NAME) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof DefaultAction);
 
-        actionPool.add(TEST_RELOAD_ACTION_URI, action);
+        actionPool.add(TEST_PERSON_ACTION_URI, action);
     }
 
     @Test
     public void testRemove() throws IOException, ConfigurationBeanLoaderException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         actionPool.reload();
 
-        Action action = actionPool.getByName(TEST_RELOAD_ACTION_NAME);
+        Action action = actionPool.get(TEST_PERSON_ACTION_NAME);
 
         assertFalse(action instanceof DefaultAction);
 
@@ -145,22 +145,22 @@ public class ActionPoolTest extends ServletContextTest {
 
         reset();
 
-        actionPool.remove(TEST_RELOAD_ACTION_URI, TEST_RELOAD_ACTION_NAME);
+        actionPool.remove(TEST_PERSON_ACTION_URI, TEST_PERSON_ACTION_NAME);
 
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertTrue(actionPool.getByName(TEST_RELOAD_ACTION_NAME) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof DefaultAction);
     }
 
     @Test
     public void testRemoveHasClient() throws IOException, ConfigurationBeanLoaderException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         actionPool.reload();
 
-        Action actionHasClient = actionPool.getByName(TEST_RELOAD_ACTION_NAME);
+        Action actionHasClient = actionPool.get(TEST_PERSON_ACTION_NAME);
 
         assertFalse(actionHasClient instanceof DefaultAction);
 
@@ -168,11 +168,11 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.init(servletContext);
 
-        actionPool.remove(TEST_RELOAD_ACTION_URI, TEST_RELOAD_ACTION_NAME);
+        actionPool.remove(TEST_PERSON_ACTION_URI, TEST_PERSON_ACTION_NAME);
 
         assertEquals(1, actionPool.obsoleteCount());
 
-        assertTrue(actionPool.getByName(TEST_RELOAD_ACTION_NAME) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof DefaultAction);
 
         actionHasClient.removeClient();
     }
@@ -181,75 +181,75 @@ public class ActionPoolTest extends ServletContextTest {
     public void testRemoveWithModelLoaded() throws IOException, ConfigurationBeanLoaderException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
         actionPool.reload();
 
-        actionPool.remove(TEST_RELOAD_ACTION_URI, TEST_RELOAD_ACTION_NAME);
+        actionPool.remove(TEST_PERSON_ACTION_URI, TEST_PERSON_ACTION_NAME);
     }
 
     @Test
     public void testReloadSingle() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
-        Action action = actionPool.getByName(TEST_RELOAD_ACTION_NAME);
+        Action action = actionPool.get(TEST_PERSON_ACTION_NAME);
 
         assertTrue(action instanceof DefaultAction);
 
-        actionPool.reload(TEST_RELOAD_ACTION_URI);
+        actionPool.reload(TEST_PERSON_ACTION_URI);
 
-        assertActionByName(actionPool.getByName(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_PERSON_ACTION_NAME, actionPool.get(TEST_PERSON_ACTION_NAME));
     }
 
     @Test
     public void testReload() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        loadReloadModel();
+        loadTestModel();
 
         actionPool.reload();
 
-        assertEquals(2, actionPool.count());
+        assertEquals(8, actionPool.count());
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertActionByName(actionPool.getByName(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_PERSON_ACTION_NAME, actionPool.get(TEST_PERSON_ACTION_NAME));
     }
 
     @Test
     public void testReloadThreadSafety() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        loadReloadModel();
+        loadTestModel();
 
         CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> actionPool.reload());
 
         while (!reloadFuture.isDone()) {
-            assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
+            assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
         }
 
-        assertActionByName(actionPool.getByName(TEST_ACTION_NAME), TEST_ACTION_NAME);
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        assertActionByName(actionPool.getByName(TEST_RELOAD_ACTION_NAME), TEST_RELOAD_ACTION_NAME);
+        assertAction(TEST_PERSON_ACTION_NAME, actionPool.get(TEST_PERSON_ACTION_NAME));
     }
 
     @Test
     public void testRealodOfActionHasClient() throws IOException {
         ActionPool actionPool = initWithDefaultModel();
 
-        loadReloadModel();
+        loadTestModel();
 
-        Action action = actionPool.getByName(TEST_ACTION_NAME);
+        Action action = actionPool.get(TEST_ACTION_NAME);
 
         CompletableFuture<Void> reloadFuture = CompletableFuture.runAsync(() -> actionPool.reload());
 
         while (!reloadFuture.isDone()) {
-            assertEquals(TEST_ACTION_NAME, action.getName());
+            assertEquals(TEST_ACTION_NAME, action.getKey());
         }
 
         action.removeClient();
@@ -262,7 +262,7 @@ public class ActionPoolTest extends ServletContextTest {
         actionPool.reload();
 
         long initalCount = actionPool.obsoleteCount();
-        Action action = actionPool.getByName(TEST_ACTION_NAME);
+        Action action = actionPool.get(TEST_ACTION_NAME);
 
         action.removeClient();
 
@@ -283,8 +283,8 @@ public class ActionPoolTest extends ServletContextTest {
         Runnable client = new Runnable() {
             @Override
             public void run() {
-                Action action = actionPool.getByName(name);
-                assertEquals(name, action.getName());
+                Action action = actionPool.get(name);
+                assertEquals(name, action.getKey());
                 assertTrue(action.hasClients());
             }
         };
@@ -303,13 +303,13 @@ public class ActionPoolTest extends ServletContextTest {
         return actionPool;
     }
 
-    private void assertActionByName(Action action, String name) {
-        assertNotNull(action);
-        assertFalse(format("%s not loaded!", name), action instanceof DefaultAction);
-        assertTrue(action.isValid());
-        assertEquals(name, action.getName());
-        assertTrue(action.hasClients());
-        action.removeClient();
+    private void assertAction(String expectedName, Action actualAction) {
+        assertNotNull(actualAction);
+        assertFalse(format("%s not loaded!", expectedName), actualAction instanceof DefaultAction);
+        assertTrue(actualAction.isValid());
+        assertEquals(expectedName, actualAction.getKey());
+        assertTrue(actualAction.hasClients());
+        actualAction.removeClient();
     }
 
 }

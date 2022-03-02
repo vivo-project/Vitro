@@ -1,17 +1,16 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.*;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
-import org.junit.After;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-
-import static java.lang.String.format;
-import static org.junit.Assert.*;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.IsInteger;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.IsNotBlank;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.NumericRangeValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.RegularExpressionValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.StringLengthRangeValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 
 public class ValidatorsTest {
 
@@ -22,10 +21,10 @@ public class ValidatorsTest {
 
         String fieldName = "field";
 
-        String[] values1 = {"1245","-123"};
+        String[] values1 = { "1245", "-123" };
         assertTrue(validator.isValid(fieldName, values1));
 
-        String[] values2 = {"1245.2"};
+        String[] values2 = { "1245.2" };
         assertFalse(validator.isValid(fieldName, values2));
     }
 
@@ -39,10 +38,10 @@ public class ValidatorsTest {
         String[] values1 = {};
         assertFalse(validator.isValid(fieldName, values1));
 
-        String[] values2 = {""};
+        String[] values2 = { "" };
         assertFalse(validator.isValid(fieldName, values2));
 
-        String[] values3 = {"a string"};
+        String[] values3 = { "a string" };
         assertTrue(validator.isValid(fieldName, values3));
     }
 
@@ -59,17 +58,17 @@ public class ValidatorsTest {
 
         String fieldName = "field";
 
-        String[] values1 = {"35"};
+        String[] values1 = { "35" };
         assertTrue(validator1.isValid(fieldName, values1));
         assertFalse(validator2.isValid(fieldName, values1));
         assertFalse(validator3.isValid(fieldName, values1));
 
-        String[] values2 = {"36.3"};
+        String[] values2 = { "36.3" };
         assertTrue(validator1.isValid(fieldName, values2));
         assertTrue(validator2.isValid(fieldName, values2));
         assertTrue(validator3.isValid(fieldName, values2));
 
-        String[] values3 = {"42"};
+        String[] values3 = { "42" };
         assertFalse(validator1.isValid(fieldName, values3));
         assertTrue(validator2.isValid(fieldName, values3));
         assertFalse(validator3.isValid(fieldName, values3));
@@ -88,17 +87,17 @@ public class ValidatorsTest {
 
         String fieldName = "field";
 
-        String[] values1 = {"test"};
+        String[] values1 = { "test" };
         assertTrue(validator1.isValid(fieldName, values1));
         assertFalse(validator2.isValid(fieldName, values1));
         assertFalse(validator3.isValid(fieldName, values1));
 
-        String[] values2 = {"testte"};
+        String[] values2 = { "testte" };
         assertTrue(validator1.isValid(fieldName, values2));
         assertTrue(validator2.isValid(fieldName, values2));
         assertTrue(validator3.isValid(fieldName, values2));
 
-        String[] values3 = {"testtest"};
+        String[] values3 = { "testtest" };
         assertFalse(validator1.isValid(fieldName, values3));
         assertTrue(validator2.isValid(fieldName, values3));
         assertFalse(validator3.isValid(fieldName, values3));
@@ -112,13 +111,13 @@ public class ValidatorsTest {
 
         String fieldName = "email";
 
-        String[] values1 = {"dragan@uns.ac.rs"};
+        String[] values1 = { "dragan@uns.ac.rs" };
         assertTrue(validator1.isValid(fieldName, values1));
 
-        String[] values2 = {"dragan@"};
+        String[] values2 = { "dragan@" };
         assertFalse(validator1.isValid(fieldName, values2));
 
-        String[] values3 = {"uns.ac.rs"};
+        String[] values3 = { "uns.ac.rs" };
         assertFalse(validator1.isValid(fieldName, values3));
     }
 
