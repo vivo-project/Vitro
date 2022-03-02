@@ -24,6 +24,12 @@ public class Resource implements Versionable<ResourceKey> {
 	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
 	@Override
+	public void dereference() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public String getVersionMin() {
 		return versionMin;
 	}
@@ -113,12 +119,6 @@ public class Resource implements Versionable<ResourceKey> {
 	}
 
 	@Override
-	public void dereference() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void addClient() {
 		clients.add(Thread.currentThread().getId());
 	}
@@ -147,39 +147,48 @@ public class Resource implements Versionable<ResourceKey> {
 		return !clients.isEmpty();
 	}
 
-	public String getCustomRestActionByName(String name) {
-		for (CustomRESTAction customRestAction : customRESTActions) {
-			if (customRestAction.getName().equals(name)) {
-				return customRestAction.getTargetRPC().getName();
-			}
+	public RPC getRestRPC(String method) {
+		RPC rpc = getRestRpcByMethod(method);
+		if (rpc != null) {
+			return rpc;
+		}
+		throw new UnsupportedOperationException("Unsupported method");
+	}
+
+	private RPC getRestRpcByMethod(String method) {
+		switch (method.toUpperCase()) {
+			case "POST":
+				return rpcOnPost;
+			case "GET":
+				return rpcOnGet;
+			case "DELETE":
+				return rpcOnDelete;
+			case "PUT":
+				return rpcOnPut;
+			case "PATCH":
+				return rpcOnPatch;
+			default:
+				return null;
+		}
+	}
+
+	public RPC getCustomRestActionRPC(String name) {
+		RPC rpc = getCustomRestActionRpcByName(name);
+		if (rpc != null) {
+			return rpc;
 		}
 		throw new UnsupportedOperationException("Unsupported custom action");
 	}
 
-	public String getActionNameByMethod(String method) {
-		System.out.println("\nget action name: " + method + "\n");
-		switch (method.toUpperCase()) {
-			case "POST":
-				return getNameOfRpc(rpcOnPost);
-			case "GET":
-				return getNameOfRpc(rpcOnGet);
-			case "DELETE":
-				return getNameOfRpc(rpcOnDelete);
-			case "PUT":
-				return getNameOfRpc(rpcOnPut);
-			case "PATCH":
-				return getNameOfRpc(rpcOnPatch);
-			default:
-				throw new UnsupportedOperationException("Unsupported method");
+	private RPC getCustomRestActionRpcByName(String name) {
+		RPC rpc = null;
+		for (CustomRESTAction customRestAction : customRESTActions) {
+			if (customRestAction.getName().equals(name)) {
+				rpc = customRestAction.getTargetRPC();
+				break;
+			}
 		}
-	}
-
-	private String getNameOfRpc(RPC rpc) {
-		System.out.println("\nget name of rpc: " + rpc + "\n");
-		if (rpc != null) {
-			return rpc.getName();
-		}
-		throw new UnsupportedOperationException("Unable to determine action");
+		return rpc;
 	}
 
 }
