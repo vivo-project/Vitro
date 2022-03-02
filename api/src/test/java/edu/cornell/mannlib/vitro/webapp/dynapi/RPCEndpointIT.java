@@ -36,7 +36,7 @@ import org.mockito.MockedStatic;
 @RunWith(Parameterized.class)
 public class RPCEndpointIT extends ServletContextIT {
 
-	private final static String URI_CONTEXT = "/api/rpc/";
+    private final static String URI_CONTEXT = "/api/rpc/";
     private final static String URI_BASE = "http://localhost" + URI_CONTEXT;
 
     private RPCEndpoint rpcEndpoint;
@@ -155,7 +155,7 @@ public class RPCEndpointIT extends ServletContextIT {
 
     /**
      * Prevent SPARQL from actually running by returning a mocked response.
-     * @throws IOException 
+     * @throws IOException
      */
     protected void mockSparqlResponseEmptySuccess() throws IOException {
         String json = readMockFile("sparql/response/json/sparql-empty-success.json");
