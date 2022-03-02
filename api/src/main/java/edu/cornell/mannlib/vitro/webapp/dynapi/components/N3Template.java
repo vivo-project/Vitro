@@ -8,9 +8,11 @@ public class N3Template implements Template{
 	private String n3Text;
   	private Parameters requiredParams = new Parameters();
 
-	@Override
-	public void dereference() {
-		
+  	//region @Property Setters
+
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+	public void addRequiredParameter(Parameter param) {
+		requiredParams.add(param);
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasN3Text", minOccurs = 1, maxOccurs = 1)
@@ -18,25 +20,29 @@ public class N3Template implements Template{
 		this.n3Text = n3Text;
 	}
 
-	@Override
-	public OperationResult run(OperationData input) {
-		
-		return null;
-	}
+	//endregion
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addRequiredParameter(Parameter param) {
-	  requiredParams.add(param);
-	}
+	//region Getters
 
 	@Override
 	public Parameters getRequiredParams() {
 		return requiredParams;
 	}
 
-  	@Override
-  	public Parameters getProvidedParams() {
-    return new Parameters();
-  }
+	@Override
+	public Parameters getProvidedParams() {
+		return new Parameters();
+	}
 
+	//endregion
+
+	@Override
+	public OperationResult run(OperationData input) {
+		return null;
+	}
+
+	@Override
+	public void dereference() {
+
+	}
 }

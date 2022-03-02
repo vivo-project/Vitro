@@ -11,14 +11,11 @@
         rdfs:label               "Test solr query 1"@en-US ;
         dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam> ;
         dynapi:solrQueryText   "http" ;
-        dynapi:solrField   "Field1" ;
-        dynapi:solrField   "Field2" ;
-        dynapi:solrFilter   "Field2:?textSearchParam" ;
-        dynapi:solrFilter   "ALTTEXT:get" ;
+        dynapi:solrField   "Field1" , "Field2" ;
+        dynapi:solrFilter   "Field2:?textSearchParam" , "ALTTEXT:get" ;
         dynapi:solrOffset   "3" ;
         dynapi:solrLimit   "10" ;
-        dynapi:solrSort   "testField   ASC" ;
-        dynapi:solrSort   "?sortFieldParam ?sortFieldDirection" ;
+        dynapi:solrSort   "testField   ASC" , "?sortFieldParam ?sortFieldDirection" ;
         dynapi:solrFacet   "ALLTEXT" .
     
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam>
