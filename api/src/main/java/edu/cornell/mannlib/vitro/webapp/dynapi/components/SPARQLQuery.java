@@ -30,12 +30,12 @@ public class SPARQLQuery implements Operation {
 	public void dereference() {
 		//TODO
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
 	public void addRequiredParameter(Parameter param) {
-		requiredParams.add(param);	
+		requiredParams.add(param);
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
 	public void addProvidedParameter(Parameter param) {
 		providedParams.add(param);

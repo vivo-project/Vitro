@@ -47,6 +47,14 @@ public abstract class ServletContextTest {
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
+    protected void loadModelsFromN3(String fileFormat, String... paths) throws IOException {
+        for(String path : paths){
+            loadModel(
+                    new RDFFile(fileFormat, path)
+            );
+        }
+    }
+
     protected void loadTestModel() throws IOException {
         // all actions reuse testSparqlQuery1 from testing action
         loadModel(
