@@ -7,10 +7,12 @@ import static org.mockito.Mockito.*;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SolrQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -18,8 +20,13 @@ import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
+
 @RunWith(MockitoJUnitRunner.class)
-public class SolrQueryTest {
+public class SolrQueryTest extends ServletContextTest{
+
+    private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-solr-test.n3";
+    private final static String TEST_SOLR_QUERY_URI="https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery";
 
     @Spy
     private SolrQuery solrQuery;
@@ -44,18 +51,34 @@ public class SolrQueryTest {
     @BeforeClass
     public static void setupStaticObjects() {
         applicationUtils = mockStatic(ApplicationUtils.class);
-
     }
+
     @AfterClass
     public static void afterEach() {
         applicationUtils.close();
     }
+
     @Before
     public void setupQuery(){
         when(ApplicationUtils.instance()).thenReturn(application);
         when(application.getSearchEngine()).thenReturn(searchEngine);
         when(searchEngine.createQuery()).thenReturn(searchQuery);
         this.solrQuery = new SolrQuery();
+    }
+
+    @Test
+    public void testLoadingAndPropertiesSetup() throws IOException, ConfigurationBeanLoaderException {
+        loadDefaultModel();
+        loadModelsFromN3(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
+
+        SolrQuery query = loader.loadInstance(TEST_SOLR_QUERY_URI, SolrQuery.class);
+        assertNotNull(query);
+        assertEquals(2, query.getSorts().size());
+        assertEquals("http", query.getQueryText());
+        assertEquals(1, query.getFacets().size());
+        assertEquals(2, query.getFields().size());
+        assertEquals("10", query.getLimit());
+        assertEquals("3", query.getOffset());
     }
 
     @Test

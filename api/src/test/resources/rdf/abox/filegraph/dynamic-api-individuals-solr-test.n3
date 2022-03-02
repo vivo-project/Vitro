@@ -11,6 +11,8 @@
         rdfs:label               "Test solr query 1"@en-US ;
         dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam> ;
         dynapi:solrQueryText   "http" ;
+        dynapi:solrField   "Field1" ;
+        dynapi:solrField   "Field2" ;
         dynapi:solrFilter   "Field2:?textSearchParam" ;
         dynapi:solrFilter   "ALTTEXT:get" ;
         dynapi:solrOffset   "3" ;
