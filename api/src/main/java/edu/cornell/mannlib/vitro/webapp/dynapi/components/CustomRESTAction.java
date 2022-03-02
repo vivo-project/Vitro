@@ -6,11 +6,11 @@ public class CustomRESTAction implements Removable {
 
 	private String name;
 	private RPC targetRPC;
-	
+
 	@Override
 	public void dereference() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public String getName() {
