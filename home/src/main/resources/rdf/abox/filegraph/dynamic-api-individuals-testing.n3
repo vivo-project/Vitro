@@ -8,10 +8,10 @@
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1>
-        a                               dynapi:action ;
-        rdfs:label                      "Test action"@en-US ;
-        dynapi:assignedRPC              <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
-        dynapi:firstStep                <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
+        a                                   dynapi:action ;
+        rdfs:label                          "Test action"@en-US ;
+        dynapi:assignedRPC                  <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1> ;
+        dynapi:firstStep                    <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1>
         a                                   dynapi:step, dynapi:operationalStep ;
@@ -57,31 +57,58 @@
         dynapi:validatorMinLengthValue      5 ;
         rdfs:label                          "Test string length range validator for parameter 2"@en-US .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1>
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc individual" ;
+        dynapi:resourceName                 "Test rpc create individual" ;
         dynapi:rpcName                      "test_action"@en-US ;
         dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:rpcAPIVersionMin             "0.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetRPC1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc get individual" ;
+        dynapi:rpcName                      "test_action"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:rpcAPIVersionMin             "0.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateRPC1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc update individual" ;
+        dynapi:rpcName                      "test_action"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:rpcAPIVersionMin             "0.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchRPC1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc patch individual" ;
+        dynapi:rpcName                      "test_action"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
+        dynapi:rpcAPIVersionMin             "0.1.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteRPC1>
+        a                                   dynapi:rpc ;
+        dynapi:resourceName                 "Test rpc delete individual" ;
+        dynapi:rpcName                      "test_action"@en-US ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
         dynapi:rpcAPIVersionMin             "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_custom_action1>
         a                                   dynapi:customRESTAction ;
         dynapi:resourceName                 "Test custom action" ;
         dynapi:customRESTActionName         "test_custom_action_name" ;
-        dynapi:forwardTo                    <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:forwardTo                    <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateRPC1> ;
+        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:rpcAPIVersionMin             "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resource/testResource1>
         a                                   dynapi:resource ;
         dynapi:resourceName                 "test_resource" ;
         rdfs:label                          "Test resource 1"@en-US ;
-        dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
-        dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
-        dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
-        dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
-        dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testRPC1> ;
+        dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1> ;
+        dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetRPC1> ;
+        dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateRPC1> ;
+        dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchRPC1> ;
+        dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteRPC1> ;
         dynapi:hasCustomRESTAction          <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_custom_action1> ;
         dynapi:restAPIVersionMin            "0.1.0" .
-
 
