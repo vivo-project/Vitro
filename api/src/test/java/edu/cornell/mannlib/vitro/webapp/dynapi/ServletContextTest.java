@@ -55,7 +55,7 @@ public abstract class ServletContextTest {
         }
     }
 
-    protected void loadReloadModel() throws IOException {
+    protected void loadTestModel() throws IOException {
         // reloading action reuses testSparqlQuery1 from testing action
         loadModel(
             new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-collection.n3"),
