@@ -75,10 +75,6 @@ public abstract class ServletContextTest {
         }
     }
 
-    protected String readMockFile(String path) throws IOException {
-        return readFile("src/test/resources/dynapi/mock/" + path);
-    }
-
     protected String readFile(String path) throws IOException {
         Path p = new File(path).toPath();
 

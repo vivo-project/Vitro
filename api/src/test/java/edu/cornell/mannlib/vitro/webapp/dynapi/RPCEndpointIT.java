@@ -13,10 +13,13 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -30,19 +33,17 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.mockito.MockedStatic;
 
-import stubs.javax.servlet.http.HttpServletRequestStub;
-import stubs.javax.servlet.http.HttpServletResponseStub;
-
 @RunWith(Parameterized.class)
-public class RPCEndpointIT extends ServletContextTest {
+public class RPCEndpointIT extends ServletContextIT {
 
-    private final static String URI_BASE = "http://localhost/api/rpc/";
+	private final static String URI_CONTEXT = "/api/rpc/";
+    private final static String URI_BASE = "http://localhost" + URI_CONTEXT;
 
     private RPCEndpoint rpcEndpoint;
 
-    private HttpServletRequestStub request;
+    private HttpServletRequest request;
 
-    private HttpServletResponseStub response;
+    private HttpServletResponse response;
 
     private MockedStatic<ActionPool> actionPoolStatic;
 
@@ -65,10 +66,16 @@ public class RPCEndpointIT extends ServletContextTest {
     public Integer testStatus;
 
     @Parameter(4)
+    public Method testBefore;
+
+    @Parameter(5)
+    public Method testAfter;
+
+    @Parameter(6)
     public String testMessage;
 
     @Before
-    public void beforeEach() throws IOException {
+    public void beforeEach() throws Exception {
         queryExecution = mock(QueryExecution.class);
         actionPool = new ActionPool();
 
@@ -78,39 +85,42 @@ public class RPCEndpointIT extends ServletContextTest {
         queryExecutionFactoryStatic = mockStatic(QueryExecutionFactory.class);
         when(QueryExecutionFactory.create(any(String.class), any(Model.class))).thenReturn(queryExecution);
 
-        request = new HttpServletRequestStub();
-        response = new HttpServletResponseStub();
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
         rpcEndpoint = new RPCEndpoint();
 
         loadDefaultModel();
 
-        request.setServletContext(servletContext);
+        when(request.getServletContext()).thenReturn(servletContext);
+        when(request.getContextPath()).thenReturn(URI_CONTEXT);
 
         actionPool.init(request.getServletContext());
         actionPool.reload();
 
         if (testAction != null) {
-            request.setRequestUrl(new URL(URI_BASE + testAction));
-            request.setPathInfo("/" + testAction);
+            StringBuffer buffer = new StringBuffer(URI_BASE + testAction);
+            when(request.getRequestURL()).thenReturn(buffer);
+            when(request.getPathInfo()).thenReturn("/" + testAction);
         }
 
-        if (testLimit != null) {
-            request.addParameter("limit", testLimit.toString());
-        }
+        when(request.getParameterMap()).thenReturn(parameterMap);
 
-        if (testEmail != null) {
-            request.addParameter("email", testEmail.toString());
-        }
+        mockParameterIntoMap("limit", testLimit);
+        mockParameterIntoMap("email", testEmail);
+        mockStatus(response);
+        runCallback(testBefore);
     }
 
     @After
-    public void afterEach() {
+    public void afterEach() throws Exception {
+        runCallback(testAfter);
+
         actionPoolStatic.close();
         queryExecutionFactoryStatic.close();
     }
 
     @Test
-    public void doGetTest() throws MalformedURLException {
+    public void doGetTest() {
         rpcEndpoint.doGet(request, response);
 
         // For all permutations, this should return HTTP 501.
@@ -118,19 +128,13 @@ public class RPCEndpointIT extends ServletContextTest {
     }
 
     @Test
-    public void doPostTest() throws IOException {
-
-        // Prevent SPARQL from actually running by returning a mocked response.
-        String json = readMockFile("json/sparql-empty-success.json");
-        InputStream stream = new ByteArrayInputStream(json.getBytes());
-        when(queryExecution.execSelect()).thenReturn(ResultSetFactory.fromJSON(stream));
-
+    public void doPostTest() {
         rpcEndpoint.doPost(request, response);
         assertResponseStatus(testStatus);
     }
 
     @Test
-    public void doDeleteTest() throws MalformedURLException {
+    public void doDeleteTest() {
         rpcEndpoint.doDelete(request, response);
 
         // For all permutations, this should return HTTP 501.
@@ -138,7 +142,7 @@ public class RPCEndpointIT extends ServletContextTest {
     }
 
     @Test
-    public void doPutTest() throws MalformedURLException {
+    public void doPutTest() {
         rpcEndpoint.doPut(request, response);
 
         // For all permutations, this should return HTTP 501.
@@ -149,8 +153,18 @@ public class RPCEndpointIT extends ServletContextTest {
         assertEquals("Invalid Status for test: " + testMessage, status, response.getStatus());
     }
 
+    /**
+     * Prevent SPARQL from actually running by returning a mocked response.
+     * @throws IOException 
+     */
+    protected void mockSparqlResponseEmptySuccess() throws IOException {
+        String json = readMockFile("sparql/response/json/sparql-empty-success.json");
+        InputStream stream = new ByteArrayInputStream(json.getBytes());
+        when(queryExecution.execSelect()).thenReturn(ResultSetFactory.fromJSON(stream));
+    }
+
     @Parameterized.Parameters
-    public static Collection<Object[]> requests() throws MalformedURLException {
+    public static Collection<Object[]> requests() throws MalformedURLException, NoSuchMethodException, SecurityException {
         int nf = SC_NOT_FOUND;
         int se = SC_INTERNAL_SERVER_ERROR;
         int ni = SC_NOT_IMPLEMENTED;
@@ -166,17 +180,22 @@ public class RPCEndpointIT extends ServletContextTest {
         String emailIsBad = "a";
         String emailIsGood = "example@localhost";
 
+        Method[] before = new Method[] {
+            RPCEndpointIT.class.getDeclaredMethod("mockSparqlResponseEmptySuccess")
+        };
+
         return Arrays.asList(new Object[][] {
-            { null,            null,         null,         nf, "NULL Request" },
-            { actionIsEmpty,   null,         null,         nf, "Empty Action" },
-            { actionIsUnknown, null,         null,         ni, "Unknown Action" },
-            { actionIsGood,    null,         null,         se, "NULL Limit" },
-            { actionIsGood,    limitIsEmpty, null,         se, "Empty Limit" },
-            { actionIsGood,    limitIsBad,   null,         se, "Bad Limit" },
-            { actionIsGood,    limitIsGood,  null,         se, "NULL E-mail" },
-            { actionIsGood,    limitIsGood,  emailIsEmpty, se, "Empty E-mail" },
-            { actionIsGood,    limitIsGood,  emailIsBad,   se, "Bad E-mail" },
-            { actionIsGood,    limitIsGood,  emailIsGood,  ok, "Valid Request" },
+            // action          limit         email         status before       after   testMessage
+            { null,            null,         null,         nf,    null,        null,   "NULL Request" },
+            { actionIsEmpty,   null,         null,         nf,    null,        null,   "Empty Action" },
+            { actionIsUnknown, null,         null,         ni,    null,        null,   "Unknown Action" },
+            { actionIsGood,    null,         null,         se,    null,        null,   "NULL Limit" },
+            { actionIsGood,    limitIsEmpty, null,         se,    null,        null,   "Empty Limit" },
+            { actionIsGood,    limitIsBad,   null,         se,    null,        null,   "Bad Limit" },
+            { actionIsGood,    limitIsGood,  null,         se,    null,        null,   "NULL E-mail" },
+            { actionIsGood,    limitIsGood,  emailIsEmpty, se,    null,        null,   "Empty E-mail" },
+            { actionIsGood,    limitIsGood,  emailIsBad,   se,    null,        null,   "Bad E-mail" },
+            { actionIsGood,    limitIsGood,  emailIsGood,  ok,    before[0],   null,   "Valid Request" },
         });
     }
 }
