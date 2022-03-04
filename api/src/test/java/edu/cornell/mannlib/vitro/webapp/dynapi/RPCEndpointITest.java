@@ -35,7 +35,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.mockito.MockedStatic;
 
 @RunWith(Parameterized.class)
-public class RPCEndpointIT extends ServletContextIT {
+public class RPCEndpointITest extends ServletContextITest {
 
     private final static String URI_BASE = "http://localhost:8080" + RPC_SERVLET_PATH;
 
@@ -181,7 +181,7 @@ public class RPCEndpointIT extends ServletContextIT {
         String emailIsGood = "example@localhost";
 
         Method[] before = new Method[] {
-            RPCEndpointIT.class.getDeclaredMethod("mockSparqlResponseEmptySuccess")
+            RPCEndpointITest.class.getDeclaredMethod("mockSparqlResponseEmptySuccess")
         };
 
         return Arrays.asList(new Object[][] {
