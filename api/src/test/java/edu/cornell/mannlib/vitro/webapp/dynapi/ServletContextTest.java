@@ -47,14 +47,6 @@ public abstract class ServletContextTest {
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
-    protected void loadModelsFromN3(String fileFormat, String... paths) throws IOException {
-        for(String path : paths){
-            loadModel(
-                    new RDFFile(fileFormat, path)
-            );
-        }
-    }
-
     protected void loadTestModel() throws IOException {
         // all actions reuse testSparqlQuery1 from testing action
         loadModel(
@@ -80,6 +72,12 @@ public abstract class ServletContextTest {
         for (RDFFile rdfFile : rdfFiles) {
             String rdf = readFile(rdfFile.path);
             ontModel.read(new StringReader(rdf), null, rdfFile.format);
+        }
+    }
+
+    protected void loadModels(String fileFormat, String... paths) throws IOException {
+        for (String path : paths) {
+            loadModel(new RDFFile(fileFormat, path));
         }
     }
 

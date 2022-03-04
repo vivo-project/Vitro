@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_BASE_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_SERVLET_PATH;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
@@ -30,7 +30,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 public class RPCEndpointTest {
 
 	private final static String PATH_INFO = "/test";
-	private final static String CONTEXT_PATH = RPC_BASE_PATH + PATH_INFO;
 
 	private Map<String, String[]> params;
 
@@ -80,7 +79,7 @@ public class RPCEndpointTest {
 	public void doPostTest() {
 		OperationResult result = new OperationResult(HttpServletResponse.SC_OK);
 
-		when(request.getContextPath()).thenReturn(CONTEXT_PATH);
+		when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
 		when(request.getPathInfo()).thenReturn(PATH_INFO);
 		when(action.run(any(OperationData.class))).thenReturn(result);
 
