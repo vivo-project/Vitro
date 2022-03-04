@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_BASE_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
 import static java.lang.String.format;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Resource;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
 
-@WebServlet(name = "RESTEndpoint", urlPatterns = { REST_BASE_PATH + "/*" })
+@WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
 public class RESTEndpoint extends VitroHttpServlet {
 
 	private static final Log log = LogFactory.getLog(RESTEndpoint.class);

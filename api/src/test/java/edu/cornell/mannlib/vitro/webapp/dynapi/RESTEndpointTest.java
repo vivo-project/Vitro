@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_BASE_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -40,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
 public class RESTEndpointTest {
 
 	private final static String PATH_INFO = "/1/test";
-	private final static String CONTEXT_PATH = REST_BASE_PATH + PATH_INFO;
 
 	private Map<String, String[]> params = new HashMap<>();
 
@@ -173,7 +172,7 @@ public class RESTEndpointTest {
 
 	private void prepareMocks(String method, String actionName) {
 		when(request.getMethod()).thenReturn(method);
-		when(request.getContextPath()).thenReturn(CONTEXT_PATH);
+		when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
 		when(request.getPathInfo()).thenReturn(PATH_INFO);
 
 		when(action.run(any(OperationData.class)))
@@ -206,7 +205,7 @@ public class RESTEndpointTest {
 
 	private void prepareMocksCustomAction(String method, String actionName) {
 		when(request.getMethod()).thenReturn(method);
-		when(request.getContextPath()).thenReturn(CONTEXT_PATH + "/" + actionName);
+		when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
 		when(request.getPathInfo()).thenReturn(PATH_INFO + "/" + actionName);
 
 		when(action.run(any(OperationData.class)))

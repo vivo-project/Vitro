@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_SERVLET_PATH;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_IMPLEMENTED;
@@ -36,8 +37,7 @@ import org.mockito.MockedStatic;
 @RunWith(Parameterized.class)
 public class RPCEndpointITest extends ServletContextITest {
 
-    private final static String URI_CONTEXT = "/api/rpc/";
-    private final static String URI_BASE = "http://localhost" + URI_CONTEXT;
+    private final static String URI_BASE = "http://localhost:8080" + RPC_SERVLET_PATH;
 
     private RPCEndpoint rpcEndpoint;
 
@@ -92,13 +92,13 @@ public class RPCEndpointITest extends ServletContextITest {
         loadDefaultModel();
 
         when(request.getServletContext()).thenReturn(servletContext);
-        when(request.getContextPath()).thenReturn(URI_CONTEXT);
+        when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
 
         actionPool.init(request.getServletContext());
         actionPool.reload();
 
         if (testAction != null) {
-            StringBuffer buffer = new StringBuffer(URI_BASE + testAction);
+            StringBuffer buffer = new StringBuffer(URI_BASE + "/" + testAction);
             when(request.getRequestURL()).thenReturn(buffer);
             when(request.getPathInfo()).thenReturn("/" + testAction);
         }
