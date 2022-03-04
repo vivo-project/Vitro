@@ -11,12 +11,14 @@ public class ModelComponent implements Removable {
 	public void setModelName(String name) {
 		this.name = ModelNames.namesMap.get(name);
 	}
+
+	public String getName() {
+		return name;
+	}
+
 	@Override
 	public void dereference() {
 		this.name = null;
-	}
-	public String getName() {
-		return name;
 	}
 
 }
