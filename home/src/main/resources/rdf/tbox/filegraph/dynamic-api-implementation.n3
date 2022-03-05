@@ -21,11 +21,11 @@ dynapi:model rdfs:subClassOf dynapi_java:ModelComponent .
 
 dynapi:parameter rdfs:subClassOf dynapi_java:Parameter .
 
-dynapi:primitiveParameterType rdfs:subClassOf dynapi_java:PrimitiveParameterType, dynapi_java:ParameterType .
+dynapi:primitiveParameterType rdfs:subClassOf dynapi_java:types.PrimitiveParameterType, dynapi_java:types.ParameterType .
 
-dynapi:arrayParameterType rdfs:subClassOf dynapi_java:ArrayParameterType, dynapi_java:ParameterType .
+dynapi:arrayParameterType rdfs:subClassOf dynapi_java:types.ArrayParameterType, dynapi_java:types.ParameterType .
 
-dynapi:objectParameterType rdfs:subClassOf dynapi_java:ObjectParameterType, dynapi_java:ParameterType .
+dynapi:objectParameterType rdfs:subClassOf dynapi_java:types.ObjectParameterType, dynapi_java:types.ParameterType .
 
 dynapi:resourceAPI rdfs:subClassOf dynapi_java:ResourceAPI .
 

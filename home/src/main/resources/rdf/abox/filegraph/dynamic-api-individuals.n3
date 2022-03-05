@@ -40,8 +40,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDboolean>
         a                       dynapi:parameterType ,
                                 dynapi:primitiveParameterType ,
-                                dynapi_java:ParameterType ,
-                                dynapi:PrimitiveParameterType ;
+                                dynapi_java:types.ParameterType ,
+                                dynapi_java:types.PrimitiveParameterType ;
         dynapi:name             "boolean" ;
         rdfs:label              "Boolean type"@en-US ;
         vitro:mostSpecificType  dynapi:primitiveParameterType .
@@ -49,8 +49,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDdecimal>
         a                       dynapi:parameterType ,
                                 dynapi:primitiveParameterType ,
-                                dynapi_java:ParameterType ,
-                                dynapi:PrimitiveParameterType ;
+                                dynapi_java:types.ParameterType ,
+                                dynapi_java:types.PrimitiveParameterType ;
         dynapi:name             "decimal" ;
         rdfs:label              "Decimal type"@en-US ;
         vitro:mostSpecificType  dynapi:primitiveParameterType .
@@ -58,8 +58,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger>
         a                       dynapi:parameterType ,
                                 dynapi:primitiveParameterType ,
-                                dynapi_java:ParameterType ,
-                                dynapi:PrimitiveParameterType ;
+                                dynapi_java:types.ParameterType ,
+                                dynapi_java:types.PrimitiveParameterType ;
         dynapi:name             "integer" ;
         rdfs:label              "Integer type"@en-US ;
         vitro:mostSpecificType  dynapi:primitiveParameterType .
@@ -67,8 +67,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDobject>
         a                       dynapi:parameterType ,
                                 dynapi:objectParameterType ,
-                                dynapi_java:ParameterType ,
-                                dynapi_java:ObjectParameterType ;
+                                dynapi_java:types.ParameterType ,
+                                dynapi_java:types.ObjectParameterType ;
         dynapi:name             "object" ;
         rdfs:label              "Object type"@en-US ;
         vitro:mostSpecificType  dynapi:objectParameterType .
@@ -76,8 +76,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDarray>
         a                       dynapi:parameterType ,
                                 dynapi:arrayParameterType ,
-                                dynapi_java:ParameterType ,
-                                dynapi_java:ArrayParameterType ;
+                                dynapi_java:types.ParameterType ,
+                                dynapi_java:types.ArrayParameterType ;
         dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
         vitro:mostSpecificType  dynapi:arrayParameterType .
@@ -85,8 +85,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring>
         a                       dynapi:parameterType ,
                                 dynapi:primitiveParameterType ,
-                                dynapi_java:ParameterType ,
-                                dynapi:PrimitiveParameterType ;
+                                dynapi_java:types.ParameterType ,
+                                dynapi_java:types.PrimitiveParameterType ;
         dynapi:name             "string" ;
         rdfs:label              "String type"@en-US ;
         vitro:mostSpecificType  dynapi:primitiveParameterType .

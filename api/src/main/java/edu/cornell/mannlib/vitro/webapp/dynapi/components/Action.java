@@ -39,12 +39,12 @@ public class Action implements Poolable<String>, Operation, Link {
 		return firstStep.run(input);
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#firstStep", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
 	public void setStep(OperationalStep step) {
 		this.firstStep = step;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#assignedRPC", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC", minOccurs = 1, maxOccurs = 1)
 	public void setRPC(RPC rpc) {
 		this.rpc = rpc;
 	}

@@ -5,12 +5,11 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction4>
         a                                   dynapi:action ;
         rdfs:label                          "Test person action 4"@en-US ;
-        dynapi:assignedRPC                  <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC4> ;
-        dynapi:firstStep                    <https://vivoweb.org/ontology/vitro-dynamic-api/step/testPersonStep4> .
+        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC4> ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testPersonStep4> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testPersonStep4>
         a                                   dynapi:step, dynapi:operationalStep ;
@@ -19,73 +18,76 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC4>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc create person 4" ;
-        dynapi:rpcName                      "test_person"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
-        dynapi:rpcAPIVersionMin             "4.3.7" .
+        rdfs:label                          "Test rpc create person 4"@en-US ;
+        dynapi:name                         "test_person" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:minAPIVersion                "4.3.7" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetPersonRPC4>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc get person 4" ;
-        dynapi:rpcName                      "test_person"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
-        dynapi:rpcAPIVersionMin             "4.3.7" .
+        rdfs:label                          "Test rpc get person 4"@en-US ;
+        dynapi:name                         "test_person" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "4.3.7" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC4>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc update person 4" ;
-        dynapi:rpcName                      "test_person"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
-        dynapi:rpcAPIVersionMin             "4.3.7" .
+        rdfs:label                          "Test rpc update person 4"@en-US ;
+        dynapi:name                         "test_person" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:minAPIVersion                "4.3.7" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchPersonRPC4>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc patch person 4" ;
-        dynapi:rpcName                      "test_person"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
-        dynapi:rpcAPIVersionMin             "4.3.7" .
+        rdfs:label                          "Test rpc patch person 4"@en-US ;
+        dynapi:name                         "test_person" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
+        dynapi:minAPIVersion                "4.3.7" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeletePersonRPC4>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc delete person 4" ;
-        dynapi:rpcName                      "test_person"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
-        dynapi:rpcAPIVersionMin             "4.3.7" .
+        rdfs:label                          "Test rpc delete person 4"@en-US ;
+        dynapi:name                         "test_person" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:minAPIVersion                "4.3.7" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_person_custom_action4>
         a                                   dynapi:customRESTAction ;
-        dynapi:resourceName                 "Test person custom action 4" ;
-        dynapi:customRESTActionName         "test_person_custom_action_name" ;
-        dynapi:forwardTo                    <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeletePersonRPC4> ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
-        dynapi:rpcAPIVersionMin             "4.3.7" .
+        rdfs:label                          "Test person custom action 4"@en-US ;
+        dynapi:name                         "test_person_custom_action_name" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC4> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/resource/testPersonResource4>
-        a                                   dynapi:resource ;
-        dynapi:resourceName                 "test_person_resource" ;
-        rdfs:label                          "Test person resource 4"@en-US ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testPersonResource4>
+        a                                   dynapi:resourceAPI ;
+        rdfs:label                          "Test person resourceAPI 4.3.7"@en-US ;
+        dynapi:name                         "test_person_resource" ;
+        dynapi:minAPIVersion                "4.3.7" ;
         dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC4> ;
         dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetPersonRPC4> ;
         dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC4> ;
         dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchPersonRPC4> ;
         dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeletePersonRPC4> ;
-        dynapi:hasCustomRESTAction          <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_person_custom_action4> ;
-        dynapi:restAPIVersionMin            "4.3.7" .
+        dynapi:hasCustomRESTAction          <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_person_custom_action4> .
+
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC2>
-        dynapi:rpcAPIVersionMax             "2.0.0" .
+        dynapi:maxAPIVersion                "2.0.0" .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetPersonRPC2>
-        dynapi:rpcAPIVersionMax             "2.0.0" .
+        dynapi:maxAPIVersion                "2.0.0" .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC2>
-        dynapi:rpcAPIVersionMax             "2.0.0" .
+        dynapi:maxAPIVersion                "2.0.0" .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchPersonRPC2>
-        dynapi:rpcAPIVersionMax             "2.0.0" .
+        dynapi:maxAPIVersion                "2.0.0" .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeletePersonRPC2>
-        dynapi:rpcAPIVersionMax             "2.0.0" .
+        dynapi:maxAPIVersion                "2.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_person_custom_action2>
-        dynapi:rpcAPIVersionMax             "2.0.0" .
+        dynapi:maxAPIVersion                "2.0.0" .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/resource/testPersonResource2>
-        dynapi:restAPIVersionMax            "2.0.0" .
-
+<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testPersonResource2>
+        dynapi:maxAPIVersion                "2.0.0" .

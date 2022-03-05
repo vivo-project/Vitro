@@ -2,13 +2,13 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import static java.lang.String.format;
 
-public class ResourceKey implements Comparable<ResourceKey>, Versioned {
+public class ResourceAPIKey implements Comparable<ResourceAPIKey>, Versioned {
 
     private final String name;
 
     private final Version version;
 
-    private ResourceKey(String name, String version) {
+    private ResourceAPIKey(String name, String version) {
         this.name = name;
         this.version = Version.of(version);
     }
@@ -43,7 +43,7 @@ public class ResourceKey implements Comparable<ResourceKey>, Versioned {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        ResourceKey other = (ResourceKey) obj;
+        ResourceAPIKey other = (ResourceAPIKey) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -62,7 +62,7 @@ public class ResourceKey implements Comparable<ResourceKey>, Versioned {
     }
 
     @Override
-    public int compareTo(ResourceKey o) {
+    public int compareTo(ResourceAPIKey o) {
         int nameCompare = this.name.compareTo(o.name);
         if (nameCompare == 0) {
             return this.version.compareTo(o.version);
@@ -75,8 +75,8 @@ public class ResourceKey implements Comparable<ResourceKey>, Versioned {
         return format("%s (%s)", name, version.toString());
     }
 
-    public static ResourceKey of(String name, String version) {
-        return new ResourceKey(name, version);
+    public static ResourceAPIKey of(String name, String version) {
+        return new ResourceAPIKey(name, version);
     }
 
 }

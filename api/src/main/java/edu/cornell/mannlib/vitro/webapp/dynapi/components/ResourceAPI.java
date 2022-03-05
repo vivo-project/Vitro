@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Resource implements Versionable<ResourceKey> {
+public class ResourceAPI implements Versionable<ResourceAPIKey> {
 
 	private String name;
 	private String versionMin;
@@ -34,7 +34,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return versionMin;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMin", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", maxOccurs = 1)
 	public void setVersionMin(String versionMin) {
 		this.versionMin = versionMin;
 	}
@@ -44,7 +44,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return versionMax;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMax", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion", maxOccurs = 1)
 	public void setVersionMax(String versionMax) {
 		this.versionMax = versionMax;
 	}
@@ -53,14 +53,14 @@ public class Resource implements Versionable<ResourceKey> {
 		return name;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#resourceName", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	@Override
-	public ResourceKey getKey() {
-		return ResourceKey.of(name, versionMin);
+	public ResourceAPIKey getKey() {
+		return ResourceAPIKey.of(name, versionMin);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return rpcOnGet;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", maxOccurs = 1)
 	public void setRpcOnGet(RPC rpcOnGet) {
 		this.rpcOnGet = rpcOnGet;
 	}
@@ -81,7 +81,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return rpcOnPost;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", maxOccurs = 1)
 	public void setRpcOnPost(RPC rpcOnPost) {
 		this.rpcOnPost = rpcOnPost;
 	}
@@ -90,7 +90,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return rpcOnDelete;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", maxOccurs = 1)
 	public void setRpcOnDelete(RPC rpcOnDelete) {
 		this.rpcOnDelete = rpcOnDelete;
 	}
@@ -99,7 +99,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return rpcOnPut;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", maxOccurs = 1)
 	public void setRpcOnPut(RPC rpcOnPut) {
 		this.rpcOnPut = rpcOnPut;
 	}
@@ -108,7 +108,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return rpcOnPatch;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", maxOccurs = 1)
 	public void setRpcOnPatch(RPC rpcOnPatch) {
 		this.rpcOnPatch = rpcOnPatch;
 	}
