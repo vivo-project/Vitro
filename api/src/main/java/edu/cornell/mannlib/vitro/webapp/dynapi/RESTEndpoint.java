@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResource;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
@@ -64,66 +65,81 @@ public class RESTEndpoint extends VitroHttpServlet {
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response) {
+		String method = request.getMethod();
 		RequestPath requestPath = RequestPath.from(request);
 
-		if (requestPath.isValid()) {
-			ResourceKey resourceKey = ResourceKey.of(requestPath.getResourceName(), requestPath.getResourceVersion());
+		if (!requestPath.isValid()) {
+			log.error(format("Request path %s is not found", request.getPathInfo()));
+			OperationResult.notFound().prepareResponse(response);
+			return;
+		}
 
-			if (log.isDebugEnabled()) {
-				resourcePool.printKeys();
-			}
-			Resource resource = resourcePool.get(resourceKey);
-			ResourceKey key = resource.getKey();
-			String method = request.getMethod();
+		if (!requestPath.isMethodAllowed(method)) {
+			log.error(format("Method %s not allowed at path %s", method, request.getPathInfo()));
+			OperationResult.methodNotAllowed().prepareResponse(response);
+			return;
+		}
 
-			RPC rpc = null;
+		ResourceKey resourceKey = ResourceKey.of(requestPath.getResourceName(), requestPath.getResourceVersion());
 
-			if (requestPath.isCustomRestAction()) {
-				String customRestActionName = requestPath.getActionName();
-				try {
-					rpc = resource.getCustomRestActionRPC(customRestActionName);
-				} catch (UnsupportedOperationException e) {
-					log.error(format("Custom REST action %s not implemented for resource %s", customRestActionName, key), e);
-					OperationResult.notImplemented().prepareResponse(response);
-					return;
-				} finally {
-					resource.removeClient();
-				}
-			} else {
-				try {
-					rpc = resource.getRestRPC(method);
-				} catch (UnsupportedOperationException e) {
-					log.error(format("Method %s not implemented for resource %s", method, key), e);
-					OperationResult.notImplemented().prepareResponse(response);
-					return;
-				} finally {
-					resource.removeClient();
-				}
-			}
+		if (log.isDebugEnabled()) {
+			resourcePool.printKeys();
+		}
+		Resource resource = resourcePool.get(resourceKey);
 
-			HTTPMethod rpcMethod = rpc.getHttpMethod();
+		if (resource instanceof DefaultResource) {
+			log.error(format("Resource %s not found", resourceKey));
+			OperationResult.notFound().prepareResponse(response);
+			return;
+		}
 
-			if (rpcMethod == null || !rpcMethod.getName().toUpperCase().equals(method)) {
-				log.error(format("Remote Procedure Call not implemented for resource %s with method %s", key, method));
-				OperationResult.notImplemented().prepareResponse(response);
-				return;
-			}
+		ResourceKey key = resource.getKey();
 
-			String actionName = rpc.getName();
+		RPC rpc = null;
 
-			if (log.isDebugEnabled()) {
-				actionPool.printKeys();
-			}
-			Action action = actionPool.get(actionName);
-			OperationData input = new OperationData(request);
+		if (requestPath.isCustomRestAction()) {
+			String customRestActionName = requestPath.getActionName();
 			try {
-				OperationResult result = action.run(input);
-				result.prepareResponse(response);
+				rpc = resource.getCustomRestActionRPC(customRestActionName);
+			} catch (UnsupportedOperationException e) {
+				log.error(format("Custom REST action %s not implemented for resource %s", customRestActionName, key), e);
+				OperationResult.methodNotAllowed().prepareResponse(response);
+				return;
 			} finally {
-				action.removeClient();
+				resource.removeClient();
 			}
 		} else {
-			OperationResult.notFound().prepareResponse(response);
+			try {
+				rpc = resource.getRestRPC(method);
+			} catch (UnsupportedOperationException e) {
+				log.error(format("Method %s not implemented for resource %s", method, key), e);
+				OperationResult.methodNotAllowed().prepareResponse(response);
+				return;
+			} finally {
+				resource.removeClient();
+			}
+		}
+
+		HTTPMethod rpcMethod = rpc.getHttpMethod();
+
+		if (rpcMethod == null || !rpcMethod.getName().toUpperCase().equals(method)) {
+			log.error(format("Remote Procedure Call not implemented for resource %s with method %s", key, method));
+			OperationResult.methodNotAllowed().prepareResponse(response);
+			return;
+		}
+
+		String actionName = rpc.getName();
+
+		if (log.isDebugEnabled()) {
+			actionPool.printKeys();
+		}
+		Action action = actionPool.get(actionName);
+		OperationData input = new OperationData(request);
+		try {
+			OperationResult result = action.run(input);
+			result.prepareResponse(response);
+		} finally {
+			action.removeClient();
 		}
 	}
 

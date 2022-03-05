@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
@@ -34,7 +32,7 @@ public class Action implements Poolable<String>, Operation, Link {
 	@Override
 	public OperationResult run(OperationData input) {
 		if (firstStep == null) {
-			return new OperationResult(HttpServletResponse.SC_NOT_IMPLEMENTED);
+			return OperationResult.internalServerError();
 		}
 		return firstStep.run(input);
 	}

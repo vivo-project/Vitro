@@ -47,7 +47,7 @@ public class OperationalStep implements Step{
 	}
 	
 	public OperationResult run(OperationData data) {
-		OperationResult result = OperationResult.notImplemented();
+		OperationResult result = OperationResult.badRequest();
 		log.debug("Processing in STEP");
 		log.debug("Execution step is optional? " + optional);
 		if (operation != null) {

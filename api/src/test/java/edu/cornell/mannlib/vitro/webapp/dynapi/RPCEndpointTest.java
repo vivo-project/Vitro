@@ -72,7 +72,7 @@ public class RPCEndpointTest {
 	public void doGetTest() {
 		rpcEndpoint.doGet(request, response);
 		verify(action, times(0)).run(any());
-		verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 	}
 
 	@Test
@@ -101,13 +101,13 @@ public class RPCEndpointTest {
 	public void doDeleteTest() {
 		rpcEndpoint.doDelete(request, response);
 		verify(action, times(0)).run(any());
-		verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 	}
 
 	@Test
 	public void doPutTest() {
 		rpcEndpoint.doPut(request, response);
 		verify(action, times(0)).run(any());
-		verify(response, times(1)).setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+		verify(response, times(1)).setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 	}
 }

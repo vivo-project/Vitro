@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -27,7 +28,11 @@ public abstract class ServletContextITest extends ServletContextTest {
     }
 
     protected String readMockFile(String path) throws IOException {
-        return super.readFile("src/test/resources/dynapi/mock/" + path);
+        return readFile("src/test/resources/dynapi/mock/" + path);
+    }
+
+    protected InputStream readMockFileAsInputStream(String path) throws IOException {
+        return readFileAsInputStream("src/test/resources/dynapi/mock/" + path);
     }
 
     protected void mockParameterIntoMap(String name, String value) {
