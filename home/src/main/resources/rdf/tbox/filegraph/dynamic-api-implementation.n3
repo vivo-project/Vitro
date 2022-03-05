@@ -21,9 +21,13 @@ dynapi:model rdfs:subClassOf dynapi_java:ModelComponent .
 
 dynapi:parameter rdfs:subClassOf dynapi_java:Parameter .
 
-dynapi:parameterType rdfs:subClassOf dynapi_java:ParameterType .
+dynapi:primitiveParameterType rdfs:subClassOf dynapi_java:PrimitiveParameterType, dynapi_java:ParameterType .
 
-dynapi:resource rdfs:subClassOf dynapi_java:Resource .
+dynapi:arrayParameterType rdfs:subClassOf dynapi_java:ArrayParameterType, dynapi_java:ParameterType .
+
+dynapi:objectParameterType rdfs:subClassOf dynapi_java:ObjectParameterType, dynapi_java:ParameterType .
+
+dynapi:resourceAPI rdfs:subClassOf dynapi_java:ResourceAPI .
 
 dynapi:rpc rdfs:subClassOf dynapi_java:RPC .
 
@@ -31,3 +35,4 @@ dynapi:httpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
 
 dynapi:customRESTAction rdfs:subClassOf dynapi_java:CustomRESTAction .
 
+dynapi:api rdfs:subClassOf dynapi_java:APIInformation .

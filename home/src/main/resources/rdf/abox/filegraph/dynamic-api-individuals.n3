@@ -25,12 +25,12 @@
         vitro:mostSpecificType  dynapi:validator .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>
-        a                                       dynapi:validator ,
-                                                dynapi_java:validators.Validator ,
-                                                dynapi_java:validators.RegularExpressionValidator ;
-        dynapi:validatorRegularExpressionValue  "^(.+)@(\\S+)$" ;
-        rdfs:label                              "Is email"@en-US ;
-        vitro:mostSpecificType                  dynapi:validator .
+        a                                   dynapi:validator ,
+                                            dynapi_java:validators.Validator ,
+                                            dynapi_java:validators.RegularExpressionValidator ;
+        dynapi:regularExpression            "^(.+)@(\\S+)$" ;
+        rdfs:label                          "Is email"@en-US ;
+        vitro:mostSpecificType              dynapi:validator .
 
 #-------------------------------------------------------------------------------
 #
@@ -39,45 +39,57 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDboolean>
         a                       dynapi:parameterType ,
-                                dynapi_java:ParameterType ;
-        dynapi:typeName         "boolean" ;
+                                dynapi:primitiveParameterType ,
+                                dynapi_java:ParameterType ,
+                                dynapi:PrimitiveParameterType ;
+        dynapi:name             "boolean" ;
         rdfs:label              "Boolean type"@en-US ;
-        vitro:mostSpecificType  dynapi:parameterType .
+        vitro:mostSpecificType  dynapi:primitiveParameterType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDdecimal>
         a                       dynapi:parameterType ,
-                                dynapi_java:ParameterType ;
-        dynapi:typeName         "decimal" ;
+                                dynapi:primitiveParameterType ,
+                                dynapi_java:ParameterType ,
+                                dynapi:PrimitiveParameterType ;
+        dynapi:name             "decimal" ;
         rdfs:label              "Decimal type"@en-US ;
-        vitro:mostSpecificType  dynapi:parameterType .
+        vitro:mostSpecificType  dynapi:primitiveParameterType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger>
         a                       dynapi:parameterType ,
-                                dynapi_java:ParameterType ;
-        dynapi:typeName         "integer" ;
+                                dynapi:primitiveParameterType ,
+                                dynapi_java:ParameterType ,
+                                dynapi:PrimitiveParameterType ;
+        dynapi:name             "integer" ;
         rdfs:label              "Integer type"@en-US ;
-        vitro:mostSpecificType  dynapi:parameterType .
+        vitro:mostSpecificType  dynapi:primitiveParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDindividual>
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDobject>
         a                       dynapi:parameterType ,
-                                dynapi_java:ParameterType ;
-        dynapi:typeName         "individual" ;
-        rdfs:label              "Individual type"@en-US ;
-        vitro:mostSpecificType  dynapi:parameterType .
+                                dynapi:objectParameterType ,
+                                dynapi_java:ParameterType ,
+                                dynapi_java:ObjectParameterType ;
+        dynapi:name             "object" ;
+        rdfs:label              "Object type"@en-US ;
+        vitro:mostSpecificType  dynapi:objectParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDlist>
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDarray>
         a                       dynapi:parameterType ,
-                                dynapi_java:ParameterType ;
-        dynapi:typeName         "list" ;
-        rdfs:label              "List type"@en-US ;
-        vitro:mostSpecificType  dynapi:parameterType .
+                                dynapi:arrayParameterType ,
+                                dynapi_java:ParameterType ,
+                                dynapi_java:ArrayParameterType ;
+        dynapi:name             "array" ;
+        rdfs:label              "Array type"@en-US ;
+        vitro:mostSpecificType  dynapi:arrayParameterType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring>
         a                       dynapi:parameterType ,
-                                dynapi_java:ParameterType ;
-        dynapi:typeName         "string" ;
+                                dynapi:primitiveParameterType ,
+                                dynapi_java:ParameterType ,
+                                dynapi:PrimitiveParameterType ;
+        dynapi:name             "string" ;
         rdfs:label              "String type"@en-US ;
-        vitro:mostSpecificType  dynapi:parameterType .
+        vitro:mostSpecificType  dynapi:primitiveParameterType .
 
 #-------------------------------------------------------------------------------
 #
@@ -86,43 +98,43 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_assertions>
         a                       dynapi:model ;
-        dynapi:modelName        "TBOX_ASSERTIONS" ;
+        dynapi:name             "TBOX_ASSERTIONS" ;
         rdfs:label              "tbox assertions model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions>
         a                       dynapi:model ;
-        dynapi:modelName        "ABOX_ASSERTIONS" ;
+        dynapi:name             "ABOX_ASSERTIONS" ;
         rdfs:label              "abox assertions model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_union>
         a                       dynapi:model ;
-        dynapi:modelName        "ABOX_UNION" ;
+        dynapi:name             "ABOX_UNION" ;
         rdfs:label              "abox union model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_union>
         a                       dynapi:model ;
-        dynapi:modelName        "TBOX_UNION" ;
+        dynapi:name             "TBOX_UNION" ;
         rdfs:label              "tbox union model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union>
         a                       dynapi:model ;
-        dynapi:modelName        "FULL_UNION" ;
+        dynapi:name             "FULL_UNION" ;
         rdfs:label              "full union model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/application_metadata>
         a                       dynapi:model ;
-        dynapi:modelName        "APPLICATION_METADATA" ;
+        dynapi:name             "APPLICATION_METADATA" ;
         rdfs:label              "application metadata model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/user_accounts>
         a                       dynapi:model ;
-        dynapi:modelName        "USER_ACCOUNTS" ;
+        dynapi:name             "USER_ACCOUNTS" ;
         rdfs:label              "user accounts model"@en-US ;
         vitro:mostSpecificType  dynapi:model .
 
@@ -133,36 +145,36 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get>
         a                       dynapi:httpMethod ;
-        dynapi:methodName       "GET" ;
+        dynapi:name             "GET" ;
         rdfs:label              "HTTP GET method"@en-US ;
         vitro:mostSpecificType  dynapi:httpMethod .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post>
         a                       dynapi:httpMethod ;
-        dynapi:methodName       "POST" ;
+        dynapi:name             "POST" ;
         rdfs:label              "HTTP POST method"@en-US ;
         vitro:mostSpecificType  dynapi:httpMethod .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put>
         a                       dynapi:httpMethod ;
-        dynapi:methodName       "PUT" ;
+        dynapi:name             "PUT" ;
         rdfs:label              "HTTP PUT method"@en-US ;
         vitro:mostSpecificType  dynapi:httpMethod .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch>
         a                       dynapi:httpMethod ;
-        dynapi:methodName       "PATCH" ;
+        dynapi:name             "PATCH" ;
         rdfs:label              "HTTP PATCH method"@en-US ;
         vitro:mostSpecificType  dynapi:httpMethod .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete>
         a                       dynapi:httpMethod ;
-        dynapi:methodName       "DELETE" ;
+        dynapi:name             "DELETE" ;
         rdfs:label              "HTTP DELETE method"@en-US ;
         vitro:mostSpecificType  dynapi:httpMethod .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/options>
         a                       dynapi:httpMethod ;
-        dynapi:methodName       "OPTIONS" ;
+        dynapi:name             "OPTIONS" ;
         rdfs:label              "HTTP OPTIONS method"@en-US ;
         vitro:mostSpecificType  dynapi:httpMethod .

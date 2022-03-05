@@ -7,10 +7,10 @@
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
     <owl:Ontology rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api"/>
-    
 
 
-    <!-- 
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Object Properties
@@ -18,11 +18,9 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
-   
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#operation -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
@@ -31,7 +29,7 @@
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
         <rdfs:label xml:lang="en-US">has operation</rdfs:label>
     </owl:ObjectProperty>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator -->
@@ -42,48 +40,48 @@
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
         <rdfs:label xml:lang="en-US">has validator</rdfs:label>
     </owl:ObjectProperty>
-    
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#firstStep -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#firstStep">
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep -->
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en-US">first step</rdfs:label>
     </owl:ObjectProperty>
-    
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#next -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#next">
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep -->
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en-US">next</rdfs:label>
     </owl:ObjectProperty>
-    
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#nextIfFalse -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#nextIfFalse">
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse -->
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en-US">next step if condition fails</rdfs:label>
     </owl:ObjectProperty>
-    
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#nextIfTrue -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#nextIfTrue">
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue -->
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en-US">next step if condition is met</rdfs:label>
     </owl:ObjectProperty>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter -->
@@ -94,7 +92,7 @@
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:label xml:lang="en-US">provides parameter</rdfs:label>
     </owl:ObjectProperty>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess -->
@@ -105,7 +103,7 @@
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#role"/>
         <rdfs:label xml:lang="en-US">requires access</rdfs:label>
     </owl:ObjectProperty>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter -->
@@ -116,84 +114,87 @@
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:label xml:lang="en-US">requires parameter</rdfs:label>
     </owl:ObjectProperty>
-    
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasQueryModel -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasQueryModel">
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasModel -->
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasModel">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#model"/>
         <rdfs:label xml:lang="en-US">has query model</rdfs:label>
     </owl:ObjectProperty>
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasTemplateModel -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasType -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasTemplateModel">
-        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#model"/>
-        <rdfs:label xml:lang="en-US">has template model</rdfs:label>
-    </owl:ObjectProperty>
-
-
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasParameterType -->
-
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasParameterType">
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasType">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
-        <rdfs:label xml:lang="en-US">has parameter type</rdfs:label>
+        <rdfs:label xml:lang="en-US">has type</rdfs:label>
     </owl:ObjectProperty>
-    
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasElementsOfType">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#arrayParameterType"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
+        <rdfs:label xml:lang="en-US">type of elements in an array</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement">
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#objectParameterType"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
+        <rdfs:label xml:lang="en-US">has internal element</rdfs:label>
+    </owl:ObjectProperty>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#onGet -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#onGet">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:label xml:lang="en-US">on GET</rdfs:label>
     </owl:ObjectProperty>
-    
+
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#onPost -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#onPost">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:label xml:lang="en-US">on POST</rdfs:label>
     </owl:ObjectProperty>
 
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#onDelete -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#onDelete">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:label xml:lang="en-US">on DELETE</rdfs:label>
     </owl:ObjectProperty>
 
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#onPut -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#onPut">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:label xml:lang="en-US">on PUT</rdfs:label>
     </owl:ObjectProperty>
- 
-    
+
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#onPatch -->
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#onPatch">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:label xml:lang="en-US">on PATCH</rdfs:label>
     </owl:ObjectProperty>
@@ -203,15 +204,15 @@
 
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
         <rdfs:label xml:lang="en-US">has custom action</rdfs:label>
     </owl:ObjectProperty>
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#forwardTo -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#forwardTo">
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
@@ -221,9 +222,9 @@
 
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#assignedRPC -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#assignedRPC">
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
@@ -231,17 +232,19 @@
     </owl:ObjectProperty>
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#defaultMethod -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod -->
 
-    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#defaultMethod">
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
         <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod"/>
         <rdfs:label xml:lang="en-US">default http method</rdfs:label>
     </owl:ObjectProperty>
-       
 
-    <!-- 
+
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Data properties
@@ -249,18 +252,16 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
-
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasN3Text -->
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasN3Text">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#n3Text">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#n3Template"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">has n3 text</rdfs:label>
+        <rdfs:label xml:lang="en-US">n3 text</rdfs:label>
     </owl:DatatypeProperty>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText -->
@@ -272,8 +273,8 @@
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">SPARQL query text</rdfs:label>
     </owl:DatatypeProperty>
-    
-    
+
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText -->
 
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText">
@@ -283,27 +284,27 @@
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">solr query text</rdfs:label>
     </owl:DatatypeProperty>
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrField -->
-    
+
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrField">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">solr query fields to be returned</rdfs:label>
     </owl:DatatypeProperty>
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrFilter -->
-    
+
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrFilter">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">solr query filter</rdfs:label>
     </owl:DatatypeProperty>
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrLimit -->
-    
+
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrLimit">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
@@ -311,9 +312,9 @@
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">solr query limit parameter</rdfs:label>
     </owl:DatatypeProperty>
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrOffset -->
-    
+
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrOffset">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
@@ -321,36 +322,36 @@
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">solr query offset parameter</rdfs:label>
     </owl:DatatypeProperty>
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrSort -->
-    
+
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrSort">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">solr query sort parameter</rdfs:label>
     </owl:DatatypeProperty>
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrFacet -->
-    
+
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#solrFacet">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:label xml:lang="en-US">solr query facet parameter</rdfs:label>
     </owl:DatatypeProperty>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasQuestion -->
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasQuestion">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#question">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">has question</rdfs:label>
+        <rdfs:label xml:lang="en-US">question</rdfs:label>
     </owl:DatatypeProperty>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#isOptional -->
@@ -361,131 +362,101 @@
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
         <rdfs:label xml:lang="en-US">is optional</rdfs:label>
     </owl:DatatypeProperty>
-    
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#rpcName">
+
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#name">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">rpc name</rdfs:label>
-    </owl:DatatypeProperty>
-
-
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#modelName">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#model"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">model name</rdfs:label>
-    </owl:DatatypeProperty>
-
-
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#paramName">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">parameter name</rdfs:label>
+        <rdfs:label xml:lang="en-US">name</rdfs:label>
     </owl:DatatypeProperty>
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#validatorMinNumericValue">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#minValue">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
         <rdfs:label xml:lang="en-US">validator min value</rdfs:label>
     </owl:DatatypeProperty>
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#validatorMaxNumericValue">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#maxValue">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
         <rdfs:label xml:lang="en-US">validator max value</rdfs:label>
     </owl:DatatypeProperty>
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#validatorMinLengthValue">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#minLength">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
-        <rdfs:label xml:lang="en-US">validator min length value</rdfs:label>
+        <rdfs:label xml:lang="en-US">validator min length </rdfs:label>
     </owl:DatatypeProperty>
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#validatorMaxLengthValue">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#maxLength">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
-        <rdfs:label xml:lang="en-US">validator max length value</rdfs:label>
+        <rdfs:label xml:lang="en-US">validator max length </rdfs:label>
     </owl:DatatypeProperty>
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#validatorRegularExpressionValue">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">validator regular expression value</rdfs:label>
+        <rdfs:label xml:lang="en-US">validator regular expression </rdfs:label>
     </owl:DatatypeProperty>
 
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#typeName">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">type name</rdfs:label>
-      </owl:DatatypeProperty>
-
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#resourceName">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">resource name</rdfs:label>
-      </owl:DatatypeProperty>
-
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMin">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">REST API minimum version</rdfs:label>
-      </owl:DatatypeProperty>
-
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMax">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resource"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">REST API maximum version</rdfs:label>
-      </owl:DatatypeProperty>
-
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#rpcAPIVersionMin">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">RPC API minimum version</rdfs:label>
-      </owl:DatatypeProperty>
+        <rdfs:label xml:lang="en-US">API minimum version</rdfs:label>
+    </owl:DatatypeProperty>
 
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#rpcAPIVersionMax">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">RPC API maximum version</rdfs:label>
-      </owl:DatatypeProperty>
+        <rdfs:label xml:lang="en-US">API maximum version</rdfs:label>
+    </owl:DatatypeProperty>
 
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#methodName">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#title">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#api"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">http method name</rdfs:label>
-      </owl:DatatypeProperty>
+        <rdfs:label xml:lang="en-US">title</rdfs:label>
+    </owl:DatatypeProperty>
 
-     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTActionName">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#description">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#api"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">custom action name</rdfs:label>
-      </owl:DatatypeProperty>
+        <rdfs:label xml:lang="en-US">description</rdfs:label>
+    </owl:DatatypeProperty>
 
-    <!-- 
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#version">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#api"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label xml:lang="en-US">version</rdfs:label>
+    </owl:DatatypeProperty>
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Classes
     //
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
-
-    
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#action -->
@@ -495,7 +466,7 @@
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider"/>
         <rdfs:label xml:lang="en-US">Action</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep -->
@@ -504,7 +475,7 @@
         <rdfs:label xml:lang="en-US">Conditional step</rdfs:label>
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
     </owl:Class>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#parameter -->
@@ -520,8 +491,21 @@
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType">
         <rdfs:label xml:lang="en-US">Parameter type</rdfs:label>
     </owl:Class>
-    
 
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#primitiveParameterType">
+        <rdfs:label xml:lang="en-US">Primitive parameter type</rdfs:label>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#objectParameterType">
+        <rdfs:label xml:lang="en-US">Object parameter type</rdfs:label>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
+    </owl:Class>
+
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#arrayParameterType">
+        <rdfs:label xml:lang="en-US">Array parameter type</rdfs:label>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
+    </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#role -->
 
@@ -529,7 +513,7 @@
         <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:label xml:lang="en-US">Role</rdfs:label>
     </owl:Class>
-    
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider">
@@ -550,7 +534,7 @@
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
         <rdfs:label xml:lang="en-US">sparql Query</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery -->
@@ -561,7 +545,7 @@
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
         <rdfs:label xml:lang="en-US">SolrQuery</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#step -->
@@ -575,7 +559,7 @@
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
         <rdfs:label xml:lang="en-US">Operational step</rdfs:label>
     </owl:Class>
-    
+
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#operation -->
 
@@ -591,7 +575,7 @@
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operation"/>
         <rdfs:label xml:lang="en-US">Template</rdfs:label>
     </owl:Class>
-    
+
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#n3Template -->
 
@@ -633,18 +617,17 @@
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#model">
         <rdfs:label xml:lang="en-US">Model</rdfs:label>
     </owl:Class>
-    
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#resource -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#resource">
-        <rdfs:label xml:lang="en-US">Resource</rdfs:label>
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI">
+        <rdfs:label xml:lang="en-US">Resource API</rdfs:label>
     </owl:Class>
-        
+
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#rpc -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#rpc">
-        <rdfs:label xml:lang="en-US">RPC </rdfs:label>
+        <rdfs:label xml:lang="en-US">RPC</rdfs:label>
     </owl:Class>
 
 
@@ -660,9 +643,12 @@
         <rdfs:label xml:lang="en-US">Custom REST action</rdfs:label>
     </owl:Class>
 
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#api">
+        <rdfs:label xml:lang="en-US">API description</rdfs:label>
+    </owl:Class>
+
 </rdf:RDF>
 
 
 
 <!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
-
