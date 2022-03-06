@@ -34,7 +34,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 		return versionMin;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", minOccurs = 0, maxOccurs = 1)
 	public void setVersionMin(String versionMin) {
 		this.versionMin = versionMin;
 	}
@@ -72,7 +72,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 		return rpcOnGet;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", minOccurs = 0, maxOccurs = 1)
 	public void setRpcOnGet(RPC rpcOnGet) {
 		this.rpcOnGet = rpcOnGet;
 	}
@@ -81,7 +81,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 		return rpcOnPost;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", minOccurs = 0, maxOccurs = 1)
 	public void setRpcOnPost(RPC rpcOnPost) {
 		this.rpcOnPost = rpcOnPost;
 	}
@@ -90,7 +90,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 		return rpcOnDelete;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", minOccurs = 0, maxOccurs = 1)
 	public void setRpcOnDelete(RPC rpcOnDelete) {
 		this.rpcOnDelete = rpcOnDelete;
 	}
@@ -99,7 +99,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 		return rpcOnPut;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", minOccurs = 0, maxOccurs = 1)
 	public void setRpcOnPut(RPC rpcOnPut) {
 		this.rpcOnPut = rpcOnPut;
 	}
@@ -108,7 +108,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 		return rpcOnPatch;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", minOccurs = 0, maxOccurs = 1)
 	public void setRpcOnPatch(RPC rpcOnPatch) {
 		this.rpcOnPatch = rpcOnPatch;
 	}

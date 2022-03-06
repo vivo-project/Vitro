@@ -26,5 +26,4 @@ public class ResourceAPIPool extends VersionableAbstractPool<ResourceAPIKey, Res
 	public Class<ResourceAPI> getType() {
 		return ResourceAPI.class;
 	}
-
 }
