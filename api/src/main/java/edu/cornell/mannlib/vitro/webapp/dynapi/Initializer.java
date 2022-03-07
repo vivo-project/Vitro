@@ -8,8 +8,8 @@ public class Initializer implements ServletContextListener {
 	public Initializer() {}
 
 	private void initializeResourcePool(ServletContext ctx) {
-		ResourcePool resourcePool = ResourcePool.getInstance();
-		resourcePool.init(ctx);		
+		ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
+		resourceAPIPool.init(ctx);
 	}
 
 	private void initializeActionPool(ServletContext ctx) {

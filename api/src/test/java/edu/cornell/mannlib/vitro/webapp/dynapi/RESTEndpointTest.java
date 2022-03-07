@@ -35,8 +35,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Resource;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 
 @RunWith(Parameterized.class)
 public class RESTEndpointTest {
@@ -45,7 +45,7 @@ public class RESTEndpointTest {
 
 	private Map<String, String[]> params = new HashMap<>();
 
-	private MockedStatic<ResourcePool> resourcePoolStatic;
+	private MockedStatic<ResourceAPIPool> resourceAPIPoolStatic;
 
 	private MockedStatic<ActionPool> actionPoolStatic;
 
@@ -53,13 +53,13 @@ public class RESTEndpointTest {
 	private ServletContext context;
 
 	@Mock
-	private ResourcePool resourcePool;
+	private ResourceAPIPool resourceAPIPool;
 
 	@Mock
 	private ActionPool actionPool;
 
 	@Mock
-	private Resource resource;
+	private ResourceAPI resourceAPI;
 
 	@Mock
 	private RPC rpc;
@@ -99,11 +99,11 @@ public class RESTEndpointTest {
 	@Before
 	public void beforeEach() {
 		MockitoAnnotations.openMocks(this);
-		resourcePoolStatic = mockStatic(ResourcePool.class);
+		resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
 		actionPoolStatic = mockStatic(ActionPool.class);
 
-		when(ResourcePool.getInstance()).thenReturn(resourcePool);
-		when(resourcePool.get(any(ResourceKey.class))).thenReturn(resource);
+		when(ResourceAPIPool.getInstance()).thenReturn(resourceAPIPool);
+		when(resourceAPIPool.get(any(ResourceAPIKey.class))).thenReturn(resourceAPI);
 
 		when(ActionPool.getInstance()).thenReturn(actionPool);
 		when(actionPool.get(any(String.class))).thenReturn(action);
@@ -116,7 +116,7 @@ public class RESTEndpointTest {
 
 	@After
 	public void afterEach() {
-		resourcePoolStatic.close();
+		resourceAPIPoolStatic.close();
 		actionPoolStatic.close();
 	}
 
@@ -134,15 +134,15 @@ public class RESTEndpointTest {
 		when(rpc.getName()).thenReturn(testActionName);
 		when(rpc.getHttpMethod()).thenReturn(httpMethod);
 
-		when(resource.getRestRPC(testMethod)).thenReturn(rpc);
-		when(resource.getCustomRestActionRPC(testActionName)).thenReturn(rpc);
-		doNothing().when(resource).removeClient();
+		when(resourceAPI.getRestRPC(testMethod)).thenReturn(rpc);
+		when(resourceAPI.getCustomRestActionRPC(testActionName)).thenReturn(rpc);
+		doNothing().when(resourceAPI).removeClient();
 
 		run(testMethod);
-		
-		verify(resource, times(expectedCounts[0])).getRestRPC(any());
-		verify(resource, times(expectedCounts[1])).getCustomRestActionRPC(any());
-		verify(resource, times(expectedCounts[2])).removeClient();
+
+		verify(resourceAPI, times(expectedCounts[0])).getRestRPC(any());
+		verify(resourceAPI, times(expectedCounts[1])).getCustomRestActionRPC(any());
+		verify(resourceAPI, times(expectedCounts[2])).removeClient();
 		verify(action, times(expectedCounts[3])).run(any());
 		verify(action, times(expectedCounts[4])).removeClient();
 		verify(response, times(expectedCounts[5])).setStatus(expectedStatus);

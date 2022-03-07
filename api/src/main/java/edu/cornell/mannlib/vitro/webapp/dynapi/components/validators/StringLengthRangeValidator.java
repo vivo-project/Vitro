@@ -16,7 +16,7 @@ public class StringLengthRangeValidator extends IsNotBlank {
 		return minLength;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMinLengthValue", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minLength", maxOccurs = 1)
 	public void setMinLength(int minLength) {
 		this.minLength = minLength;
 	}
@@ -25,7 +25,7 @@ public class StringLengthRangeValidator extends IsNotBlank {
 		return maxLength;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMaxLengthValue", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxLength", maxOccurs = 1)
 	public void setMaxLength(int maxValue) {
 		this.maxLength = maxValue;
 	}

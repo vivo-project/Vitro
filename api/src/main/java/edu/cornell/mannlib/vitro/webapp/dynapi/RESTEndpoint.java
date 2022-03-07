@@ -15,12 +15,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResource;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Resource;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
@@ -28,7 +28,7 @@ public class RESTEndpoint extends VitroHttpServlet {
 
 	private static final Log log = LogFactory.getLog(RESTEndpoint.class);
 
-	private ResourcePool resourcePool = ResourcePool.getInstance();
+	private ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
 	private ActionPool actionPool = ActionPool.getInstance();
 
 	@Override
@@ -80,43 +80,43 @@ public class RESTEndpoint extends VitroHttpServlet {
 			return;
 		}
 
-		ResourceKey resourceKey = ResourceKey.of(requestPath.getResourceName(), requestPath.getResourceVersion());
+		ResourceAPIKey resourceAPIKey = ResourceAPIKey.of(requestPath.getResourceName(), requestPath.getResourceVersion());
 
 		if (log.isDebugEnabled()) {
-			resourcePool.printKeys();
+			resourceAPIPool.printKeys();
 		}
-		Resource resource = resourcePool.get(resourceKey);
+		ResourceAPI resourceAPI = resourceAPIPool.get(resourceAPIKey);
 
-		if (resource instanceof DefaultResource) {
-			log.error(format("Resource %s not found", resourceKey));
+		if (resourceAPI instanceof DefaultResourceAPI) {
+			log.error(format("ResourceAPI %s not found", resourceAPIKey));
 			OperationResult.notFound().prepareResponse(response);
 			return;
 		}
 
-		ResourceKey key = resource.getKey();
+		ResourceAPIKey key = resourceAPI.getKey();
 
 		RPC rpc = null;
 
 		if (requestPath.isCustomRestAction()) {
 			String customRestActionName = requestPath.getActionName();
 			try {
-				rpc = resource.getCustomRestActionRPC(customRestActionName);
+				rpc = resourceAPI.getCustomRestActionRPC(customRestActionName);
 			} catch (UnsupportedOperationException e) {
 				log.error(format("Custom REST action %s not implemented for resource %s", customRestActionName, key), e);
 				OperationResult.methodNotAllowed().prepareResponse(response);
 				return;
 			} finally {
-				resource.removeClient();
+				resourceAPI.removeClient();
 			}
 		} else {
 			try {
-				rpc = resource.getRestRPC(method);
+				rpc = resourceAPI.getRestRPC(method);
 			} catch (UnsupportedOperationException e) {
 				log.error(format("Method %s not implemented for resource %s", method, key), e);
 				OperationResult.methodNotAllowed().prepareResponse(response);
 				return;
 			} finally {
-				resource.removeClient();
+				resourceAPI.removeClient();
 			}
 		}
 
