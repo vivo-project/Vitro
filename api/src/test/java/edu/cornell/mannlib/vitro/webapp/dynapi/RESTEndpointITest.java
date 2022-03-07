@@ -60,7 +60,7 @@ public class RESTEndpointITest extends ServletContextITest {
 
     private ActionPool actionPool;
 
-    private ResourcePool resourcePool;
+    private ResourceAPIPool resourceAPIPool;
 
     @Mock
     private QueryExecution queryExecution;
@@ -106,7 +106,7 @@ public class RESTEndpointITest extends ServletContextITest {
     @Before
     public void beforeEach() throws IOException {
         actionPool = ActionPool.getInstance();
-        resourcePool = ResourcePool.getInstance();
+        resourceAPIPool = ResourceAPIPool.getInstance();
 
         restEndpoint = new RESTEndpoint();
 
@@ -116,8 +116,8 @@ public class RESTEndpointITest extends ServletContextITest {
         actionPool.init(servletContext);
         actionPool.reload();
 
-        resourcePool.init(servletContext);
-        resourcePool.reload();
+        resourceAPIPool.init(servletContext);
+        resourceAPIPool.reload();
 
         MockitoAnnotations.openMocks(this);
 
