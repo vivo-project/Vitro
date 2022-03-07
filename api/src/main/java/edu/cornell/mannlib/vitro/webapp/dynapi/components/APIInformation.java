@@ -1,16 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import org.apache.jena.datatypes.RDFDatatype;
-
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class APIInformation {
 

@@ -24,4 +24,8 @@ public abstract class ParameterType implements Removable {
 		// TODO Auto-generated method stub
 	}
 
+	public String getName() {
+		return name;
+	}
+
 }

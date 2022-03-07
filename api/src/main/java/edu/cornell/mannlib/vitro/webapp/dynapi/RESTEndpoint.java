@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.REST_SERVLET_PATH;
 import static java.lang.String.format;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
-import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
+import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
 public class RESTEndpoint extends VitroHttpServlet {
@@ -66,7 +66,7 @@ public class RESTEndpoint extends VitroHttpServlet {
 
 	private void process(HttpServletRequest request, HttpServletResponse response) {
 		String method = request.getMethod();
-		RequestPath requestPath = RequestPath.from(request);
+		ApiRequestPath requestPath = ApiRequestPath.from(request);
 
 		if (!requestPath.isValid()) {
 			log.error(format("Request path %s is not found", request.getPathInfo()));

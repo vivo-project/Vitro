@@ -7,7 +7,7 @@ import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class RequestPath {
+public class ApiRequestPath {
 
     public static final String RESOURCE_ID_PARAM = "RESOURCE_ID";
 
@@ -27,7 +27,7 @@ public class RequestPath {
 
     private final String actionName;
 
-    private RequestPath(HttpServletRequest request) {
+    private ApiRequestPath(HttpServletRequest request) {
         String servletPath = request != null && request.getServletPath() != null
                 ? request.getServletPath()
                 : EMPTY;
@@ -147,8 +147,8 @@ public class RequestPath {
         return isNotEmpty(resourceVersion) && isNotEmpty(resourceName) && isNotEmpty(actionName);
     }
 
-    public static RequestPath from(HttpServletRequest request) {
-        return new RequestPath(request);
+    public static ApiRequestPath from(HttpServletRequest request) {
+        return new ApiRequestPath(request);
     }
 
     public enum RequestType {

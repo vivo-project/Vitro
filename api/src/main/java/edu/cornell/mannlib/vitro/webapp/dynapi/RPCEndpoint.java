@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_SERVLET_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC_SERVLET_PATH;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
+import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 @WebServlet(name = "RPCEndpoint", urlPatterns = { RPC_SERVLET_PATH + "/*" })
 public class RPCEndpoint extends VitroHttpServlet {
@@ -28,7 +28,7 @@ public class RPCEndpoint extends VitroHttpServlet {
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		RequestPath requestPath = RequestPath.from(request);
+		ApiRequestPath requestPath = ApiRequestPath.from(request);
 		if (requestPath.isValid()) {
 			if (log.isDebugEnabled()) {
 				actionPool.printKeys(); 

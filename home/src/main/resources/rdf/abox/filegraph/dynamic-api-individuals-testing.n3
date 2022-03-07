@@ -11,7 +11,49 @@
         a                                   dynapi:action ;
         rdfs:label                          "Test action"@en-US ;
         dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1> ;
-        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> ;
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testResultParameter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testResultParameter>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result parameter"@en-US ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/testResultArray> ;
+        dynapi:name                         "result" ;
+        dynapi:description                  "Test action result" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/testResultArray>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        dynapi:name                         "result array" ;
+        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/testResultElement> ;
+        rdfs:label                          "Result Array type"@en-US ;
+        vitro:mostSpecificType              dynapi:arrayParameterType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/testResultElement>
+        a                                   dynapi:parameterType,
+                                            dynapi:objectParameterType ;
+        rdfs:label                          "Test result element parameter"@en-US ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDobject> ;
+        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testResultElementActionParameter> ;
+        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testResultElementLabelParameter> ;
+        dynapi:name                         "result element" ;
+        vitro:mostSpecificType              dynapi:objectParameterType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testResultElementActionParameter>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result element action parameter"@en-US ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        dynapi:name                         "action" ;
+        dynapi:description                  "Test action result element action" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testResultElementLabelParameter>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result element label parameter"@en-US ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        dynapi:name                         "label" ;
+        dynapi:description                  "Test action result element label" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1>
         a                                   dynapi:step, dynapi:operationalStep ;

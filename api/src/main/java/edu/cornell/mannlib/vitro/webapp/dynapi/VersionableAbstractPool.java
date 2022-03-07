@@ -1,6 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versionable;
@@ -9,6 +11,14 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versioned;
 public abstract class VersionableAbstractPool<K extends Versioned, C extends Versionable<K>, P extends Pool<K, C>>
         extends AbstractPool<K, C, P> {
 
+    public List<C> getComponents(Version version) {
+        return getComponents()
+            .values()
+            .stream()
+            .filter(component -> isInRange(component, version))
+            .collect(Collectors.toList());
+    }
+
     public C get(K key) {
         C component = null;
         Entry<K, C> entry = getComponents().floorEntry(key);
@@ -16,22 +26,7 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
             component = entry.getValue();
             String keyName = key.getName();
             Version keyVersion = key.getVersion();
-            // ensure key name matches component key name
-            if (keyName.equals(component.getKey().getName())) {
-                boolean hasVersionMax = component.getVersionMax() != null;
-                boolean hasVersionMin = component.getVersionMin() != null;
-                if (hasVersionMax) {
-                    // ensure key version is not greater than component version max
-                    if (greaterThanVersionMax(component, keyVersion)) {
-                        component = null;
-                    }
-                } else if (hasVersionMin) {
-                    // ensure key version specific values are respected
-                    if (mismatchSpecificVersion(component, keyVersion)) {
-                        component = null;
-                    }
-                }
-            } else {
+            if (!matchesName(component, keyName) || !isInRange(component, keyVersion)) {
                 component = null;
             }
         }
@@ -42,6 +37,30 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
 
         component.addClient();
         return component;
+    }
+
+    private boolean matchesName(C component, String keyName) {
+        // ensure key name matches component key name
+        return keyName.equals(component.getKey().getName());
+    }
+
+    private boolean isInRange(C component, Version keyVersion) {
+        boolean hasVersionMax = component.getVersionMax() != null;
+        boolean hasVersionMin = component.getVersionMin() != null;
+
+        if (hasVersionMax) {
+            // ensure key version is not greater than component version max
+            if (greaterThanVersionMax(component, keyVersion)) {
+                return false;
+            }
+        } else if (hasVersionMin) {
+            // ensure key version specific values are respected
+            if (mismatchSpecificVersion(component, keyVersion)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private boolean greaterThanVersionMax(C component, Version keyVersion) {
