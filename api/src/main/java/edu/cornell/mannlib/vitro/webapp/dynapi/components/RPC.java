@@ -18,7 +18,7 @@ public class RPC implements Removable {
 		return name;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rpcName", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -27,12 +27,12 @@ public class RPC implements Removable {
 		return minVersion;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rpcAPIVersionMin", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", maxOccurs = 1)
 	public void setMinVersion(String minVersion) {
 		this.minVersion = minVersion;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rpcAPIVersionMax", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion", maxOccurs = 1)
 	public void setMaxVersion(String maxVersion) {
 		this.maxVersion = maxVersion;
 	}
@@ -45,7 +45,7 @@ public class RPC implements Removable {
 		return httpMethod;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultMethod")
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod")
 	public void setHttpMethod(HTTPMethod httpMethod) {
 		this.httpMethod = httpMethod;
 	}

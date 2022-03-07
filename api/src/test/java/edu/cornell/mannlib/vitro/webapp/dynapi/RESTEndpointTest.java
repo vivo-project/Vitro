@@ -33,8 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Resource;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 
 @RunWith(Parameterized.class)
 public class RESTEndpointTest {
@@ -43,7 +43,7 @@ public class RESTEndpointTest {
 
 	private Map<String, String[]> params = new HashMap<>();
 
-	private MockedStatic<ResourcePool> resourcePoolStatic;
+	private MockedStatic<ResourceAPIPool> resourcePoolStatic;
 
 	private MockedStatic<ActionPool> actionPoolStatic;
 
@@ -51,13 +51,13 @@ public class RESTEndpointTest {
 	private ServletContext context;
 
 	@Mock
-	private ResourcePool resourcePool;
+	private ResourceAPIPool resourceAPIPool;
 
 	@Mock
 	private ActionPool actionPool;
 
 	@Mock
-	private Resource resource;
+	private ResourceAPI resourceAPI;
 
 	@Mock
 	private RPC rpc;
@@ -85,11 +85,11 @@ public class RESTEndpointTest {
 	@Before
 	public void beforeEach() {
 		MockitoAnnotations.openMocks(this);
-		resourcePoolStatic = mockStatic(ResourcePool.class);
+		resourcePoolStatic = mockStatic(ResourceAPIPool.class);
 		actionPoolStatic = mockStatic(ActionPool.class);
 
-		when(ResourcePool.getInstance()).thenReturn(resourcePool);
-		when(resourcePool.get(any(ResourceKey.class))).thenReturn(resource);
+		when(ResourceAPIPool.getInstance()).thenReturn(resourceAPIPool);
+		when(resourceAPIPool.get(any(ResourceAPIKey.class))).thenReturn(resourceAPI);
 
 		when(ActionPool.getInstance()).thenReturn(actionPool);
 		when(actionPool.get(any(String.class))).thenReturn(action);
@@ -183,8 +183,8 @@ public class RESTEndpointTest {
 		when(rpc.getName()).thenReturn(actionName);
 		when(rpc.getHttpMethod()).thenReturn(httpMethod);
 
-		when(resource.getRestRPC(method)).thenReturn(rpc);
-		doNothing().when(resource).removeClient();
+		when(resourceAPI.getRestRPC(method)).thenReturn(rpc);
+		doNothing().when(resourceAPI).removeClient();
 	}
 
 	private void prepareMocksNotFound(String method, String actionName) {
@@ -194,7 +194,7 @@ public class RESTEndpointTest {
 
 	private void prepareMocksUnsupportedMethod(String method, String actionName) {
 		prepareMocks(method, actionName);
-		when(resource.getRestRPC(method))
+		when(resourceAPI.getRestRPC(method))
 				.thenThrow(new UnsupportedOperationException("Unsupported method"));
 	}
 
@@ -216,13 +216,13 @@ public class RESTEndpointTest {
 		when(rpc.getName()).thenReturn(actionName);
 		when(rpc.getHttpMethod()).thenReturn(httpMethod);
 
-		when(resource.getCustomRestActionRPC(actionName)).thenReturn(rpc);
-		doNothing().when(resource).removeClient();
+		when(resourceAPI.getCustomRestActionRPC(actionName)).thenReturn(rpc);
+		doNothing().when(resourceAPI).removeClient();
 	}
 
 	private void prepareMocksUnsupportedCustomAction(String method, String actionName) {
 		prepareMocksCustomAction(method, actionName);
-		when(resource.getCustomRestActionRPC(actionName))
+		when(resourceAPI.getCustomRestActionRPC(actionName))
 			.thenThrow(new UnsupportedOperationException("Unsupported custom action"));
 	}
 
@@ -251,9 +251,9 @@ public class RESTEndpointTest {
 	}
 
 	private void verifyMocks(int[] times, int status) {
-		verify(resource, times(times[0])).getRestRPC(any());
-		verify(resource, times(times[1])).getCustomRestActionRPC(any());
-		verify(resource, times(times[2])).removeClient();
+		verify(resourceAPI, times(times[0])).getRestRPC(any());
+		verify(resourceAPI, times(times[1])).getCustomRestActionRPC(any());
+		verify(resourceAPI, times(times[2])).removeClient();
 		verify(action, times(times[3])).run(any());
 		verify(action, times(times[4])).removeClient();
 		verify(response, times(times[5])).setStatus(status);

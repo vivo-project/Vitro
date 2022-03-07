@@ -12,7 +12,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Before;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
@@ -21,10 +21,10 @@ import stubs.javax.servlet.ServletContextStub;
 public abstract class ServletContextTest {
 
     protected final static String TEST_ACTION_NAME = "test_action";
-    protected final static ResourceKey TEST_RESOURCE_KEY = ResourceKey.of("test_resource", "0.1.0");
+    protected final static ResourceAPIKey TEST_RESOURCE_KEY = ResourceAPIKey.of("test_resource", "0.1.0");
 
     protected final static String TEST_PERSON_ACTION_NAME = "test_person";
-    protected final static ResourceKey TEST_PERSON_RESOURCE_KEY = ResourceKey.of("test_person_resource", "1.0.0");
+    protected final static ResourceAPIKey TEST_PERSON_RESOURCE_KEY = ResourceAPIKey.of("test_person_resource", "1.0.0");
 
     protected ServletContextStub servletContext;
     protected ModelAccessFactoryStub modelAccessFactory;

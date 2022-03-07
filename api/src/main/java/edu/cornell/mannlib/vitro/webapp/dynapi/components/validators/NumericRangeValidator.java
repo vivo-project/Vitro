@@ -17,7 +17,7 @@ public class NumericRangeValidator extends IsNotBlank {
 		return minValue;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMinNumericValue", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minNumeric", maxOccurs = 1)
 	public void setMinValue(float minValue) {
 		this.minValue = minValue;
 	}
@@ -26,7 +26,7 @@ public class NumericRangeValidator extends IsNotBlank {
 		return maxValue;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorMaxNumericValue", maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxNumeric", maxOccurs = 1)
 	public void setMaxValue(float maxValue) {
 		this.maxValue = maxValue;
 	}

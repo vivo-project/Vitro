@@ -31,17 +31,17 @@ public class OperationalStep implements Step{
 		}
 	}
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#next", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep", maxOccurs = 1)
 	public void setNextStep(OperationalStep step) {
 		this.nextStep = step;
 	}	 
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation", maxOccurs = 1)
 	public void setOperation(Operation operation) {
 		this.operation = operation;
 	}
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#isOptional", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#isOptional", maxOccurs = 1)
 	public void setOptional(boolean optional) {
 		this.optional = optional;
 	}
