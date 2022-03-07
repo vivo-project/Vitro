@@ -3,7 +3,9 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,6 +87,12 @@ public abstract class ServletContextTest {
         Path p = new File(path).toPath();
 
         return new String(Files.readAllBytes(p));
+    }
+
+    protected InputStream readFileAsInputStream(String path) throws IOException {
+        File file = new File(path);
+
+        return new FileInputStream(file);
     }
 
     protected class RDFFile {

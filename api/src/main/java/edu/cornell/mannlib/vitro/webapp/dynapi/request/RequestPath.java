@@ -124,6 +124,25 @@ public class RequestPath {
         return isValid;
     }
 
+    public boolean isMethodAllowed(String method) {
+        switch (method.toUpperCase()) {
+            case "POST":
+                return resourceId == null;
+            case "PUT":
+            case "PATCH":
+            case "DELETE":
+                return resourceId != null;
+            case "GET":
+                return true;
+            case "HEAD": // this will likely want to be true when supported
+            case "CONNECT":
+            case "OPTIONS":
+            case "TRACE":
+            default:
+        }
+        return false;
+    }
+
     public boolean isCustomRestAction() {
         return isNotEmpty(resourceVersion) && isNotEmpty(resourceName) && isNotEmpty(actionName);
     }

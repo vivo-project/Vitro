@@ -23,7 +23,7 @@ public class RPCEndpoint extends VitroHttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		OperationResult.notImplemented().prepareResponse(response);
+		OperationResult.methodNotAllowed().prepareResponse(response);
 	}
 
 	@Override
@@ -48,12 +48,12 @@ public class RPCEndpoint extends VitroHttpServlet {
 
 	@Override
 	public void doDelete(HttpServletRequest request, HttpServletResponse response) {
-		OperationResult.notImplemented().prepareResponse(response);
+		OperationResult.methodNotAllowed().prepareResponse(response);
 	}
 
 	@Override
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
-		OperationResult.notImplemented().prepareResponse(response);
+		OperationResult.methodNotAllowed().prepareResponse(response);
 	}
 
 }
