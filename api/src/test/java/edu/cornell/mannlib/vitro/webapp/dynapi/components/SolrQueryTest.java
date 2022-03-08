@@ -56,7 +56,7 @@ public class SolrQueryTest extends ServletContextTest {
     }
 
     @AfterClass
-    public static void afterEach() {
+    public static void after() {
         applicationUtils.close();
     }
 

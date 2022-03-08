@@ -10,11 +10,7 @@ public class Parameter implements Removable{
 	String name;
 	Validators validators = new Validators();
 	ParameterType type;
-	
-	public String getName() {
-		return name;
-	}
-	
+
 	public RDFDatatype getRDFDataType() {
 		return type.getRDFDataType();
 	}
@@ -32,6 +28,10 @@ public class Parameter implements Removable{
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator")
 	public void addValidator(Validator validator) {
 		validators.add(validator);
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public boolean isValid(String name, String[] values) {

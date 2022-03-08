@@ -58,11 +58,11 @@
         rdfs:label              "Integer type"@en-US ;
         vitro:mostSpecificType  dynapi:parameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDindividual>
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI>
         a                       dynapi:parameterType ,
                                 dynapi_java:ParameterType ;
-        dynapi:typeName         "individual" ;
-        rdfs:label              "Individual type"@en-US ;
+        dynapi:typeName         "anyURI" ;
+        rdfs:label              "Individualized Resource Identifier type"@en-US ;
         vitro:mostSpecificType  dynapi:parameterType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDlist>

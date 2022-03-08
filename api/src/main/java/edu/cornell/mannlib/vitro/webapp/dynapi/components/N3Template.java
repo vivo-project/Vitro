@@ -2,18 +2,18 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetractions;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResourceFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class N3Template implements Template{
 
@@ -52,6 +52,8 @@ public class N3Template implements Template{
 		return new Parameters();
 	}
 
+	public String getN3Text() { return this.n3Text; }
+
 	//endregion
 
 	@Override
@@ -86,36 +88,37 @@ public class N3Template implements Template{
 
 	private String insertParameters(OperationData input) throws InputMismatchException{
 
-		String n3WithParameters = n3Text;
+		EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
 
-		for(String token : n3Text.split(" ")){
-			if(!token.startsWith("?")){
-				continue;
-			}
-			String varName = token.substring(1);
+		//Had to convert String to List<String> to be compatible with EditN3GeneratorVTwo methods
+		List<String> n3WithParameters = Arrays.asList(n3Text);
 
-			//Is it safe to assume this condition is met?
-			if(!input.has(varName)){
-				throw new InputMismatchException("N3 template '" + varName + "' doesn't have a corresponding " +
-						"variable within OperationData");
-			}
+		//region Substitute IRI variables
+		Map<String, List<String>> parametersToUris = requiredParams.params.values().stream()
+				.filter(value->value.type.name=="anyURI")
+				.collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
 
-			//For now assuming each n3template variable can have only one value (not lists)
-			String varValue = input.get(varName)[0];
+		gen.subInMultiUris(parametersToUris, n3WithParameters);
+		//endregion
 
-			//If variable value isn't RDF resource, a number, or boolean (true/false), assumed that it a string literal,
-			// which needs to be surrounded by double quotes
-			Pattern numberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
-			if(!numberPattern.matcher(varValue).matches() &&
-					!(varValue.startsWith("<") && varValue.endsWith(">")) &&
-					!(varValue=="true" || varValue=="false")){
-				varValue = "\""+varValue+"\"";
-			}
+		//region Substitute other (literal) variables
+		Map<String, List<Literal>> parametersToLiterals = requiredParams.params.values().stream()
+				.filter(value->value.type.name!="anyURI")
+				.collect(Collectors.toMap(
+						param -> param.getName(),
+						param -> Arrays.asList(ResourceFactory.createTypedLiteral(input.get(param.name)[0]))));
 
-			n3WithParameters.replaceAll(varName,varValue);
+		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
+		//endregion
+
+		//Check if any n3 variables are left without inserted value
+		String[] leftoverVariables = Arrays.stream(n3WithParameters.get(0).split(" "))
+				.filter(token -> token.startsWith("?")).toArray(String[]::new);
+		if(leftoverVariables.length>0){
+			throw new InputMismatchException("N3 template variables:'" + Arrays.toString(leftoverVariables) +
+					"' dont have corresponding input parameters with values that should be inserted in their place.");
 		}
-
-		return n3WithParameters;
+		return n3WithParameters.get(0);
 	}
 
 	private boolean isInputValid(OperationData input) {
