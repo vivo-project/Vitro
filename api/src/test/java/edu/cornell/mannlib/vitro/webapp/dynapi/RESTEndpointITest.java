@@ -239,6 +239,7 @@ public class RESTEndpointITest extends ServletContextITest {
         String customRestActionPath = format("%s/%s", individualResourcePath, customRestActionName);
 
         return new ArrayList<>(Arrays.asList(new Object[][] {
+            // Method   RequestPath             RequestParams      RequestBody      SparqlFile     ResponseStatus         ResponseBody     Message
             { "POST",   resourcePath,           restReqParamsFile, restReqBodyFile, sparqlResFile, SC_OK,                 restResBodyFile, "Create collection resource" },
             { "GET",    resourcePath,           restReqParamsFile, null,            sparqlResFile, SC_OK,                 restResBodyFile, "Get collection resources" },
             { "PUT",    resourcePath,           restReqParamsFile, null,            null,          SC_METHOD_NOT_ALLOWED, null,            "Update not allowed on collection" },

@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.REST_SERVLET_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath.RPC_DOCS_SERVLET_PATH;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static java.lang.String.format;
 
@@ -91,14 +91,15 @@ public class DynamicAPIDocumentation {
             return openApi;
         }
 
+        System.out.print("\nMatched api (" + apiInformation.getVersion() + ") is " + apiInformation.getTitle() + ".\n");
+
         openApi.setInfo(info(apiInformation));
 
         Paths paths = new Paths();
 
-        String restPathKey = REST_SERVLET_PATH;
+        String servletPath = requestPath.getServletPath();
 
         if (requestPath.getResourceName() == null) {
-
             Version version = Version.of(apiInformation.getVersion());
 
             List<ResourceAPI> resourceAPIs = ResourceAPIPool.getInstance().getComponents(version);
@@ -106,12 +107,12 @@ public class DynamicAPIDocumentation {
             for (ResourceAPI resourceAPI : resourceAPIs) {
                 String resourceName = resourceAPI.getName();
 
-                Tag tag = tag(resourceAPI);
+                Tag tag = tag(resourceAPI, requestPath.getServletPath());
 
                 openApi.addTagsItem(tag);
 
                 // resource collection API
-                String resourceCollectionPathKey = format("%s/%s/%s", restPathKey, version, resourceName);
+                String resourceCollectionPathKey = format("%s/%s/%s", servletPath, version, resourceName);
 
                 paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
@@ -120,9 +121,7 @@ public class DynamicAPIDocumentation {
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
             }
-
         } else {
-
             String resourceName = requestPath.getResourceName();
             String version = apiInformation.getVersion();
 
@@ -130,12 +129,12 @@ public class DynamicAPIDocumentation {
 
             ResourceAPI resourceAPI = ResourceAPIPool.getInstance().get(resourceAPIKey);
 
-            Tag tag = tag(resourceAPI);
+            Tag tag = tag(resourceAPI, requestPath.getServletPath());
 
             openApi.addTagsItem(tag);
 
             // resource collection API
-            String resourceCollectionPathKey = format("%s/%s/%s", restPathKey, version, resourceName);
+            String resourceCollectionPathKey = format("%s/%s/%s", servletPath, version, resourceName);
 
             paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
@@ -143,7 +142,6 @@ public class DynamicAPIDocumentation {
             String resourceIndividualPathKey = format("%s/resource:{resourceId}", resourceCollectionPathKey);
 
             paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
-
         }
 
         openApi.paths(paths);
@@ -160,30 +158,42 @@ public class DynamicAPIDocumentation {
         return info;
     }
 
-    private Tag tag(ResourceAPI resourceAPI) {
+    private Tag tag(ResourceAPI resourceAPI, String servletPath) {
         Tag tag = new Tag();
-        tag.setName(resourceAPI.getName());
+
+        if (resourceAPI.getName() == null) {
+            tag.setName("All");
+        } else {
+            tag.setName(resourceAPI.getName());
+        }
+
         // No description available per resource API
-        tag.setDescription(format("REST for %s", resourceAPI.getName()));
+        String protocol = "REST";
+        if (servletPath.toLowerCase().startsWith(RPC_DOCS_SERVLET_PATH)) {
+            protocol = "RPC";
+        }
+
+        tag.setDescription(format("%s for %s.", protocol, tag.getName()));
 
         return tag;
     }
 
     private PathItem collectionPathItem(ResourceAPI resourceAPI, Tag tag) {
         ActionPool actionPool = ActionPool.getInstance();
-
         PathItem pathItem = new PathItem();
 
         // No way to distinguish an RCP get for collection or individual
         RPC collectionGetRPC = resourceAPI.getRpcOnGet();
-        Action collectionGetAction = actionPool.get(collectionGetRPC.getName());
-
-        pathItem.setGet(collectionGetOperation(collectionGetAction, tag));
+        if (collectionGetRPC != null) {
+            Action action = actionPool.get(collectionGetRPC.getName());
+            pathItem.setGet(collectionGetOperation(action, tag));
+        }
 
         RPC collectionPostRPC = resourceAPI.getRpcOnPost();
-        Action collectionPostAction = actionPool.get(collectionPostRPC.getName());
-
-        pathItem.setPost(collectionPostOperation(collectionPostAction, tag));
+        if (collectionPostRPC != null) {
+            Action action = actionPool.get(collectionPostRPC.getName());
+            pathItem.setPost(collectionPostOperation(action, tag));
+        }
 
         return pathItem;
     }
@@ -197,24 +207,28 @@ public class DynamicAPIDocumentation {
 
         // No way to distinguish an RCP get for collection or individual
         RPC individualGetRPC = resourceAPI.getRpcOnGet();
-        Action individualGetAction = actionPool.get(individualGetRPC.getName());
+        if (individualGetRPC != null) {
+            Action action = actionPool.get(individualGetRPC.getName());
+            pathItem.setGet(individualGetOperation(action, tag));
+        }
 
-        pathItem.setGet(individualGetOperation(individualGetAction, tag));
+        RPC individualPutAction = resourceAPI.getRpcOnPut();
+        if (individualPutAction != null) {
+            Action action = actionPool.get(individualPutAction.getName());
+            pathItem.setPut(individualPutOperation(action, tag));
+        }
 
-        RPC individualPutRPC = resourceAPI.getRpcOnGet();
-        Action individualPutAction = actionPool.get(individualPutRPC.getName());
+        RPC individualPatchAction = resourceAPI.getRpcOnPatch();
+        if (individualPatchAction != null) {
+            Action action = actionPool.get(individualPatchAction.getName());
+            pathItem.setPatch(individualPatchOperation(action, tag));
+        }
 
-        pathItem.setPut(individualPutOperation(individualPutAction, tag));
-
-        RPC individualPatchRPC = resourceAPI.getRpcOnGet();
-        Action individualPatchAction = actionPool.get(individualPatchRPC.getName());
-
-        pathItem.setPatch(individualPatchOperation(individualPatchAction, tag));
-
-        RPC individualDeleteRPC = resourceAPI.getRpcOnGet();
-        Action individualDeleteAction = actionPool.get(individualDeleteRPC.getName());
-
-        pathItem.setDelete(individualDeleteOperation(individualDeleteAction, tag));
+        RPC individualDeleteAction = resourceAPI.getRpcOnDelete();
+        if (individualDeleteAction != null) {
+            Action action = actionPool.get(individualDeleteAction.getName());
+            pathItem.setDelete(individualDeleteOperation(action, tag));
+        }
 
         return pathItem;
     }

@@ -182,7 +182,7 @@ public class RPCEndpointITest extends ServletContextITest {
         };
 
         return Arrays.asList(new Object[][] {
-            // action          limit         email         status before       after   testMessage
+            // action          limit         email         status before       after   message
             { null,            null,         null,         nf,    null,        null,   "NULL Request" },
             { actionIsEmpty,   null,         null,         nf,    null,        null,   "Empty Action" },
             { actionIsUnknown, null,         null,         se,    null,        null,   "Unknown Action" },
