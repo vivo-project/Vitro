@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
@@ -62,15 +63,15 @@ public class SPARQLQuery implements Operation {
 	}
 	
 	@Override
-	public OperationResult run(OperationData input) {
-		if (!isInputValid(input)) {
+	public OperationResult run(OperationData inputOutput) {
+		if (!isInputValid(inputOutput)) {
 			return new OperationResult(500);
 		}
 		int resultCode = 200;
-		Model queryModel = ModelAccess.on(input.getContext()).getOntModel(modelComponent.getName());
+		Model queryModel = ModelAccess.on(inputOutput.getContext()).getOntModel(modelComponent.getName());
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
 		for (String paramName : requiredParams.getNames()) {
-			pss.setLiteral(paramName, input.get(paramName)[0],requiredParams.get(paramName).getRDFDataType());
+			pss.setLiteral(paramName, inputOutput.get(paramName)[0],requiredParams.get(paramName).getRDFDataType());
 		}
 		pss.setCommandText(queryText);
 		queryModel.enterCriticalSection(Lock.READ);
@@ -82,14 +83,17 @@ public class SPARQLQuery implements Operation {
 				List<String> vars = results.getResultVars();
 				log.debug("Query vars: " + String.join(", ", vars));
 
+				int j=0;
 				while (results.hasNext()) {
 					QuerySolution solution = results.nextSolution();
 					log.debug("Query solution " + i++);
 					for (String var :vars) {
 						if (solution.contains(var)) {
 							log.debug(var + " : " + solution.get(var));
+							inputOutput.add("result."+j+"."+var, new StringData(solution.get(var).toString()));
 						}
 					}
+					j++;
 				}
 				
 			} catch(Exception e) {
@@ -106,7 +110,7 @@ public class SPARQLQuery implements Operation {
 		} finally {
 			queryModel.leaveCriticalSection();
 		}
-		return new OperationResult(resultCode);
+		return new OperationResult(resultCode, inputOutput);
 	}
 
 	private boolean isInputValid(OperationData input) {
