@@ -28,21 +28,28 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
 
     protected void process(HttpServletRequest request, HttpServletResponse response) {
         try {
-            OpenAPI openApi = dynamicAPIDocumentation.generate(DocsRequestPath.from(request));
-            String mimeType = determineMimeType(request);
-            String content = null;
+            DocsRequestPath requestPath = DocsRequestPath.from(request);
 
-            if (mimeType.equalsIgnoreCase(APPLICATION_JSON)) {
-                content = Json.mapper().writeValueAsString(openApi);
+            if (requestPath.isValid()) {
+                OpenAPI openApi = dynamicAPIDocumentation.generate(requestPath);
+                String mimeType = determineMimeType(request);
+                String content = null;
+
+                if (mimeType.equalsIgnoreCase(APPLICATION_JSON)) {
+                    content = Json.mapper().writeValueAsString(openApi);
+                } else {
+                    JsonNode node = Yaml.mapper().convertValue(openApi, JsonNode.class);
+                    content = Yaml.pretty(node);
+                }
+
+                response.setStatus(200);
+                response.setContentType(mimeType);
+                response.getWriter().print(content);
+                response.getWriter().flush();
+                System.out.println("\n\n" + content + "\n\n");
             } else {
-                JsonNode node = Yaml.mapper().convertValue(openApi, JsonNode.class);
-                content = Yaml.pretty(node);
+                response.setStatus(400);
             }
-
-            response.setContentType(mimeType);
-            response.getWriter().print(content);
-            response.getWriter().flush();
-            System.out.println("\n\n" + content + "\n\n");
         } catch (ConfigurationBeanLoaderException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {

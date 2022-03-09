@@ -103,7 +103,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
         verify(response, times(1)).setContentType(mimeType);
 
         // Needs to compare against a pre-built expected response body.
-        //verify(responsePrintWriter, times(1)).print(expectedReponseBody);
+        // verify(responsePrintWriter, times(1)).print(expectedReponseBody);
         verify(responsePrintWriter, times(1)).flush();
     }
 
@@ -117,10 +117,10 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
             { "2.1.0", null,       false, "All, Version 2.1.0" },
             { "1",     collection, false, collection + ", Version 1" },
             { "2.1.0", collection, false, collection + ", Version 2.1.0" },
-            { "1",     null,       true, "All, Version 1" },
-            { "2.1.0", null,       true, "All, Version 2.1.0" },
-            { "1",     collection, true, collection + ", Version 1" },
-            { "2.1.0", collection, true, collection + ", Version 2.1.0" },
+            { "1",     null,       true,  "All, Version 1" },
+            { "2.1.0", null,       true,  "All, Version 2.1.0" },
+            { "1",     collection, true,  collection + ", Version 1" },
+            { "2.1.0", collection, true,  collection + ", Version 2.1.0" },
         });
     }
 
