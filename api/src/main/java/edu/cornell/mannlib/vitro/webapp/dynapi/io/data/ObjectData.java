@@ -1,11 +1,16 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.io.data;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.directwebremoting.util.DelegatingServletInputStream;
 
 import java.util.*;
 
 public class ObjectData extends ContainerData<Map<String, Data>> {
+
+    public ObjectData(){
+        super(new HashMap<>());
+    }
 
     public ObjectData(Map<String, Data> container){
         super(container);
@@ -38,12 +43,12 @@ public class ObjectData extends ContainerData<Map<String, Data>> {
             String fieldNameSecondPart = (fieldNameOtherPart.contains("."))?fieldNameOtherPart.substring(0, fieldNameOtherPart.indexOf(".")):fieldNameOtherPart;
             if (NumberUtils.isDigits(fieldNameSecondPart)){
                 if (!(internalData instanceof ArrayData)){
-                    internalData = new ArrayData(new ArrayList<>());
+                    internalData = new ArrayData();
                     container.put(fieldNameFirstPart, internalData);
                 }
             } else {
                 if (!(internalData instanceof ObjectData)){
-                    internalData = new ObjectData(new HashMap<>());
+                    internalData = new ObjectData();
                     container.put(fieldNameFirstPart, internalData);
                 }
             }
@@ -57,6 +62,16 @@ public class ObjectData extends ContainerData<Map<String, Data>> {
         List<String> retVal = new ArrayList<String>();
         for (Data item: container.values()) {
             retVal.addAll(item.getAsString());
+        }
+        return retVal;
+    }
+
+    public ObjectData filter(Set<String> fieldNames){
+        ObjectData retVal = new ObjectData();
+        for (String prefix:fieldNames){
+            Data data = this.getElement(prefix);
+            if(data!=null)
+                retVal.setElement(prefix, data);
         }
         return retVal;
     }

@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,7 +38,7 @@ public class RPCEndpoint extends VitroHttpServlet {
 			OperationData input = new OperationData(request);
 			try {
 				OperationResult result = action.run(input);
-				result.prepareResponse(response);
+				result.prepareResponse(response, ContentType.JSON.getMediaType(), action, input);
 			} finally {
 				action.removeClient();
 			}

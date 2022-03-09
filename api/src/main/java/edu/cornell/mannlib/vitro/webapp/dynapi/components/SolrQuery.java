@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
-public class SolrQuery implements Operation{
+public class SolrQuery extends Operation{
 
     private static final Log log = LogFactory.getLog(SolrQuery.class);
 
@@ -194,20 +194,6 @@ public class SolrQuery implements Operation{
         return property;
     }
 
-    private boolean isInputValid(OperationData input) {
-        for (String name : requiredParams.getNames()) {
-            if (!input.has(name)) {
-                log.error("Parameter " + name + " not found");
-                return false;
-            }
-            Parameter param = requiredParams.get(name);
-            String[] inputValues = input.get(name);
-            if (!param.isValid(name, inputValues)){
-                return false;
-            }
-        }
-        return true;
-    }
 
     @Override
     public void dereference() {

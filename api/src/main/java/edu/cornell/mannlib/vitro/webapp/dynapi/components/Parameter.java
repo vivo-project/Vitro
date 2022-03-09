@@ -1,6 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ArrayParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ObjectParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.jena.datatypes.RDFDatatype;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
@@ -51,6 +55,18 @@ public class Parameter implements Removable{
 
 	public boolean isValid(String name, String[] values) {
 		return validators.isAllValid(name, values);
+	}
+
+	public String computePrefix(String fieldName){
+		String retVal = "";
+		if (type instanceof PrimitiveParameterType)
+			retVal = type.computePrefix(fieldName, name);
+		else if (! (fieldName.contains(".")))
+			retVal = null;
+		else
+			retVal = type.computePrefix(fieldName, name);
+
+		return retVal;
 	}
 
 	@Override

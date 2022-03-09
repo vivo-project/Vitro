@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Action implements Poolable<String>, Operation, Link {
+public class Action extends Operation implements Poolable<String>, Link {
 
 	private Step firstStep = null;
 	private RPC rpc;
@@ -115,4 +115,20 @@ public class Action implements Poolable<String>, Operation, Link {
 		return true;
 	}
 
+	@Override
+	public boolean isOutputValid(OperationData inputOutput) {
+		if (! (super.isOutputValid(inputOutput)))
+			return false;
+		Parameters providedParams = getRequiredParams();
+		if(providedParams!=null) {
+			for (String name : providedParams.getNames()) {
+				Parameter param = providedParams.get(name);
+				String[] outputValues = inputOutput.get(name);
+				if (!param.isValid(name, outputValues)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }

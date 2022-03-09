@@ -26,4 +26,8 @@ public abstract class PrimitiveData<T> implements Data {
         return retVal;
     }
 
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 }

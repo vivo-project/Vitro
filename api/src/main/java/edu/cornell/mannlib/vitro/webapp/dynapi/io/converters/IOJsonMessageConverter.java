@@ -3,9 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.io.converters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ActionPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.*;
-import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -14,27 +12,19 @@ import java.util.stream.Collectors;
 
 public class IOJsonMessageConverter implements IOMessageConverter {
 
-    private final static int IOUnknown 	    = 0;
-    private final static int IOObject 	    = 1;
-    private final static int IOArray 		= 2;
-    private final static int IOInteger 	    = 3;
-    private final static int IODecimal 	    = 4;
-    private final static int IOBoolean 	    = 5;
-    private final static int IOString 	    = 6;
-
     private static IOJsonMessageConverter INSTANCE = new IOJsonMessageConverter();
 
     public static IOJsonMessageConverter getInstance() {
         return INSTANCE;
     }
 
+    private ObjectMapper mapper = new ObjectMapper();
 
     public ObjectData loadDataFromRequest(HttpServletRequest request){
         Map<String, Data> ioDataMap = new HashMap<String, Data>();
         try {
             if(request.getReader() != null && request.getReader().lines()!=null){
                 String requestData = request.getReader().lines().collect(Collectors.joining());
-                ObjectMapper mapper = new ObjectMapper();
                 JsonNode actualObj = mapper.readTree(requestData);
                 Iterator<String> fieldNames = actualObj.fieldNames();
                 while (fieldNames.hasNext()) {
@@ -49,21 +39,10 @@ public class IOJsonMessageConverter implements IOMessageConverter {
 
         }
 
-        if(ioDataMap.get("id") == null) {
-            RequestPath requestPath = RequestPath.from(request);
-            String resourceId = requestPath.getResourceId();
-            if (resourceId != null) {
-                Data resourceIdData = fromJson(new TextNode(resourceId));
-                if (resourceIdData != null)
-                    ioDataMap.put("id", resourceIdData);
-            }
-        }
         return new ObjectData(ioDataMap);
     }
 
-    // to generate response, not just a string
     public String exportDataToResponseBody(ObjectData data){
-        ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         Map<String, Data> ioDataMap = data.getContainer();
         Iterator<String> fieldNames = ioDataMap.keySet().iterator();
@@ -82,7 +61,7 @@ public class IOJsonMessageConverter implements IOMessageConverter {
     public Data fromJson(JsonNode node){
         Data retVal = null;
         switch (getDataType(node)){
-            case IOObject:
+            case Data.IOObject:
                 Map<String, Data> fields = new HashMap<String, Data>();
                 Iterator<String> fieldNames = node.fieldNames();
                 while (fieldNames.hasNext()) {
@@ -94,7 +73,7 @@ public class IOJsonMessageConverter implements IOMessageConverter {
                 }
                 retVal = new ObjectData(fields);
                 break;
-            case IOArray:
+            case Data.IOArray:
                 if (node instanceof ArrayNode){
                     ArrayNode arrayNode = (ArrayNode) node;
                     List<Data> values = new ArrayList<Data>();
@@ -106,16 +85,16 @@ public class IOJsonMessageConverter implements IOMessageConverter {
                     retVal = new ArrayData(values);
                 }
                 break;
-            case IOInteger:
+            case Data.IOInteger:
                 retVal = new IntegerData(node.asInt());
                 break;
-            case IODecimal:
+            case Data.IODecimal:
                 retVal = new DecimalData(node.asDouble());
                 break;
-            case IOBoolean:
+            case Data.IOBoolean:
                 retVal = new BooleanData(node.asBoolean());
                 break;
-            case IOString:
+            case Data.IOString:
                 retVal = new StringData(node.asText());
                 break;
         }
@@ -124,10 +103,8 @@ public class IOJsonMessageConverter implements IOMessageConverter {
 
     public JsonNode toJson(Data data){
         JsonNode retVal = null;
-        ObjectMapper mapper = null;
         switch (getDataType(data)){
-            case IOObject:
-                mapper = new ObjectMapper();
+            case Data.IOObject:
                 ObjectNode objectNode = mapper.createObjectNode();
                 Map<String, Data> fields = ((ObjectData)data).getContainer();
                 Iterator<String> fieldNames = fields.keySet().iterator();
@@ -139,8 +116,7 @@ public class IOJsonMessageConverter implements IOMessageConverter {
                 }
                 retVal = objectNode;
                 break;
-            case IOArray:
-                mapper = new ObjectMapper();
+            case Data.IOArray:
                 ArrayNode arrayNode = mapper.createArrayNode();
                 List<Data> values = ((ArrayData)data).getContainer();
                 for (Data value:values) {
@@ -149,16 +125,16 @@ public class IOJsonMessageConverter implements IOMessageConverter {
                 }
                 retVal = arrayNode;
                 break;
-            case IOInteger:
+            case Data.IOInteger:
                 retVal = IntNode.valueOf(((IntegerData)data).getValue());
                 break;
-            case IODecimal:
+            case Data.IODecimal:
                 retVal = DoubleNode.valueOf(((DecimalData)data).getValue());
                 break;
-            case IOBoolean:
+            case Data.IOBoolean:
                 retVal = BooleanNode.valueOf(((BooleanData)data).getValue());
                 break;
-            case IOString:
+            case Data.IOString:
                 retVal = TextNode.valueOf(((StringData)data).getValue());
                 break;
         }
@@ -167,38 +143,37 @@ public class IOJsonMessageConverter implements IOMessageConverter {
 
 
     private int getDataType(JsonNode node){
-        JsonNodeType nodeType = (node != null)?node.getNodeType():JsonNodeType.MISSING;
         if (node.isArray())
-            return IOArray;
+            return Data.IOArray;
         else if (node.isObject())
-            return IOObject;
+            return Data.IOObject;
         else if (node.isInt())
-            return IOInteger;
+            return Data.IOInteger;
         else if (node.isDouble())
-            return IODecimal;
+            return Data.IODecimal;
         else if (node.isBoolean())
-            return IOBoolean;
+            return Data.IOBoolean;
         else if (node.isTextual())
-            return IOString;
+            return Data.IOString;
         else
-            return IOUnknown;
+            return Data.IOUnknown;
     }
 
     private int getDataType(Data data){
         if (data instanceof ArrayData)
-            return IOArray;
+            return Data.IOArray;
         else if (data instanceof ObjectData)
-            return IOObject;
+            return Data.IOObject;
         else if (data instanceof IntegerData)
-            return IOInteger;
+            return Data.IOInteger;
         else if (data instanceof DecimalData)
-            return IODecimal;
+            return Data.IODecimal;
         else if (data instanceof BooleanData)
-            return IOBoolean;
+            return Data.IOBoolean;
         else if (data instanceof StringData)
-            return IOString;
+            return Data.IOString;
         else
-            return IOUnknown;
+            return Data.IOUnknown;
     }
 
 }

@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class SPARQLQuery implements Operation {
+public class SPARQLQuery extends Operation {
 
  	private static final Log log = LogFactory.getLog(SPARQLQuery.class);
 
@@ -90,7 +90,7 @@ public class SPARQLQuery implements Operation {
 					for (String var :vars) {
 						if (solution.contains(var)) {
 							log.debug(var + " : " + solution.get(var));
-							inputOutput.add("result."+j+"."+var, new StringData(solution.get(var).toString()));
+							inputOutput.add(computeProvidedFieldName(j+"."+var), new StringData(solution.get(var).toString()));
 						}
 					}
 					j++;
@@ -110,21 +110,11 @@ public class SPARQLQuery implements Operation {
 		} finally {
 			queryModel.leaveCriticalSection();
 		}
-		return new OperationResult(resultCode, inputOutput);
+		if (!isOutputValid(inputOutput)) {
+			return new OperationResult(500);
+		}
+		return new OperationResult(resultCode);
 	}
 
-	private boolean isInputValid(OperationData input) {
-		for (String name : requiredParams.getNames()) {
-			if (!input.has(name)) {
-				log.error("Parameter " + name + " not found");
-				return false;
-			}
-			Parameter param = requiredParams.get(name);
-			String[] inputValues = input.get(name);
-			if (!param.isValid(name, inputValues)){
-				return false;
-			}
-		}
-		return true;
-	}
+
 }

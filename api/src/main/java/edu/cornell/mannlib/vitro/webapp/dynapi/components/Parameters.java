@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class Parameters implements Removable {
 
-	Map <String, Parameter> params;
+	private Map <String, Parameter> params;
 	
 	public Parameters() {
 		params = new HashMap<String,Parameter>();

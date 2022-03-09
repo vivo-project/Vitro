@@ -8,7 +8,11 @@ import java.util.List;
 
 public class ArrayData extends ContainerData<List<Data>> {
 
-	public ArrayData(List<Data> container) {
+	public ArrayData(){
+	    super (new ArrayList<>());
+    }
+
+    public ArrayData(List<Data> container) {
         super(container);
     }
 
@@ -55,12 +59,12 @@ public class ArrayData extends ContainerData<List<Data>> {
                 String fieldNameSecondPart = (fieldNameOtherPart.contains(".")) ? fieldNameOtherPart.substring(0, fieldNameOtherPart.indexOf(".")) : fieldNameOtherPart;
                 if (NumberUtils.isDigits(fieldNameSecondPart)) {
                     if (!(internalData instanceof ArrayData)) {
-                        internalData = new ArrayData(new ArrayList<>());
+                        internalData = new ArrayData();
                         container.add(index, internalData);
                     }
                 } else {
                     if (!(internalData instanceof ObjectData)) {
-                        internalData = new ObjectData(new HashMap<>());
+                        internalData = new ObjectData();
                         container.add(index, internalData);
                     }
                 }

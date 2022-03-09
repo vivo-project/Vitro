@@ -24,4 +24,6 @@ public abstract class ParameterType implements Removable {
 		// TODO Auto-generated method stub
 	}
 
+	public abstract String computePrefix(String fieldName, String parameterName);
+
 }
