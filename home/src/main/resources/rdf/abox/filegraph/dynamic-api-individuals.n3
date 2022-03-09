@@ -66,10 +66,12 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI>
         a                       dynapi:parameterType ,
-                                dynapi_java:ParameterType ;
-        dynapi:typeName         "anyURI" ;
+        			dynapi:primitiveParameterType ,
+                                dynapi_java:types.ParameterType ,
+                                dynapi_java:types.PrimitiveParameterType ;
+        dynapi:name         	"anyURI" ;
         rdfs:label              "Individualized Resource Identifier type"@en-US ;
-        vitro:mostSpecificType  dynapi:parameterType .
+        vitro:mostSpecificType  dynapi:primitiveParameterType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDobject>
         a                       dynapi:parameterType ,

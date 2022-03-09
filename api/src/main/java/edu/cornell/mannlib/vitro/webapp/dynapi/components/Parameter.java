@@ -49,10 +49,6 @@ public class Parameter implements Removable{
 		validators.add(validator);
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public boolean isValid(String name, String[] values) {
 		return validators.isAllValid(name, values);
 	}

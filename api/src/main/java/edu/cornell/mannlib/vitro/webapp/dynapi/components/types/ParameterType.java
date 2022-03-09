@@ -13,7 +13,9 @@ public abstract class ParameterType implements Removable {
 	public RDFDatatype getRDFDataType() {
 		return new XSDDatatype(name);
 	}
-	
+
+	public String getName() { return this.name; }
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;

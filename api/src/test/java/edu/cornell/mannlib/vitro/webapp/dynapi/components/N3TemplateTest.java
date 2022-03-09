@@ -5,12 +5,12 @@ import static org.mockito.Mockito.*;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
-import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
@@ -61,9 +61,9 @@ public class N3TemplateTest extends ServletContextTest {
     public static void setupStaticObjects(){
         modelAccess = mockStatic(ModelAccess.class);
 
-        anyURI = new ParameterType();
+        anyURI = new PrimitiveParameterType();
         anyURI.setName("anyURI");
-        stringType = new ParameterType();
+        stringType = new PrimitiveParameterType();
         stringType.setName("string");
     }
 
@@ -84,7 +84,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testLoadingAndPropertiesSetup() throws IOException, ConfigurationBeanLoaderException {
         loadDefaultModel();
-        loadModelsFromN3(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
+        loadModels(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
 
         N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
         assertNotNull(n3Template);
