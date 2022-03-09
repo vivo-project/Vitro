@@ -78,21 +78,21 @@
                                             dynapi_java:types.ArrayParameterType ;
         rdfs:label                          "Test result array type"@en-US ;
         dynapi:name                         "test result array type" ;
-        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultGeolocationType> .
+        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultGeolocationType>
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType>
         a                                   dynapi:parameterType ,
                                             dynapi:objectParameterType ,
                                             dynapi_java:types.ParameterType ,
                                             dynapi_java:types.ObjectParameterType ;
-        rdfs:label                          "Test result geolocation object type"@en-US ;
-        dynapi:name                         "test result geolocation object type" ;
-        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultGeolocation> ,
+        rdfs:label                          "Test result action object type"@en-US ;
+        dynapi:name                         "test result action object type" ;
+        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction> ,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultGeolocation>
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction>
         a                                   dynapi:parameter ;
-        rdfs:label                          "Test result geolocation parameter"@en-US ;
+        rdfs:label                          "Test result action parameter"@en-US ;
         dynapi:name                         "action" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
 
