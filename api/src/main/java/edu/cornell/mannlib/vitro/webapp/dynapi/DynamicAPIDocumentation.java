@@ -166,6 +166,14 @@ public class DynamicAPIDocumentation {
 
         String servletPath = ApiRequestPath.RPC_SERVLET_PATH;
 
+        // Both "info" and "info.version" are required by OpenAPIv3, even if it is an empty string.
+        APIInformation apiInformation = new APIInformation();
+        apiInformation.setTitle("RPC API");
+        apiInformation.setDescription("An RPC API.");
+        apiInformation.setVersion("");
+
+        openApi.setInfo(info(apiInformation));
+
         if (requestPath.getActionName() == null) {
 
             Map<String, Action> actions = ActionPool.getInstance().getComponents();
@@ -506,7 +514,7 @@ public class DynamicAPIDocumentation {
 
         ApiResponses apiResponses = new ApiResponses();
 
-        addCreatedApiResponse(apiResponses);
+        addOkApiResponse(apiResponses, action);
         addUnauthorizedApiResponse(apiResponses);
         addForbiddenApiResponse(apiResponses);
         addNotFoundApiResponse(apiResponses);

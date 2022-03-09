@@ -1,0 +1,43 @@
+openapi: 3.0.1
+info:
+  title: RPC API
+  description: An RPC API.
+  version: ""
+tags:
+- name: test_process
+  description: RPC for test_process
+paths:
+  /api/rpc/test_process:
+    post:
+      tags:
+      - test_process
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+        "403":
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                type: string
+        "404":
+          description: Resource not found
+          content:
+            text/plain:
+              schema:
+                type: string

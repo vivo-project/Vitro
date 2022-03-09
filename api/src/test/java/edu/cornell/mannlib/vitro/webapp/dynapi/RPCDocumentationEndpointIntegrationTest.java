@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,6 +22,8 @@ import org.junit.runners.Parameterized.Parameter;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
+
 @RunWith(Parameterized.class)
 public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest {
 
@@ -39,9 +42,12 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest
     public String testAction;
 
     @Parameter(1)
-    public Boolean testJsonMimeType;
+    public Boolean testJson;
 
     @Parameter(2)
+    public String testExpectedResponse;
+
+    @Parameter(3)
     public String testMessage;
 
     @Before
@@ -79,7 +85,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest
             pathInfo += "/" + testAction;
         }
 
-        if (testJsonMimeType == true) {
+        if (testJson == true) {
             mimeType = "application/json";
         }
 
@@ -94,26 +100,40 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest
         rpcEndpoint.doGet(request, response);
 
         verify(response, times(1)).setContentType(mimeType);
-
-        // Needs to compare against a pre-built expected response body.
-        // verify(responsePrintWriter, times(1)).print(expectedReponseBody);
+        verify(responsePrintWriter, times(1)).print(argThat(new APIResponseMatcher(testJson, testExpectedResponse)));
         verify(responsePrintWriter, times(1)).flush();
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
-        final String action = "test_collection";
+        final String action = "test_action";
+        final String collection = "test_collection";
+        final String concept = "test_concept";
+        final String document = "test_document";
+        final String organization = "test_organization";
+        final String person = "test_person";
+        final String process = "test_process";
+        final String relationship = "test_relationship";
 
         return Arrays.asList(new Object[][] {
-            // action, json,  message
-            { null,    false, "All, Version 1" },
-            { null,    false, "All, Version 2.1.0" },
-            { action,  false, action + ", Version 1" },
-            { action,  false, action + ", Version 2.1.0" },
-            { null,    true,  "All, Version 1" },
-            { null,    true,  "All, Version 2.1.0" },
-            { action,  true,  action + ", Version 1" },
-            { action,  true,  action + ", Version 2.1.0" },
+            { null,         false, "rpc/yaml/all.yml",           "All" },
+            { action,       false, "rpc/yaml/action.yml",        action },
+            { collection,   false, "rpc/yaml/collection.yml",    collection },
+            { concept,      false, "rpc/yaml/concept.yml",       concept },
+            { document,     false, "rpc/yaml/document.yml",      document },
+            { organization, false, "rpc/yaml/organization.yml",  organization },
+            { person,       false, "rpc/yaml/person.yml",        person },
+            { process,      false, "rpc/yaml/process.yml",       process },
+            { relationship, false, "rpc/yaml/relationship.yml",  relationship },
+            { null,         true,  "rpc/json/all.json",          "All" },
+            { action,       true,  "rpc/json/action.json",       action },
+            { collection,   true,  "rpc/json/collection.json",   collection },
+            { concept,      true,  "rpc/json/concept.json",      concept },
+            { document,     true,  "rpc/json/document.json",     document },
+            { organization, true,  "rpc/json/organization.json", organization },
+            { person,       true,  "rpc/json/person.json",       person },
+            { process,      true,  "rpc/json/process.json",      process },
+            { relationship, true,  "rpc/json/relationship.json", relationship },
         });
     }
 

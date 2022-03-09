@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
 
 @RunWith(Parameterized.class)
 public class RESTDocumentationEndpointIntegrationTest extends ServletContextITest {
@@ -42,9 +45,12 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
     public String testResource;
 
     @Parameter(2)
-    public Boolean testJsonMimeType;
+    public Boolean testJson;
 
     @Parameter(3)
+    public String testExpectedResponse;
+
+    @Parameter(4)
     public String testMessage;
 
     @Before
@@ -86,7 +92,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
             pathInfo += "/" + testResource;
         }
 
-        if (testJsonMimeType == true) {
+        if (testJson == true) {
             mimeType = "application/json";
         }
 
@@ -101,9 +107,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
         restEndpoint.doGet(request, response);
 
         verify(response, times(1)).setContentType(mimeType);
-
-        // Needs to compare against a pre-built expected response body.
-        // verify(responsePrintWriter, times(1)).print(expectedReponseBody);
+        //verify(responsePrintWriter, times(1)).print(argThat(new APIResponseMatcher(testJson, testExpectedResponse)));
         verify(responsePrintWriter, times(1)).flush();
     }
 
@@ -112,15 +116,15 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
         final String collection = "test_collection_resource";
 
         return Arrays.asList(new Object[][] {
-            // version resource,   json, message
-            { "1",     null,       false, "All, Version 1" },
-            { "2.1.0", null,       false, "All, Version 2.1.0" },
-            { "1",     collection, false, collection + ", Version 1" },
-            { "2.1.0", collection, false, collection + ", Version 2.1.0" },
-            { "1",     null,       true,  "All, Version 1" },
-            { "2.1.0", null,       true,  "All, Version 2.1.0" },
-            { "1",     collection, true,  collection + ", Version 1" },
-            { "2.1.0", collection, true,  collection + ", Version 2.1.0" },
+            // version resource,   json,  expectedResponse, message
+            { "1",     null,       false, null,             "All, Version 1" },
+            { "2.1.0", null,       false, null,             "All, Version 2.1.0" },
+            { "1",     collection, false, null,             collection + ", Version 1" },
+            { "2.1.0", collection, false, null,             collection + ", Version 2.1.0" },
+            { "1",     null,       true,  null,             "All, Version 1" },
+            { "2.1.0", null,       true,  null,             "All, Version 2.1.0" },
+            { "1",     collection, true,  null,             collection + ", Version 1" },
+            { "2.1.0", collection, true,  null,             collection + ", Version 2.1.0" }
         });
     }
 
