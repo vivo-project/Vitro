@@ -116,6 +116,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest
         final String relationship = "test_relationship";
 
         return Arrays.asList(new Object[][] {
+            // action,      json,  expected response,       message
             { null,         false, "rpc/all.json",          "All" },
             { action,       false, "rpc/action.json",       action },
             { collection,   false, "rpc/collection.json",   collection },
