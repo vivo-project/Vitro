@@ -1,17 +1,17 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.net.MediaType;
+import org.apache.commons.lang3.Range;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOJsonMessageConverter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
-import org.apache.commons.lang3.Range;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 public class OperationResult {
 
@@ -30,16 +30,15 @@ public class OperationResult {
 	}
 
 	public void prepareResponse(HttpServletResponse response, String contentType, Action action, OperationData operationData) {
-		if(responseCode >= 200 && responseCode < 300){
-			if (! (action.isOutputValid(operationData)))
-				response.setStatus(500);
-			else {
+		if (responseCode >= 200 && responseCode < 300) {
+			if (action.isOutputValid(operationData)) {
 				response.setStatus(responseCode);
 				if (contentType != null && contentType.equalsIgnoreCase(ContentType.JSON.getMediaType())) {
 					PrintWriter out = null;
 					try {
 						out = response.getWriter();
 					} catch (IOException e) {
+						// add log!
 					}
 					response.setContentType(ContentType.JSON.getMediaType());
 					response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -49,7 +48,11 @@ public class OperationResult {
 						out.flush();
 					}
 				}
+			} else {
+				response.setStatus(500);
 			}
+		} else {
+			prepareResponse(response);
 		}
 	}
 
