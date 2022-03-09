@@ -20,8 +20,10 @@ public class DocsRequestPath {
 
     private final String[] pathParts;
 
+    private final String servletPath;
+
     private DocsRequestPath(HttpServletRequest request) {
-        String servletPath = request != null && request.getServletPath() != null
+        servletPath = request != null && request.getServletPath() != null
                 ? request.getServletPath()
                 : EMPTY;
         String pathInfo = request != null && request.getPathInfo() != null
@@ -30,11 +32,11 @@ public class DocsRequestPath {
 
         pathParts = pathInfo.split("/");
 
-        if (servletPath.toLowerCase().contains(RPC_DOCS_SERVLET_PATH)) {
+        if (servletPath.toLowerCase().startsWith(RPC_DOCS_SERVLET_PATH)) {
             type = RequestType.RPC;
             apiVersion = pathParts.length > 1 ? pathParts[1] : null;
             resourceName = null;
-        } else if (servletPath.toLowerCase().contains(REST_DOCS_SERVLET_PATH)) {
+        } else if (servletPath.toLowerCase().startsWith(REST_DOCS_SERVLET_PATH)) {
             type = RequestType.REST;
             apiVersion = pathParts.length > 1 ? pathParts[1] : null;
             resourceName = pathParts.length > 2 ? pathParts[2] : null;
@@ -51,6 +53,10 @@ public class DocsRequestPath {
 
     public String getResourceName() {
         return resourceName;
+    }
+
+    public String getServletPath() {
+        return servletPath;
     }
 
     public RequestType getType() {

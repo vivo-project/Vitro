@@ -20,9 +20,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class RESTDocumentationEndpointITest extends ServletContextITest {
+public class RPCDocumentationEndpointITest extends ServletContextITest {
 
-    private RESTDocumentationEndpoint restEndpoint;
+    private RPCDocumentationEndpoint rpcEndpoint;
 
     @Mock
     private HttpServletRequest request;
@@ -41,7 +41,7 @@ public class RESTDocumentationEndpointITest extends ServletContextITest {
 
     @Before
     public void beforeEach() throws IOException {
-        restEndpoint = new RESTDocumentationEndpoint();
+        rpcEndpoint = new RPCDocumentationEndpoint();
 
         loadDefaultModel();
         loadTestModel();
@@ -77,12 +77,12 @@ public class RESTDocumentationEndpointITest extends ServletContextITest {
             pathInfo += "/" + testResource;
         }
 
-        when(request.getServletPath()).thenReturn("/docs/rest");
+        when(request.getServletPath()).thenReturn("/docs/rpc");
         when(request.getPathInfo()).thenReturn(pathInfo);
 
-        System.out.println("\n\nRunning Test against: '/docs/rest" + pathInfo + "'.\n");
+        System.out.println("\n\nRunning Test against: '/docs/rpc" + pathInfo + "'.\n");
 
-        restEndpoint.doGet(request, response);
+        rpcEndpoint.doGet(request, response);
     }
 
     @Parameterized.Parameters
