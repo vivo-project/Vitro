@@ -4,7 +4,7 @@ public abstract class ContainerData<T> implements Data {
 
     protected T container;
 
-    protected ContainerData(T container){
+    protected ContainerData(T container) {
         this.container = container;
     }
 

@@ -2,7 +2,6 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.request;
 
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_SERVLET_PATH;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,24 +42,20 @@ public class RequestPathTest {
         assertEquals(null, requestPath.getResourceName());
         assertEquals(null, requestPath.getResourceId());
 
-
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/");
 
         assertFalse(RequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn("/create");
 
         assertFalse(RequestPath.from(request).isValid());
 
-
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(RequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn(null);
@@ -83,24 +78,20 @@ public class RequestPathTest {
         assertEquals(null, requestPath.getResourceId());
         assertEquals(null, requestPath.getActionName());
 
-
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/");
 
         assertFalse(RequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn("/1/persons");
 
         assertFalse(RequestPath.from(request).isValid());
 
-
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(RequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn(null);
