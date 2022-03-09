@@ -78,4 +78,5 @@ public class ResourceAPIKey implements Comparable<ResourceAPIKey>, Versioned {
     public static ResourceAPIKey of(String name, String version) {
         return new ResourceAPIKey(name, version);
     }
+
 }

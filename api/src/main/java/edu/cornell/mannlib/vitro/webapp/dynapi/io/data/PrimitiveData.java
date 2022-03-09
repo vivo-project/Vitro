@@ -7,7 +7,7 @@ public abstract class PrimitiveData<T> implements Data {
 
     protected T value;
 
-    protected PrimitiveData(T value){
+    protected PrimitiveData(T value) {
         this.value = value;
     }
 
@@ -22,7 +22,7 @@ public abstract class PrimitiveData<T> implements Data {
     @Override
     public List<String> getAsString() {
         List<java.lang.String> retVal = new ArrayList<String>();
-        retVal.add((value != null)?value.toString():"");
+        retVal.add((value != null) ? value.toString() : "");
         return retVal;
     }
 
@@ -30,4 +30,5 @@ public abstract class PrimitiveData<T> implements Data {
     public String toString() {
         return value.toString();
     }
+
 }

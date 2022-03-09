@@ -15,65 +15,66 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 public class OperationResult {
 
-	private int responseCode;
-	private static Range<Integer> errors = Range.between(400, 599);
+    private int responseCode;
+    private static Range<Integer> errors = Range.between(400, 599);
 
-	public OperationResult(int responseCode) {
-		this.responseCode = responseCode;
-	}
+    public OperationResult(int responseCode) {
+        this.responseCode = responseCode;
+    }
 
-	public boolean hasError() {
-		if (errors.contains(responseCode)) {
-			return true;
-		}
-		return false;
-	}
+    public boolean hasError() {
+        if (errors.contains(responseCode)) {
+            return true;
+        }
+        return false;
+    }
 
-	public void prepareResponse(HttpServletResponse response, String contentType, Action action, OperationData operationData) {
-		if (responseCode >= 200 && responseCode < 300) {
-			if (action.isOutputValid(operationData)) {
-				response.setStatus(responseCode);
-				if (contentType != null && contentType.equalsIgnoreCase(ContentType.JSON.getMediaType())) {
-					PrintWriter out = null;
-					try {
-						out = response.getWriter();
-					} catch (IOException e) {
-						// add log!
-					}
-					response.setContentType(ContentType.JSON.getMediaType());
-					response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-					if (out != null) {
-						ObjectData resultData = operationData.getRootData().filter(action.getProvidedParams().getNames());
-						out.print(IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData));
-						out.flush();
-					}
-				}
-			} else {
-				response.setStatus(500);
-			}
-		} else {
-			prepareResponse(response);
-		}
-	}
+    public void prepareResponse(HttpServletResponse response, String contentType, Action action,
+            OperationData operationData) {
+        if (responseCode >= 200 && responseCode < 300) {
+            if (action.isOutputValid(operationData)) {
+                response.setStatus(responseCode);
+                if (contentType != null && contentType.equalsIgnoreCase(ContentType.JSON.getMediaType())) {
+                    PrintWriter out = null;
+                    try {
+                        out = response.getWriter();
+                    } catch (IOException e) {
+                        // add log!
+                    }
+                    response.setContentType(ContentType.JSON.getMediaType());
+                    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                    if (out != null) {
+                        ObjectData resultData = operationData.getRootData().filter(action.getProvidedParams().getNames());
+                        out.print(IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData));
+                        out.flush();
+                    }
+                }
+            } else {
+                response.setStatus(500);
+            }
+        } else {
+            prepareResponse(response);
+        }
+    }
 
-	public void prepareResponse(HttpServletResponse response) {
-		response.setStatus(responseCode);
-	}
+    public void prepareResponse(HttpServletResponse response) {
+        response.setStatus(responseCode);
+    }
 
-	public static OperationResult badRequest() {
-		return new OperationResult(HttpServletResponse.SC_BAD_REQUEST);
-	}
+    public static OperationResult badRequest() {
+        return new OperationResult(HttpServletResponse.SC_BAD_REQUEST);
+    }
 
-	public static OperationResult notFound() {
-		return new OperationResult(HttpServletResponse.SC_NOT_FOUND);
-	}
+    public static OperationResult notFound() {
+        return new OperationResult(HttpServletResponse.SC_NOT_FOUND);
+    }
 
-	public static OperationResult methodNotAllowed() {
-		return new OperationResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-	}
+    public static OperationResult methodNotAllowed() {
+        return new OperationResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+    }
 
-	public static OperationResult internalServerError() {
-		return new OperationResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	}
+    public static OperationResult internalServerError() {
+        return new OperationResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
 
 }

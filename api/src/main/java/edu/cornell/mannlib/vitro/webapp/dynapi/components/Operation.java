@@ -1,8 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 
 public abstract class Operation implements RunnableComponent, ParameterInfo {
 
@@ -10,7 +11,7 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
 
     public boolean isInputValid(OperationData inputOutput) {
         Parameters requiredParams = getRequiredParams();
-        if(requiredParams!=null) {
+        if (requiredParams != null) {
             for (String name : requiredParams.getNames()) {
                 if (!inputOutput.has(name)) {
                     log.error("Parameter " + name + " not found");
@@ -23,12 +24,13 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
                 }
             }
         }
+
         return true;
     }
 
     public boolean isOutputValid(OperationData inputOutput) {
         Parameters providedParams = getProvidedParams();
-        if(providedParams!=null) {
+        if (providedParams != null) {
             for (String name : providedParams.getNames()) {
                 if (!inputOutput.has(name)) {
                     log.error("Parameter " + name + " not found");
@@ -36,13 +38,14 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
                 }
             }
         }
+
         return true;
     }
 
-    public String computeProvidedFieldName(String partOfName){
+    public String computeProvidedFieldName(String partOfName) {
         String retVal = partOfName;
         Parameters providedParams = getProvidedParams();
-        if(providedParams!=null) {
+        if (providedParams != null) {
             for (String name : providedParams.getNames()) {
                 Parameter parameter = providedParams.get(name);
                 String prefix = parameter.computePrefix(partOfName);
@@ -52,6 +55,8 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
                 }
             }
         }
+
         return retVal;
     }
+
 }

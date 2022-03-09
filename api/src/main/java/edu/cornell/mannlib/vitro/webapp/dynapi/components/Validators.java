@@ -10,29 +10,30 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 
 public class Validators implements Removable {
 
-	private static final Log log = LogFactory.getLog(Validators.class);
-			
-	List <Validator> validators = new LinkedList<Validator>();
- 			
-	public void add(Validator validator) {
-		validators.add(validator);
-	}
+    private static final Log log = LogFactory.getLog(Validators.class);
 
-	public boolean isAllValid(String name, String[] values) {
-		for (Validator validator: validators) {
-			if (!validator.isValid(name, values)) {
-				log.error("Parameter " + name + " is invalid. Validator failed " + validator.getClass().getSimpleName());
-				return false;
-			}
-		}
-		return true;
-	}
+    List<Validator> validators = new LinkedList<Validator>();
 
-	@Override
-	public void dereference() {
-		for (Validator validator: validators) {
-			validator.dereference();
-		}
-		validators = null;
-	}
+    public void add(Validator validator) {
+        validators.add(validator);
+    }
+
+    public boolean isAllValid(String name, String[] values) {
+        for (Validator validator : validators) {
+            if (!validator.isValid(name, values)) {
+                log.error("Parameter " + name + " is invalid. Validator failed " + validator.getClass().getSimpleName());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public void dereference() {
+        for (Validator validator : validators) {
+            validator.dereference();
+        }
+        validators = null;
+    }
 }

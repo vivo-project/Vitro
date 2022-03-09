@@ -1,10 +1,22 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.io.converters;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.*;
-import org.apache.commons.lang3.math.NumberUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+
+import org.apache.commons.lang3.math.NumberUtils;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ArrayData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.BooleanData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.DecimalData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.IntegerData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.PrimitiveData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 
 public class IOParametersMessageConverter implements IOMessageConverter {
 
@@ -14,24 +26,24 @@ public class IOParametersMessageConverter implements IOMessageConverter {
         return INSTANCE;
     }
 
-
-    public ObjectData loadDataFromRequest(HttpServletRequest request){
+    public ObjectData loadDataFromRequest(HttpServletRequest request) {
         Map<String, Data> ioDataMap = new HashMap<String, Data>();
         Map<String, String[]> params = request.getParameterMap();
         if (params != null)
-            for (String key: params.keySet()) {
+            for (String key : params.keySet()) {
                 String[] values = params.get(key);
                 Data data = fromRequest(values);
-                if (data != null)
+                if (data != null) {
                     ioDataMap.put(key, data);
+                }
             }
         return new ObjectData(ioDataMap);
     }
 
-    public String exportDataToResponseBody(ObjectData data){
+    public String exportDataToResponseBody(ObjectData data) {
         StringBuilder retVal = new StringBuilder();
         Map<String, Data> ioDataMap = data.getContainer();
-        for (String key:ioDataMap.keySet()) {
+        for (String key : ioDataMap.keySet()) {
             Data value = ioDataMap.get(key);
             retVal.append(key + "=");
             retVal.append(toString(value));
@@ -40,14 +52,13 @@ public class IOParametersMessageConverter implements IOMessageConverter {
         return retVal.toString();
     }
 
-
-    public Data fromRequest(String[] values){
+    public Data fromRequest(String[] values) {
         Data retVal = null;
-        switch (getDataType(values)){
+        switch (getDataType(values)) {
             case Data.IOArray:
                 List<Data> dataItems = new ArrayList<Data>();
-                for (String value:values) {
-                    dataItems.add(fromRequest(new String[]{value}));
+                for (String value : values) {
+                    dataItems.add(fromRequest(new String[] { value }));
                 }
                 retVal = new ArrayData(dataItems);
                 break;
@@ -58,7 +69,7 @@ public class IOParametersMessageConverter implements IOMessageConverter {
                 retVal = new DecimalData(Double.parseDouble(values[0]));
                 break;
             case Data.IOBoolean:
-                retVal = new BooleanData(new Boolean(values[0]));
+                retVal = new BooleanData(Boolean.parseBoolean(values[0]));
                 break;
             case Data.IOString:
                 retVal = new StringData(values[0]);
@@ -67,13 +78,13 @@ public class IOParametersMessageConverter implements IOMessageConverter {
         return retVal;
     }
 
-    public String toString(Data data){
+    public String toString(Data data) {
         String retVal = null;
-        switch (getDataType(data)){
+        switch (getDataType(data)) {
             case Data.IOArray:
                 StringBuilder allValues = new StringBuilder();
-                for (Data arrayItem: ((ArrayData) data).getContainer()) {
-                    allValues.append(((PrimitiveData)arrayItem).toString());
+                for (Data arrayItem : ((ArrayData) data).getContainer()) {
+                    allValues.append(((PrimitiveData<?>) arrayItem).toString());
                 }
                 retVal = allValues.toString();
                 break;
@@ -81,15 +92,14 @@ public class IOParametersMessageConverter implements IOMessageConverter {
             case Data.IODecimal:
             case Data.IOBoolean:
             case Data.IOString:
-                retVal = ((PrimitiveData)data).toString();
+                retVal = ((PrimitiveData<?>) data).toString();
                 break;
         }
         return retVal;
     }
 
-
-    private int getDataType(String[] values){
-        if ((values == null) || (values.length==0))
+    private int getDataType(String[] values) {
+        if ((values == null) || (values.length == 0))
             return Data.IOUnknown;
         else if (values.length > 1)
             return Data.IOArray;
@@ -103,7 +113,7 @@ public class IOParametersMessageConverter implements IOMessageConverter {
             return Data.IOString;
     }
 
-    private int getDataType(Data data){
+    private int getDataType(Data data) {
         if (data instanceof ArrayData)
             return Data.IOArray;
         else if (data instanceof IntegerData)
