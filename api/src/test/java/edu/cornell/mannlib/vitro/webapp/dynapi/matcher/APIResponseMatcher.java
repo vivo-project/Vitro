@@ -23,13 +23,13 @@ public class APIResponseMatcher implements ArgumentMatcher<String>{
 
     @Override
     public boolean matches(String argument) {
-        OpenAPI expected = readSpec(readFile(path));
-        OpenAPI actual = readSpec(argument);
+        OpenAPI expected = readSpec(true, readFile(path));
+        OpenAPI actual = readSpec(json, argument);
 
         return actual.equals(expected);
     }
 
-    private OpenAPI readSpec(String spec) {
+    private OpenAPI readSpec(Boolean json, String spec) {
         OpenAPI api = new OpenAPI();
 
         try {
