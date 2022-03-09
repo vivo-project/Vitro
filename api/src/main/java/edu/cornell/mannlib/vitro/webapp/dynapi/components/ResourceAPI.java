@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Resource implements Versionable<ResourceKey> {
+public class ResourceAPI implements Versionable<ResourceAPIKey> {
 
 	private String name;
 	private String versionMin;
@@ -24,11 +24,17 @@ public class Resource implements Versionable<ResourceKey> {
 	private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
 	@Override
+	public void dereference() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
 	public String getVersionMin() {
 		return versionMin;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMin", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", minOccurs = 0, maxOccurs = 1)
 	public void setVersionMin(String versionMin) {
 		this.versionMin = versionMin;
 	}
@@ -38,7 +44,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return versionMax;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMax", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion", maxOccurs = 1)
 	public void setVersionMax(String versionMax) {
 		this.versionMax = versionMax;
 	}
@@ -47,14 +53,14 @@ public class Resource implements Versionable<ResourceKey> {
 		return name;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#resourceName", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	@Override
-	public ResourceKey getKey() {
-		return ResourceKey.of(name, versionMin);
+	public ResourceAPIKey getKey() {
+		return ResourceAPIKey.of(name, versionMin);
 	}
 
 	@Override
@@ -113,12 +119,6 @@ public class Resource implements Versionable<ResourceKey> {
 	}
 
 	@Override
-	public void dereference() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void addClient() {
 		clients.add(Thread.currentThread().getId());
 	}
@@ -147,39 +147,48 @@ public class Resource implements Versionable<ResourceKey> {
 		return !clients.isEmpty();
 	}
 
-	public String getCustomRestActionByName(String name) {
-		for (CustomRESTAction customRestAction : customRESTActions) {
-			if (customRestAction.getName().equals(name)) {
-				return customRestAction.getTargetRPC().getName();
-			}
+	public RPC getRestRPC(String method) {
+		RPC rpc = getRestRpcByMethod(method);
+		if (rpc != null) {
+			return rpc;
+		}
+		throw new UnsupportedOperationException("Unsupported method");
+	}
+
+	private RPC getRestRpcByMethod(String method) {
+		switch (method.toUpperCase()) {
+			case "POST":
+				return rpcOnPost;
+			case "GET":
+				return rpcOnGet;
+			case "DELETE":
+				return rpcOnDelete;
+			case "PUT":
+				return rpcOnPut;
+			case "PATCH":
+				return rpcOnPatch;
+			default:
+				return null;
+		}
+	}
+
+	public RPC getCustomRestActionRPC(String name) {
+		RPC rpc = getCustomRestActionRpcByName(name);
+		if (rpc != null) {
+			return rpc;
 		}
 		throw new UnsupportedOperationException("Unsupported custom action");
 	}
 
-	public String getActionNameByMethod(String method) {
-		System.out.println("\nget action name: " + method + "\n");
-		switch (method.toUpperCase()) {
-			case "POST":
-				return getNameOfRpc(rpcOnPost);
-			case "GET":
-				return getNameOfRpc(rpcOnGet);
-			case "DELETE":
-				return getNameOfRpc(rpcOnDelete);
-			case "PUT":
-				return getNameOfRpc(rpcOnPut);
-			case "PATCH":
-				return getNameOfRpc(rpcOnPatch);
-			default:
-				throw new UnsupportedOperationException("Unsupported method");
+	private RPC getCustomRestActionRpcByName(String name) {
+		RPC rpc = null;
+		for (CustomRESTAction customRestAction : customRESTActions) {
+			if (customRestAction.getName().equals(name)) {
+				rpc = customRestAction.getTargetRPC();
+				break;
+			}
 		}
-	}
-
-	private String getNameOfRpc(RPC rpc) {
-		System.out.println("\nget name of rpc: " + rpc + "\n");
-		if (rpc != null) {
-			return rpc.getName();
-		}
-		throw new UnsupportedOperationException("Unable to determine action");
+		return rpc;
 	}
 
 }

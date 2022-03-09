@@ -93,6 +93,11 @@ public class Version implements Comparable<Version> {
 
     @Override
     public String toString() {
+        if (minor == Integer.MAX_VALUE) {
+            return format("%s", major);
+        } else if (patch == Integer.MAX_VALUE) {
+            return format("%s.%s", major, minor);
+        }
         return format("%s.%s.%s", major, minor, patch);
     }
 

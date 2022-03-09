@@ -46,7 +46,7 @@ public class SPARQLQuery implements Operation {
 		this.queryText = queryText;
 	}
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasQueryModel", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setQueryModel(ModelComponent model) {
 		this.modelComponent = model;
 	}
@@ -70,7 +70,7 @@ public class SPARQLQuery implements Operation {
 		Model queryModel = ModelAccess.on(input.getContext()).getOntModel(modelComponent.getName());
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
 		for (String paramName : requiredParams.getNames()) {
-			pss.setLiteral(paramName, input.get(paramName)[0],requiredParams.get(paramName).getRDFDataType());	
+			pss.setLiteral(paramName, input.get(paramName)[0],requiredParams.get(paramName).getRDFDataType());
 		}
 		pss.setCommandText(queryText);
 		queryModel.enterCriticalSection(Lock.READ);
