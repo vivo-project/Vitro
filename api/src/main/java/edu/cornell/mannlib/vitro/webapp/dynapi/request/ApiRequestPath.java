@@ -17,6 +17,10 @@ public class ApiRequestPath {
 
     private final RequestType type;
 
+    private final String servletPath;
+
+    private final String pathInfo;
+
     private final String[] pathParts;
 
     private final String resourceVersion;
@@ -28,10 +32,10 @@ public class ApiRequestPath {
     private final String actionName;
 
     private ApiRequestPath(HttpServletRequest request) {
-        String servletPath = request != null && request.getServletPath() != null
+        servletPath = request != null && request.getServletPath() != null
                 ? request.getServletPath()
                 : EMPTY;
-        String pathInfo = request != null && request.getPathInfo() != null
+        pathInfo = request != null && request.getPathInfo() != null
                 ? request.getPathInfo()
                 : EMPTY;
 
@@ -76,6 +80,14 @@ public class ApiRequestPath {
 
     public RequestType getType() {
         return type;
+    }
+
+    public String getServletPath() {
+        return servletPath;
+    }
+
+    public String getPathInfo() {
+        return pathInfo;
     }
 
     public String getResourceVersion() {

@@ -1,10 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath.RPC_DOCS_SERVLET_PATH;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static java.lang.String.format;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -15,6 +15,8 @@ import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.APIInformation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
@@ -25,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ArrayParameterTy
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ObjectParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -56,7 +59,6 @@ public class DynamicAPIDocumentation {
 
     private final static DynamicAPIDocumentation INSTANCE = new DynamicAPIDocumentation();
 
-    private ServletContext ctx;
     private ConfigurationBeanLoader loader;
     private ContextModelAccess modelAccess;
     private OntModel dynamicAPIModel;
@@ -66,28 +68,30 @@ public class DynamicAPIDocumentation {
     }
 
     public void init(ServletContext ctx) {
-        this.ctx = ctx;
         modelAccess = ModelAccess.on(ctx);
         dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
         loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
     }
 
     public OpenAPI generate(DocsRequestPath requestPath) throws ConfigurationBeanLoaderException {
-
-        Set<APIInformation> apis = loader.loadAll(APIInformation.class);
-
-        APIInformation apiInformation = null;
-
-        for (APIInformation api : apis) {
-            if (api.getVersion().equals(requestPath.getApiVersion())) {
-                apiInformation = api;
-                break;
-            }
+        switch (requestPath.getType()) {
+            case REST:
+                return generateRestDocs(requestPath);
+            case RPC:
+                return generateRpcDocs(requestPath);
+            default:
+                log.error(format("Unknown generate docs request type from path %s", requestPath.getServletPath()));
+                return new OpenAPI();
         }
+    }
 
+    private OpenAPI generateRestDocs(DocsRequestPath requestPath) throws ConfigurationBeanLoaderException {
         OpenAPI openApi = new OpenAPI();
 
+        APIInformation apiInformation = lookupApiInformation(requestPath);
+
         if (apiInformation == null) {
+            log.error(format("Unable to find API information for version %s", requestPath.getApiVersion()));
             return openApi;
         }
 
@@ -97,7 +101,7 @@ public class DynamicAPIDocumentation {
 
         Paths paths = new Paths();
 
-        String servletPath = requestPath.getServletPath();
+        String servletPath = ApiRequestPath.REST_SERVLET_PATH;
 
         if (requestPath.getResourceName() == null) {
             Version version = Version.of(apiInformation.getVersion());
@@ -107,7 +111,7 @@ public class DynamicAPIDocumentation {
             for (ResourceAPI resourceAPI : resourceAPIs) {
                 String resourceName = resourceAPI.getName();
 
-                Tag tag = tag(resourceAPI, requestPath.getServletPath());
+                Tag tag = tag(resourceAPI);
 
                 openApi.addTagsItem(tag);
 
@@ -129,24 +133,95 @@ public class DynamicAPIDocumentation {
 
             ResourceAPI resourceAPI = ResourceAPIPool.getInstance().get(resourceAPIKey);
 
-            Tag tag = tag(resourceAPI, requestPath.getServletPath());
+            if (!(resourceAPI instanceof DefaultResourceAPI)) {
+                Tag tag = tag(resourceAPI);
 
-            openApi.addTagsItem(tag);
+                openApi.addTagsItem(tag);
 
-            // resource collection API
-            String resourceCollectionPathKey = format("%s/%s/%s", servletPath, version, resourceName);
+                // resource collection API
+                String resourceCollectionPathKey = format("%s/%s/%s", servletPath, version, resourceName);
 
-            paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
+                paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
-            // resource individual API
-            String resourceIndividualPathKey = format("%s/resource:{resourceId}", resourceCollectionPathKey);
+                // resource individual API
+                String resourceIndividualPathKey = format("%s/resource:{resourceId}", resourceCollectionPathKey);
 
-            paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
+                paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
+
+                resourceAPI.removeClient();
+            } else {
+                log.warn(format("Resource %s not found", resourceAPIKey));
+            }
         }
 
         openApi.paths(paths);
 
         return openApi;
+    }
+
+    private OpenAPI generateRpcDocs(DocsRequestPath requestPath) {
+        OpenAPI openApi = new OpenAPI();
+
+        Paths paths = new Paths();
+
+        String servletPath = ApiRequestPath.RPC_SERVLET_PATH;
+
+        if (requestPath.getActionName() == null) {
+
+            Map<String, Action> actions = ActionPool.getInstance().getComponents();
+
+            Tag tag = tag();
+            openApi.addTagsItem(tag);
+
+            for (Action action : actions.values()) {
+
+                String actionName = action.getKey();
+
+                String actionPathKey = format("%s/%s", servletPath, actionName);
+ 
+                paths.put(actionPathKey, actionPathItem(action, tag));
+            }
+
+        } else {
+
+            String actionName = requestPath.getActionName();
+
+            Action action = ActionPool.getInstance().get(actionName);
+
+            if (!(action instanceof DefaultAction)) {
+                Tag tag = tag(action);
+                openApi.addTagsItem(tag);
+
+                String actionPathKey = format("%s/%s", servletPath, actionName);
+
+                paths.put(actionPathKey, actionPathItem(action, tag));
+
+                action.removeClient();
+
+            } else {
+                log.warn(format("Action %s not found", actionName));
+            }
+
+        }
+
+        openApi.paths(paths);
+
+        return openApi;
+    }
+
+    private APIInformation lookupApiInformation(DocsRequestPath requestPath) throws ConfigurationBeanLoaderException {
+        Set<APIInformation> apis = loader.loadAll(APIInformation.class);
+
+        APIInformation apiInformation = null;
+
+        for (APIInformation api : apis) {
+            if (api.getVersion().equals(requestPath.getApiVersion())) {
+                apiInformation = api;
+                break;
+            }
+        }
+
+        return apiInformation;
     }
 
     private Info info(APIInformation apiInformation) {
@@ -158,22 +233,37 @@ public class DynamicAPIDocumentation {
         return info;
     }
 
-    private Tag tag(ResourceAPI resourceAPI, String servletPath) {
+    private Tag tag(ResourceAPI resourceAPI) {
         Tag tag = new Tag();
 
-        if (resourceAPI.getName() == null) {
-            tag.setName("All");
-        } else {
-            tag.setName(resourceAPI.getName());
-        }
+        tag.setName(resourceAPI.getName());
 
         // No description available per resource API
-        String protocol = "REST";
-        if (servletPath.toLowerCase().startsWith(RPC_DOCS_SERVLET_PATH)) {
-            protocol = "RPC";
-        }
+        tag.setDescription(format("REST for %s", resourceAPI.getName()));
 
-        tag.setDescription(format("%s for %s.", protocol, tag.getName()));
+        return tag;
+    }
+
+    private Tag tag() {
+        Tag tag = new Tag();
+
+        tag.setName("All RPC");
+        tag.setDescription("All available custom actions");
+
+        return tag;
+    }
+
+    private Tag tag(Action action) {
+        Tag tag = new Tag();
+
+        try {
+            tag.setName(action.getKey());
+
+            // No description available per action
+            tag.setDescription(format("RPC for %s", action.getKey()));
+        } catch (NullPointerException e) {
+            log.error("RPC not defined for action");
+        }
 
         return tag;
     }
@@ -229,6 +319,14 @@ public class DynamicAPIDocumentation {
             Action action = actionPool.get(individualDeleteAction.getName());
             pathItem.setDelete(individualDeleteOperation(action, tag));
         }
+
+        return pathItem;
+    }
+
+    private PathItem actionPathItem(Action action, Tag tag) {
+        PathItem pathItem = new PathItem();
+
+        pathItem.setPost(actionPostOperation(action, tag));
 
         return pathItem;
     }
@@ -386,6 +484,38 @@ public class DynamicAPIDocumentation {
         return operation;
     }
 
+    private Operation actionPostOperation(Action action, Tag tag) {
+        Operation operation = new Operation();
+        operation.addTagsItem(tag.getName());
+
+        // No description available per resource API rpc
+        // operation.setDescription("");
+
+        RequestBody requestBody = new RequestBody();
+        Content content = new Content();
+        MediaType mediaType = new MediaType();
+        ObjectSchema schema = new ObjectSchema();
+
+        buildObjectSchema(schema, action.getRequiredParams());
+
+        mediaType.schema(schema);
+        content.addMediaType("application/json", mediaType);
+        requestBody.setContent(content);
+
+        operation.setRequestBody(requestBody);
+
+        ApiResponses apiResponses = new ApiResponses();
+
+        addCreatedApiResponse(apiResponses);
+        addUnauthorizedApiResponse(apiResponses);
+        addForbiddenApiResponse(apiResponses);
+        addNotFoundApiResponse(apiResponses);
+
+        operation.setResponses(apiResponses);
+
+        return operation;
+    }
+
     private PathParameter individualPathParameter() {
         PathParameter pathParameter = new PathParameter();
 
@@ -470,7 +600,8 @@ public class DynamicAPIDocumentation {
 
             primitiveParameter.setDescription(parameter.getDescription());
 
-            buildObjectSchema((ObjectSchema) primitiveParameter, ((ObjectParameterType) arrayParameterType).getInternalElements());
+            buildObjectSchema((ObjectSchema) primitiveParameter,
+                    ((ObjectParameterType) arrayParameterType).getInternalElements());
 
         } else if (parameterType instanceof ArrayParameterType) {
 

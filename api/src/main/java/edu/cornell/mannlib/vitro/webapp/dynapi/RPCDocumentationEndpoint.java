@@ -8,7 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 
-@WebServlet(name = "RPCDocumentationEndpoint", urlPatterns = { RPC_DOCS_SERVLET_PATH + "/*" })
+// /docs/rpc
+// /docs/rpc/{action}
+@WebServlet(name = "RPCDocumentationEndpoint", urlPatterns = { RPC_DOCS_SERVLET_PATH, RPC_DOCS_SERVLET_PATH + "/*" })
 public class RPCDocumentationEndpoint extends DocumentationAbstractServlet {
 
     @Override
