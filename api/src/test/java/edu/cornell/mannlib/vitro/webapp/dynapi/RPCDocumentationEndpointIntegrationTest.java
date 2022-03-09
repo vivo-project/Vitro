@@ -1,9 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -20,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class RPCDocumentationEndpointITest extends ServletContextITest {
+public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest {
 
     private RPCDocumentationEndpoint rpcEndpoint;
 
@@ -30,6 +32,9 @@ public class RPCDocumentationEndpointITest extends ServletContextITest {
     @Mock
     private HttpServletResponse response;
 
+    @Mock
+    private PrintWriter responsePrintWriter;
+
     @Parameter(0)
     public String testVersion;
 
@@ -37,6 +42,9 @@ public class RPCDocumentationEndpointITest extends ServletContextITest {
     public String testResource;
 
     @Parameter(2)
+    public Boolean testJsonMimeType;
+
+    @Parameter(3)
     public String testMessage;
 
     @Before
@@ -70,19 +78,33 @@ public class RPCDocumentationEndpointITest extends ServletContextITest {
     }
 
     @Test
-    public void doTest() {
+    public void doTest() throws IOException {
         String pathInfo = "/" + testVersion;
+        String mimeType = "application/yaml";
 
         if (testResource != null) {
             pathInfo += "/" + testResource;
         }
 
+        if (testJsonMimeType == true) {
+            mimeType = "application/json";
+        }
+
         when(request.getServletPath()).thenReturn("/docs/rpc");
         when(request.getPathInfo()).thenReturn(pathInfo);
+        when(request.getHeader("Accept")).thenReturn(mimeType);
+        when(request.getContentType()).thenReturn(mimeType);
+        when(response.getWriter()).thenReturn(responsePrintWriter);
 
         System.out.println("\n\nRunning Test against: '/docs/rpc" + pathInfo + "'.\n");
 
         rpcEndpoint.doGet(request, response);
+
+        verify(response, times(1)).setContentType(mimeType);
+
+        // Needs to compare against a pre-built expected response body.
+        //verify(responsePrintWriter, times(1)).print(expectedReponseBody);
+        verify(responsePrintWriter, times(1)).flush();
     }
 
     @Parameterized.Parameters
@@ -90,11 +112,15 @@ public class RPCDocumentationEndpointITest extends ServletContextITest {
         final String collection = "test_collection_resource";
 
         return Arrays.asList(new Object[][] {
-            // version resource,   message
-            { "1",     null,       "All, Version 1" },
-            { "2.1.0", null,       "All, Version 2.1.0" },
-            { "1",     collection, collection + ", Version 1" },
-            { "2.1.0", collection, collection + ", Version 2.1.0" },
+            // version resource,   json, message
+            { "1",     null,       false, "All, Version 1" },
+            { "2.1.0", null,       false, "All, Version 2.1.0" },
+            { "1",     collection, false, collection + ", Version 1" },
+            { "2.1.0", collection, false, collection + ", Version 2.1.0" },
+            { "1",     null,       true, "All, Version 1" },
+            { "2.1.0", null,       true, "All, Version 2.1.0" },
+            { "1",     collection, true, collection + ", Version 1" },
+            { "2.1.0", collection, true, collection + ", Version 2.1.0" },
         });
     }
 
