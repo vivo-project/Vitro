@@ -88,10 +88,10 @@ public class RESTEndpointTest {
 	public String testActionName;
 
 	@Parameter(3)
-	public int[] expectedCounts;
+	public int[] testExpectedCounts;
 
 	@Parameter(4)
-	public int expectedStatus;
+	public int testExpectedStatus;
 
 	@Parameter(5)
 	public String testMessage;
@@ -127,7 +127,7 @@ public class RESTEndpointTest {
 		when(request.getPathInfo()).thenReturn(testPathInfo);
 
 		when(action.run(any(OperationData.class)))
-			.thenReturn(new OperationResult(expectedStatus));
+			.thenReturn(new OperationResult(testExpectedStatus));
 
 		when(httpMethod.getName()).thenReturn(testMethod);
 
@@ -140,12 +140,12 @@ public class RESTEndpointTest {
 
 		run(testMethod);
 
-		verify(resourceAPI, times(expectedCounts[0])).getRestRPC(any());
-		verify(resourceAPI, times(expectedCounts[1])).getCustomRestActionRPC(any());
-		verify(resourceAPI, times(expectedCounts[2])).removeClient();
-		verify(action, times(expectedCounts[3])).run(any());
-		verify(action, times(expectedCounts[4])).removeClient();
-		verify(response, times(expectedCounts[5])).setStatus(expectedStatus);
+		verify(resourceAPI, times(testExpectedCounts[0])).getRestRPC(any());
+		verify(resourceAPI, times(testExpectedCounts[1])).getCustomRestActionRPC(any());
+		verify(resourceAPI, times(testExpectedCounts[2])).removeClient();
+		verify(action, times(testExpectedCounts[3])).run(any());
+		verify(action, times(testExpectedCounts[4])).removeClient();
+		verify(response, times(testExpectedCounts[5])).setStatus(testExpectedStatus);
 	}
 
 	private void run(String method) {
@@ -179,7 +179,7 @@ public class RESTEndpointTest {
 			// expected counts key
 			// resource.getRestRPC, resource.getCustomRestActionRPC, resource.removeClient, action.run, action.removeClient, response.setStatus
 
-			// method   path info                 action      expected counts                 expected status
+			// method   path info                 action      expected counts                 expected status        message
 			{ "POST",   PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Create collection resource" },
 			{ "GET",    PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Get collection resources" },
 			{ "PUT",    PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot put on resource collecion" },
