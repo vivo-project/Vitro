@@ -41,158 +41,158 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 @RunWith(Parameterized.class)
 public class RESTEndpointTest {
 
-	private final static String PATH_INFO = "/1/test";
+    private final static String PATH_INFO = "/1/test";
 
-	private Map<String, String[]> params = new HashMap<>();
+    private Map<String, String[]> params = new HashMap<>();
 
-	private MockedStatic<ResourceAPIPool> resourceAPIPoolStatic;
+    private MockedStatic<ResourceAPIPool> resourceAPIPoolStatic;
 
-	private MockedStatic<ActionPool> actionPoolStatic;
+    private MockedStatic<ActionPool> actionPoolStatic;
 
-	@Mock
-	private ServletContext context;
+    @Mock
+    private ServletContext context;
 
-	@Mock
-	private ResourceAPIPool resourceAPIPool;
+    @Mock
+    private ResourceAPIPool resourceAPIPool;
 
-	@Mock
-	private ActionPool actionPool;
+    @Mock
+    private ActionPool actionPool;
 
-	@Mock
-	private ResourceAPI resourceAPI;
+    @Mock
+    private ResourceAPI resourceAPI;
 
-	@Mock
-	private RPC rpc;
+    @Mock
+    private RPC rpc;
 
-	@Mock
-	private HTTPMethod httpMethod;
+    @Mock
+    private HTTPMethod httpMethod;
 
-	@Spy
-	private Action action;
+    @Spy
+    private Action action;
 
-	@Mock
-	private HttpServletRequest request;
+    @Mock
+    private HttpServletRequest request;
 
-	@Mock
-	private HttpServletResponse response;
+    @Mock
+    private HttpServletResponse response;
 
-	private RESTEndpoint restEndpoint;
+    private RESTEndpoint restEndpoint;
 
-	@Parameter(0)
-	public String testMethod;
+    @Parameter(0)
+    public String testMethod;
 
-	@Parameter(1)
-	public String testPathInfo;
+    @Parameter(1)
+    public String testPathInfo;
 
-	@Parameter(2)
-	public String testActionName;
+    @Parameter(2)
+    public String testActionName;
 
-	@Parameter(3)
-	public int[] expectedCounts;
+    @Parameter(3)
+    public int[] testExpectedCounts;
 
-	@Parameter(4)
-	public int expectedStatus;
+    @Parameter(4)
+    public int testExpectedStatus;
 
-	@Parameter(5)
-	public String testMessage;
+    @Parameter(5)
+    public String testMessage;
 
-	@Before
-	public void beforeEach() {
-		MockitoAnnotations.openMocks(this);
-		resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
-		actionPoolStatic = mockStatic(ActionPool.class);
+    @Before
+    public void beforeEach() {
+        MockitoAnnotations.openMocks(this);
+        resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
+        actionPoolStatic = mockStatic(ActionPool.class);
 
-		when(ResourceAPIPool.getInstance()).thenReturn(resourceAPIPool);
-		when(resourceAPIPool.get(any(ResourceAPIKey.class))).thenReturn(resourceAPI);
+        when(ResourceAPIPool.getInstance()).thenReturn(resourceAPIPool);
+        when(resourceAPIPool.get(any(ResourceAPIKey.class))).thenReturn(resourceAPI);
 
-		when(ActionPool.getInstance()).thenReturn(actionPool);
-		when(actionPool.get(any(String.class))).thenReturn(action);
+        when(ActionPool.getInstance()).thenReturn(actionPool);
+        when(actionPool.get(any(String.class))).thenReturn(action);
 
-		when(request.getParameterMap()).thenReturn(params);
-		when(request.getServletContext()).thenReturn(context);
+        when(request.getParameterMap()).thenReturn(params);
+        when(request.getServletContext()).thenReturn(context);
 
-		restEndpoint = new RESTEndpoint();
-	}
+        restEndpoint = new RESTEndpoint();
+    }
 
-	@After
-	public void afterEach() {
-		resourceAPIPoolStatic.close();
-		actionPoolStatic.close();
-	}
+    @After
+    public void afterEach() {
+        resourceAPIPoolStatic.close();
+        actionPoolStatic.close();
+    }
 
-	@Test
-	public void doTest() {
-		when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
-		when(request.getMethod()).thenReturn(testMethod);
-		when(request.getPathInfo()).thenReturn(testPathInfo);
+    @Test
+    public void doTest() {
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
+        when(request.getMethod()).thenReturn(testMethod);
+        when(request.getPathInfo()).thenReturn(testPathInfo);
 
-		when(action.run(any(OperationData.class)))
-			.thenReturn(new OperationResult(expectedStatus));
+        when(action.run(any(OperationData.class)))
+            .thenReturn(new OperationResult(testExpectedStatus));
 
-		when(httpMethod.getName()).thenReturn(testMethod);
+        when(httpMethod.getName()).thenReturn(testMethod);
 
-		when(rpc.getName()).thenReturn(testActionName);
-		when(rpc.getHttpMethod()).thenReturn(httpMethod);
+        when(rpc.getName()).thenReturn(testActionName);
+        when(rpc.getHttpMethod()).thenReturn(httpMethod);
 
-		when(resourceAPI.getRestRPC(testMethod)).thenReturn(rpc);
-		when(resourceAPI.getCustomRestActionRPC(testActionName)).thenReturn(rpc);
-		doNothing().when(resourceAPI).removeClient();
+        when(resourceAPI.getRestRPC(testMethod)).thenReturn(rpc);
+        when(resourceAPI.getCustomRestActionRPC(testActionName)).thenReturn(rpc);
+        doNothing().when(resourceAPI).removeClient();
 
-		run(testMethod);
+        run(testMethod);
 
-		verify(resourceAPI, times(expectedCounts[0])).getRestRPC(any());
-		verify(resourceAPI, times(expectedCounts[1])).getCustomRestActionRPC(any());
-		verify(resourceAPI, times(expectedCounts[2])).removeClient();
-		verify(action, times(expectedCounts[3])).run(any());
-		verify(action, times(expectedCounts[4])).removeClient();
-		verify(response, times(expectedCounts[5])).setStatus(expectedStatus);
-	}
+        verify(resourceAPI, times(testExpectedCounts[0])).getRestRPC(any());
+        verify(resourceAPI, times(testExpectedCounts[1])).getCustomRestActionRPC(any());
+        verify(resourceAPI, times(testExpectedCounts[2])).removeClient();
+        verify(action, times(testExpectedCounts[3])).run(any());
+        verify(action, times(testExpectedCounts[4])).removeClient();
+        verify(response, times(testExpectedCounts[5])).setStatus(testExpectedStatus);
+    }
 
-	private void run(String method) {
-		switch (method) {
-			case "POST":
-				restEndpoint.doPost(request, response);
-				break;
-			case "GET":
-				restEndpoint.doGet(request, response);
-				break;
-			case "PUT":
-				restEndpoint.doPut(request, response);
-				break;
-			case "PATCH":
-				restEndpoint.doPatch(request, response);
-				break;
-			case "DELETE":
-				restEndpoint.doDelete(request, response);
-				break;
-			default:
-				break;
-		}
-	}
+    private void run(String method) {
+        switch (method) {
+            case "POST":
+                restEndpoint.doPost(request, response);
+                break;
+            case "GET":
+                restEndpoint.doGet(request, response);
+                break;
+            case "PUT":
+                restEndpoint.doPut(request, response);
+                break;
+            case "PATCH":
+                restEndpoint.doPatch(request, response);
+                break;
+            case "DELETE":
+                restEndpoint.doDelete(request, response);
+                break;
+            default:
+                break;
+        }
+    }
 
-	@Parameterized.Parameters
-	public static Collection<Object[]> requests() {
-		String actionName = "test";
-		String customRestActionPathInfo = format("%s/%s", PATH_INFO, actionName);
+    @Parameterized.Parameters
+    public static Collection<Object[]> requests() {
+        String actionName = "test";
+        String customRestActionPathInfo = format("%s/%s", PATH_INFO, actionName);
 
-		return Arrays.asList(new Object[][] {
-			// expected counts key
-			// resource.getRestRPC, resource.getCustomRestActionRPC, resource.removeClient, action.run, action.removeClient, response.setStatus
+        return Arrays.asList(new Object[][] {
+            // expected counts key
+            // resource.getRestRPC, resource.getCustomRestActionRPC, resource.removeClient, action.run, action.removeClient, response.setStatus
 
-			// method   path info                 action      expected counts                 expected status
-			{ "POST",   PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Create collection resource" },
-			{ "GET",    PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Get collection resources" },
-			{ "PUT",    PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot put on resource collecion" },
-			{ "PATCH",  PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot patch on resource collection" },
-			{ "DELETE", PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot delete on resource collection" },
+            // method   path info                 action      expected counts                 expected status        message
+            { "POST",   PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Create collection resource" },
+            { "GET",    PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Get collection resources" },
+            { "PUT",    PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot put on resource collecion" },
+            { "PATCH",  PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot patch on resource collection" },
+            { "DELETE", PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot delete on resource collection" },
 
-			{ "POST",   customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_OK,                 "Resource found with supported method" },
-			{ "GET",    customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with unsupported method" },
-			{ "PUT",    customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
-			{ "PATCH",  customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
-			{ "DELETE", customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" }
-			
-		});
-	}
+            { "POST",   customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_OK,                 "Resource found with supported method" },
+            { "GET",    customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with unsupported method" },
+            { "PUT",    customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
+            { "PATCH",  customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
+            { "DELETE", customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" }
+            
+        });
+    }
 
 }
