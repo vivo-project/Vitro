@@ -16,6 +16,7 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 
 import org.apache.jena.rdf.model.impl.PropertyImpl;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -40,6 +41,7 @@ public class N3TemplateTest extends ServletContextTest {
 
     static ParameterType anyURI;
     static ParameterType stringType;
+    static ParameterType booleanType;
 
     @Mock
     OperationData input;
@@ -65,6 +67,8 @@ public class N3TemplateTest extends ServletContextTest {
         anyURI.setName("anyURI");
         stringType = new PrimitiveParameterType();
         stringType.setName("string");
+        booleanType = new PrimitiveParameterType();
+        booleanType.setName("boolean");
     }
 
     @AfterClass
@@ -169,7 +173,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testMultipleStatements(){
         when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3Text("?uri1 <http:has> ?literal1 .\n?uri1 <http:was> ?literal2");
+        n3Template.setN3Text("?uri1 <http://has> ?literal1 .\n?uri1 <http://was> ?literal2");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -179,7 +183,7 @@ public class N3TemplateTest extends ServletContextTest {
         param2.setParamType(stringType);
         param2.setName("literal1");
         Parameter param3 = new Parameter();
-        param3.setParamType(stringType);
+        param3.setParamType(booleanType);
         param3.setName("literal2");
 
         n3Template.addRequiredParameter(param1);
@@ -190,12 +194,14 @@ public class N3TemplateTest extends ServletContextTest {
         when(input.getContext()).thenReturn(servletContext);
         when(input.get("uri1")).thenReturn(new String[]{"http://testSubject"});
         when(input.get("literal1")).thenReturn(new String[]{"testLiteral"});
-        when(input.get("literal2")).thenReturn(new String[]{"testLiteral2"});
+        when(input.get("literal2")).thenReturn(new String[]{"true"});
 
         assertFalse(n3Template.run(input).hasError());
         assertNotNull(writeModel.getResource("http://testSubject"));
         assertEquals(2,writeModel.listObjects().toList().size());
         assertEquals(1,writeModel.listSubjects().toList().size());
         assertEquals(2, writeModel.listStatements().toList().size());
+        assertTrue(writeModel.containsLiteral(
+                new ResourceImpl("http://testSubject"), new PropertyImpl("http://was"),true));
     }
 }

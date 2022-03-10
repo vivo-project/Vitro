@@ -19,6 +19,8 @@ public class N3Template implements Template{
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
+	private static final String ANY_URI="anyURI";
+
 	private Parameters requiredParams = new Parameters();
 	private String n3Text;
 	private ModelComponent templateModel;
@@ -95,7 +97,7 @@ public class N3Template implements Template{
 
 		//region Substitute IRI variables
 		Map<String, List<String>> parametersToUris = requiredParams.params.values().stream()
-				.filter(value->value.getType().getName()=="anyURI")
+				.filter(value->value.getType().getName()==ANY_URI)
 				.collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
 
 		gen.subInMultiUris(parametersToUris, n3WithParameters);
@@ -103,10 +105,14 @@ public class N3Template implements Template{
 
 		//region Substitute other (literal) variables
 		Map<String, List<Literal>> parametersToLiterals = requiredParams.params.values().stream()
-				.filter(value->value.getType().getName()!="anyURI")
+				.filter(value->value.getType().getName()!=ANY_URI)
 				.collect(Collectors.toMap(
 						param -> param.getName(),
-						param -> Arrays.asList(ResourceFactory.createTypedLiteral(input.get(param.getName())[0]))));
+						param -> Arrays.asList(ResourceFactory.createTypedLiteral(
+																	input.get(param.getName())[0],
+																	param.getRDFDataType()
+																	)
+						)));
 
 		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
 		//endregion
