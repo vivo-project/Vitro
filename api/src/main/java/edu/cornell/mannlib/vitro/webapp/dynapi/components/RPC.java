@@ -4,50 +4,50 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class RPC implements Removable {
 
-	private String name;
-	private String minVersion;
-	private String maxVersion;
-	private HTTPMethod httpMethod;
+    private String name;
+    private String minVersion;
+    private String maxVersion;
+    private HTTPMethod httpMethod;
 
-	@Override
-	public void dereference() {
-		// TODO Auto-generated method stub
-	}
+    @Override
+    public void dereference() {
+        // TODO Auto-generated method stub
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getMinVersion() {
-		return minVersion;
-	}
+    public String getMinVersion() {
+        return minVersion;
+    }
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", maxOccurs = 1)
-	public void setMinVersion(String minVersion) {
-		this.minVersion = minVersion;
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", maxOccurs = 1)
+    public void setMinVersion(String minVersion) {
+        this.minVersion = minVersion;
+    }
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion", maxOccurs = 1)
-	public void setMaxVersion(String maxVersion) {
-		this.maxVersion = maxVersion;
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion", maxOccurs = 1)
+    public void setMaxVersion(String maxVersion) {
+        this.maxVersion = maxVersion;
+    }
 
-	public String getMaxVersion() {
-		return maxVersion;
-	}
+    public String getMaxVersion() {
+        return maxVersion;
+    }
 
-	public HTTPMethod getHttpMethod() {
-		return httpMethod;
-	}
+    public HTTPMethod getHttpMethod() {
+        return httpMethod;
+    }
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod")
-	public void setHttpMethod(HTTPMethod httpMethod) {
-		this.httpMethod = httpMethod;
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod")
+    public void setHttpMethod(HTTPMethod httpMethod) {
+        this.httpMethod = httpMethod;
+    }
 
 }
