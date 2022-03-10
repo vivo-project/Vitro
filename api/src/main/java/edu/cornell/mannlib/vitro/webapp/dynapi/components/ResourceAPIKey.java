@@ -24,6 +24,11 @@ public class ResourceAPIKey implements Comparable<ResourceAPIKey>, Versioned {
     }
 
     @Override
+    public ResourceAPIKey getMajorVersionKey() {
+        return ResourceAPIKey.of(name, String.valueOf(version.getMajor()));
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -78,4 +83,5 @@ public class ResourceAPIKey implements Comparable<ResourceAPIKey>, Versioned {
     public static ResourceAPIKey of(String name, String version) {
         return new ResourceAPIKey(name, version);
     }
+
 }

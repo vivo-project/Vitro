@@ -21,9 +21,6 @@
     "name" : "test_person_resource",
     "description" : "REST test_person_resource (2.0.0)"
   }, {
-    "name" : "test_person_resource",
-    "description" : "REST test_person_resource (4.3.7)"
-  }, {
     "name" : "test_process_resource",
     "description" : "REST test_process_resource (1.0.0)"
   }, {
