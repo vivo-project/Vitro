@@ -6,10 +6,10 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Teplate>
+<https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Template>
         a                        dynapi:operation, dynapi:n3Template ;
         rdfs:label               "Test n3 Template 1"@en-US ;
-        dynapi:hasTemplateModel  <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:hasModel  <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject> ;
         dynapi:n3Text            "?testSubject <http://has> ?testObject" .
     
@@ -28,18 +28,17 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/n3TemplateTestAction>
         a                        dynapi:action ;
         rdfs:label               "N3 template test action"@en-US ;
-        dynapi:assignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/n3TestRPC1> ;
-        dynapi:firstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/n3TemplateTestStep> .
+        dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/n3TestRPC1> ;
+        dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/n3TemplateTestStep> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/n3TestRPC1>
         a                        dynapi:rpc ;
-        dynapi:resourceName      "N3 template Test rpc individual" ;
-        dynapi:rpcName           "n3template_test_action"@en-US ;
-        dynapi:defaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
-        dynapi:rpcAPIVersionMin  "0.1.0" .
+        dynapi:name           "n3template_test_action"@en-US ;
+        dynapi:hasDefaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:minAPIVersionMin  "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/n3TemplateTestStep>
         a                        dynapi:step, dynapi:operationalStep ;
         rdfs:label               "N3 template Test operational step 1"@en-US ;
-        dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Teplate> .   
+        dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Template> .   
 

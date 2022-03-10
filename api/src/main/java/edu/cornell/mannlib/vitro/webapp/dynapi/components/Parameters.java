@@ -20,6 +20,8 @@ public class Parameters implements Removable {
         return params.keySet();
     }
 
+    public Map<String, Parameter> getParameters() { return params; }
+
     public Parameter get(String name) {
         return params.get(name);
     }

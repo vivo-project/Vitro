@@ -8,6 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -19,13 +20,11 @@ public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
-	private static final String ANY_URI="anyURI";
+	private static final String ANY_URI="http://www.w3.org/2001/XMLSchema#anyURI";
 
 	private Parameters requiredParams = new Parameters();
 	private String n3Text;
 	private ModelComponent templateModel;
-
-    private Parameters requiredParams = new Parameters();
 
     // region @Property Setters
 
@@ -34,7 +33,7 @@ public class N3Template extends Operation implements Template {
         requiredParams.add(param);
     }
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasTemplateModel", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setTemplateModel(ModelComponent templateModel){ this.templateModel = templateModel; }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3Text", minOccurs = 1, maxOccurs = 1)
@@ -50,6 +49,11 @@ public class N3Template extends Operation implements Template {
     public Parameters getRequiredParams() {
         return requiredParams;
     }
+
+	@Override
+	public Parameters getProvidedParams() {
+		return new Parameters();
+	}
 
 	public String getN3Text() { return this.n3Text; }
 
@@ -93,16 +97,16 @@ public class N3Template extends Operation implements Template {
 		List<String> n3WithParameters = Arrays.asList(n3Text);
 
 		//region Substitute IRI variables
-		Map<String, List<String>> parametersToUris = requiredParams.params.values().stream()
-				.filter(value->value.getType().getName()==ANY_URI)
+		Map<String, List<String>> parametersToUris = requiredParams.getParameters().values().stream()
+				.filter(value->value.getRDFDataType().getURI().equals(ANY_URI))
 				.collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
 
 		gen.subInMultiUris(parametersToUris, n3WithParameters);
 		//endregion
 
 		//region Substitute other (literal) variables
-		Map<String, List<Literal>> parametersToLiterals = requiredParams.params.values().stream()
-				.filter(value->value.getType().getName()!=ANY_URI)
+		Map<String, List<Literal>> parametersToLiterals = requiredParams.getParameters().values().stream()
+				.filter(value->!value.getRDFDataType().getURI().equals(ANY_URI))
 				.collect(Collectors.toMap(
 						param -> param.getName(),
 						param -> Arrays.asList(ResourceFactory.createTypedLiteral(
@@ -124,21 +128,8 @@ public class N3Template extends Operation implements Template {
 		return n3WithParameters.get(0);
 	}
 
-	private boolean isInputValid(OperationData input) {
-		for (String name : requiredParams.getNames()) {
-			if (!input.has(name)) {
-				log.error("Parameter " + name + " not found");
-				return false;
-			}
-			Parameter param = requiredParams.get(name);
-			String[] inputValues = input.get(name);
-			if (!param.isValid(name, inputValues)){
-				return false;
-			}
-		}
-		return true;
-	}
+
 	@Override
-	public void dereference() {
+	public void dereference() {}
 
 }

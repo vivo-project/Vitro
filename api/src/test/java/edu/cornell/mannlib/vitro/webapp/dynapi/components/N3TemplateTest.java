@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 public class N3TemplateTest extends ServletContextTest {
 
     private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-n3template-test.n3";
-    private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Teplate";
+    private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Template";
 
     private static MockedStatic<ModelAccess> modelAccess;
 
@@ -92,8 +92,8 @@ public class N3TemplateTest extends ServletContextTest {
 
         N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
         assertNotNull(n3Template);
-        assertEquals(0, n3Template.getProvidedParams().params.size());
-        assertEquals(2, n3Template.getRequiredParams().params.size());
+        assertEquals(0, n3Template.getProvidedParams().getParameters().size());
+        assertEquals(2, n3Template.getRequiredParams().getParameters().size());
         assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3Text());
     }
 
