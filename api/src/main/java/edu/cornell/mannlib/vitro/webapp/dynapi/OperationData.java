@@ -1,30 +1,81 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOJsonMessageConverter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOParametersMessageConverter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
+
 public class OperationData {
 
-	private final Map<String, String[]> params;
-	private final ServletContext context;
+    private final static String RESOURCE_ID = "resource_id";
 
-	public OperationData(HttpServletRequest request) {
-		params = request.getParameterMap();
-		context = request.getServletContext();
-	}
+    private final Map<String, String[]> params;
+    private final ServletContext context;
+    private ObjectData data;
 
-	public ServletContext getContext() {
-		return context;
-	}
+    public OperationData(HttpServletRequest request) {
+        params = request.getParameterMap();
+        context = request.getServletContext();
+        // if (ContentType.APPLICATION_JSON.toString().equalsIgnoreCase(request.getContentType()))
+        //   data = IOJsonMessageConverter.getInstance().loadDataFromRequest(request);
+        // else
+        //   data = IOParametersMessageConverter.getInstance().loadDataFromRequest(request);
+        data = IOJsonMessageConverter.getInstance().loadDataFromRequest(request);
+        if ((data == null) || (data.getContainer().size() == 0)) {
+            data = IOParametersMessageConverter.getInstance().loadDataFromRequest(request);
+        }
+        addRequestPathParameters(request);
+    }
 
-	public boolean has(String paramName) {
-		return params.containsKey(paramName);
-	}
+    private void addRequestPathParameters(HttpServletRequest request) {
+        if (data == null)
+            data = new ObjectData();
+        Map<String, Data> ioDataMap = data.getContainer();
+        if (ioDataMap.get(OperationData.RESOURCE_ID) == null) {
+            RequestPath requestPath = RequestPath.from(request);
+            String resourceId = requestPath.getResourceId();
+            if (resourceId != null) {
+                ioDataMap.put(OperationData.RESOURCE_ID, new StringData(resourceId));
+            }
+        }
+    }
 
-	public String[] get(String paramName) {
-		return params.get(paramName);
-	}
+    public ServletContext getContext() {
+        return context;
+    }
+
+    public ObjectData getRootData() {
+        return data;
+    }
+
+    public Data getData(String paramName) {
+        return data.getElement(paramName);
+    }
+
+    public boolean has(String paramName) {
+        return getData(paramName) != null;
+    }
+
+    public String[] get(String paramName) {
+        String[] retVal = new String[0];
+        Data internalData = getData(paramName);
+        if (internalData != null) {
+            List<String> listString = internalData.getAsString();
+            retVal = (listString != null) ? listString.toArray(new String[0]) : retVal;
+        }
+        return retVal;
+    }
+
+    public void add(String key, Data newData) {
+        data.setElement(key, newData);
+    }
 
 }

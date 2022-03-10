@@ -15,7 +15,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class N3Template implements Template{
+public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
@@ -25,34 +25,31 @@ public class N3Template implements Template{
 	private String n3Text;
 	private ModelComponent templateModel;
 
-  	//region @Property Setters
+    private Parameters requiredParams = new Parameters();
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addRequiredParameter(Parameter param) {
-		requiredParams.add(param);
-	}
+    // region @Property Setters
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3Text", minOccurs = 1, maxOccurs = 1)
-	public void setN3Text(String n3Text) {
-		this.n3Text = n3Text;
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+    public void addRequiredParameter(Parameter param) {
+        requiredParams.add(param);
+    }
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasTemplateModel", minOccurs = 1, maxOccurs = 1)
 	public void setTemplateModel(ModelComponent templateModel){ this.templateModel = templateModel; }
 
-	//endregion
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3Text", minOccurs = 1, maxOccurs = 1)
+    public void setN3Text(String n3Text) {
+        this.n3Text = n3Text;
+    }
 
-	//region Getters
+    // endregion
 
-	@Override
-	public Parameters getRequiredParams() {
-		return requiredParams;
-	}
+    // region Getters
 
-	@Override
-	public Parameters getProvidedParams() {
-		return new Parameters();
-	}
+    @Override
+    public Parameters getRequiredParams() {
+        return requiredParams;
+    }
 
 	public String getN3Text() { return this.n3Text; }
 
@@ -144,5 +141,4 @@ public class N3Template implements Template{
 	@Override
 	public void dereference() {
 
-	}
 }
