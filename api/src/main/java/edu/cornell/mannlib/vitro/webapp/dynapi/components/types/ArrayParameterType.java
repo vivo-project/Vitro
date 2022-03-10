@@ -19,24 +19,12 @@ public class ArrayParameterType extends ParameterType {
     }
 
     @Override
-    public String computePrefix(String fieldName, String parameterName) {
+    public String computePrefix(String fieldName) {
         String retVal = "";
-        String fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("."));
-        String index = "notNumber";
+        String index = fieldName.substring(0, fieldName.indexOf("."));
         String fieldNameOtherPart = fieldName.substring(fieldName.indexOf(".") + 1);
-        if (!(parameterName.equals(fieldNameFirstPart))) {
-            retVal = parameterName;
-            index = fieldNameFirstPart;
-        } else {
-            index = (fieldNameOtherPart.contains("."))
-                    ? fieldNameOtherPart.substring(0, fieldNameOtherPart.indexOf("."))
-                    : "notNumber";
-        }
         if (NumberUtils.isDigits(index)) {
             ParameterType internalParameterType = this.getElementsType();
-            if (fieldNameOtherPart.contains(".")) {
-                fieldNameOtherPart = fieldNameOtherPart.substring(fieldName.indexOf(".") + 1);
-            }
             if (internalParameterType instanceof ObjectParameterType) {
                 ObjectParameterType objectType = (ObjectParameterType) internalParameterType;
                 boolean exist = false;
@@ -59,7 +47,7 @@ public class ArrayParameterType extends ParameterType {
             retVal = null;
         }
 
-        return (retVal != null && retVal.length() > 0) ? retVal += "." : retVal;
+        return (retVal != null && retVal.length() > 0) ? retVal + "." : retVal;
     }
 
 }

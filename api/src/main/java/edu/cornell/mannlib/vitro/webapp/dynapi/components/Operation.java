@@ -43,11 +43,18 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
     }
 
     public String computeProvidedFieldName(String partOfName) {
+        return computeFieldName(partOfName, getProvidedParams());
+    }
+
+    public String computeRequiredFieldName(String partOfName) {
+        return computeFieldName(partOfName, getRequiredParams());
+    }
+
+    private String computeFieldName(String partOfName, Parameters params) {
         String retVal = partOfName;
-        Parameters providedParams = getProvidedParams();
-        if (providedParams != null) {
-            for (String name : providedParams.getNames()) {
-                Parameter parameter = providedParams.get(name);
+        if (params != null) {
+            for (String name : params.getNames()) {
+                Parameter parameter = params.get(name);
                 String prefix = parameter.computePrefix(partOfName);
                 if (prefix != null) {
                     retVal = prefix + partOfName;

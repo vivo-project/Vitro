@@ -12,8 +12,12 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOJsonMessageConverter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class OperationResult {
+
+    private static final Log log = LogFactory.getLog(OperationResult.class);
 
     private int responseCode;
     private static Range<Integer> errors = Range.between(400, 599);
@@ -39,7 +43,7 @@ public class OperationResult {
                     try {
                         out = response.getWriter();
                     } catch (IOException e) {
-                        // add log!
+                        log.error(e.getLocalizedMessage());
                     }
                     response.setContentType(ContentType.JSON.getMediaType());
                     response.setCharacterEncoding(StandardCharsets.UTF_8.name());

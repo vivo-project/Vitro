@@ -16,21 +16,13 @@ public class ObjectParameterType extends ParameterType {
     public Parameters getInternalElements() {
         return internalElements;
     }
-
     @Override
-    public String computePrefix(String fieldName, String parameterName) {
+    public String computePrefix(String fieldName) {
         String retVal = "";
-        String fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("."));
-        String fieldNameSecondPart = fieldName.substring(fieldName.indexOf(".") + 1);
-        String fieldNameOther = fieldNameSecondPart;
-        if (!(parameterName.equals(fieldNameFirstPart))) {
-            retVal = parameterName;
-        }
-        fieldNameOther = fieldName;
         boolean exist = false;
         for (String internalFieldName : this.getInternalElements().getNames()) {
             Parameter internalParameter = this.getInternalElements().get(internalFieldName);
-            String prefix = internalParameter.computePrefix(fieldNameOther);
+            String prefix = internalParameter.computePrefix(fieldName);
             if (prefix != null) {
                 retVal += prefix;
                 exist = true;
@@ -41,7 +33,7 @@ public class ObjectParameterType extends ParameterType {
             retVal = null;
         }
 
-        return (retVal != null && retVal.length() > 0) ? retVal += "." : retVal;
+        return (retVal != null && retVal.length() > 0) ? retVal + "." : retVal;
     }
 
 }

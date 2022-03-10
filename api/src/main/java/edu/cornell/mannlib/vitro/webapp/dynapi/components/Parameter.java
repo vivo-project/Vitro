@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ArrayParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ObjectParameterType;
 import org.apache.jena.datatypes.RDFDatatype;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
@@ -57,11 +59,17 @@ public class Parameter implements Removable {
     public String computePrefix(String fieldName) {
         String retVal = "";
         if (type instanceof PrimitiveParameterType) {
-            retVal = type.computePrefix(fieldName, name);
+            retVal = (name.equals(fieldName)) ? "" : null;
         } else if (!(fieldName.contains("."))) {
             retVal = null;
         } else {
-            retVal = type.computePrefix(fieldName, name);
+            String fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("."));
+            if (!(name.equals(fieldNameFirstPart))) {
+                String restOfPrefix = type.computePrefix(fieldName);
+                retVal = (restOfPrefix != null) ? name + "." + restOfPrefix: null;
+            } else {
+                retVal = type.computePrefix(fieldName.substring(fieldName.indexOf(".") + 1));
+            }
         }
 
         return retVal;
