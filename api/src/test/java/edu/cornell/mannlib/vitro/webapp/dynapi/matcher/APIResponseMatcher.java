@@ -23,7 +23,7 @@ public class APIResponseMatcher implements ArgumentMatcher<String>{
 
     @Override
     public boolean matches(String argument) {
-        OpenAPI expected = readSpec(true, readFile(path));
+        OpenAPI expected = readSpec(true, readJson(path));
         OpenAPI actual = readSpec(json, argument);
 
         return actual.equals(expected);
@@ -45,9 +45,9 @@ public class APIResponseMatcher implements ArgumentMatcher<String>{
         return api;
     }
 
-    private String readFile(String path) {
+    private String readJson(String path) {
         try {
-            return new String(Files.readAllBytes(getFile().toPath()));
+            return new String(Files.readAllBytes(getJson().toPath()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,8 +55,8 @@ public class APIResponseMatcher implements ArgumentMatcher<String>{
         return null;
     }
 
-    private File getFile() throws IOException {
-        return new File("src/test/resources/dynapi/mock/docs/response/" + path);
+    private File getJson() throws IOException {
+        return new File("src/test/resources/dynapi/mock/docs/response/" + path + ".json");
     }
 
 }

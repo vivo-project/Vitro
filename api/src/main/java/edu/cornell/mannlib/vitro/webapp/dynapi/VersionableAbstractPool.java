@@ -54,8 +54,8 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
                 return false;
             }
         } else if (hasVersionMin) {
-            // ensure key version specific values are respected
-            if (mismatchSpecificVersion(component, keyVersion)) {
+            // ensure key version is not less than component version min
+            if (lessThanVersionMin(component, keyVersion)) {
                 return false;
             }
         }
@@ -76,16 +76,17 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
         return majorVersionGreater || minorVersionGreater || patchVersionGreater;
     }
 
-    private boolean mismatchSpecificVersion(C component, Version keyVersion) {
+    private boolean lessThanVersionMin(C component, Version keyVersion) {
         Version componentVersionMin = Version.of(component.getVersionMin());
+        boolean majorVersionLesser = keyVersion.getMajor().compareTo(componentVersionMin.getMajor()) < 0;
 
-        boolean mismatchMinorVersion = minorVersionSpecific(keyVersion)
-                && !keyVersion.getMinor().equals(componentVersionMin.getMinor());
+        boolean minorVersionLesser = minorVersionSpecific(keyVersion)
+                && keyVersion.getMinor().compareTo(componentVersionMin.getMinor()) < 0;
 
-        boolean mismatchPatchVersion = patchVersionSpecific(keyVersion)
-                && !keyVersion.getPatch().equals(componentVersionMin.getPatch());
+        boolean patchVersionLesser = patchVersionSpecific(keyVersion)
+                && keyVersion.getPatch().compareTo(componentVersionMin.getPatch()) < 0;
 
-        return mismatchMinorVersion || mismatchPatchVersion;
+        return majorVersionLesser || minorVersionLesser || patchVersionLesser;
     }
 
     private boolean minorVersionSpecific(Version keyVersion) {

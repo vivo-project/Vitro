@@ -116,25 +116,27 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest
         final String relationship = "test_relationship";
 
         return Arrays.asList(new Object[][] {
-            // action,      json,  expected response,       message
-            { null,         false, "rpc/all.json",          "All" },
-            { action,       false, "rpc/action.json",       action },
-            { collection,   false, "rpc/collection.json",   collection },
-            { concept,      false, "rpc/concept.json",      concept },
-            { document,     false, "rpc/document.json",     document },
-            { organization, false, "rpc/organization.json", organization },
-            { person,       false, "rpc/person.json",       person },
-            { process,      false, "rpc/process.json",      process },
-            { relationship, false, "rpc/relationship.json", relationship },
-            { null,         true,  "rpc/all.json",          "All" },
-            { action,       true,  "rpc/action.json",       action },
-            { collection,   true,  "rpc/collection.json",   collection },
-            { concept,      true,  "rpc/concept.json",      concept },
-            { document,     true,  "rpc/document.json",     document },
-            { organization, true,  "rpc/organization.json", organization },
-            { person,       true,  "rpc/person.json",       person },
-            { process,      true,  "rpc/process.json",      process },
-            { relationship, true,  "rpc/relationship.json", relationship },
+            // action,      json,  expected response,  message
+            { null,         false, "rpc/all",          "All with yaml" },
+            { action,       false, "rpc/action",       action + " with yaml" },
+            { collection,   false, "rpc/collection",   collection + " with yaml" },
+            { concept,      false, "rpc/concept",      concept + " with yaml" },
+            { document,     false, "rpc/document",     document + " with yaml" },
+            { organization, false, "rpc/organization", organization + " with yaml" },
+            { person,       false, "rpc/person",       person + " with yaml" },
+            { process,      false, "rpc/process",      process + " with yaml" },
+            { relationship, false, "rpc/relationship", relationship + " with yaml" },
+
+            // action,      json,  expected response,  message
+            { null,         true,  "rpc/all",          "All with json" },
+            { action,       true,  "rpc/action",       action + " with json" },
+            { collection,   true,  "rpc/collection",   collection + " with json" },
+            { concept,      true,  "rpc/concept",      concept + " with json" },
+            { document,     true,  "rpc/document",     document + " with json" },
+            { organization, true,  "rpc/organization", organization + " with json" },
+            { person,       true,  "rpc/person",       person + " with json" },
+            { process,      true,  "rpc/process",      process + " with json" },
+            { relationship, true,  "rpc/relationship", relationship + " with json" },
         });
     }
 
