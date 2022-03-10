@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
 
 @RunWith(Parameterized.class)
 public class RESTDocumentationEndpointIntegrationTest extends ServletContextITest {
@@ -42,9 +45,12 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
     public String testResource;
 
     @Parameter(2)
-    public Boolean testJsonMimeType;
+    public Boolean testJson;
 
     @Parameter(3)
+    public String testExpectedResponse;
+
+    @Parameter(4)
     public String testMessage;
 
     @Before
@@ -53,6 +59,9 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
 
         loadDefaultModel();
         loadTestModel();
+        loadPersonVersion1_1Model();
+        loadPersonVersion2Model();
+        loadPersonVersion4_3_7Model();
 
         loadModels("n3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-api.n3");
 
@@ -86,7 +95,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
             pathInfo += "/" + testResource;
         }
 
-        if (testJsonMimeType == true) {
+        if (testJson == true) {
             mimeType = "application/json";
         }
 
@@ -101,26 +110,63 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
         restEndpoint.doGet(request, response);
 
         verify(response, times(1)).setContentType(mimeType);
-
-        // Needs to compare against a pre-built expected response body.
-        // verify(responsePrintWriter, times(1)).print(expectedReponseBody);
+        verify(responsePrintWriter, times(1)).print(argThat(new APIResponseMatcher(testJson, testExpectedResponse)));
         verify(responsePrintWriter, times(1)).flush();
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         final String collection = "test_collection_resource";
+        final String concept = "test_concept_resource";
+        final String document = "test_document_resource";
+        final String organization = "test_organization_resource";
+        final String person = "test_person_resource";
+        final String process = "test_process_resource";
+        final String relationship = "test_relationship_resource";
+        final String resource = "test_resource";
 
         return Arrays.asList(new Object[][] {
-            // version resource,   json, message
-            { "1",     null,       false, "All, Version 1" },
-            { "2.1.0", null,       false, "All, Version 2.1.0" },
-            { "1",     collection, false, collection + ", Version 1" },
-            { "2.1.0", collection, false, collection + ", Version 2.1.0" },
-            { "1",     null,       true,  "All, Version 1" },
-            { "2.1.0", null,       true,  "All, Version 2.1.0" },
-            { "1",     collection, true,  collection + ", Version 1" },
-            { "2.1.0", collection, true,  collection + ", Version 2.1.0" },
+            // version resource,     json,  expected response,        message
+            { "1",     null,         false, "rest/1/all",             "All, Version 1 with yaml" },
+            { "1",     collection,   false, "rest/1/" + collection,   collection + ", Version 1 with yaml" },
+            { "1",     concept,      false, "rest/1/" + concept,      concept + ", Version 1 with yaml" },
+            { "1",     document,     false, "rest/1/" + document,     document + ", Version 1 with yaml" },
+            { "1",     organization, false, "rest/1/" + organization, organization + ", Version 1 with yaml" },
+            { "1",     person,       false, "rest/1/" + person,       person + ", Version 1 with yaml" },
+            { "1",     process,      false, "rest/1/" + process,      process + ", Version 1 with yaml" },
+            { "1",     relationship, false, "rest/1/" + relationship, relationship + ", Version 1 with yaml" },
+            { "1",     resource,     false, "rest/1/" + resource,     resource + ", Version 1 with yaml" },
+
+            { "2",     null,         false, "rest/2/all",             "All, Version 2 with yaml" },
+            { "2",     collection,   false, "rest/2/" + collection,   collection + ", Version 2 with yaml" },
+            { "2",     concept,      false, "rest/2/" + concept,      concept + ", Version 2 with yaml" },
+            { "2",     document,     false, "rest/2/" + document,     document + ", Version 2 with yaml" },
+            { "2",     organization, false, "rest/2/" + organization, organization + ", Version 2 with yaml" },
+            { "2",     person,       false, "rest/2/" + person,       person + ", Version 2 with yaml" },
+            { "2",     process,      false, "rest/2/" + process,      process + ", Version 2 with yaml" },
+            { "2",     relationship, false, "rest/2/" + relationship, relationship + ", Version 2 with yaml" },
+            { "2",     resource,     false, "rest/2/" + resource,     resource + ", Version 2 with yaml" },
+
+            // // version resource,     json,  expected response,        message
+            { "1",     null,         true, "rest/1/all",              "All, Version 1 with json" },
+            { "1",     collection,   true, "rest/1/" + collection,    collection + ", Version 1 with json" },
+            { "1",     concept,      true, "rest/1/" + concept,       concept + ", Version 1 with json" },
+            { "1",     document,     true, "rest/1/" + document,      document + ", Version 1 with json" },
+            { "1",     organization, true, "rest/1/" + organization,  organization + ", Version 1 with json" },
+            { "1",     person,       true, "rest/1/" + person,        person + ", Version 1 with json" },
+            { "1",     process,      true, "rest/1/" + process,       process + ", Version 1 with json" },
+            { "1",     relationship, true, "rest/1/" + relationship,  relationship + ", Version 1 with json" },
+            { "1",     resource,     true, "rest/1/" + resource,      resource + ", Version 1 with json" },
+
+            { "2",     null,         true, "rest/2/all",              "All, Version 2 with json" },
+            { "2",     collection,   true, "rest/2/" + collection,    collection + ", Version 2 with json" },
+            { "2",     concept,      true, "rest/2/" + concept,       concept + ", Version 2 with json" },
+            { "2",     document,     true, "rest/2/" + document,      document + ", Version 2 with json" },
+            { "2",     organization, true, "rest/2/" + organization,  organization + ", Version 2 with json" },
+            { "2",     person,       true, "rest/2/" + person,        person + ", Version 2 with json" },
+            { "2",     process,      true, "rest/2/" + process,       process + ", Version 2 with json" },
+            { "2",     relationship, true, "rest/2/" + relationship,  relationship + ", Version 2 with json" },
+            { "2",     resource,     true, "rest/2/" + resource,      resource + ", Version 2 with json" },
         });
     }
 

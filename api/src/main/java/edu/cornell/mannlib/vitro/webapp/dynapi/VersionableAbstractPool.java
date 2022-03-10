@@ -2,6 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
@@ -13,10 +14,20 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
 
     public List<C> getComponents(Version version) {
         return getComponents()
-            .values()
-            .stream()
-            .filter(component -> isInRange(component, version))
-            .collect(Collectors.toList());
+                .values()
+                .stream()
+                .collect(
+                    // dedupe by name and major version
+                    Collectors.toMap(
+                        component -> component.getKey().getMajorVersionKey(),
+                        component -> component,
+                        (existing, current) -> current,
+                        ConcurrentSkipListMap::new)
+                    )
+                .values()
+                .stream()
+                .filter(component -> isMajorVersionInRange(component, version))
+                .collect(Collectors.toList());
     }
 
     public C get(K key) {
@@ -26,7 +37,7 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
             component = entry.getValue();
             String keyName = key.getName();
             Version keyVersion = key.getVersion();
-            if (!matchesName(component, keyName) || !isInRange(component, keyVersion)) {
+            if (!matchesName(component, keyName) || !nearestVersion(component, keyVersion)) {
                 component = null;
             }
         }
@@ -39,12 +50,30 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
         return component;
     }
 
+    private boolean isMajorVersionInRange(C component, Version keyVersion) {
+        Version componentVersionMin = Version.of(component.getVersionMin());
+
+        if (componentVersionMin.getMajor() > keyVersion.getMajor()) {
+            return false;
+        }
+
+        if (component.getVersionMax() != null) {
+            Version componentVersionMax = Version.of(component.getVersionMax());
+
+            if (componentVersionMax.getMajor() < keyVersion.getMajor()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private boolean matchesName(C component, String keyName) {
         // ensure key name matches component key name
         return keyName.equals(component.getKey().getName());
     }
 
-    private boolean isInRange(C component, Version keyVersion) {
+    private boolean nearestVersion(C component, Version keyVersion) {
         boolean hasVersionMax = component.getVersionMax() != null;
         boolean hasVersionMin = component.getVersionMin() != null;
 

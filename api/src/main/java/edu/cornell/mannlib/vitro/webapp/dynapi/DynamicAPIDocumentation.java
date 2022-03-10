@@ -166,6 +166,14 @@ public class DynamicAPIDocumentation {
 
         String servletPath = ApiRequestPath.RPC_SERVLET_PATH;
 
+        // Both "info" and "info.version" are required by OpenAPIv3, even if it is an empty string.
+        APIInformation apiInformation = new APIInformation();
+        apiInformation.setTitle("RPC API");
+        apiInformation.setDescription("An RPC API.");
+        apiInformation.setVersion("");
+
+        openApi.setInfo(info(apiInformation));
+
         if (requestPath.getActionName() == null) {
 
             Map<String, Action> actions = ActionPool.getInstance().getComponents();
@@ -239,7 +247,7 @@ public class DynamicAPIDocumentation {
         tag.setName(resourceAPI.getName());
 
         // No description available per resource API
-        tag.setDescription(format("REST for %s", resourceAPI.getName()));
+        tag.setDescription(format("REST %s", resourceAPI.getKey()));
 
         return tag;
     }
@@ -260,7 +268,7 @@ public class DynamicAPIDocumentation {
             tag.setName(action.getKey());
 
             // No description available per action
-            tag.setDescription(format("RPC for %s", action.getKey()));
+            tag.setDescription(format("RPC %s", action.getKey()));
         } catch (NullPointerException e) {
             log.error("RPC not defined for action");
         }
@@ -506,7 +514,7 @@ public class DynamicAPIDocumentation {
 
         ApiResponses apiResponses = new ApiResponses();
 
-        addCreatedApiResponse(apiResponses);
+        addOkApiResponse(apiResponses, action);
         addUnauthorizedApiResponse(apiResponses);
         addForbiddenApiResponse(apiResponses);
         addNotFoundApiResponse(apiResponses);

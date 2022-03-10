@@ -19,9 +19,9 @@
         dynapi:description                  "A test of the newer dynamic API" ;
         dynapi:version                      "2" .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv2.1.0>
+<https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv4>
         a                                   dynapi:api ;
         rdfs:label                          "Improved Test API"@en-US ;
         dynapi:title                        "Improved Test API" ;
         dynapi:description                  "A test of thew improved newer dynamic API" ;
-        dynapi:version                      "2.1.0" .
+        dynapi:version                      "4" .
