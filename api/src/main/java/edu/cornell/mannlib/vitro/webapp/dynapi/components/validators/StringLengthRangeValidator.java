@@ -1,59 +1,63 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+
 public class StringLengthRangeValidator extends IsNotBlank {
-	
-	private static final Log log = LogFactory.getLog(StringLengthRangeValidator.class);
 
-	private Integer minLength;
+    private static final Log log = LogFactory.getLog(StringLengthRangeValidator.class);
 
-	private Integer maxLength;
+    private Integer minLength;
 
-	public Integer getMinLength() {
-		return minLength;
-	}
+    private Integer maxLength;
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minLength", maxOccurs = 1)
-	public void setMinLength(int minLength) {
-		this.minLength = minLength;
-	}
+    public Integer getMinLength() {
+        return minLength;
+    }
 
-	public Integer getMaxLength() {
-		return maxLength;
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minLength", maxOccurs = 1)
+    public void setMinLength(int minLength) {
+        this.minLength = minLength;
+    }
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxLength", maxOccurs = 1)
-	public void setMaxLength(int maxValue) {
-		this.maxLength = maxValue;
-	}
+    public Integer getMaxLength() {
+        return maxLength;
+    }
 
-	@Override
-	public boolean isValid(String name, String[] values) {
-		if (!super.isValid(name, values)) {
-			return false;
-		}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxLength", maxOccurs = 1)
+    public void setMaxLength(int maxValue) {
+        this.maxLength = maxValue;
+    }
 
-		for (String value : values) {
-			if (!isLengthInRange(value)) {
-				log.debug("Length of " + name + " is not in range [" + ((minLength != null)?minLength:" ") + "-" + ((maxLength != null)?maxLength:" ")+"].");
-				return false;
-			}
-		}
-		return true;
-	}
+    @Override
+    public boolean isValid(String name, String[] values) {
+        if (!super.isValid(name, values)) {
+            return false;
+        }
 
-	private boolean isLengthInRange(String string) {
-		int length = string.length();
+        for (String value : values) {
+            if (!isLengthInRange(value)) {
+                log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"
+                        + ((maxLength != null) ? maxLength : " ") + "].");
+                return false;
+            }
+        }
+        return true;
+    }
 
-		if ((minLength != null) && (length < minLength))
-			return false;
+    private boolean isLengthInRange(String string) {
+        int length = string.length();
 
-		if ((maxLength != null) && (length > maxLength))
-			return false;
+        if ((minLength != null) && (length < minLength)) {
+            return false;
+        }
 
-		return true;
-	}
+        if ((maxLength != null) && (length > maxLength)) {
+            return false;
+        }
+
+        return true;
+    }
 }

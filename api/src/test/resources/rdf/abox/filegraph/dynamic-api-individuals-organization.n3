@@ -8,6 +8,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testOrganizationAction1>
         a                                   dynapi:action ;
         rdfs:label                          "Test organization action 1"@en-US ;
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
         dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateOrganizationRPC1> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testOrganizationStep1> .
 

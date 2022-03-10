@@ -10,6 +10,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1>
         a                                   dynapi:action ;
         rdfs:label                          "Test action"@en-US ;
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
         dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
 
@@ -24,7 +25,8 @@
         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam2> ;
-        dynapi:sparqlQueryText              "SELECT ?geoLocation ?label\nWHERE\n{\n      ?geoLocation <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation>\n       OPTIONAL { ?geoLocation <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
+        dynapi:sparqlQueryText              "SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>
         a                                   dynapi:parameter ;
@@ -34,14 +36,6 @@
         dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger> ,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam2>
-        a                                   dynapi:parameter ;
-        rdfs:label                          "Test parameter 2 for query 1"@en-US ;
-        dynapi:name                         "email" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
-        dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>,
-                                            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator> .
-
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator>
         a                                   dynapi:validator ,
                                             dynapi_java:validators.Validator ,
@@ -50,12 +44,64 @@
         dynapi:minValue                     10 ;
         dynapi:maxValue                     30.5 .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam2>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test parameter 2 for query 1"@en-US ;
+        dynapi:name                         "email" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>,
+                                            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator> .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator>
         a                                   dynapi:validator ,
                                             dynapi_java:validators.Validator ,
                                             dynapi_java:validators.StringLengthRangeValidator ;
         rdfs:label                          "Test string length range validator for parameter 2"@en-US ;
         dynapi:minLength                    5 .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Result parameter 1 for query 1"@en-US ;
+        dynapi:name                         "result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultArray>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result array structure"@en-US ;
+        dynapi:name                         "result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Test result array type"@en-US ;
+        dynapi:name                         "test result array type" ;
+        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:objectParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Test result action object type"@en-US ;
+        dynapi:name                         "test result action object type" ;
+        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction> ,
+                                            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result action parameter"@en-US ;
+        dynapi:name                         "action" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result label parameter"@en-US ;
+        dynapi:name                         "label" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1>
         a                                   dynapi:rpc ;

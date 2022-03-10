@@ -9,11 +9,11 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import org.junit.After;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
