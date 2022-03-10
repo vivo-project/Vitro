@@ -1,18 +1,197 @@
 {
   "openapi" : "3.0.1",
   "info" : {
-    "title" : "RPC API",
-    "description" : "An RPC API.",
-    "version" : ""
+    "title" : "Test API",
+    "description" : "A test dynamic API",
+    "version" : "1"
   },
   "tags" : [ {
-    "name" : "All RPC",
-    "description" : "All available custom actions"
+    "name" : "test_resource",
+    "description" : "REST test_resource (0.1.0)"
   } ],
   "paths" : {
-    "/api/rpc/test_action" : {
+    "/api/rest/1/test_resource" : {
+      "get" : {
+        "tags" : [ "test_resource" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      },
       "post" : {
-        "tags" : [ "All RPC" ],
+        "tags" : [ "test_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rest/1/test_resource/resource:{resourceId}" : {
+      "get" : {
+        "tags" : [ "test_resource" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "test_resource" ],
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -84,27 +263,36 @@
             }
           }
         }
-      }
-    },
-    "/api/rpc/test_collection" : {
-      "post" : {
-        "tags" : [ "All RPC" ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "object"
-              }
-            }
-          }
-        },
+      },
+      "delete" : {
+        "tags" : [ "test_resource" ],
         "responses" : {
           "200" : {
             "description" : "OK",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -140,11 +328,9 @@
             }
           }
         }
-      }
-    },
-    "/api/rpc/test_concept" : {
-      "post" : {
-        "tags" : [ "All RPC" ],
+      },
+      "patch" : {
+        "tags" : [ "test_resource" ],
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -160,7 +346,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -196,287 +402,16 @@
             }
           }
         }
-      }
-    },
-    "/api/rpc/test_document" : {
-      "post" : {
-        "tags" : [ "All RPC" ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "object"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Resource not found",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          }
+      },
+      "parameters" : [ {
+        "name" : "resourceId",
+        "in" : "path",
+        "description" : "Base64 encoded URI of the resource",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
         }
-      }
-    },
-    "/api/rpc/test_organization" : {
-      "post" : {
-        "tags" : [ "All RPC" ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "object"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Resource not found",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/rpc/test_person" : {
-      "post" : {
-        "tags" : [ "All RPC" ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "object"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Resource not found",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/rpc/test_process" : {
-      "post" : {
-        "tags" : [ "All RPC" ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "object"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Resource not found",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/rpc/test_relationship" : {
-      "post" : {
-        "tags" : [ "All RPC" ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "object"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Resource not found",
-            "content" : {
-              "text/plain" : {
-                "schema" : {
-                  "type" : "string"
-                }
-              }
-            }
-          }
-        }
-      }
+      } ]
     }
   }
 }

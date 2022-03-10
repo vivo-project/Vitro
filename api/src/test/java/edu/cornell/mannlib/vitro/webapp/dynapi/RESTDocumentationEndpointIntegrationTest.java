@@ -59,6 +59,9 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
 
         loadDefaultModel();
         loadTestModel();
+        loadPersonVersion1_1Model();
+        loadPersonVersion2Model();
+        loadPersonVersion4_3_7Model();
 
         loadModels("n3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-api.n3");
 
@@ -123,45 +126,47 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
         final String resource = "test_resource";
 
         return Arrays.asList(new Object[][] {
-            // version resource,     json,  expected response,         message
-            { "1",     null,         false, "rest/1/all",              "All, Version 1 with yaml" },
-          //{ "2.1.0", null,         false, "rest/2.1.0/all",          "All, Version 2.1.0 with yaml" },
-            { "1",     collection,   false, "rest/1/collection",       collection + ", Version 1 with yaml" },
-          //{ "2.1.0", collection,   false, "rest/2.1.0/collection",   collection + ", Version 2.1.0 with yaml" },
-            { "1",     concept,      false, "rest/1/concept",          concept + ", Version 1 with yaml" },
-          //{ "2.1.0", concept,      false, "rest/2.1.0/concept",      concept + ", Version 2.1.0 with yaml" },
-            { "1",     document,     false, "rest/1/document",         document + ", Version 1 with yaml" },
-          //{ "2.1.0", document,     false, "rest/2.1.0/document",     document + ", Version 2.1.0 with yaml" },
-            { "1",     organization, false, "rest/1/organization",     organization + ", Version 1 with yaml" },
-          //{ "2.1.0", organization, false, "rest/2.1.0/organization", organization + ", Version 2.1.0 with yaml" },
-            { "1",     person,       false, "rest/1/person",           person + ", Version 1 with yaml" },
-          //{ "2.1.0", person,       false, "rest/2.1.0/person",       person + ", Version 2.1.0 with yaml" },
-            { "1",     process,      false, "rest/1/process",          process + ", Version 1 with yaml" },
-          //{ "2.1.0", process,      false, "rest/2.1.0/process",      process + ", Version 2.1.0 with yaml" },
-            { "1",     relationship, false, "rest/1/relationship",     relationship + ", Version 1 with yaml" },
-          //{ "2.1.0", relationship, false, "rest/2.1.0/relationship", relationship + ", Version 2.1.0 with yaml" },
-            { "1",     resource,     false, "rest/1/resource",         resource + ", Version 1 with yaml" },
-          //{ "2.1.0", resource,     false, "rest/2.1.0/resource",     resource + ", Version 2.1.0 with yaml" },
-
             // version resource,     json,  expected response,        message
+            { "1",     null,         false, "rest/1/all",             "All, Version 1 with yaml" },
+            { "1",     collection,   false, "rest/1/" + collection,   collection + ", Version 1 with yaml" },
+            { "1",     concept,      false, "rest/1/" + concept,      concept + ", Version 1 with yaml" },
+            { "1",     document,     false, "rest/1/" + document,     document + ", Version 1 with yaml" },
+            { "1",     organization, false, "rest/1/" + organization, organization + ", Version 1 with yaml" },
+            { "1",     person,       false, "rest/1/" + person,       person + ", Version 1 with yaml" },
+            { "1",     process,      false, "rest/1/" + process,      process + ", Version 1 with yaml" },
+            { "1",     relationship, false, "rest/1/" + relationship, relationship + ", Version 1 with yaml" },
+            { "1",     resource,     false, "rest/1/" + resource,     resource + ", Version 1 with yaml" },
+
+            { "2",     null,         false, "rest/2/all",             "All, Version 2 with yaml" },
+            { "2",     collection,   false, "rest/2/" + collection,   collection + ", Version 2 with yaml" },
+            { "2",     concept,      false, "rest/2/" + concept,      concept + ", Version 2 with yaml" },
+            { "2",     document,     false, "rest/2/" + document,     document + ", Version 2 with yaml" },
+            { "2",     organization, false, "rest/2/" + organization, organization + ", Version 2 with yaml" },
+            { "2",     person,       false, "rest/2/" + person,       person + ", Version 2 with yaml" },
+            { "2",     process,      false, "rest/2/" + process,      process + ", Version 2 with yaml" },
+            { "2",     relationship, false, "rest/2/" + relationship, relationship + ", Version 2 with yaml" },
+            { "2",     resource,     false, "rest/2/" + resource,     resource + ", Version 2 with yaml" },
+
+            // // version resource,     json,  expected response,        message
             { "1",     null,         true, "rest/1/all",              "All, Version 1 with json" },
-          //{ "2.1.0", null,         true, "rest/2.1.0/all",          "All, Version 2.1.0 with json" },
-            { "1",     collection,   true, "rest/1/collection",       collection + ", Version 1 with json" },
-          //{ "2.1.0", collection,   true, "rest/2.1.0/collection",   collection + ", Version 2.1.0 with json" },
-            { "1",     concept,      true, "rest/1/concept",          concept + ", Version 1 with json" },
-          //{ "2.1.0", concept,      true, "rest/2.1.0/concept",      concept + ", Version 2.1.0 with json" },
-            { "1",     document,     true, "rest/1/document",         document + ", Version 1 with json" },
-          //{ "2.1.0", document,     true, "rest/2.1.0/document",     document + ", Version 2.1.0 with json" },
-            { "1",     organization, true, "rest/1/organization",     organization + ", Version 1 with json" },
-          //{ "2.1.0", organization, true, "rest/2.1.0/organization", organization + ", Version 2.1.0 with json" },
-            { "1",     person,       true, "rest/1/person",           person + ", Version 1 with json" },
-          //{ "2.1.0", person,       true, "rest/2.1.0/person",       person + ", Version 2.1.0 with json" },
-            { "1",     process,      true, "rest/1/process",          process + ", Version 1 with json" },
-          //{ "2.1.0", process,      true, "rest/2.1.0/process",      process + ", Version 2.1.0 with json" },
-            { "1",     relationship, true, "rest/1/relationship",     relationship + ", Version 1 with json" },
-          //{ "2.1.0", relationship, true, "rest/2.1.0/relationship", relationship + ", Version 2.1.0 with json" },
-            { "1",     resource,     true, "rest/1/resource",         resource + ", Version 1 with json" },
-          //{ "2.1.0", resource,     true, "rest/2.1.0/resource",       resource + ", Version 2.1.0 with json" },
+            { "1",     collection,   true, "rest/1/" + collection,    collection + ", Version 1 with json" },
+            { "1",     concept,      true, "rest/1/" + concept,       concept + ", Version 1 with json" },
+            { "1",     document,     true, "rest/1/" + document,      document + ", Version 1 with json" },
+            { "1",     organization, true, "rest/1/" + organization,  organization + ", Version 1 with json" },
+            { "1",     person,       true, "rest/1/" + person,        person + ", Version 1 with json" },
+            { "1",     process,      true, "rest/1/" + process,       process + ", Version 1 with json" },
+            { "1",     relationship, true, "rest/1/" + relationship,  relationship + ", Version 1 with json" },
+            { "1",     resource,     true, "rest/1/" + resource,      resource + ", Version 1 with json" },
+
+            { "2",     null,         true, "rest/2/all",              "All, Version 2 with json" },
+            { "2",     collection,   true, "rest/2/" + collection,    collection + ", Version 2 with json" },
+            { "2",     concept,      true, "rest/2/" + concept,       concept + ", Version 2 with json" },
+            { "2",     document,     true, "rest/2/" + document,      document + ", Version 2 with json" },
+            { "2",     organization, true, "rest/2/" + organization,  organization + ", Version 2 with json" },
+            { "2",     person,       true, "rest/2/" + person,        person + ", Version 2 with json" },
+            { "2",     process,      true, "rest/2/" + process,       process + ", Version 2 with json" },
+            { "2",     relationship, true, "rest/2/" + relationship,  relationship + ", Version 2 with json" },
+            { "2",     resource,     true, "rest/2/" + resource,      resource + ", Version 2 with json" },
         });
     }
 

@@ -247,7 +247,7 @@ public class DynamicAPIDocumentation {
         tag.setName(resourceAPI.getName());
 
         // No description available per resource API
-        tag.setDescription(format("REST for %s", resourceAPI.getName()));
+        tag.setDescription(format("REST %s", resourceAPI.getKey()));
 
         return tag;
     }
@@ -268,7 +268,7 @@ public class DynamicAPIDocumentation {
             tag.setName(action.getKey());
 
             // No description available per action
-            tag.setDescription(format("RPC for %s", action.getKey()));
+            tag.setDescription(format("RPC %s", action.getKey()));
         } catch (NullPointerException e) {
             log.error("RPC not defined for action");
         }

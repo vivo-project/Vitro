@@ -1,9 +1,9 @@
 {
   "openapi" : "3.0.1",
   "info" : {
-    "title" : "Test API",
-    "description" : "A test dynamic API",
-    "version" : "1"
+    "title" : "Newer Test API",
+    "description" : "A test of the newer dynamic API",
+    "version" : "2"
   },
   "tags" : [ {
     "name" : "test_collection_resource",
@@ -17,12 +17,6 @@
   }, {
     "name" : "test_organization_resource",
     "description" : "REST test_organization_resource (1.0.0)"
-  }, {
-    "name" : "test_person_resource",
-    "description" : "REST test_person_resource (1.0.0)"
-  }, {
-    "name" : "test_person_resource",
-    "description" : "REST test_person_resource (1.1.0)"
   }, {
     "name" : "test_person_resource",
     "description" : "REST test_person_resource (2.0.0)"
@@ -40,7 +34,7 @@
     "description" : "REST test_resource (0.1.0)"
   } ],
   "paths" : {
-    "/api/rest/1/test_collection_resource" : {
+    "/api/rest/2/test_collection_resource" : {
       "get" : {
         "tags" : [ "test_collection_resource" ],
         "responses" : {
@@ -134,7 +128,7 @@
         }
       }
     },
-    "/api/rest/1/test_collection_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_collection_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_collection_resource" ],
         "responses" : {
@@ -343,7 +337,7 @@
         }
       } ]
     },
-    "/api/rest/1/test_concept_resource" : {
+    "/api/rest/2/test_concept_resource" : {
       "get" : {
         "tags" : [ "test_concept_resource" ],
         "responses" : {
@@ -437,7 +431,7 @@
         }
       }
     },
-    "/api/rest/1/test_concept_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_concept_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_concept_resource" ],
         "responses" : {
@@ -646,7 +640,7 @@
         }
       } ]
     },
-    "/api/rest/1/test_document_resource" : {
+    "/api/rest/2/test_document_resource" : {
       "get" : {
         "tags" : [ "test_document_resource" ],
         "responses" : {
@@ -740,7 +734,7 @@
         }
       }
     },
-    "/api/rest/1/test_document_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_document_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_document_resource" ],
         "responses" : {
@@ -949,7 +943,7 @@
         }
       } ]
     },
-    "/api/rest/1/test_organization_resource" : {
+    "/api/rest/2/test_organization_resource" : {
       "get" : {
         "tags" : [ "test_organization_resource" ],
         "responses" : {
@@ -1043,7 +1037,7 @@
         }
       }
     },
-    "/api/rest/1/test_organization_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_organization_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_organization_resource" ],
         "responses" : {
@@ -1252,7 +1246,7 @@
         }
       } ]
     },
-    "/api/rest/1/test_person_resource" : {
+    "/api/rest/2/test_person_resource" : {
       "get" : {
         "tags" : [ "test_person_resource" ],
         "responses" : {
@@ -1346,7 +1340,7 @@
         }
       }
     },
-    "/api/rest/1/test_person_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_person_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_person_resource" ],
         "responses" : {
@@ -1555,7 +1549,7 @@
         }
       } ]
     },
-    "/api/rest/1/test_process_resource" : {
+    "/api/rest/2/test_process_resource" : {
       "get" : {
         "tags" : [ "test_process_resource" ],
         "responses" : {
@@ -1649,7 +1643,7 @@
         }
       }
     },
-    "/api/rest/1/test_process_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_process_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_process_resource" ],
         "responses" : {
@@ -1858,7 +1852,7 @@
         }
       } ]
     },
-    "/api/rest/1/test_relationship_resource" : {
+    "/api/rest/2/test_relationship_resource" : {
       "get" : {
         "tags" : [ "test_relationship_resource" ],
         "responses" : {
@@ -1952,7 +1946,7 @@
         }
       }
     },
-    "/api/rest/1/test_relationship_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_relationship_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_relationship_resource" ],
         "responses" : {
@@ -2161,7 +2155,7 @@
         }
       } ]
     },
-    "/api/rest/1/test_resource" : {
+    "/api/rest/2/test_resource" : {
       "get" : {
         "tags" : [ "test_resource" ],
         "responses" : {
@@ -2275,7 +2269,7 @@
         }
       }
     },
-    "/api/rest/1/test_resource/resource:{resourceId}" : {
+    "/api/rest/2/test_resource/resource:{resourceId}" : {
       "get" : {
         "tags" : [ "test_resource" ],
         "responses" : {

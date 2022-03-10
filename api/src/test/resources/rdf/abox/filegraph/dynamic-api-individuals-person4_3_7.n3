@@ -14,7 +14,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testPersonStep4>
         a                                   dynapi:step, dynapi:operationalStep ;
         rdfs:label                          "Test person operational step 4"@en-US ;
-        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery4> .
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC4>
         a                                   dynapi:rpc ;
