@@ -7,15 +7,15 @@
   },
   "tags": [
     {
-      "name": "test_collection_resource",
-      "description": "REST for test_collection_resource"
+      "name": "test_organization_resource",
+      "description": "REST for test_organization_resource"
     }
   ],
   "paths": {
-    "/api/rest/1/test_collection_resource": {
+    "/api/rest/1/test_organization_resource": {
       "get": {
         "tags": [
-          "test_collection_resource"
+          "test_organization_resource"
         ],
         "responses": {
           "200": {
@@ -62,7 +62,7 @@
       },
       "post": {
         "tags": [
-          "test_collection_resource"
+          "test_organization_resource"
         ],
         "requestBody": {
           "content": {
@@ -110,10 +110,10 @@
         }
       }
     },
-    "/api/rest/1/test_collection_resource/resource:{resourceId}": {
+    "/api/rest/1/test_organization_resource/resource:{resourceId}": {
       "get": {
         "tags": [
-          "test_collection_resource"
+          "test_organization_resource"
         ],
         "responses": {
           "200": {
@@ -160,7 +160,7 @@
       },
       "put": {
         "tags": [
-          "test_collection_resource"
+          "test_organization_resource"
         ],
         "requestBody": {
           "content": {
@@ -216,7 +216,7 @@
       },
       "delete": {
         "tags": [
-          "test_collection_resource"
+          "test_organization_resource"
         ],
         "responses": {
           "200": {
@@ -263,7 +263,7 @@
       },
       "patch": {
         "tags": [
-          "test_collection_resource"
+          "test_organization_resource"
         ],
         "requestBody": {
           "content": {

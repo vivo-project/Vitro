@@ -13,10 +13,10 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
 
     public List<C> getComponents(Version version) {
         return getComponents()
-            .values()
-            .stream()
-            .filter(component -> isInRange(component, version))
-            .collect(Collectors.toList());
+                .values()
+                .stream()
+                .filter(component -> isInRange(component, version))
+                .collect(Collectors.toList());
     }
 
     public C get(K key) {
@@ -54,8 +54,8 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
                 return false;
             }
         } else if (hasVersionMin) {
-            // ensure key version is not less than component version min
-            if (lessThanVersionMin(component, keyVersion)) {
+            // ensure key version specific values are respected
+            if (mismatchSpecificVersion(component, keyVersion)) {
                 return false;
             }
         }
@@ -76,17 +76,16 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
         return majorVersionGreater || minorVersionGreater || patchVersionGreater;
     }
 
-    private boolean lessThanVersionMin(C component, Version keyVersion) {
+    private boolean mismatchSpecificVersion(C component, Version keyVersion) {
         Version componentVersionMin = Version.of(component.getVersionMin());
-        boolean majorVersionLesser = keyVersion.getMajor().compareTo(componentVersionMin.getMajor()) < 0;
 
-        boolean minorVersionLesser = minorVersionSpecific(keyVersion)
-                && keyVersion.getMinor().compareTo(componentVersionMin.getMinor()) < 0;
+        boolean mismatchMinorVersion = minorVersionSpecific(keyVersion)
+                && !keyVersion.getMinor().equals(componentVersionMin.getMinor());
 
-        boolean patchVersionLesser = patchVersionSpecific(keyVersion)
-                && keyVersion.getPatch().compareTo(componentVersionMin.getPatch()) < 0;
+        boolean mismatchPatchVersion = patchVersionSpecific(keyVersion)
+                && !keyVersion.getPatch().equals(componentVersionMin.getPatch());
 
-        return majorVersionLesser || minorVersionLesser || patchVersionLesser;
+        return mismatchMinorVersion || mismatchPatchVersion;
     }
 
     private boolean minorVersionSpecific(Version keyVersion) {
