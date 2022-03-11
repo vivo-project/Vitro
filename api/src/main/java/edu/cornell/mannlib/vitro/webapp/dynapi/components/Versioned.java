@@ -6,6 +6,4 @@ public interface Versioned {
 
     public Version getVersion();
 
-    public Versioned getMajorVersionKey();
-
 }

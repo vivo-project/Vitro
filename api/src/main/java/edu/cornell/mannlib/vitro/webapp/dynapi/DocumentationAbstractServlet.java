@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath;
-import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RequestType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;

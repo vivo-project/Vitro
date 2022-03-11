@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static java.lang.String.format;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -108,7 +108,7 @@ public class DynamicAPIDocumentation {
         if (requestPath.getResourceName() == null) {
             Version version = Version.of(apiInformation.getVersion());
 
-            List<ResourceAPI> resourceAPIs = ResourceAPIPool.getInstance().getComponents(version);
+            Collection<ResourceAPI> resourceAPIs = ResourceAPIPool.getInstance().getComponents(version);
 
             for (ResourceAPI resourceAPI : resourceAPIs) {
                 String resourceName = resourceAPI.getName();
