@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
@@ -12,22 +12,26 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versioned;
 public abstract class VersionableAbstractPool<K extends Versioned, C extends Versionable<K>, P extends Pool<K, C>>
         extends AbstractPool<K, C, P> {
 
-    public List<C> getComponents(Version version) {
+    public Collection<C> getComponents(Version version) {
         return getComponents()
                 .values()
                 .stream()
-                .collect(
-                    // dedupe by name and major version maintaining order
-                    Collectors.toMap(
-                        component -> component.getKey().getMajorVersionKey(),
-                        component -> component,
-                        (existing, current) -> current,
-                        ConcurrentSkipListMap::new)
-                    )
-                .values()
-                .stream()
-                .filter(component -> isMajorVersionInRange(component, version))
-                .collect(Collectors.toList());
+                .filter(component -> nearestVersion(component, version))
+                .collect(Collectors.toMap(
+                    component -> component.getKey().getName(),
+                    component -> component,
+                    (l, r) -> {
+                        Version left = l.getKey().getVersion();
+                        Version right = r.getKey().getVersion();
+
+                        if (left.compareTo(right) >= 0) {
+                            return l;
+                        }
+
+                        return r;
+                    },
+                    ConcurrentSkipListMap::new)
+                ).values();
     }
 
     public C get(K key) {
@@ -50,30 +54,16 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
         return component;
     }
 
-    private boolean isMajorVersionInRange(C component, Version keyVersion) {
-        Version componentVersionMin = Version.of(component.getVersionMin());
-
-        if (componentVersionMin.getMajor() > keyVersion.getMajor()) {
-            return false;
-        }
-
-        if (component.getVersionMax() != null) {
-            Version componentVersionMax = Version.of(component.getVersionMax());
-
-            if (componentVersionMax.getMajor() < keyVersion.getMajor()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     private boolean matchesName(C component, String keyName) {
         // ensure key name matches component key name
         return keyName.equals(component.getKey().getName());
     }
 
     private boolean nearestVersion(C component, Version keyVersion) {
+        if (component.getKey().getVersion().getMajor() > keyVersion.getMajor()) {
+            return false;
+        }
+
         boolean hasVersionMax = component.getVersionMax() != null;
         boolean hasVersionMin = component.getVersionMin() != null;
 
