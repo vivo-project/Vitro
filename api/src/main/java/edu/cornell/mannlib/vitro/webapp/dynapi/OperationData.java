@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 public class OperationData {
 
-    private final static String RESOURCE_ID = "resource_id";
+    public final static String RESOURCE_ID = "resource_id";
 
     private final Map<String, String[]> params;
     private final ServletContext context;

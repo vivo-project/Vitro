@@ -133,7 +133,7 @@
         }
       }
     },
-    "/api/rest/1/test_resource/resource:{resourceId}" : {
+    "/api/rest/1/test_resource/resource:{resource_id}" : {
       "get" : {
         "tags" : [ "test_resource" ],
         "responses" : {
@@ -431,7 +431,7 @@
         }
       },
       "parameters" : [ {
-        "name" : "resourceId",
+        "name" : "resource_id",
         "in" : "path",
         "description" : "Base64 encoded URI of the resource",
         "required" : true,

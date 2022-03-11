@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static edu.cornell.mannlib.vitro.webapp.dynapi.OperationData.RESOURCE_ID;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static java.lang.String.format;
 
@@ -97,7 +98,7 @@ public class DynamicAPIDocumentation {
             return openApi;
         }
 
-        System.out.print("Matched api (" + apiInformation.getVersion() + ") is " + apiInformation.getTitle() + ".");
+        log.info("Matched api (" + apiInformation.getVersion() + ") is " + apiInformation.getTitle() + ".");
 
         openApi.setInfo(info(apiInformation));
 
@@ -123,7 +124,7 @@ public class DynamicAPIDocumentation {
                 paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
                 // resource individual API
-                String resourceIndividualPathKey = format("%s/resource:{resourceId}", resourceCollectionPathKey);
+                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESOURCE_ID);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
 
@@ -155,7 +156,7 @@ public class DynamicAPIDocumentation {
                 paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
                 // resource individual API
-                String resourceIndividualPathKey = format("%s/resource:{resourceId}", resourceCollectionPathKey);
+                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESOURCE_ID);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
 
@@ -603,7 +604,7 @@ public class DynamicAPIDocumentation {
     private PathParameter individualPathParameter() {
         PathParameter pathParameter = new PathParameter();
 
-        pathParameter.setName("resourceId");
+        pathParameter.setName(RESOURCE_ID);
         pathParameter.description("Base64 encoded URI of the resource");
         StringSchema schema = new StringSchema();
         pathParameter.schema(schema);
