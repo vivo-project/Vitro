@@ -147,7 +147,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
             { "2",     relationship, false, "rest/2/" + relationship, relationship + ", Version 2 with yaml" },
             { "2",     resource,     false, "rest/2/" + resource,     resource + ", Version 2 with yaml" },
 
-            // // version resource,     json,  expected response,        message
+            // version resource,     json, expected response,        message
             { "1",     null,         true, "rest/1/all",              "All, Version 1 with json" },
             { "1",     collection,   true, "rest/1/" + collection,    collection + ", Version 1 with json" },
             { "1",     concept,      true, "rest/1/" + concept,       concept + ", Version 1 with json" },

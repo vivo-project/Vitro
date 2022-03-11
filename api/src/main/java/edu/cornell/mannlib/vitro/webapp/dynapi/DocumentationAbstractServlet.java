@@ -46,7 +46,7 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
                 response.setContentType(mimeType);
                 response.getWriter().print(content);
                 response.getWriter().flush();
-                System.out.println("\n\n" + content + "\n\n");
+                // System.out.println("\n\n" + content + "\n\n");
 
             } else {
                 response.setStatus(400);

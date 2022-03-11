@@ -104,7 +104,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -160,7 +180,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -216,7 +256,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -272,7 +332,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -328,7 +408,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -384,7 +484,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -440,7 +560,27 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "object"
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
                 }
               }
             }
