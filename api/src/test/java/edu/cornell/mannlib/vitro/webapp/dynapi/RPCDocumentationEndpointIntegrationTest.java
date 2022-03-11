@@ -25,7 +25,7 @@ import org.mockito.MockitoAnnotations;
 import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
 
 @RunWith(Parameterized.class)
-public class RPCDocumentationEndpointIntegrationTest extends ServletContextITest {
+public class RPCDocumentationEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private RPCDocumentationEndpoint rpcEndpoint;
 

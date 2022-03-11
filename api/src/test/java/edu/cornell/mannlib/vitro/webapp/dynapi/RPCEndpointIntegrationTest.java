@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class RPCEndpointITest extends ServletContextITest {
+public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private final static String URI_BASE = "http://localhost:8080" + RPC_SERVLET_PATH;
 

@@ -39,7 +39,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class RESTEndpointITest extends ServletContextITest {
+public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private final static String BASE_URL = "http://localhost:8080";
 
