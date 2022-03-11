@@ -17,7 +17,7 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
                 .values()
                 .stream()
                 .collect(
-                    // dedupe by name and major version
+                    // dedupe by name and major version maintaining order
                     Collectors.toMap(
                         component -> component.getKey().getMajorVersionKey(),
                         component -> component,

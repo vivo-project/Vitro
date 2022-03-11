@@ -105,7 +105,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
         when(request.getContentType()).thenReturn(mimeType);
         when(response.getWriter()).thenReturn(responsePrintWriter);
 
-        System.out.println("\n\nRunning Test against: '/docs/rest" + pathInfo + "'.\n");
+        System.out.println("Running Test against: '/docs/rest" + pathInfo + "'.");
 
         restEndpoint.doGet(request, response);
 
@@ -147,6 +147,16 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
             { "2",     relationship, false, "rest/2/" + relationship, relationship + ", Version 2 with yaml" },
             { "2",     resource,     false, "rest/2/" + resource,     resource + ", Version 2 with yaml" },
 
+            { "4",     null,         false, "rest/4/all",             "All, Version 4 with yaml" },
+            { "4",     collection,   false, "rest/4/" + collection,   collection + ", Version 4 with yaml" },
+            { "4",     concept,      false, "rest/4/" + concept,      concept + ", Version 4 with yaml" },
+            { "4",     document,     false, "rest/4/" + document,     document + ", Version 4 with yaml" },
+            { "4",     organization, false, "rest/4/" + organization, organization + ", Version 4 with yaml" },
+            { "4",     person,       false, "rest/4/" + person,       person + ", Version 4 with yaml" },
+            { "4",     process,      false, "rest/4/" + process,      process + ", Version 4 with yaml" },
+            { "4",     relationship, false, "rest/4/" + relationship, relationship + ", Version 4 with yaml" },
+            { "4",     resource,     false, "rest/4/" + resource,     resource + ", Version 4 with yaml" },
+
             // version resource,     json, expected response,        message
             { "1",     null,         true, "rest/1/all",              "All, Version 1 with json" },
             { "1",     collection,   true, "rest/1/" + collection,    collection + ", Version 1 with json" },
@@ -167,6 +177,16 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextITes
             { "2",     process,      true, "rest/2/" + process,       process + ", Version 2 with json" },
             { "2",     relationship, true, "rest/2/" + relationship,  relationship + ", Version 2 with json" },
             { "2",     resource,     true, "rest/2/" + resource,      resource + ", Version 2 with json" },
+
+            { "4",     null,         true, "rest/4/all",              "All, Version 4 with json" },
+            { "4",     collection,   true, "rest/4/" + collection,    collection + ", Version 4 with json" },
+            { "4",     concept,      true, "rest/4/" + concept,       concept + ", Version 4 with json" },
+            { "4",     document,     true, "rest/4/" + document,      document + ", Version 4 with json" },
+            { "4",     organization, true, "rest/4/" + organization,  organization + ", Version 4 with json" },
+            { "4",     person,       true, "rest/4/" + person,        person + ", Version 4 with json" },
+            { "4",     process,      true, "rest/4/" + process,       process + ", Version 4 with json" },
+            { "4",     relationship, true, "rest/4/" + relationship,  relationship + ", Version 4 with json" },
+            { "4",     resource,     true, "rest/4/" + resource,      resource + ", Version 4 with json" },
         });
     }
 

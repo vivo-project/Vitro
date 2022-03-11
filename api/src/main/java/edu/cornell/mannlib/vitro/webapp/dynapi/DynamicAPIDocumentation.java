@@ -95,7 +95,7 @@ public class DynamicAPIDocumentation {
             return openApi;
         }
 
-        System.out.print("\nMatched api (" + apiInformation.getVersion() + ") is " + apiInformation.getTitle() + ".\n");
+        System.out.print("Matched api (" + apiInformation.getVersion() + ") is " + apiInformation.getTitle() + ".");
 
         openApi.setInfo(info(apiInformation));
 

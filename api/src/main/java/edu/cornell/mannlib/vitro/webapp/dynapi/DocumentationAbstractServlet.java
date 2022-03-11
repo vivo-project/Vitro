@@ -1,6 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,7 +49,25 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
                 response.setContentType(mimeType);
                 response.getWriter().print(content);
                 response.getWriter().flush();
+
                 // System.out.println("\n\n" + content + "\n\n");
+
+                // keep to easily generate expected test api
+                // new File("src/test/resources/dynapi/mock/docs/response/rest/1").mkdirs();
+                // new File("src/test/resources/dynapi/mock/docs/response/rest/2").mkdirs();
+                // new File("src/test/resources/dynapi/mock/docs/response/rest/4").mkdirs();
+                // String next = requestPath.getPathInfo();
+                // if (requestPath.getPathInfo().equals("/1")) {
+                //     next = "/1/all";
+                // } else if (requestPath.getPathInfo().equals("/2")) {
+                //     next = "/2/all";
+                // } else if (requestPath.getPathInfo().equals("/4")) {
+                //     next = "/4/all";
+                // }
+                // FileWriter fileWriter = new FileWriter("src/test/resources/dynapi/mock/docs/response/rest/" + next + ".json");
+                // PrintWriter printWriter = new PrintWriter(fileWriter);
+                // printWriter.print(content);
+                // printWriter.close();
 
             } else {
                 response.setStatus(400);
@@ -84,6 +105,21 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
         }
 
         return APPLICATION_YAML;
+    }
+
+    /**
+     * Write OpenAPI specification to a file.
+     *
+     * @param path location to write file
+     * @param content file content
+     * @throws IOException
+     */
+    private void writeApiFile(String path, String content) throws IOException {
+        new File(path).getParentFile().mkdirs();
+        FileWriter fileWriter = new FileWriter(path);
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        printWriter.print(content);
+        printWriter.close();
     }
 
 }
