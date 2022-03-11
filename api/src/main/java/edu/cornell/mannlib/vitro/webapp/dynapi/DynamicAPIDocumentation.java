@@ -15,8 +15,10 @@ import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.APIInformation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.CustomRESTAction;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
@@ -124,6 +126,15 @@ public class DynamicAPIDocumentation {
                 String resourceIndividualPathKey = format("%s/resource:{resourceId}", resourceCollectionPathKey);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
+
+                for (CustomRESTAction customRestAction : resourceAPI.getCustomRESTActions()) {
+
+                    // resource custom REST action
+                    String resourceCustomRESTActionPathKey = format("%s/%s", resourceCollectionPathKey,
+                            customRestAction.getName());
+
+                    paths.put(resourceCustomRESTActionPathKey, customRESTActionPathItem(customRestAction, tag));
+                }
             }
         } else {
             String resourceName = requestPath.getResourceName();
@@ -147,6 +158,15 @@ public class DynamicAPIDocumentation {
                 String resourceIndividualPathKey = format("%s/resource:{resourceId}", resourceCollectionPathKey);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
+
+                for (CustomRESTAction customRestAction : resourceAPI.getCustomRESTActions()) {
+
+                    // resource custom REST action
+                    String resourceCustomRESTActionPathKey = format("%s/%s", resourceCollectionPathKey,
+                            customRestAction.getName());
+
+                    paths.put(resourceCustomRESTActionPathKey, customRESTActionPathItem(customRestAction, tag));
+                }
 
                 resourceAPI.removeClient();
             } else {
@@ -186,7 +206,7 @@ public class DynamicAPIDocumentation {
                 String actionName = action.getKey();
 
                 String actionPathKey = format("%s/%s", servletPath, actionName);
- 
+
                 paths.put(actionPathKey, actionPathItem(action, tag));
             }
 
@@ -326,6 +346,42 @@ public class DynamicAPIDocumentation {
         if (individualDeleteAction != null) {
             Action action = actionPool.get(individualDeleteAction.getName());
             pathItem.setDelete(individualDeleteOperation(action, tag));
+        }
+
+        return pathItem;
+    }
+
+    private PathItem customRESTActionPathItem(CustomRESTAction customRESTAction, Tag tag) {
+        ActionPool actionPool = ActionPool.getInstance();
+
+        PathItem pathItem = new PathItem();
+
+        RPC targetRPC = customRESTAction.getTargetRPC();
+        if (targetRPC != null) {
+            Action action = actionPool.get(targetRPC.getName());
+            HTTPMethod httpMethod = targetRPC.getHttpMethod();
+
+            if (httpMethod != null) {
+                switch (httpMethod.getName().toUpperCase()) {
+                    case "POST":
+                        pathItem.setPost(customRESTActionPostOperation(action, tag));
+                        break;
+                    case "GET":
+                        pathItem.setGet(customRESTActionGetOperation(action, tag));
+                        break;
+                    case "PUT":
+                        pathItem.setPut(customRESTActionPutOperation(action, tag));
+                        break;
+                    case "PATCH":
+                        pathItem.setPatch(customRESTActionPatchOperation(action, tag));
+                        break;
+                    case "DELETE":
+                        pathItem.setDelete(customRESTActionDeleteOperation(action, tag));
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         return pathItem;
@@ -490,6 +546,26 @@ public class DynamicAPIDocumentation {
         operation.setResponses(apiResponses);
 
         return operation;
+    }
+
+    private Operation customRESTActionGetOperation(Action action, Tag tag) {
+        return collectionGetOperation(action, tag);
+    }
+
+    private Operation customRESTActionPostOperation(Action action, Tag tag) {
+        return collectionPostOperation(action, tag);
+    }
+
+    private Operation customRESTActionPutOperation(Action action, Tag tag) {
+        return individualPutOperation(action, tag);
+    }
+
+    private Operation customRESTActionPatchOperation(Action action, Tag tag) {
+        return individualPatchOperation(action, tag);
+    }
+
+    private Operation customRESTActionDeleteOperation(Action action, Tag tag) {
+        return individualDeleteOperation(action, tag);
     }
 
     private Operation actionPostOperation(Action action, Tag tag) {

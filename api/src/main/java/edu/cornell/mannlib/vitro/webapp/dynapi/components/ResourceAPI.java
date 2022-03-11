@@ -117,6 +117,10 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
         customRESTActions.add(customRESTAction);
     }
 
+    public List<CustomRESTAction> getCustomRESTActions() {
+        return customRESTActions;
+    }
+
     @Override
     public void addClient() {
         clients.add(Thread.currentThread().getId());

@@ -434,6 +434,82 @@
         }
       } ]
     },
+    "/api/rest/1/test_collection_resource/test_collection_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_collection_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/rest/1/test_concept_resource" : {
       "get" : {
         "tags" : [ "test_concept_resource" ],
@@ -836,6 +912,82 @@
           "type" : "string"
         }
       } ]
+    },
+    "/api/rest/1/test_concept_resource/test_concept_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_concept_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "/api/rest/1/test_document_resource" : {
       "get" : {
@@ -1240,6 +1392,82 @@
         }
       } ]
     },
+    "/api/rest/1/test_document_resource/test_document_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_document_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/rest/1/test_organization_resource" : {
       "get" : {
         "tags" : [ "test_organization_resource" ],
@@ -1642,6 +1870,82 @@
           "type" : "string"
         }
       } ]
+    },
+    "/api/rest/1/test_organization_resource/test_organization_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_organization_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "/api/rest/1/test_person_resource" : {
       "get" : {
@@ -2046,6 +2350,82 @@
         }
       } ]
     },
+    "/api/rest/1/test_person_resource/test_person_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_person_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/rest/1/test_process_resource" : {
       "get" : {
         "tags" : [ "test_process_resource" ],
@@ -2448,6 +2828,82 @@
           "type" : "string"
         }
       } ]
+    },
+    "/api/rest/1/test_process_resource/test_process_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_process_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "/api/rest/1/test_relationship_resource" : {
       "get" : {
@@ -2852,6 +3308,82 @@
         }
       } ]
     },
+    "/api/rest/1/test_relationship_resource/test_relationship_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_relationship_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/rest/1/test_resource" : {
       "get" : {
         "tags" : [ "test_resource" ],
@@ -3254,6 +3786,82 @@
           "type" : "string"
         }
       } ]
+    },
+    "/api/rest/1/test_resource/test_custom_action_name" : {
+      "put" : {
+        "tags" : [ "test_resource" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

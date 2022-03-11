@@ -66,7 +66,7 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
                 // }
                 // FileWriter fileWriter = new FileWriter("src/test/resources/dynapi/mock/docs/response/rest/" + next + ".json");
                 // PrintWriter printWriter = new PrintWriter(fileWriter);
-                // printWriter.print(content);
+                // printWriter.print(content + "\n");
                 // printWriter.close();
 
             } else {
