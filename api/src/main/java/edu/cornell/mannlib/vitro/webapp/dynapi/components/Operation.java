@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,8 +20,8 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
                     return false;
                 }
                 Parameter param = requiredParams.get(name);
-                String[] inputValues = inputOutput.get(name);
-                if (!param.isValid(name, inputValues)) {
+                Data data = inputOutput.getData(name);
+                if (!param.isValid(data)) {
                     return false;
                 }
             }

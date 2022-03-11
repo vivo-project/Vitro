@@ -2,13 +2,14 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.io.converters;
 
 import javax.servlet.http.HttpServletRequest;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.*;
 
-public interface IOMessageConverter {
+public abstract class IOMessageConverter {
 
-    Data loadDataFromRequest(HttpServletRequest request);
+    public abstract Data loadDataFromRequest(HttpServletRequest request, Parameters parameters);
 
-    String exportDataToResponseBody(ObjectData data);
+    public abstract String exportDataToResponseBody(ObjectData data);
+
 
 }

@@ -3,6 +3,9 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.io.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Validators;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ArrayParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class ArrayData extends ContainerData<List<Data>> {
@@ -32,11 +35,7 @@ public class ArrayData extends ContainerData<List<Data>> {
                 int index = Integer.parseInt(fieldNameFirstPart);
                 data = (container.size() > index) ? container.get(index) : null;
             }
-            if (data instanceof ContainerData) {
-                return ((ContainerData<?>) data).getElement(fieldNameSecondPart);
-            } else {
-                return null;
-            }
+            return data.getElement(fieldNameSecondPart);
         }
     }
 
@@ -71,7 +70,7 @@ public class ArrayData extends ContainerData<List<Data>> {
                     }
                 }
 
-                return ((ContainerData<?>) internalData).setElement(fieldNameOtherPart, newData);
+                return internalData.setElement(fieldNameOtherPart, newData);
             } else {
                 return false;
             }
@@ -79,10 +78,34 @@ public class ArrayData extends ContainerData<List<Data>> {
     }
 
     @Override
-    public List<String> getAsString() {
-        List<String> retVal = new ArrayList<String>();
-        for (Data item : container) {
-            retVal.addAll(item.getAsString());
+    public String getType() {
+        return "array";
+    }
+
+    @Override
+    public boolean checkType(ParameterType parameterType) {
+        boolean retVal = (parameterType instanceof ArrayParameterType);
+        if (retVal) {
+            ParameterType internalParameterType = ((ArrayParameterType) parameterType).getElementsType();
+            for (Data element : container)
+                if ((element == null) || (!(element.checkType(internalParameterType)))) {
+                    retVal = false;
+                    break;
+                }
+        }
+        return retVal;
+    }
+
+    @Override
+    public boolean isAllValid(String name, Validators validators, ParameterType type) {
+        boolean retVal = true;
+        ParameterType internalParameterType = ((ArrayParameterType) type).getElementsType();
+        for (int i = 0; i < container.size(); i++) {
+            Data element = container.get(i);
+            if (!(element.isAllValid(name + "[" + i + "]", validators, internalParameterType))) {
+                retVal = false;
+                break;
+            }
         }
         return retVal;
     }

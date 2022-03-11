@@ -32,17 +32,15 @@ public class StringLengthRangeValidator extends IsNotBlank {
     }
 
     @Override
-    public boolean isValid(String name, String[] values) {
-        if (!super.isValid(name, values)) {
+    public boolean isValid(String name, String value) {
+        if (!super.isValid(name, value)) {
             return false;
         }
 
-        for (String value : values) {
-            if (!isLengthInRange(value)) {
-                log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"
-                        + ((maxLength != null) ? maxLength : " ") + "].");
-                return false;
-            }
+        if (!isLengthInRange(value)) {
+            log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"
+                    + ((maxLength != null) ? maxLength : " ") + "].");
+            return false;
         }
         return true;
     }

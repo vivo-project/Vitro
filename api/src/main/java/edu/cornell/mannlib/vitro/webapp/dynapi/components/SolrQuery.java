@@ -185,10 +185,10 @@ public class SolrQuery extends Operation {
                 .toArray(String[]::new);
 
         for (String propertyVar : propertyVariables) {
-            if (!input.has(propertyVar) || input.get(propertyVar).length > 1) {
+            if (!input.has(propertyVar)) {
                 throw new InputMismatchException();
             }
-            property = property.replace("?" + propertyVar, input.get(propertyVar)[0]);
+            property = property.replace("?" + propertyVar, input.get(propertyVar));
         }
 
         return property;

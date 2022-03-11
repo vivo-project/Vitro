@@ -18,9 +18,9 @@ public class Validators implements Removable {
         validators.add(validator);
     }
 
-    public boolean isAllValid(String name, String[] values) {
+    public boolean isAllValid(String name, String value) {
         for (Validator validator : validators) {
-            if (!validator.isValid(name, values)) {
+            if (!validator.isValid(name, value)) {
                 log.error("Parameter " + name + " is invalid. Validator failed " + validator.getClass().getSimpleName());
                 return false;
             }

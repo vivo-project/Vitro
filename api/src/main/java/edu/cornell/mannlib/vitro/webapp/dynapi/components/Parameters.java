@@ -1,5 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ArrayParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ObjectParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -36,25 +41,44 @@ public class Parameters implements Removable {
         .collect(Collectors.toMap(
                 param -> param.getName(),
                 param -> Arrays.asList(
-                        ResourceFactory.createTypedLiteral(input.get(param.getName())[0], param.getRDFDataType()))));
+                        ResourceFactory.createTypedLiteral(input.getData(param.getName()).toString(), param.getRDFDataType()))));
     }
-    
+
     public Map<String, List<String>> getUrisMap(OperationData input){
         return getUrisParamStream(true)
         .collect(Collectors.toMap(
-                param -> param.getName(), 
-                param -> Arrays.asList(input.get(param.getName()))));
+                param -> param.getName(),
+                param -> Arrays.asList(input.getData(param.getName()).toString())));
     }
 
     private Stream<Parameter> getUrisParamStream(boolean isUri) {
         return params.values().stream()
         .filter(value->value.getRDFDataType().getURI().equals(ANY_URI) == isUri);
     }
-    
+
     public Parameter get(String name) {
-        return params.get(name);
+        if (!name.contains(".")) {
+            return params.get(name);
+        } else {
+            String fieldNameFirstPart = name.substring(0, name.indexOf("."));
+            String fieldNameSecondPart = name.substring(name.indexOf(".") + 1);
+            Parameter parameter = params.get(fieldNameFirstPart);
+            if (parameter.getType() instanceof ObjectParameterType) {
+                return ((ObjectParameterType) parameter.getType()).getInternalElements().get(fieldNameSecondPart);
+            } else if (parameter.getType() instanceof ArrayParameterType) {
+                String fieldNameOtherPart = fieldNameSecondPart.substring(fieldNameSecondPart.indexOf(".") + 1);
+                if (StringUtils.isEmpty(fieldNameOtherPart))
+                    return parameter;
+                else {
+                    ParameterType internalArrayParameterType = ((ArrayParameterType) parameter.getType()).getElementsType();
+                    if (internalArrayParameterType instanceof ObjectParameterType)
+                        return ((ObjectParameterType) internalArrayParameterType).getInternalElements().get(fieldNameOtherPart);
+                }
+            }
+        }
+        return null;
     }
-    
+
     public int size() {
         return params.size();
     }
@@ -63,7 +87,7 @@ public class Parameters implements Removable {
     public Map<String, List<String>> substituteIRIVariables(OperationData input){
         return params.values().stream()
                 .filter(value->value.getRDFDataType().getURI().equals(ANY_URI))
-                .collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
+                .collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.getData(param.getName()).toString())));
     }
 
     // Substitute parameters that represent RDF literals with their values in specific request
@@ -73,7 +97,7 @@ public class Parameters implements Removable {
                 .collect(Collectors.toMap(
                         param -> param.getName(),
                         param -> Arrays.asList(ResourceFactory.createTypedLiteral(
-                                input.get(param.getName())[0],
+                                input.getData(param.getName()).toString(),
                                 param.getRDFDataType()
                                 )
                         )));

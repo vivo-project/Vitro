@@ -6,4 +6,9 @@ public class DecimalData extends PrimitiveData<Double> {
         super(value);
     }
 
+    @Override
+    public String getType() {
+        return "double";
+    }
+
 }

@@ -9,16 +9,14 @@ public class IsNotBlank extends AbstractValidator {
     private static final Log log = LogFactory.getLog(IsNotBlank.class);
 
     @Override
-    public boolean isValid(String name, String[] values) {
-        if (values.length == 0) {
+    public boolean isValid(String name, String value) {
+        if (value == null) {
             log.debug("No values of " + name + " found. Validation failed.");
             return false;
         }
-        for (String value : values) {
-            if (StringUtils.isBlank(value)) {
-                log.debug("Value is blank. Validation failed.");
-                return false;
-            }
+        if (StringUtils.isBlank(value)) {
+           log.debug("Value is blank. Validation failed.");
+           return false;
         }
         return true;
     }

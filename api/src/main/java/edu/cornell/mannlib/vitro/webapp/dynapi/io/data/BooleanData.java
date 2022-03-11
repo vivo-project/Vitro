@@ -6,4 +6,8 @@ public class BooleanData extends PrimitiveData<Boolean> {
         super(value);
     }
 
+    @Override
+    public String getType() {
+        return "boolean";
+    }
 }

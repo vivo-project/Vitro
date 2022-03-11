@@ -33,16 +33,14 @@ public class NumericRangeValidator extends IsNotBlank {
     }
 
     @Override
-    public boolean isValid(String name, String[] values) {
-        if (!super.isValid(name, values)) {
+    public boolean isValid(String name, String value) {
+        if (!super.isValid(name, value)) {
             return false;
         }
-        for (String value : values) {
-            if (!isInRange(value)) {
-                log.debug("Value of " + name + " is not in range [" + ((minValue != null) ? minValue : " ") + "-"
-                        + ((maxValue != null) ? maxValue : " ") + "].");
-                return false;
-            }
+        if (!isInRange(value)) {
+            log.debug("Value of " + name + " is not in range [" + ((minValue != null) ? minValue : " ") + "-"
+                    + ((maxValue != null) ? maxValue : " ") + "].");
+            return false;
         }
         return true;
     }

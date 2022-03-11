@@ -24,25 +24,7 @@ public class ArrayParameterType extends ParameterType {
         String index = fieldName.substring(0, fieldName.indexOf("."));
         String fieldNameOtherPart = fieldName.substring(fieldName.indexOf(".") + 1);
         if (NumberUtils.isDigits(index)) {
-            ParameterType internalParameterType = this.getElementsType();
-            if (internalParameterType instanceof ObjectParameterType) {
-                ObjectParameterType objectType = (ObjectParameterType) internalParameterType;
-                boolean exist = false;
-                for (String internalFieldName : objectType.getInternalElements().getNames()) {
-                    Parameter internalParameter = objectType.getInternalElements().get(internalFieldName);
-                    String prefix = internalParameter.computePrefix(fieldNameOtherPart);
-                    if (prefix != null) {
-                        retVal += prefix;
-                        exist = true;
-                        break;
-                    }
-                }
-                if (!exist) {
-                    retVal = null;
-                }
-            } else if (!(internalParameterType instanceof PrimitiveParameterType)) {
-                retVal = null;
-            }
+            retVal = this.getElementsType().computePrefix(fieldNameOtherPart);
         } else {
             retVal = null;
         }

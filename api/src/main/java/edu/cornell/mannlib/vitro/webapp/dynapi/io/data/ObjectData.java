@@ -1,11 +1,13 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.io.data;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Validators;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ObjectParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class ObjectData extends ContainerData<Map<String, Data>> {
@@ -26,11 +28,7 @@ public class ObjectData extends ContainerData<Map<String, Data>> {
             String fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("."));
             String fieldNameSecondPart = fieldName.substring(fieldName.indexOf(".") + 1);
             Data data = container.get(fieldNameFirstPart);
-            if (data instanceof ContainerData) {
-                return ((ContainerData<?>) data).getElement(fieldNameSecondPart);
-            } else {
-                return null;
-            }
+            return data.getElement(fieldNameSecondPart);
         }
     }
 
@@ -57,17 +55,8 @@ public class ObjectData extends ContainerData<Map<String, Data>> {
                     container.put(fieldNameFirstPart, internalData);
                 }
             }
-            return ((ContainerData<?>) internalData).setElement(fieldNameOtherPart, newData);
+            return internalData.setElement(fieldNameOtherPart, newData);
         }
-    }
-
-    @Override
-    public List<String> getAsString() {
-        List<String> retVal = new ArrayList<String>();
-        for (Data item : container.values()) {
-            retVal.addAll(item.getAsString());
-        }
-        return retVal;
     }
 
     public ObjectData filter(Set<String> fieldNames) {
@@ -76,6 +65,41 @@ public class ObjectData extends ContainerData<Map<String, Data>> {
             Data data = this.getElement(prefix);
             if (data != null) {
                 retVal.setElement(prefix, data);
+            }
+        }
+        return retVal;
+    }
+
+    @Override
+    public String getType() {
+        return "object";
+    }
+
+    @Override
+    public boolean checkType(ParameterType parameterType) {
+        boolean retVal = (parameterType instanceof ObjectParameterType);
+        if (retVal) {
+            for (String name : ((ObjectParameterType) parameterType).getInternalElements().getNames()) {
+                Data element = container.get(name);
+                ParameterType internalParameterType = ((ObjectParameterType) parameterType).getInternalElements().get(name).getType();
+                if ((element == null) || (!(element.checkType(internalParameterType)))) {
+                    retVal = false;
+                    break;
+                }
+            }
+        }
+        return retVal;
+    }
+
+    @Override
+    public boolean isAllValid(String name, Validators validators, ParameterType type) {
+        boolean retVal = true;
+        for (String internalName : ((ObjectParameterType) type).getInternalElements().getNames()) {
+            Data element = container.get(internalName);
+            Parameter internalParameter = ((ObjectParameterType) type).getInternalElements().get(internalName);
+            if (!(element.isAllValid(name + "." + internalName, internalParameter.getValidators(), internalParameter.getType()))) {
+                retVal = false;
+                break;
             }
         }
         return retVal;

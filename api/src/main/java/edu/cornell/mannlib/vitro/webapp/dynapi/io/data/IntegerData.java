@@ -6,4 +6,9 @@ public class IntegerData extends PrimitiveData<Integer> {
         super(value);
     }
 
+    @Override
+    public String getType() {
+        return "integer";
+    }
+
 }

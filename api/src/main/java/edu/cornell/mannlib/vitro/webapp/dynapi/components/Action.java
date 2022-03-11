@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class Action extends Operation implements Poolable<String>, Link {
@@ -122,12 +123,12 @@ public class Action extends Operation implements Poolable<String>, Link {
         if (!(super.isOutputValid(inputOutput))) {
             return false;
         }
-        Parameters providedParams = getRequiredParams();
+        Parameters providedParams = getProvidedParams();
         if (providedParams != null) {
             for (String name : providedParams.getNames()) {
                 Parameter param = providedParams.get(name);
-                String[] outputValues = inputOutput.get(name);
-                if (!param.isValid(name, outputValues)) {
+                Data outputValue = inputOutput.getData(name);
+                if (!param.isValid(outputValue)) {
                     return false;
                 }
             }

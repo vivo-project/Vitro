@@ -6,4 +6,9 @@ public class StringData extends PrimitiveData<String> {
         super(value);
     }
 
+    @Override
+    public String getType() {
+        return "string";
+    }
+
 }
