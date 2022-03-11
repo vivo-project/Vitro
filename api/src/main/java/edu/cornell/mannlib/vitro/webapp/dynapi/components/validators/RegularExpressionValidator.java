@@ -1,44 +1,46 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.regex.Pattern;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class RegularExpressionValidator extends AbstractValidator {
-	
-	private static final Log log = LogFactory.getLog(RegularExpressionValidator.class);
 
-	private String regularExpression;
+    private static final Log log = LogFactory.getLog(RegularExpressionValidator.class);
 
-	public String getRegularExpression() {
-		return regularExpression;
-	}
+    private String regularExpression;
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression", minOccurs = 1, maxOccurs = 1)
-	public void setRegularExpression (String regularExpression) {
-		this.regularExpression = regularExpression;
-	}
+    public String getRegularExpression() {
+        return regularExpression;
+    }
 
-	@Override
-	public boolean isValid(String name, String[] values) {
-		if (values.length == 0) {
-			log.debug("No values of " + name + " found. Validation failed.");
-			return false;
-		}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression", minOccurs = 1, maxOccurs = 1)
+    public void setRegularExpression(String regularExpression) {
+        this.regularExpression = regularExpression;
+    }
 
-		for (String value : values) {
-			if (!isLengthInRange(value)) {
-				log.debug("Value of " + name + " is not in accordance with the pattern \"" + regularExpression + "\"");
-				return false;
-			}
-		}
+    @Override
+    public boolean isValid(String name, String[] values) {
+        if (values.length == 0) {
+            log.debug("No values of " + name + " found. Validation failed.");
+            return false;
+        }
 
-		return true;
-	}
+        for (String value : values) {
+            if (!isLengthInRange(value)) {
+                log.debug("Value of " + name + " is not in accordance with the pattern \"" + regularExpression + "\"");
+                return false;
+            }
+        }
 
-	private boolean isLengthInRange(String string) {
-		return Pattern.matches(regularExpression, string);
-	}
+        return true;
+    }
+
+    private boolean isLengthInRange(String string) {
+        return Pattern.matches(regularExpression, string);
+    }
+
 }

@@ -3,46 +3,48 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class N3Template implements Template{
+public class N3Template extends Operation implements Template {
 
-	private String n3Text;
-  	private Parameters requiredParams = new Parameters();
+    private String n3Text;
 
-  	//region @Property Setters
+    private Parameters requiredParams = new Parameters();
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addRequiredParameter(Parameter param) {
-		requiredParams.add(param);
-	}
+    // region @Property Setters
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3Text", minOccurs = 1, maxOccurs = 1)
-	public void setN3Text(String n3Text) {
-		this.n3Text = n3Text;
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+    public void addRequiredParameter(Parameter param) {
+        requiredParams.add(param);
+    }
 
-	//endregion
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3Text", minOccurs = 1, maxOccurs = 1)
+    public void setN3Text(String n3Text) {
+        this.n3Text = n3Text;
+    }
 
-	//region Getters
+    // endregion
 
-	@Override
-	public Parameters getRequiredParams() {
-		return requiredParams;
-	}
+    // region Getters
 
-	@Override
-	public Parameters getProvidedParams() {
-		return new Parameters();
-	}
+    @Override
+    public Parameters getRequiredParams() {
+        return requiredParams;
+    }
 
-	//endregion
+    @Override
+    public Parameters getProvidedParams() {
+        return new Parameters();
+    }
 
-	@Override
-	public OperationResult run(OperationData input) {
-		return null;
-	}
+    // endregion
 
-	@Override
-	public void dereference() {
+    @Override
+    public OperationResult run(OperationData input) {
+        return null;
+    }
 
-	}
+    @Override
+    public void dereference() {
+
+    }
+
 }

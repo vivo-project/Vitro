@@ -43,24 +43,20 @@ public class RequestPathTest {
         assertEquals(null, requestPath.getResourceName());
         assertEquals(null, requestPath.getResourceId());
 
-
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/");
 
         assertFalse(ApiRequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn("/create");
 
         assertFalse(ApiRequestPath.from(request).isValid());
 
-
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(ApiRequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn(null);
@@ -83,24 +79,20 @@ public class RequestPathTest {
         assertEquals(null, requestPath.getResourceId());
         assertEquals(null, requestPath.getActionName());
 
-
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/");
 
         assertFalse(ApiRequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn("/1/persons");
 
         assertFalse(ApiRequestPath.from(request).isValid());
 
-
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(ApiRequestPath.from(request).isValid());
-
 
         when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn(null);
