@@ -95,7 +95,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
         when(request.getContentType()).thenReturn(mimeType);
         when(response.getWriter()).thenReturn(responsePrintWriter);
 
-        System.out.println("\n\nRunning Test against: '/docs/rpc" + pathInfo + "'.\n");
+        System.out.println("Running Test against: '/docs/rpc" + pathInfo + "'.");
 
         rpcEndpoint.doGet(request, response);
 

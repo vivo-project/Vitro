@@ -103,7 +103,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -217,7 +226,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -356,7 +374,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -441,7 +468,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -582,7 +618,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -696,7 +741,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -835,7 +889,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -920,7 +983,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1061,7 +1133,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1175,7 +1256,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1314,7 +1404,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1399,7 +1498,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1540,7 +1648,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1654,7 +1771,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1793,7 +1919,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -1878,7 +2013,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2019,7 +2163,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2133,7 +2286,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2272,7 +2434,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2357,7 +2528,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2498,7 +2678,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2612,7 +2801,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2751,7 +2949,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2836,7 +3043,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -2977,7 +3193,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -3091,7 +3316,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -3230,7 +3464,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -3315,7 +3558,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -3456,7 +3708,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -3570,7 +3831,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -3709,7 +3979,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }
@@ -3794,7 +4073,16 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "type" : "object"
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
               }
             }
           }

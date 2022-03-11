@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath;
+import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RequestType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
@@ -53,18 +54,21 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
                 // System.out.println("\n\n" + content + "\n\n");
 
                 // keep to easily generate expected test api
+                // String type = requestPath.getType() == RequestType.REST ? "/rest" : "/rpc";
                 // new File("src/test/resources/dynapi/mock/docs/response/rest/1").mkdirs();
                 // new File("src/test/resources/dynapi/mock/docs/response/rest/2").mkdirs();
                 // new File("src/test/resources/dynapi/mock/docs/response/rest/4").mkdirs();
                 // String next = requestPath.getPathInfo();
-                // if (requestPath.getPathInfo().equals("/1")) {
-                //     next = "/1/all";
+                // if (requestPath.getPathInfo().equals("")) {
+                //     next = type + "/all";
+                // } else if (requestPath.getPathInfo().equals("/1")) {
+                //     next = type + "/1/all";
                 // } else if (requestPath.getPathInfo().equals("/2")) {
-                //     next = "/2/all";
+                //     next = type + "/2/all";
                 // } else if (requestPath.getPathInfo().equals("/4")) {
-                //     next = "/4/all";
+                //     next = type + "/4/all";
                 // }
-                // FileWriter fileWriter = new FileWriter("src/test/resources/dynapi/mock/docs/response/rest/" + next + ".json");
+                // FileWriter fileWriter = new FileWriter("src/test/resources/dynapi/mock/docs/response" + next + ".json");
                 // PrintWriter printWriter = new PrintWriter(fileWriter);
                 // printWriter.print(content + "\n");
                 // printWriter.close();
