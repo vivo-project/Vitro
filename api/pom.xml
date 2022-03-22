@@ -74,7 +74,9 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-core</artifactId>
-            <version>2.1.12</version>
+            <!-- downgraded to match jackson version from org.apache.jena:jena-arq:jar:3.16.0 to avoid conflict -->
+            <!-- jackson version 2.10.1 -->
+            <version>2.1.2</version>
         </dependency>
 
         <dependency>
