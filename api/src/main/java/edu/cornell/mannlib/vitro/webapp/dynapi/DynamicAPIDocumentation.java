@@ -400,8 +400,8 @@ public class DynamicAPIDocumentation {
         Operation operation = new Operation();
         operation.addTagsItem(tag.getName());
 
-        // No description available per resource API rpc
-        // operation.setDescription("");
+        // No description available per action RPC
+        // operation.setDescription(format("RPC %s", action.getKey()));
 
         ApiResponses apiResponses = new ApiResponses();
 
@@ -419,8 +419,8 @@ public class DynamicAPIDocumentation {
         Operation operation = new Operation();
         operation.addTagsItem(tag.getName());
 
-        // No description available per resource API rpc
-        // operation.setDescription("");
+        // No description available per action RPC
+        // operation.setDescription(format("RPC %s", action.getKey()));
 
         RequestBody requestBody = new RequestBody();
         Content content = new Content();
@@ -451,8 +451,8 @@ public class DynamicAPIDocumentation {
         Operation operation = new Operation();
         operation.addTagsItem(tag.getName());
 
-        // No description available per resource API rpc
-        // operation.setDescription("");
+        // No description available per action RPC
+        // operation.setDescription(format("RPC %s", action.getKey()));
 
         ApiResponses apiResponses = new ApiResponses();
 
@@ -470,8 +470,8 @@ public class DynamicAPIDocumentation {
         Operation operation = new Operation();
         operation.addTagsItem(tag.getName());
 
-        // No description available per resource API rpc
-        // operation.setDescription("");
+        // No description available per action RPC
+        // operation.setDescription(format("RPC %s", action.getKey()));
 
         RequestBody requestBody = new RequestBody();
         Content content = new Content();
@@ -502,8 +502,8 @@ public class DynamicAPIDocumentation {
         Operation operation = new Operation();
         operation.addTagsItem(tag.getName());
 
-        // No description available per resource API rpc
-        // operation.setDescription("");
+        // No description available per action RPC
+        // operation.setDescription(format("RPC %s", action.getKey()));
 
         RequestBody requestBody = new RequestBody();
         Content content = new Content();
@@ -534,8 +534,8 @@ public class DynamicAPIDocumentation {
         Operation operation = new Operation();
         operation.addTagsItem(tag.getName());
 
-        // No description available per resource API rpc
-        // operation.setDescription("");
+        // No description available per action RPC
+        // operation.setDescription(format("RPC %s", action.getKey()));
 
         ApiResponses apiResponses = new ApiResponses();
 
@@ -573,8 +573,8 @@ public class DynamicAPIDocumentation {
         Operation operation = new Operation();
         operation.addTagsItem(tag.getName());
 
-        // No description available per resource API rpc
-        // operation.setDescription("");
+        // No description available per action RPC
+        // operation.setDescription(format("RPC %s", action.getKey()));
 
         RequestBody requestBody = new RequestBody();
         Content content = new Content();
