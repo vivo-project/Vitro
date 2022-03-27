@@ -219,6 +219,9 @@ public class FileUploadController extends FreemarkerHttpServlet {
 
 	private String printAllowedMediaTypes() {
 		StringBuilder sb = new StringBuilder();
+		if (allowedMediaTypes.isEmpty()) {
+			return sb.toString();
+		}
 		for (Iterator<String> it = allowedMediaTypes.iterator(); it.hasNext();) {
 			String mediaType = (String) it.next();
 			sb.append(mediaType);
@@ -369,7 +372,11 @@ public class FileUploadController extends FreemarkerHttpServlet {
 	private void setAllowedMediaTypes() {
 		ConfigurationProperties config = ConfigurationProperties.getBean(getServletContext());
 		String allowedTypes = config.getProperty(ALLOWED_MEDIA_TYPES, "");
-		allowedMediaTypes = new HashSet<String>(Arrays.asList(allowedTypes.toLowerCase().trim().split("\\s*,\\s*")));
+		if (allowedTypes.isEmpty()) {
+			allowedMediaTypes = new HashSet<String>();
+		} else {
+			allowedMediaTypes = new HashSet<String>(Arrays.asList(allowedTypes.toLowerCase().trim().split("\\s*,\\s*")));	
+		}
 	}
 
 	private String getReferrer(VitroRequest vreq) {

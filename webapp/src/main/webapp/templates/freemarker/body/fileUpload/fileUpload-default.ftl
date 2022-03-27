@@ -13,10 +13,15 @@ ${scripts.add('<script type="text/javascript" src="${urls.base}/js/fileUpload/fi
             <p>${errorMessage}</p>
         </section>
     </#if>
+    <#if !supportedMediaTypes?has_content>
+    	<section id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" alt="${i18n.alt_error_alert}" />
+	    	<p>${i18n.file_upload_no_allowed_media}</p>
+		</section>
+	</#if>
 	<#if action?? && action == "upload" >
 	    <form id="fileUploadForm" action="${formAction}" enctype="multipart/form-data" method="post" role="form">
-	        <label>${i18n.file_upload_supported_media}</label>
-			<#if supportedMediaTypes??>
+			<#if supportedMediaTypes?has_content>
+		        <label>${i18n.file_upload_supported_media}</label>
 	        	<p>${supportedMediaTypes}</p>
 			</#if>
 	        <input id="datafile" type="file" name="datafile" size="30" />
