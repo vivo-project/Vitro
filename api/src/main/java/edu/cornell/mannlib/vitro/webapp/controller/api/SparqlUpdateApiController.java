@@ -8,6 +8,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.apache.jena.riot.web.HttpNames.paramUsingGraphURI;
+import static org.apache.jena.riot.web.HttpNames.paramUsingNamedGraphURI;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.update.GraphStore;
@@ -25,6 +28,9 @@ import org.apache.jena.update.GraphStoreFactory;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.sparql.modify.UsingList;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -76,26 +82,47 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 
 	private UpdateRequest parseUpdateString(HttpServletRequest req)
 			throws ParseException {
-		String update = req.getParameter("update");
-		if (StringUtils.isBlank(update)) {
-			log.debug("No update parameter.");
-			throw new ParseException("No 'update' parameter.");
-		}
+		InputStream update;
+		String reqtype = req.getContentType();
+		UsingList usingList = processProtocol(req);
 
-		if (!StringUtils.containsIgnoreCase(update, "GRAPH") && !StringUtils.containsIgnoreCase(update, "WITH")) {
-			if (log.isDebugEnabled()) {
-				log.debug("No GRAPH or WITH uri in '" + update + "'");
+		// Support update via both POST body and an 'update' parameter 
+		if (reqtype.equalsIgnoreCase("application/sparql-update")) {
+			try {
+				update = req.getInputStream();
+			} catch (IOException e) {
+				log.debug("Error parsing POST body.");
+				throw new ParseException("Error parsing POST body.");
 			}
-			throw new ParseException("SPARQL update must specify a GRAPH ( or WITH) URI.");
+		}
+		else {
+			String updateString = req.getParameter("update");
+			if (StringUtils.isBlank(updateString)) {
+				log.debug("No update parameter.");
+				throw new ParseException("No 'update' parameter.");
+			}
+			if (!StringUtils.containsIgnoreCase(updateString, "GRAPH") && !StringUtils.containsIgnoreCase(updateString, "WITH")) {
+				if (log.isDebugEnabled()) {
+					log.debug("No GRAPH or WITH uri in '" + updateString + "'");
+				}
+				throw new ParseException("SPARQL update must specify a GRAPH ( or WITH) URI.");
+			}
+			try {
+				update = org.apache.commons.io.IOUtils.toInputStream(updateString, "UTF-8");
+			} catch (IOException e) {
+				log.debug("Error parsing POST body.");
+				throw new ParseException("Error parsing POST body.");
+			}
 		}
 
 		try {
-			return UpdateFactory.create(update);
+			return UpdateFactory.read(usingList, update);
 		} catch (Exception e) {
 			log.debug("Problem parsing", e);
 			throw new ParseException("Failed to parse SPARQL update", e);
 		}
 	}
+	
 
 	private void executeUpdate(HttpServletRequest req, UpdateRequest parsed) {
 		VitroRequest vreq = new VitroRequest(req);
@@ -120,6 +147,35 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 			}
 		}
 	}
+
+	/* 
+	 * The method below and the 'createNode' helper were 
+	 * adapted from the Fuseki source code 
+	 */
+    private UsingList processProtocol(HttpServletRequest request) {
+        UsingList toReturn = new UsingList();
+
+        String[] usingArgs = request.getParameterValues(paramUsingGraphURI);
+        String[] usingNamedArgs = request.getParameterValues(paramUsingNamedGraphURI);
+        if ( usingArgs == null && usingNamedArgs == null )
+            return toReturn;
+        if ( usingArgs == null )
+            usingArgs = new String[0];
+        if ( usingNamedArgs == null )
+            usingNamedArgs = new String[0];
+        // Impossible.
+//        if ( usingArgs.length == 0 && usingNamedArgs.length == 0 )
+//            return;
+
+        for ( String nodeUri : usingArgs ) {
+            toReturn.addUsing(createNode(nodeUri));
+        }
+        for ( String nodeUri : usingNamedArgs ) {
+            toReturn.addUsingNamed(createNode(nodeUri));
+        }
+
+        return toReturn;
+    }
 
 	private void do200response(HttpServletResponse resp) throws IOException {
 		sendShortResponse(SC_OK, "SPARQL update accepted.", resp);
@@ -157,5 +213,15 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 			super(message, cause);
 		}
 	}
+
+	private static Node createNode(String x) {
+        try {
+            return NodeFactory.createURI(x);
+        } catch (Exception ex) {
+			log.debug("SPARQL Update: bad IRI: "+x);
+            return null;
+        }
+
+    }
 
 }
