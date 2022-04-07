@@ -8,6 +8,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -65,7 +68,11 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 						.get(i));
 			}
 			try {
-				return MessageFormat.format(textString, unwrappedArgs);
+				if(isOnlineTranslationsEnabled()) {
+					return getOnlineTranslationsFormattedMessage(textString, unwrappedArgs);
+				} else {
+					return MessageFormat.format(textString, unwrappedArgs);	
+				}
 			} catch (Exception e) {
 				String message = "Can't format '" + key + "' from bundle '"
 						+ bundleName + "', wrong argument types: " + args
@@ -74,6 +81,41 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 				return message;
 			}
 		}
+	}
+	
+	/**
+	 * Splits preProcessed string, formats message with arguments, lists arguments before message 
+	 * and combines preProcessed string back to be used with online translations.
+	 * Substitutes arguments in message which is a part of preProcessed string  
+	 * @param preProcessed String "startSep + key + intSep + textString + intSep + message + endSep"
+	 * @param arguments that should be listed before message and substituted in the message itself 
+	 * @return
+	 */
+	private String getOnlineTranslationsFormattedMessage(String preProcessed, Object[] args) {
+		String[] parts = preProcessed.split(I18nBundle.INT_SEP);
+		final int messageIndex = parts.length -1;
+		String message = MessageFormat.format(parts[messageIndex], args);
+		String[] arguments = convertToArrayOfStrings(args);
+		parts[messageIndex] = "";
+		String result = String.join(I18nBundle.INT_SEP, parts) + 
+				            String.join(I18nBundle.INT_SEP, arguments) + 
+				            I18nBundle.INT_SEP + message ;
+		return result;
+	}
+
+	private String[] convertToArrayOfStrings(Object[] args) {
+		String[] result = new String[args.length];
+		for (int i = 0; i < result.length; i++)
+			if (args[i] != null) {
+				result[i] = args[i].toString();	
+			} else {
+				result[i] = "";
+			}
+		return result;
+	}
+
+	private static boolean isOnlineTranslationsEnabled() {
+		return DeveloperSettings.getInstance().getBoolean(Key.I18N_ONLINE_TRANSLATION);
 	}
 
 }

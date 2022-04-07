@@ -208,10 +208,14 @@ $(document).ready(function() {
 
 
     $(document).ajaxStart(function(){
-      progressImage.removeClass('hidden').css('display', 'inline-block');
+      if (progressImage){
+        progressImage.removeClass('hidden').css('display', 'inline-block');
+      }
     });
 
     $(document).ajaxStop(function(){
-      progressImage.hide().addClass('hidden');
+      if (progressImage){
+        progressImage.hide().addClass('hidden');
+      }
     });
 });

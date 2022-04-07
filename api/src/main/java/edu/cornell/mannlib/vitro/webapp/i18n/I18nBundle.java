@@ -10,6 +10,9 @@ import java.util.ResourceBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
+
 /**
  * A wrapper for a ResourceBundle that will not throw an exception, no matter
  * what string you request.
@@ -20,7 +23,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class I18nBundle {
 	private static final Log log = LogFactory.getLog(I18nBundle.class);
-
+	private static final String START_SEP = "\u25a4";
+	private static final String END_SEP = "\u25a5";
+	public static final String INT_SEP = "\u25a6";
 	private static final String MESSAGE_BUNDLE_NOT_FOUND = "Text bundle ''{0}'' not found.";
 	private static final String MESSAGE_KEY_NOT_FOUND = "Text bundle ''{0}'' has no text for ''{1}''";
 
@@ -75,13 +80,27 @@ public class I18nBundle {
 					key);
 			log.warn(message);
 			textString = "ERROR: " + message;
-		}
-		String result = formatString(textString, parameters);
+		}			
+		String message = formatString(textString, parameters);	
 
 		if (i18nLogger != null) {
-			i18nLogger.log(bundleName, key, parameters, textString, result);
+			i18nLogger.log(bundleName, key, parameters, textString, message);
 		}
-		return result;
+		if (isNeedExportInfo()) {
+			String separatedArgs = "";
+			for (int i = 0; i < parameters.length; i++) {
+				separatedArgs += parameters[i] + INT_SEP;
+			}
+			
+			return START_SEP + key + INT_SEP + textString + INT_SEP + separatedArgs + message + END_SEP;
+		} else {
+			return message;	
+		}
+		
+	}
+	
+	private static boolean isNeedExportInfo() {
+		return DeveloperSettings.getInstance().getBoolean(Key.I18N_ONLINE_TRANSLATION);
 	}
 
 	private static String formatString(String textString, Object... parameters) {
