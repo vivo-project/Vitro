@@ -1,7 +1,7 @@
 #!/bin/bash
 # RC Script
 
-RC_VERSION=1.11.1
+RC_VERSION=1.12.0
 RC_NUM=1
 
 git checkout master

@@ -7,13 +7,13 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-api</artifactId>
-    <version>1.12.1-SNAPSHOT</version>
+    <version>1.12.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
         <artifactId>vitro-project</artifactId>
-        <version>1.12.1-SNAPSHOT</version>
+        <version>1.12.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -21,6 +21,13 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <runOrder>alphabetical</runOrder>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -66,7 +73,7 @@
         <dependency>
             <groupId>org.vivoweb</groupId>
             <artifactId>vitro-dependencies</artifactId>
-            <version>1.12.1-SNAPSHOT</version>
+            <version>1.12.3-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>

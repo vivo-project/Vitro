@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Assert;
-
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -23,6 +23,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
+import stubs.javax.servlet.ServletContextStub;
 
 /**
  * Test that the Jena DAOs write different types of data to the appropriate models.
@@ -31,11 +33,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  */
 public class OntModelSegementationTest extends AbstractTestClass {
 
-	private WebappDaoFactoryJena wadf;
-	@org.junit.Before
+private WebappDaoFactoryJena wadf;
+
+	@Before
 	public void setUpWebappDaoFactoryJena() {
 		super.setUp();
 		wadf = new WebappDaoFactoryJena(new SimpleOntModelSelector());
+		ServletContextStub ctx = new ServletContextStub();
+		new ModelAccessFactoryStub().get(ctx).setWebappDaoFactory(wadf);
 	}
 
 	@Test

@@ -22,6 +22,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
@@ -36,6 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
+import stubs.javax.servlet.ServletContextStub;
 
 
 public class JenaBaseDaoTest extends AbstractTestClass {
@@ -54,6 +58,12 @@ public class JenaBaseDaoTest extends AbstractTestClass {
         "@prefix owl:  <" + OWL.getURI() + "> . \n" +
         "@prefix ex: <http://example.com/> . \n" ;
 
+  	@Before
+  	public void setup() {
+  		WebappDaoFactoryStub wdf = new WebappDaoFactoryStub();
+  		ServletContextStub ctx = new ServletContextStub();
+  		new ModelAccessFactoryStub().get(ctx).setWebappDaoFactory(wdf);
+  	}
 	@Test
 	public void smartRemoveTestForIndivdiualDelete(){
 
