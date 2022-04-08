@@ -31,7 +31,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.HAS_DELETE_QUERY;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.MOST_SPECIFIC_TYPE;
+
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -46,10 +48,14 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 	private static final boolean BEGIN = true;
 	private static final boolean END = !BEGIN;
 
-	private static String TYPE_QUERY = "" + "PREFIX vitro:    <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>"
-			+ "SELECT ?type " + "WHERE" + "{ ?individualURI vitro:mostSpecificType ?type ." + "}";
-	private static String queryForDeleteQuery = "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS + "> \n"
-			+ "SELECT ?deleteQueryText WHERE { ?associatedURI display:hasDeleteQuery ?deleteQueryText }";
+	private static String TYPE_QUERY = ""
+			+ "SELECT ?type WHERE { "
+			+ "?individualURI <" + MOST_SPECIFIC_TYPE + "> ?type ." 
+			+ "}";
+	private static String queryForDeleteQuery = ""
+			+ "SELECT ?deleteQueryText WHERE { "
+			+ "?associatedURI <" + HAS_DELETE_QUERY + "> ?deleteQueryText ."
+			+ "}";
 
 	private static final String DEFAULT_DELETE_QUERY_TEXT = "DESCRIBE ?individualURI";
 
@@ -67,8 +73,8 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 		String type = getObjectMostSpecificType(individualUri, vreq);
 		Model displayModel = vreq.getDisplayModel();
 
-		String delteQueryText = getDeleteQueryForType(type, displayModel);
-		Model toRemove = getIndividualsToDelete(individualUri, delteQueryText, vreq);
+		String deleteQueryText = getDeleteQueryForType(type, displayModel);
+		Model toRemove = getIndividualsToDelete(individualUri, deleteQueryText, vreq);
 		if (toRemove.size() > 0) {
 			deleteIndividuals(toRemove, vreq);
 		}
@@ -127,7 +133,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 		if (!deleteQueryText.equals(DEFAULT_DELETE_QUERY_TEXT)) {
 			log.debug("For " + typeURI + " found delete query \n" + deleteQueryText);
 		} else {
-			log.debug("For " + typeURI + " delete query not found. Using defalut query \n" + deleteQueryText);
+			log.debug("For " + typeURI + " delete query not found. Using default query \n" + deleteQueryText);
 		}
 		return deleteQueryText;
 	}
