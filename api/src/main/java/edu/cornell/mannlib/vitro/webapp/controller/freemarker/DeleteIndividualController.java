@@ -102,8 +102,8 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 		if (uri == null) {
 			return "Individual uri is null. No object to delete.";
 		}
-		if (uri.contains(">")) {
-			return "Individual uri shouldn't contain >";
+		if (uri.contains("<") || uri.contains(">")) {
+			return "Individual IRI shouldn't contain '<' or '>";
 		}
 		return "";
 	}
@@ -189,7 +189,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 			StringWriter sw = new StringWriter();
 			model.write(sw, "N3");
 			log.error("Got " + e.getClass().getSimpleName() + " while removing\n" + sw.toString());
-			e.printStackTrace();
+			log.error(e,e);
 			throw new RuntimeException(e);
 		}
 	}
