@@ -7,6 +7,9 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +30,7 @@ import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -57,7 +61,11 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 			+ "?associatedURI <" + HAS_DELETE_QUERY + "> ?deleteQueryText ."
 			+ "}";
 
-	private static final String DEFAULT_DELETE_QUERY_TEXT = "DESCRIBE ?individualURI";
+	private static final String DEFAULT_DELETE_QUERY_TEXT = ""
+			+ "CONSTRUCT { ?individualURI ?p1 ?o1 . ?s2 ?p2 ?individualURI . } "
+			+ "WHERE {"
+			+ "  { ?individualURI ?p1 ?o1 . } UNION { ?s2 ?p2 ?individualURI. } "
+			+ "}";
 
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
@@ -70,10 +78,10 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 			return prepareErrorMessage(errorMessage);
 		}
 		String individualUri = vreq.getParameter("individualUri");
-		String type = getObjectMostSpecificType(individualUri, vreq);
+		List<String> types = getObjectMostSpecificTypes(individualUri, vreq);
 		Model displayModel = vreq.getDisplayModel();
 
-		String deleteQueryText = getDeleteQueryForType(type, displayModel);
+		String deleteQueryText = getDeleteQueryForTypes(types, displayModel);
 		Model toRemove = getIndividualsToDelete(individualUri, deleteQueryText, vreq);
 		if (toRemove.size() > 0) {
 			deleteIndividuals(toRemove, vreq);
@@ -108,55 +116,53 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 		return "";
 	}
 
-	private static String getDeleteQueryForType(String typeURI, Model displayModel) {
+	private static String getDeleteQueryForTypes(List<String> types, Model displayModel) {
 		String deleteQueryText = DEFAULT_DELETE_QUERY_TEXT;
-		Query queryForTypeSpecificDeleteQuery = QueryFactory.create(queryForDeleteQuery);
-		QuerySolutionMap initialBindings = new QuerySolutionMap();
-		initialBindings.add("associatedURI", ResourceFactory.createResource(typeURI));
-		displayModel.enterCriticalSection(Lock.READ);
-		try {
-			QueryExecution qexec = QueryExecutionFactory.create(queryForTypeSpecificDeleteQuery, displayModel,
-					initialBindings);
+		String foundType = "";
+		for ( String type: types) {
+			Query queryForTypeSpecificDeleteQuery = QueryFactory.create(queryForDeleteQuery);
+			QuerySolutionMap initialBindings = new QuerySolutionMap();
+			initialBindings.add("associatedURI", ResourceFactory.createResource(type));
+			displayModel.enterCriticalSection(Lock.READ);
 			try {
-				ResultSet results = qexec.execSelect();
-				if (results.hasNext()) {
-					QuerySolution solution = results.nextSolution();
-					deleteQueryText = solution.get("deleteQueryText").toString();
+				QueryExecution qexec = QueryExecutionFactory.create(queryForTypeSpecificDeleteQuery, displayModel,
+						initialBindings);
+				try {
+					ResultSet results = qexec.execSelect();
+					if (results.hasNext()) {
+						QuerySolution solution = results.nextSolution();
+						deleteQueryText = solution.get("deleteQueryText").toString();
+						foundType = type;
+					}
+				} finally {
+					qexec.close();
 				}
 			} finally {
-				qexec.close();
+				displayModel.leaveCriticalSection();
 			}
-		} finally {
-			displayModel.leaveCriticalSection();
+			if (!foundType.isEmpty()) {
+				break;
+			}
 		}
-
-		if (!deleteQueryText.equals(DEFAULT_DELETE_QUERY_TEXT)) {
-			log.debug("For " + typeURI + " found delete query \n" + deleteQueryText);
+		
+		if (!foundType.isEmpty()) {
+			log.debug("For " + foundType + " found delete query \n" + deleteQueryText);
 		} else {
-			log.debug("For " + typeURI + " delete query not found. Using default query \n" + deleteQueryText);
+			log.debug("For most specific types: " + types.stream().collect(Collectors.joining(",")) + " no delete query was found. Using default query \n" + deleteQueryText);
 		}
 		return deleteQueryText;
 	}
 
-	private String getObjectMostSpecificType(String individualURI, VitroRequest vreq) {
-		String type = "";
-		try {
-			Query typeQuery = QueryFactory.create(TYPE_QUERY);
-			QuerySolutionMap bindings = new QuerySolutionMap();
-			bindings.add("individualURI", ResourceFactory.createResource(individualURI));
-			Model ontModel = vreq.getJenaOntModel();
-			QueryExecution qexec = QueryExecutionFactory.create(typeQuery, ontModel, bindings);
-			ResultSet results = qexec.execSelect();
-			while (results.hasNext()) {
-				QuerySolution solution = results.nextSolution();
-				type = solution.get("type").toString();
-				log.debug(type);
+	private List<String> getObjectMostSpecificTypes(String individualURI, VitroRequest vreq) {
+		List<String> types = new LinkedList<String>();
+			Individual individual = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
+			if (individual != null) {
+				types = individual.getMostSpecificTypeURIs();
 			}
-		} catch (Exception e) {
-			log.error("Failed to get type for individual URI " + individualURI);
-			log.error(e, e);
+		if (types.isEmpty()) {
+			log.error("Failed to get most specific type for individual URI " + individualURI);
 		}
-		return type;
+		return types;
 	}
 
 	private Model getIndividualsToDelete(String targetIndividual, String deleteQuery, VitroRequest vreq) {
@@ -166,7 +172,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 			bindings.add("individualURI", ResourceFactory.createResource(targetIndividual));
 			Model ontModel = vreq.getJenaOntModel();
 			QueryExecution qexec = QueryExecutionFactory.create(queryForTypeSpecificDeleteQuery, ontModel, bindings);
-			Model results = qexec.execDescribe();
+			Model results = qexec.execConstruct();
 			return results;
 
 		} catch (Exception e) {
