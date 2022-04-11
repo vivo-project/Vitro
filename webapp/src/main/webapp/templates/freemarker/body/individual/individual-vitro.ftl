@@ -49,7 +49,9 @@
                 <h1 class="fn" itemprop="name">
                     <#-- Label -->
                     <@p.label individual editable labelCount localesCount languageCount/>
-
+                    <#if editable>
+                        <@p.deleteIndividualLink individual />
+                    </#if>
                     <#--  Most-specific types -->
                     <@p.mostSpecificTypes individual />
                     <span id="iconControlsVitro"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></span>
