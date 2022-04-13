@@ -10,7 +10,15 @@ jobs:
       MAVEN_OPTS: -Xmx1024M
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          path: Vitro
+
+      - name: Checkout vitro languages
+        uses: actions/checkout@v3
+        with:
+          repository: vivo-project/Vitro-languages
+          path: Vitro-languages
 
       - name: Maven Cache
         uses: actions/cache@v2
@@ -25,4 +33,8 @@ jobs:
           java-version: 11
 
       - name: Maven Build
-        run: mvn clean install
+        run: |
+          cd ./Vitro-languages
+          mvn clean install
+          cd ../Vitro
+          mvn clean install
