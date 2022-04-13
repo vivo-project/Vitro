@@ -9,6 +9,8 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -17,6 +19,7 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.net.ssl.SSLContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -191,7 +194,9 @@ public class FreemarkerEmailFactory {
 		props.put("mail.smtp.port", emailPort);
 		if (emailPort == TLS_PORT) {
 			props.put("mail.smtp.starttls.enable", "true");
-			props.put("mail.smtp.ssl.protocols", "TLSv1.3 TLSv1.2");
+			if (isTLS13Supported()) {
+				props.put("mail.smtp.ssl.protocols", "TLSv1.3 TLSv1.2");	
+			}
 		}
 		if (emailPort == SSL_PORT) {
 			props.put("mail.smtp.socketFactory.port", emailPort);
@@ -203,6 +208,18 @@ public class FreemarkerEmailFactory {
 			auth = getAuthenticator();
 		}
 		return Session.getDefaultInstance(props, auth);
+	}
+
+	private boolean isTLS13Supported() {
+		String[] protocols;
+		try {
+			protocols = SSLContext.getDefault().getSupportedSSLParameters().getProtocols();
+			return (Arrays.stream(protocols).anyMatch("TLSv1.3"::equals));
+		} catch (NoSuchAlgorithmException e) {
+			log.error("No SSL context found. Suppose TLSv1.3 is not supported.");
+			log.error(e, e);
+		}
+		return false;
 	}
 
 	private Authenticator getAuthenticator() {
@@ -326,7 +343,7 @@ public class FreemarkerEmailFactory {
 								+ "to users.", e);
 			}
 		}
-
+		
 		@Override
 		public void contextDestroyed(ServletContextEvent sce) {
 			sce.getServletContext().removeAttribute(ATTRIBUTE_NAME);
