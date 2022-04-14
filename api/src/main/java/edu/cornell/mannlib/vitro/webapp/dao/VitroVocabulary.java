@@ -234,6 +234,9 @@ public class VitroVocabulary {
     public static final String IND_MAIN_IMAGE = VITRO_PUBLIC + "mainImage";
     public static final String IND_IMAGE = VITRO_PUBLIC + "image";
 
+    public static final String STORED_FILE = VITRO_PUBLIC + "storedFile";
+    public static final String PUBLIC_FILENAME = VITRO_PUBLIC + "publicFilename";
+
     // =============== Date Time with Precision vocabulary ===============
     private static final String DATETIME_NS = "http://vivoweb.org/ontology/core#";
 

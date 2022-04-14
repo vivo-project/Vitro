@@ -61,6 +61,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         if (VitroVocabulary.IND_MAIN_IMAGE.equals(property.getURI())) {
             return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "delete");
         }
+        //If object is a File but not associated with main image
+        if (ObjectPropertyTemplateModel.isFileStoreProperty(property)) {
+          return ObjectPropertyTemplateModel.getDeleteFileUrl(subjectUri, property.getURI(), objectUri);
+        }
 
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
@@ -108,6 +112,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
 
         if (VitroVocabulary.IND_MAIN_IMAGE.equals(property.getURI())) {
             return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
+        }
+        if (ObjectPropertyTemplateModel.isFileStoreProperty(property)) {
+          //Disable file editing
+        	return "";
         }
 
         ParamMap params = new ParamMap(

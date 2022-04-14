@@ -253,5 +253,21 @@ public class UploadedFileHelper {
 		}
 		return !stmts.isEmpty();
 	}
+	
+	public void removeUploadedFile(String subjectUri, String predicateUri, String fileUri) {
+		FileInfo fileInfo = FileInfo.instanceFromSurrogateUri(wadf, fileUri);
+		objectPropertyStatementDao
+				.deleteObjectPropertyStatement(new ObjectPropertyStatementImpl(subjectUri, predicateUri, fileUri));
+		deleteIfNotReferenced(fileInfo);
+	}
 
+	public void attachFileToSubject(FileInfo fileInfo, String subjectUri, String predicateUri) {
+		objectPropertyStatementDao
+				.insertNewObjectPropertyStatement(new ObjectPropertyStatementImpl(subjectUri, predicateUri, fileInfo.getUri()));
+	}
+
+	public void setPublicFileName(FileInfo fileInfo, String uploadedFileName) {
+		dataPropertyStatementDao.insertNewDataPropertyStatement(
+				new DataPropertyStatementImpl(fileInfo.getUri(), VitroVocabulary.PUBLIC_FILENAME, uploadedFileName));
+	}
 }
