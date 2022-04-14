@@ -9,12 +9,17 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Scanner;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.net.ssl.SSLContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -40,11 +45,18 @@ import freemarker.template.Configuration;
  * syntactically invalid, an exception is thrown and startup is aborted.
  */
 public class FreemarkerEmailFactory {
+
 	private static final Log log = LogFactory
 			.getLog(FreemarkerEmailFactory.class);
 
+	private static final int DEFAULT_SMTP_PORT = 25;
+	private static final int TLS_PORT = 587;
+	private static final int SSL_PORT = 465;
 	public static final String SMTP_HOST_PROPERTY = "email.smtpHost";
 	public static final String REPLY_TO_PROPERTY = "email.replyTo";
+	public static final String EMAIL_PASSWORD = "email.password";
+	public static final String EMAIL_USERNAME = "email.username";
+	public static final String EMAIL_PORT = "email.port";
 
 	private static final String ATTRIBUTE_NAME = FreemarkerEmailFactory.class
 			.getName();
@@ -91,13 +103,20 @@ public class FreemarkerEmailFactory {
 	private final String smtpHost;
 	private final InternetAddress replyToAddress;
 	private final Session emailSession;
+	private final String password;
+	private final String userName;
+	private final int emailPort;
+
 
 	public FreemarkerEmailFactory(ServletContext ctx) {
 		this.smtpHost = getSmtpHostFromConfig(ctx);
-		new SmtpHostTester().test(this.smtpHost);
-
+		this.emailPort = getPortFromConfig(ctx);
+		new SmtpHostTester().test(this.smtpHost, emailPort);
 		this.replyToAddress = getReplyToAddressFromConfig(ctx);
+		this.password = getPasswordFromConfig(ctx);
+		this.userName = getUserNameFromConfig(ctx);
 		this.emailSession = createEmailSession(smtpHost);
+
 	}
 
 	String getSmtpHost() {
@@ -108,10 +127,10 @@ public class FreemarkerEmailFactory {
 		return replyToAddress;
 	}
 
-	Session getEmailSession() {
+	private Session getEmailSession() {
 		return emailSession;
 	}
-
+	
 	private String getSmtpHostFromConfig(ServletContext ctx) {
 		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
 		String hostName = config.getProperty(SMTP_HOST_PROPERTY, "");
@@ -121,6 +140,28 @@ public class FreemarkerEmailFactory {
 		return hostName;
 	}
 
+	private String getPasswordFromConfig(ServletContext ctx) {
+		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
+		String password = config.getProperty(EMAIL_PASSWORD, "");
+		return password;
+	}
+	
+	private String getUserNameFromConfig(ServletContext ctx) {
+		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
+		String userName = config.getProperty(EMAIL_USERNAME, "");
+		return userName;
+	}
+	
+	private int getPortFromConfig(ServletContext ctx) {
+		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
+		String port = config.getProperty(EMAIL_PORT, Integer.toString(DEFAULT_SMTP_PORT));
+		try {
+			return Integer.parseInt(port);
+		} catch (NumberFormatException e) {
+			return DEFAULT_SMTP_PORT;
+		}
+	}
+	
 	private InternetAddress getReplyToAddressFromConfig(ServletContext ctx) {
 		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
 		String rawAddress = config.getProperty(REPLY_TO_PROPERTY, "");
@@ -150,7 +191,43 @@ public class FreemarkerEmailFactory {
 	private Session createEmailSession(String hostName) {
 		Properties props = new Properties(System.getProperties());
 		props.put("mail.smtp.host", hostName);
-		return Session.getDefaultInstance(props, null);
+		props.put("mail.smtp.port", emailPort);
+		if (emailPort == TLS_PORT) {
+			props.put("mail.smtp.starttls.enable", "true");
+			if (isTLS13Supported()) {
+				props.put("mail.smtp.ssl.protocols", "TLSv1.3 TLSv1.2");	
+			}
+		}
+		if (emailPort == SSL_PORT) {
+			props.put("mail.smtp.socketFactory.port", emailPort);
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		}
+		Authenticator auth = null;
+		if (!password.isEmpty() && !userName.isEmpty()) {
+			props.put("mail.smtp.auth", "true");
+			auth = getAuthenticator();
+		}
+		return Session.getDefaultInstance(props, auth);
+	}
+
+	private boolean isTLS13Supported() {
+		String[] protocols;
+		try {
+			protocols = SSLContext.getDefault().getSupportedSSLParameters().getProtocols();
+			return (Arrays.stream(protocols).anyMatch("TLSv1.3"::equals));
+		} catch (NoSuchAlgorithmException e) {
+			log.error("No SSL context found. Suppose TLSv1.3 is not supported.");
+			log.error(e, e);
+		}
+		return false;
+	}
+
+	private Authenticator getAuthenticator() {
+		return new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(userName, password);
+			}
+		};
 	}
 
 	// ----------------------------------------------------------------------
@@ -188,17 +265,18 @@ public class FreemarkerEmailFactory {
 		/**
 		 * Try to open a connection to the SMTP host and conduct an "empty"
 		 * conversation using SMTP.
+		 * @param emailPort 
 		 *
 		 * @throws InvalidSmtpHost
 		 *             If anything goes wrong.
 		 */
-		public void test(String smtpHost) throws InvalidSmtpHost {
+		public void test(String smtpHost, int emailPort) throws InvalidSmtpHost {
 			Socket socket = null;
 			PrintStream out = null;
 			Scanner in = null;
 			try {
 				InetAddress hostAddr = InetAddress.getByName(smtpHost);
-				socket = new Socket(hostAddr, SMTP_PORT);
+				socket = new Socket(hostAddr, emailPort);
 
 				out = new PrintStream(socket.getOutputStream());
 				in = new Scanner(new InputStreamReader(socket.getInputStream()));
@@ -216,7 +294,7 @@ public class FreemarkerEmailFactory {
 						"host name is not recognized");
 			} catch (ConnectException e) {
 				throw new InvalidSmtpHost(smtpHost,
-						"refused connection on port " + SMTP_PORT);
+						"refused connection on port " + emailPort);
 			} catch (IOException e) {
 				throw new RuntimeException("unrecognized problem: ", e);
 			} finally {
@@ -265,7 +343,7 @@ public class FreemarkerEmailFactory {
 								+ "to users.", e);
 			}
 		}
-
+		
 		@Override
 		public void contextDestroyed(ServletContextEvent sce) {
 			sce.getServletContext().removeAttribute(ATTRIBUTE_NAME);
