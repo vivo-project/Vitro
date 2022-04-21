@@ -2,12 +2,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.vivoweb</groupId>
-    <artifactId>vitro-languages</artifactId>
-    <version>1.12.3-SNAPSHOT</version>
+    <artifactId>vitro-languages-sr_Latn_RS</artifactId>
     <packaging>pom</packaging>
 
-    <name>Vitro Languages</name>
+    <name>Vitro Languages sr_Latn_RS</name>
     <description>Vitro Languages</description>
     <url>http://vivoweb.org/</url>
 
@@ -18,27 +16,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <developers>
-        <developer>
-            <name>Graham Triggs</name>
-            <email>gtriggs@duraspace.org</email>
-            <organization>DuraSpace</organization>
-            <organizationUrl>http://vivoweb.org/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Jim Blake</name>
-            <email>jeb228@cornell.edu</email>
-            <organization>Cornell University Library</organization>
-            <organizationUrl>https://github.com/j2blake</organizationUrl>
-        </developer>
-        <developer>
-            <name>John Fereira</name>
-            <email>jaf30@cornell.edu</email>
-            <organization>Cornell University</organization>
-            <organizationUrl>https://github.com/fereira</organizationUrl>
-        </developer>
-    </developers>
 
     <!--
        The SCM repository location is used by Continuum to update against
@@ -62,6 +39,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <modules>
+        <module>webapp</module>
+    </modules>
 
     <profiles>
         <profile>
@@ -212,15 +192,11 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-    <modules>
-    	<module>core</module>
-    	<module>en_CA</module>
-    	<module>en_US</module>
-    	<module>es</module>
-    	<module>fr_CA</module>
-    	<module>pt_BR</module>
-    	<module>de_DE</module>
-    	<module>sr_Latn_RS</module>
-    	<module>ru_RU</module>
-    </modules>
+    <parent>
+    	<groupId>org.vivoweb</groupId>
+    	<artifactId>vitro-languages</artifactId>
+    	<version>1.12.3-SNAPSHOT</version>
+    </parent>
+    <version>1.12.3-SNAPSHOT</version>
+    <groupId>org.vivoweb</groupId>
 </project>
