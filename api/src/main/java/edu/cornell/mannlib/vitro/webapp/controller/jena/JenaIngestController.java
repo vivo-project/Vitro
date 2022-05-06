@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -290,13 +292,16 @@ public class JenaIngestController extends BaseEditController {
     private void processOutputModelRequest(VitroRequest vreq,
                                            HttpServletResponse response) {
         String modelNameStr = vreq.getParameter("modelName");
+        DateTimeFormatter timeStampPattern = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss");
+        String fileName = FilenameUtils.getName(modelNameStr) + "-" + timeStampPattern.format(java.time.LocalDateTime.now());
         Model model = getModel(modelNameStr,vreq);
         JenaOutputUtils.setNameSpacePrefixes(model,vreq.getWebappDaoFactory());
         model.enterCriticalSection(Lock.READ);
         try {
             OutputStream out = response.getOutputStream();
             response.setContentType("application/x-turtle");
-            //out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".getBytes());
+            response.setHeader("Content-Transfer-Encoding", "binary");
+            response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".ttl");
             model.write(out, "TTL");
             out.flush();
             out.close();
