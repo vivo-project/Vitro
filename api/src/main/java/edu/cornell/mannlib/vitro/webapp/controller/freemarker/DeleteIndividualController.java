@@ -3,8 +3,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,7 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.HAS_DELETE_QUERY;
-import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.MOST_SPECIFIC_TYPE;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -47,24 +44,21 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 @WebServlet(name = "DeleteIndividualController", urlPatterns = "/deleteIndividualController")
 public class DeleteIndividualController extends FreemarkerHttpServlet {
 
+	private static final String INDIVIDUAL_URI = "individualUri";
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory.getLog(DeleteIndividualController.class);
 	private static final boolean BEGIN = true;
 	private static final boolean END = !BEGIN;
 
-	private static String TYPE_QUERY = ""
-			+ "SELECT ?type WHERE { "
-			+ "?individualURI <" + MOST_SPECIFIC_TYPE + "> ?type ." 
-			+ "}";
 	private static String queryForDeleteQuery = ""
 			+ "SELECT ?deleteQueryText WHERE { "
-			+ "?associatedURI <" + HAS_DELETE_QUERY + "> ?deleteQueryText ."
+			+ "?associatedUri <" + HAS_DELETE_QUERY + "> ?deleteQueryText ."
 			+ "}";
 
 	private static final String DEFAULT_DELETE_QUERY_TEXT = ""
-			+ "CONSTRUCT { ?individualURI ?p1 ?o1 . ?s2 ?p2 ?individualURI . } "
+			+ "CONSTRUCT { ?individualUri ?p1 ?o1 . ?s2 ?p2 ?individualUri . } "
 			+ "WHERE {"
-			+ "  { ?individualURI ?p1 ?o1 . } UNION { ?s2 ?p2 ?individualURI. } "
+			+ "  { ?individualUri ?p1 ?o1 . } UNION { ?s2 ?p2 ?individualUri. } "
 			+ "}";
 
 	@Override
@@ -77,7 +71,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 		if (!errorMessage.isEmpty()) {
 			return prepareErrorMessage(errorMessage);
 		}
-		String individualUri = vreq.getParameter("individualUri");
+		String individualUri = vreq.getParameter(INDIVIDUAL_URI);
 		List<String> types = getObjectMostSpecificTypes(individualUri, vreq);
 		Model displayModel = vreq.getDisplayModel();
 
@@ -106,7 +100,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 	}
 
 	private String handleErrors(VitroRequest vreq) {
-		String uri = vreq.getParameter("individualUri");
+		String uri = vreq.getParameter(INDIVIDUAL_URI);
 		if (uri == null) {
 			return "Individual uri is null. No object to delete.";
 		}
@@ -147,20 +141,26 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 		
 		if (!foundType.isEmpty()) {
 			log.debug("For " + foundType + " found delete query \n" + deleteQueryText);
+			if (!deleteQueryText.contains(INDIVIDUAL_URI)){
+				log.error("Safety check failed. Delete query text should contain " + INDIVIDUAL_URI + ", "
+						+ "but it didn't. To prevent bad consequences query was rejected.");
+				log.error("Delete query which caused the error: \n" + deleteQueryText);
+				deleteQueryText = DEFAULT_DELETE_QUERY_TEXT;
+			}
 		} else {
 			log.debug("For most specific types: " + types.stream().collect(Collectors.joining(",")) + " no delete query was found. Using default query \n" + deleteQueryText);
 		}
 		return deleteQueryText;
 	}
 
-	private List<String> getObjectMostSpecificTypes(String individualURI, VitroRequest vreq) {
+	private List<String> getObjectMostSpecificTypes(String individualUri, VitroRequest vreq) {
 		List<String> types = new LinkedList<String>();
-			Individual individual = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
+			Individual individual = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualUri);
 			if (individual != null) {
 				types = individual.getMostSpecificTypeURIs();
 			}
 		if (types.isEmpty()) {
-			log.error("Failed to get most specific type for individual URI " + individualURI);
+			log.error("Failed to get most specific type for individual Uri " + individualUri);
 		}
 		return types;
 	}
@@ -169,7 +169,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 		try {
 			Query queryForTypeSpecificDeleteQuery = QueryFactory.create(deleteQuery);
 			QuerySolutionMap bindings = new QuerySolutionMap();
-			bindings.add("individualURI", ResourceFactory.createResource(targetIndividual));
+			bindings.add(INDIVIDUAL_URI, ResourceFactory.createResource(targetIndividual));
 			Model ontModel = vreq.getJenaOntModel();
 			QueryExecution qexec = QueryExecutionFactory.create(queryForTypeSpecificDeleteQuery, ontModel, bindings);
 			Model results = qexec.execConstruct();
