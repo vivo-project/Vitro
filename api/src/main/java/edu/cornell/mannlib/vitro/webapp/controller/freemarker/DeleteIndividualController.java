@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.HAS_DELETE_QUERY;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -170,7 +171,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 			Query queryForTypeSpecificDeleteQuery = QueryFactory.create(deleteQuery);
 			QuerySolutionMap bindings = new QuerySolutionMap();
 			bindings.add(INDIVIDUAL_URI, ResourceFactory.createResource(targetIndividual));
-			Model ontModel = vreq.getJenaOntModel();
+			Model ontModel = ModelAccess.on(vreq).getOntModelSelector().getABoxModel();
 			QueryExecution qexec = QueryExecutionFactory.create(queryForTypeSpecificDeleteQuery, ontModel, bindings);
 			Model results = qexec.execConstruct();
 			return results;
