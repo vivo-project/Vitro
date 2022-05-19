@@ -89,13 +89,13 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
             mimeType = "application/json";
         }
 
-        when(request.getServletPath()).thenReturn("/docs/rpc");
+        when(request.getServletPath()).thenReturn("/api/docs/rpc");
         when(request.getPathInfo()).thenReturn(pathInfo);
         when(request.getHeader("Accept")).thenReturn(mimeType);
         when(request.getContentType()).thenReturn(mimeType);
         when(response.getWriter()).thenReturn(responsePrintWriter);
 
-        System.out.println("Running Test against: '/docs/rpc" + pathInfo + "'.");
+        System.out.println("Running Test against: '/api/docs/rpc" + pathInfo + "'.");
 
         rpcEndpoint.doGet(request, response);
 

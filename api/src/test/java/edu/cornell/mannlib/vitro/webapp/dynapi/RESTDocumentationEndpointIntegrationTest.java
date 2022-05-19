@@ -99,16 +99,16 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
             mimeType = "application/json";
         }
 
-        when(request.getServletPath()).thenReturn("/docs/rest");
+        when(request.getServletPath()).thenReturn("/api/docs/rest");
         when(request.getPathInfo()).thenReturn(pathInfo);
         when(request.getHeader("Accept")).thenReturn(mimeType);
         when(request.getContentType()).thenReturn(mimeType);
         when(response.getWriter()).thenReturn(responsePrintWriter);
 
-        System.out.println("Running Test against: '/docs/rest" + pathInfo + "'.");
+        System.out.println("Running Test against: '/api/docs/rest" + pathInfo + "'.");
 
         restEndpoint.doGet(request, response);
-
+        
         verify(response, times(1)).setContentType(mimeType);
         verify(responsePrintWriter, times(1)).print(argThat(new APIResponseMatcher(testJson, testExpectedResponse)));
         verify(responsePrintWriter, times(1)).flush();
