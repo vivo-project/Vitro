@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class OperationalStep implements Step {
@@ -31,7 +32,7 @@ public class OperationalStep implements Step {
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep", maxOccurs = 1)
-    public void setNextStep(OperationalStep step) {
+    public void setNextStep(Step step) {
         this.nextStep = step;
     }
 
@@ -63,8 +64,18 @@ public class OperationalStep implements Step {
     }
 
     @Override
-    public Set<Link> getNextLinks() {
+    public Set<StepInfo> getNextNodes() {
         return Collections.singleton(nextStep);
+    }
+
+    @Override
+    public boolean isRoot() {
+        return false;
+    }
+
+    @Override
+    public boolean isOptional() {
+        return false;
     }
 
     @Override
@@ -75,11 +86,6 @@ public class OperationalStep implements Step {
     @Override
     public Parameters getProvidedParams() {
         return operation.getProvidedParams();
-    }
-
-    @Override
-    public boolean isRoot() {
-        return false;
     }
 
 }

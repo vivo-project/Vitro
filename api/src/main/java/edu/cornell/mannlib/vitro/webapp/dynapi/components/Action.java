@@ -6,10 +6,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.computation.AutoConfiguration;
+import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Action extends Operation implements Poolable<String>, Link {
+public class Action extends Operation implements Poolable<String>, StepInfo {
+    
+    private static final Log log = LogFactory.getLog(Action.class);
 
     private Step firstStep = null;
     private RPC rpc;
@@ -17,7 +24,7 @@ public class Action extends Operation implements Poolable<String>, Link {
     private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
     private Parameters providedParams = new Parameters();
-    private Parameters requiredParams;
+    private Parameters requiredParams = new Parameters();
 
     @Override
     public void dereference() {
@@ -38,7 +45,7 @@ public class Action extends Operation implements Poolable<String>, Link {
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
-    public void setStep(OperationalStep step) {
+    public void setStep(Step step) {
         this.firstStep = step;
     }
 
@@ -59,7 +66,14 @@ public class Action extends Operation implements Poolable<String>, Link {
 
     @Override
     public boolean isValid() {
-        return true;
+        boolean result = false;
+        try {
+            computeParams();
+            result = true;
+        } catch (Exception e) {
+           log.error(e,e);
+        }
+        return result;
     }
 
     @Override
@@ -90,31 +104,15 @@ public class Action extends Operation implements Poolable<String>, Link {
         return !clients.isEmpty();
     }
 
-    @Override
-    public Set<Link> getNextLinks() {
-        return Collections.singleton(firstStep);
-    }
 
     @Override
     public Parameters getRequiredParams() {
-        if (firstStep == null) {
-            return new Parameters();
-        }
-        return firstStep.getRequiredParams();
-    }
-
-    public void computeScopes() {
-        requiredParams = Scopes.computeInitialRequirements(this);
+        return requiredParams;
     }
 
     @Override
     public Parameters getProvidedParams() {
         return providedParams;
-    }
-
-    @Override
-    public boolean isRoot() {
-        return true;
     }
 
     @Override
@@ -134,6 +132,25 @@ public class Action extends Operation implements Poolable<String>, Link {
         }
 
         return true;
+    }
+    
+    public void computeParams() {
+        AutoConfiguration.computeParams(this);
+    }
+
+    @Override
+    public Set<StepInfo> getNextNodes() {
+        return Collections.singleton(firstStep);
+    }
+
+    @Override
+    public boolean isRoot() {
+        return true;
+    }
+
+    @Override
+    public boolean isOptional() {
+        return false;
     }
 
 }
