@@ -85,7 +85,15 @@
             <artifactId>fluent-hc</artifactId>
             <version>4.5.6</version>
         </dependency>
-        
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core</artifactId>
+            <!-- downgraded to match jackson version from org.apache.jena:jena-arq:jar:3.16.0 to avoid conflict -->
+            <!-- jackson version 2.10.1 -->
+            <version>2.1.2</version>
+        </dependency>
+
         <dependency>
             <groupId>org.vivoweb</groupId>
             <artifactId>vitro-dependencies</artifactId>

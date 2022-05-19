@@ -83,6 +83,27 @@ public abstract class ServletContextTest {
         }
     }
 
+    protected void loadPersonVersion1_1Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person1_1.n3")
+        );
+    }
+
+    protected void loadPersonVersion2Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person2.n3")
+        );
+    }
+
+    protected void loadPersonVersion4_3_7Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person4_3_7.n3")
+        );
+    }
+
     protected String readFile(String path) throws IOException {
         Path p = new File(path).toPath();
 
