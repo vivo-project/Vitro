@@ -503,27 +503,6 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         return resourceAPIPool;
     }
 
-    private void loadPersonVersion1_1Model() throws IOException {
-        // versioning action reuses testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person1_1.n3")
-        );
-    }
-
-    private void loadPersonVersion2Model() throws IOException {
-        // versioning action reuses testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person2.n3")
-        );
-    }
-
-    private void loadPersonVersion4_3_7Model() throws IOException {
-        // versioning action reuses testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person4_3_7.n3")
-        );
-    }
-
     private void assertResource(ResourceAPIKey expctedResourceAPIKey, String expectedActionName, ResourceAPI actualResourceAPI) {
         assertNotNull(actualResourceAPI);
         assertFalse(format("%s not loaded!", expctedResourceAPIKey), actualResourceAPI instanceof DefaultResourceAPI);

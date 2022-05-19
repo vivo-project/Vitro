@@ -31,6 +31,13 @@
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllPersonRPC1>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "Test rpc get all person 1"@en-US ;
+        dynapi:name                         "test_person" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC1>
         a                                   dynapi:rpc ;
         rdfs:label                          "Test rpc update person 1"@en-US ;
@@ -66,6 +73,7 @@
         dynapi:minAPIVersion                "1.0.0" ;
         dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC1> ;
         dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetPersonRPC1> ;
+        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllPersonRPC1> ;
         dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC1> ;
         dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchPersonRPC1> ;
         dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeletePersonRPC1> ;

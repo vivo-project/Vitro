@@ -26,4 +26,8 @@ public abstract class ParameterType implements Removable {
 
     public abstract String computePrefix(String fieldName);
 
+	public String getName() {
+		return name;
+	}
+
 }

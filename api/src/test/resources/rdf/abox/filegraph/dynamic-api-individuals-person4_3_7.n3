@@ -15,7 +15,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testPersonStep4>
         a                                   dynapi:step, dynapi:operationalStep ;
         rdfs:label                          "Test person operational step 4"@en-US ;
-        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery4> .
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC4>
         a                                   dynapi:rpc ;
@@ -27,6 +27,13 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetPersonRPC4>
         a                                   dynapi:rpc ;
         rdfs:label                          "Test rpc get person 4"@en-US ;
+        dynapi:name                         "test_person" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "4.3.7" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllPersonRPC4>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "Test rpc get all person 4"@en-US ;
         dynapi:name                         "test_person" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "4.3.7" .
@@ -66,6 +73,7 @@
         dynapi:minAPIVersion                "4.3.7" ;
         dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC4> ;
         dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetPersonRPC4> ;
+        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllPersonRPC4> ;
         dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC4> ;
         dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchPersonRPC4> ;
         dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeletePersonRPC4> ;
