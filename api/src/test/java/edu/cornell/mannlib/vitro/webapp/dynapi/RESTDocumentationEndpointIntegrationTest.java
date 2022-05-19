@@ -108,7 +108,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
         System.out.println("Running Test against: '/api/docs/rest" + pathInfo + "'.");
 
         restEndpoint.doGet(request, response);
-
+        
         verify(response, times(1)).setContentType(mimeType);
         verify(responsePrintWriter, times(1)).print(argThat(new APIResponseMatcher(testJson, testExpectedResponse)));
         verify(responsePrintWriter, times(1)).flush();

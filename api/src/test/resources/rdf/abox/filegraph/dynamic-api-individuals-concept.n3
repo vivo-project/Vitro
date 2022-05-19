@@ -31,6 +31,13 @@
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllConceptRPC1>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "Test rpc get all concept 1"@en-US ;
+        dynapi:name                         "test_concept" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateConceptRPC1>
         a                                   dynapi:rpc ;
         rdfs:label                          "Test rpc update concept 1"@en-US ;
@@ -66,6 +73,7 @@
         dynapi:minAPIVersion                "1.0.0" ;
         dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateConceptRPC1> ;
         dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetConceptRPC1> ;
+        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllConceptRPC1> ;
         dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateConceptRPC1> ;
         dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchConceptRPC1> ;
         dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteConceptRPC1> ;
