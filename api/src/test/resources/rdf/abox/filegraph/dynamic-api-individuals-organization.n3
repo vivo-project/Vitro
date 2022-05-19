@@ -31,6 +31,13 @@
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllOrganizationRPC1>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "Test rpc get all organization 1"@en-US ;
+        dynapi:name                         "test_organization" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateOrganizationRPC1>
         a                                   dynapi:rpc ;
         rdfs:label                          "Test rpc update organization 1"@en-US ;
@@ -66,6 +73,7 @@
         dynapi:minAPIVersion                "1.0.0" ;
         dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateOrganizationRPC1> ;
         dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetOrganizationRPC1> ;
+        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllOrganizationRPC1> ;
         dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateOrganizationRPC1> ;
         dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchOrganizationRPC1> ;
         dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteOrganizationRPC1> ;

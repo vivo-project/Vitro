@@ -11,11 +11,11 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOParametersMessage
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
-import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
+import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 public class OperationData {
 
-    private final static String RESOURCE_ID = "resource_id";
+    public final static String RESOURCE_ID = "resource_id";
 
     private final Map<String, String[]> params;
     private final ServletContext context;
@@ -36,11 +36,12 @@ public class OperationData {
     }
 
     private void addRequestPathParameters(HttpServletRequest request) {
-        if (data == null)
+        if (data == null) {
             data = new ObjectData();
+        }
         Map<String, Data> ioDataMap = data.getContainer();
         if (ioDataMap.get(OperationData.RESOURCE_ID) == null) {
-            RequestPath requestPath = RequestPath.from(request);
+            ApiRequestPath requestPath = ApiRequestPath.from(request);
             String resourceId = requestPath.getResourceId();
             if (resourceId != null) {
                 ioDataMap.put(OperationData.RESOURCE_ID, new StringData(resourceId));
