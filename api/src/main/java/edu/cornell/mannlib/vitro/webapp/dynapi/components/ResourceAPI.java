@@ -15,6 +15,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
     private String versionMin;
     private String versionMax;
     private RPC rpcOnGet;
+    private RPC rpcOnGetAll;
     private RPC rpcOnPost;
     private RPC rpcOnDelete;
     private RPC rpcOnPut;
@@ -75,6 +76,15 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
     public void setRpcOnGet(RPC rpcOnGet) {
         this.rpcOnGet = rpcOnGet;
     }
+    
+    public RPC getRpcOnGetAll() {
+        return rpcOnGetAll;
+    }
+
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll", minOccurs = 0, maxOccurs = 1)
+    public void setRpcOnGetAll(RPC rpcOnGetAll) {
+        this.rpcOnGetAll = rpcOnGetAll;
+    }
 
     public RPC getRpcOnPost() {
         return rpcOnPost;
@@ -115,6 +125,10 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction")
     public void addCustomRESTAction(CustomRESTAction customRESTAction) {
         customRESTActions.add(customRESTAction);
+    }
+
+    public List<CustomRESTAction> getCustomRESTActions() {
+        return customRESTActions;
     }
 
     @Override

@@ -97,7 +97,10 @@ public class Action extends Operation implements Poolable<String>, Link {
 
     @Override
     public Parameters getRequiredParams() {
-        return requiredParams;
+        if (firstStep == null) {
+            return new Parameters();
+        }
+        return firstStep.getRequiredParams();
     }
 
     public void computeScopes() {

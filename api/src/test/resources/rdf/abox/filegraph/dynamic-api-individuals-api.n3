@@ -1,0 +1,27 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv1>
+        a                                   dynapi:api ;
+        rdfs:label                          "Test API"@en-US ;
+        dynapi:title                        "Test API" ;
+        dynapi:description                  "A test dynamic API" ;
+        dynapi:version                      "1" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv2>
+        a                                   dynapi:api ;
+        rdfs:label                          "Newer Test API"@en-US ;
+        dynapi:title                        "Newer Test API" ;
+        dynapi:description                  "A test of the newer dynamic API" ;
+        dynapi:version                      "2" .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv4>
+        a                                   dynapi:api ;
+        rdfs:label                          "Improved Test API"@en-US ;
+        dynapi:title                        "Improved Test API" ;
+        dynapi:description                  "A test of thew improved newer dynamic API" ;
+        dynapi:version                      "4" .
