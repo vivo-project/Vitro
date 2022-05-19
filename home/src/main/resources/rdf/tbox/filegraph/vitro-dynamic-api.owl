@@ -159,6 +159,15 @@
         <rdfs:label xml:lang="en-US">on GET</rdfs:label>
     </owl:ObjectProperty>
 
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll -->
+
+    <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+        <rdfs:label xml:lang="en-US">on GET</rdfs:label>
+    </owl:ObjectProperty>
+
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#onPost -->
 

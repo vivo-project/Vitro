@@ -301,8 +301,7 @@ public class DynamicAPIDocumentation {
         ActionPool actionPool = ActionPool.getInstance();
         PathItem pathItem = new PathItem();
 
-        // No way to distinguish an RCP get for collection or individual
-        RPC collectionGetRPC = resourceAPI.getRpcOnGet();
+        RPC collectionGetRPC = resourceAPI.getRpcOnGetAll();
         if (collectionGetRPC != null) {
             Action action = actionPool.get(collectionGetRPC.getName());
             pathItem.setGet(collectionGetOperation(action, tag));
@@ -324,7 +323,6 @@ public class DynamicAPIDocumentation {
 
         pathItem.addParametersItem(individualPathParameter());
 
-        // No way to distinguish an RCP get for collection or individual
         RPC individualGetRPC = resourceAPI.getRpcOnGet();
         if (individualGetRPC != null) {
             Action action = actionPool.get(individualGetRPC.getName());
