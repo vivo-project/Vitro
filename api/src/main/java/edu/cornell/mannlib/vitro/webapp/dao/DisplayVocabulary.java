@@ -53,6 +53,8 @@ public class DisplayVocabulary {
     //specific case for internal class, value is true or false
     public static final String 	RESTRICT_RESULTS_BY_INTERNAL = NS + "restrictResultsByInternalClass";
 
+    public static final String HAS_DELETE_QUERY = NS + "hasDeleteQuery";
+
 
     /* Data Properties */
     public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty(NS + "urlMapping");

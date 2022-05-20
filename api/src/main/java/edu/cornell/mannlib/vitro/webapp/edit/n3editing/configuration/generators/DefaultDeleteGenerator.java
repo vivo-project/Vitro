@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
-import java.util.HashMap;
-
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
@@ -21,14 +19,16 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
  */
 public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 
-	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
+	private static final Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
+	private static final String PROPERTY_TEMPLATE = "confirmDeletePropertyForm.ftl";
+	private static final String INDIVIDUAL_TEMPLATE = "confirmDeleteIndividualForm.ftl";
+
 	private String subjectUri = null;
 	private String predicateUri = null;
 	private String objectUri = null;
 	private Integer dataHash = 0;
 	private DataPropertyStatement dps = null;
-	private String dataLiteral = null;
-	private String template = "confirmDeletePropertyForm.ftl";
+
 
 	//In this case, simply return the edit configuration currently saved in session
 	//Since this is forwarding from another form, an edit configuration should already exist in session
@@ -43,17 +43,37 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     	if(editConfiguration == null) {
     		editConfiguration = setupEditConfiguration(vreq, session);
     	}
-    	editConfiguration.setTemplate(template);
     	//prepare update?
     	prepare(vreq, editConfiguration);
+    	if (editConfiguration.getPredicateUri() == null && editConfiguration.getSubjectUri() == null) {
+    		editConfiguration.setTemplate(INDIVIDUAL_TEMPLATE);
+    		addDeleteParams(vreq, editConfiguration);
+    	}else {
+    		editConfiguration.setTemplate(PROPERTY_TEMPLATE);
+    	}
     	return editConfiguration;
     }
+
+	private void addDeleteParams(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
+		String redirectUrl = vreq.getParameter("redirectUrl");
+		if (redirectUrl != null) {
+			editConfiguration.addFormSpecificData("redirectUrl", redirectUrl);
+		}
+		String individualName = vreq.getParameter("individualName");
+		if (redirectUrl != null) {
+			editConfiguration.addFormSpecificData("individualName", individualName);
+		}
+		String individualType = vreq.getParameter("individualType");
+		if (redirectUrl != null) {
+			editConfiguration.addFormSpecificData("individualType", individualType);
+		}
+	}
 
 	private EditConfigurationVTwo  setupEditConfiguration(VitroRequest vreq, HttpSession session) {
 		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
 		initProcessParameters(vreq, session, editConfiguration);
 		//set edit key for this as well
-		editConfiguration.setEditKey(editConfiguration.newEditKey(session));
+		editConfiguration.setEditKey(EditConfigurationVTwo.newEditKey(session));
 		return editConfiguration;
 
 	}
