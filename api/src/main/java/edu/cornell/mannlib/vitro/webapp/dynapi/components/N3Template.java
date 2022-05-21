@@ -20,8 +20,6 @@ public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
-	private static final String ANY_URI="http://www.w3.org/2001/XMLSchema#anyURI";
-
 	private Parameters requiredParams = new Parameters();
 	private String n3Text;
 	private ModelComponent templateModel;
@@ -97,23 +95,13 @@ public class N3Template extends Operation implements Template {
 		List<String> n3WithParameters = Arrays.asList(n3Text);
 
 		//region Substitute IRI variables
-		Map<String, List<String>> parametersToUris = requiredParams.getParameters().values().stream()
-				.filter(value->value.getRDFDataType().getURI().equals(ANY_URI))
-				.collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
+		Map<String, List<String>> parametersToUris = requiredParams.substituteIRIVariables(input);
 
 		gen.subInMultiUris(parametersToUris, n3WithParameters);
 		//endregion
 
 		//region Substitute other (literal) variables
-		Map<String, List<Literal>> parametersToLiterals = requiredParams.getParameters().values().stream()
-				.filter(value->!value.getRDFDataType().getURI().equals(ANY_URI))
-				.collect(Collectors.toMap(
-						param -> param.getName(),
-						param -> Arrays.asList(ResourceFactory.createTypedLiteral(
-																	input.get(param.getName())[0],
-																	param.getRDFDataType()
-																	)
-						)));
+		Map<String, List<Literal>> parametersToLiterals = requiredParams.substituteLiteralVariables(input);
 
 		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
 		//endregion
