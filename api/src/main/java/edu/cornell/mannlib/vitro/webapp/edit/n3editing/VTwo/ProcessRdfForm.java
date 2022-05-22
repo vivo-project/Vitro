@@ -411,7 +411,7 @@ public class ProcessRdfForm {
      * If REQUIRED, then throw exceptions on errors.
      * @throws Exception
      */
-    protected static List<Model> parseN3ToRDF(
+    public static List<Model> parseN3ToRDF(
             List<String> n3Strings, N3ParseType parseType ) throws Exception {
        List<String> errorMessages = new ArrayList<String>();
 
@@ -548,7 +548,7 @@ public class ProcessRdfForm {
    private static N3ParseType OPTIONAL = N3ParseType.OPTIONAL;
    private static N3ParseType REQUIRED = N3ParseType.REQUIRED;
 
-   private enum N3ParseType {
+   public enum N3ParseType {
        /* indicates that the n3 is optional and that a parse error should not
         * throw an exception */
        OPTIONAL,

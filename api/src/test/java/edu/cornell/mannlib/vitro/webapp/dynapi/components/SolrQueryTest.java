@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi;
+package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,14 +27,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.SolrQuery;
+import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SolrQueryTest extends ServletContextTest{
+public class SolrQueryTest extends ServletContextTest {
 
     private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-solr-test.n3";
     private final static String TEST_SOLR_QUERY_URI="https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery";
@@ -65,7 +65,7 @@ public class SolrQueryTest extends ServletContextTest{
     }
 
     @AfterClass
-    public static void afterEach() {
+    public static void after() {
         applicationUtils.close();
     }
 
