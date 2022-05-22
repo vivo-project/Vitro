@@ -92,8 +92,8 @@ public class N3TemplateTest extends ServletContextTest {
 
         N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
         assertNotNull(n3Template);
-        assertEquals(0, n3Template.getProvidedParams().getParameters().size());
-        assertEquals(2, n3Template.getRequiredParams().getParameters().size());
+        assertEquals(0, n3Template.getProvidedParams().size());
+        assertEquals(2, n3Template.getRequiredParams().size());
         assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3Text());
     }
 

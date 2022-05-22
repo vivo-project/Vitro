@@ -8,17 +8,15 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ResourceFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
+
 
 	private Parameters requiredParams = new Parameters();
 	private String n3Text;
@@ -95,13 +93,13 @@ public class N3Template extends Operation implements Template {
 		List<String> n3WithParameters = Arrays.asList(n3Text);
 
 		//region Substitute IRI variables
-		Map<String, List<String>> parametersToUris = requiredParams.substituteIRIVariables(input);
+		Map<String, List<String>> parametersToUris = requiredParams.getUrisMap(input);
 
 		gen.subInMultiUris(parametersToUris, n3WithParameters);
 		//endregion
 
 		//region Substitute other (literal) variables
-		Map<String, List<Literal>> parametersToLiterals = requiredParams.substituteLiteralVariables(input);
+		Map<String, List<Literal>> parametersToLiterals = requiredParams.getLiteralsMap(input);
 
 		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
 		//endregion
