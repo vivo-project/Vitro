@@ -61,7 +61,7 @@ public class Parameters implements Removable {
 
     // Substitute IRI parameters with their values in specific request
     public Map<String, List<String>> substituteIRIVariables(OperationData input){
-        return getParameters().values().stream()
+        return params.values().stream()
                 .filter(value->value.getRDFDataType().getURI().equals(ANY_URI))
                 .collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
     }
