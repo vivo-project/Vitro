@@ -59,6 +59,26 @@ public class Parameters implements Removable {
         return params.size();
     }
 
+    // Substitute IRI parameters with their values in specific request
+    public Map<String, List<String>> substituteIRIVariables(OperationData input){
+        return getParameters().values().stream()
+                .filter(value->value.getRDFDataType().getURI().equals(ANY_URI))
+                .collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
+    }
+
+    // Substitute parameters that represent RDF literals with their values in specific request
+    public Map<String, List<Literal>> substituteLiteralVariables(OperationData input){
+        return params.values().stream()
+                .filter(value->!value.getRDFDataType().getURI().equals(ANY_URI))
+                .collect(Collectors.toMap(
+                        param -> param.getName(),
+                        param -> Arrays.asList(ResourceFactory.createTypedLiteral(
+                                input.get(param.getName())[0],
+                                param.getRDFDataType()
+                                )
+                        )));
+    }
+
     @Override
     public void dereference() {
         for (String name : params.keySet()) {
