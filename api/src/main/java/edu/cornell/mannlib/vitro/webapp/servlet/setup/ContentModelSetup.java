@@ -3,25 +3,23 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS_FIRSTTIME_BACKUP;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS_FIRSTTIME_BACKUP;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.StringWriter;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
@@ -29,9 +27,6 @@ import org.apache.jena.shared.Lock;
 import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.util.iterator.ClosableIterator;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
@@ -130,23 +125,24 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 	 * URI of the Portal based on the default namespace.
 	 */
 	private void setPortalUriOnFirstTime(Model model, ServletContext ctx) {
-		// Only a single portal is permitted in the initialization data
-		Resource portalResource = null;
+		// Only a single portal is permitted in the initialization data.
+	    // Treat all blank nodes with type Portal as describing the same
+	    // portal, and give them the same URI.
+		List<Resource> toRename = new ArrayList<Resource>();
 		ClosableIterator<Resource> portalResIt = model
 				.listSubjectsWithProperty(RDF.type,
 						model.getResource(VitroVocabulary.PORTAL));
 		try {
-			if (portalResIt.hasNext()) {
+			while (portalResIt.hasNext()) {
 				Resource portalRes = portalResIt.next();
 				if (portalRes.isAnon()) {
-					portalResource = portalRes;
+					toRename.add(portalRes);
 				}
 			}
 		} finally {
 			portalResIt.close();
 		}
-
-		if (portalResource != null) {
+		for (Resource portalResource : toRename) {
 			ResourceUtils.renameResource(portalResource, getDefaultNamespace(ctx) + "portal1");
 		}
 	}
