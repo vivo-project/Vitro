@@ -298,7 +298,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
                 log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out);
 
                 // Check if the UI-changes Overlap with the changes made in the fristtime-files 
-                RDFFilesLoader.checkUiChangesOverlapWithFileChanges(baseModel, userModel, difOldNew);
+                RDFFilesLoader.removeChangesThatConflictWithUIEdits(baseModel, userModel, difOldNew);
 
                 // before we remove the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be removed are still in user´s triplestore, remove them
@@ -317,7 +317,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
                 log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2);
 
                 // Check if the UI-changes Overlap with the changes made in the fristtime-files 
-                RDFFilesLoader.checkUiChangesOverlapWithFileChanges(baseModel, userModel, difNewOld);
+                RDFFilesLoader.removeChangesThatConflictWithUIEdits(baseModel, userModel, difNewOld);
 
                 // before we add the triples, we need to compare values in back up firsttime with user's triplestore
                 // if the triples which should be added are not already in user´s triplestore, add them

@@ -61,8 +61,8 @@ public class RDFFilesLoaderTest extends AbstractTestClass {
         Model additionsModel = fileModel.difference(backupModel);
         Model retractionsModel = backupModel.difference(fileModel);
         
-        RDFFilesLoader.checkUiChangesOverlapWithFileChanges(backupModel, userModel, additionsModel);
-        RDFFilesLoader.checkUiChangesOverlapWithFileChanges(backupModel, userModel, retractionsModel);
+        RDFFilesLoader.removeChangesThatConflictWithUIEdits(backupModel, userModel, additionsModel);
+        RDFFilesLoader.removeChangesThatConflictWithUIEdits(backupModel, userModel, retractionsModel);
         
         userModel.remove(retractionsModel);
         userModel.add(additionsModel);
@@ -73,7 +73,6 @@ public class RDFFilesLoaderTest extends AbstractTestClass {
         // have the same language tag.
         assertTrue("expected: " + userModelExpected + " but was: " + userModel,
                 userModelExpected.isIsomorphicWith(userModel));
-        
     }
     
     @org.junit.Test
@@ -118,8 +117,8 @@ public class RDFFilesLoaderTest extends AbstractTestClass {
         Model additionsModel = fileModel.difference(backupModel);
         Model retractionsModel = backupModel.difference(fileModel);
         
-        RDFFilesLoader.checkUiChangesOverlapWithFileChanges(backupModel, userModel, additionsModel);
-        RDFFilesLoader.checkUiChangesOverlapWithFileChanges(backupModel, userModel, retractionsModel);
+        RDFFilesLoader.removeChangesThatConflictWithUIEdits(backupModel, userModel, additionsModel);
+        RDFFilesLoader.removeChangesThatConflictWithUIEdits(backupModel, userModel, retractionsModel);
         
         userModel.remove(retractionsModel);
         userModel.add(additionsModel);

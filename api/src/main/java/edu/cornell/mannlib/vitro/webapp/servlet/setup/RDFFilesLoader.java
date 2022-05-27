@@ -224,7 +224,7 @@ public class RDFFilesLoader {
 	 * @param userModel current state in the system (user/UI-model)
 	 * @param changesModel the changes between firsttime-files and firsttime-backup
 	 */
-	public static void checkUiChangesOverlapWithFileChanges(Model baseModel,
+	public static void removeChangesThatConflictWithUIEdits(Model baseModel,
 	        Model userModel, Model changesModel) {
 	    log.debug("Check if subtractions from backup-firsttime model to"
 	            + " current state of firsttime-files were changed in user-model"
@@ -245,74 +245,71 @@ public class RDFFilesLoader {
 	    log.debug("Diff of scoped user model against firsttime backup has "
 	            + changesUserModel.size() + " triples");
 	    List<Statement> changedInUIandFileStatements = new ArrayList<Statement>();
-	    if(!changesUserModel.isEmpty()) {
-	        removeBlankTriples(changesUserModel);
-	        if(log.isDebugEnabled()) {
-	            StringWriter out3 = new StringWriter();
-	            changesUserModel.write(out3, "TTL");
-	            log.debug("changesUserModel:\n" + out3);
-	        }
-	        log.debug("There were changes in the user-model via UI which have"
-	                + " also changed in the firsttime files. The following"
-	                + " triples will not be updated.");
-	        // Iterate over all statements and check if the ones which should be
-	        // removed were not changed via the UI
-	        StmtIterator iter = changesUserModel.listStatements();
-	        while (iter.hasNext()) {
-	            Statement stmt      = iter.nextStatement();
-	            Resource  subject   = stmt.getSubject();
-	            Property predicate  = stmt.getPredicate();
-	            RDFNode   object    = stmt.getObject();
-	            StmtIterator iter2 = changesModel.listStatements(
-	                    subject, predicate, (RDFNode) null);
-	            while (iter2.hasNext()) {
-	                Statement stmt2      = iter2.nextStatement();
-	                RDFNode   object2    = stmt2.getObject();
-	                // If subject and predicate are equal but the object differs
-	                // and the language tag is the same, do not update these triples.
-	                // This case indicates an change in the UI, which should not
-	                // be overwritten from the firsttime files.
-	                if(!object.equals(object2) ) {
-	                    // if object is an literal, check the language tag
-	                    if (object.isLiteral() && object2.isLiteral()) {
-	                        // if the language tag is the same, remove this
-	                        // triple from the update list
-	                        if(object.asLiteral().getLanguage().equals(
-	                                object2.asLiteral().getLanguage())) {
-	                            log.debug("This two triples changed UI and"
-	                                    + " files: \n UI: " + stmt
-	                                    + " \n file: " +stmt2);
-	                            changedInUIandFileStatements.add(stmt2);
-	                        }
-	                    } else {
-	                        log.debug("This two triples changed UI and"
-	                                + " files: \n UI: " + stmt
-	                                + " \n file: " +stmt2);
-	                        changedInUIandFileStatements.add(stmt2);
-	                    }
-	                }
-	            }
-	        }
-	        // remove triples which were changed in the user model (UI) from the list
-	        changesModel.remove(changedInUIandFileStatements);
-	    } else {
+	    if(changesUserModel.isEmpty()) {
 	        log.debug("There were no changes in the user-model via UI"
-	                + " compared to the backup-firsttime-model");
+                    + " compared to the backup-firsttime-model");
+	        return;
 	    }
+        removeBlankTriples(changesUserModel);
+        if(log.isDebugEnabled()) {
+            StringWriter out3 = new StringWriter();
+            changesUserModel.write(out3, "TTL");
+            log.debug("changesUserModel:\n" + out3);
+        }
+        log.debug("There were changes in the user-model via UI which have"
+                + " also changed in the firsttime files. The following"
+                + " triples will not be updated.");
+        // Iterate over all statements and check if the ones which should be
+        // removed were not changed via the UI
+        StmtIterator userChanges = changesUserModel.listStatements();
+        while (userChanges.hasNext()) {
+            Statement stmt      = userChanges.nextStatement();
+            Resource  subject   = stmt.getSubject();
+            Property predicate  = stmt.getPredicate();
+            RDFNode   object    = stmt.getObject();
+            StmtIterator firsttimeChanges = changesModel.listStatements(
+                    subject, predicate, (RDFNode) null);
+            while (firsttimeChanges.hasNext()) {
+                Statement stmt2      = firsttimeChanges.nextStatement();
+                RDFNode   object2    = stmt2.getObject();
+                // If subject and predicate are equal but the object differs
+                // and the language tag is the same, do not update these triples.
+                // This case indicates an change in the UI, which should not
+                // be overwritten from the firsttime files.
+                if(!object.equals(object2) ) {
+                    // if object is an literal, check the language tag
+                    if (object.isLiteral() && object2.isLiteral()) {
+                        // if the language tag is the same, remove this
+                        // triple from the update list
+                        if(object.asLiteral().getLanguage().equals(
+                                object2.asLiteral().getLanguage())) {
+                            log.debug("This two triples changed UI and"
+                                    + " files: \n UI: " + stmt
+                                    + " \n file: " +stmt2);
+                            changedInUIandFileStatements.add(stmt2);
+                        }
+                    } else {
+                        log.debug("This two triples changed UI and"
+                                + " files: \n UI: " + stmt
+                                + " \n file: " +stmt2);
+                        changedInUIandFileStatements.add(stmt2);
+                    }
+                }
+            }
+        }
+        // remove triples which were changed in the user model (UI) from the list
+        changesModel.remove(changedInUIandFileStatements);
 	}
 
     /**
      * Remove all triples where subject or object is blank (Anon)
      */
     public static void removeBlankTriples(Model model) {
-        StmtIterator iter = model.listStatements();
         List<Statement> removeStatement = new ArrayList<Statement>();
-        while (iter.hasNext()) {
-            Statement stmt      = iter.nextStatement();  // get next statement
-            Resource  subject   = stmt.getSubject();     // get the subject
-            RDFNode   object    = stmt.getObject();      // get the object          
-
-            if(subject.isAnon() || object.isAnon())
+        StmtIterator stmts = model.listStatements();
+        while (stmts.hasNext()) {
+            Statement stmt      = stmts.nextStatement();
+            if(stmt.getSubject().isAnon() || stmt.getObject().isAnon())
             {
                 removeStatement.add(stmt);
             }
