@@ -4,9 +4,9 @@
 RC_VERSION=1.13.0
 RC_NUM=2
 
-#git checkout master
-#git pull
-#git push origin master:rel-${RC_VERSION}-RC
+git checkout master
+git pull
+git push origin master:rel-${RC_VERSION}-RC
 
 
 git checkout rel-${RC_VERSION}-RC
