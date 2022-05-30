@@ -603,21 +603,21 @@
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator">
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
         <rdfs:label xml:lang="en-US">Numeric Range Validator</rdfs:label>
     </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator">
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
         <rdfs:label xml:lang="en-US">String Length Range Validator</rdfs:label>
     </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator">
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
         <rdfs:label xml:lang="en-US">Regular Expression Validator</rdfs:label>
     </owl:Class>
 
