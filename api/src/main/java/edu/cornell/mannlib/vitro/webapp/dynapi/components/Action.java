@@ -94,6 +94,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
                 .collect(Collectors.toMap(Thread::getId, Thread::isAlive));
         for (Long client : clients) {
             if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
+                log.error("Removed client " + client);
                 clients.remove(client);
             }
         }
