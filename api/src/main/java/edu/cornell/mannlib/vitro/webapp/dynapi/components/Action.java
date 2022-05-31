@@ -135,7 +135,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         return true;
     }
     
-    public void computeParams() {
+    private void computeParams() {
         AutoConfiguration.computeParams(this);
     }
 
