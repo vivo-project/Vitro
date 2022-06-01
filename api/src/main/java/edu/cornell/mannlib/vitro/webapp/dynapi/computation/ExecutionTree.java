@@ -42,14 +42,14 @@ public class ExecutionTree {
         return getPrevOf(NullStep.getInstance());
     }
 
-    public List<StepInfo>getPrevOf(StepInfo node){
+    public List<StepInfo> getPrevOf(StepInfo node){
         if (!backwardMap.containsKey(node)) {
             return Collections.emptyList();
         }
         return backwardMap.get(node);
     }
     
-    public List<StepInfo>getNextOf(StepInfo node){
+    public List<StepInfo> getNextOf(StepInfo node){
         if (!forwardMap.containsKey(node)) {
             return Collections.emptyList();
         }

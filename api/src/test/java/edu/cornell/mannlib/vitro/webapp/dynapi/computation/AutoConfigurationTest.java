@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ConditionalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SPARQLQuery;
@@ -51,6 +52,28 @@ public class AutoConfigurationTest {
         assertEquals(0, action.getRequiredParams().size());
         AutoConfiguration.computeParams(action);
         assertEquals(0, action.getRequiredParams().size());
+    }
+    
+    @Test
+    public void testConditionalInActionRequirements() {
+        Action action = new Action();
+        ConditionalStep step1 = new ConditionalStep();
+        OperationalStep step2 = new OperationalStep();
+        OperationalStep step3 = new OperationalStep();
+
+        action.setStep(step1);
+        
+        step1.setNextStepTrue(step2);
+        step1.setNextStepFalse(step3);
+        step2.setOperation(query(arr("B"), arr("A")));
+        step3.setOperation(query(arr("A"), arr("B")));
+
+        assertEquals(0, action.getRequiredParams().size());
+        AutoConfiguration.computeParams(action);
+        assertEquals(2, action.getRequiredParams().size());
+        assertTrue(action.getRequiredParams().contains("A"));
+        assertTrue(action.getRequiredParams().contains("B"));
+
     }
     
     private String[] arr(String... str) {

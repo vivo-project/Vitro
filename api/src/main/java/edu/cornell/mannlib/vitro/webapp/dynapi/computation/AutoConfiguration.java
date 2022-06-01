@@ -15,7 +15,7 @@ public class AutoConfiguration {
     private static final Log log = LogFactory.getLog(AutoConfiguration.class);
 
     public static void computeParams(Action action) {
-        //TODO: Support optional steps
+        Parameters requiredParams = action.getRequiredParams();
         ExecutionTree tree = new ExecutionTree(action);
         List<StepInfo> exits = tree.getLeafs();
         List<List<StepInfo>> paths = new LinkedList<List<StepInfo>>();
@@ -24,14 +24,20 @@ public class AutoConfiguration {
             path.add(exit);
             findAllPaths(tree, exit, path, paths);
         }
-        //TODO: Support multiple execution paths
-        Parameters computed = computeActionRequirements(paths.get(0));
-        action.getRequiredParams().addAll(computed);
+        for (List<StepInfo> path: paths) {
+            Parameters computed = computeActionRequirements(path);
+            mergeParameters(requiredParams, computed);
+        }
         if( log.isDebugEnabled()) {
             Set<String> names = action.getRequiredParams().getNames();
             String toLog = String.join(", ", names);
             log.debug("Required params: " + toLog);    
         }
+    }
+
+    private static void mergeParameters(Parameters requiredParams, Parameters computed) {
+        //TODO: Support optional steps
+        requiredParams.addAll(computed);
     }
 
     private static Parameters computeActionRequirements(List<StepInfo> list) {
@@ -40,14 +46,14 @@ public class AutoConfiguration {
         StepInfo last = list.get(position);
         Parameters required = last.getRequiredParams();
         //Add required by last node
-        requirements.addAll(required);
+        mergeParameters(requirements, required);
         position--;
         while (position > 0) {
             StepInfo step =  list.get(position);
             Parameters stepRequired = step.getRequiredParams();
             Parameters stepProvided = step.getProvidedParams();
             requirements.removeAll(stepProvided);
-            requirements.addAll(stepRequired);
+            mergeParameters(requirements, stepRequired);
             position--;
         }
         return requirements;
