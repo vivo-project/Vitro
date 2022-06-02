@@ -30,6 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 public class MultiValueEditSubmission {
 
+    private static final String LABEL = "label";
+
     String editKey;
 
     private Map<String,List<Literal>> literalsFromForm ;
@@ -172,20 +174,14 @@ public class MultiValueEditSubmission {
 	/* maybe this could be static */
 	public Literal createLiteral(String value, String datatypeUri, String lang) {
 		if( datatypeUri != null && !datatypeUri.isEmpty() ){
-			// UQAM Original code contained tow-dots ':' in place of '#'
-//            if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
 			if( XSD.anyURI.getURI().equals(datatypeUri) ){
-//				try {
-//					return literalCreationModel.createTypedLiteral( URLEncoder.encode(value, "UTF8"), datatypeUri);
 					return literalCreationModel.createTypedLiteral( value, datatypeUri);
-//				} catch (UnsupportedEncodingException e) {
-//					log.error(e, e);
-//				}
-			} else if ( XSD.xstring.getURI().equals(datatypeUri) || RDF.dtLangString.getURI().equals(datatypeUri) ){
-				if( lang != null && lang.length() > 0 )	return ResourceFactory.createLangLiteral(value, lang);
+			} else if ( RDF.dtLangString.getURI().equals(datatypeUri) ){
+				if( lang != null && lang.length() > 0 )	{
+				    return ResourceFactory.createLangLiteral(value, lang);
+				}
 			}
 			return literalCreationModel.createTypedLiteral(value, datatypeUri);
-			// UQAM take into account the linguistic context
 		} else if( lang != null && lang.length() > 0 )
 			return ResourceFactory.createLangLiteral(value, lang);
 		return ResourceFactory.createPlainLiteral(value);
@@ -311,9 +307,9 @@ public class MultiValueEditSubmission {
 							}
 							// if the language is set in the given Literal, this language-tag should be used and remain the same
 							// for example when you edit an label with an langauge-tag (no matter which language is selected globally)
-							if (!StringUtils.isBlank(editConfig.getLiteralsInScope().get("label").get(0).getLanguage()) && getLabelLanguage)
+							if (ifLangSetInFirstLiteral(editConfig, getLabelLanguage) )
 							{
-								rangeLang = editConfig.getLiteralsInScope().get("label").get(0).getLanguage();
+								rangeLang = editConfig.getLiteralsInScope().get(LABEL).get(0).getLanguage();
 							} else { // if the literal has no langauge-tag, use the language which is globally selected
 								rangeLang = _vreq.getLocale().getLanguage();
 								if (!_vreq.getLocale().getCountry().isEmpty()) {
@@ -323,6 +319,7 @@ public class MultiValueEditSubmission {
 						}
 
 					} catch (Exception e) {
+					    log.error(e,e);
 					}
 					literalsArray.add(createLiteral(
 							value,
@@ -335,6 +332,26 @@ public class MultiValueEditSubmission {
         }else{
             log.debug("could not find value for parameter " + var  );
         }
+    }
+
+    private boolean ifLangSetInFirstLiteral(EditConfigurationVTwo editConfig, Boolean getLabelLanguage) {
+        if (!getLabelLanguage) {
+            return false;
+        }
+        Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
+        if (!literalsInScope.containsKey(LABEL)) {
+            return false;
+        }
+        List<Literal> labelLiterals = literalsInScope.get(LABEL);
+        if (labelLiterals.size() == 0) {
+            return false;
+        }
+        Literal literal = labelLiterals.get(0);
+        if (literal == null){
+            return false;
+        }
+        
+        return !StringUtils.isBlank(literal.getLanguage());
     }
     //Add literal to form
     //Add uri to form

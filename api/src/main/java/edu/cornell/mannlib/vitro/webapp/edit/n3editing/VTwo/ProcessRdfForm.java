@@ -218,7 +218,7 @@ public class ProcessRdfForm {
                     if (RDF.dtLangString.getURI().equals(aLiteratDT) && !aLiteral.getLanguage().isEmpty()) {
                         newLiteral = aLiteral;
                     }
-                    else if (XSD.xstring.getURI().equals(aLiteratDT) || RDF.dtLangString.getURI().equals(aLiteratDT)) {
+                    else if ( RDF.dtLangString.getURI().equals(aLiteratDT)) {
                         String lang = vreq.getLocale().getLanguage();
                         if (!vreq.getLocale().getCountry().isEmpty()) {
                             lang += "-" + vreq.getLocale().getCountry();
