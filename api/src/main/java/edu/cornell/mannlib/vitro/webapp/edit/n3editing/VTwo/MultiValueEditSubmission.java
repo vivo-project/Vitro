@@ -307,7 +307,7 @@ public class MultiValueEditSubmission {
 							}
 							// if the language is set in the given Literal, this language-tag should be used and remain the same
 							// for example when you edit an label with an langauge-tag (no matter which language is selected globally)
-							if (ifLangSetInFirstLiteral(editConfig, getLabelLanguage) )
+							if (getLabelLanguage && isLangSetInFirstLiteral(editConfig) )
 							{
 								rangeLang = editConfig.getLiteralsInScope().get(LABEL).get(0).getLanguage();
 							} else { // if the literal has no langauge-tag, use the language which is globally selected
@@ -334,10 +334,7 @@ public class MultiValueEditSubmission {
         }
     }
 
-    private boolean ifLangSetInFirstLiteral(EditConfigurationVTwo editConfig, Boolean getLabelLanguage) {
-        if (!getLabelLanguage) {
-            return false;
-        }
+    private boolean isLangSetInFirstLiteral(EditConfigurationVTwo editConfig) {
         Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
         if (!literalsInScope.containsKey(LABEL)) {
             return false;
