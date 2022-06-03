@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.ModelValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
@@ -23,6 +24,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
+import org.topbraid.shacl.vocabulary.SH;
 
 /**
  * Load one or more Configuration beans from a specified model.
@@ -102,20 +104,29 @@ public class ConfigurationBeanLoader {
 	 */
 	private final HttpServletRequest req;
 
+	/**
+	 * May be null, but in that case no SHACL validation before loading.
+	 */
+	private final ModelValidator validator;
+
 	public ConfigurationBeanLoader(Model model) {
-		this(new LockableModel(model), null, null);
+		this(new LockableModel(model), null, null, null);
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking) {
-		this(locking, null, null);
+		this(locking, null, null, null);
+	}
+
+	public ConfigurationBeanLoader(Model model, ServletContext ctx, ModelValidator validator) {
+		this(new LockableModel(model), ctx, null, validator);
 	}
 
 	public ConfigurationBeanLoader(Model model, ServletContext ctx) {
-		this(new LockableModel(model), ctx, null);
+		this(new LockableModel(model), ctx, null, null);
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking, ServletContext ctx) {
-		this(locking, ctx, null);
+		this(locking, ctx, null, null);
 	}
 
 	public ConfigurationBeanLoader(Model model, HttpServletRequest req) {
@@ -126,15 +137,16 @@ public class ConfigurationBeanLoader {
 			HttpServletRequest req) {
 		this(locking,
 				(req == null) ? null : req.getSession().getServletContext(),
-				req);
+				req, null);
 	}
 
 	private ConfigurationBeanLoader(LockableModel locking, ServletContext ctx,
-			HttpServletRequest req) {
+			HttpServletRequest req, ModelValidator validator) {
 		this.locking = Objects.requireNonNull(locking,
 				"locking may not be null.");
 		this.req = req;
 		this.ctx = ctx;
+		this.validator = validator;
 	}
 
 	/**
@@ -163,7 +175,7 @@ public class ConfigurationBeanLoader {
 		    throw new ConfigurationBeanLoaderException(uri, e);
 		  }
 		}
-		
+
 		try {
 			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
 					.parse(locking, uri, resultClass);
@@ -174,7 +186,11 @@ public class ConfigurationBeanLoader {
 			instancesMap.put(uri, wrapper.getInstance());
 			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
 			wrapper.validate();
-			return wrapper.getInstance();
+			if (isValid(uri))
+				return wrapper.getInstance();
+			else
+				throw new ConfigurationBeanLoaderException(
+						"Failed to load '" + uri + "', because it is not valid according to SHACL rules, please check log for details.");
 		} catch (Exception e) {
 			throw new ConfigurationBeanLoaderException(
 					"Failed to load '" + uri + "'", e);
@@ -204,8 +220,9 @@ public class ConfigurationBeanLoader {
 		Set<T> instances = new HashSet<>();
 		for (String uri : uris) {
 			try {
-				instances.add(loadInstance(uri, resultClass));
-			} catch (ConfigurationBeanLoaderException e) {
+				if (isValid(uri))
+					instances.add(loadInstance(uri, resultClass));
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 		}
@@ -224,5 +241,9 @@ public class ConfigurationBeanLoader {
 				}
 			}
 		}
+	}
+
+	private boolean isValid(String uri){
+		return validator==null || validator.isValid(uri);
 	}
 }

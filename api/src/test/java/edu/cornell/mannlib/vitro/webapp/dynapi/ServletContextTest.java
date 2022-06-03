@@ -65,6 +65,7 @@ public abstract class ServletContextTest {
     
     protected void loadDefaultModel() throws IOException {
         loadModel(
+            new RDFFile("N3", "../home/src/main/resources/rdf/tbox/filegraph/vitro-dynamic-api-shacl.n3"),
             new RDFFile("N3", "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3"),
             new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3"),
             new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-testing.n3")

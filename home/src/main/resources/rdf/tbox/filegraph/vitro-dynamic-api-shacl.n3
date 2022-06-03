@@ -1,0 +1,627 @@
+@prefix :      <https://vivoweb.org/ontology/vitro-dynamic-api> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrOffset>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#solrOffset> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#rpc-name>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-name>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#n3Template>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#n3Template-n3Text> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep-hasOperation>
+        a            sh:PropertyShape ;
+        sh:class     <https://vivoweb.org/ontology/vitro-dynamic-api#operation> ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator-maxLength>
+        a            sh:PropertyShape ;
+        sh:class     xsd:int ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#maxLength> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#template-hasModel>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#model> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasModel> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#action-hasFirstStep>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#onGet-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#onGet> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrFilter>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#solrFilter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrSort> , <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrFacet> , <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrField> , <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrOffset> , <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrQueryText> , <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrLimit> , <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrFilter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#minValue-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#minValue> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator-regularExpression> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-question>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#question> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#rpc-hasDefaultMethod>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod-name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrSort-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrSort> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#rpc-minAPIVersion>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrFilter-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrFilter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#model-name>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onPost>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#onPost> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#onPatch-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#onPatch> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#rpc>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc-minAPIVersion> , <https://vivoweb.org/ontology/vitro-dynamic-api#rpc-description> , <https://vivoweb.org/ontology/vitro-dynamic-api#rpc-maxAPIVersion> , <https://vivoweb.org/ontology/vitro-dynamic-api#rpc-hasDefaultMethod> , <https://vivoweb.org/ontology/vitro-dynamic-api#rpc-name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator-maxValue>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:float ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#maxValue> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameterType-name>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrLimit>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#solrLimit> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrSort>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#solrSort> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#action> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery-sparqlQueryText> , <https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery-hasModel> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onGet>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#onGet> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-hasDefaultMethod> , <https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-name> , <https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-maxAPIVersion> , <https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-forwardsTo> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep-isOptional> , <https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep-hasOperation> , <https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep-hasNextStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#question-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#question> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onDelete>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#onDelete> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrQueryText>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver-requiresParameter>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#parameter> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrFacet>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#solrFacet> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrField-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrField> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider-providesParameter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#arrayParameterType-hasElementsOfType>
+        a            sh:PropertyShape ;
+        sh:class     <https://vivoweb.org/ontology/vitro-dynamic-api#parameterType> ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#hasElementsOfType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator-minLength>
+        a            sh:PropertyShape ;
+        sh:class     xsd:int ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#minLength> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#objectParameterType-hasInternalElement>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#parameter> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfTrue> , <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfFalse> , <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-question> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-hasDefaultMethod>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#onDelete-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#onDelete> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#isOptional-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#isOptional> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#action-requiresAccess>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#role> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#api-description>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#description> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator-regularExpression>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator-minValue>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:float ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#minValue> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#objectParameterType>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#objectParameterType-hasInternalElement> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameter-hasValidator>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#validator> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-hasCustomRESTAction>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameterType>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#parameterType-name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#api-title>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#title> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onGetAll>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery-sparqlQueryText>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#maxValue-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#maxValue> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameter-hasType>
+        a            sh:PropertyShape ;
+        sh:class     <https://vivoweb.org/ontology/vitro-dynamic-api#parameterType> ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#hasType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod-name>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#minLength-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#minLength> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasModel-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasModel> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#n3Template-n3Text>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#n3Text> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#version-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#api> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#version> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#api-version>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#version> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#template>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#template-hasModel> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#model>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#model-name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#parameterReceiver-requiresParameter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasType-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#parameter> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator-maxLength> , <https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator-minLength> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameter-description>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#description> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onPatch>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#onPatch> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#action> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#onPost-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#onPost> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfFalse>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasElementsOfType-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#arrayParameterType> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasElementsOfType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#onPut-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#onPut> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#description-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#description> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onPut>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#onPut> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#name-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#objectParameterType> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#arrayParameterType>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#arrayParameterType-hasElementsOfType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery-hasModel>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#model> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasModel> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfTrue>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-maxAPIVersion>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator-maxValue> , <https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator-minValue> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#api>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#api-title> , <https://vivoweb.org/ontology/vitro-dynamic-api#api-version> , <https://vivoweb.org/ontology/vitro-dynamic-api#api-description> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameter-name>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep-isOptional>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:boolean ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#isOptional> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#parameter> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrFacet-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrFacet> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#title-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#api> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#title> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameter>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#parameter-description> , <https://vivoweb.org/ontology/vitro-dynamic-api#parameter-name> , <https://vivoweb.org/ontology/vitro-dynamic-api#parameter-hasValidator> , <https://vivoweb.org/ontology/vitro-dynamic-api#parameter-hasType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#maxLength-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#maxLength> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#action-hasAssignedRPC>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#n3Text-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#n3Template> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#n3Text> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI>
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onDelete> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-minAPIVersion> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-hasCustomRESTAction> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-maxAPIVersion> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-name> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onPatch> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onGet> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onGetAll> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onPut> , <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onPost> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#action> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-minAPIVersion>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrOffset-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrOffset> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-name>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep-hasNextStep>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#rpc-maxAPIVersion>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#action>
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#action-requiresAccess> , <https://vivoweb.org/ontology/vitro-dynamic-api#action-hasFirstStep> , <https://vivoweb.org/ontology/vitro-dynamic-api#action-hasAssignedRPC> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrLimit-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrLimit> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#parameterProvider-providesParameter>
+        a         sh:PropertyShape ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#parameter> ;
+        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#rpc-description>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#description> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery-solrField>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#solrField> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion-shape>
+        a                    sh:NodeShape ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-maxAPIVersion>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-forwardsTo>
+        a            sh:PropertyShape ;
+        sh:class     <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
+        sh:maxCount  1 ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo> .

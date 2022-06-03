@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
+import org.topbraid.shacl.vocabulary.SH;
 
 public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C>> implements Pool<K, C> {
 
@@ -37,6 +38,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     private ServletContext ctx;
     private ConfigurationBeanLoader loader;
     private OntModel dynamicAPIModel;
+    private ModelValidator modelValidator;
     private ConcurrentLinkedQueue<C> obsoleteComponents;
 
     protected AbstractPool() {
@@ -46,6 +48,10 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     protected ConcurrentNavigableMap<K, C> getComponents() {
         return components;
+    }
+
+    public ModelValidator getModelValidator(){
+        return modelValidator;
     }
 
     public abstract P getPool();
@@ -123,7 +129,9 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     public void reload(String uri) {
         try {
-            add(uri, loader.loadInstance(uri, getType()));
+            C component = loader.loadInstance(uri, getType());
+            if(component!=null)
+                add(uri, component);
         } catch (ConfigurationBeanLoaderException e) {
             throw new RuntimeException(format("Failed to reload %s with URI %s.", getType().getName(), uri));
         }
@@ -153,7 +161,8 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         this.ctx = ctx;
         ContextModelAccess modelAccess = ModelAccess.on(ctx);
         dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
-        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
+        modelValidator = new ModelValidator(dynamicAPIModel);
+        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
         log.debug("Context Initialization ...");
         loadComponents(components);
     }
