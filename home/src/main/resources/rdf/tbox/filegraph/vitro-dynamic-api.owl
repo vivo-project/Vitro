@@ -37,7 +37,7 @@
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
         <rdfs:label xml:lang="en-US">has validator</rdfs:label>
     </owl:ObjectProperty>
 
@@ -594,30 +594,30 @@
     </owl:Class>
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#validator -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Validator -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#validator">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Validator">
         <rdfs:label xml:lang="en-US">Validator</rdfs:label>
     </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#numericRangeValidator">
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
         <rdfs:label xml:lang="en-US">Numeric Range Validator</rdfs:label>
     </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#stringLengthRangeValidator">
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
         <rdfs:label xml:lang="en-US">String Length Range Validator</rdfs:label>
     </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator -->
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#regularExpressionValidator">
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#validator"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Validator"/>
         <rdfs:label xml:lang="en-US">Regular Expression Validator</rdfs:label>
     </owl:Class>
 
