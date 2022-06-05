@@ -15,7 +15,9 @@ public class AutoConfiguration {
     private static final Log log = LogFactory.getLog(AutoConfiguration.class);
 
     public static void computeParams(Action action) {
-        Parameters requiredParams = action.getRequiredParams();
+        Parameters required = action.getRequiredParams();
+        Parameters provided = action.getProvidedParams();
+
         ExecutionTree tree = new ExecutionTree(action);
         List<StepInfo> exits = tree.getLeafs();
         List<List<StepInfo>> paths = new LinkedList<List<StepInfo>>();
@@ -25,8 +27,8 @@ public class AutoConfiguration {
             findAllPaths(tree, exit, path, paths);
         }
         for (List<StepInfo> path: paths) {
-            Parameters computed = computeActionRequirements(path);
-            mergeParameters(requiredParams, computed);
+            Parameters computed = computeActionRequirements(path, provided);
+            mergeParameters(required, computed);
         }
         if( log.isDebugEnabled()) {
             Set<String> names = action.getRequiredParams().getNames();
@@ -40,8 +42,9 @@ public class AutoConfiguration {
         requiredParams.addAll(computed);
     }
 
-    private static Parameters computeActionRequirements(List<StepInfo> list) {
+    private static Parameters computeActionRequirements(List<StepInfo> list, Parameters provided) {
         Parameters requirements = new Parameters();
+        requirements.addAll(provided);
         int position = list.size() - 1;
         StepInfo last = list.get(position);
         Parameters required = last.getRequiredParams();

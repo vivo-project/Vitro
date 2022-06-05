@@ -76,6 +76,26 @@ public class AutoConfigurationTest {
 
     }
     
+    @Test
+    public void testConditionalWithNullStepInActionRequirements() {
+        Action action = new Action();
+        action.addProvidedParameter(param("A"));
+        ConditionalStep step1 = new ConditionalStep();
+        OperationalStep step2 = new OperationalStep();
+
+        action.setStep(step1);
+        step1.setNextStepFalse(step2);
+        step2.setOperation(query(arr("B"), arr("A")));
+
+        assertEquals(0, action.getRequiredParams().size());
+        AutoConfiguration.computeParams(action);
+        assertEquals(2, action.getRequiredParams().size());
+        assertTrue(action.getRequiredParams().contains("A"));
+        assertTrue(action.getRequiredParams().contains("B"));
+
+    }
+    
+    
     private String[] arr(String... str) {
         return str;
         
