@@ -45,11 +45,8 @@ public class AutoConfiguration {
     private static Parameters computeActionRequirements(List<StepInfo> list, Parameters provided) {
         Parameters requirements = new Parameters();
         requirements.addAll(provided);
-        int position = list.size() - 1;
-        StepInfo last = list.get(position);
-        Parameters required = last.getRequiredParams();
+        int position = list.size();
         //Add required by last node
-        mergeParameters(requirements, required);
         position--;
         while (position > 0) {
             StepInfo step =  list.get(position);
