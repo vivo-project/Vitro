@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ConditionalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
 
 
 public class ExecutionTreeTest {
@@ -60,8 +60,8 @@ public class ExecutionTreeTest {
        OperationalStep operationStep1 = new OperationalStep();
        OperationalStep operationStep2 = new OperationalStep();
 
-       conditionalStep.setNextStepFalse(operationStep1);
-       conditionalStep.setNextStepTrue(operationStep2);
+       conditionalStep.setNextIfNotSatisfied(operationStep1);
+       conditionalStep.setNextIfSatisfied(operationStep2);
 
        ExecutionTree graph = new ExecutionTree(action);
 

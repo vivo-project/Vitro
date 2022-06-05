@@ -1,0 +1,35 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:action>
+        a                                   dynapi:action ;
+        rdfs:label                          "action"@en-US ;
+        dynapi:providesParameter            <test:result_param> ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:hasAssignedRPC               <test:rpc1> .
+
+<test:step1>
+        a                                   dynapi:step, dynapi:operationalStep ;
+        rdfs:label                          "step 1"@en-US ;
+        dynapi:hasOperation                 <test:query1> .
+
+<test:rpc1>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "test_action" .
+
+<test:result_param>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "result param"@en-US ;
+        dynapi:name                         "limit" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> .
+
+<test:query1>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "sparql query 1"@en-US ;
+        dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:sparqlQueryText              "SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .

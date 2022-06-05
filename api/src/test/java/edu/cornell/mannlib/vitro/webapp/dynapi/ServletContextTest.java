@@ -63,11 +63,18 @@ public abstract class ServletContextTest {
         );
     }
 
+    public void loadOntology() throws IOException {
+        loadModel(
+                new RDFFile("N3", "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3"),
+                new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3")
+                );
+    }
+    
     protected void loadDefaultModel() throws IOException {
         loadModel(
             new RDFFile("N3", "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3"),
             new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3"),
-            new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals-testing.n3")
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-testing.n3")
         );
     }
 
