@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
+
 public class ExecutionTree {
     private Map<StepInfo, List<StepInfo>> forwardMap;
     private Map<StepInfo, List<StepInfo>> backwardMap;
     
-    public ExecutionTree() {
+    private ExecutionTree() {
         //map from previous to list of next
         forwardMap = new HashMap<StepInfo, List<StepInfo>>();
         //map from next to list of previous
@@ -20,40 +22,38 @@ public class ExecutionTree {
     
     public ExecutionTree(StepInfo rootNode) {
         this();
-        initialize(rootNode);
+        addNodesToMaps(rootNode);
     }
 
-    private void initialize(StepInfo prev) {
-        if (prev == null) {
+    private void addNodesToMaps(StepInfo node) {
+        if (NullStep.getInstance().equals(node)) {
             return;
         }
-        Set<StepInfo> nextNodes = prev.getNextNodes();
+        Set<StepInfo> nextNodes = node.getNextNodes();
         for (StepInfo next : nextNodes) {
             if (!containsPrev(next)) {
-                addArc(prev, next);
-                initialize(next);
+                addArc(node, next);
+                addNodesToMaps(next);
             }
         }
     }
     
     public List<StepInfo> getLeafs(){
-        return getPrevOf(null);
+        return getPrevOf(NullStep.getInstance());
     }
 
     public List<StepInfo>getPrevOf(StepInfo node){
-        List<StepInfo> prevs = backwardMap.get(node);
-        if (prevs == null) {
+        if (!backwardMap.containsKey(node)) {
             return Collections.emptyList();
         }
-        return prevs;
+        return backwardMap.get(node);
     }
     
     public List<StepInfo>getNextOf(StepInfo node){
-        List<StepInfo> next = forwardMap.get(node);
-        if (next == null) {
+        if (!forwardMap.containsKey(node)) {
             return Collections.emptyList();
         }
-        return next;
+        return forwardMap.get(node);
     }
     
     private void addArc(StepInfo prev, StepInfo next) {

@@ -10,8 +10,10 @@ public class ConditionalStep implements Step {
 
     private Condition condition;
     
-    Step nextStepIfFailed = null;
-    Step nextStepIfSucceded = null;
+    Step nextStepIfFailed = NullStep.getInstance();
+    Step nextStepIfSucceded = NullStep.getInstance();
+
+    private Parameters parameters = new Parameters();
 
 
     @Override
@@ -29,9 +31,7 @@ public class ConditionalStep implements Step {
     }
 
     @Override
-    public void dereference() {
-        // TODO Auto-generated method stub
-    }
+    public void dereference() {}
 
     @Override
     public Set<StepInfo> getNextNodes() {
@@ -48,14 +48,12 @@ public class ConditionalStep implements Step {
 
     @Override
     public boolean isOptional() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public Parameters getRequiredParams() {
-        // TODO Auto-generated method stub
-        return null;
+        return parameters ;
     }
 
     public void setNextStepFalse(Step step) {

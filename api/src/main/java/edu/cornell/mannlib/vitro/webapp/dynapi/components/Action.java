@@ -18,7 +18,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     
     private static final Log log = LogFactory.getLog(Action.class);
 
-    private Step firstStep = null;
+    private Step firstStep = NullStep.getInstance();
     private RPC rpc;
 
     private Set<Long> clients = ConcurrentHashMap.newKeySet();
@@ -28,19 +28,14 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Override
     public void dereference() {
-        if (firstStep != null) {
-            firstStep.dereference();
-            firstStep = null;
-        }
+        firstStep.dereference();
+        firstStep = null;
         rpc.dereference();
         rpc = null;
     }
 
     @Override
     public OperationResult run(OperationData input) {
-        if (firstStep == null) {
-            return OperationResult.internalServerError();
-        }
         return firstStep.run(input);
     }
 

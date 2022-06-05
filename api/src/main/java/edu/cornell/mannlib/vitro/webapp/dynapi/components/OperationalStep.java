@@ -16,7 +16,7 @@ public class OperationalStep implements Step {
 
     private Operation operation;
     private boolean optional;
-    private Step nextStep;
+    private Step nextStep = NullStep.getInstance();
 
     public OperationalStep() {
         optional = false;
@@ -57,7 +57,7 @@ public class OperationalStep implements Step {
                 return result;
             }
         }
-        if (nextStep != null) {
+        if (!NullStep.getInstance().equals(nextStep)) {
             return nextStep.run(data);
         }
         return result;

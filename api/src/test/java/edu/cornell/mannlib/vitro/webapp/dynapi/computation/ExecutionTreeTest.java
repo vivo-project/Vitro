@@ -7,19 +7,21 @@ import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ConditionalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 
 
 public class ExecutionTreeTest {
   
-   
+   NullStep exit = NullStep.getInstance();
+    
    @Test
    public void testOperationGraphActionEmpty() {
        Action action = new Action();
        ExecutionTree graph = new ExecutionTree(action);
        
        assertEquals(1, graph.getNextOf(action).size());
-       assertEquals(null, graph.getNextOf(action).get(0));
+       assertEquals(exit, graph.getNextOf(action).get(0));
        assertEquals(0, graph.getPrevOf(action).size());
    }
 
@@ -33,8 +35,8 @@ public class ExecutionTreeTest {
 
        assertEquals(1, graph.getNextOf(action).size());
        assertEquals(step, graph.getNextOf(action).get(0));
-       assertEquals(1, graph.getPrevOf(null).size());
-       assertEquals(step, graph.getPrevOf(null).get(0));
+       assertEquals(1, graph.getPrevOf(exit).size());
+       assertEquals(step, graph.getPrevOf(exit).get(0));
    }
 
    @Test
@@ -45,7 +47,7 @@ public class ExecutionTreeTest {
        OperationalStep step2 = addNextStep(step1);
        ExecutionTree graph = new ExecutionTree(action);
        assertEquals(1, graph.getNextOf(step2).size());
-       assertEquals(null, graph.getNextOf(step2).get(0));
+       assertEquals(exit, graph.getNextOf(step2).get(0));
 
    }
     
@@ -63,11 +65,11 @@ public class ExecutionTreeTest {
 
        ExecutionTree graph = new ExecutionTree(action);
 
-       assertEquals(2, graph.getPrevOf(null).size());
+       assertEquals(2, graph.getPrevOf(exit).size());
        assertEquals(2, graph.getNextOf(conditionalStep).size());
 
-       assertTrue(graph.getPrevOf(null).contains(operationStep1));
-       assertTrue(graph.getPrevOf(null).contains(operationStep2));
+       assertTrue(graph.getPrevOf(exit).contains(operationStep1));
+       assertTrue(graph.getPrevOf(exit).contains(operationStep2));
    }
    
    
@@ -81,7 +83,7 @@ public class ExecutionTreeTest {
        step.setNextStep(step);
        ExecutionTree graph = new ExecutionTree(action);
 
-       assertEquals(0, graph.getPrevOf(null).size());
+       assertEquals(0, graph.getPrevOf(exit).size());
    }
 
    private OperationalStep addNextStep(OperationalStep step1) {
