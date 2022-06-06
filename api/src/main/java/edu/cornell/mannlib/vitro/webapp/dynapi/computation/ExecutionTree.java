@@ -26,9 +26,6 @@ public class ExecutionTree {
     }
 
     private void addNodesToMaps(StepInfo node) {
-        if (NullStep.getInstance().equals(node)) {
-            return;
-        }
         Set<StepInfo> nextNodes = node.getNextNodes();
         for (StepInfo next : nextNodes) {
             if (!containsPrev(next)) {
