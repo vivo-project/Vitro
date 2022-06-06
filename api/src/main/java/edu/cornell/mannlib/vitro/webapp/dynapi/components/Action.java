@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,13 +84,15 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Override
     public void removeDeadClients() {
+        Set<Long> currentClients = new HashSet<Long>();
+        currentClients.addAll(clients);
         Map<Long, Boolean> currentThreadIds = Thread.getAllStackTraces()
                 .keySet()
                 .stream()
                 .collect(Collectors.toMap(Thread::getId, Thread::isAlive));
-        for (Long client : clients) {
+        for (Long client : currentClients) {
             if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
-                log.error("Removed client " + client);
+                log.error("Removed left client thread with id " + client);
                 clients.remove(client);
             }
         }
