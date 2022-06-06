@@ -59,17 +59,11 @@ public class ExecutionTree {
     }
     
     private boolean containsNext(StepInfo node) {
-        if (backwardMap.containsKey(node)) {
-            return true;
-        }
-        return false;
+        return backwardMap.containsKey(node);
     }
     
     private boolean containsPrev(StepInfo node) {
-        if (forwardMap.containsKey(node)) {
-            return true;
-        }
-        return false;
+        return forwardMap.containsKey(node);
     }
 
     private void addToBackwardMap(StepInfo prev, StepInfo next) {
