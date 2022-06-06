@@ -177,7 +177,7 @@ public class MultiValueEditSubmission {
 			if( XSD.anyURI.getURI().equals(datatypeUri) ){
 					return literalCreationModel.createTypedLiteral( value, datatypeUri);
 			} else if ( RDF.dtLangString.getURI().equals(datatypeUri) ){
-				if( lang != null && lang.length() > 0 )	{
+				if( StringUtils.isNotEmpty(lang) )	{
 				    return ResourceFactory.createLangLiteral(value, lang);
 				}
 			}
@@ -340,6 +340,9 @@ public class MultiValueEditSubmission {
             return false;
         }
         List<Literal> labelLiterals = literalsInScope.get(LABEL);
+        if (labelLiterals == null) {
+            return false;
+        }
         if (labelLiterals.size() == 0) {
             return false;
         }
@@ -348,7 +351,7 @@ public class MultiValueEditSubmission {
             return false;
         }
         
-        return !StringUtils.isBlank(literal.getLanguage());
+        return StringUtils.isNotEmpty(literal.getLanguage());
     }
     //Add literal to form
     //Add uri to form
