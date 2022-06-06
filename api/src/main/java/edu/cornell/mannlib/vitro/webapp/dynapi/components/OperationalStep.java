@@ -57,10 +57,7 @@ public class OperationalStep implements Step {
                 return result;
             }
         }
-        if (!NullStep.getInstance().equals(nextStep)) {
-            return nextStep.run(data);
-        }
-        return result;
+        return nextStep.run(data);
     }
 
     @Override

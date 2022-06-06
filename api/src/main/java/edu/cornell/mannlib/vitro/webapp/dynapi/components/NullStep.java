@@ -18,7 +18,7 @@ public class NullStep implements Step {
     
     @Override
     public OperationResult run(OperationData input) {
-        return OperationResult.internalServerError();
+        return new OperationResult(200);
     }
 
     @Override
