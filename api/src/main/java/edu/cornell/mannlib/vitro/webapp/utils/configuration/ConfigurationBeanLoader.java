@@ -16,6 +16,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ModelValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.NullValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
@@ -24,7 +25,6 @@ import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
-import org.topbraid.shacl.vocabulary.SH;
 
 /**
  * Load one or more Configuration beans from a specified model.
@@ -36,7 +36,7 @@ public class ConfigurationBeanLoader {
 
 	private static final String JAVA_URI_PREFIX = "java:";
 
-  Map<String, Object> instancesMap = new HashMap<String,Object>();
+	Map<String, Object> instancesMap = new HashMap<String,Object>();
 
 	
 	// ----------------------------------------------------------------------
@@ -110,11 +110,11 @@ public class ConfigurationBeanLoader {
 	private final ModelValidator validator;
 
 	public ConfigurationBeanLoader(Model model) {
-		this(new LockableModel(model), null, null, null);
+		this(new LockableModel(model), null, null, new NullValidator());
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking) {
-		this(locking, null, null, null);
+		this(locking, null, null, new NullValidator());
 	}
 
 	public ConfigurationBeanLoader(Model model, ServletContext ctx, ModelValidator validator) {
@@ -122,11 +122,11 @@ public class ConfigurationBeanLoader {
 	}
 
 	public ConfigurationBeanLoader(Model model, ServletContext ctx) {
-		this(new LockableModel(model), ctx, null, null);
+		this(new LockableModel(model), ctx, null, new NullValidator());
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking, ServletContext ctx) {
-		this(locking, ctx, null, null);
+		this(locking, ctx, null, new NullValidator());
 	}
 
 	public ConfigurationBeanLoader(Model model, HttpServletRequest req) {
@@ -137,7 +137,7 @@ public class ConfigurationBeanLoader {
 			HttpServletRequest req) {
 		this(locking,
 				(req == null) ? null : req.getSession().getServletContext(),
-				req, null);
+				req, new NullValidator());
 	}
 
 	private ConfigurationBeanLoader(LockableModel locking, ServletContext ctx,
@@ -177,17 +177,18 @@ public class ConfigurationBeanLoader {
 		}
 
 		try {
-			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
-					.parse(locking, uri, resultClass);
-			WrappedInstance<T> wrapper = InstanceWrapper
-					.wrap(parsedRdf.getConcreteClass());
-			wrapper.satisfyInterfaces(ctx, req);
-			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
-			instancesMap.put(uri, wrapper.getInstance());
-			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
-			wrapper.validate();
-			if (isValid(uri))
+			if (isValid(uri)) {
+				ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
+						.parse(locking, uri, resultClass);
+				WrappedInstance<T> wrapper = InstanceWrapper
+						.wrap(parsedRdf.getConcreteClass());
+				wrapper.satisfyInterfaces(ctx, req);
+				wrapper.checkCardinality(parsedRdf.getPropertyStatements());
+				instancesMap.put(uri, wrapper.getInstance());
+				wrapper.setProperties(this, parsedRdf.getPropertyStatements());
+				wrapper.validate();
 				return wrapper.getInstance();
+			}
 			else
 				throw new ConfigurationBeanLoaderException(
 						"Failed to load '" + uri + "', because it is not valid according to SHACL rules, please check log for details.");
@@ -220,8 +221,7 @@ public class ConfigurationBeanLoader {
 		Set<T> instances = new HashSet<>();
 		for (String uri : uris) {
 			try {
-				if (isValid(uri))
-					instances.add(loadInstance(uri, resultClass));
+				instances.add(loadInstance(uri, resultClass));
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
@@ -244,6 +244,6 @@ public class ConfigurationBeanLoader {
 	}
 
 	private boolean isValid(String uri){
-		return validator==null || validator.isValid(uri);
+		return validator.isValid(uri);
 	}
 }
