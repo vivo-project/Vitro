@@ -33,8 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 /**
  * Test the basic features of ProgramTest.
  */
-public class ProgramLoginTest extends AbstractTestClass {
-	private static final Log log = LogFactory.getLog(ProgramLoginTest.class);
+public class ProgramLoginControllerTest extends AbstractTestClass {
+	private static final Log log = LogFactory.getLog(ProgramLoginControllerTest.class);
 
 	private static final String NEW_USER_URI = "new_user_uri";
 	private static final String NEW_USER_NAME = "new_user";
