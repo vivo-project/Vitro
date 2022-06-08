@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.shared.Lock;
 import org.junit.Before;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
@@ -73,7 +74,14 @@ public abstract class ServletContextTest {
     protected void loadModel(RDFFile... rdfFiles) throws IOException {
         for (RDFFile rdfFile : rdfFiles) {
             String rdf = readFile(rdfFile.path);
-            ontModel.read(new StringReader(rdf), null, rdfFile.format);
+            ontModel.enterCriticalSection(Lock.WRITE);
+            try {
+                ontModel.read(new StringReader(rdf), null, rdfFile.format);
+            } finally {
+                if (ontModel != null) {
+                    ontModel.leaveCriticalSection();
+                }
+            }
         }
     }
 
