@@ -63,7 +63,7 @@ public class LoginController extends VitroHttpServlet {
         response.setStatus(200);
     }
 
-    private void writeResponseError(HttpServletResponse response, String message){
+    private void writeResponseError(HttpServletResponse response, String message) {
         try {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
         } catch (IOException e) {

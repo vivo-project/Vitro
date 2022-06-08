@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginControllerTest {
@@ -34,7 +35,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testBadRequestWithNoParameters(){
+    public void testBadRequestWithNoParameters() {
         when(request.getParameter("username")).thenReturn(null);
         when(request.getParameter("password")).thenReturn(null);
 
@@ -46,7 +47,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testBadRequestNonExistentUsername(){
+    public void testBadRequestNonExistentUsername() {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
 
@@ -63,7 +64,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testUserNotPermittedToLogin(){
+    public void testUserNotPermittedToLogin() {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
 
@@ -81,7 +82,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testWithWrongPassword(){
+    public void testWithWrongPassword() {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
 
@@ -100,14 +101,17 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testCorrectCredentials(){
+    public void testCorrectCredentials() {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
-        when(request.getSession()).thenReturn(new HttpSessionStub());
+        HttpSession session = new HttpSessionStub();
+        UserAccount testUser = new UserAccount();
+        testUser.setEmailAddress("test@mail.com");
+        when(request.getSession()).thenReturn(session);
 
         try (MockedConstruction<BasicAuthenticator> mocked = mockConstruction(BasicAuthenticator.class,
                 (mock, context)->{
-                    when(mock.getAccountForInternalAuth("testUsername")).thenReturn(new UserAccount());
+                    when(mock.getAccountForInternalAuth("testUsername")).thenReturn(testUser);
                     when(mock.isUserPermittedToLogin(any(UserAccount.class))).thenReturn(true);
                     when(mock.isCurrentPasswordArgon2(any(UserAccount.class),eq("testPassword"))).thenReturn(true);
                 })){
@@ -118,5 +122,6 @@ public class LoginControllerTest {
         verify(request, times(1)).getParameter("password");
         verify(request, times(1)).getSession();
         assertEquals(response.getStatus(), 200);
+        assertEquals(((UserAccount)session.getAttribute("logged_in_user")).getEmailAddress(),"test@mail.com");
     }
 }
