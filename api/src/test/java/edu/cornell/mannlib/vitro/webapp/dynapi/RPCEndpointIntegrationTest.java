@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC_SERVLET_PATH;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
@@ -134,6 +135,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
     public static Collection<Object[]> requests() throws MalformedURLException, NoSuchMethodException, SecurityException {
         int nf = SC_NOT_FOUND;
         int se = SC_INTERNAL_SERVER_ERROR;
+        int br = SC_BAD_REQUEST;
         int ok = SC_OK;
 
         String actionIsEmpty = "";
@@ -150,7 +152,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
             // action          limit         email         status before after   testMessage
             { null,            null,         null,         nf,    null,  null,   "NULL Request" },
             { actionIsEmpty,   null,         null,         nf,    null,  null,   "Empty Action" },
-            { actionIsUnknown, null,         null,         se,    null,  null,   "Unknown Action" },
+            { actionIsUnknown, null,         null,         br,    null,  null,   "Unknown Action" },
             { actionIsGood,    null,         null,         se,    null,  null,   "NULL Limit" },
             { actionIsGood,    limitIsEmpty, null,         se,    null,  null,   "Empty Limit" },
             { actionIsGood,    limitIsBad,   null,         se,    null,  null,   "Bad Limit" },
