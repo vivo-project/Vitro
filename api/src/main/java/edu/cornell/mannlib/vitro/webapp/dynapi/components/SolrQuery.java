@@ -198,5 +198,4 @@ public class SolrQuery extends Operation {
     public void dereference() {
 
     }
-
 }

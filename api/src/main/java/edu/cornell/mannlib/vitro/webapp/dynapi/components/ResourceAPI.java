@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -143,12 +144,14 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 
     @Override
     public void removeDeadClients() {
+        Set<Long> currentClients = new HashSet<Long>();
+        currentClients.addAll(clients);
         Map<Long, Boolean> currentThreadIds = Thread
                 .getAllStackTraces()
                 .keySet()
                 .stream()
                 .collect(Collectors.toMap(Thread::getId, Thread::isAlive));
-        for (Long client : clients) {
+        for (Long client : currentClients) {
             if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
                 clients.remove(client);
             }

@@ -1,44 +1,47 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.computation.AutoConfiguration;
+import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Action extends Operation implements Poolable<String>, Link {
+public class Action extends Operation implements Poolable<String>, StepInfo {
+    
+    private static final Log log = LogFactory.getLog(Action.class);
 
-    private Step firstStep = null;
+    private Step firstStep = NullStep.getInstance();
     private RPC rpc;
 
     private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
     private Parameters providedParams = new Parameters();
-    private Parameters requiredParams;
+    private Parameters requiredParams = new Parameters();
 
     @Override
     public void dereference() {
-        if (firstStep != null) {
-            firstStep.dereference();
-            firstStep = null;
-        }
+        firstStep.dereference();
+        firstStep = null;
         rpc.dereference();
         rpc = null;
     }
 
     @Override
     public OperationResult run(OperationData input) {
-        if (firstStep == null) {
-            return OperationResult.internalServerError();
-        }
         return firstStep.run(input);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
-    public void setStep(OperationalStep step) {
+    public void setStep(Step step) {
         this.firstStep = step;
     }
 
@@ -59,7 +62,14 @@ public class Action extends Operation implements Poolable<String>, Link {
 
     @Override
     public boolean isValid() {
-        return true;
+        boolean result = false;
+        try {
+            computeParams();
+            result = true;
+        } catch (Exception e) {
+           log.error(e,e);
+        }
+        return result;
     }
 
     @Override
@@ -74,12 +84,15 @@ public class Action extends Operation implements Poolable<String>, Link {
 
     @Override
     public void removeDeadClients() {
+        Set<Long> currentClients = new HashSet<Long>();
+        currentClients.addAll(clients);
         Map<Long, Boolean> currentThreadIds = Thread.getAllStackTraces()
                 .keySet()
                 .stream()
                 .collect(Collectors.toMap(Thread::getId, Thread::isAlive));
-        for (Long client : clients) {
+        for (Long client : currentClients) {
             if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
+                log.error("Removed left client thread with id " + client);
                 clients.remove(client);
             }
         }
@@ -90,31 +103,15 @@ public class Action extends Operation implements Poolable<String>, Link {
         return !clients.isEmpty();
     }
 
-    @Override
-    public Set<Link> getNextLinks() {
-        return Collections.singleton(firstStep);
-    }
 
     @Override
     public Parameters getRequiredParams() {
-        if (firstStep == null) {
-            return new Parameters();
-        }
-        return firstStep.getRequiredParams();
-    }
-
-    public void computeScopes() {
-        requiredParams = Scopes.computeInitialRequirements(this);
+        return requiredParams;
     }
 
     @Override
     public Parameters getProvidedParams() {
         return providedParams;
-    }
-
-    @Override
-    public boolean isRoot() {
-        return true;
     }
 
     @Override
@@ -134,6 +131,25 @@ public class Action extends Operation implements Poolable<String>, Link {
         }
 
         return true;
+    }
+    
+    private void computeParams() {
+        AutoConfiguration.computeParams(this);
+    }
+
+    @Override
+    public Set<StepInfo> getNextNodes() {
+        return Collections.singleton(firstStep);
+    }
+
+    @Override
+    public boolean isRoot() {
+        return true;
+    }
+
+    @Override
+    public boolean isOptional() {
+        return false;
     }
 
 }
