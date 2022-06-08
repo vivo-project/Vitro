@@ -50,25 +50,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         return components;
     }
 
-    public ModelValidator getModelValidator(){
-        return modelValidator;
-    }
-
-    public void setModelValidator(ModelValidator modelValidator){
-        this.modelValidator = modelValidator;
-        this.loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
-    }
-
-    public void setSHACLValidator(){
-        this.modelValidator = new SHACLValidator(dynamicAPIModel, dynamicAPIModel);
-        this.loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
-    }
-
-    public void setNullValidator(){
-        this.modelValidator = NullValidator.getInstance();
-        this.loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
-    }
-
     public abstract P getPool();
 
     public abstract C getDefault();
