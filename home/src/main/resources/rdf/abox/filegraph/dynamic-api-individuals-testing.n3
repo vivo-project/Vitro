@@ -37,7 +37,7 @@
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator>
-        a                                   dynapi:validator ,
+        a                                   dynapi:Validator ,
                                             dynapi_java:validators.Validator ,
                                             dynapi_java:validators.NumericRangeValidator ;
         rdfs:label                          "Test range validator for parameter 1"@en-US ;
@@ -53,7 +53,7 @@
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator>
-        a                                   dynapi:validator ,
+        a                                   dynapi:Validator ,
                                             dynapi_java:validators.Validator ,
                                             dynapi_java:validators.StringLengthRangeValidator ;
         rdfs:label                          "Test string length range validator for parameter 2"@en-US ;
