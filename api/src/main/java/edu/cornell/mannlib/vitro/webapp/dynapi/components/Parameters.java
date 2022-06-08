@@ -26,6 +26,20 @@ public class Parameters implements Removable {
     public void add(Parameter param) {
         params.put(param.getName(), param);
     }
+    
+    public void addAll(Parameters newParams) {
+        Set<String> names = newParams.getNames();
+        for (String name : names) {
+            add(newParams.get(name));
+        }
+    }
+    
+    public void removeAll(Parameters toRemove) {
+        Set<String> names = toRemove.getNames();
+        for (String name : names) {
+            params.remove(name);
+        }
+    }
 
     public Set<String> getNames() {
         return params.keySet();
@@ -58,6 +72,10 @@ public class Parameters implements Removable {
     public int size() {
         return params.size();
     }
+    
+    public boolean contains(String name) {
+        return params.containsKey(name);
+    }
 
     // Substitute IRI parameters with their values in specific request
     public Map<String, List<String>> substituteIRIVariables(OperationData input){
@@ -86,5 +104,7 @@ public class Parameters implements Removable {
         }
         params = null;
     }
+
+
 
 }
