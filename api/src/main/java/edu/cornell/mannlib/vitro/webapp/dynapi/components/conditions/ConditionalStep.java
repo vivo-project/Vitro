@@ -28,9 +28,6 @@ public class ConditionalStep implements Step {
         } else {
             next = nextIfNotSatisfied;
         }
-        if (NullStep.getInstance().equals(next)) {
-            return new OperationResult(200);
-        }
         return next.run(data);
     }
 
