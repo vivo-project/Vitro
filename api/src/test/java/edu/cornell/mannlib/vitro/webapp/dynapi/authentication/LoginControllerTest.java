@@ -8,10 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.junit.MockitoJUnitRunner;
-import stubs.javax.servlet.http.HttpServletResponseStub;
-import stubs.javax.servlet.http.HttpSessionStub;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,12 +23,15 @@ public class LoginControllerTest {
     @Mock
     private HttpServletRequest request;
 
+    @Mock
     private HttpServletResponse response;
+
+    @Mock
+    private HttpSession session;
 
     @Before
     public void beforeEach() {
         loginController = new LoginController();
-        response = new HttpServletResponseStub();
     }
 
     @Test
@@ -43,11 +43,12 @@ public class LoginControllerTest {
 
         verify(request, times(1)).getParameter("username");
         verify(request, times(1)).getParameter("password");
-        assertEquals(response.getStatus(), 400);
+
+        verify(response, times(1)).setStatus(400);
     }
 
     @Test
-    public void testBadRequestNonExistentUsername() {
+    public void testNonExistentUsername() {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
 
@@ -60,7 +61,8 @@ public class LoginControllerTest {
 
         verify(request, times(1)).getParameter("username");
         verify(request, times(1)).getParameter("password");
-        assertEquals(response.getStatus(), 400);
+
+        verify(response, times(1)).setStatus(401);
     }
 
     @Test
@@ -78,7 +80,8 @@ public class LoginControllerTest {
 
         verify(request, times(1)).getParameter("username");
         verify(request, times(1)).getParameter("password");
-        assertEquals(response.getStatus(), 400);
+
+        verify(response, times(1)).setStatus(401);
     }
 
     @Test
@@ -97,14 +100,14 @@ public class LoginControllerTest {
 
         verify(request, times(1)).getParameter("username");
         verify(request, times(1)).getParameter("password");
-        assertEquals(response.getStatus(), 400);
+
+        verify(response, times(1)).setStatus(401);
     }
 
     @Test
     public void testCorrectCredentials() {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
-        HttpSession session = new HttpSessionStub();
         UserAccount testUser = new UserAccount();
         testUser.setEmailAddress("test@mail.com");
         when(request.getSession()).thenReturn(session);
@@ -121,7 +124,9 @@ public class LoginControllerTest {
         verify(request, times(1)).getParameter("username");
         verify(request, times(1)).getParameter("password");
         verify(request, times(1)).getSession();
-        assertEquals(response.getStatus(), 200);
-        assertEquals(((UserAccount)session.getAttribute("logged_in_user")).getEmailAddress(),"test@mail.com");
+
+        verify(session, times(1)).setAttribute("logged_in_user", testUser);
+
+        verify(response, times(1)).setStatus(200);
     }
 }

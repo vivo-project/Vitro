@@ -6,7 +6,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.BasicAuthenticat
 import edu.cornell.mannlib.vitro.webapp.dynapi.RESTEndpoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.base.Sys;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,7 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "Login", urlPatterns = {"/rest_login"})
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.API_SERVLET_LOGIN;
+
+@WebServlet(name = "Login", urlPatterns = {API_SERVLET_LOGIN})
 public class LoginController extends VitroHttpServlet {
 
     private static final Log log = LogFactory.getLog(RESTEndpoint.class);
@@ -34,8 +35,8 @@ public class LoginController extends VitroHttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        if (username==null || password==null){
-            writeResponseError(response, "'username' and 'password' parameters must be present");
+        if (username==null || password==null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -44,18 +45,18 @@ public class LoginController extends VitroHttpServlet {
         UserAccount user = authenticator.getAccountForInternalAuth(
                 username);
 
-        if (user == null){
-            writeResponseError(response, "User with given username does not exist");
+        if (user == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         if (!authenticator.isUserPermittedToLogin(user)) {
-            writeResponseError(response, "User is not permitted to login");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         if (!authenticator.isCurrentPasswordArgon2(user, password)) {
-            writeResponseError(response, "Wrong password");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
@@ -63,11 +64,4 @@ public class LoginController extends VitroHttpServlet {
         response.setStatus(200);
     }
 
-    private void writeResponseError(HttpServletResponse response, String message) {
-        try {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-        } catch (IOException e) {
-            log.error(e);
-        }
-    }
 }
