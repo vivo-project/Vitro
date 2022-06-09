@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ConditionalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SPARQLQuery;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
 
 public class AutoConfigurationTest {
     @Test
@@ -63,8 +63,8 @@ public class AutoConfigurationTest {
 
         action.setStep(step1);
         
-        step1.setNextStepTrue(step2);
-        step1.setNextStepFalse(step3);
+        step1.setNextIfSatisfied(step2);
+        step1.setNextIfNotSatisfied(step3);
         step2.setOperation(query(arr("B"), arr("A")));
         step3.setOperation(query(arr("A"), arr("B")));
 
@@ -84,7 +84,7 @@ public class AutoConfigurationTest {
         OperationalStep step2 = new OperationalStep();
 
         action.setStep(step1);
-        step1.setNextStepFalse(step2);
+        step1.setNextIfNotSatisfied(step2);
         step2.setOperation(query(arr("B"), arr("A")));
 
         assertEquals(0, action.getRequiredParams().size());

@@ -14,7 +14,7 @@
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testRelationshipStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testRelationshipStep1>
-        a                                   dynapi:step, dynapi:operationalStep ;
+        a                                   dynapi:Step, dynapi:operationalStep ;
         rdfs:label                          "Test relationship operational step 1"@en-US ;
         dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
