@@ -9,31 +9,31 @@
         a                                   dynapi:action ;
         rdfs:label                          "action"@en-US ;
         dynapi:providesParameter            <test:result_param> ;
-        dynapi:hasFirstStep                 <test:step2> ;
+        dynapi:hasFirstStep                 <test:step1> ;
         dynapi:hasAssignedRPC               <test:rpc1> .
 
-<test:step2>
+<test:step1>
         a                                   dynapi:Step, dynapi:ConditionalStep ;
-        rdfs:label                          "step 2"@en-US ;
-		dynapi:nextIfSatisfied				<test:step3> ;
-		dynapi:nextIfNotSatisfied  			<test:step4> ;
+        rdfs:label                          "step 1"@en-US ;
+        dynapi:nextIfSatisfied              <test:step2> ;
+        dynapi:nextIfNotSatisfied           <test:step3> ;
         dynapi:hasCondition                 <test:condition1> .
 
 <test:condition1> 
-		a									dynapi:Condition, dynapi:ConditionIsNotEmpty ;
-		rdfs:label							"condition 1"@en-US ;
-		dynapi:requiresParameter            <test:input_param> .
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition 1"@en-US ;
+        dynapi:requiresParameter            <test:input_param> .
+
+<test:step2>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "step 2"@en-US ;
+        dynapi:providesParameter            <test:result_param> ;
+        dynapi:hasOperation                 <test:query2> .
 
 <test:step3>
         a                                   dynapi:Step, dynapi:operationalStep ;
         rdfs:label                          "step 3"@en-US ;
-		dynapi:providesParameter            <test:result_param> ;
-        dynapi:hasOperation                 <test:query2> .
-
-<test:step4>
-        a                                   dynapi:Step, dynapi:operationalStep ;
-        rdfs:label                          "step 4"@en-US ;
-		dynapi:providesParameter            <test:result_param> ;
+        dynapi:providesParameter            <test:result_param> ;
         dynapi:hasOperation                 <test:query3> .
 
 <test:rpc1>
