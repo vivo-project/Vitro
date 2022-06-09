@@ -38,7 +38,7 @@
         dynapi:minAPIVersionMin  "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/n3TemplateTestStep>
-        a                        dynapi:step, dynapi:operationalStep ;
+        a                        dynapi:Step, dynapi:operationalStep ;
         rdfs:label               "N3 template Test operational step 1"@en-US ;
         dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Template> .   
 

@@ -1,0 +1,66 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:action>
+        a                                   dynapi:action ;
+        rdfs:label                          "action"@en-US ;
+        dynapi:providesParameter            <test:result_param> ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:hasAssignedRPC               <test:rpc1> .
+
+<test:step1>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "step 1"@en-US ;
+        dynapi:nextIfSatisfied              <test:step2> ;
+        dynapi:nextIfNotSatisfied           <test:step3> ;
+        dynapi:hasCondition                 <test:condition1> .
+
+<test:condition1> 
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition 1"@en-US ;
+        dynapi:requiresParameter            <test:input_param> .
+
+<test:step2>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "step 2"@en-US ;
+        dynapi:providesParameter            <test:result_param> ;
+        dynapi:hasOperation                 <test:query2> .
+
+<test:step3>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "step 3"@en-US ;
+        dynapi:providesParameter            <test:result_param> ;
+        dynapi:hasOperation                 <test:query3> .
+
+<test:rpc1>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "test_action" .
+
+<test:input_param>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "input param"@en-US ;
+        dynapi:name                         "input_param" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+
+<test:result_param>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "result param"@en-US ;
+        dynapi:name                         "label" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+
+<test:query2>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "sparql query 2"@en-US ;
+        dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:sparqlQueryText              "SELECT ?label WHERE { <test:uri2> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }" . 
+
+<test:query3>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "sparql query 3"@en-US ;
+        dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:sparqlQueryText              "SELECT ?label WHERE { <test:uri3> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }" . 
