@@ -55,7 +55,7 @@
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#action"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
         <rdfs:label xml:lang="en-US">first step</rdfs:label>
     </owl:ObjectProperty>
 
@@ -64,7 +64,7 @@
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
         <rdfs:label xml:lang="en-US">next</rdfs:label>
     </owl:ObjectProperty>
 
@@ -75,7 +75,7 @@
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#nextIfNotSatisfied">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#h"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
         <rdfs:label xml:lang="en-US">next step if condition not satisfied</rdfs:label>
     </owl:ObjectProperty>
 
@@ -86,7 +86,7 @@
     <owl:ObjectProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#nextIfSatisfied">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep"/>
-        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
+        <rdfs:range rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
         <rdfs:label xml:lang="en-US">next step if condition is satisfied</rdfs:label>
     </owl:ObjectProperty>
 
@@ -498,7 +498,7 @@
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep">
         <rdfs:label xml:lang="en-US">Conditional step</rdfs:label>
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
     </owl:Class>
 
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Condition -->
@@ -585,15 +585,15 @@
 
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#step -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#Step -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#step">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#Step">
         <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
         <rdfs:label xml:lang="en-US">Step</rdfs:label>
     </owl:Class>
 
     <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep">
-        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#step"/>
+        <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#Step"/>
         <rdfs:label xml:lang="en-US">Operational step</rdfs:label>
     </owl:Class>
 
