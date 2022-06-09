@@ -11,20 +11,17 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
 
     public boolean isInputValid(OperationData inputOutput) {
         Parameters requiredParams = getRequiredParams();
-        if (requiredParams != null) {
-            for (String name : requiredParams.getNames()) {
-                if (!inputOutput.has(name)) {
-                    log.error("Parameter " + name + " not found");
-                    return false;
-                }
-                Parameter param = requiredParams.get(name);
-                String[] inputValues = inputOutput.get(name);
-                if (!param.isValid(name, inputValues)) {
-                    return false;
-                }
+        for (String name : requiredParams.getNames()) {
+            if (!inputOutput.has(name)) {
+                log.error("Parameter " + name + " not found");
+                return false;
+            }
+            Parameter param = requiredParams.get(name);
+            String[] inputValues = inputOutput.get(name);
+            if (!param.isValid(name, inputValues)) {
+                return false;
             }
         }
-
         return true;
     }
 

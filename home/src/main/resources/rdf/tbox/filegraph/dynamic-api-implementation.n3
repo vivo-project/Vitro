@@ -9,9 +9,9 @@ dynapi:action rdfs:subClassOf dynapi_java:Action .
 
 dynapi:operationalStep rdfs:subClassOf dynapi_java:OperationalStep .
 
-dynapi:conditionalStep rdfs:subClassOf dynapi_java:ConditionalStep .
+dynapi:ConditionalStep rdfs:subClassOf dynapi_java:conditions.ConditionalStep .
 
-dynapi:step rdfs:subClassOf dynapi_java:Step .
+dynapi:Step rdfs:subClassOf dynapi_java:Step .
 
 dynapi:n3Template rdfs:subClassOf dynapi_java:N3Template .
 
@@ -38,3 +38,7 @@ dynapi:httpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
 dynapi:customRESTAction rdfs:subClassOf dynapi_java:CustomRESTAction .
 
 dynapi:api rdfs:subClassOf dynapi_java:APIInformation .
+
+dynapi:Condition rdfs:subClassOf dynapi_java:conditions.Condition .
+
+dynapi:ConditionIsNotEmpty rdfs:subClassOf dynapi_java:conditions.ConditionIsNotEmpty
