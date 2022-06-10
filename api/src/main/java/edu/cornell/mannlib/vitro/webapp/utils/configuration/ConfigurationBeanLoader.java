@@ -15,8 +15,7 @@ import java.util.TreeSet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.ModelValidator;
-import edu.cornell.mannlib.vitro.webapp.dynapi.NullValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.ModelValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
@@ -104,29 +103,21 @@ public class ConfigurationBeanLoader {
 	 */
 	private final HttpServletRequest req;
 
-	/**
-	 * May be null, but in that case no SHACL validation before loading.
-	 */
-	private final ModelValidator validator;
 
 	public ConfigurationBeanLoader(Model model) {
-		this(new LockableModel(model), null, null, NullValidator.getInstance());
+		this(new LockableModel(model), null, null);
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking) {
-		this(locking, null, null, NullValidator.getInstance());
-	}
-
-	public ConfigurationBeanLoader(Model model, ServletContext ctx, ModelValidator validator) {
-		this(new LockableModel(model), ctx, null, validator);
+		this(locking, null, null);
 	}
 
 	public ConfigurationBeanLoader(Model model, ServletContext ctx) {
-		this(new LockableModel(model), ctx, null, NullValidator.getInstance());
+		this(new LockableModel(model), ctx, null);
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking, ServletContext ctx) {
-		this(locking, ctx, null, NullValidator.getInstance());
+		this(locking, ctx, null);
 	}
 
 	public ConfigurationBeanLoader(Model model, HttpServletRequest req) {
@@ -137,16 +128,15 @@ public class ConfigurationBeanLoader {
 			HttpServletRequest req) {
 		this(locking,
 				(req == null) ? null : req.getSession().getServletContext(),
-				req, NullValidator.getInstance());
+				req);
 	}
 
 	private ConfigurationBeanLoader(LockableModel locking, ServletContext ctx,
-			HttpServletRequest req, ModelValidator validator) {
+			HttpServletRequest req) {
 		this.locking = Objects.requireNonNull(locking,
 				"locking may not be null.");
 		this.req = req;
 		this.ctx = ctx;
-		this.validator = validator;
 	}
 
 	/**
@@ -155,6 +145,16 @@ public class ConfigurationBeanLoader {
 	public <T> T loadInstance(String uri, Class<T> resultClass) throws ConfigurationBeanLoaderException {
 		instancesMap.clear();
 		T result = loadSubordinateInstance(uri, resultClass);
+		instancesMap.clear();
+		return result;
+	}
+
+	/**
+	 * Load the instance with this URI, if it is valid and assignable to this class.
+	 */
+	public <T> T loadInstance(String uri, Class<T> resultClass, ModelValidator validator) throws ConfigurationBeanLoaderException {
+		instancesMap.clear();
+		T result = (validator.isValidResource(uri, true))?loadSubordinateInstance(uri, resultClass):null;
 		instancesMap.clear();
 		return result;
 	}
@@ -177,21 +177,16 @@ public class ConfigurationBeanLoader {
 		}
 
 		try {
-			if (isValid(uri)) {
-				ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
-						.parse(locking, uri, resultClass);
-				WrappedInstance<T> wrapper = InstanceWrapper
-						.wrap(parsedRdf.getConcreteClass());
-				wrapper.satisfyInterfaces(ctx, req);
-				wrapper.checkCardinality(parsedRdf.getPropertyStatements());
-				instancesMap.put(uri, wrapper.getInstance());
-				wrapper.setProperties(this, parsedRdf.getPropertyStatements());
-				wrapper.validate();
-				return wrapper.getInstance();
-			}
-			else
-				throw new ConfigurationBeanLoaderException(
-						"Failed to load '" + uri + "', because it is not valid according to SHACL rules, please check log for details.");
+			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
+					.parse(locking, uri, resultClass);
+			WrappedInstance<T> wrapper = InstanceWrapper
+					.wrap(parsedRdf.getConcreteClass());
+			wrapper.satisfyInterfaces(ctx, req);
+			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
+			instancesMap.put(uri, wrapper.getInstance());
+			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
+			wrapper.validate();
+			return wrapper.getInstance();
 		} catch (Exception e) {
 			throw new ConfigurationBeanLoaderException(
 					"Failed to load '" + uri + "'", e);
@@ -215,15 +210,18 @@ public class ConfigurationBeanLoader {
 	/**
 	 * Find all of the resources with the specified class, and instantiate them.
 	 */
-	public <T> Set<T> loadEach(Class<T> resultClass){
+	public <T> Set<T> loadEach(Class<T> resultClass, ModelValidator validator){
 		Set<String> uris = new HashSet<>();
 		findUris(resultClass, uris);
 		Set<T> instances = new HashSet<>();
 		for (String uri : uris) {
 			try {
-				instances.add(loadInstance(uri, resultClass));
+				T instance = loadInstance(uri, resultClass, validator);
+				if (instance != null) {
+					instances.add(instance);
+				}
 			} catch (ConfigurationBeanLoaderException e) {
-				log.warn(e.getMessage());
+				log.warn(e,e);
 			}
 		}
 		return instances;
@@ -243,7 +241,4 @@ public class ConfigurationBeanLoader {
 		}
 	}
 
-	private boolean isValid(String uri){
-		return validator.isValidResource(uri);
-	}
 }

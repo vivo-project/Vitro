@@ -282,7 +282,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         loadTestModel();
 
-        ResourceAPI resourceAPI = loader.loadInstance(TEST_PERSON_RESOURCE_URI, ResourceAPI.class);
+        ResourceAPI resourceAPI = loader.loadInstance(TEST_PERSON_RESOURCE_URI, ResourceAPI.class, modelValidator);
 
         resourceAPIPool.add(TEST_PERSON_RESOURCE_URI, resourceAPI);
 
@@ -299,7 +299,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         resourceAPIPool.reload();
 
-        ResourceAPI resourceAPI = loader.loadInstance(TEST_PERSON_RESOURCE_URI, ResourceAPI.class);
+        ResourceAPI resourceAPI = loader.loadInstance(TEST_PERSON_RESOURCE_URI, ResourceAPI.class, modelValidator);
 
         assertEquals(0, resourceAPIPool.obsoleteCount());
 
@@ -318,7 +318,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         loadTestModel();
 
-        ResourceAPI resourceAPI = loader.loadInstance(TEST_PERSON_RESOURCE_URI, ResourceAPI.class);
+        ResourceAPI resourceAPI = loader.loadInstance(TEST_PERSON_RESOURCE_URI, ResourceAPI.class, modelValidator);
 
         reset();
 

@@ -14,6 +14,9 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.ModelValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.NullValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.SHACLBeanValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.ontology.OntModel;
@@ -125,7 +128,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     public void reload(String uri) {
         try {
-            C component = loader.loadInstance(uri, getType());
+            C component = loader.loadInstance(uri, getType(), modelValidator);
             if(component!=null)
                 add(uri, component);
         } catch (ConfigurationBeanLoaderException e) {
@@ -158,7 +161,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         modelAccess = ModelAccess.on(ctx);
         dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
         modelValidator = NullValidator.getInstance();
-        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
+        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
         log.debug("Context Initialization ...");
         loadComponents(components);
     }
@@ -167,14 +170,14 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         this.ctx = ctx;
         ContextModelAccess modelAccess = ModelAccess.on(ctx);
         dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
-        modelValidator = new SHACLValidator(dynamicAPIModel, modelAccess.getOntModel(TBOX_ASSERTIONS));
-        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
+        modelValidator = new SHACLBeanValidator(dynamicAPIModel, modelAccess.getOntModel(TBOX_ASSERTIONS));
+        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
         log.debug("Context Initialization ...");
         loadComponents(components);
     }
 
     private void loadComponents(ConcurrentNavigableMap<K, C> components) {
-        Set<C> newActions = loader.loadEach(getType());
+        Set<C> newActions = loader.loadEach(getType(), modelValidator);
         log.debug(format("Context Initialization. %s %s(s) currently loaded.", components.size(), getType().getName()));
         for (C component : newActions) {
             if (component.isValid()) {

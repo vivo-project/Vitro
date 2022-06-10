@@ -9,7 +9,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.NullValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.SHACLBeanValidator;
 import org.junit.After;
 import org.junit.Test;
 
@@ -87,7 +88,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         loadTestModel();
 
-        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class, modelValidator);
 
         actionPool.add(TEST_PERSON_ACTION_URI, action);
 
@@ -104,7 +105,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.reload();
 
-        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class, modelValidator);
 
         assertEquals(0, actionPool.obsoleteCount());
 
@@ -123,7 +124,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         loadTestModel();
 
-        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class, modelValidator);
 
         reset();
 
@@ -229,7 +230,6 @@ public class ActionPoolTest extends ServletContextTest {
         assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
         modelValidator = NullValidator.getInstance();
-        loader = new ConfigurationBeanLoader(ontModel, servletContext, modelValidator);
 
         loadTestModel();
         loadNotValidAction();
@@ -247,8 +247,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        modelValidator = new SHACLValidator(ontModel, schemeModel);
-        loader = new ConfigurationBeanLoader(ontModel, servletContext, modelValidator);
+        modelValidator = new SHACLBeanValidator(ontModel, schemeModel);
 
         loadTestModel();
         loadNotValidAction();
@@ -268,8 +267,6 @@ public class ActionPoolTest extends ServletContextTest {
         assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
         modelValidator = NullValidator.getInstance();
-
-        loader = new ConfigurationBeanLoader(ontModel, servletContext, modelValidator);
 
         loadTestModel();
         loadNotValidAction();

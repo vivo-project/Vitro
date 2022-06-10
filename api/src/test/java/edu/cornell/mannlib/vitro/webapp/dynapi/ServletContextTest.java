@@ -11,6 +11,8 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.ModelValidator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.NullValidator;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
@@ -54,11 +56,11 @@ public abstract class ServletContextTest {
 
         contentModelAccess.setOntModel(TBOX_ASSERTIONS, schemeModel);
 
-//        modelValidator = new SHACLValidator(ontModel, schemeModel);
+//        modelValidator = new SHACLBeanValidator(ontModel, schemeModel);
 
         modelValidator = NullValidator.getInstance();
 
-        loader = new ConfigurationBeanLoader(ontModel, servletContext, modelValidator);
+        loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
     protected void loadTestModel() throws IOException {

@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi;
+package edu.cornell.mannlib.vitro.webapp.dynapi.validator;
 
 public class NullValidator implements ModelValidator {
 
@@ -13,7 +13,7 @@ public class NullValidator implements ModelValidator {
     }
 
     @Override
-    public boolean isValidResource(String uri){
+    public boolean isValidResource(String uri, boolean deepCheck){
         return true;
     }
 
