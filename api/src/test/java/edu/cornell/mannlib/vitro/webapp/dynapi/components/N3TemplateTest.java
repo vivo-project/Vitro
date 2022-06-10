@@ -17,6 +17,7 @@ import org.apache.jena.ontology.impl.OntModelImpl;
 
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -93,13 +94,14 @@ public class N3TemplateTest extends ServletContextTest {
         N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
         assertNotNull(n3Template);
         assertEquals(0, n3Template.getProvidedParams().size());
-        assertEquals(2, n3Template.getRequiredParams().size());
-        assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3Text());
+        assertEquals(3, n3Template.getRequiredParams().size());
+        assertEquals("?testSubject <http://has> ?testObject, ?testSubject2 <http://has> ?testObject", n3Template.getN3TextAdditions());
+        assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3TextRetractions());
     }
 
     @Test
     public void testNotAllN3VariablesSubstitutedWithValues(){
-        n3Template.setN3Text("?uri1 <http:has> ?literal1");
+        n3Template.setN3TextRetractions("?uri1 <http:has> ?literal1");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -117,7 +119,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testInsertMultipleUris() {
         when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3Text("?uri1 <http:has> ?uri2");
+        n3Template.setN3TextAdditions("?uri1 <http:has> ?uri2");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -145,7 +147,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testInsertOneUriOneLiteral(){
         when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3Text("?uri1 <http:has> ?literal1");
+        n3Template.setN3TextAdditions("?uri1 <http:has> ?literal1");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -173,7 +175,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testMultipleStatements(){
         when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3Text("?uri1 <http://has> ?literal1 .\n?uri1 <http://was> ?literal2");
+        n3Template.setN3TextAdditions("?uri1 <http://has> ?literal1 .\n?uri1 <http://was> ?literal2");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -203,5 +205,35 @@ public class N3TemplateTest extends ServletContextTest {
         assertEquals(2, writeModel.listStatements().toList().size());
         assertTrue(writeModel.containsLiteral(
                 new ResourceImpl("http://testSubject"), new PropertyImpl("http://was"),true));
+    }
+
+    @Test
+    public void testRetractionsWorkWhenModelIsEmpty() {
+        when(modelComponent.getName()).thenReturn("test");
+        n3Template.setN3TextRetractions("<http://testSubject> <http:has> <http://testObject>");
+        n3Template.setTemplateModel(modelComponent);
+
+        when(input.getContext()).thenReturn(servletContext);
+
+        assertFalse(n3Template.run(input).hasError());
+        assertTrue(writeModel.getGraph().isEmpty());
+    }
+
+    @Test
+    public void removingATriplet() {
+        when(modelComponent.getName()).thenReturn("test");
+        n3Template.setN3TextRetractions("<http://testSubject> <http:has> <http://testObject>");
+        n3Template.setTemplateModel(modelComponent);
+
+        when(input.getContext()).thenReturn(servletContext);
+
+        writeModel.add(new StatementImpl(
+                new ResourceImpl("http://testSubject"),
+                new PropertyImpl("http:has"),
+                new ResourceImpl("http://testObject"))
+        );
+        assertEquals(1,writeModel.getGraph().size());
+        assertFalse(n3Template.run(input).hasError());
+        assertEquals(0,writeModel.getGraph().size());
     }
 }
