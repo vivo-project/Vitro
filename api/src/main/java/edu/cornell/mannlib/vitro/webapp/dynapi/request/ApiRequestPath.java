@@ -13,6 +13,7 @@ public class ApiRequestPath {
     public static final String API_SERVLET_PATH = "/api";
     public static final String RPC_SERVLET_PATH = API_SERVLET_PATH + "/rpc";
     public static final String REST_SERVLET_PATH = API_SERVLET_PATH + "/rest";
+    public static final String API_SERVLET_LOGIN = API_SERVLET_PATH + "/login";
 
     private final RequestType type;
 
