@@ -7,18 +7,26 @@
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Template>
-        a                        dynapi:operation, dynapi:n3Template ;
-        rdfs:label               "Test n3 Template 1"@en-US ;
-        dynapi:hasModel  <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
-        dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject> ;
-        dynapi:n3Text            "?testSubject <http://has> ?testObject" .
+        a                           dynapi:operation, dynapi:n3Template ;
+        rdfs:label                  "Test n3 Template 1"@en-US ;
+        dynapi:hasModel             <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject2>,
+                                    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject> ;
+        dynapi:n3TextAdditions      "?testSubject <http://has> ?testObject, ?testSubject2 <http://has> ?testObject" ;
+        dynapi:n3TextRetractions   "?testSubject <http://has> ?testObject".
     
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>
         a                        dynapi:parameter;
         dynapi:name              "testSubject";
         dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
         rdfs:label               "Subject for n3 template"@en-US .
-        
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject2>
+        a                        dynapi:parameter;
+        dynapi:name              "testSubject2";
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               "Subject for n3 template"@en-US .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject>
         a                        dynapi:parameter;
         dynapi:name              "testObject";
