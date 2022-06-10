@@ -18,9 +18,7 @@ import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.API
 
 @WebServlet(name = "Login", urlPatterns = {API_SERVLET_LOGIN})
 public class LoginController extends VitroHttpServlet {
-
-    private static final Log log = LogFactory.getLog(RESTEndpoint.class);
-
+    
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         super.service(request, response);
