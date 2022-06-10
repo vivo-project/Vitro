@@ -128,6 +128,32 @@
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
+  <!-- CORS Filter -->
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    <init-param>
+      <param-name>cors.allowed.origins</param-name>
+      <param-value>*</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cors.allowed.methods</param-name>
+      <param-value>GET,POST,PUT,DELETE,HEAD,OPTIONS</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cors.allowed.headers</param-name>
+      <param-value>Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cors.exposed.headers</param-name>
+      <param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
   <!-- DWR servlet -->
   <servlet>
     <servlet-name>dwr-invoker</servlet-name>
