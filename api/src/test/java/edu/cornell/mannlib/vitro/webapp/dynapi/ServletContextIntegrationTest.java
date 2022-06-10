@@ -13,7 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-public abstract class ServletContextITest extends ServletContextTest {
+public abstract class ServletContextIntegrationTest extends ServletContextTest {
 
     protected Map<String, String[]> parameterMap;
 

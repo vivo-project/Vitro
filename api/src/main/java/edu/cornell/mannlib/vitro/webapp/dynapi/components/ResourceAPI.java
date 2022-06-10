@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
     private String versionMin;
     private String versionMax;
     private RPC rpcOnGet;
+    private RPC rpcOnGetAll;
     private RPC rpcOnPost;
     private RPC rpcOnDelete;
     private RPC rpcOnPut;
@@ -75,6 +77,15 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
     public void setRpcOnGet(RPC rpcOnGet) {
         this.rpcOnGet = rpcOnGet;
     }
+    
+    public RPC getRpcOnGetAll() {
+        return rpcOnGetAll;
+    }
+
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll", minOccurs = 0, maxOccurs = 1)
+    public void setRpcOnGetAll(RPC rpcOnGetAll) {
+        this.rpcOnGetAll = rpcOnGetAll;
+    }
 
     public RPC getRpcOnPost() {
         return rpcOnPost;
@@ -117,6 +128,10 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
         customRESTActions.add(customRESTAction);
     }
 
+    public List<CustomRESTAction> getCustomRESTActions() {
+        return customRESTActions;
+    }
+
     @Override
     public void addClient() {
         clients.add(Thread.currentThread().getId());
@@ -129,12 +144,14 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
 
     @Override
     public void removeDeadClients() {
+        Set<Long> currentClients = new HashSet<Long>();
+        currentClients.addAll(clients);
         Map<Long, Boolean> currentThreadIds = Thread
                 .getAllStackTraces()
                 .keySet()
                 .stream()
                 .collect(Collectors.toMap(Thread::getId, Thread::isAlive));
-        for (Long client : clients) {
+        for (Long client : currentClients) {
             if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
                 clients.remove(client);
             }

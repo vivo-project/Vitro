@@ -1,0 +1,99 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "RPC API",
+    "description" : "An RPC API.",
+    "version" : ""
+  },
+  "tags" : [ {
+    "name" : "test_collection",
+    "description" : "RPC test_collection"
+  } ],
+  "paths" : {
+    "/api/rpc/test_collection" : {
+      "post" : {
+        "tags" : [ "test_collection" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "limit" : {
+                    "type" : "integer",
+                    "format" : "int32"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "result" : {
+                      "type" : "array",
+                      "description" : "Test action result",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "action" : {
+                            "type" : "string",
+                            "description" : "Test action result element action"
+                          },
+                          "label" : {
+                            "type" : "string",
+                            "description" : "Test action result element label"
+                          }
+                        },
+                        "description" : "Test action result"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Resource not found",
+            "content" : {
+              "text/plain" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

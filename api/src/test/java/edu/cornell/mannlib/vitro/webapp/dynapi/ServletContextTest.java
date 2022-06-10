@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.shared.Lock;
 import org.junit.Before;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
@@ -61,19 +62,26 @@ public abstract class ServletContextTest {
             new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-relationship.n3")
         );
     }
-
+    
     protected void loadDefaultModel() throws IOException {
         loadModel(
             new RDFFile("N3", "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3"),
             new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3"),
-            new RDFFile("N3", "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals-testing.n3")
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-testing.n3")
         );
     }
 
     protected void loadModel(RDFFile... rdfFiles) throws IOException {
         for (RDFFile rdfFile : rdfFiles) {
             String rdf = readFile(rdfFile.path);
-            ontModel.read(new StringReader(rdf), null, rdfFile.format);
+            ontModel.enterCriticalSection(Lock.WRITE);
+            try {
+                ontModel.read(new StringReader(rdf), null, rdfFile.format);
+            } finally {
+                if (ontModel != null) {
+                    ontModel.leaveCriticalSection();
+                }
+            }
         }
     }
 
@@ -81,6 +89,27 @@ public abstract class ServletContextTest {
         for (String path : paths) {
             loadModel(new RDFFile(fileFormat, path));
         }
+    }
+
+    protected void loadPersonVersion1_1Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person1_1.n3")
+        );
+    }
+
+    protected void loadPersonVersion2Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person2.n3")
+        );
+    }
+
+    protected void loadPersonVersion4_3_7Model() throws IOException {
+        // versioning action reuses testSparqlQuery1 from testing action
+        loadModel(
+            new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-person4_3_7.n3")
+        );
     }
 
     protected String readFile(String path) throws IOException {

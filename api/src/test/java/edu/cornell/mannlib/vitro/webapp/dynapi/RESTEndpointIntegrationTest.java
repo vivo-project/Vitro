@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.REST_SERVLET_PATH;
 import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -39,7 +39,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class RESTEndpointITest extends ServletContextITest {
+public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private final static String BASE_URL = "http://localhost:8080";
 
