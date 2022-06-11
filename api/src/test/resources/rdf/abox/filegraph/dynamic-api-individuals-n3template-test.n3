@@ -12,8 +12,8 @@
         dynapi:hasModel             <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject2>,
                                     <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject> ;
-        dynapi:n3TextAdditions      "?testSubject <http://has> ?testObject, ?testSubject2 <http://has> ?testObject" ;
-        dynapi:n3TextRetractions   "?testSubject <http://has> ?testObject".
+        dynapi:n3TextAdditions      "?testSubject <http://has> ?testObject . ?testSubject2 <http://has> ?testObject" ;
+        dynapi:n3TextRetractions   	"?testSubject <http://has> ?testObject".
     
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>
         a                        dynapi:parameter;
@@ -22,21 +22,21 @@
         rdfs:label               "Subject for n3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject2>
-        a                        dynapi:parameter;
-        dynapi:name              "testSubject2";
-        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
-        rdfs:label               "Subject for n3 template"@en-US .
+        a						dynapi:parameter;
+        dynapi:name				"testSubject2";
+        dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label				"Subject for n3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject>
         a                        dynapi:parameter;
         dynapi:name              "testObject";
-        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
-        rdfs:label               "Object for n3 template"@en-US .
+        dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label         		"Object for n3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/n3TemplateTestAction>
-        a                        dynapi:action ;
-        rdfs:label               "N3 template test action"@en-US ;
-        dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/n3TestRPC1> ;
+        a                   	dynapi:action ;
+        rdfs:label      		"N3 template test action"@en-US ;
+        dynapi:hasAssignedRPC	<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/n3TestRPC1> ;
         dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/n3TemplateTestStep> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/n3TestRPC1>
