@@ -18,7 +18,7 @@ public class NullValidator implements ModelValidator {
     }
 
     @Override
-    public boolean isValidFile(String path){
+    public boolean isValidFile(String path, String format){
         return true;
     }
 

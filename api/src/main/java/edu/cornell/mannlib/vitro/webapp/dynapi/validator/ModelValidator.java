@@ -4,5 +4,5 @@ public interface ModelValidator {
 
     boolean isValidResource(String uri, boolean deepCheck);
 
-    boolean isValidFile(String path);
+    boolean isValidFile(String path, String format);
 }
