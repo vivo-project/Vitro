@@ -63,8 +63,8 @@ public class SHACLValidator implements ModelValidator {
             "CONSTRUCT { ?s ?p ?o }\n" +
             "WHERE\n" +
             "{\n" +
-            "  {?uri ?p ?o. \n" +
-            "  ?s ?p ?o. }\n" +
+            "  {?s ?p ?o. \n" +
+            "  FILTER (?s = ?uri). }\n" +
             "  UNION\n" +
             "  {?uri ?p1 ?s .\n" +
             "  ?s ?p ?o. }\n" +
@@ -136,7 +136,7 @@ public class SHACLValidator implements ModelValidator {
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setIri("uri", IRIFactory.uriImplementation().construct(uri));
         pss.setCommandText(queryText);
-        data.enterCriticalSection(Lock.READ);
+//        data.enterCriticalSection(Lock.READ);
         try {
             QueryExecution qexec = QueryExecutionFactory.create(pss.toString(), data);
             try {
@@ -149,7 +149,7 @@ public class SHACLValidator implements ModelValidator {
         } catch (Exception e) {
             log.error(e.getLocalizedMessage(), e);
         } finally {
-            data.leaveCriticalSection();
+//            data.leaveCriticalSection();
         }
         return dataModel;
     }
@@ -167,11 +167,11 @@ public class SHACLValidator implements ModelValidator {
 
     private Resource validateResourceAndLinkedObjectsOverSHACLRules(String uri, boolean sparql) throws InterruptedException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        System.out.println(uri);
-        System.out.println("start creation of model: " + dateFormat.format(new Date()));
+//        System.out.println(uri);
+//        System.out.println("start creation of model: " + dateFormat.format(new Date()));
         Model dataModel = (sparql)?collectResourceAndLinkedObjectsBySparqlQuery(uri):collectResourceAndLinkedObjectsByNavigatingJavaModel(uri);
-        System.out.println("end creation of model: " + dateFormat.format(new Date()));
-        System.out.println("dataModel size: " + dataModel.listStatements().toSet().size());
+//        System.out.println("end creation of model: " + dateFormat.format(new Date()));
+//        System.out.println("dataModel size: " + dataModel.listStatements().toSet().size());
 //        for (Statement statement: dataModel.listStatements().toSet()
 //             ) {
 //            System.out.println(statement.toString());
@@ -221,7 +221,7 @@ public class SHACLValidator implements ModelValidator {
     public boolean isValidResource(String uri, boolean deepCheck){
         Resource report = null;
         try {
-            report = (deepCheck)?validateResourceAndLinkedObjectsOverSHACLRules(uri, true):validateResourceOverSHACLRules(uri);
+            report = (deepCheck)?validateResourceAndLinkedObjectsOverSHACLRules(uri, false):validateResourceOverSHACLRules(uri);
         } catch (InterruptedException e) {
             log.warn("Validation of the resource " + uri + " has been interrupted.", e);
         }
