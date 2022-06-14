@@ -1,0 +1,151 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/SPARQLQueryTestAction-SELECT>
+        a                        dynapi:action ;
+        rdfs:label               "SPARQL SELECT query test action"@en-US ;
+        dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/SPARQLQueryTestRPC1> ;
+        dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/SPARQLQueryTestStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/SPARQLQueryTestAction-ASK>
+        a                        dynapi:action ;
+        rdfs:label               "SPARQL ASK query test action"@en-US ;
+        dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/SPARQLQueryTestRPC1> ;
+        dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/SPARQLQueryTestStep2> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/SPARQLQueryTestAction-CONSTRUCT>
+        a                        dynapi:action ;
+        rdfs:label               "SPARQL ASK query test action"@en-US ;
+        dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/SPARQLQueryTestRPC1> ;
+        dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/SPARQLQueryTestStep3> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/SPARQLQueryTestStep1>
+        a                        dynapi:step, dynapi:operationalStep ;
+        rdfs:label               "SPARQL Query Test operational step 1"@en-US ;
+        dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/SPARQL/testSPARQLQuery-SELECT> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/SPARQLQueryTestStep2>
+        a                        dynapi:step, dynapi:operationalStep ;
+        rdfs:label               "SPARQL Query Test operational step 2"@en-US ;
+        dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/SPARQL/testSPARQLQuery-ASK> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/SPARQLQueryTestStep3>
+        a                        dynapi:step, dynapi:operationalStep ;
+        rdfs:label               "SPARQL Query Test operational step 3"@en-US ;
+        dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/SPARQL/testSPARQLQuery-CONSTRUCT> .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/SPARQL/testSPARQLQuery-SELECT>
+        a                        dynapi:operation, dynapi:sparqlQuery  ;
+        rdfs:label               "Test SPARQL query  SELECT"@en-US ;
+        dynapi:requiresParameter    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param1>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param2>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param3> ;
+        dynapi:providesParameter    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/selectresultParam1> ;
+        dynapi:hasModel  <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:sparqlQueryText   "SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/SPARQL/testSPARQLQuery-ASK>
+        a                        dynapi:operation, dynapi:sparqlQuery  ;
+        rdfs:label               "Test ASK SPARQL query"@en-US ;
+        dynapi:hasModel  <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param1>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param2>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param3> ;
+        dynapi:providesParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/askresultParam2> ;
+        dynapi:sparqlQueryText   "ASK {?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#action>}" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/SPARQL/testSPARQLQuery-CONSTRUCT>
+        a                        dynapi:operation, dynapi:sparqlQuery  ;
+        rdfs:label               "Test CONSTRUCT SPARQL query"@en-US ;
+        dynapi:hasModel  <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param1>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param2>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param3> ;
+        dynapi:providesParameter <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/constructresultParam3> ;
+        dynapi:sparqlQueryText   "CONSTRUCT { \n ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label \n }\n WHERE \n { \n ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#action> \n OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\n LIMIT ?limit" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param1>
+        a                        dynapi:parameter;
+        dynapi:name              "iri";
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               "Test parameter 1 for queries"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param2>
+        a                        dynapi:parameter;
+        dynapi:name              "literal";
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               "Test parameter 2 for queries"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/param3>
+        a                        dynapi:parameter;
+        dynapi:name              "integer";
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               "Test parameter 3 for queries"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/selectresultParam1>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Result parameter 1 for query 1"@en-US ;
+        dynapi:name                         "SELECT result" ;
+        dynapi:description                  "Test SeLECT Query result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/askresultParam2>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Result parameter 2 for ASK query "@en-US ;
+        dynapi:name                         "ASK result" ;
+        dynapi:description                  "Test ASK query result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDboolean> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/constructresultParam3>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Result parameter 3 for CONSTRUCT query "@en-US ;
+        dynapi:name                         "CONSTRUCT result" ;
+        dynapi:description                  "Test CONSTRUCT query result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDobject> .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Test result array type"@en-US ;
+        dynapi:name                         "test result array type" ;
+        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:objectParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Test result action object type"@en-US ;
+        dynapi:name                         "test result action object type" ;
+        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction> ,
+                                            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result action parameter"@en-US ;
+        dynapi:name                         "action" ;
+        dynapi:description                  "Test action result element action" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Test result label parameter"@en-US ;
+        dynapi:name                         "label" ;
+        dynapi:description                  "Test action result element label" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/SPARQLQueryTestRPC1>
+        a                     dynapi:rpc ;
+        dynapi:name           "SPARQLQuery_test_action"@en-US ;
+        dynapi:hasDefaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:minAPIVersionMin  "0.1.0" .
+
+
+
