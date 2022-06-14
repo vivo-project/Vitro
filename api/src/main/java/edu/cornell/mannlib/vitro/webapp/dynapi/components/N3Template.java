@@ -17,40 +17,39 @@ public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
-
 	private Parameters requiredParams = new Parameters();
 	private String n3TextAdditions = "";
 	private String n3TextRetractions = "";
 	private ModelComponent templateModel;
 
-    // region @Property Setters
+	// region @Property Setters
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-    public void addRequiredParameter(Parameter param) {
-        requiredParams.add(param);
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+	public void addRequiredParameter(Parameter param) {
+		requiredParams.add(param);
+	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setTemplateModel(ModelComponent templateModel){ this.templateModel = templateModel; }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
-    public void setN3TextAdditions(String n3TextAdditions) {
-        this.n3TextAdditions = n3TextAdditions;
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
+	public void setN3TextAdditions(String n3TextAdditions) {
+		this.n3TextAdditions = n3TextAdditions;
+	}
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions", minOccurs = 0, maxOccurs = 1)
 	public void setN3TextRetractions(String n3TextRetractions) {
 		this.n3TextRetractions = n3TextRetractions;
 	}
 
-    // endregion
+	// endregion
 
-    // region Getters
+	// region Getters
 
-    @Override
-    public Parameters getRequiredParams() {
-        return requiredParams;
-    }
+	@Override
+	public Parameters getRequiredParams() {
+		return requiredParams;
+	}
 
 	@Override
 	public Parameters getProvidedParams() {
@@ -81,8 +80,8 @@ public class N3Template extends Operation implements Template {
 
 		List<Model> additionModels, retractionModels;
 		try {
-				additionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3AdditionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
-				retractionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3RetractionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
+			additionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3AdditionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
+			retractionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3RetractionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
 		} catch (Exception e) {
 			log.error("Error while trying to parse N3Template string and create a Jena rdf Model", e);
 			return new OperationResult(500);

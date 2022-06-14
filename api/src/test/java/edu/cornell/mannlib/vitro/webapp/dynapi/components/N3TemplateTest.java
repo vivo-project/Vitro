@@ -11,8 +11,6 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
@@ -97,7 +95,7 @@ public class N3TemplateTest extends ServletContextTest {
         assertNotNull(n3Template);
         assertEquals(0, n3Template.getProvidedParams().size());
         assertEquals(3, n3Template.getRequiredParams().size());
-        assertEquals("?testSubject <http://has> ?testObject . ?testSubject2 <http://has> ?testObject", n3Template.getN3TextAdditions());
+        assertEquals("?testSubject <http://has> ?testObject, ?testSubject2 <http://has> ?testObject", n3Template.getN3TextAdditions());
         assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3TextRetractions());
     }
 
@@ -237,30 +235,5 @@ public class N3TemplateTest extends ServletContextTest {
         assertEquals(1,writeModel.getGraph().size());
         assertFalse(n3Template.run(input).hasError());
         assertEquals(0,writeModel.getGraph().size());
-    }
-    
-    @Test
-    public void loadAndExecteN3operationWithAdditionAndRetraction() throws IOException, ConfigurationBeanLoaderException {
-    	loadDefaultModel();
-        loadModels(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
-
-        N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
-
-        when(input.has("testSubject")).thenReturn(true);
-        when(input.has("testSubject2")).thenReturn(true);
-        when(input.has("testObject")).thenReturn(true);
-        when(input.get("testSubject")).thenReturn(new String[]{"http://Joe"});
-        when(input.get("testSubject2")).thenReturn(new String[]{"http://Bob"});
-        when(input.get("testObject")).thenReturn(new String[]{"Bike"});
-        when(input.getContext()).thenReturn(servletContext);
-
-
-        assertFalse(n3Template.run(input).hasError());
-        assertEquals(1,writeModel.getGraph().size());
-        assertTrue(writeModel.getGraph().contains(
-        		NodeFactory.createURI("http://Bob"),
-        		NodeFactory.createURI("http://has"),
-        		NodeFactory.createLiteral("Bike"))
-        );
     }
 }
