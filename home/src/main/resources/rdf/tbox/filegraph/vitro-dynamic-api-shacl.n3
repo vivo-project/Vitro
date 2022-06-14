@@ -627,3 +627,4 @@
         sh:class     <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
         sh:maxCount  1 ;
         sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo> .
+
