@@ -12,8 +12,8 @@
         dynapi:hasModel             <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject2>,
                                     <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject> ;
-        dynapi:N3TextAdditions      "?testSubject <http://has> ?testObject. ?testSubject2 <http://has> ?testObject" ;
-        dynapi:N3TextRetractions    "?testSubject <http://has> ?testObject".
+        dynapi:N3TextAdditions      "?testSubject <http://has> ?testObject, ?testSubject2 <http://has> ?testObject" ;
+        dynapi:N3TextRetractions   "?testSubject <http://has> ?testObject".
     
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>
         a                        dynapi:parameter;
@@ -49,4 +49,5 @@
         a                        dynapi:Step, dynapi:operationalStep ;
         rdfs:label               "N3 template Test operational step 1"@en-US ;
         dynapi:hasOperation      <https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/testN3Template> .
+
 
