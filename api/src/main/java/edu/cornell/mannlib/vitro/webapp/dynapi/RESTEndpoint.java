@@ -68,7 +68,7 @@ public class RESTEndpoint extends VitroHttpServlet {
     }
 
     private void process(HttpServletRequest request, HttpServletResponse response) {
-       String method = request.getMethod();
+        String method = request.getMethod();
         ApiRequestPath requestPath = ApiRequestPath.from(request);
 
         if (!requestPath.isValid()) {
