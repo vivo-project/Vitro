@@ -190,7 +190,7 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#question-shape>
         a                    sh:NodeShape ;
-        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep> ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep> ;
         sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#question> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-onDelete>
@@ -245,13 +245,13 @@
         sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#parameter> ;
         sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep>
+<https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep>
         a            rdfs:Class , sh:NodeShape ;
         sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfTrue> , <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfFalse> , <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-question> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue-shape>
         a                    sh:NodeShape ;
-        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep> ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep> ;
         sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction-hasDefaultMethod>
@@ -419,7 +419,7 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse-shape>
         a                    sh:NodeShape ;
-        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep> ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep> ;
         sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod-shape>
