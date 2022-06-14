@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +34,8 @@ public abstract class ServletContextTest {
     protected ModelAccessFactoryStub modelAccessFactory;
     protected ContextModelAccessStub contentModelAccess;
     protected OntModel ontModel;
+    protected OntModel schemeModel;
+    protected ModelValidator modelValidator;
 
     protected ConfigurationBeanLoader loader;
 
@@ -47,7 +50,15 @@ public abstract class ServletContextTest {
 
         contentModelAccess.setOntModel(FULL_UNION, ontModel);
 
-        loader = new ConfigurationBeanLoader(ontModel, servletContext);
+        schemeModel = ModelFactory.createOntologyModel();
+
+        contentModelAccess.setOntModel(TBOX_ASSERTIONS, schemeModel);
+
+//        modelValidator = new SHACLValidator(ontModel, schemeModel);
+
+        modelValidator = NullValidator.getInstance();
+
+        loader = new ConfigurationBeanLoader(ontModel, servletContext, modelValidator);
     }
 
     protected void loadTestModel() throws IOException {
@@ -62,7 +73,7 @@ public abstract class ServletContextTest {
             new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-relationship.n3")
         );
     }
-    
+
     protected void loadDefaultModel() throws IOException {
         loadModel(
             new RDFFile("N3", "../home/src/main/resources/rdf/tbox/filegraph/vitro-dynamic-api-shacl.n3"),
@@ -75,11 +86,19 @@ public abstract class ServletContextTest {
     protected void loadModel(RDFFile... rdfFiles) throws IOException {
         for (RDFFile rdfFile : rdfFiles) {
             String rdf = readFile(rdfFile.path);
-            ontModel.enterCriticalSection(Lock.WRITE);
-            try {
-                ontModel.read(new StringReader(rdf), null, rdfFile.format);
-            } finally {
-                if (ontModel != null) {
+            if (rdfFile.path.contains("shacl")) {
+                schemeModel.enterCriticalSection(Lock.WRITE);
+                try {
+                    schemeModel.read(new StringReader(rdf), null, rdfFile.format);
+                } finally {
+                    schemeModel.leaveCriticalSection();
+                }
+            }
+            if (modelValidator.isValidFile(rdfFile.path)) {
+                ontModel.enterCriticalSection(Lock.WRITE);
+                try {
+                    ontModel.read(new StringReader(rdf), null, rdfFile.format);
+                } finally {
                     ontModel.leaveCriticalSection();
                 }
             }
@@ -90,6 +109,12 @@ public abstract class ServletContextTest {
         for (String path : paths) {
             loadModel(new RDFFile(fileFormat, path));
         }
+    }
+
+    protected void loadNotValidAction() throws IOException {
+        loadModel(
+                new RDFFile("N3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-not-valid.n3")
+        );
     }
 
     protected void loadPersonVersion1_1Model() throws IOException {

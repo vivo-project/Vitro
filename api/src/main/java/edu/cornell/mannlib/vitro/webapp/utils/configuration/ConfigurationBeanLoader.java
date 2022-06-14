@@ -110,11 +110,11 @@ public class ConfigurationBeanLoader {
 	private final ModelValidator validator;
 
 	public ConfigurationBeanLoader(Model model) {
-		this(new LockableModel(model), null, null, new NullValidator());
+		this(new LockableModel(model), null, null, NullValidator.getInstance());
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking) {
-		this(locking, null, null, new NullValidator());
+		this(locking, null, null, NullValidator.getInstance());
 	}
 
 	public ConfigurationBeanLoader(Model model, ServletContext ctx, ModelValidator validator) {
@@ -122,11 +122,11 @@ public class ConfigurationBeanLoader {
 	}
 
 	public ConfigurationBeanLoader(Model model, ServletContext ctx) {
-		this(new LockableModel(model), ctx, null, new NullValidator());
+		this(new LockableModel(model), ctx, null, NullValidator.getInstance());
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking, ServletContext ctx) {
-		this(locking, ctx, null, new NullValidator());
+		this(locking, ctx, null, NullValidator.getInstance());
 	}
 
 	public ConfigurationBeanLoader(Model model, HttpServletRequest req) {
@@ -137,7 +137,7 @@ public class ConfigurationBeanLoader {
 			HttpServletRequest req) {
 		this(locking,
 				(req == null) ? null : req.getSession().getServletContext(),
-				req, new NullValidator());
+				req, NullValidator.getInstance());
 	}
 
 	private ConfigurationBeanLoader(LockableModel locking, ServletContext ctx,
@@ -222,8 +222,8 @@ public class ConfigurationBeanLoader {
 		for (String uri : uris) {
 			try {
 				instances.add(loadInstance(uri, resultClass));
-			} catch (Throwable e) {
-				e.printStackTrace();
+			} catch (ConfigurationBeanLoaderException e) {
+				log.warn(e.getMessage());
 			}
 		}
 		return instances;
@@ -244,6 +244,6 @@ public class ConfigurationBeanLoader {
 	}
 
 	private boolean isValid(String uri){
-		return validator.isValid(uri);
+		return validator.isValidResource(uri);
 	}
 }

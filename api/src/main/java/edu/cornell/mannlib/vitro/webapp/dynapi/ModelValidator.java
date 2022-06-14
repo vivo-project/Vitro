@@ -2,5 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 public interface ModelValidator {
 
-    boolean isValid(String uri);
+    boolean isValidResource(String uri);
+
+    boolean isValidFile(String path);
 }

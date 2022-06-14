@@ -14,6 +14,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api#rpc-name>
         a            sh:PropertyShape ;
         sh:datatype  xsd:string ;
+        sh:pattern   "^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$" ;
         sh:maxCount  1 ;
         sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#name> .
 
@@ -55,9 +56,10 @@
         sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasModel> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#action-hasFirstStep>
-        a         sh:PropertyShape ;
-        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
-        sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep> .
+        a               sh:PropertyShape ;
+        sh:maxCount     1 ;
+        sh:class        <https://vivoweb.org/ontology/vitro-dynamic-api#Step> ;
+        sh:path         <https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#onGet-shape>
         a                    sh:NodeShape ;
@@ -296,7 +298,7 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#parameter-hasValidator>
         a         sh:PropertyShape ;
-        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#validator> ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#Validator> ;
         sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-hasCustomRESTAction>
@@ -426,7 +428,7 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfFalse>
         a         sh:PropertyShape ;
-        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#Step> ;
         sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfFalse> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#hasElementsOfType-shape>
@@ -477,7 +479,7 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#conditionalStep-hasNextStepIfTrue>
         a         sh:PropertyShape ;
-        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#Step> ;
         sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStepIfTrue> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI-maxAPIVersion>
@@ -576,7 +578,7 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#operationalStep-hasNextStep>
         a         sh:PropertyShape ;
-        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#step> ;
+        sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#Step> ;
         sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#rpc-maxAPIVersion>

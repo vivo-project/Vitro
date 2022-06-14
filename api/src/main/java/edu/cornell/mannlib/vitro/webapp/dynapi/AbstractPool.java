@@ -2,6 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
 import static java.lang.String.format;
 
@@ -26,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
-import org.topbraid.shacl.vocabulary.SH;
 
 public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C>> implements Pool<K, C> {
 
@@ -52,6 +52,21 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     public ModelValidator getModelValidator(){
         return modelValidator;
+    }
+
+    public void setModelValidator(ModelValidator modelValidator){
+        this.modelValidator = modelValidator;
+        this.loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
+    }
+
+    public void setSHACLValidator(){
+        this.modelValidator = new SHACLValidator(dynamicAPIModel, dynamicAPIModel);
+        this.loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
+    }
+
+    public void setNullValidator(){
+        this.modelValidator = NullValidator.getInstance();
+        this.loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
     }
 
     public abstract P getPool();
@@ -157,11 +172,21 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         unloadObsoleteComponents();
     }
 
+    public void initWithoutValidation(ServletContext ctx) {
+        this.ctx = ctx;
+        modelAccess = ModelAccess.on(ctx);
+        dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
+        modelValidator = NullValidator.getInstance();
+        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
+        log.debug("Context Initialization ...");
+        loadComponents(components);
+    }
+
     public void init(ServletContext ctx) {
         this.ctx = ctx;
         ContextModelAccess modelAccess = ModelAccess.on(ctx);
         dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
-        modelValidator = new SHACLValidator(dynamicAPIModel);
+        modelValidator = new SHACLValidator(dynamicAPIModel, dynamicAPIModel);
         loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx, modelValidator);
         log.debug("Context Initialization ...");
         loadComponents(components);

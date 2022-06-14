@@ -116,6 +116,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         loadDefaultModel();
         loadTestModel();
+        loadNotValidAction();
 
         actionPool.init(servletContext);
         actionPool.reload();
@@ -201,6 +202,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         List<Object[]> requests = new ArrayList<>(Arrays.asList(new Object[][] {
             { "POST",   "/1/test_not_found", null, null, SC_NOT_FOUND,          null, "Resource not found" },
             { "GET",    "/1/test_not_found", null, null, SC_NOT_FOUND,          null, "Resource not found" },
+            { "GET",    "/1/test_NoValid_resource", null, null, SC_NOT_FOUND,          null, "Resource not found" },
             { "PUT",    "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null, "Method not allowed before looking for resource" },
             { "PATCH",  "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null, "Method not allowed before looking for resource" },
             { "DELETE", "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null, "Method not allowed before looking for resource" }
