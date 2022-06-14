@@ -68,11 +68,11 @@ public class N3Template extends Operation implements Template {
 			return new OperationResult(500);
 		}
 
-		String substitutedN3AdditionsTemplate = "";
-		String substitutedN3RetractionsTemplate = "";
+		String substitutedN3AdditionsTemplate;
+		String substitutedN3RetractionsTemplate;
 		try {
-			n3TextAdditions = substitutedN3AdditionsTemplate=insertParameters(input, n3TextAdditions);
-			n3TextRetractions = substitutedN3RetractionsTemplate=insertParameters(input, n3TextRetractions);
+			substitutedN3AdditionsTemplate = insertParameters(input, n3TextAdditions);
+			substitutedN3RetractionsTemplate = insertParameters(input, n3TextRetractions);
 		}catch (InputMismatchException e){
 			log.error(e);
 			return new OperationResult(500);
@@ -80,8 +80,13 @@ public class N3Template extends Operation implements Template {
 
 		List<Model> additionModels, retractionModels;
 		try {
-			additionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3AdditionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
-			retractionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3RetractionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
+			additionModels = ProcessRdfForm.parseN3ToRDF(
+					Arrays.asList(substitutedN3AdditionsTemplate),
+					ProcessRdfForm.N3ParseType.REQUIRED);
+
+			retractionModels = ProcessRdfForm.parseN3ToRDF(
+					Arrays.asList(substitutedN3RetractionsTemplate),
+					ProcessRdfForm.N3ParseType.REQUIRED);
 		} catch (Exception e) {
 			log.error("Error while trying to parse N3Template string and create a Jena rdf Model", e);
 			return new OperationResult(500);
