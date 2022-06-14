@@ -19,8 +19,8 @@ public class N3Template extends Operation implements Template {
 
 
 	private Parameters requiredParams = new Parameters();
-	private String n3TextAdditions;
-	private String n3TextRetractions;
+	private String n3TextAdditions = "";
+	private String n3TextRetractions = "";
 	private ModelComponent templateModel;
 
     // region @Property Setters
@@ -33,12 +33,12 @@ public class N3Template extends Operation implements Template {
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setTemplateModel(ModelComponent templateModel){ this.templateModel = templateModel; }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3TextAdditions", minOccurs = 0, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
     public void setN3TextAdditions(String n3TextAdditions) {
         this.n3TextAdditions = n3TextAdditions;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3TextRetractions", minOccurs = 0, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions", minOccurs = 0, maxOccurs = 1)
 	public void setN3TextRetractions(String n3TextRetractions) {
 		this.n3TextRetractions = n3TextRetractions;
 	}
@@ -69,24 +69,22 @@ public class N3Template extends Operation implements Template {
 			return new OperationResult(500);
 		}
 
-		String substitutedN3AdditionsTemplate = null, substitutedN3RetractionsTemplate = null;
+		String substitutedN3AdditionsTemplate = "";
+		String substitutedN3RetractionsTemplate = "";
 		try {
-			if (this.n3TextAdditions != null) substitutedN3AdditionsTemplate=insertParameters(input, this.n3TextAdditions);
-			if (this.n3TextRetractions != null) substitutedN3RetractionsTemplate=insertParameters(input, this.n3TextRetractions);
+			n3TextAdditions = substitutedN3AdditionsTemplate=insertParameters(input, n3TextAdditions);
+			n3TextRetractions = substitutedN3RetractionsTemplate=insertParameters(input, n3TextRetractions);
 		}catch (InputMismatchException e){
 			log.error(e);
 			return new OperationResult(500);
 		}
 
-		List<Model> additionModels = new ArrayList<>(), retractionModels = new ArrayList<>();
+		List<Model> additionModels, retractionModels;
 		try {
-			if (substitutedN3AdditionsTemplate != null)
 				additionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3AdditionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
-			if (substitutedN3RetractionsTemplate != null)
 				retractionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3RetractionsTemplate), ProcessRdfForm.N3ParseType.REQUIRED);
 		} catch (Exception e) {
-			log.error("Error while trying to parse N3Template string and create a Jena rdf Model");
-			log.error(e);
+			log.error("Error while trying to parse N3Template string and create a Jena rdf Model", e);
 			return new OperationResult(500);
 		}
 

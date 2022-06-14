@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 public class N3TemplateTest extends ServletContextTest {
 
     private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-n3template-test.n3";
-    private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Template";
+    private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/testN3Template";
 
     private static MockedStatic<ModelAccess> modelAccess;
 
