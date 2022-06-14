@@ -96,7 +96,7 @@ public abstract class ServletContextTest {
                     schemeModel.leaveCriticalSection();
                 }
             }
-            if (modelValidator.isValidFile(rdfFile.path)) {
+            if (modelValidator.isValidFile(rdfFile.path, rdfFile.format)) {
                 ontModel.enterCriticalSection(Lock.WRITE);
                 try {
                     ontModel.read(new StringReader(rdf), null, rdfFile.format);
