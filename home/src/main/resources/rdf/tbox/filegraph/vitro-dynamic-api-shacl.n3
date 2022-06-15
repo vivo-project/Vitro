@@ -29,9 +29,9 @@
         sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#solrQuery> ;
         sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api#n3Template>
+<https://vivoweb.org/ontology/vitro-dynamic-api#N3Template>
         a            sh:NodeShape , rdfs:Class ;
-        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#n3Template-n3Text> .
+        sh:property  <https://vivoweb.org/ontology/vitro-dynamic-api#N3Template-N3TextAdditions> , <https://vivoweb.org/ontology/vitro-dynamic-api#N3Template-N3TextRetractions>.
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep-shape>
         a                    sh:NodeShape ;
@@ -351,10 +351,15 @@
         a                    sh:NodeShape ;
         sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#hasModel> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api#n3Template-n3Text>
+<https://vivoweb.org/ontology/vitro-dynamic-api#N3Template-N3TextAdditions>
         a            sh:PropertyShape ;
         sh:datatype  xsd:string ;
-        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#n3Text> .
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#N3Template-N3TextRetractions>
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      <https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression-shape>
         a                    sh:NodeShape ;
@@ -540,10 +545,15 @@
         sh:class  <https://vivoweb.org/ontology/vitro-dynamic-api#rpc> ;
         sh:path   <https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api#n3Text-shape>
+<https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions-shape>
         a                    sh:NodeShape ;
-        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#n3Template> ;
-        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#n3Text> .
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#N3Template> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions-shape>
+        a                    sh:NodeShape ;
+        sh:class             <https://vivoweb.org/ontology/vitro-dynamic-api#N3Template> ;
+        sh:targetSubjectsOf  <https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI>
         a            sh:NodeShape , rdfs:Class ;
