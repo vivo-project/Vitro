@@ -78,7 +78,8 @@ public class N3Template extends Operation implements Template {
 			return new OperationResult(500);
 		}
 
-		List<Model> additionModels, retractionModels;
+		List<Model> additionModels;
+		List<Model> retractionModels;
 		try {
 			additionModels = ProcessRdfForm.parseN3ToRDF(
 					Arrays.asList(substitutedN3AdditionsTemplate),
