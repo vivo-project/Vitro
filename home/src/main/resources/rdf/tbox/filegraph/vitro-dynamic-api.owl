@@ -270,15 +270,24 @@
      -->
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasN3Text -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasN3TextAdditions -->
 
-    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#n3Text">
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
-        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#n3Template"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#N3Template"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <rdfs:label xml:lang="en-US">n3 text</rdfs:label>
+        <rdfs:label xml:lang="en-US">N3 text</rdfs:label>
     </owl:DatatypeProperty>
 
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#hasN3TextRetractions -->
+
+    <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+        <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#N3Template"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label xml:lang="en-US">N3 text</rdfs:label>
+    </owl:DatatypeProperty>
+    
     <!-- https://vivoweb.org/ontology/vitro-dynamic-api#allConditionsRequired -->
 
     <owl:DatatypeProperty rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#allConditionsRequired">
@@ -614,9 +623,9 @@
     </owl:Class>
 
 
-    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#n3Template -->
+    <!-- https://vivoweb.org/ontology/vitro-dynamic-api#N3Template -->
 
-    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#n3Template">
+    <owl:Class rdf:about="https://vivoweb.org/ontology/vitro-dynamic-api#N3Template">
         <rdfs:subClassOf rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
         <rdfs:label xml:lang="en-US">N3 template</rdfs:label>
     </owl:Class>

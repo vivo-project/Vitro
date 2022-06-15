@@ -17,41 +17,48 @@ public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
-
 	private Parameters requiredParams = new Parameters();
-	private String n3Text;
+	private String n3TextAdditions = "";
+	private String n3TextRetractions = "";
 	private ModelComponent templateModel;
 
-    // region @Property Setters
+	// region @Property Setters
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-    public void addRequiredParameter(Parameter param) {
-        requiredParams.add(param);
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+	public void addRequiredParameter(Parameter param) {
+		requiredParams.add(param);
+	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setTemplateModel(ModelComponent templateModel){ this.templateModel = templateModel; }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3Text", minOccurs = 1, maxOccurs = 1)
-    public void setN3Text(String n3Text) {
-        this.n3Text = n3Text;
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
+	public void setN3TextAdditions(String n3TextAdditions) {
+		this.n3TextAdditions = n3TextAdditions;
+	}
 
-    // endregion
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions", minOccurs = 0, maxOccurs = 1)
+	public void setN3TextRetractions(String n3TextRetractions) {
+		this.n3TextRetractions = n3TextRetractions;
+	}
 
-    // region Getters
+	// endregion
 
-    @Override
-    public Parameters getRequiredParams() {
-        return requiredParams;
-    }
+	// region Getters
+
+	@Override
+	public Parameters getRequiredParams() {
+		return requiredParams;
+	}
 
 	@Override
 	public Parameters getProvidedParams() {
 		return new Parameters();
 	}
 
-	public String getN3Text() { return this.n3Text; }
+	public String getN3TextAdditions() { return this.n3TextAdditions; }
+
+	public String getN3TextRetractions() { return this.n3TextRetractions; }
 
 	//endregion
 
@@ -61,31 +68,39 @@ public class N3Template extends Operation implements Template {
 			return new OperationResult(500);
 		}
 
-		String substitutedN3Template;
+		String substitutedN3AdditionsTemplate;
+		String substitutedN3RetractionsTemplate;
 		try {
-			substitutedN3Template=insertParameters(input);
+			substitutedN3AdditionsTemplate = insertParameters(input, n3TextAdditions);
+			substitutedN3RetractionsTemplate = insertParameters(input, n3TextRetractions);
 		}catch (InputMismatchException e){
 			log.error(e);
 			return new OperationResult(500);
 		}
 
 		List<Model> additionModels;
+		List<Model> retractionModels;
 		try {
-			additionModels = ProcessRdfForm.parseN3ToRDF(Arrays.asList(substitutedN3Template), ProcessRdfForm.N3ParseType.REQUIRED);
+			additionModels = ProcessRdfForm.parseN3ToRDF(
+					Arrays.asList(substitutedN3AdditionsTemplate),
+					ProcessRdfForm.N3ParseType.REQUIRED);
+
+			retractionModels = ProcessRdfForm.parseN3ToRDF(
+					Arrays.asList(substitutedN3RetractionsTemplate),
+					ProcessRdfForm.N3ParseType.REQUIRED);
 		} catch (Exception e) {
-			log.error("Error while trying to parse N3Template string and create a Jena rdf Model");
-			log.error(e);
+			log.error("Error while trying to parse N3Template string and create a Jena rdf Model", e);
 			return new OperationResult(500);
 		}
 
-		AdditionsAndRetractions changes = new AdditionsAndRetractions(additionModels, new ArrayList<Model>());
+		AdditionsAndRetractions changes = new AdditionsAndRetractions(additionModels, retractionModels);
 		Model writeModel = ModelAccess.on(input.getContext()).getOntModel(templateModel.getName());
 		ProcessRdfForm.applyChangesToWriteModel(changes, null, writeModel,"");
 
 		return new OperationResult(200);
 	}
 
-	private String insertParameters(OperationData input) throws InputMismatchException{
+	private String insertParameters(OperationData input, String n3Text) throws InputMismatchException{
 
 		EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
 
