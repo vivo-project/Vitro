@@ -1,0 +1,14 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/API1>
+        a                                   dynapi:api ;
+        rdfs:label                          "API for VIVO"@en-US ;
+        dynapi:title                        "API for VIVO" ;
+        dynapi:description                  "This is an API for VIVO" ;
+        dynapi:version                      "1.0.0" .
