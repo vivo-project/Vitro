@@ -115,7 +115,7 @@ public class RESTEndpoint extends VitroHttpServlet {
             }
         } else {
             try {
-                rpc = resourceAPI.getRestRPC(method);
+                rpc = resourceAPI.getRestRPC(method, requestPath.isResourceRequest());
             } catch (UnsupportedOperationException e) {
                 log.error(format("Method %s not implemented for resource %s", method, key), e);
                 OperationResult.methodNotAllowed().prepareResponse(response);
