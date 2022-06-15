@@ -7,10 +7,15 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ArrayData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
+import org.apache.http.HttpRequest;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -27,9 +32,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
+import stubs.javax.servlet.http.HttpServletRequestStub;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -238,7 +246,6 @@ public class N3TemplateTest extends ServletContextTest {
         assertEquals(0,writeModel.getGraph().size());
     }
 
-
     @Test
     public void loadAndExecuteN3operationWithAdditionAndRetraction() throws IOException, ConfigurationBeanLoaderException {
         loadDefaultModel();
@@ -298,5 +305,24 @@ public class N3TemplateTest extends ServletContextTest {
                 NodeFactory.createLiteral("Bike"))
         );
 
+    }
+
+    @Test
+    public void testActionWithObjectsAsParameters() throws IOException, ConfigurationBeanLoaderException {
+        String testDataPath = "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-sparql-n3-complex-action.n3";
+
+        loadDefaultModel();
+        loadModels(testDataPath.split("\\.")[1],testDataPath);
+
+        String n3_uri="https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteDynamicActionN3Template";
+        N3Template n3Template = loader.loadInstance(n3_uri, N3Template.class);
+        assertNotNull(n3Template);
+        assertEquals(1, n3Template.getRequiredParams().size());
+
+        when(input.has("actionForDeleting")).thenReturn(true);
+        when(input.get("?actionForDeleting.0.uri")).thenReturn(new String[]{"http://Joe"});
+        when(input.get("?actionForDeleting.0.label")).thenReturn(new String[]{"http://Bob"});
+
+        assertFalse(n3Template.run(input).hasError());
     }
 }

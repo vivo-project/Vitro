@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class N3Template extends Operation implements Template {
 
@@ -104,20 +105,32 @@ public class N3Template extends Operation implements Template {
 
 		EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
 
+		List<String> variables = getVariables(n3Text);
+
 		//Had to convert String to List<String> to be compatible with EditN3GeneratorVTwo methods
 		List<String> n3WithParameters = Arrays.asList(n3Text);
 
-		//region Substitute IRI variables
-		Map<String, List<String>> parametersToUris = requiredParams.getUrisMap(input);
+		Map<String, List<String>> parametersToValues =
+				variables.stream()
+				.map(variable -> variable.substring(1))
+				.collect(Collectors.toMap(
+						paramName -> paramName,
+						paramName -> Arrays.asList(input.get(paramName))
+		));
 
-		gen.subInMultiUris(parametersToUris, n3WithParameters);
-		//endregion
+		gen.subInMultiUris(parametersToValues, n3WithParameters);
 
-		//region Substitute other (literal) variables
-		Map<String, List<Literal>> parametersToLiterals = requiredParams.getLiteralsMap(input);
-
-		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
-		//endregion
+//		//region Substitute IRI variables
+//		Map<String, List<String>> parametersToUris = requiredParams.getUrisMap(input);
+//
+//		gen.subInMultiUris(parametersToUris, n3WithParameters);
+//		//endregion
+//
+//		//region Substitute other (literal) variables
+//		Map<String, List<Literal>> parametersToLiterals = requiredParams.getLiteralsMap(input);
+//
+//		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
+//		//endregion
 
 		//Check if any n3 variables are left without inserted value
 		String[] leftoverVariables = Arrays.stream(n3WithParameters.get(0).split(" "))
@@ -129,7 +142,11 @@ public class N3Template extends Operation implements Template {
 		return n3WithParameters.get(0);
 	}
 
-
+	private List<String> getVariables(String n3Text){
+    	return Arrays.stream(n3Text.split("\\s+"))
+				.filter(token -> token.startsWith("?"))
+				.collect(Collectors.toList());
+	}
 	@Override
 	public void dereference() {}
 
