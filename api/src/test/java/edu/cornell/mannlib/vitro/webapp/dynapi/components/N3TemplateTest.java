@@ -11,12 +11,14 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,7 +37,7 @@ import static org.junit.Assert.*;
 public class N3TemplateTest extends ServletContextTest {
 
     private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-n3template-test.n3";
-    private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/n3Template/testN3Template";
+    private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/testN3Template";
 
     private static MockedStatic<ModelAccess> modelAccess;
 
@@ -93,13 +95,14 @@ public class N3TemplateTest extends ServletContextTest {
         N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
         assertNotNull(n3Template);
         assertEquals(0, n3Template.getProvidedParams().size());
-        assertEquals(2, n3Template.getRequiredParams().size());
-        assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3Text());
+        assertEquals(3, n3Template.getRequiredParams().size());
+        assertEquals("?testSubject <http://has> ?testObject. ?testSubject2 <http://has> ?testObject", n3Template.getN3TextAdditions());
+        assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3TextRetractions());
     }
 
     @Test
     public void testNotAllN3VariablesSubstitutedWithValues(){
-        n3Template.setN3Text("?uri1 <http:has> ?literal1");
+        n3Template.setN3TextRetractions("?uri1 <http:has> ?literal1");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -117,7 +120,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testInsertMultipleUris() {
         when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3Text("?uri1 <http:has> ?uri2");
+        n3Template.setN3TextAdditions("?uri1 <http:has> ?uri2");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -145,7 +148,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testInsertOneUriOneLiteral(){
         when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3Text("?uri1 <http:has> ?literal1");
+        n3Template.setN3TextAdditions("?uri1 <http:has> ?literal1");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -173,7 +176,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testMultipleStatements(){
         when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3Text("?uri1 <http://has> ?literal1 .\n?uri1 <http://was> ?literal2");
+        n3Template.setN3TextAdditions("?uri1 <http://has> ?literal1 .\n?uri1 <http://was> ?literal2");
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
@@ -203,5 +206,97 @@ public class N3TemplateTest extends ServletContextTest {
         assertEquals(2, writeModel.listStatements().toList().size());
         assertTrue(writeModel.containsLiteral(
                 new ResourceImpl("http://testSubject"), new PropertyImpl("http://was"),true));
+    }
+
+    @Test
+    public void testRetractionsWorkWhenModelIsEmpty() {
+        when(modelComponent.getName()).thenReturn("test");
+        n3Template.setN3TextRetractions("<http://testSubject> <http:has> <http://testObject>");
+        n3Template.setTemplateModel(modelComponent);
+
+        when(input.getContext()).thenReturn(servletContext);
+
+        assertFalse(n3Template.run(input).hasError());
+        assertTrue(writeModel.getGraph().isEmpty());
+    }
+
+    @Test
+    public void removingATriplet() {
+        when(modelComponent.getName()).thenReturn("test");
+        n3Template.setN3TextRetractions("<http://testSubject> <http:has> <http://testObject>");
+        n3Template.setTemplateModel(modelComponent);
+
+        when(input.getContext()).thenReturn(servletContext);
+
+        writeModel.add(new StatementImpl(
+                new ResourceImpl("http://testSubject"),
+                new PropertyImpl("http:has"),
+                new ResourceImpl("http://testObject"))
+        );
+        assertEquals(1,writeModel.getGraph().size());
+        assertFalse(n3Template.run(input).hasError());
+        assertEquals(0,writeModel.getGraph().size());
+    }
+
+
+    @Test
+    public void loadAndExecuteN3operationWithAdditionAndRetraction() throws IOException, ConfigurationBeanLoaderException {
+        loadDefaultModel();
+        loadModels(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
+
+        N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
+
+        when(input.has("testSubject")).thenReturn(true);
+        when(input.has("testSubject2")).thenReturn(true);
+        when(input.has("testObject")).thenReturn(true);
+        when(input.get("testSubject")).thenReturn(new String[]{"http://Joe"});
+        when(input.get("testSubject2")).thenReturn(new String[]{"http://Bob"});
+        when(input.get("testObject")).thenReturn(new String[]{"Bike"});
+        when(input.getContext()).thenReturn(servletContext);
+
+        assertFalse(n3Template.run(input).hasError());
+        assertEquals(1,writeModel.getGraph().size());
+        assertTrue(writeModel.getGraph().contains(
+                NodeFactory.createURI("http://Bob"),
+                NodeFactory.createURI("http://has"),
+                NodeFactory.createLiteral("Bike"))
+        );
+    }
+
+    @Test
+    public void loadAndExecuteN3operationMultipleTimes() throws IOException, ConfigurationBeanLoaderException {
+        loadDefaultModel();
+        loadModels(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
+
+        N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
+
+        when(input.has("testSubject")).thenReturn(true);
+        when(input.has("testSubject2")).thenReturn(true);
+        when(input.has("testObject")).thenReturn(true);
+        when(input.get("testSubject")).thenReturn(new String[]{"http://Joe"});
+        when(input.get("testSubject2")).thenReturn(new String[]{"http://Bob"});
+        when(input.get("testObject")).thenReturn(new String[]{"Bike"});
+        when(input.getContext()).thenReturn(servletContext);
+
+        assertFalse(n3Template.run(input).hasError());
+        assertEquals(1,writeModel.getGraph().size());
+        assertTrue(writeModel.getGraph().contains(
+                NodeFactory.createURI("http://Bob"),
+                NodeFactory.createURI("http://has"),
+                NodeFactory.createLiteral("Bike"))
+        );
+
+        when(input.get("testSubject")).thenReturn(new String[]{"http://Bob"});
+        when(input.get("testSubject2")).thenReturn(new String[]{"http://Mike"});
+        when(input.get("testObject")).thenReturn(new String[]{"Bike"});
+
+        assertFalse(n3Template.run(input).hasError());
+        assertEquals(1,writeModel.getGraph().size());
+        assertTrue(writeModel.getGraph().contains(
+                NodeFactory.createURI("http://Mike"),
+                NodeFactory.createURI("http://has"),
+                NodeFactory.createLiteral("Bike"))
+        );
+
     }
 }

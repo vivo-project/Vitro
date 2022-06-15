@@ -13,7 +13,8 @@ dynapi:ConditionalStep rdfs:subClassOf dynapi_java:conditions.ConditionalStep .
 
 dynapi:Step rdfs:subClassOf dynapi_java:Step .
 
-dynapi:n3Template rdfs:subClassOf dynapi_java:N3Template .
+dynapi:N3Template rdfs:subClassOf dynapi_java:N3Template,
+dynapi_java:Operation .
 
 dynapi:sparqlQuery rdfs:subClassOf dynapi_java:SPARQLQuery, dynapi_java:Operation .
 
