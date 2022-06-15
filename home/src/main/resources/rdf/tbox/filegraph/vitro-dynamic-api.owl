@@ -131,8 +131,8 @@
         <rdfs:domain>
             <owl:Class>
                 <owl:unionOf rdf:parseType="Collection">
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQuery"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#template"/>
                 </owl:unionOf>
             </owl:Class>
         </rdfs:domain>
@@ -262,8 +262,8 @@
         <rdfs:domain>
             <owl:Class>
                 <owl:unionOf rdf:parseType="Collection">
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
                 </owl:unionOf>
             </owl:Class>
         </rdfs:domain>
@@ -406,13 +406,13 @@
         <rdfs:domain>
             <owl:Class>
                 <owl:unionOf rdf:parseType="Collection">
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#model"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#model"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#parameterType"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#httpMethod"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#customRESTAction"/>
                 </owl:unionOf>
             </owl:Class>
         </rdfs:domain>
@@ -460,8 +460,8 @@
         <rdfs:domain>
             <owl:Class>
                 <owl:unionOf rdf:parseType="Collection">
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
                 </owl:unionOf>
             </owl:Class>
         </rdfs:domain>
@@ -474,8 +474,8 @@
         <rdfs:domain>
             <owl:Class>
                 <owl:unionOf rdf:parseType="Collection">
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
                 </owl:unionOf>
             </owl:Class>
         </rdfs:domain>
@@ -495,9 +495,9 @@
         <rdfs:domain>
             <owl:Class>
                 <owl:unionOf rdf:parseType="Collection">
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#api"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
-                    <rdfs:domain rdf:resource="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#api"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#rpc"/>
+                    <owl:Class rdf:about=="https://vivoweb.org/ontology/vitro-dynamic-api#parameter"/>
                 </owl:unionOf>
             </owl:Class>
         </rdfs:domain>
