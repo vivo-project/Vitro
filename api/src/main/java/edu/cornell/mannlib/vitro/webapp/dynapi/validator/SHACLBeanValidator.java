@@ -8,8 +8,10 @@ import java.util.Set;
 
 public class SHACLBeanValidator extends SHACLValidator {
 
-    public SHACLBeanValidator(Model data, Model scheme){
-        super(data, scheme);
+    private static final String JAVA_BINDING_PREFIX = "java:edu.cornell.mannlib.vitro.webapp.dynapi.components";
+
+    public SHACLBeanValidator(Model data, Model scheme, String rootUri){
+        super(data, scheme, rootUri);
         queryText = "PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
                 "PREFIX rdfs:     <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 "PREFIX xsd:      <http://www.w3.org/2001/XMLSchema#>\n" +
@@ -94,12 +96,14 @@ public class SHACLBeanValidator extends SHACLValidator {
     @Override
     protected boolean shouldBeValidated(Resource resource){
         boolean retVal = false;
-        Set<Statement> properties = resource.listProperties().toSet();
-        for (Statement statement : properties) {
-            if (statement.getPredicate().getLocalName().equals("type")) {
-                if (statement.getObject().toString().contains("java:")) {
-                    retVal = true;
-                    break;
+        if (!map.containsKey(resource.getURI())) {
+            Set<Statement> properties = resource.listProperties().toSet();
+            for (Statement statement : properties) {
+                if (statement.getPredicate().getLocalName().equals("type")) {
+                    if (statement.getObject().toString().contains(SHACLBeanValidator.JAVA_BINDING_PREFIX)) {
+                        retVal = true;
+                        break;
+                    }
                 }
             }
         }

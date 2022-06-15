@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versionable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Versioned;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.ModelValidator;
 
-public abstract class VersionableAbstractPool<K extends Versioned, C extends Versionable<K>, P extends Pool<K, C>>
-        extends AbstractPool<K, C, P> {
+public abstract class VersionableAbstractPool<K extends Versioned, C extends Versionable<K>, P extends Pool<K, C>, V extends ModelValidator>
+        extends AbstractPool<K, C, P, V> {
 
     public Collection<C> getComponents(Version version) {
         return getComponents()

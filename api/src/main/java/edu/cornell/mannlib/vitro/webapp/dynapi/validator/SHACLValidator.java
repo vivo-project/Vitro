@@ -16,23 +16,26 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SHACLValidator implements ModelValidator {
 
     private final Log log = LogFactory.getLog(this.getClass());
 
+    private static final String SHACL_PREFIX = "http://www.w3.org/ns/shacl";
+
     protected String queryText;
 
-    protected final Model data;
-    protected final Model scheme;
+    protected Model data;
+    protected Model scheme;
     protected Map<String, Resource> map;
 
-    public SHACLValidator(Model data, Model scheme){
+    public SHACLValidator(Model data, Model scheme, String rootUri){
         this.data = data;
-        this.scheme = scheme;
+        map = new HashMap<String, Resource>();
+        this.scheme = (rootUri!=null)   ?
+                    collectConstraintsByNavigatingJavaModel(JenaUtil.createMemoryModel().union(scheme).getResource(rootUri))    :
+                    JenaUtil.createMemoryModel().union(scheme);
         queryText = "PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
                 "PREFIX rdfs:     <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 "PREFIX xsd:      <http://www.w3.org/2001/XMLSchema#>\n" +
@@ -120,9 +123,6 @@ public class SHACLValidator implements ModelValidator {
         dataModel.add(data.getResource(uri).listProperties());
         Resource report = ValidationUtil.validateModel(dataModel, scheme, true);
 
-        if (report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() != 0) {
-            log.warn(ModelPrinter.get().print(report.getModel()));
-        }
         return report;
     }
 
@@ -150,9 +150,9 @@ public class SHACLValidator implements ModelValidator {
     }
 
     private Model collectResourceAndLinkedObjectsByNavigatingJavaModel(String uri){
-        Model dataModel = JenaUtil.createMemoryModel();;
+        Model dataModel = JenaUtil.createMemoryModel();
         clean();
-        collectHierarchy(data.getResource(uri));
+        collectDataForValidation(data.getResource(uri));
 
         for(Resource resource:map.values()) {
             dataModel.add(resource.listProperties());
@@ -160,39 +160,67 @@ public class SHACLValidator implements ModelValidator {
         return dataModel;
     }
 
-    protected boolean shouldBeValidated(Resource resource){
-        return !map.containsKey(resource.getURI());
-    }
-
-    private void collectHierarchy(Resource resource){
+    private void collectDataForValidation(Resource resource){
         if(shouldBeValidated(resource)){
             map.put(resource.getURI(), resource);
             Set<Statement> properties = resource.listProperties().toSet();
             for (Statement statement : properties) {
                 if (statement.getObject().isResource()) {
-                    collectHierarchy(statement.getObject().asResource());
+                    collectDataForValidation(statement.getObject().asResource());
                 }
             }
         }
     }
 
+    protected boolean shouldBeValidated(Resource resource){
+        return !map.containsKey(resource.getURI());
+    }
+
+    private Model collectConstraintsByNavigatingJavaModel(Resource rootResource){
+        clean();
+        collectConstraints(rootResource);
+
+        Model schemeModel = JenaUtil.createMemoryModel();
+        for(Resource resource:map.values()) {
+            schemeModel.add(resource.listProperties());
+        }
+        return schemeModel;
+    }
+
+    private void collectConstraints(Resource resource){
+        if(shouldBeAConstraint(resource)){
+            map.put(resource.getURI(), resource);
+            Set<Statement> properties = resource.listProperties().toSet();
+            for (Statement statement : properties) {
+                if (statement.getObject().isResource()) {
+                    collectConstraints(statement.getObject().asResource());
+                }
+            }
+        }
+    }
+
+    protected boolean shouldBeAConstraint(Resource resource){
+        boolean retVal = !map.containsKey(resource.getURI());
+        if (retVal) {
+            retVal = false;
+            Set<Statement> properties = resource.listProperties().toSet();
+            for (Statement statement : properties) {
+                if (statement.getPredicate().getLocalName().equals("type")) {
+                    if (statement.getObject().toString().contains(SHACLValidator.SHACL_PREFIX)) {
+                        retVal = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return retVal;
+    }
+
     private Resource validateResourceAndLinkedObjects(String uri, boolean sparql) throws InterruptedException {
-//        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-//        System.out.println(uri);
-//        System.out.println("start creation of model: " + dateFormat.format(new Date()));
         Model dataModel = (sparql)?collectResourceAndLinkedObjectsBySparqlQuery(uri):collectResourceAndLinkedObjectsByNavigatingJavaModel(uri);
-//        System.out.println("end creation of model: " + dateFormat.format(new Date()));
-//        System.out.println("dataModel size: " + dataModel.listStatements().toSet().size());
-//        for (Statement statement: dataModel.listStatements().toSet()
-//             ) {
-//            System.out.println(statement.toString());
-//        }
 
         Resource report = ValidationUtil.validateModel(dataModel, scheme, true);
 
-        if (report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() != 0) {
-            log.warn(ModelPrinter.get().print(report.getModel()));
-        }
         return report;
     }
 
@@ -206,9 +234,6 @@ public class SHACLValidator implements ModelValidator {
 
         Resource report = ValidationUtil.validateModel(dataModel.union(data), scheme, true);
 
-        if (report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() != 0) {
-            log.warn(ModelPrinter.get().print(report.getModel()));
-        }
         return report;
     }
 
@@ -220,7 +245,14 @@ public class SHACLValidator implements ModelValidator {
         } catch (InterruptedException e) {
             log.warn("Validation of the resource " + uri + " has been interrupted.", e);
         }
-        return report != null && report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() == 0;
+        if (report == null) {
+            return false;
+        } else if (report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() != 0) {
+            log.warn(ModelPrinter.get().print(report.getModel()));
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -231,7 +263,14 @@ public class SHACLValidator implements ModelValidator {
         } catch (IOException e) {
             log.warn("File " + path + " can't be read.", e);
         }
-        return report != null && report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() == 0;
+        if (report == null) {
+            return false;
+        } else if (report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() != 0) {
+            log.warn(ModelPrinter.get().print(report.getModel()));
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

@@ -247,7 +247,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        modelValidator = new SHACLBeanValidator(ontModel, schemeModel);
+        modelValidator = new SHACLBeanValidator(ontModel, schemeModel, "https://vivoweb.org/ontology/vitro-dynamic-api#action");
 
         loadTestModel();
         loadNotValidAction();
