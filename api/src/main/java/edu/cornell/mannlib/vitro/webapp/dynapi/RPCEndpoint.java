@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static edu.cornell.mannlib.vitro.webapp.dynapi.OperationData.RESOURCE_ID;
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC_SERVLET_PATH;
 
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
@@ -32,10 +34,13 @@ public class RPCEndpoint extends VitroHttpServlet {
         ApiRequestPath requestPath = ApiRequestPath.from(request);
         if (requestPath.isValid()) {
             if (log.isDebugEnabled()) {
-                actionPool.printKeys(); 
+                actionPool.printKeys();
             }
             Action action = actionPool.get(requestPath.getActionName());
             OperationData input = new OperationData(request);
+            if (requestPath.isResourceRequest()) {
+                input.add(RESOURCE_ID, new StringData(requestPath.getResourceId()));
+            }
             try {
                 OperationResult result = action.run(input);
                 result.prepareResponse(response, ContentType.JSON.getMediaType(), action, input);

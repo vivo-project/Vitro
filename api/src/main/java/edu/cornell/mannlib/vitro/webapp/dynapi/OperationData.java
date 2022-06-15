@@ -10,8 +10,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOJsonMessageConver
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOParametersMessageConverter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
-import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 public class OperationData {
 
@@ -31,21 +29,6 @@ public class OperationData {
         data = IOJsonMessageConverter.getInstance().loadDataFromRequest(request);
         if ((data == null) || (data.getContainer().size() == 0)) {
             data = IOParametersMessageConverter.getInstance().loadDataFromRequest(request);
-        }
-        addRequestPathParameters(request);
-    }
-
-    private void addRequestPathParameters(HttpServletRequest request) {
-        if (data == null) {
-            data = new ObjectData();
-        }
-        Map<String, Data> ioDataMap = data.getContainer();
-        if (ioDataMap.get(OperationData.RESOURCE_ID) == null) {
-            ApiRequestPath requestPath = ApiRequestPath.from(request);
-            String resourceId = requestPath.getResourceId();
-            if (resourceId != null) {
-                ioDataMap.put(OperationData.RESOURCE_ID, new StringData(resourceId));
-            }
         }
     }
 
