@@ -1,12 +1,13 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.request;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.OperationData.RESOURCE_ID;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class ApiRequestPath {
 
@@ -56,7 +57,6 @@ public class ApiRequestPath {
                 if (pathParts[3].toLowerCase().startsWith("resource:")) {
                     resourceId = decode(pathParts[3]);
                     actionName = pathParts.length > 4 ? pathParts[4] : null;
-                    request.getParameterMap().put(RESOURCE_ID, new String[] { resourceId });
                 } else {
                     resourceId = null;
                     actionName = pathParts[3];
@@ -104,6 +104,10 @@ public class ApiRequestPath {
 
     public String getActionName() {
         return actionName;
+    }
+
+    public boolean isResourceRequest() {
+        return StringUtils.isNotEmpty(resourceId);
     }
 
     public boolean isValid() {
