@@ -163,20 +163,20 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
         return !clients.isEmpty();
     }
 
-    public RPC getRestRPC(String method) {
-        RPC rpc = getRestRpcByMethod(method);
+    public RPC getRestRPC(String method, boolean isResourceRequest) {
+        RPC rpc = getRestRpcByMethod(method, isResourceRequest);
         if (rpc != null) {
             return rpc;
         }
         throw new UnsupportedOperationException("Unsupported method");
     }
 
-    private RPC getRestRpcByMethod(String method) {
+    private RPC getRestRpcByMethod(String method, boolean isResourceRequest) {
         switch (method.toUpperCase()) {
             case "POST":
                 return rpcOnPost;
             case "GET":
-                return rpcOnGet;
+                return isResourceRequest ? rpcOnGet : rpcOnGetAll;
             case "DELETE":
                 return rpcOnDelete;
             case "PUT":

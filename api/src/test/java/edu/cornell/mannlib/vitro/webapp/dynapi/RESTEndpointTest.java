@@ -5,6 +5,7 @@ import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
@@ -134,13 +135,13 @@ public class RESTEndpointTest {
         when(rpc.getName()).thenReturn(testActionName);
         when(rpc.getHttpMethod()).thenReturn(httpMethod);
 
-        when(resourceAPI.getRestRPC(testMethod)).thenReturn(rpc);
+        when(resourceAPI.getRestRPC(testMethod, false)).thenReturn(rpc);
         when(resourceAPI.getCustomRestActionRPC(testActionName)).thenReturn(rpc);
         doNothing().when(resourceAPI).removeClient();
 
         run(testMethod);
 
-        verify(resourceAPI, times(testExpectedCounts[0])).getRestRPC(any());
+        verify(resourceAPI, times(testExpectedCounts[0])).getRestRPC(any(), anyBoolean());
         verify(resourceAPI, times(testExpectedCounts[1])).getCustomRestActionRPC(any());
         verify(resourceAPI, times(testExpectedCounts[2])).removeClient();
         verify(action, times(testExpectedCounts[3])).run(any());
