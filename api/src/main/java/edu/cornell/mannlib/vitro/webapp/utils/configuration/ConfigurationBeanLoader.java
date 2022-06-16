@@ -103,7 +103,6 @@ public class ConfigurationBeanLoader {
 	 */
 	private final HttpServletRequest req;
 
-
 	public ConfigurationBeanLoader(Model model) {
 		this(new LockableModel(model), null, null);
 	}
@@ -240,5 +239,4 @@ public class ConfigurationBeanLoader {
 			}
 		}
 	}
-
 }

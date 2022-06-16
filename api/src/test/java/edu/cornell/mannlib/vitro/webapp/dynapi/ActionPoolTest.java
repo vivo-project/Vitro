@@ -238,7 +238,6 @@ public class ActionPoolTest extends ServletContextTest {
         assertEquals(9, actionPool.count());
         assertEquals(0, actionPool.obsoleteCount());
 
-//        assertAction(TEST_NOT_VALID_ACTION_URI, actionPool.get(TEST_NOT_VALID_ACTION_URI));
     }
 
     @Test

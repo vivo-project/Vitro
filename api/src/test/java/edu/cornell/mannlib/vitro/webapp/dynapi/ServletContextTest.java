@@ -56,8 +56,6 @@ public abstract class ServletContextTest {
 
         contentModelAccess.setOntModel(TBOX_ASSERTIONS, schemeModel);
 
-//        modelValidator = new SHACLBeanValidator(ontModel, schemeModel);
-
         modelValidator = NullValidator.getInstance();
 
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
