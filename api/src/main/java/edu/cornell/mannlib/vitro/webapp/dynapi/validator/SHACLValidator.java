@@ -24,98 +24,33 @@ public class SHACLValidator implements ModelValidator {
 
     private static final String SHACL_PREFIX = "http://www.w3.org/ns/shacl";
 
-    protected String queryText;
+    private static final String SPARQL_QUERY = "CONSTRUCT { ?s ?p ?o }\n" +
+                                                "WHERE\n" +
+                                                "{\n" +
+                                                "  {?s ?p ?o . \n" +
+                                                "  FILTER (?s = ?uri) . }\n" +
+                                                "}\n";
+
+    protected String sparqlQuery;
 
     protected Model data;
     protected Model scheme;
     protected Map<String, Resource> map;
 
-    public SHACLValidator(Model data, Model scheme, String rootUri){
+    public SHACLValidator(Model data, Model scheme, String shaclRootUri, String sparqlQuery){
         this.data = data;
-        map = new HashMap<String, Resource>();
-        this.scheme = (rootUri!=null)   ?
-                    collectConstraintsByNavigatingJavaModel(JenaUtil.createMemoryModel().union(scheme).getResource(rootUri))    :
+        map = new HashMap<>();
+        this.scheme = (shaclRootUri!=null)   ?
+                    collectConstraintsByNavigatingJavaModel(JenaUtil.createMemoryModel().union(scheme).getResource(shaclRootUri))    :
                     JenaUtil.createMemoryModel().union(scheme);
-        queryText = "PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                "PREFIX rdfs:     <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                "PREFIX xsd:      <http://www.w3.org/2001/XMLSchema#>\n" +
-                "PREFIX owl:      <http://www.w3.org/2002/07/owl#>\n" +
-                "PREFIX swrl:     <http://www.w3.org/2003/11/swrl#>\n" +
-                "PREFIX swrlb:    <http://www.w3.org/2003/11/swrlb#>\n" +
-                "PREFIX vitro:    <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\n" +
-                "PREFIX bibo:     <http://purl.org/ontology/bibo/>\n" +
-                "PREFIX c4o:      <http://purl.org/spar/c4o/>\n" +
-                "PREFIX cito:     <http://purl.org/spar/cito/>\n" +
-                "PREFIX dcterms:  <http://purl.org/dc/terms/>\n" +
-                "PREFIX event:    <http://purl.org/NET/c4dm/event.owl#>\n" +
-                "PREFIX fabio:    <http://purl.org/spar/fabio/>\n" +
-                "PREFIX foaf:     <http://xmlns.com/foaf/0.1/>\n" +
-                "PREFIX geo:      <http://aims.fao.org/aos/geopolitical.owl#>\n" +
-                "PREFIX obo:      <http://purl.obolibrary.org/obo/>\n" +
-                "PREFIX ocrer:    <http://purl.org/net/OCRe/research.owl#>\n" +
-                "PREFIX ocresst:  <http://purl.org/net/OCRe/statistics.owl#>\n" +
-                "PREFIX ocresd:   <http://purl.org/net/OCRe/study_design.owl#>\n" +
-                "PREFIX ocresp:   <http://purl.org/net/OCRe/study_protocol.owl#>\n" +
-                "PREFIX ro:       <http://purl.obolibrary.org/obo/ro.owl#>\n" +
-                "PREFIX skos:     <http://www.w3.org/2004/02/skos/core#>\n" +
-                "PREFIX swo:      <http://www.ebi.ac.uk/efo/swo/>\n" +
-                "PREFIX vcard:    <http://www.w3.org/2006/vcard/ns#>\n" +
-                "PREFIX vitro-public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n" +
-                "PREFIX vivo:     <http://vivoweb.org/ontology/core#>\n" +
-                "PREFIX scires:   <http://vivoweb.org/ontology/scientific-research#>\n" +
-                "PREFIX vann:     <http://purl.org/vocab/vann/>\n" +
-                "PREFIX dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> \n" +
-                "\n" +
-                "#\n" +
-                "#\n" +
-                "CONSTRUCT { ?s ?p ?o }\n" +
-                "WHERE\n" +
-                "{\n" +
-                "  {?s ?p ?o. \n" +
-                "  FILTER (?s = ?uri). }\n" +
-                "  UNION\n" +
-                "  {?uri ?p1 ?s .\n" +
-                "  ?s ?p ?o. }\n" +
-                "  \tUNION \n" +
-                "  {?uri ?p1 ?o1 .\n" +
-                "    ?o1 ?p2 ?s .\n" +
-                "    ?s ?p ?o.\n" +
-                "  } \n" +
-                "  \tUNION\n" +
-                "  { ?uri ?p1 ?o1 .\n" +
-                "    ?o1 ?p2 ?o2 .\n" +
-                "    ?o2 ?p3 ?s .\n" +
-                "    ?s ?p ?o.\n" +
-                "  }\n" +
-                "   UNION\n" +
-                "  { ?uri ?p1 ?o1 .\n" +
-                "    ?o1 ?p2 ?o2 .\n" +
-                "    ?o2 ?p3 ?o3 .\n" +
-                "    ?o3 ?p4 ?s .\n" +
-                "    ?s ?p ?o.\n" +
-                "  }\n" +
-                "  UNION\n" +
-                "  { ?uri ?p1 ?o1 .\n" +
-                "    ?o1 ?p2 ?o2 .\n" +
-                "    ?o2 ?p3 ?o3 .\n" +
-                "    ?o3 ?p4 ?o4 .\n" +
-                "     ?o4 ?p5 ?s .\n" +
-                "    ?s ?p ?o.\n" +
-                "  }\n" +
-                "  UNION\n" +
-                "  { ?uri ?p1 ?o1 .\n" +
-                "    ?o1 ?p2 ?o2 .\n" +
-                "    ?o2 ?p3 ?o3 .\n" +
-                "    ?o3 ?p4 ?o4 .\n" +
-                "     ?o4 ?p5 ?o5 .\n" +
-                "     ?o5 ?p6 ?s .\n" +
-                "    ?s ?p ?o.\n" +
-                "  }\n" +
-                "}\n";
+        this.sparqlQuery = (sparqlQuery!=null)?
+                                sparqlQuery :
+                                SHACLValidator.SPARQL_QUERY;
+
     }
 
     private void clean(){
-        map = new HashMap<String, Resource>();
+        map = new HashMap<>();
     }
 
     private Resource validateResource(String uri) {
@@ -130,7 +65,7 @@ public class SHACLValidator implements ModelValidator {
         Model dataModel = null;
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setIri("uri", IRIFactory.uriImplementation().construct(uri));
-        pss.setCommandText(queryText);
+        pss.setCommandText(sparqlQuery);
         data.enterCriticalSection(Lock.READ);
         try {
             QueryExecution qexec = QueryExecutionFactory.create(pss.toString(), data);
@@ -216,7 +151,7 @@ public class SHACLValidator implements ModelValidator {
         return retVal;
     }
 
-    private Resource validateResourceAndLinkedObjects(String uri, boolean sparql) throws InterruptedException {
+    private Resource validateResourceAndLinkedObjects(String uri, boolean sparql) {
         Model dataModel = (sparql)?collectResourceAndLinkedObjectsBySparqlQuery(uri):collectResourceAndLinkedObjectsByNavigatingJavaModel(uri);
 
         Resource report = ValidationUtil.validateModel(dataModel, scheme, true);
@@ -240,11 +175,7 @@ public class SHACLValidator implements ModelValidator {
     @Override
     public boolean isValidResource(String uri, boolean deepCheck){
         Resource report = null;
-        try {
-            report = (deepCheck)?validateResourceAndLinkedObjects(uri, false):validateResource(uri);
-        } catch (InterruptedException e) {
-            log.warn("Validation of the resource " + uri + " has been interrupted.", e);
-        }
+        report = (deepCheck)?validateResourceAndLinkedObjects(uri, false):validateResource(uri);
         if (report == null) {
             return false;
         } else if (report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() != 0) {

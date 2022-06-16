@@ -247,7 +247,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        modelValidator = new SHACLBeanValidator(ontModel, schemeModel, "https://vivoweb.org/ontology/vitro-dynamic-api#action");
+        modelValidator = new SHACLBeanValidator(ontModel, schemeModel, "https://vivoweb.org/ontology/vitro-dynamic-api#action", null);
 
         loadTestModel();
         loadNotValidAction();
@@ -366,9 +366,9 @@ public class ActionPoolTest extends ServletContextTest {
     private ActionPool initWithDefaultModelWithoutValidation() throws IOException {
         loadDefaultModel();
 
-        ActionPool actionPool = ActionPool.getInstance();
+        ActionPool actionPool = ActionPoolNullValidator.getInstance();
 
-        actionPool.initWithoutValidation(servletContext);
+        actionPool.init(servletContext);
 
         return actionPool;
     }

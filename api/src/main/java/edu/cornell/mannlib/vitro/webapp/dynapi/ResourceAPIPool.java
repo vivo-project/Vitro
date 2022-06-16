@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.validator.ModelValidator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.validator.SHACLActionBeanValidator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.validator.SHACLBeanValidator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.validator.SHACLResourceAPIBeanValidator;
@@ -15,7 +16,7 @@ import javax.servlet.ServletContext;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 
-public class ResourceAPIPool extends VersionableAbstractPool<ResourceAPIKey, ResourceAPI, ResourceAPIPool, SHACLResourceAPIBeanValidator> {
+public class ResourceAPIPool extends VersionableAbstractPool<ResourceAPIKey, ResourceAPI, ResourceAPIPool> {
 
     private static ResourceAPIPool INSTANCE = new ResourceAPIPool();
 
@@ -39,7 +40,7 @@ public class ResourceAPIPool extends VersionableAbstractPool<ResourceAPIKey, Res
     }
 
     @Override
-    public SHACLResourceAPIBeanValidator getValidator(Model data, Model scheme) {
+    public ModelValidator getValidator(Model data, Model scheme) {
         return new SHACLResourceAPIBeanValidator(data, scheme);
     }
 }
