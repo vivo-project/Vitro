@@ -31,12 +31,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
-import stubs.javax.servlet.http.HttpServletRequestStub;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -309,7 +306,7 @@ public class N3TemplateTest extends ServletContextTest {
 
     @Test
     public void testActionWithObjectsAsParameters() throws IOException, ConfigurationBeanLoaderException {
-        String testDataPath = "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-sparql-n3-complex-action.n3";
+        String testDataPath = "src/test/resources/rdf/abox/filegraph/dyn-api-geolocation-crud-endpoints.n3";
 
         loadDefaultModel();
         loadModels(testDataPath.split("\\.")[1],testDataPath);
@@ -320,8 +317,9 @@ public class N3TemplateTest extends ServletContextTest {
         assertEquals(1, n3Template.getRequiredParams().size());
 
         when(input.has("actionForDeleting")).thenReturn(true);
-        when(input.get("?actionForDeleting.0.uri")).thenReturn(new String[]{"http://Joe"});
-        when(input.get("?actionForDeleting.0.label")).thenReturn(new String[]{"http://Bob"});
+        when(input.get("actionForDeleting.0.uri")).thenReturn(new String[]{"http://Joe"});
+        when(input.get("actionForDeleting.0.label")).thenReturn(new String[]{"test_label"});
+        when(input.getContext()).thenReturn(servletContext);
 
         assertFalse(n3Template.run(input).hasError());
     }

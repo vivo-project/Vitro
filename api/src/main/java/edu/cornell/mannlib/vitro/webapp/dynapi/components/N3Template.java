@@ -6,15 +6,19 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class N3Template extends Operation implements Template {
+
+	private static final String ANY_URI="http://www.w3.org/2001/XMLSchema#anyURI";
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
@@ -110,16 +114,42 @@ public class N3Template extends Operation implements Template {
 		//Had to convert String to List<String> to be compatible with EditN3GeneratorVTwo methods
 		List<String> n3WithParameters = Arrays.asList(n3Text);
 
-		Map<String, List<String>> parametersToValues =
-				variables.stream()
-				.map(variable -> variable.substring(1))
-				.collect(Collectors.toMap(
-						paramName -> paramName,
-						paramName -> Arrays.asList(input.get(paramName))
-		));
+		Map<String, List<String>> uriParametersToValues;
+		try {
+			uriParametersToValues =
+					variables.stream()
+							.map(variable -> variable.substring(1))
+							.distinct()
+							.filter(paramName -> requiredParams.get(paramName).getRDFDataType().getURI().equals(ANY_URI))
+							.collect(Collectors.toMap(
+									paramName -> paramName,
+									paramName -> Arrays.asList(input.get(paramName))
+							));
+		} catch (Exception e){
+			throw new InputMismatchException("Some N3 template variables dont have corresponding input parameters " +
+					"with values that should be inserted in their place.");
+		}
+		gen.subInMultiUris(uriParametersToValues, n3WithParameters);
 
-		gen.subInMultiUris(parametersToValues, n3WithParameters);
-
+		Map<String, List<Literal>> literalParametersToValues;
+		try {
+			literalParametersToValues =
+					variables.stream()
+							.map(variable -> variable.substring(1))
+							.distinct()
+							.filter(paramName -> !requiredParams.get(paramName).getRDFDataType().getURI().equals(ANY_URI))
+							.collect(Collectors.toMap(
+									paramName -> paramName,
+									paramName -> Arrays.asList(ResourceFactory.createTypedLiteral(
+											input.get(paramName)[0],
+											requiredParams.get(paramName).getRDFDataType()
+									))
+							));
+		} catch (Exception e){
+			throw new InputMismatchException("Some N3 template variables dont have corresponding input parameters " +
+					"with values that should be inserted in their place.");
+		}
+		gen.subInMultiLiterals(literalParametersToValues, n3WithParameters);
 //		//region Substitute IRI variables
 //		Map<String, List<String>> parametersToUris = requiredParams.getUrisMap(input);
 //
@@ -145,6 +175,7 @@ public class N3Template extends Operation implements Template {
 	private List<String> getVariables(String n3Text){
     	return Arrays.stream(n3Text.split("\\s+"))
 				.filter(token -> token.startsWith("?"))
+				.map(token -> StringUtils.stripEnd(token, ".,"))
 				.collect(Collectors.toList());
 	}
 	@Override

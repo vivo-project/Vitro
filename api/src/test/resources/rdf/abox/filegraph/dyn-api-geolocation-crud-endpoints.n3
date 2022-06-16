@@ -153,7 +153,7 @@
         rdfs:label                          "dynamic action for deleting"@en-US ;
         dynapi:name                         "actionForDeleting" ;
         dynapi:description                  "List of available dynamic actions" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uriLabelObjectType> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>
         a                        dynapi:parameter ;
