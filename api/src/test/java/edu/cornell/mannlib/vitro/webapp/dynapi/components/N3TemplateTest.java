@@ -15,7 +15,6 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
-import org.apache.http.HttpRequest;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -245,6 +244,7 @@ public class N3TemplateTest extends ServletContextTest {
         assertFalse(n3Template.run(input).hasError());
         assertEquals(0,writeModel.getGraph().size());
     }
+
 
     @Test
     public void loadAndExecuteN3operationWithAdditionAndRetraction() throws IOException, ConfigurationBeanLoaderException {
