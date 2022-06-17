@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.IntegerData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
@@ -30,6 +32,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -82,6 +85,9 @@ public class SPARQLQueryTest extends ServletContextTest{
 
     SPARQLQuery sparqlQuery;
 
+    @Mock
+    private HttpServletRequest request;
+
 
 
 
@@ -111,7 +117,8 @@ public class SPARQLQueryTest extends ServletContextTest{
         when(ModelAccess.on(any(ServletContext.class))).thenReturn(contextModelAccess);
         this.queryModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
 
-        when(contextModelAccess.getOntModel(any(String.class))).thenReturn(this.queryModel);
+        when(request.getServletContext()).thenReturn(servletContext);
+
         this.sparqlQuery.setQueryModel(modelComponent);
         this.select_pss = new ParameterizedSparqlString();
         this.ask_pss = new ParameterizedSparqlString();
@@ -146,7 +153,7 @@ public class SPARQLQueryTest extends ServletContextTest{
     @Test
     public void testNotAllvariablessubstitutedWithValues() {
         // SELECT query
-        when(modelComponent.getName()).thenReturn("test");
+
         sparqlQuery.setQueryModel(modelComponent);
         sparqlQuery.setQueryText("SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit");
 
@@ -154,13 +161,24 @@ public class SPARQLQueryTest extends ServletContextTest{
         param1.setParamType(anyURI);
         param1.setName("action");
 
-        sparqlQuery.addRequiredParameter(param1);
+        Parameter param2 = new Parameter();
+        param2.setParamType(stringType);
+        param2.setName("label");
 
-        when(inputOutput.has(any(String.class))).thenReturn(true);
-        when(inputOutput.get("action")).thenReturn(new String[]{"http://action"});
+        Parameter param3 = new Parameter();
+        param3.setParamType(integerType);
+        param3.setName("limit");
+
+
+        sparqlQuery.addRequiredParameter(param1);
+        sparqlQuery.addRequiredParameter(param2);
+        sparqlQuery.addRequiredParameter(param3);
+
+        inputOutput= new OperationData(request);
+        inputOutput.add("action", new StringData("labelstring"));
+        inputOutput.add("limit", new IntegerData(3));
 
         assertTrue(sparqlQuery.run(inputOutput).hasError());
-
 
     }
 
