@@ -50,7 +50,7 @@
         dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
         dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/geolocationForDeleting> ;
-        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = ?resource_id) \n}" .
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = IRI(?resource_id)) \n}" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteGeolocationStep2>
         a                        			dynapi:Step, dynapi:operationalStep ;
@@ -196,7 +196,7 @@
         dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
         dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/geolocations> ;
-        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = ?resource_id) \n}" .
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = IRI(?resource_id)) \n}" .
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/updateGeolocation>
