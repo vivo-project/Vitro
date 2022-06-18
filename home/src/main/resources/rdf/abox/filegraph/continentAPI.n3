@@ -1,0 +1,376 @@
+@prefix rdf:  			<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  			<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   			<http://www.w3.org/2002/07/owl#> .
+@prefix vitro: 			<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: 		<https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: 	<java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: 			<http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  			<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  			<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   			<http://www.w3.org/2002/07/owl#> .
+@prefix vitro: 			<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: 		<https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: 	<java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: 			<http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/createContinent>
+        a                        			dynapi:action ;
+        rdfs:label               			"creation of a continent"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createContinentRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/createContinentStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/createContinentStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a continent step 1"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createContinentN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createContinentN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"create continent N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> ;
+        dynapi:N3TextAdditions   			"?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent> .\n?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label " .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/deleteContinent>
+        a                        			dynapi:action ;
+        rdfs:label               			"removing of a continent"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteContinentRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteContinentStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteContinentStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a continent"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentForDeletionSparqlQuery> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteContinentStep2>.
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentForDeletionSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read continents sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continentForDeleting> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = ?resource_id) \n}" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteContinentStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a continent"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteContinentN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteContinentN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"delete continent N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continentForDeleting> ;
+        dynapi:N3TextRetractions 			"?actionForDeleting.0.uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent> .\n?actionForDeleting.0.uri <http://www.w3.org/2000/01/rdf-schema#label> ?actionForDeleting.0.label " .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/readContinents>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching continents"@en-US ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count>;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readContinentsRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitSortByConditionalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitSortByConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading which might include limit and sortBy"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitSortByOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsSortByConditionalStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readContinentsLimitSortByCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readContinentsLimitSortByCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if limit and offset and sortBy and order are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitSortByOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read continents step with limit"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsLimitSortBySparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfContinentsOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsLimitSortBySparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read continents sparql query with limit and sort by"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ?order(??sortBy) \n LIMIT ?limit OFFSET ?offset" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsSortByConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading which might include sort by and order"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsSortByOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitConditionalStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readContinentsSortByCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readContinentsSortByCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if sort by and order are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsSortByOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read continents step with sortBy"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsSortBySparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfContinentsOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsSortBySparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read continents sparql query with sorting"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ?order(??sortBy)" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading with pagination (limit and offset)"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readContinentsLimitCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readContinentsLimitCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if limit and offset are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsLimitOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read continents step with limit"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsLimitSparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfContinentsOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsLimitSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read continents sparql query with pagination (limit and offset)"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} LIMIT ?limit OFFSET ?offset" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentsStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read continents step 1"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsSparqlQuery> ;
+		dynapi:hasNextStep						<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfContinentsOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentsSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read continents sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfContinentsOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "number of continents step "@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readNumberOfContinentsSparqlQuery> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readNumberOfContinentsSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "number of continents sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count> ;
+        dynapi:sparqlQueryText              "SELECT (count(distinct ?uri) as ?total) WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/readContinent>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching a continent"@en-US ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readContinentRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readContinentStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a continent"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentSparqlQuery> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read continents sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = ?resource_id) \n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/updateContinent>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching a continent"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateContinentRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateContinentStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateContinentStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a continent"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readContinentForDeletionSparqlQuery> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateContinentStep2> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateContinentStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a continent"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteContinentN3Template> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateContinentStep3> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateContinentStep3>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a continent"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createContinentN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "continents"@en-US ;
+        dynapi:name                         "result" ;
+        dynapi:description                  "List of available continents and number" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Result (uri, label) array type"@en-US ;
+        dynapi:name                         "array of results" ;
+        dynapi:hasElementsOfType 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uriLabelObjectType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uriLabelObjectType>
+        a                                   dynapi:parameterType ,
+											dynapi:objectParameterType ,
+											dynapi_java:types.ParameterType ,
+											dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Data (uri, label) object type"@en-US ;
+        dynapi:name                         "object uri label" ;
+        dynapi:hasInternalElement 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri> ,
+											<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Number of fetched continents"@en-US ;
+        dynapi:name                         "count" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultCountArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultCountArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Result (uri, label) array type"@en-US ;
+        dynapi:name                         "array of total numbers" ;
+        dynapi:hasElementsOfType 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/totalCountObjectType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/totalCountObjectType>
+        a                                   dynapi:parameterType ,
+											dynapi:objectParameterType ,
+											dynapi_java:types.ParameterType ,
+											dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Counts (total) object type"@en-US ;
+        dynapi:name                         "object" ;
+        dynapi:hasInternalElement 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/total> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continentForDeleting>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "continent for deleting"@en-US ;
+        dynapi:name                         "actionForDeleting" ;
+        dynapi:description                  "List of available continents" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>
+        a                       			dynapi:parameter ;
+        dynapi:name             			"uri" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label              			"uri"@en-US .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"label" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               			"label"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"resource_id" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               			"resource uri"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/total>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"total" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"total"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"limit" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"limit"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"offset" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"offset"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"sortBy" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               			"sortBy"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"order" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               			"order"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createContinentRPC>
+        a                            		dynapi:rpc ;
+        rdfs:label                     		"remote procedure call endpoint for creation of a continent"@en-US ;
+        dynapi:name                   		"remote procedure call endpoint for creation of a continent" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:minAPIVersionMin      		"1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteContinentRPC>
+        a                            		dynapi:rpc ;
+        rdfs:label                     		"remote procedure call endpoint for removing of a continent"@en-US ;
+        dynapi:name                   		"remote procedure call endpoint for removing of a continent" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:minAPIVersionMin      		"1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readContinentRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for fetching a continent"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for fetching a continent" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateContinentRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for updating a continent"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for updating a continent" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readContinentsRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for fetching continents"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for fetching continents" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/continent>
+        a                                   dynapi:resourceAPI ;
+        rdfs:label                          "continent resourceAPI 1"@en-US ;
+        dynapi:name                         "continent" ;
+        dynapi:minAPIVersion                "1.0.0" ;
+        dynapi:onPost 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createContinentRPC> ;
+        dynapi:onDelete 					<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteContinentRPC> ;
+        dynapi:onGet 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readContinentRPC> ;
+        dynapi:onPut 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateContinentRPC> ;
+        dynapi:onGetAll 					<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readContinentsRPC> .

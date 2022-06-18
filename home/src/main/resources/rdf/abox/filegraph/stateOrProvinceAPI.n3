@@ -1,0 +1,376 @@
+@prefix rdf:  			<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  			<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   			<http://www.w3.org/2002/07/owl#> .
+@prefix vitro: 			<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: 		<https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: 	<java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: 			<http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  			<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  			<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   			<http://www.w3.org/2002/07/owl#> .
+@prefix vitro: 			<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: 		<https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: 	<java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: 			<http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/createStateOrProvince>
+        a                        			dynapi:action ;
+        rdfs:label               			"creation of a stateOrProvince"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createStateOrProvinceRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/createStateOrProvinceStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/createStateOrProvinceStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a stateOrProvince step 1"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createStateOrProvinceN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createStateOrProvinceN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"create stateOrProvince N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> ;
+        dynapi:N3TextAdditions   			"?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince> .\n?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label " .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/deleteStateOrProvince>
+        a                        			dynapi:action ;
+        rdfs:label               			"removing of a stateOrProvince"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteStateOrProvinceRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteStateOrProvinceStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteStateOrProvinceStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a stateOrProvince"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvinceForDeletionSparqlQuery> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteStateOrProvinceStep2>.
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvinceForDeletionSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read stateOrProvinces sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinceForDeleting> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = ?resource_id) \n}" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteStateOrProvinceStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a stateOrProvince"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteStateOrProvinceN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteStateOrProvinceN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"delete stateOrProvince N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinceForDeleting> ;
+        dynapi:N3TextRetractions 			"?actionForDeleting.0.uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince> .\n?actionForDeleting.0.uri <http://www.w3.org/2000/01/rdf-schema#label> ?actionForDeleting.0.label " .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/readStateOrProvinces>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching stateOrProvinces"@en-US ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count>;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readStateOrProvincesRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitSortByConditionalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitSortByConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading which might include limit and sortBy"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitSortByOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesSortByConditionalStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readStateOrProvincesLimitSortByCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readStateOrProvincesLimitSortByCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if limit and offset and sortBy and order are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitSortByOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read stateOrProvinces step with limit"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesLimitSortBySparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfStateOrProvincesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesLimitSortBySparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read stateOrProvinces sparql query with limit and sort by"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ?order(??sortBy) \n LIMIT ?limit OFFSET ?offset" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesSortByConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading which might include sort by and order"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesSortByOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitConditionalStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readStateOrProvincesSortByCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readStateOrProvincesSortByCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if sort by and order are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesSortByOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read stateOrProvinces step with sortBy"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesSortBySparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfStateOrProvincesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesSortBySparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read stateOrProvinces sparql query with sorting"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ?order(??sortBy)" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading with pagination (limit and offset)"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readStateOrProvincesLimitCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readStateOrProvincesLimitCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if limit and offset are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesLimitOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read stateOrProvinces step with limit"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesLimitSparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfStateOrProvincesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesLimitSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read stateOrProvinces sparql query with pagination (limit and offset)"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} LIMIT ?limit OFFSET ?offset" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvincesStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read stateOrProvinces step 1"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesSparqlQuery> ;
+		dynapi:hasNextStep						<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfStateOrProvincesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvincesSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read stateOrProvinces sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfStateOrProvincesOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "number of stateOrProvinces step "@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readNumberOfStateOrProvincesSparqlQuery> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readNumberOfStateOrProvincesSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "number of stateOrProvinces sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count> ;
+        dynapi:sparqlQueryText              "SELECT (count(distinct ?uri) as ?total) WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince>\n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/readStateOrProvince>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching a stateOrProvince"@en-US ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces> ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readStateOrProvinceRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvinceStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readStateOrProvinceStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a stateOrProvince"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvinceSparqlQuery> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvinceSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read stateOrProvinces sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = ?resource_id) \n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/updateStateOrProvince>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching a stateOrProvince"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateStateOrProvinceRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateStateOrProvinceStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateStateOrProvinceStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a stateOrProvince"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readStateOrProvinceForDeletionSparqlQuery> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateStateOrProvinceStep2> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateStateOrProvinceStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a stateOrProvince"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteStateOrProvinceN3Template> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateStateOrProvinceStep3> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateStateOrProvinceStep3>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a stateOrProvince"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createStateOrProvinceN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinces>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "stateOrProvinces"@en-US ;
+        dynapi:name                         "result" ;
+        dynapi:description                  "List of available stateOrProvinces and number" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Result (uri, label) array type"@en-US ;
+        dynapi:name                         "array of results" ;
+        dynapi:hasElementsOfType 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uriLabelObjectType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uriLabelObjectType>
+        a                                   dynapi:parameterType ,
+											dynapi:objectParameterType ,
+											dynapi_java:types.ParameterType ,
+											dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Data (uri, label) object type"@en-US ;
+        dynapi:name                         "object uri label" ;
+        dynapi:hasInternalElement 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri> ,
+											<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Number of fetched stateOrProvinces"@en-US ;
+        dynapi:name                         "count" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultCountArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultCountArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Result (uri, label) array type"@en-US ;
+        dynapi:name                         "array of total numbers" ;
+        dynapi:hasElementsOfType 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/totalCountObjectType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/totalCountObjectType>
+        a                                   dynapi:parameterType ,
+											dynapi:objectParameterType ,
+											dynapi_java:types.ParameterType ,
+											dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Counts (total) object type"@en-US ;
+        dynapi:name                         "object" ;
+        dynapi:hasInternalElement 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/total> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinceForDeleting>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "stateOrProvince for deleting"@en-US ;
+        dynapi:name                         "actionForDeleting" ;
+        dynapi:description                  "List of available stateOrProvinces" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>
+        a                       			dynapi:parameter ;
+        dynapi:name             			"uri" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label              			"uri"@en-US .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"label" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               			"label"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"resource_id" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               			"resource uri"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/total>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"total" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"total"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"limit" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"limit"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"offset" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"offset"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"sortBy" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               			"sortBy"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"order" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               			"order"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createStateOrProvinceRPC>
+        a                            		dynapi:rpc ;
+        rdfs:label                     		"remote procedure call endpoint for creation of a stateOrProvince"@en-US ;
+        dynapi:name                   		"remote procedure call endpoint for creation of a stateOrProvince" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:minAPIVersionMin      		"1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteStateOrProvinceRPC>
+        a                            		dynapi:rpc ;
+        rdfs:label                     		"remote procedure call endpoint for removing of a stateOrProvince"@en-US ;
+        dynapi:name                   		"remote procedure call endpoint for removing of a stateOrProvince" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:minAPIVersionMin      		"1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readStateOrProvinceRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for fetching a stateOrProvince"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for fetching a stateOrProvince" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateStateOrProvinceRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for updating a stateOrProvince"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for updating a stateOrProvince" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readStateOrProvincesRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for fetching stateOrProvinces"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for fetching stateOrProvinces" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/stateOrProvince>
+        a                                   dynapi:resourceAPI ;
+        rdfs:label                          "stateOrProvince resourceAPI 1"@en-US ;
+        dynapi:name                         "stateOrProvince" ;
+        dynapi:minAPIVersion                "1.0.0" ;
+        dynapi:onPost 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createStateOrProvinceRPC> ;
+        dynapi:onDelete 					<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteStateOrProvinceRPC> ;
+        dynapi:onGet 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readStateOrProvinceRPC> ;
+        dynapi:onPut 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateStateOrProvinceRPC> ;
+        dynapi:onGetAll 					<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readStateOrProvincesRPC> .
