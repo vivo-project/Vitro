@@ -4,7 +4,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.validator.ModelValidator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.validator.NullValidator;
 import org.apache.jena.rdf.model.Model;
 
-public class ActionPoolNullValidator extends ActionPool{
+class ActionPoolNullValidator extends ActionPool{
 
     private static ActionPoolNullValidator INSTANCE = new ActionPoolNullValidator();
 

@@ -4,7 +4,7 @@ import org.apache.jena.rdf.model.Model;
 
 public class SHACLResourceAPIBeanValidator extends SHACLBeanValidator {
 
-    private static final String RESOURCE_API_URI = "https://vivoweb.org/ontology/vitro-dynamic-api#action";
+    private static final String RESOURCE_API_URI = "https://vivoweb.org/ontology/vitro-dynamic-api#resourceAPI";
 
     private static final String SPARQL_QUERY =  "PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
                                                 "PREFIX dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>\n" +
