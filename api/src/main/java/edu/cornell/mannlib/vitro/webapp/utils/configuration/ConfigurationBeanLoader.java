@@ -148,16 +148,6 @@ public class ConfigurationBeanLoader {
 		return result;
 	}
 
-	/**
-	 * Load the instance with this URI, if it is valid and assignable to this class.
-	 */
-	public <T> T loadInstance(String uri, Class<T> resultClass, ModelValidator validator) throws ConfigurationBeanLoaderException {
-		instancesMap.clear();
-		T result = (validator.isValidResource(uri, true))?loadSubordinateInstance(uri, resultClass):null;
-		instancesMap.clear();
-		return result;
-	}
-
 	protected <T> T loadSubordinateInstance(String uri, Class<T> resultClass)
 			throws ConfigurationBeanLoaderException {
 		if (uri == null) {
@@ -205,28 +195,8 @@ public class ConfigurationBeanLoader {
 		}
 		return instances;
 	}
-	
-	/**
-	 * Find all of the resources with the specified class, and instantiate them.
-	 */
-	public <T> Set<T> loadEach(Class<T> resultClass, ModelValidator validator){
-		Set<String> uris = new HashSet<>();
-		findUris(resultClass, uris);
-		Set<T> instances = new HashSet<>();
-		for (String uri : uris) {
-			try {
-				T instance = loadInstance(uri, resultClass, validator);
-				if (instance != null) {
-					instances.add(instance);
-				}
-			} catch (ConfigurationBeanLoaderException e) {
-				log.warn(e,e);
-			}
-		}
-		return instances;
-	}
 
-	private <T> void findUris(Class<T> resultClass, Set<String> uris) {
+	public <T> void findUris(Class<T> resultClass, Set<String> uris) {
 		try (LockedModel m = locking.read()) {
 			for (String typeUri : toPossibleJavaUris(resultClass)) {
 				List<Resource> resources = m.listResourcesWithProperty(RDF.type,

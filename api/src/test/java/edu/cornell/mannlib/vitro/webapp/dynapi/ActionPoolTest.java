@@ -88,7 +88,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         loadTestModel();
 
-        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class, modelValidator);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
 
         actionPool.add(TEST_PERSON_ACTION_URI, action);
 
@@ -105,7 +105,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.reload();
 
-        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class, modelValidator);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
 
         assertEquals(0, actionPool.obsoleteCount());
 
@@ -124,7 +124,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         loadTestModel();
 
-        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class, modelValidator);
+        Action action = loader.loadInstance(TEST_PERSON_ACTION_URI, Action.class);
 
         reset();
 
