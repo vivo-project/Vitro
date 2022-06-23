@@ -27,7 +27,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createStateOrProvinceN3Template>
         a                        			dynapi:operation, dynapi:N3Template ;
         rdfs:label               			"create stateOrProvince N3 Template"@en-US ;
-        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/stateOrProvince> ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/stateOrProvinces> ;
         dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> ;
         dynapi:N3TextAdditions   			"?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince> .\n?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label " .
 
@@ -60,7 +60,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteStateOrProvinceN3Template>
         a                        			dynapi:operation, dynapi:N3Template ;
         rdfs:label               			"delete stateOrProvince N3 Template"@en-US ;
-        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/stateOrProvince> ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/stateOrProvinces> ;
         dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/stateOrProvinceForDeleting> ;
         dynapi:N3TextRetractions 			"?actionForDeleting.0.uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#StateOrProvince> .\n?actionForDeleting.0.uri <http://www.w3.org/2000/01/rdf-schema#label> ?actionForDeleting.0.label " .
 
