@@ -22,14 +22,27 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/createGeolocationStep1>
         a                        			dynapi:Step, dynapi:operationalStep ;
         rdfs:label               			"creation of a geolocation step 1"@en-US ;
-        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationN3Template> .
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationTypeN3Template> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/createGeolocationStep2>.
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationN3Template>
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationTypeN3Template>
         a                        			dynapi:operation, dynapi:N3Template ;
         rdfs:label               			"create geolocation N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/geolocations> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri> ;
+        dynapi:N3TextAdditions   			"?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation> . " .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/createGeolocationStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a geolocation step 2"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationLabelN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationLabelN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"create geolocation label N3 Template"@en-US ;
         dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
         dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> ;
-        dynapi:N3TextAdditions   			"?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation> .\n?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label " .
+        dynapi:N3TextAdditions   			"?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label " .
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/deleteGeolocation>
@@ -42,7 +55,7 @@
         a                        			dynapi:Step, dynapi:operationalStep ;
         rdfs:label               			"reading of a geolocation"@en-US ;
         dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readGeolocationForDeletionSparqlQuery> ;
-        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteGeolocationStep2>.
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteGeolocationStep2> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readGeolocationForDeletionSparqlQuery>
         a                                   dynapi:operation, dynapi:sparqlQuery ;
@@ -54,16 +67,28 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteGeolocationStep2>
         a                        			dynapi:Step, dynapi:operationalStep ;
-        rdfs:label               			"deleting of a geolocation"@en-US ;
-        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationN3Template> .
+        rdfs:label               			"deleting of a geolocation label"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationLabelN3Template> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteGeolocationStep3> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationN3Template>
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationLabelN3Template>
         a                        			dynapi:operation, dynapi:N3Template ;
-        rdfs:label               			"delete geolocation N3 Template"@en-US ;
+        rdfs:label               			"delete geolocation label N3 Template"@en-US ;
         dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
         dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/geolocationForDeleting> ;
-        dynapi:N3TextRetractions 			"?actionForDeleting.0.uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation> .\n?actionForDeleting.0.uri <http://www.w3.org/2000/01/rdf-schema#label> ?actionForDeleting.0.label " .
+        dynapi:N3TextRetractions 			"?stateOrProvinceForDeleting.0.uri <http://www.w3.org/2000/01/rdf-schema#label> ?stateOrProvinceForDeleting.0.label " .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteGeolocationStep3>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a geolocation type"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationTypeN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationTypeN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"delete geolocation type N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/geolocations> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/geolocationForDeleting> ;
+        dynapi:N3TextRetractions 			"?stateOrProvinceForDeleting.0.uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#GeographicLocation> . " .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/readGeolocations>
         a                                   dynapi:action ;
@@ -213,14 +238,26 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep2>
         a                        			dynapi:Step, dynapi:operationalStep ;
-        rdfs:label               			"deleting of a geolocation"@en-US ;
-        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationN3Template> ;
-        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep3> .
+        rdfs:label               			"deleting of a geolocation label"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationLabelN3Template> ;
+		dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep3> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep3>
         a                        			dynapi:Step, dynapi:operationalStep ;
-        rdfs:label               			"creation of a geolocation"@en-US ;
-        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationN3Template> .
+        rdfs:label               			"deleting of a geolocation type"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteGeolocationTypeN3Template> ;
+		dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep4> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep4>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a geolocation type"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationTypeN3Template> ;
+		dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep5> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateGeolocationStep5>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a geolocation label"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createGeolocationLabelN3Template> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/geolocations>
         a                                   dynapi:parameter ;
@@ -275,7 +312,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/geolocationForDeleting>
         a                                   dynapi:parameter ;
         rdfs:label                          "geolocation for deleting"@en-US ;
-        dynapi:name                         "actionForDeleting" ;
+        dynapi:name                         "stateOrProvinceForDeleting" ;
         dynapi:description                  "List of available geolocations" ;
         dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
 
@@ -327,6 +364,13 @@
         dynapi:name              			"order" ;
         dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
         rdfs:label               			"order"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/geolocations>
+        a                       dynapi:model ;
+        dynapi:name             "http://vitro.mannlib.cornell.edu/filegraph/abox/geopolitical.abox.ver1.1-11-18-11.owl" ;
+        rdfs:label              "geolocations model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createGeolocationRPC>
         a                            		dynapi:rpc ;
