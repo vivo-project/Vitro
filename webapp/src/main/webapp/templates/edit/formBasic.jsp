@@ -23,6 +23,7 @@
 	<tr><th colspan="${colspan}">
 	<div>
 		<h2>${title}</h2>
+			<span class="note">Note: This form does not support the language tags required for multi-language sites. If required, use the front-end editor.</span>
 			<c:choose>
 				<c:when test='${_action == "insert"}'>
 					<h3 class="blue">Creating New Record
