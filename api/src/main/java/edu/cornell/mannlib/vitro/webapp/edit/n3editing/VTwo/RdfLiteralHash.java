@@ -55,6 +55,10 @@ public class RdfLiteralHash {
         }else{
             if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
                 langOrDatatype = stmt.getDatatypeURI();
+                //Treat integer data type the same as int 
+                //With Jena 3.16.0 all integer literals are stored as int
+                //TODO: remove workaround when bug is resolved
+                langOrDatatype = replaceIntegerWithInt(langOrDatatype);
             }
         }
 
@@ -63,7 +67,13 @@ public class RdfLiteralHash {
             log.debug("got hash " + hashMe.hashCode() + " for String '" + hashMe + "'");
         return hashMe.hashCode();
     }
-
+    
+    private static String replaceIntegerWithInt(String predicate) {
+        if( predicate.equals("http://www.w3.org/2001/XMLSchema#integer")) {
+            predicate = "http://www.w3.org/2001/XMLSchema#int";
+        }
+        return predicate;
+    }
 
     /**
      * @param stmt Data statement
