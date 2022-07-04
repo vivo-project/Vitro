@@ -15,11 +15,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.vocabulary.XSD;
+import org.apache.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
@@ -216,7 +214,7 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 		FieldVTwo field = new FieldVTwo();
     	field.setName(literalName);
     	//queryForExisting is not being used anywhere in Field
-    	String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
+    	String rangeDatatypeUri = RDF.dtLangString.getURI();
     	String rangeLang = getRangeLang(editConfiguration, vreq);
 
     	List<String> validators = getFieldValidators(editConfiguration, vreq);
@@ -253,43 +251,13 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 	    return rangeLang;
 	}
 
-	private String getRangeDatatypeUri(EditConfigurationVTwo editConfiguration,
-			VitroRequest vreq) {
-		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
-		DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-		String rangeDatatypeUri = null;
-		//rangeDefaultJson goes into literalk options
-		//validations include dataype:rangedatatypeurijson
-		//rangeDatatypeUri is rangeDAttypeUriJson
-		//rangeLang = rangeLanJson
-	   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-	   if (dps != null) {
-
-	        rangeDatatypeUri = dps.getDatatypeURI();
-	        if (rangeDatatypeUri == null) {
-	            log.debug("no range datatype uri set on rdfs:label statement for property " + predicateUri + "in RDFSLabelGenerator");
-	        } else {
-	            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on rdfs:label statement for property " + predicateUri + "in RDFSLabelGenerator");
-	        }
-
-	    } else {
-	        log.debug("No incoming rdfs:label statement for property "+predicateUri+"; adding a new statement");
-	        rangeDatatypeUri = XSD.xstring.getURI();
-	    }
-
-	    if( rangeDatatypeUri != null && rangeDatatypeUri.trim().length() == 0)
-            rangeDatatypeUri = null;
-
-	    return rangeDatatypeUri;
-	}
-
 	private List<String> getFieldValidators(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		List<String> validatorList = new ArrayList<String>();
 		String predicateUri =EditConfigurationUtils.getPredicateUri(vreq);
 	    if (predicateUri.equals(VitroVocabulary.LABEL) || predicateUri.equals(VitroVocabulary.RDF_TYPE)) {
 	        validatorList.add("nonempty");
 	    }
-	    String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
+	    String rangeDatatypeUri = RDF.dtLangString.getURI();
 	    if (rangeDatatypeUri != null && !rangeDatatypeUri.isEmpty()) {
 	        validatorList.add("datatype:" +  rangeDatatypeUri);
 	    }
