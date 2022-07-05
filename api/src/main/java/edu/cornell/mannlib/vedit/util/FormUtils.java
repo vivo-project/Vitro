@@ -369,6 +369,9 @@ public class FormUtils {
         for (String aParam : param) {
             String[] p = aParam.split(":");
             beanParamMap.put(p[0], new String(Base64.decodeBase64(p[1].getBytes())));
+            if (p.length > 3) {
+                beanParamMap.put(p[2], new String(Base64.decodeBase64(p[3].getBytes())));
+            }
         }
         return beanParamMap;
     }

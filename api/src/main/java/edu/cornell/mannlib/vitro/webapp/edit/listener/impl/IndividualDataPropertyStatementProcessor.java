@@ -22,7 +22,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BasicValidationVTwo;
 
 public class IndividualDataPropertyStatementProcessor implements ChangeListener {
 
-	private static final Log log = LogFactory.getLog(IndividualDataPropertyStatementProcessor.class.getName());
+    private static final String LANGUAGE = "language";
+    private static final Log log = LogFactory.getLog(IndividualDataPropertyStatementProcessor.class.getName());
 
     public void doInserted(Object newObj, EditProcessObject epo) {
         processDataprops(epo);
@@ -53,6 +54,9 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
                 try {
                     Map beanParamMap = FormUtils.beanParamMapFromString(keyArg[3]);
                     String dataPropertyURI = (String) beanParamMap.get("DatatypePropertyURI");
+                    if (beanParamMap.containsKey(LANGUAGE)) {
+                        dataPropertyStmt.setLanguage((String) beanParamMap.get(LANGUAGE));
+                    }
                     if (!deletedDataPropertyURIs.contains(dataPropertyURI)) {
                         deletedDataPropertyURIs.add(dataPropertyURI);
                         dataPropertyStatementDao.deleteDataPropertyStatementsForIndividualByDataProperty(((Individual) epo.getNewBean()).getURI(), dataPropertyURI);
