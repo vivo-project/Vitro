@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -286,15 +287,14 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             ontModel.getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,ent.getURI()));
             org.apache.jena.ontology.Individual ind = ontModel.getIndividual(ent.getURI());
             if (ind != null) {
-                if (ent.getName() != null && ( (ind.getLabel(getDefaultLanguage())==null) || (ind.getLabel(getDefaultLanguage())!=null && ent.getName()!=null && !ent.getName().equals(ind.getLabel(getDefaultLanguage())) ) ) ) {
-
-                	// removal of existing values done this odd way to trigger
-                	// the change listeners
-                	Model temp = ModelFactory.createDefaultModel();
-                	temp.add(ontModel.listStatements(ind, RDFS.label, (RDFNode) null));
-                	ontModel.remove(temp);
-
-                    ind.setLabel(ent.getName(), getDefaultLanguage());
+               
+                String newLabel = ent.getName();
+                String oldLabel = ind.getLabel(getDefaultLanguage());
+                if ( newLabel != null && !newLabel.equals(oldLabel) ) {
+                    if (oldLabel == null) {
+                        oldLabel = "";
+                    }
+                    replaceOldLabelWithNewInDefaultLanguage(ontModel, ind, newLabel, oldLabel);
                 }
                 Set<String> oldTypeURIsSet = new HashSet<String>();
                 for (Iterator<Resource> typeIt = ind.listRDFTypes(true); typeIt.hasNext();) {
@@ -345,6 +345,23 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             ontModel.getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,ent.getURI()));
             ontModel.leaveCriticalSection();
         }
+    }
+
+    private void replaceOldLabelWithNewInDefaultLanguage(OntModel ontModel, org.apache.jena.ontology.Individual ind,
+        final String newLabel, final String oldLabel) {
+        Model temp = ModelFactory.createDefaultModel();
+        StmtIterator statements = ontModel.listStatements(ind, RDFS.label, (RDFNode) null);
+        while (statements.hasNext()) {
+            Statement statement = (Statement) statements.next();
+            Literal object = statement.getLiteral();
+            String lexicalForm = object.getLexicalForm();
+            String language = object.getLanguage();
+            if (oldLabel.equals(lexicalForm) && language.equals(getDefaultLanguage()) ) {
+                temp.add(statement);
+            }
+        }
+        ontModel.remove(temp);
+        ind.addLabel(newLabel, getDefaultLanguage());    
     }
 
     public void markModified(Individual ind) {

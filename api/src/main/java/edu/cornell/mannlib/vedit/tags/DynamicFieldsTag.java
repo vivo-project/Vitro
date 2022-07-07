@@ -23,9 +23,13 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.DynamicField;
 import edu.cornell.mannlib.vedit.beans.DynamicFieldRow;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+
 import edu.cornell.mannlib.vedit.tags.EditTag;
 
 public class DynamicFieldsTag extends EditTag {
+
+    private static final String LANGUAGE = "language";
 
     private char PATH_SEP = File.separatorChar;
 
@@ -175,7 +179,12 @@ public class DynamicFieldsTag extends EditTag {
                                 String key = (String) paramIt.next();
                                 String value = (String) row.getParameterMap().get(key);
                                 byte[] valueInBase64 = Base64.encodeBase64(value.getBytes());
-                                taName.append(key).append(":").append(new String(valueInBase64)).append(";");
+                                taName.append(key).append(":").append(new String(valueInBase64));
+                                if (StringUtils.isNotBlank(row.getLanguage())) {
+                                    byte[] encodedLang = Base64.encodeBase64(row.getLanguage().getBytes());
+                                    taName.append(":").append(LANGUAGE).append(":").append(new String(encodedLang));                                    
+                                }
+                                taName.append(";");
                             }
                             if (row.getValue().length() > 0) {
                                 String templateWithVars = templateMarkup;

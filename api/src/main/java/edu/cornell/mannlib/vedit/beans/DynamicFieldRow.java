@@ -8,6 +8,7 @@ public class DynamicFieldRow {
 
     private int id = -1;
     private String value = null;
+    private String language = "";
     private Map parameterMap = null;
 
     public int getId() {
@@ -34,4 +35,13 @@ public class DynamicFieldRow {
         this.parameterMap = parameterMap;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        if (language != null) {
+            this.language = language;    
+        }
+    }
 }

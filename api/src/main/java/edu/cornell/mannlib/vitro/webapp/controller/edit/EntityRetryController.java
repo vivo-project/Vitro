@@ -20,8 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.collections4.map.ListOrderedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.ctc.wstx.util.StringUtil;
 
 import edu.cornell.mannlib.vedit.beans.DynamicField;
 import edu.cornell.mannlib.vedit.beans.DynamicFieldRow;
@@ -250,7 +253,12 @@ public class EntityRetryController extends BaseEditController {
                         //TODO: UGH
                         //row.setId(existingValue.getId());
                         row.setParameterMap(parameterMap);
-                        row.setValue(existingValue.getData());
+                        String value = existingValue.getData();
+                        row.setValue(value);
+                        String language = existingValue.getLanguage();
+                        if (!StringUtils.isBlank(language)) {
+                            row.setLanguage(language);
+                        }
                         if (dynamo.getRowList() == null)
                             dynamo.setRowList(new ArrayList());
                         dynamo.getRowList().add(row);
