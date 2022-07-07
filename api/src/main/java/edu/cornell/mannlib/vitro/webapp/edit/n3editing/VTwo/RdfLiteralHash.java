@@ -35,6 +35,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class RdfLiteralHash {
 
     private static final Log log = LogFactory.getLog(RdfLiteralHash.class.getName());
+    
+    private static final String integerPattern = 
+            "^http://www.w3.org/2001/XMLSchema#int$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#long$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#short$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#unsignedByte$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#unsignedShort$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#unsignedInt$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#unsignedLong$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#nonPositiveInteger$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#nonNegativeInteger$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#positiveInteger$" + "|" +
+            "^http://www.w3.org/2001/XMLSchema#negativeInteger$";
 
     /**
      * Make a hash based on individual, property, literal and (lang or datatype).
@@ -55,10 +68,11 @@ public class RdfLiteralHash {
         }else{
             if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
                 langOrDatatype = stmt.getDatatypeURI();
-                //Treat integer data type the same as int 
-                //With Jena 3.16.0 all integer literals are stored as int
-                //TODO: remove workaround when bug is resolved
-                langOrDatatype = replaceIntegerWithInt(langOrDatatype);
+                // TDB has a bug: if given a literal of type xsd:nonNegativeInteger, it
+                // stores a literal of type xsd:integer. 
+                // Replace integer types the same way it is done in RDFServiceTDB
+                // TODO: remove workaround when bug is resolved
+                langOrDatatype = replaceIntegers(langOrDatatype);
             }
         }
 
@@ -68,10 +82,9 @@ public class RdfLiteralHash {
         return hashMe.hashCode();
     }
     
-    private static String replaceIntegerWithInt(String predicate) {
-        if( predicate.equals("http://www.w3.org/2001/XMLSchema#integer")) {
-            predicate = "http://www.w3.org/2001/XMLSchema#int";
-        }
+    
+    private static String replaceIntegers(String predicate) {
+        predicate = predicate.replaceAll(integerPattern, "http://www.w3.org/2001/XMLSchema#integer");
         return predicate;
     }
 
