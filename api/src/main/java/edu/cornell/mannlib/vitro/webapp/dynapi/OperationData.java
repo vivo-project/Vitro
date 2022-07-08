@@ -1,7 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -12,22 +11,17 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
 
 public class OperationData {
-
-    public final static String RESOURCE_ID = "resource_id";
-
-    private final Map<String, String[]> params;
+    
     private final ServletContext context;
     private ObjectData data;
-
     public OperationData(HttpServletRequest request) {
-        params = request.getParameterMap();
         context = request.getServletContext();
         data = IOJsonMessageConverter.getInstance().loadDataFromRequest(request);
         if ((data == null) || (data.getContainer().size() == 0)) {
             data = IOParametersMessageConverter.getInstance().loadDataFromRequest(request);
         }
     }
-
+    
     public ServletContext getContext() {
         return context;
     }
@@ -39,7 +33,7 @@ public class OperationData {
     public Data getData(String paramName) {
         return data.getElement(paramName);
     }
-
+    
     public boolean has(String paramName) {
         return getData(paramName) != null;
     }

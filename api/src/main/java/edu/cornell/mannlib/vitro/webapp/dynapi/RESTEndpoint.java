@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.OperationData.RESOURCE_ID;
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.REST_SERVLET_PATH;
 import static java.lang.String.format;
 
@@ -33,6 +32,8 @@ public class RESTEndpoint extends VitroHttpServlet {
 
     private ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
     private ActionPool actionPool = ActionPool.getInstance();
+
+    public final static String RESOURCE_ID = "resource_id";
 
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -141,7 +142,7 @@ public class RESTEndpoint extends VitroHttpServlet {
         Action action = actionPool.get(actionName);
         OperationData input = new OperationData(request);
         if (requestPath.isResourceRequest()) {
-            input.add(RESOURCE_ID, new StringData(requestPath.getResourceId()));
+            input.add(RESTEndpoint.RESOURCE_ID, new StringData(requestPath.getResourceId()));
         }
         try {
             OperationResult result = action.run(input);

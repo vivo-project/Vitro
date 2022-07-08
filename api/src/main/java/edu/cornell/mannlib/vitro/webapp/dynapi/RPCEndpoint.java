@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.OperationData.RESOURCE_ID;
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC_SERVLET_PATH;
 
 import javax.servlet.annotation.WebServlet;
@@ -39,7 +38,7 @@ public class RPCEndpoint extends VitroHttpServlet {
             Action action = actionPool.get(requestPath.getActionName());
             OperationData input = new OperationData(request);
             if (requestPath.isResourceRequest()) {
-                input.add(RESOURCE_ID, new StringData(requestPath.getResourceId()));
+                input.add(RESTEndpoint.RESOURCE_ID, new StringData(requestPath.getResourceId()));
             }
             try {
                 OperationResult result = action.run(input);
