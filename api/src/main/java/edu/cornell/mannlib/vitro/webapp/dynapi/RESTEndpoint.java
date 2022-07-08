@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
@@ -140,6 +141,8 @@ public class RESTEndpoint extends VitroHttpServlet {
             actionPool.printKeys();
         }
         Action action = actionPool.get(actionName);
+        Parameters requiredParams = action.getRequiredParams();
+        action.getInputStructure();
         OperationData input = new OperationData(request);
         if (requestPath.isResourceRequest()) {
             input.add(RESTEndpoint.RESOURCE_ID, new StringData(requestPath.getResourceId()));

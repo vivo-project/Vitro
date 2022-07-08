@@ -152,4 +152,9 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         return false;
     }
 
+    public void getInputStructure() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }
