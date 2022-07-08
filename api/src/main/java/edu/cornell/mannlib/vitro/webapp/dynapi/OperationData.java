@@ -22,10 +22,6 @@ public class OperationData {
     public OperationData(HttpServletRequest request) {
         params = request.getParameterMap();
         context = request.getServletContext();
-        // if (ContentType.APPLICATION_JSON.toString().equalsIgnoreCase(request.getContentType()))
-        //   data = IOJsonMessageConverter.getInstance().loadDataFromRequest(request);
-        // else
-        //   data = IOParametersMessageConverter.getInstance().loadDataFromRequest(request);
         data = IOJsonMessageConverter.getInstance().loadDataFromRequest(request);
         if ((data == null) || (data.getContainer().size() == 0)) {
             data = IOParametersMessageConverter.getInstance().loadDataFromRequest(request);

@@ -6,9 +6,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 
-public class DefaultAction extends Action {
+public class NullAction extends Action {
 
-    private static final Log log = LogFactory.getLog(DefaultAction.class);
+    private static final Log log = LogFactory.getLog(NullAction.class);
     
     @Override
     public OperationResult run(OperationData input) {

@@ -1,7 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ArrayParameterType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ObjectParameterType;
 import org.apache.jena.datatypes.RDFDatatype;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;

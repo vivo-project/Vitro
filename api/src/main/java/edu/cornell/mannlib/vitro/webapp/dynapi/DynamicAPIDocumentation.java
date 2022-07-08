@@ -17,7 +17,7 @@ import org.apache.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.APIInformation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.CustomRESTAction;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullAction;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -217,7 +217,7 @@ public class DynamicAPIDocumentation {
 
             Action action = ActionPool.getInstance().get(actionName);
 
-            if (!(action instanceof DefaultAction)) {
+            if (!(action instanceof NullAction)) {
                 Tag tag = tag(action);
                 openApi.addTagsItem(tag);
 
