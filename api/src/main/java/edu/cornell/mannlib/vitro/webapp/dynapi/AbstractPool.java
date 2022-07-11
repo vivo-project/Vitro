@@ -36,7 +36,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     private ConcurrentNavigableMap<K, C> components;
     private ServletContext ctx;
     private ConfigurationBeanLoader loader;
-    private ContextModelAccess modelAccess;
+    public ContextModelAccess modelAccess;
     private OntModel dynamicAPIModel;
     private ConcurrentLinkedQueue<C> obsoleteComponents;
 

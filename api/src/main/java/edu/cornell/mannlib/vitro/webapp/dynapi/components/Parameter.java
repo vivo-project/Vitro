@@ -13,6 +13,7 @@ public class Parameter implements Removable {
     private String description;
     private Validators validators = new Validators();
     private ParameterType type;
+    private boolean local;
 
     public String getName() {
         return name;
@@ -76,6 +77,10 @@ public class Parameter implements Removable {
     @Override
     public void dereference() {
 
+    }
+
+    public boolean isLocal() {
+        return local;
     }
 
 }

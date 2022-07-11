@@ -26,6 +26,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     private Parameters providedParams = new Parameters();
     private Parameters requiredParams = new Parameters();
+    private Parameters localParams = new Parameters();
 
     @Override
     public void dereference() {
@@ -102,13 +103,16 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     public boolean hasClients() {
         return !clients.isEmpty();
     }
-
-
+    
+    public Parameters getLocalParams() {
+        return localParams;
+    }
+    
     @Override
     public Parameters getRequiredParams() {
         return requiredParams;
     }
-
+    
     @Override
     public Parameters getProvidedParams() {
         return providedParams;

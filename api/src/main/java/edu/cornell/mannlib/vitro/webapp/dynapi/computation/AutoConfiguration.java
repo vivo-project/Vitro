@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 
 public class AutoConfiguration {
@@ -17,6 +18,7 @@ public class AutoConfiguration {
     public static void computeParams(Action action) {
         Parameters required = action.getRequiredParams();
         Parameters provided = action.getProvidedParams();
+        Parameters local = action.getLocalParams();
 
         ExecutionTree tree = new ExecutionTree(action);
         List<StepInfo> exits = tree.getLeafs();
@@ -28,7 +30,7 @@ public class AutoConfiguration {
         }
         for (List<StepInfo> path: paths) {
             Parameters computed = computeActionRequirements(path, provided);
-            mergeParameters(required, computed);
+            mergeParameters(required, local, computed);
         }
         if( log.isDebugEnabled()) {
             Set<String> names = action.getRequiredParams().getNames();
@@ -37,9 +39,16 @@ public class AutoConfiguration {
         }
     }
 
-    private static void mergeParameters(Parameters requiredParams, Parameters computed) {
+    private static void mergeParameters(Parameters required, Parameters local, Parameters computed) {
         //TODO: Support optional steps
-        requiredParams.addAll(computed);
+        for (String name : computed.getNames()) {
+            Parameter param = computed.get(name);
+            if (param.isLocal()) {
+                local.add(param);
+            } else {
+                required.add(param);
+            }
+        }
     }
 
     private static Parameters computeActionRequirements(List<StepInfo> list, Parameters provided) {
@@ -53,7 +62,7 @@ public class AutoConfiguration {
             Parameters stepRequired = step.getRequiredParams();
             Parameters stepProvided = step.getProvidedParams();
             requirements.removeAll(stepProvided);
-            mergeParameters(requirements, stepRequired);
+            requirements.addAll(stepRequired);
             position--;
         }
         return requirements;
