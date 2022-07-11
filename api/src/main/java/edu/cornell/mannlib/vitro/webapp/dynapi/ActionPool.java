@@ -2,6 +2,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullAction;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class ActionPool extends AbstractPool<String, Action, ActionPool> {
 
@@ -26,4 +28,7 @@ public class ActionPool extends AbstractPool<String, Action, ActionPool> {
         return Action.class;
     }
 
+    public static ContextModelAccess getModelAccess() {
+		return modelAccess;
+    }
 }

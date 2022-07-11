@@ -22,8 +22,12 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
@@ -141,11 +145,19 @@ public class RESTEndpoint extends VitroHttpServlet {
             actionPool.printKeys();
         }
         Action action = actionPool.get(actionName);
-        Parameters requiredParams = action.getRequiredParams();
-        action.getInputStructure();
+        DataStore dataStore = new DataStore();
+		try {
+			Converter.convert(request, action, dataStore);
+		} catch (ConversionException e) {
+			log.error(e,e);
+			response.setStatus(500);
+			return;
+		}
+
         OperationData input = new OperationData(request);
         if (requestPath.isResourceRequest()) {
             input.add(RESTEndpoint.RESOURCE_ID, new StringData(requestPath.getResourceId()));
+            dataStore.addResourceID(requestPath.getResourceId());
         }
         try {
             OperationResult result = action.run(input);
