@@ -72,12 +72,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		// If request is for new individual, return simple do back end editing action permission
-		if (StringUtils.isNotEmpty(EditConfigurationUtils.getTypeOfNew(vreq))) {
-			return SimplePermission.DO_BACK_END_EDITING.ACTION;
-		} else if(MANAGE_MENUS_FORM.equals(vreq.getParameter("editForm"))) {
-		    return SimplePermission.MANAGE_MENUS.ACTION;
-		}
+
 		if (isIndividualDeletion(vreq)) {
 			return SimplePermission.DO_BACK_END_EDITING.ACTION;
 		}
@@ -93,7 +88,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		predicateProp.setRangeVClassURI(rangeUri);
 		OntModel ontModel = ModelAccess.on(vreq).getOntModel();
 		AbstractObjectPropertyStatementAction objectPropertyAction;
-		if (objectUri == null) {
+		if (StringUtils.isBlank(objectUri)) {
 			objectPropertyAction = new AddObjectPropertyStatement(ontModel, subjectUri, predicateProp, RequestedAction.SOME_URI);
 		} else {
 			if (isDeleteForm(vreq)) {
@@ -105,7 +100,14 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, 
 				new EditDataPropertyStatement(ontModel, subjectUri, predicateUri, objectUri).
 				or(objectPropertyAction));
-
+		if (!isAuthorized) {
+			// If request is for new individual, return simple do back end editing action permission
+			if (StringUtils.isNotEmpty(EditConfigurationUtils.getTypeOfNew(vreq))) {
+				return SimplePermission.DO_BACK_END_EDITING.ACTION;
+			} else if (MANAGE_MENUS_FORM.equals(vreq.getParameter("editForm"))) {
+				return SimplePermission.MANAGE_MENUS.ACTION;
+			}
+		}
 		return isAuthorized? SimplePermission.DO_FRONT_END_EDITING.ACTION: AuthorizationRequest.UNAUTHORIZED;
 	}
 
