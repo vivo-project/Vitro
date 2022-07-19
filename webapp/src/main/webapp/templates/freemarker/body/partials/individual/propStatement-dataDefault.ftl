@@ -81,7 +81,7 @@
 		     	<span class="invalidFormatText">invalid format</span>
 				<#break>
 		  	<#case "float">
-				<#if !value?matches("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?.") >
+				<#if !value?matches("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?") >
 		     		<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
 			     	<span class="invalidFormatText">invalid format</span>
 				</#if>
