@@ -15,6 +15,7 @@ public class Parameter implements Removable {
     private Validators validators = new Validators();
     private ParameterType type;
     private boolean local;
+	private String serializedType = "string";
 
     public String getName() {
         return name;
@@ -86,6 +87,14 @@ public class Parameter implements Removable {
 
 	public static boolean isArray() {
 		return isArray ;
+	}
+
+	public String getSerializedType() {
+		return serializedType ;
+	}
+
+	public String getInputPath() {
+		return "";
 	}
 
 }

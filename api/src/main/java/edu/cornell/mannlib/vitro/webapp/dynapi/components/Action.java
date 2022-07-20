@@ -164,4 +164,9 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         return "";
     }
 
+	public String getOutputSerializedSchema() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -28,7 +28,7 @@ public class DataFactory {
 
 	private static RawData createArray(Parameter param, String[] values) {
 		RawData data = new RawData(param);
-		ArrayList<String> list = new ArrayList<>(values.length);
+		ArrayList<Object> list = new ArrayList<>(values.length);
 		for (String value : values) {
 			list.add(value);
 		}

@@ -7,10 +7,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 
 public class RawData {
 
-    Set<String> types = null;
-    String string = null;
-    Object object = null;
-    Parameter param = null;
+    private Set<String> types = null;
+    private String string = null;
+    private Object object = null;
+    private Parameter param = null;
 
     public RawData(Parameter param){
         types = new HashSet<>();
@@ -23,6 +23,10 @@ public class RawData {
     
     protected Object getObject() {
         return object;
+    }
+    
+    protected Parameter getParam() {
+    	return param;
     }
     
     public void setRawString(String raw) {
