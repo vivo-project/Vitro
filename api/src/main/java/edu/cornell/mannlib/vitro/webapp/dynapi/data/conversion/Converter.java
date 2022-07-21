@@ -67,7 +67,7 @@ public class Converter {
 	private static ContentType getContentType(HttpServletRequest request) {
 		String header = request.getContentType();
 		if (StringUtils.isBlank(header)) {
-			return ContentType.APPLICATION_JSON;
+			return ContentType.MULTIPART_FORM_DATA;
 		}
 		return ContentType.parse(header);
 	}

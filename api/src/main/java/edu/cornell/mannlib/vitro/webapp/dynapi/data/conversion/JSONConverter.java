@@ -81,6 +81,8 @@ public class JSONConverter {
 			}
 		} catch (IOException e) {
 			log.error(e,e);
+		}
+		if (jsonRequest == null) {
 			String message = "Error reading input json:\n" + jsonString;
 			throw new ConversionException(message);
 		}

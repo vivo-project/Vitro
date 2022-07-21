@@ -122,7 +122,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         if (testRequestBodyFile != null) {
             String filePath = format("%s/rest/request/body/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(), testRequestParamsFile);
-
+            when(request.getContentType()).thenReturn("application/json;UTF-8");
             when(request.getReader()).thenReturn(new BufferedReader(new FileReader(filePath)));
         }
 
