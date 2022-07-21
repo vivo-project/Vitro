@@ -9,6 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public abstract class ParameterType implements Removable {
 
     protected String name;
+	private String serializedType = "string";
 
     public RDFDatatype getRDFDataType() {
         return new XSDDatatype(name);
@@ -28,6 +29,19 @@ public abstract class ParameterType implements Removable {
 
 	public String getName() {
 		return name;
+	}
+	
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializedType", minOccurs = 0, maxOccurs = 1)
+    public void setSerializedType(String serializedType) {
+        this.serializedType = serializedType;
+    }
+
+	public String getSerializedType() {
+		//TODO: temporary hacks. Implement in ontology
+		if (name.contains("integer")) {
+			return "integer";
+		}
+		return serializedType;
 	}
 
 }

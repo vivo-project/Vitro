@@ -41,7 +41,7 @@ public class JSONConverter {
 		JsonNode jsonRequest = readRequest(request);
 		Set<ValidationMessage> messages = schema.validate(jsonRequest);
 		if (!messages.isEmpty()) {
-			//validationFailed(jsonRequest, messages);
+			validationFailed(jsonRequest, messages);
 		}
 		Parameters required = action.getRequiredParams();
 		ReadContext ctx = JsonPath.parse(jsonRequest.toString());
@@ -56,7 +56,6 @@ public class JSONConverter {
 			data.setRawString(value);
 			dataStore.addData(name, data);
 		}
-		//TODO: get jsonPath to node from schema
 	}
 	
 	public static void convert(HttpServletResponse response, Action action, DataStore dataStore){
