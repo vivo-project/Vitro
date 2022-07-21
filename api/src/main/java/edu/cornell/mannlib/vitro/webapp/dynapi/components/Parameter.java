@@ -96,4 +96,8 @@ public class Parameter implements Removable {
 		return "";
 	}
 
+	public boolean isOptional() {
+		return false;
+	}
+
 }

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
@@ -92,17 +93,17 @@ public class JSONConverter {
 	private static JsonSchema getInputSchema(Action action) {
 		String serializedSchema = action.getInputSerializedSchema();
 		Parameters params = action.getRequiredParams();
-		return getSchema(serializedSchema, params);
+		return getDefaultSchema(serializedSchema, params);
 	}
 
 	private static JsonSchema getOutputSchema(Action action) {
 		String serializedSchema = action.getOutputSerializedSchema();
 		Parameters params = action.getProvidedParams();
 
-		return getSchema(serializedSchema, params);
+		return getDefaultSchema(serializedSchema, params);
 	}
 	
-	private static JsonSchema getSchema(String serializedSchema, Parameters params) {
+	private static JsonSchema getDefaultSchema(String serializedSchema, Parameters params) {
 		JsonNode nativeSchema = deserializeSchema(serializedSchema);
 		if (nativeSchema != null) {
 			JsonSchema jsonSchema = factory.getSchema(nativeSchema);
@@ -133,12 +134,19 @@ public class JSONConverter {
 	    schema.put(TYPE, "object");
 	    ObjectNode properties = mapper.createObjectNode();
 	    schema.set("properties", properties);
+	    ArrayNode required = mapper.createArrayNode();
 	    for (String name : params.getNames()) {
 	    	Parameter parameter = params.get(name);
 	    	String type = parameter.getSerializedType();
 		    ObjectNode paramNode = mapper.createObjectNode();
 		    paramNode.put(TYPE, type);
 		    properties.set(name, paramNode);
+		    if (!parameter.isOptional()) {
+		    	required.add(name);
+		    }
+	    }
+	    if (!required.isEmpty()) {
+		    schema.set("required", required);
 	    }
 		return schema;
 	}
