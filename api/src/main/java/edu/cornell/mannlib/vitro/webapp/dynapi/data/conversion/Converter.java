@@ -1,19 +1,31 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 
+import java.io.IOException;
+
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.HttpHeaders;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOJsonMessageConverter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
 
 public class Converter {
 
+	private static final Log log = LogFactory.getLog(Converter.class.getName());
 	private static final String SPLIT_BY_COMMA_AND_TRIM_REGEX = "\\s*,\\s*";
 
 	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
@@ -32,6 +44,40 @@ public class Converter {
 			throw new ConversionException(message);
 		}
 	}
+	
+	public static void convert(HttpServletResponse response, Action action, DataStore dataStore, OperationResult result) 
+			throws ConversionException{
+		
+	}
+	
+	public static void prepareResponse(HttpServletResponse response, String contentType, Action action,
+            OperationResult operationResult, OperationData operationData) {
+        if (!operationResult.hasSuccess()) {
+        	operationResult.prepareResponse(response);
+        	return;
+        }
+    	if (!action.isOutputValid(operationData)) {
+            response.setStatus(500);
+            return;
+    	}
+    	operationResult.prepareResponse(response);
+        if (contentType == null || !contentType.equalsIgnoreCase(edu.cornell.mannlib.vitro.webapp.web.ContentType.JSON.getMediaType())) {
+        	return;
+        } 
+        PrintWriter out = null;
+        try {
+            out = response.getWriter();
+        } catch (IOException e) {
+            log.error(e.getLocalizedMessage());
+        }
+        response.setContentType(edu.cornell.mannlib.vitro.webapp.web.ContentType.JSON.getMediaType());
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        if (out != null) {
+            ObjectData resultData = operationData.getRootData().filter(action.getProvidedParams().getNames());
+            out.print(IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData));
+            out.flush();
+        }
+    }
 
 	private static Set<LangTag> getAcceptLanguages(HttpServletRequest request) {
 		Set<LangTag> result = new HashSet<>();

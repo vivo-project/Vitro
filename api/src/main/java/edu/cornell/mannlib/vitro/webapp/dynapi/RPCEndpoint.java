@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
@@ -42,7 +43,7 @@ public class RPCEndpoint extends VitroHttpServlet {
             }
             try {
                 OperationResult result = action.run(input);
-                result.prepareResponse(response, ContentType.JSON.getMediaType(), action, input);
+                Converter.prepareResponse(response, ContentType.JSON.getMediaType(), action, result, input);
             } finally {
                 action.removeClient();
             }

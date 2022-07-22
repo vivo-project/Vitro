@@ -163,7 +163,7 @@ public class RESTEndpoint extends VitroHttpServlet {
         }
         try {
             OperationResult result = action.run(input);
-            result.prepareResponse(response, ContentType.JSON.getMediaType(), action, input);
+            Converter.prepareResponse(response, ContentType.JSON.getMediaType(), action, result, input);
         } finally {
             action.removeClient();
         }
