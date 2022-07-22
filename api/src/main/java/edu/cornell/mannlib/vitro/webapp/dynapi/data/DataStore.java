@@ -32,8 +32,12 @@ public class DataStore {
 		this.resourceId  = resourceId;
 	}
 
-	public void setAcceptedContentTypes(Set<ContentType> acceptTypes) {
-		this.acceptTypes.addAll(acceptTypes);
+	public void setAcceptedContentTypes(Set<ContentType> acceptTypes, ContentType contentType) {
+		if (acceptTypes.isEmpty()) {
+			this.acceptTypes.add(contentType);
+		} else {
+			this.acceptTypes.addAll(acceptTypes);	
+		}
 	}
 
 	public void setAcceptLangs(Set<LangTag> acceptLangs) {

@@ -32,7 +32,7 @@ public class Converter {
 			throws ConversionException {
 		ContentType contentType = getContentType(request);
 		Set<ContentType> returnTypes = getAcceptContentTypes(request);
-		dataStore.setAcceptedContentTypes(returnTypes);
+		dataStore.setAcceptedContentTypes(returnTypes, contentType);
 		Set<LangTag> acceptLangs = getAcceptLanguages(request);
 		dataStore.setAcceptLangs(acceptLangs);
 		if (isJson(contentType)) {
