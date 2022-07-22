@@ -14,6 +14,7 @@ public class DataStore {
 	protected Map<String, RawData> dataMap = new HashMap<>();
 	private Set<ContentType> acceptTypes = new HashSet<>();
 	private Set<LangTag> acceptLangs = new HashSet<>();
+	private String resourceId = "";
 
 
 	public DataStore() {
@@ -23,8 +24,12 @@ public class DataStore {
         dataMap.put(name, data);
     }
 
-	public void addResourceID(String resourceId) {
-		// TODO Auto-generated method stub
+	public String getResourceId() {
+		return resourceId;
+	}
+	
+	public void setResourceID(String resourceId) {
+		this.resourceId  = resourceId;
 	}
 
 	public void setAcceptedContentTypes(Set<ContentType> acceptTypes) {
@@ -34,4 +39,5 @@ public class DataStore {
 	public void setAcceptLangs(Set<LangTag> acceptLangs) {
 		this.acceptLangs.addAll(acceptLangs);
 	}
+
 }

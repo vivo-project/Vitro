@@ -146,6 +146,9 @@ public class RESTEndpoint extends VitroHttpServlet {
         }
         Action action = actionPool.get(actionName);
         DataStore dataStore = new DataStore();
+        if (requestPath.isResourceRequest()) {
+            dataStore.setResourceID(requestPath.getResourceId());
+        }
 		try {
 			Converter.convert(request, action, dataStore);
 		} catch (ConversionException e) {
@@ -157,7 +160,6 @@ public class RESTEndpoint extends VitroHttpServlet {
         OperationData input = new OperationData(request);
         if (requestPath.isResourceRequest()) {
             input.add(RESTEndpoint.RESOURCE_ID, new StringData(requestPath.getResourceId()));
-            dataStore.addResourceID(requestPath.getResourceId());
         }
         try {
             OperationResult result = action.run(input);
