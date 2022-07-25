@@ -42,7 +42,7 @@ public class DefaultDataPropertyFormValidator implements N3ValidatorVTwo{
     private final Pattern ymPattern = Pattern.compile(ymRegex);
     private final String monthRegex = "^--(0[1-9]|1[012])";
     private final Pattern monthPattern = Pattern.compile(monthRegex);
-    private final String floatRegex = "^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?.";
+    private final String floatRegex = "^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?";
     private final Pattern floatPattern = Pattern.compile(floatRegex);
     private final String intRegex = "^-?\\d+$";
     private final Pattern intPattern = Pattern.compile(intRegex);
