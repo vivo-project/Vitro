@@ -9,7 +9,7 @@ public class DataFactory {
 
 	public static RawData create(Parameter param, String[] values) throws ConversionException {
 		
-		if (Parameter.isArray()) {
+		if (param.isArray()) {
 			return createArray(param, values);
 		} else {
 			return createData(param, values);

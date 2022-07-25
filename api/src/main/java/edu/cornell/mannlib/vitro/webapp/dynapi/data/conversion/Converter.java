@@ -1,9 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 
-import java.io.IOException;
 
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,19 +18,19 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOJsonMessageConverter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
 
 public class Converter {
 
 	private static final Log log = LogFactory.getLog(Converter.class.getName());
 	private static final String SPLIT_BY_COMMA_AND_TRIM_REGEX = "\\s*,\\s*";
+	private static Set<ContentType> supportedContentTypes = new HashSet<>(
+			Arrays.asList(ContentType.APPLICATION_JSON, ContentType.MULTIPART_FORM_DATA));
 
 	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
 			throws ConversionException {
 		ContentType contentType = getContentType(request);
-		Set<ContentType> returnTypes = getAcceptContentTypes(request);
-		dataStore.setAcceptedContentTypes(returnTypes, contentType);
+		ContentType responseType = getResponseType(request, contentType);
+		dataStore.setResponseType(responseType);
 		Set<LangTag> acceptLangs = getAcceptLanguages(request);
 		dataStore.setAcceptLangs(acceptLangs);
 		if (isJson(contentType)) {
@@ -40,44 +38,42 @@ public class Converter {
 		} else if (isForm(contentType)) {
 			FormDataConverter.convert(request, action, dataStore);
 		} else {
-			String message = String.format("No suitable converter found for content type %s", contentType);
+			String message = String.format("No suitable converter found for input content type %s", contentType);
 			throw new ConversionException(message);
 		}
 	}
-	
-	public static void convert(HttpServletResponse response, Action action, DataStore dataStore, OperationResult result) 
-			throws ConversionException{
-		
+
+	private static ContentType getResponseType(HttpServletRequest request, ContentType requestType) {
+		// TODO:Content negotiation: if accept header isn't empty, filter unsupported
+		// types and select
+		// type with highest weight. If no supported types found throw exception.
+		// If accept header is empty, use request type
+		// Set<ContentType> responseTypes = getAcceptContentTypes(request);
+		return ContentType.APPLICATION_JSON;
 	}
-	
-	public static void prepareResponse(HttpServletResponse response, String contentType, Action action,
-            OperationResult operationResult, OperationData operationData) {
-        if (!operationResult.hasSuccess()) {
-        	operationResult.prepareResponse(response);
-        	return;
-        }
-    	if (!action.isOutputValid(operationData)) {
-            response.setStatus(500);
-            return;
-    	}
-    	operationResult.prepareResponse(response);
-        if (contentType == null || !contentType.equalsIgnoreCase(edu.cornell.mannlib.vitro.webapp.web.ContentType.JSON.getMediaType())) {
-        	return;
-        } 
-        PrintWriter out = null;
-        try {
-            out = response.getWriter();
-        } catch (IOException e) {
-            log.error(e.getLocalizedMessage());
-        }
-        response.setContentType(edu.cornell.mannlib.vitro.webapp.web.ContentType.JSON.getMediaType());
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        if (out != null) {
-            ObjectData resultData = operationData.getRootData().filter(action.getProvidedParams().getNames());
-            out.print(IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData));
-            out.flush();
-        }
-    }
+
+	public static void convert(HttpServletResponse response, Action action, OperationResult operationResult,
+			OperationData operationData, DataStore dataStore) throws ConversionException {
+		if (!operationResult.hasSuccess()) {
+			operationResult.prepareResponse(response);
+			return;
+		}
+		if (!action.isOutputValid(operationData)) {
+			response.setStatus(500);
+			return;
+		}
+		operationResult.prepareResponse(response);
+		// TODO: test accepted content types and prepare response according to it
+		ContentType responseType = dataStore.getResponseType();
+		if (isJson(responseType)) {
+			JSONConverter.convert(response, action, operationData, dataStore);
+		} else if (isForm(responseType)) {
+			FormDataConverter.convert(response, action, operationData, dataStore);
+		} else {
+			String message = String.format("No suitable converter found for output content type %s", responseType);
+			throw new ConversionException(message);
+		}
+	}
 
 	private static Set<LangTag> getAcceptLanguages(HttpServletRequest request) {
 		Set<LangTag> result = new HashSet<>();
@@ -98,8 +94,6 @@ public class Converter {
 		Set<ContentType> result = new HashSet<>();
 		String header = request.getHeader(HttpHeaders.ACCEPT);
 		if (StringUtils.isBlank(header)) {
-			// Default
-			result.add(ContentType.APPLICATION_JSON);
 			return result;
 		}
 		String[] types = header.trim().split(SPLIT_BY_COMMA_AND_TRIM_REGEX);

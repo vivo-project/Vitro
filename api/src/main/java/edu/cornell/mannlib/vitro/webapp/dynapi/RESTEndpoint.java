@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
@@ -27,8 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionExcepti
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
-import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
 public class RESTEndpoint extends VitroHttpServlet {
@@ -163,7 +160,11 @@ public class RESTEndpoint extends VitroHttpServlet {
         }
         try {
             OperationResult result = action.run(input);
-            Converter.prepareResponse(response, ContentType.JSON.getMediaType(), action, result, input);
+            Converter.convert(response, action, result, input, dataStore);
+        } catch (ConversionException e) {
+        	log.error(e,e);
+        	response.setStatus(500);
+        	return;
         } finally {
             action.removeClient();
         }

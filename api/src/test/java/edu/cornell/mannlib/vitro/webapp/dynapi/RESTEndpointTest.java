@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -98,7 +99,7 @@ public class RESTEndpointTest {
     public String testMessage;
 
     @Before
-    public void beforeEach() {
+    public void beforeEach() throws Exception{
         MockitoAnnotations.openMocks(this);
         resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
         actionPoolStatic = mockStatic(ActionPool.class);
@@ -111,6 +112,8 @@ public class RESTEndpointTest {
 
         when(request.getParameterMap()).thenReturn(params);
         when(request.getServletContext()).thenReturn(context);
+
+        when(response.getWriter()).thenReturn(new PrintWriter(System.out));
 
         restEndpoint = new RESTEndpoint();
     }

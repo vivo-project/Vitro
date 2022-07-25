@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.LangTag;
 public class DataStore {
 
 	protected Map<String, RawData> dataMap = new HashMap<>();
-	private Set<ContentType> acceptTypes = new HashSet<>();
+	private ContentType responseType = ContentType.APPLICATION_JSON;
 	private Set<LangTag> acceptLangs = new HashSet<>();
 	private String resourceId = "";
 
@@ -32,12 +32,12 @@ public class DataStore {
 		this.resourceId  = resourceId;
 	}
 
-	public void setAcceptedContentTypes(Set<ContentType> acceptTypes, ContentType contentType) {
-		if (acceptTypes.isEmpty()) {
-			this.acceptTypes.add(contentType);
-		} else {
-			this.acceptTypes.addAll(acceptTypes);	
-		}
+	public ContentType getResponseType() {
+		return responseType;	
+	}
+	
+	public void setResponseType(ContentType contentType) {
+		this.responseType = contentType;	
 	}
 
 	public void setAcceptLangs(Set<LangTag> acceptLangs) {

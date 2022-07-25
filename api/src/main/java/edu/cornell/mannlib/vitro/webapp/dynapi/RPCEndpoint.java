@@ -12,10 +12,11 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
-import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 @WebServlet(name = "RPCEndpoint", urlPatterns = { RPC_SERVLET_PATH + "/*" })
 public class RPCEndpoint extends VitroHttpServlet {
@@ -37,13 +38,28 @@ public class RPCEndpoint extends VitroHttpServlet {
                 actionPool.printKeys();
             }
             Action action = actionPool.get(requestPath.getActionName());
+            DataStore dataStore = new DataStore();
+            if (requestPath.isResourceRequest()) {
+                dataStore.setResourceID(requestPath.getResourceId());
+            }
+            try {
+            	Converter.convert(request, action, dataStore);
+            } catch (ConversionException e) {
+            	log.error(e,e);
+            	response.setStatus(500);
+            	return;
+            }
             OperationData input = new OperationData(request);
             if (requestPath.isResourceRequest()) {
                 input.add(RESTEndpoint.RESOURCE_ID, new StringData(requestPath.getResourceId()));
             }
             try {
                 OperationResult result = action.run(input);
-                Converter.prepareResponse(response, ContentType.JSON.getMediaType(), action, result, input);
+                Converter.convert(response, action, result, input, dataStore);
+            } catch (ConversionException e) {
+            	log.error(e,e);
+            	response.setStatus(500);
+            	return;
             } finally {
                 action.removeClient();
             }

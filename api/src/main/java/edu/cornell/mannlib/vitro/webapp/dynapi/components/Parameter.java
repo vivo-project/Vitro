@@ -9,7 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class Parameter implements Removable {
 
-    private static boolean isArray = false;
+    private boolean isArray = false;
 	private String name;
     private String description;
     private Validators validators = new Validators();
@@ -84,7 +84,7 @@ public class Parameter implements Removable {
         return local;
     }
 
-	public static boolean isArray() {
+	public boolean isArray() {
 		return isArray ;
 	}
 

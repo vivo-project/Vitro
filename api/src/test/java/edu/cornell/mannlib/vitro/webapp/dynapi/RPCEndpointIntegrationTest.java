@@ -9,6 +9,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         when(request.getServletContext()).thenReturn(servletContext);
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
-
+        
         if (testAction != null) {
             StringBuffer buffer = new StringBuffer(URI_BASE + "/" + testAction);
             when(request.getRequestURL()).thenReturn(buffer);
@@ -85,7 +86,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         }
 
         when(request.getParameterMap()).thenReturn(parameterMap);
-
+        when(response.getWriter()).thenReturn(new PrintWriter(System.out));
         mockParameterIntoMap("limit", testLimit);
         mockParameterIntoMap("email", testEmail);
         mockStatus(response);
