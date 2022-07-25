@@ -48,12 +48,13 @@ public class JSONConverter {
 	private static JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V6);
 	private static ObjectMapper mapper = new ObjectMapper();
 	private static final Configuration jsonPathConfig = prepareJsonPathConfig();
+	private static final String DEFAULT_OUTPUT_JSON = "{ \"result\" : [ {} ] }";
 
 	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
 			throws ConversionException {
 		JsonSchema schema = getInputSchema(action, dataStore.getResourceId());
 		String jsonString = readRequest(request);
-		JsonNode jsonRequest = injectResourceId(jsonString, schema, dataStore, action);
+		JsonNode jsonRequest = injectResourceId(jsonString, dataStore, action);
 		Set<ValidationMessage> messages = schema.validate(jsonRequest);
 		if (!messages.isEmpty()) {
 			validationFailed(jsonRequest, messages);
@@ -70,21 +71,56 @@ public class JSONConverter {
 			DataStore dataStore) throws ConversionException {
 		response.setContentType(dataStore.getResponseType().toString());
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-		//JsonSchema schema = getOutputSchema(action);
-		//Parameters params = action.getProvidedParams();
-		// Set<ValidationMessage> result = schema.validate(jsonResponse);
+
+		Parameters params = action.getProvidedParams();
 		// TODO: Validate output
-		try(PrintWriter writer = response.getWriter()) {
-			ObjectData resultData = operationData.getRootData().filter(action.getProvidedParams().getNames());
-			writer.print(IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData));
+		// JsonSchema schema = getOutputSchema(action);
+		// Set<ValidationMessage> result = schema.validate(jsonResponse);
+
+		try (PrintWriter writer = response.getWriter()) {
+			ObjectData resultData = operationData.getRootData().filter(params.getNames());
+			String newResultBody = createOutputJson(dataStore, action);
+			String resultBody = IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData);
+			writer.print(resultBody);
 			writer.flush();
 		} catch (IOException e) {
-			log.error(e.getLocalizedMessage());
+			log.error(e,e);
 			throw new ConversionException("IO exception while preparing response");
 		} catch (NullPointerException e) {
-			log.error(e.getLocalizedMessage());
+			log.error(e,e);
 			throw new ConversionException("NPE while preparing response");
+		} catch (Exception e) {
+			log.error(e,e);
+			throw new ConversionException(e.getLocalizedMessage());
 		}
+	}
+
+	private static String createOutputJson(DataStore dataStore, Action action) throws ConversionException {
+		Parameters params = action.getProvidedParams();
+		DocumentContext ctx = getOutputTemplate(action);
+		for (String name : params.getNames()) {
+			final Parameter param = params.get(name);
+			String path = getOutputPathPrefix(param);
+			RawData data = dataStore.getData(name);
+			//TODO: General schema for objects, arrays and simple values is to get 
+			//the serialised by RawData and the put to the context here. 
+			//ctx.put(path, name, data.getJsonValue());
+		}
+		return ctx.jsonString();
+	}
+
+	private static DocumentContext getOutputTemplate(Action action) {
+		String template = action.getOutputTemplate();
+		DocumentContext ctx = null;
+		if (StringUtils.isBlank(template)) {
+			template = DEFAULT_OUTPUT_JSON;
+		}
+		try {
+			ctx = JsonPath.using(jsonPathConfig).parse(DEFAULT_OUTPUT_JSON);
+		} catch(Exception e) {
+			log.error(e,e);
+		}
+		return ctx;
 	}
 
 	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param) {
@@ -92,10 +128,11 @@ public class JSONConverter {
 		JsonNode node = ctx.read(paramPath, JsonNode.class);
 		RawData data = new RawData(param);
 		data.setRawString(node.toString());
+		data.earlyInitialization();
 		dataStore.addData(name, data);
 	}
 
-	private static JsonNode injectResourceId(String jsonString, JsonSchema schema, DataStore dataStore, Action action)
+	private static JsonNode injectResourceId(String jsonString, DataStore dataStore, Action action)
 			throws ConversionException {
 		final String resourceId = dataStore.getResourceId();
 
@@ -110,11 +147,10 @@ public class JSONConverter {
 			return readJson(jsonString);
 		}
 
-		String path = getPathPrefix(param);
+		String path = getInputPathPrefix(param);
 		DocumentContext ctx = JsonPath.using(jsonPathConfig).parse(jsonString).put(path, RESTEndpoint.RESOURCE_ID,
 				resourceId);
 		return readJson(ctx.jsonString());
-
 	}
 
 	private static JsonNode readJson(String jsonString) throws ConversionException {
@@ -132,13 +168,21 @@ public class JSONConverter {
 	}
 
 	private static String getReadPath(String name, Parameter param) {
-		return getPathPrefix(param) + "." + name;
+		return getInputPathPrefix(param) + "." + name;
 	}
 
-	private static String getPathPrefix(Parameter param) {
+	private static String getInputPathPrefix(Parameter param) {
 		String paramPath = param.getInputPath();
 		if (StringUtils.isBlank(paramPath)) {
 			paramPath = JSON_ROOT;
+		}
+		return paramPath;
+	}
+
+	private static String getOutputPathPrefix(Parameter param) {
+		String paramPath = param.getOutputPath();
+		if (StringUtils.isBlank(paramPath)) {
+			paramPath = JSON_ROOT + ".result[0]";
 		}
 		return paramPath;
 	}
@@ -172,21 +216,6 @@ public class JSONConverter {
 		ObjectNode schema = createSchema(params);
 		JsonSchema jsonSchema = factory.getSchema(schema);
 		return jsonSchema;
-	}
-
-	private static JsonSchema getOutputSchema(Action action) throws ConversionException {
-		String serializedSchema = action.getOutputSerializedSchema();
-		Parameters params = action.getProvidedParams();
-
-		JsonNode nativeSchema = deserializeSchema(serializedSchema);
-		if (nativeSchema != null) {
-			JsonSchema jsonSchema = factory.getSchema(nativeSchema);
-			return jsonSchema;
-		}
-		ObjectNode schema = createSchema(params);
-		JsonSchema jsonSchema = factory.getSchema(schema);
-		return jsonSchema;
-
 	}
 
 	private static JsonNode deserializeSchema(String serializedSchema) throws ConversionException {

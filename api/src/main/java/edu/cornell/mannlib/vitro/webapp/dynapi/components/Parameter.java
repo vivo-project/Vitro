@@ -95,6 +95,10 @@ public class Parameter implements Removable {
 	public String getInputPath() {
 		return "";
 	}
+	
+	public String getOutputPath() {
+		return "";
+	}
 
 	public boolean isOptional() {
 		return false;

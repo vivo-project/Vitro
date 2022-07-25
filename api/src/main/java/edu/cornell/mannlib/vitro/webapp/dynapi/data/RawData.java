@@ -36,4 +36,12 @@ public class RawData {
     protected String getRawString() {
         return string;
     }
+
+	public void earlyInitialization() {
+		
+	}
+
+	public Object getJsonValue() {
+		return "";
+	}
 }

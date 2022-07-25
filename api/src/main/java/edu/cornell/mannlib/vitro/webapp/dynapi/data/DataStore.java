@@ -23,7 +23,11 @@ public class DataStore {
 	public void addData(String name, RawData data) {
         dataMap.put(name, data);
     }
-
+	
+	public RawData getData(String name) {
+		return dataMap.get(name);
+	}
+	
 	public String getResourceId() {
 		return resourceId;
 	}
