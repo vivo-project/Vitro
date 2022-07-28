@@ -63,7 +63,7 @@ public class JSONConverter {
 		ReadContext ctx = JsonPath.using(jsonPathConfig).parse(jsonRequest.toString());
 		for (String name : required.getNames()) {
 			Parameter param = required.get(name);
-			readParam(dataStore, ctx, name, param);
+			readParam(dataStore, ctx, name, param, action);
 		}
 	}
 
@@ -100,7 +100,7 @@ public class JSONConverter {
 		DocumentContext ctx = getOutputTemplate(action);
 		for (String name : params.getNames()) {
 			final Parameter param = params.get(name);
-			String path = getOutputPathPrefix(param);
+			String path = getOutputPathPrefix(param, action);
 			RawData data = dataStore.getData(name);
 			//TODO: General schema for objects, arrays and simple values is to get 
 			//the serialised by RawData and the put to the context here. 
@@ -123,8 +123,8 @@ public class JSONConverter {
 		return ctx;
 	}
 
-	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param) {
-		String paramPath = getReadPath(name, param);
+	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param, Action action) {
+		String paramPath = getReadPath(name, param, action);
 		JsonNode node = ctx.read(paramPath, JsonNode.class);
 		RawData data = new RawData(param);
 		data.setRawString(node.toString());
@@ -147,7 +147,7 @@ public class JSONConverter {
 			return readJson(jsonString);
 		}
 
-		String path = getInputPathPrefix(param);
+		String path = getInputPathPrefix(param, action);
 		DocumentContext ctx = JsonPath.using(jsonPathConfig).parse(jsonString).put(path, RESTEndpoint.RESOURCE_ID,
 				resourceId);
 		return readJson(ctx.jsonString());
@@ -167,22 +167,28 @@ public class JSONConverter {
 		return node;
 	}
 
-	private static String getReadPath(String name, Parameter param) {
-		return getInputPathPrefix(param) + "." + name;
+	private static String getReadPath(String name, Parameter param, Action action) {
+		return getInputPathPrefix(param, action) + "." + name;
 	}
 
-	private static String getInputPathPrefix(Parameter param) {
+	private static String getInputPathPrefix(Parameter param, Action action) {
 		String paramPath = param.getInputPath();
 		if (StringUtils.isBlank(paramPath)) {
-			paramPath = JSON_ROOT;
+			paramPath = action.getInputPath();
+			if (StringUtils.isBlank(paramPath)) {
+				paramPath = JSON_ROOT;
+			}
 		}
 		return paramPath;
 	}
 
-	private static String getOutputPathPrefix(Parameter param) {
+	private static String getOutputPathPrefix(Parameter param, Action action) {
 		String paramPath = param.getOutputPath();
 		if (StringUtils.isBlank(paramPath)) {
-			paramPath = JSON_ROOT + ".result[0]";
+			paramPath = action.getOutputPath();
+			if (StringUtils.isBlank(paramPath)) {
+				paramPath = JSON_ROOT + ".result[0]";
+			}
 		}
 		return paramPath;
 	}

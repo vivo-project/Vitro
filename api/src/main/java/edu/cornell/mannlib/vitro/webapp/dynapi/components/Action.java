@@ -153,15 +153,28 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Override
     public boolean isOptional() {
-        return false;
+		// TODO Auto-generated method stub
+    	return false;
     }
 
-    public String getInputSerializedSchema() {
-        return "";
-    }
-    
-    public String getOutputTemplate() {
-        return "";
-    }
+	public String getInputSerializedSchema() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	public String getOutputTemplate() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	public String getInputPath() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	public String getOutputPath() {
+		// TODO Auto-generated method stub
+		return "";
+	}
 
 }
