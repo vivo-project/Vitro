@@ -1,39 +1,31 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
-import java.util.ArrayList;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
-public class DataFactory {
-
-	public static RawData create(Parameter param, String[] values) throws ConversionException {
+public class DataInitializer {
+	
+	public static void initialize(Parameter param, RawData data) throws ConversionException {
 		
 		if (param.isArray()) {
-			return createArray(param, values);
+			initializeArray(param, data);
+		} else if (param.isJsonObject()){
+			initializeJsonObject(param, data);
 		} else {
-			return createData(param, values);
+			initializeData(param, data);
 		}
 	}
 
-	private static RawData createData(Parameter param, String[] values) throws ConversionException {
-		if (values.length > 1) {
-			String message = String.format("Found %s1 values for param %s2", values.length, param.getName());
-			throw new ConversionException(message);
-		}
-		RawData data = new RawData(param);
-		data.setRawString(values[0]);
-		return null;
+	private static void initializeJsonObject(Parameter param, RawData data) {
+		JsonObject object = new JsonObject(data.getRawString());
+		data.setObject(object);
 	}
 
-	private static RawData createArray(Parameter param, String[] values) {
-		RawData data = new RawData(param);
-		ArrayList<Object> list = new ArrayList<>(values.length);
-		for (String value : values) {
-			list.add(value);
-		}
-		data.setObject(list);
-		return data;
+	private static void initializeData(Parameter param, RawData data) throws ConversionException {
+		
 	}
 
+	private static void initializeArray(Parameter param, RawData data) {
+		
+	}
 }

@@ -38,7 +38,7 @@ public class RawData {
     }
 
 	public void earlyInitialization() {
-		
+		String initValue = this.string;
 	}
 
 	public Object getJsonValue() {

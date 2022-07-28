@@ -104,4 +104,9 @@ public class Parameter implements Removable {
 		return false;
 	}
 
+	public boolean isJsonObject() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
