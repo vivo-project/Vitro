@@ -18,19 +18,19 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject>
         a                        dynapi:Parameter;
         dynapi:name              "testSubject";
-        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> ;
         rdfs:label               "Subject for N3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testSubject2>
         a                        dynapi:Parameter;
         dynapi:name              "testSubject2";
-        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> ;
         rdfs:label               "Subject for N3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject>
         a                        dynapi:Parameter;
         dynapi:name              "testObject";
-        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> ;
         rdfs:label               "Object for N3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/N3TemplateTestAction>

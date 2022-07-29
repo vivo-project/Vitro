@@ -3,7 +3,7 @@
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
-
+@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
 dynapi:Action rdfs:subClassOf dynapi_java:Action .
 
@@ -24,11 +24,13 @@ dynapi:Model rdfs:subClassOf dynapi_java:ModelComponent .
 
 dynapi:Parameter rdfs:subClassOf dynapi_java:Parameter .
 
-dynapi:PrimitiveParameterType rdfs:subClassOf dynapi_java:types.PrimitiveParameterType, dynapi_java:types.ParameterType .
+dynapi:ParameterType rdfs:subClassOf dynapi_types:ParameterType .
 
-dynapi:ArrayParameterType rdfs:subClassOf dynapi_java:types.ArrayParameterType, dynapi_java:types.ParameterType .
+dynapi:PrimitiveSerializationType rdfs:subClassOf dynapi_java:serialization.PrimitiveSerializationType, dynapi_java:serialization.SerializationType .
 
-dynapi:ObjectParameterType rdfs:subClassOf dynapi_java:types.ObjectParameterType, dynapi_java:types.ParameterType .
+dynapi:ArraySerializationType rdfs:subClassOf dynapi_java:serialization.ArraySerializationType, dynapi_java:serialization.SerializationType .
+
+dynapi:JsonObjectSerializationType rdfs:subClassOf dynapi_java:serialization.JsonObjectSerializationType, dynapi_java:serialization.SerializationType .
 
 dynapi:ResourceAPI rdfs:subClassOf dynapi_java:ResourceAPI .
 

@@ -32,19 +32,19 @@
         a                           dynapi:Parameter ;
         rdfs:label                  "Search text for solr query 1"@en-US ;
         dynapi:name                 "searchText" ;
-        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortFieldParam>
         a                           dynapi:Parameter ;
         rdfs:label                  "Choose document field for sorting"@en-US ;
         dynapi:name                 "fildForSorting" ;
-        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortFieldDirection>
         a                           dynapi:Parameter ;
         rdfs:label                  "Choose sort direction"@en-US ;
         dynapi:paramName            "sordDirection" ;
-        dynapi:hasParameterType     <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType     <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/solrTestRPC1>
         a                           dynapi:Rpc ;

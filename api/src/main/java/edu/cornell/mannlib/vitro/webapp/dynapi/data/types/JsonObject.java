@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi.data;
+package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;

@@ -50,7 +50,7 @@ public class Parameters implements Removable {
         .collect(Collectors.toMap(
                 param -> param.getName(),
                 param -> Arrays.asList(
-                        ResourceFactory.createTypedLiteral(input.get(param.getName())[0], param.getRDFDataType()))));
+                        ResourceFactory.createTypedLiteral(input.get(param.getName())[0], param.getType().getSerializationType().getRDFDataType()))));
     }
     
     public Map<String, List<String>> getUrisMap(OperationData input){
@@ -62,7 +62,7 @@ public class Parameters implements Removable {
 
     private Stream<Parameter> getUrisParamStream(boolean isUri) {
         return params.values().stream()
-        .filter(value->value.getRDFDataType().getURI().equals(ANY_URI) == isUri);
+        .filter(value->value.getType().getSerializationType().getRDFDataType().getURI().equals(ANY_URI) == isUri);
     }
     
     public Parameter get(String name) {
@@ -80,19 +80,19 @@ public class Parameters implements Removable {
     // Substitute IRI parameters with their values in specific request
     public Map<String, List<String>> substituteIRIVariables(OperationData input){
         return params.values().stream()
-                .filter(value->value.getRDFDataType().getURI().equals(ANY_URI))
+                .filter(value->value.getType().getSerializationType().getRDFDataType().getURI().equals(ANY_URI))
                 .collect(Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
     }
 
     // Substitute parameters that represent RDF literals with their values in specific request
     public Map<String, List<Literal>> substituteLiteralVariables(OperationData input){
         return params.values().stream()
-                .filter(value->!value.getRDFDataType().getURI().equals(ANY_URI))
+                .filter(value->!value.getType().getSerializationType().getRDFDataType().getURI().equals(ANY_URI))
                 .collect(Collectors.toMap(
                         param -> param.getName(),
                         param -> Arrays.asList(ResourceFactory.createTypedLiteral(
                                 input.get(param.getName())[0],
-                                param.getRDFDataType()
+                                param.getType().getSerializationType().getRDFDataType()
                                 )
                         )));
     }

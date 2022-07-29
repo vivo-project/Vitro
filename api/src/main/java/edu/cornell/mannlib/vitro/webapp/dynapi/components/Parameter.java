@@ -2,9 +2,10 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import org.apache.jena.datatypes.RDFDatatype;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class Parameter implements Removable {
@@ -14,23 +15,20 @@ public class Parameter implements Removable {
     private String description;
     private Validators validators = new Validators();
     private ParameterType type;
+    
     private boolean local;
 
     public String getName() {
         return name;
     }
-
-    public RDFDatatype getRDFDataType() {
-        return type.getRDFDataType();
-    }
-
-    public ParameterType getType() {
-        return type;
-    }
-
+    
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasType", minOccurs = 1, maxOccurs = 1)
-    public void setParamType(ParameterType type) {
+    public void setType(ParameterType type) {
         this.type = type;
+    }
+    
+    public ParameterType getType() {
+    	return type;
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
@@ -58,17 +56,18 @@ public class Parameter implements Removable {
 
     public String computePrefix(String fieldName) {
         String retVal = "";
-        if (type instanceof PrimitiveParameterType) {
+        SerializationType serializationType = type.getSerializationType();
+        if (serializationType instanceof PrimitiveSerializationType) {
             retVal = (name.equals(fieldName)) ? "" : null;
         } else if (!(fieldName.contains("."))) {
             retVal = null;
         } else {
             String fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("."));
             if (!(name.equals(fieldNameFirstPart))) {
-                String restOfPrefix = type.computePrefix(fieldName);
+                String restOfPrefix = serializationType.computePrefix(fieldName);
                 retVal = (restOfPrefix != null) ? name + "." + restOfPrefix: null;
             } else {
-                retVal = type.computePrefix(fieldName.substring(fieldName.indexOf(".") + 1));
+                retVal = serializationType.computePrefix(fieldName.substring(fieldName.indexOf(".") + 1));
             }
         }
 
@@ -86,10 +85,6 @@ public class Parameter implements Removable {
 
 	public boolean isArray() {
 		return isArray ;
-	}
-
-	public String getSerializedType() {
-		return type.getSerializedType() ;
 	}
 
 	public String getInputPath() {

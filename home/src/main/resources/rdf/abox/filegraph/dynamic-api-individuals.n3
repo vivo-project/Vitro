@@ -4,6 +4,7 @@
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
 #-------------------------------------------------------------------------------
 #
@@ -37,68 +38,149 @@
 # Parameter types
 #
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDboolean>
-        a                       dynapi:ParameterType ,
-                                dynapi:PrimitiveParameterType ,
-                                dynapi_java:types.ParameterType ,
-                                dynapi_java:types.PrimitiveParameterType ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/boolean>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
         dynapi:name             "boolean" ;
         rdfs:label              "Boolean type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveParameterType .
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/boolean> ;
+        vitro:mostSpecificType  dynapi:ParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDdecimal>
-        a                       dynapi:ParameterType ,
-                                dynapi:PrimitiveParameterType ,
-                                dynapi_java:types.ParameterType ,
-                                dynapi_java:types.PrimitiveParameterType ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/decimal>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
         dynapi:name             "decimal" ;
         rdfs:label              "Decimal type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveParameterType .
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/decimal> ;
+        vitro:mostSpecificType  dynapi:ParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger>
-        a                       dynapi:ParameterType ,
-                                dynapi:PrimitiveParameterType ,
-                                dynapi_java:types.ParameterType ,
-                                dynapi_java:types.PrimitiveParameterType ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
         dynapi:name             "integer" ;
         rdfs:label              "Integer type"@en-US ;
-        vitro:mostSpecificType  dynapi:primitiveParameterType .
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/integer> ;
+        vitro:mostSpecificType  dynapi:ParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI>
-        a                       dynapi:ParameterType ,
-        			dynapi:primitiveParameterType ,
-                                dynapi_java:types.ParameterType ,
-                                dynapi_java:types.PrimitiveParameterType ;
-        dynapi:name         	"anyURI" ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
+        dynapi:name         	"uri" ;
         rdfs:label              "Individualized Resource Identifier type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveParameterType .
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/anyURI> ;
+        vitro:mostSpecificType  dynapi:ParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDobject>
-        a                       dynapi:ParameterType ,
-                                dynapi:ObjectParameterType ,
-                                dynapi_java:types.ParameterType ,
-                                dynapi_java:types.ObjectParameterType ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonObject>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
         dynapi:name             "object" ;
         rdfs:label              "Object type"@en-US ;
-        vitro:mostSpecificType  dynapi:ObjectParameterType .
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/object> ;
+        vitro:mostSpecificType  dynapi:ParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDarray>
-        a                       dynapi:ParameterType ,
-                                dynapi:ArrayParameterType ,
-                                dynapi_java:types.ParameterType ,
-                                dynapi_java:types.ArrayParameterType ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/array>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
         dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
-        vitro:mostSpecificType  dynapi:ArrayParameterType .
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/array> ;
+        vitro:mostSpecificType  dynapi:ParameterType, dynapi_types:ParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring>
-        a                       dynapi:ParameterType ,
-                                dynapi:PrimitiveParameterType ,
-                                dynapi_java:types.ParameterType ,
-                                dynapi_java:types.PrimitiveParameterType ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
         dynapi:name             "string" ;
         rdfs:label              "String type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveParameterType .
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/string> ;
+        vitro:mostSpecificType  dynapi:ParameterType .
+
+#TODO: something weird, array should store only one type, not multiple types
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/arrayOfDescribedJsonObjectsTest>
+        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
+        dynapi:name             "array" ;
+        rdfs:label              "Array type"@en-US ;
+		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultArrayType> ;
+        vitro:mostSpecificType  dynapi:ParameterType, dynapi_types:ParameterType .
+
+#-------------------------------------------------------------------------------
+#
+# Parameter serialization types
+#
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultArrayType>
+        a                                   dynapi:SerializationType ,
+                                            dynapi:ArraySerializationType ,
+                                            dynapi_java:serialization.SerializationType ,
+                                            dynapi_java:serialization.ArraySerializationType ;
+        rdfs:label                          "Test result array type"@en-US ;
+        dynapi:name                         "test result array type" ;
+        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultActionType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultActionType>
+        a                                   dynapi:SerializationType ,
+                                            dynapi:JsonObjectSerializationType ,
+                                            dynapi_java:serialization.SerializationType ,
+                                            dynapi_java:serialization.JsonObjectSerializationType ;
+        rdfs:label                          "Test result action object type"@en-US ;
+        dynapi:name                         "test result action object type" ;
+        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction> ,
+                                            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel> .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/boolean>
+        a                       dynapi:SerializationType ,
+                                dynapi:PrimitiveSerializationType ,
+                                dynapi_java:serialization.SerializationType ,
+                                dynapi_java:serialization.PrimitiveSerializationType ;
+        dynapi:name             "boolean" ;
+        rdfs:label              "Boolean type"@en-US ;
+        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/decimal>
+        a                       dynapi:SerializationType ,
+                                dynapi:PrimitiveSerializationType ,
+                                dynapi_java:serialization.SerializationType ,
+                                dynapi_java:serialization.PrimitiveSerializationType ;
+        dynapi:name             "decimal" ;
+        rdfs:label              "Decimal type"@en-US ;
+        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/integer>
+        a                       dynapi:SerializationType ,
+                                dynapi:PrimitiveSerializationType ,
+                                dynapi_java:serialization.SerializationType ,
+                                dynapi_java:serialization.PrimitiveSerializationType ;
+        dynapi:name             "integer" ;
+        rdfs:label              "Integer type"@en-US ;
+        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/anyURI>
+        a                       dynapi:SerializationType ,
+        			dynapi:primitiveSerializationType ,
+                                dynapi_java:serialization.SerializationType ,
+                                dynapi_java:serialization.PrimitiveSerializationType ;
+        dynapi:name         	"anyURI" ;
+        rdfs:label              "Individualized Resource Identifier type"@en-US ;
+        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/object>
+        a                       dynapi:SerializationType ,
+                                dynapi:JsonObjectSerializationType ,
+                                dynapi_java:serialization.SerializationType ,
+                                dynapi_java:serialization.JsonObjectSerializationType ;
+        dynapi:name             "object" ;
+        rdfs:label              "Object type"@en-US ;
+        vitro:mostSpecificType  dynapi:JsonObjectSerializationType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/array>
+        a                       dynapi:SerializationType ,
+                                dynapi:ArraySerializationType ,
+                                dynapi_java:serialization.SerializationType ,
+                                dynapi_java:serialization.ArraySerializationType ;
+        dynapi:name             "array" ;
+        rdfs:label              "Array type"@en-US ;
+        vitro:mostSpecificType  dynapi:ArraySerializationType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/string>
+        a                       dynapi:SerializationType ,
+                                dynapi:PrimitiveSerializationType ,
+                                dynapi_java:serialization.SerializationType ,
+                                dynapi_java:serialization.PrimitiveSerializationType ;
+        dynapi:name             "string" ;
+        rdfs:label              "String type"@en-US ;
+        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
 
 #-------------------------------------------------------------------------------
 #

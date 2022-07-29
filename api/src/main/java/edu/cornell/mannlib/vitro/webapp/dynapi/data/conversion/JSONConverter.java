@@ -241,7 +241,7 @@ public class JSONConverter {
 		ArrayNode required = mapper.createArrayNode();
 		for (String name : params.getNames()) {
 			Parameter parameter = params.get(name);
-			String type = parameter.getSerializedType();
+			String type = parameter.getType().getSerializationType().getSerializedName();
 			ObjectNode paramNode = mapper.createObjectNode();
 			paramNode.put(TYPE, type);
 			properties.set(name, paramNode);

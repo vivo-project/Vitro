@@ -5,8 +5,9 @@ import static org.mockito.Mockito.*;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -41,9 +42,9 @@ public class N3TemplateTest extends ServletContextTest {
 
     private static MockedStatic<ModelAccess> modelAccess;
 
-    static ParameterType anyURI;
-    static ParameterType stringType;
-    static ParameterType booleanType;
+    static SerializationType anyURI;
+    static SerializationType stringType;
+    static SerializationType booleanType;
 
     @Mock
     OperationData input;
@@ -65,11 +66,11 @@ public class N3TemplateTest extends ServletContextTest {
     public static void setupStaticObjects(){
         modelAccess = mockStatic(ModelAccess.class);
 
-        anyURI = new PrimitiveParameterType();
+        anyURI = new PrimitiveSerializationType();
         anyURI.setName("anyURI");
-        stringType = new PrimitiveParameterType();
+        stringType = new PrimitiveSerializationType();
         stringType.setName("string");
-        booleanType = new PrimitiveParameterType();
+        booleanType = new PrimitiveSerializationType();
         booleanType.setName("boolean");
     }
 
@@ -106,7 +107,9 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
-        param1.setParamType(anyURI);
+        ParameterType type = new ParameterType();
+        param1.setType(type);
+        type.setSerializationType(anyURI);
         param1.setName("uri1");
 
         n3Template.addRequiredParameter(param1);
@@ -124,10 +127,14 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
-        param1.setParamType(anyURI);
+        ParameterType type = new ParameterType();
+        param1.setType(type);
+        type.setSerializationType(anyURI);
         param1.setName("uri1");
         Parameter param2 = new Parameter();
-        param2.setParamType(anyURI);
+        ParameterType type2 = new ParameterType();
+        param2.setType(type2);
+        type2.setSerializationType(anyURI);
         param2.setName("uri2");
 
         n3Template.addRequiredParameter(param1);
@@ -152,10 +159,14 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
-        param1.setParamType(anyURI);
+        ParameterType type1 = new ParameterType();
+        param1.setType(type1);
+        type1.setSerializationType(anyURI);
         param1.setName("uri1");
         Parameter param2 = new Parameter();
-        param2.setParamType(stringType);
+        ParameterType type2 = new ParameterType();
+        param2.setType(type2);
+        type2.setSerializationType(stringType);
         param2.setName("literal1");
 
         n3Template.addRequiredParameter(param1);
@@ -180,13 +191,19 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(modelComponent);
 
         Parameter param1 = new Parameter();
-        param1.setParamType(anyURI);
+        ParameterType type1 = new ParameterType();
+        param1.setType(type1);
+        type1.setSerializationType(anyURI);
         param1.setName("uri1");
         Parameter param2 = new Parameter();
-        param2.setParamType(stringType);
+        ParameterType type2 = new ParameterType();
+        param2.setType(type2);
+        type2.setSerializationType(stringType);
         param2.setName("literal1");
         Parameter param3 = new Parameter();
-        param3.setParamType(booleanType);
+        ParameterType type3 = new ParameterType();
+        param3.setType(type3);
+        type3.setSerializationType(booleanType);
         param3.setName("literal2");
 
         n3Template.addRequiredParameter(param1);

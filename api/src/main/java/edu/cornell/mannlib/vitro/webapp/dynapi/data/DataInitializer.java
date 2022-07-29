@@ -2,6 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.JsonObject;
 
 public class DataInitializer {
 	

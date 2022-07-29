@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi.components.types;
+package edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -6,10 +6,10 @@ import org.apache.jena.datatypes.xsd.XSDDatatype;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public abstract class ParameterType implements Removable {
+public abstract class SerializationType implements Removable {
 
     protected String name;
-	private String serializedType = "string";
+	private String type = "string";
 
     public RDFDatatype getRDFDataType() {
         return new XSDDatatype(name);
@@ -32,16 +32,16 @@ public abstract class ParameterType implements Removable {
 	}
 	
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializedType", minOccurs = 0, maxOccurs = 1)
-    public void setSerializedType(String serializedType) {
-        this.serializedType = serializedType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-	public String getSerializedType() {
+	public String getSerializedName() {
 		//TODO: temporary hacks. Implement in ontology
 		if (name.contains("integer")) {
 			return "integer";
 		}
-		return serializedType;
+		return type;
 	}
 
 }

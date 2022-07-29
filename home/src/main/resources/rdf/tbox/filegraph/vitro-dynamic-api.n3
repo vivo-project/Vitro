@@ -60,8 +60,8 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasElementsOfType
 :hasElementsOfType rdf:type owl:ObjectProperty ,
                             owl:FunctionalProperty ;
-                   rdfs:domain :ArrayParameterType ;
-                   rdfs:range :ParameterType ;
+                   rdfs:domain :ArraySerializationType ;
+                   rdfs:range :SerializationType ;
                    rdfs:label "type of elements in an array"@en-US .
 
 
@@ -75,7 +75,7 @@
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement
 :hasInternalElement rdf:type owl:ObjectProperty ;
-                    rdfs:domain :ObjectParameterType ;
+                    rdfs:domain :JsonObjectSerializationType ;
                     rdfs:range :Parameter ;
                     rdfs:label "has internal element"@en-US .
 
@@ -110,11 +110,20 @@
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasType
-:hasType rdf:type owl:ObjectProperty ;
+:serializationType rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
          rdf:type owl:FunctionalProperty ;
          rdfs:domain :Parameter ;
          rdfs:range :ParameterType ;
+         rdfs:label "has type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#serializationType
+:serializationType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :ParameterType ;
+         rdfs:range :SerializationType ;
          rdfs:label "has type"@en-US .
 
 
@@ -328,7 +337,8 @@
                                   :HttpMethod
                                   :Model
                                   :Parameter
-                                  :ParameterType
+                                  :SerializationType
+								  :ParameterType
                                   :ResourceAPI
                                   :Rpc
                                 )
@@ -459,9 +469,9 @@
      rdfs:label "API description"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ArrayParameterType
-:ArrayParameterType rdf:type owl:Class ;
-                    rdfs:subClassOf :ParameterType ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ArraySerializationType
+:ArraySerializationType rdf:type owl:Class ;
+                    rdfs:subClassOf :SerializationType ;
                     rdfs:label "Array parameter type"@en-US .
 
 
@@ -510,9 +520,9 @@
                        rdfs:label "Numeric Range Validator"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ObjectParameterType
-:ObjectParameterType rdf:type owl:Class ;
-                     rdfs:subClassOf :ParameterType ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#JsonObjectSerializationType
+:JsonObjectSerializationType rdf:type owl:Class ;
+                     rdfs:subClassOf :SerializationType ;
                      rdfs:label "Object parameter type"@en-US .
 
 
@@ -546,10 +556,14 @@
 :ParameterType rdf:type owl:Class ;
                rdfs:label "Parameter type"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#SerializationType
+:SerializationType rdf:type owl:Class ;
+               rdfs:label "Serialization type"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#PrimitiveParameterType
-:PrimitiveParameterType rdf:type owl:Class ;
-                        rdfs:subClassOf :ParameterType ;
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#PrimitiveSerializationType
+:PrimitiveSerializationType rdf:type owl:Class ;
+                        rdfs:subClassOf :SerializationType ;
                         rdfs:label "Primitive parameter type"@en-US .
 
 
