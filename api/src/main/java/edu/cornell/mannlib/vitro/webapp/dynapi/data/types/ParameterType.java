@@ -8,6 +8,7 @@ public class ParameterType implements Removable {
 
     protected String name;
 	private SerializationType serializationType;
+	private RDFType rdftype;
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
     public void setName(String name) {
@@ -17,6 +18,15 @@ public class ParameterType implements Removable {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationType", minOccurs = 1, maxOccurs = 1)
     public void setSerializationType(SerializationType serializationType) {
         this.serializationType = serializationType;
+    }
+    
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rdfType", minOccurs = 0, maxOccurs = 1)
+    public void setRdfType(RDFType rdftype) {
+        this.rdftype = rdftype;
+    }
+    
+    public RDFType getRdfType() {
+    	return rdftype;
     }
     
     public SerializationType getSerializationType() {

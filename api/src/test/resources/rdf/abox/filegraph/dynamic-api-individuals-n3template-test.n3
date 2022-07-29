@@ -30,7 +30,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testObject>
         a                        dynapi:Parameter;
         dynapi:name              "testObject";
-        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> ;
+        dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> ;
         rdfs:label               "Object for N3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/N3TemplateTestAction>

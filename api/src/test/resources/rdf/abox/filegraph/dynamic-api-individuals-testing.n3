@@ -32,7 +32,7 @@
         a                                   dynapi:Parameter ;
         rdfs:label                          "Test parameter 1 for query 1"@en-US ;
         dynapi:name                         "limit" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer-literal> ;
         dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger> ,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator> .
 
@@ -48,7 +48,7 @@
         a                                   dynapi:Parameter ;
         rdfs:label                          "Test parameter 2 for query 1"@en-US ;
         dynapi:name                         "email" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> ;
         dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator> .
 

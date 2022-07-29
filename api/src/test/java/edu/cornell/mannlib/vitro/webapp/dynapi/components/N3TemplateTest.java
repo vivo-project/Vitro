@@ -8,6 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -130,11 +131,17 @@ public class N3TemplateTest extends ServletContextTest {
         ParameterType type = new ParameterType();
         param1.setType(type);
         type.setSerializationType(anyURI);
+        RDFType rdfType1 = new RDFType();
+        rdfType1.setName("anyURI");
+        type.setRdfType(rdfType1);
         param1.setName("uri1");
         Parameter param2 = new Parameter();
         ParameterType type2 = new ParameterType();
         param2.setType(type2);
         type2.setSerializationType(anyURI);
+        RDFType rdfType2 = new RDFType();
+        rdfType2.setName("anyURI");
+        type2.setRdfType(rdfType2);
         param2.setName("uri2");
 
         n3Template.addRequiredParameter(param1);
@@ -162,11 +169,19 @@ public class N3TemplateTest extends ServletContextTest {
         ParameterType type1 = new ParameterType();
         param1.setType(type1);
         type1.setSerializationType(anyURI);
+        RDFType rdfType1 = new RDFType();
+        rdfType1.setName("anyURI");
+        type1.setRdfType(rdfType1);
         param1.setName("uri1");
         Parameter param2 = new Parameter();
         ParameterType type2 = new ParameterType();
         param2.setType(type2);
         type2.setSerializationType(stringType);
+        
+        RDFType rdfType2 = new RDFType();
+        rdfType2.setName("string");
+        type2.setRdfType(rdfType2);
+        
         param2.setName("literal1");
 
         n3Template.addRequiredParameter(param1);
@@ -194,16 +209,28 @@ public class N3TemplateTest extends ServletContextTest {
         ParameterType type1 = new ParameterType();
         param1.setType(type1);
         type1.setSerializationType(anyURI);
+        RDFType rdfType1 = new RDFType();
+        rdfType1.setName("anyURI");
+        type1.setRdfType(rdfType1);
         param1.setName("uri1");
         Parameter param2 = new Parameter();
         ParameterType type2 = new ParameterType();
         param2.setType(type2);
         type2.setSerializationType(stringType);
+        RDFType rdfType2 = new RDFType();
+        rdfType2.setName("string");
+        type2.setRdfType(rdfType2);
+        
         param2.setName("literal1");
         Parameter param3 = new Parameter();
         ParameterType type3 = new ParameterType();
         param3.setType(type3);
         type3.setSerializationType(booleanType);
+        
+        RDFType rdfType3 = new RDFType();
+        rdfType3.setName("boolean");
+        type3.setRdfType(rdfType3);
+        
         param3.setName("literal2");
 
         n3Template.addRequiredParameter(param1);

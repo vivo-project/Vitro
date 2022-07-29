@@ -109,6 +109,15 @@
               rdfs:label "has operation"@en-US .
 
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#rdfType
+:rdfType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :ParameterType ;
+         rdfs:range :RDFType ;
+         rdfs:label "has RDF data type"@en-US .
+
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasType
 :serializationType rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
@@ -340,6 +349,7 @@
                                   :SerializationType
 								  :ParameterType
                                   :ResourceAPI
+								  :RDFType
                                   :Rpc
                                 )
                   ] ;
@@ -560,6 +570,9 @@
 :SerializationType rdf:type owl:Class ;
                rdfs:label "Serialization type"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#RDFType
+:RDFType rdf:type owl:Class ;
+               rdfs:label "RDF data type type"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#PrimitiveSerializationType
 :PrimitiveSerializationType rdf:type owl:Class ;
