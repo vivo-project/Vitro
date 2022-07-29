@@ -8,6 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -76,13 +78,13 @@ public class RPCEndpointTest {
     }
 
     @Test
-    public void doPostTest() {
+    public void doPostTest() throws IOException {
         OperationResult result = new OperationResult(HttpServletResponse.SC_OK);
 
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(PATH_INFO);
         when(action.run(any(OperationData.class))).thenReturn(result);
-
+        when(response.getWriter()).thenReturn(new PrintWriter(System.out));
         rpcEndpoint.doPost(request, response);
         verify(action, times(1)).run(any());
         verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
