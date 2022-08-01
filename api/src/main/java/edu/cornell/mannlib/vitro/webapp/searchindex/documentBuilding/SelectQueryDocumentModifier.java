@@ -52,25 +52,25 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 	private static final Log log = LogFactory
 			.getLog(SelectQueryDocumentModifier.class);
 
-	private RDFService rdfService;
+	protected RDFService rdfService;
 
 	/** A name to be used in logging, to identify this instance. */
-	private String label;
+	protected String label;
 
 	/** The queries to be executed. There must be at least one. */
-	private List<String> queries = new ArrayList<>();
+	protected List<String> queries = new ArrayList<>();
 
 	/**
 	 * The names of the fields where the results of the queries will be stored.
 	 * If empty, it is assumed to be ALLTEXT and ALLTEXTUNSTEMMED.
 	 */
-	private List<String> fieldNames = new ArrayList<>();
+	protected List<String> fieldNames = new ArrayList<>();
 
 	/**
 	 * URIs of the types of individuals to whom these queries apply. If empty,
 	 * then the queries apply to all individuals.
 	 */
-	private Set<String> typeRestrictions = new HashSet<>();
+	protected Set<String> typeRestrictions = new HashSet<>();
 
 	@Override
 	public void setContextModels(ContextModelAccess models) {
@@ -128,7 +128,7 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 		}
 	}
 
-	private boolean passesTypeRestrictions(Individual ind) {
+	protected boolean passesTypeRestrictions(Individual ind) {
 		if (typeRestrictions.isEmpty()) {
 			return true;
 		} else {
@@ -141,7 +141,7 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 		return false;
 	}
 
-	private List<String> getTextForQueries(Individual ind) {
+	protected List<String> getTextForQueries(Individual ind) {
 		List<String> list = new ArrayList<>();
 		for (String query : queries) {
 			list.addAll(getTextForQuery(query, ind));
@@ -149,7 +149,7 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 		return list;
 	}
 
-	private List<String> getTextForQuery(String query, Individual ind) {
+	protected List<String> getTextForQuery(String query, Individual ind) {
 		try {
 			QueryHolder queryHolder = new QueryHolder(query).bindToUri("uri",
 					ind.getURI());

@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividualBuilder;
+import javax.servlet.annotation.WebServlet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -27,8 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineExcepti
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
-
-import javax.servlet.annotation.WebServlet;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividualBuilder;
 
 /**
  * Generates a list of individuals for display in a template
@@ -43,6 +45,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
     private static final int MAX_PAGES = 40;  // must be even
 
     private static final String TEMPLATE_DEFAULT = "individualList.ftl";
+    private static final String LANGUAGE_FILTER_PROPERTY = "RDFService.languageFilter";
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -152,11 +155,17 @@ public class IndividualListController extends FreemarkerHttpServlet {
         return SearchQueryUtils.getPageParameter(request);
     }
 
-    public static IndividualListResults getResultsForVClass(String vclassURI, int page, String alpha, VitroRequest vreq)
+    public static IndividualListResults getResultsForVClass(String vclassURI,
+            int page, String alpha, VitroRequest vreq)
     throws SearchException{
    	 	try{
+            ConfigurationProperties props = ConfigurationProperties.getBean(vreq);
+            boolean languageFilter = Boolean.valueOf(props.getProperty(
+                    LANGUAGE_FILTER_PROPERTY, "false"));
             List<String> classUris = Collections.singletonList(vclassURI);
-			IndividualListQueryResults results = buildAndExecuteVClassQuery(classUris, alpha, page, INDIVIDUALS_PER_PAGE, vreq.getWebappDaoFactory().getIndividualDao());
+			IndividualListQueryResults results = buildAndExecuteVClassQuery(
+			        classUris, alpha, ((languageFilter) ? vreq.getLocale() : null),
+			        page, INDIVIDUALS_PER_PAGE, vreq.getWebappDaoFactory().getIndividualDao());
 	        return getResultsForVClassQuery(results, page, INDIVIDUALS_PER_PAGE, alpha, vreq);
    	 	} catch (SearchEngineException e) {
    	 	    String msg = "An error occurred retrieving results for vclass query";
@@ -169,9 +178,15 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	    }
     }
 
-    public static IndividualListResults getResultsForVClassIntersections(List<String> vclassURIs, int page, int pageSize, String alpha, VitroRequest vreq) {
+    public static IndividualListResults getResultsForVClassIntersections(
+            List<String> vclassURIs, int page, int pageSize, String alpha, VitroRequest vreq) {
         try{
-            IndividualListQueryResults results = buildAndExecuteVClassQuery(vclassURIs, alpha, page, pageSize, vreq.getWebappDaoFactory().getIndividualDao());
+            ConfigurationProperties props = ConfigurationProperties.getBean(vreq);
+            boolean languageFilter = Boolean.valueOf(props.getProperty(
+                    LANGUAGE_FILTER_PROPERTY, "false"));
+            IndividualListQueryResults results = buildAndExecuteVClassQuery(
+                    vclassURIs, alpha, ((languageFilter) ? vreq.getLocale() : null),
+                    page, pageSize, vreq.getWebappDaoFactory().getIndividualDao());
 	        return getResultsForVClassQuery(results, page, pageSize, alpha, vreq);
         } catch(Throwable th) {
        	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
@@ -201,9 +216,10 @@ public class IndividualListController extends FreemarkerHttpServlet {
 
 
     private static IndividualListQueryResults buildAndExecuteVClassQuery(
-			List<String> vclassURIs, String alpha, int page, int pageSize, IndividualDao indDao)
+			List<String> vclassURIs, String alpha, Locale locale, int page,
+			int pageSize, IndividualDao indDao)
 			throws SearchEngineException {
-		 SearchQuery query = SearchQueryUtils.getQuery(vclassURIs, alpha, page, pageSize);
+		 SearchQuery query = SearchQueryUtils.getQuery(vclassURIs, alpha, locale, page, pageSize);
 		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
 		 log.debug("Executed search query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) {

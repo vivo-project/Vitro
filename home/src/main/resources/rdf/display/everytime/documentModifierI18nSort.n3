@@ -1,0 +1,15 @@
+@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:documentModifier_multilingual_sort
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.SelectQueryDocumentModifierDynamicTargetField> ,
+            <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    rdfs:label "multilingual sort document modifier" ;
+    :hasSelectQuery """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT ?targetField (LCASE(STR(MIN(?labelRaw))) AS ?label) WHERE {
+            ?uri rdfs:label ?labelRaw
+            BIND(CONCAT("nameLowercaseSingleValued_", IF(LANG(?labelRaw) = "", "plain", LANG(?labelRaw)), "_s") AS ?targetField)
+        } GROUP BY ?targetField
+    """ .
