@@ -25,6 +25,27 @@ public class ParameterType implements Removable {
         this.rdftype = rdftype;
     }
     
+    public boolean isLiteral() {
+    	if (!isRdfType()) {
+    		return false;
+    	}
+    	return rdftype.isLiteral();
+    }
+    
+    public boolean isUri() {
+    	if (!isRdfType()) {
+    		return false;
+    	}
+    	return rdftype.isUri();
+    }
+    
+    public boolean isRdfType() {
+    	if (rdftype != null) {
+    		return true;
+    	}
+    	return false;
+    }
+    
     public RDFType getRdfType() {
     	return rdftype;
     }

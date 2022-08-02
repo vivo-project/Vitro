@@ -15,8 +15,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 
 public class Parameters implements Removable {
 
-	private static final String ANY_URI = "http://www.w3.org/2001/XMLSchema#anyURI";
-
 	private Map<String, Parameter> params;
 
 	public Parameters() {
@@ -57,8 +55,7 @@ public class Parameters implements Removable {
 	}
 
 	private Stream<Parameter> getUrisParamStream(boolean isUri) {
-		return params.values().stream().filter(value -> value.getType().getRdfType() != null
-				&& value.getType().getRdfType().getRDFDataType().getURI().equals(ANY_URI) == isUri);
+		return params.values().stream().filter(value -> value.getType().isRdfType()	&& value.getType().isUri() == isUri);
 	}
 
 	public Parameter get(String name) {
@@ -76,8 +73,7 @@ public class Parameters implements Removable {
 	// Substitute IRI parameters with their values in specific request
 	public Map<String, List<String>> substituteIRIVariables(OperationData input) {
 		return params.values().stream()
-				.filter(value -> value.getType().getRdfType() != null
-						&& value.getType().getRdfType().getRDFDataType().getURI().equals(ANY_URI)).collect(
+				.filter(value -> value.getType().isUri()).collect(
 						Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
 	}
 
@@ -85,8 +81,7 @@ public class Parameters implements Removable {
 	// specific request
 	public Map<String, List<Literal>> substituteLiteralVariables(OperationData input) {
 		return params.values().stream()
-				.filter(value -> value.getType().getRdfType() != null
-						&& !value.getType().getRdfType().getRDFDataType().getURI().equals(ANY_URI))
+				.filter(value -> value.getType().isLiteral())
 				.collect(Collectors.toMap(param -> param.getName(),
 						param -> Arrays.asList(ResourceFactory.createTypedLiteral(input.get(param.getName())[0],
 								param.getType().getRdfType().getRDFDataType()))));
