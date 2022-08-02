@@ -8,7 +8,7 @@
     rdfs:label "multilingual label document modifier" ;
     :hasSelectQuery """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        SELECT ?targetField (LCASE(STR(MIN(?labelRaw))) AS ?label) WHERE {
+        SELECT ?targetField (STR(MIN(?labelRaw)) AS ?label) WHERE {
             ?uri rdfs:label ?labelRaw
             FILTER("" != LANG(?labelRaw))
             BIND(CONCAT("nameRawSingleValued_", LANG(?labelRaw), "_s") AS ?targetField)
