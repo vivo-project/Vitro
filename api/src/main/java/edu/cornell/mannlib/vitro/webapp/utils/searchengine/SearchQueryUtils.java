@@ -212,6 +212,11 @@ public class SearchQueryUtils {
         return VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED + "_"
             + locale.toString().replace('_', '-') + "_s";
     }
+    
+    public static String getLabelFieldNameForLocale(Locale locale) {
+        return VitroSearchTermNames.NAME_RAW + "SingleValued_"
+            + locale.toString().replace('_', '-') + "_s";
+    }
 
     public static SearchQuery getRandomQuery(List<String> vclassUris, int page, int pageSize){
         String queryText = "";

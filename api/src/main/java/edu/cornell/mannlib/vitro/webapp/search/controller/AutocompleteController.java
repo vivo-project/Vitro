@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumen
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 
 /**
  * AutocompleteController generates autocomplete content
@@ -127,7 +128,10 @@ public class AutocompleteController extends VitroAjaxController {
             for (SearchResultDocument doc : docs) {
                 try {
                     String uri = doc.getStringValue(VitroSearchTermNames.URI);
-                    String name = doc.getStringValue(VitroSearchTermNames.NAME_RAW);
+                    String name = doc.getStringValue(SearchQueryUtils.getLabelFieldNameForLocale(vreq.getLocale()));
+                    if (name == null) {
+                        name = doc.getStringValue(VitroSearchTermNames.NAME_RAW);
+                    }
                     //There may be multiple most specific types, sending them all back
                     String mst = doc.getStringValue(VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS);
                     //Assuming these will get me string values
@@ -184,7 +188,9 @@ public class AutocompleteController extends VitroAjaxController {
         	addFilterQuery(query, typeParam,  multipleTypesParam);
         }
 
-        query.addFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS); // fields to retrieve
+        query.addFields(SearchQueryUtils.getLabelFieldNameForLocale(vreq.getLocale()),
+                VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI,
+                VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS); // fields to retrieve
 
         // Can't sort on multivalued field, so we sort the results in Java when we get them.
         // query.addSortField(VitroSearchTermNames.NAME_LOWERCASE, Order.ASC);

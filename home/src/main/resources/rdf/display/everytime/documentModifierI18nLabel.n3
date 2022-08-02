@@ -2,15 +2,15 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-:documentModifier_multilingual_sort
+:documentModifier_multilingual_label
     a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.SelectQueryDocumentModifierDynamicTargetField> ,
             <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
-    rdfs:label "multilingual sort document modifier" ;
+    rdfs:label "multilingual label document modifier" ;
     :hasSelectQuery """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         SELECT ?targetField (LCASE(STR(MIN(?labelRaw))) AS ?label) WHERE {
             ?uri rdfs:label ?labelRaw
             FILTER("" != LANG(?labelRaw))
-            BIND(CONCAT("nameLowercaseSingleValued_", LANG(?labelRaw), "_s") AS ?targetField)
+            BIND(CONCAT("nameRawSingleValued_", LANG(?labelRaw), "_s") AS ?targetField)
         } GROUP BY ?targetField
     """ .
