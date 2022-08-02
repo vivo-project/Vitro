@@ -117,6 +117,14 @@
          rdfs:range :RDFType ;
          rdfs:label "has RDF data type"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#implementationType
+:implementationType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :ParameterType ;
+         rdfs:range :ImplementationType ;
+         rdfs:label "has implementation type"@en-US .
+
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasType
 :serializationType rdf:type owl:ObjectProperty ;
@@ -357,6 +365,14 @@
       rdfs:label "name"@en-US .
 
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#className
+:className rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ImplementationType ;
+          rdfs:range xsd:string ;
+          rdfs:label "Fully-qualified implementation class name"@en-US .
+
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#question
 :question rdf:type owl:DatatypeProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
@@ -573,6 +589,10 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#RDFType
 :RDFType rdf:type owl:Class ;
                rdfs:label "RDF data type type"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ImplementationType
+:ImplementationType rdf:type owl:Class ;
+               rdfs:label "Implementation type"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#PrimitiveSerializationType
 :PrimitiveSerializationType rdf:type owl:Class ;

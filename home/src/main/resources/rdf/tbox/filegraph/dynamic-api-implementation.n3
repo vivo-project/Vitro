@@ -28,6 +28,8 @@ dynapi:ParameterType rdfs:subClassOf dynapi_types:ParameterType .
 
 dynapi:RDFType rdfs:subClassOf dynapi_types:RDFType .
 
+dynapi:ImplementationType rdfs:subClassOf dynapi_types:ImplementationType .
+
 dynapi:PrimitiveSerializationType rdfs:subClassOf dynapi_java:serialization.PrimitiveSerializationType, dynapi_java:serialization.SerializationType .
 
 dynapi:ArraySerializationType rdfs:subClassOf dynapi_java:serialization.ArraySerializationType, dynapi_java:serialization.SerializationType .

@@ -12,6 +12,5 @@ public class JsonObject {
 	public JsonObject(String rawString) {
 		ctx = JsonPath.using(jsonPathConfig).parse(rawString);
 	}
-
 	
 }
