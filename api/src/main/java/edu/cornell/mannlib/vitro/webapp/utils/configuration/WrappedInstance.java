@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyMethod;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyStatement;
@@ -60,6 +61,15 @@ public class WrappedInstance<T> {
 			} else {
 				RequestModelsUser rmu = (RequestModelsUser) instance;
 				rmu.setRequestModels(ModelAccess.on(req));
+			}
+		}
+		if (instance instanceof ConfigurationReader) {
+			if (ctx == null) {
+				throw new ResourceUnavailableException("Cannot satisfy "
+						+ "ConfigurationReader interface: context not available.");
+			} else {
+				ConfigurationReader cr = (ConfigurationReader) instance;
+				cr.setConfigurationProperties(ConfigurationProperties.getBean(ctx));
 			}
 		}
 	}

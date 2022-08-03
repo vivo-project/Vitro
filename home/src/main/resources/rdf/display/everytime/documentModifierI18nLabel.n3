@@ -6,11 +6,10 @@
     a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.SelectQueryDocumentModifierDynamicTargetField> ,
             <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
     rdfs:label "multilingual label document modifier" ;
+    :hasTargetSuffix "_label_display" ;
     :hasSelectQuery """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        SELECT ?targetField (STR(MIN(?labelRaw)) AS ?label) WHERE {
-            ?uri rdfs:label ?labelRaw
-            FILTER("" != LANG(?labelRaw))
-            BIND(CONCAT("nameRawSingleValued_", LANG(?labelRaw), "_s") AS ?targetField)
-        } GROUP BY ?targetField
+        SELECT ( MIN(?label) as ?singleLabel ) WHERE {
+            ?uri rdfs:label ?label .
+        }
     """ .

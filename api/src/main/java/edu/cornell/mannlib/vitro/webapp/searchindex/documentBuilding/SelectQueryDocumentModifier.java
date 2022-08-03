@@ -141,7 +141,7 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 		return false;
 	}
 
-	protected List<String> getTextForQueries(Individual ind) {
+	private List<String> getTextForQueries(Individual ind) {
 		List<String> list = new ArrayList<>();
 		for (String query : queries) {
 			list.addAll(getTextForQuery(query, ind));
@@ -149,7 +149,7 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 		return list;
 	}
 
-	protected List<String> getTextForQuery(String query, Individual ind) {
+	private List<String> getTextForQuery(String query, Individual ind) {
 		try {
 			QueryHolder queryHolder = new QueryHolder(query).bindToUri("uri",
 					ind.getURI());
