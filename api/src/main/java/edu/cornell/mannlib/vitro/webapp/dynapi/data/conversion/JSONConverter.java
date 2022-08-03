@@ -153,7 +153,7 @@ public class JSONConverter {
 		return readJson(ctx.jsonString());
 	}
 
-	private static JsonNode readJson(String jsonString) throws ConversionException {
+	public static JsonNode readJson(String jsonString) throws ConversionException {
 		JsonNode node = null;
 		try {
 			node = mapper.readTree(jsonString);

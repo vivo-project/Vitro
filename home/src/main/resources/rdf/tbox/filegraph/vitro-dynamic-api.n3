@@ -366,11 +366,40 @@
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#className
-:className rdf:type owl:DatatypeProperty ;
+:className rdf:type owl:DatatypeProperty,
+					owl:FunctionalProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
-          rdfs:domain :ImplementationType ;
+          rdfs:domain [ rdf:type owl:Class ;
+                       owl:unionOf ( :ImplementationType
+                                     :ImplementationConfig
+                                   )
+                     ] ;
           rdfs:range xsd:string ;
           rdfs:label "Fully-qualified implementation class name"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#methodName
+:methodName rdf:type owl:DatatypeProperty,
+					owl:FunctionalProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ImplementationConfig ;
+          rdfs:range xsd:string ;
+          rdfs:label "Method name"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#methodArguments
+:methodArguments rdf:type owl:DatatypeProperty,
+					owl:FunctionalProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ImplementationConfig ;
+          rdfs:range xsd:string ;
+          rdfs:label "Method arguments"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#isStaticMethod
+:isStaticMethod rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :ImplementationConfig ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "is static method or not"@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#question
@@ -582,17 +611,26 @@
 :ParameterType rdf:type owl:Class ;
                rdfs:label "Parameter type"@en-US .
 
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#SerializationType
 :SerializationType rdf:type owl:Class ;
                rdfs:label "Serialization type"@en-US .
+
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#RDFType
 :RDFType rdf:type owl:Class ;
                rdfs:label "RDF data type type"@en-US .
 
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ImplementationType
 :ImplementationType rdf:type owl:Class ;
                rdfs:label "Implementation type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ImplementationConfig
+:ImplementationConfig rdf:type owl:Class ;
+               rdfs:label "Parameter implementation configuration"@en-US .
+
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#PrimitiveSerializationType
 :PrimitiveSerializationType rdf:type owl:Class ;
