@@ -239,8 +239,8 @@
         rdfs:label              "String deserialization config"@en-US ;
 		dynapi:className 		"java.lang.String" ;
 		dynapi:methodName 		"toString";
-		dynapi:methodArguments	"input";
-		dynapi:isStaticMethod	"true"^^xsd:boolean ;
+		dynapi:methodArguments	"";
+		dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/string>

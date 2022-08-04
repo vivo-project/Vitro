@@ -1,7 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
-import java.math.BigInteger;
-
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ImplementationType {
@@ -10,6 +8,13 @@ public class ImplementationType {
 	private ImplementationConfig serializationConfig;
 	private ImplementationConfig deserializationConfig;
 
+	public ImplementationConfig getSerializationConfig() {
+		return serializationConfig;
+	}
+
+	public ImplementationConfig getDeserializationConfig() {
+		return deserializationConfig;
+	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#className", minOccurs = 1, maxOccurs = 1)
 	public void setName(String className) throws ClassNotFoundException {

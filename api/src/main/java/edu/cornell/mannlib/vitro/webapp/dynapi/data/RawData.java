@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ParameterConverter;
 
 public class RawData {
 
@@ -37,8 +39,8 @@ public class RawData {
         return string;
     }
 
-	public void earlyInitialization() {
-		String initValue = this.string;
+	public void earlyInitialization() throws ConversionException {
+		object = ParameterConverter.deserialize(param, string);
 	}
 
 	public Object getJsonValue() {

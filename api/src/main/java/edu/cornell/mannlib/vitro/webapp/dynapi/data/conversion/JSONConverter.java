@@ -123,7 +123,7 @@ public class JSONConverter {
 		return ctx;
 	}
 
-	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param, Action action) {
+	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param, Action action) throws ConversionException {
 		String paramPath = getReadPath(name, param, action);
 		JsonNode node = ctx.read(paramPath, JsonNode.class);
 		RawData data = new RawData(param);
