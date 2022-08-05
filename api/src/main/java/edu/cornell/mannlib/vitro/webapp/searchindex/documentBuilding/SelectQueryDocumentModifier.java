@@ -64,13 +64,13 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 	 * The names of the fields where the results of the queries will be stored.
 	 * If empty, it is assumed to be ALLTEXT and ALLTEXTUNSTEMMED.
 	 */
-	protected List<String> fieldNames = new ArrayList<>();
+	private List<String> fieldNames = new ArrayList<>();
 
 	/**
 	 * URIs of the types of individuals to whom these queries apply. If empty,
 	 * then the queries apply to all individuals.
 	 */
-	protected Set<String> typeRestrictions = new HashSet<>();
+	private Set<String> typeRestrictions = new HashSet<>();
 
 	@Override
 	public void setContextModels(ContextModelAccess models) {
