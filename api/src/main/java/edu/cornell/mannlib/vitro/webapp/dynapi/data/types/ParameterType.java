@@ -10,6 +10,7 @@ public class ParameterType implements Removable {
 	private SerializationType serializationType;
 	private RDFType rdftype;
 	private ImplementationType implementationType;
+	protected ParameterType valuesType = this;
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
     public void setName(String name) {
@@ -30,9 +31,13 @@ public class ParameterType implements Removable {
     public void setImplementationType(ImplementationType implementationType) {
         this.implementationType = implementationType;
     }
-    
+        
     public ImplementationType getImplementationType() {
     	return implementationType;
+    }
+    
+    public ParameterType getValuesType() {
+    	return valuesType;
     }
     
     public boolean isLiteral() {

@@ -104,6 +104,8 @@ public class JSONConverter {
 			RawData data = dataStore.getData(name);
 			//TODO: General schema for objects, arrays and simple values is to get 
 			//the serialised by RawData and the put to the context here. 
+			
+			
 			//ctx.put(path, name, data.getJsonValue());
 		}
 		return ctx.jsonString();

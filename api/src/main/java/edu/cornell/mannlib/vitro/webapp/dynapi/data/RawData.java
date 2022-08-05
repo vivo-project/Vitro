@@ -40,10 +40,10 @@ public class RawData {
     }
 
 	public void earlyInitialization() throws ConversionException {
-		object = ParameterConverter.deserialize(param, string);
+		object = ParameterConverter.deserialize(param.getType(), string);
 	}
 
-	public Object getJsonValue() {
-		return "";
+	public Object getJsonValue() throws ConversionException {
+		return ParameterConverter.serialize(param.getType(), object);
 	}
 }

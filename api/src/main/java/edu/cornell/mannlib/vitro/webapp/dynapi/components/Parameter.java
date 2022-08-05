@@ -1,7 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import org.apache.jena.datatypes.RDFDatatype;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;

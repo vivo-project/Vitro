@@ -81,13 +81,14 @@
 		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/string> ;
         vitro:mostSpecificType  dynapi:ParameterType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/array>
-        a                       dynapi:ParameterType, dynapi_types:ParameterType ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/array-of-strings>
+        a                       dynapi:ArrayParameterType, dynapi:ParameterType, dynapi_types:ParameterType, dynapi_types:ArrayParameterType ;
         dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
-		dynapi:implementationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/array-list> ;
+		dynapi:implementationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/array> ;
 		dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/array> ;
-        vitro:mostSpecificType  dynapi:ParameterType, dynapi_types:ParameterType .
+		dynapi:containsType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> ;
+        vitro:mostSpecificType  dynapi:ArrayParameterType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string>
         a                       dynapi:ParameterType, dynapi_types:ParameterType ;
@@ -159,10 +160,10 @@
         rdfs:label              "BigInteger"@en-US ;
         vitro:mostSpecificType  dynapi:ImplementationType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/array-list>
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/array>
         a                       dynapi:ImplementationType, dynapi_types:ImplementationType ;
-		dynapi:serializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/array-list> ;
-		dynapi:deserializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/array-list> ;
+		dynapi:serializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/array> ;
+		dynapi:deserializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/array> ;
         dynapi:className        "java.util.ArrayList" ;
         rdfs:label              "Array list"@en-US ;
         vitro:mostSpecificType  dynapi:ImplementationType .
@@ -198,7 +199,7 @@
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/array-list>
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/array>
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Array list deserialization config"@en-US ;
 		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList" ;
@@ -207,7 +208,7 @@
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/array-list> 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/array> 
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Array list serialization config"@en-US ;
 		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList" ;

@@ -17,14 +17,13 @@ public class ParameterConverter {
 
 	private static final Log log = LogFactory.getLog(ParameterConverter.class.getName());
 	
-	public static String serialize(Parameter param, Object input) throws ConversionException {
-		return convert(param, input).toString();
+	public static String serialize(ParameterType type, Object input) throws ConversionException {
+		return convert(type, input).toString();
 	}
-	public static Object deserialize(Parameter param, Object input) throws ConversionException {
-		return convert(param, input);
+	public static Object deserialize(ParameterType type, Object input) throws ConversionException {
+		return convert(type, input);
 	}
-	private static Object convert(Parameter param, Object input) throws ConversionException {
-		ParameterType type = param.getType();
+	private static Object convert(ParameterType type, Object input) throws ConversionException {
 		ImplementationType implementation = type.getImplementationType();
 		ImplementationConfig config = implementation.getDeserializationConfig();
 		Class<?> classObject = config.getClassObject();
@@ -40,7 +39,7 @@ public class ParameterConverter {
 		Class<?> methodArgs[] = new Class[length];
 		Object invokeArgs[] = new Object[length];
 		for (int i = 0; i < methodArgs.length; i++) {
-			String className = getClassName(arguments[i], input);
+			String className = getClassName(arguments[i], input, type);
 			try {
 				methodArgs[i] = Class.forName(className);
 			} catch (ClassNotFoundException e) {
@@ -50,7 +49,7 @@ public class ParameterConverter {
 		}
 		
 		for (int i = 0; i < invokeArgs.length; i++) {
-			invokeArgs[i]= getArgument(arguments[i], input);
+			invokeArgs[i]= getArgument(arguments[i], input, type);
 		}
 		
 		config.getMethodArguments();
@@ -93,16 +92,22 @@ public class ParameterConverter {
 		return length;
 	}
 	
-	private static String getClassName(String var, Object input) throws ConversionException {
+	private static String getClassName(String var, Object input, ParameterType type) throws ConversionException {
 		if ("input".equals(var)) {
 			return input.getClass().getCanonicalName();
+		}
+		if ("type".equals(var)) {
+			return type.getClass().getCanonicalName();
 		}
 		throw new ConversionException("Variable name " + var + " is not known");
 	}
 	
-	private static Object getArgument(String var, Object input) throws ConversionException {
+	private static Object getArgument(String var, Object input, ParameterType type) throws ConversionException {
 		if ("input".equals(var)) {
 			return input;
+		}
+		if ("type".equals(var)) {
+			return type;
 		}
 		throw new ConversionException("Variable name " + var + " is not known");
 	}

@@ -26,6 +26,8 @@ dynapi:Parameter rdfs:subClassOf dynapi_java:Parameter .
 
 dynapi:ParameterType rdfs:subClassOf dynapi_types:ParameterType .
 
+dynapi:ArrayParameterType rdfs:subClassOf dynapi_types:ParameterType, dynapi_types:ArrayParameterType .
+
 dynapi:RDFType rdfs:subClassOf dynapi_types:RDFType .
 
 dynapi:ImplementationType rdfs:subClassOf dynapi_types:ImplementationType .
