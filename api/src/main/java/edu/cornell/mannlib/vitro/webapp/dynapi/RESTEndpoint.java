@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
@@ -154,13 +153,9 @@ public class RESTEndpoint extends VitroHttpServlet {
 			return;
 		}
 
-        OperationData input = new OperationData(request);
-        if (requestPath.isResourceRequest()) {
-            input.add(RESTEndpoint.RESOURCE_ID, new StringData(requestPath.getResourceId()));
-        }
         try {
-            OperationResult result = action.run(input);
-            Converter.convert(response, action, result, input, dataStore);
+            OperationResult result = action.run(dataStore);
+            Converter.convert(response, action, result, dataStore);
         } catch (ConversionException e) {
         	log.error(e,e);
         	response.setStatus(500);

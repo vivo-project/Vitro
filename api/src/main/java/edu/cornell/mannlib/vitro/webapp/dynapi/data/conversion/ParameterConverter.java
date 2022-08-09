@@ -18,14 +18,20 @@ public class ParameterConverter {
 	private static final Log log = LogFactory.getLog(ParameterConverter.class.getName());
 	
 	public static String serialize(ParameterType type, Object input) throws ConversionException {
-		return convert(type, input).toString();
+		return convert(type, input, true).toString();
 	}
 	public static Object deserialize(ParameterType type, Object input) throws ConversionException {
-		return convert(type, input);
+		return convert(type, input, false);
 	}
-	private static Object convert(ParameterType type, Object input) throws ConversionException {
+	private static Object convert(ParameterType type, Object input, boolean serialize) throws ConversionException {
 		ImplementationType implementation = type.getImplementationType();
-		ImplementationConfig config = implementation.getDeserializationConfig();
+		ImplementationConfig config = null;
+		if (serialize) {
+			config = implementation.getSerializationConfig();
+		} else {
+			config = implementation.getDeserializationConfig();			
+		}
+
 		Class<?> classObject = config.getClassObject();
 		String methodName = config.getMethodName();
 		String rawArgs = config.getMethodArguments();

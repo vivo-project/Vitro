@@ -27,6 +27,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RPCEndpointTest {
@@ -34,8 +35,6 @@ public class RPCEndpointTest {
     private final static String PATH_INFO = "/test";
 
     private Map<String, String[]> params;
-
-    private ServletContext context;
 
     private MockedStatic<ActionPool> actionPoolStatic;
 
@@ -60,7 +59,6 @@ public class RPCEndpointTest {
         when(actionPool.get(any(String.class))).thenReturn(action);
 
         when(request.getParameterMap()).thenReturn(params);
-        when(request.getServletContext()).thenReturn(context);
 
         rpcEndpoint = new RPCEndpoint();
     }
@@ -83,7 +81,7 @@ public class RPCEndpointTest {
 
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(PATH_INFO);
-        when(action.run(any(OperationData.class))).thenReturn(result);
+        when(action.run(any(DataStore.class))).thenReturn(result);
         when(response.getWriter()).thenReturn(new PrintWriter(System.out));
         rpcEndpoint.doPost(request, response);
         verify(action, times(1)).run(any());

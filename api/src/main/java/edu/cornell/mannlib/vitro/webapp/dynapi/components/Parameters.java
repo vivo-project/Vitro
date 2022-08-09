@@ -1,17 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.ResourceFactory;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 
 public class Parameters implements Removable {
 
@@ -43,21 +34,6 @@ public class Parameters implements Removable {
 		return params.keySet();
 	}
 
-	public Map<String, List<Literal>> getLiteralsMap(OperationData input) {
-		return getUrisParamStream(false).collect(Collectors.toMap(param -> param.getName(),
-				param -> Arrays.asList(ResourceFactory.createTypedLiteral(input.get(param.getName())[0],
-						param.getType().getRdfType().getRDFDataType()))));
-	}
-
-	public Map<String, List<String>> getUrisMap(OperationData input) {
-		return getUrisParamStream(true).collect(
-				Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
-	}
-
-	private Stream<Parameter> getUrisParamStream(boolean isUri) {
-		return params.values().stream().filter(value -> value.getType().isRdfType()	&& value.getType().isUri() == isUri);
-	}
-
 	public Parameter get(String name) {
 		return params.get(name);
 	}
@@ -70,22 +46,21 @@ public class Parameters implements Removable {
 		return params.containsKey(name);
 	}
 
-	// Substitute IRI parameters with their values in specific request
-	public Map<String, List<String>> substituteIRIVariables(OperationData input) {
-		return params.values().stream()
-				.filter(value -> value.getType().isUri()).collect(
-						Collectors.toMap(param -> param.getName(), param -> Arrays.asList(input.get(param.getName()))));
-	}
-
-	// Substitute parameters that represent RDF literals with their values in
-	// specific request
-	public Map<String, List<Literal>> substituteLiteralVariables(OperationData input) {
-		return params.values().stream()
-				.filter(value -> value.getType().isLiteral())
-				.collect(Collectors.toMap(param -> param.getName(),
-						param -> Arrays.asList(ResourceFactory.createTypedLiteral(input.get(param.getName())[0],
-								param.getType().getRdfType().getRDFDataType()))));
-	}
+	/*
+	 * // Substitute IRI parameters with their values in specific request public
+	 * Map<String, List<String>> substituteIRIVariables(DataStore input) { return
+	 * params.values().stream() .filter(value -> value.getType().isUri()).collect(
+	 * Collectors.toMap(param -> param.getName(), param ->
+	 * Arrays.asList(input.get(param.getName())))); }
+	 * 
+	 * // Substitute parameters that represent RDF literals with their values in //
+	 * specific request public Map<String, List<Literal>>
+	 * substituteLiteralVariables(DataStore input) { return params.values().stream()
+	 * .filter(value -> value.getType().isLiteral()) .collect(Collectors.toMap(param
+	 * -> param.getName(), param ->
+	 * Arrays.asList(ResourceFactory.createTypedLiteral(input.get(param.getName())[0
+	 * ], param.getType().getRdfType().getRDFDataType())))); }
+	 */
 
 	@Override
 	public void dereference() {

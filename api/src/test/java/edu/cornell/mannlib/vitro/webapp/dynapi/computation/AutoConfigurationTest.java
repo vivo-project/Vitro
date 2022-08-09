@@ -10,6 +10,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SPARQLQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 
 public class AutoConfigurationTest {
     @Test
@@ -114,7 +118,32 @@ public class AutoConfigurationTest {
 
     private Parameter param(String name) {
         Parameter param = new Parameter();
-        param.setName(name);
+        ParameterType uri1ParamType = new ParameterType();
+        ImplementationType uri1ImplType = new ImplementationType();
+        
+        ImplementationConfig config = new ImplementationConfig();
+		
+		try {
+			config.setClassName("java.lang.String");
+			config.setMethodArguments("");
+			config.setMethodName("toString");
+			config.setStaticMethod(false);
+			uri1ImplType.setDeserializationConfig(config);
+			uri1ImplType.setSerializationConfig(config);
+			uri1ImplType.setName("java.lang.String");
+
+			RDFType rdfType = new RDFType();
+			rdfType.setName("anyURI");
+			uri1ParamType.setRdfType(rdfType);
+			
+			uri1ParamType.setImplementationType(uri1ImplType );
+			param.setType(uri1ParamType);
+	        param.setName(name);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return param;
+
     }
 }

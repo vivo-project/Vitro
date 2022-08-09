@@ -19,15 +19,15 @@ public class RawData {
         this.param = param;
     }
     
-    protected void setObject(Object object) {
+    public void setObject(Object object) {
         this.object = object;
     }
     
-    protected Object getObject() {
+    public Object getObject() {
         return object;
     }
     
-    protected Parameter getParam() {
+    public Parameter getParam() {
     	return param;
     }
     
@@ -40,10 +40,17 @@ public class RawData {
     }
 
 	public void earlyInitialization() throws ConversionException {
+		if (param.isInternal()) {
+			object = ParameterConverter.deserialize(param.getType(), param.getName());
+			return;
+		} 
 		object = ParameterConverter.deserialize(param.getType(), string);
 	}
 
-	public Object getJsonValue() throws ConversionException {
+	public String getJsonValue() throws ConversionException {
+		if (object == null) {
+			object = ParameterConverter.deserialize(param.getType(), string);
+		}
 		return ParameterConverter.serialize(param.getType(), object);
 	}
 }

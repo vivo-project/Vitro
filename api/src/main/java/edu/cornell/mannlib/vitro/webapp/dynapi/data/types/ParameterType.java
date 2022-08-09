@@ -6,70 +6,93 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ParameterType implements Removable {
 
-    protected String name;
+	private String name;
 	private SerializationType serializationType;
 	private RDFType rdftype;
 	private ImplementationType implementationType;
 	protected ParameterType valuesType = this;
+	private boolean isInternal = false;
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
+	
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationType", minOccurs = 1, maxOccurs = 1)
-    public void setSerializationType(SerializationType serializationType) {
-        this.serializationType = serializationType;
-    }
-    
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rdfType", minOccurs = 0, maxOccurs = 1)
-    public void setRdfType(RDFType rdftype) {
-        this.rdftype = rdftype;
-    }
-    
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#implementationType", minOccurs = 1, maxOccurs = 1)
-    public void setImplementationType(ImplementationType implementationType) {
-        this.implementationType = implementationType;
-    }
-        
-    public ImplementationType getImplementationType() {
-    	return implementationType;
-    }
-    
-    public ParameterType getValuesType() {
-    	return valuesType;
-    }
-    
-    public boolean isLiteral() {
-    	if (!isRdfType()) {
-    		return false;
-    	}
-    	return rdftype.isLiteral();
-    }
-    
-    public boolean isUri() {
-    	if (!isRdfType()) {
-    		return false;
-    	}
-    	return rdftype.isUri();
-    }
-    
-    public boolean isRdfType() {
-    	if (rdftype != null) {
-    		return true;
-    	}
-    	return false;
-    }
-    
-    public RDFType getRdfType() {
-    	return rdftype;
-    }
-    
-    public SerializationType getSerializationType() {
-    	return serializationType;
-    }
-    
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationType", minOccurs = 1, maxOccurs = 1)
+	public void setSerializationType(SerializationType serializationType) {
+		this.serializationType = serializationType;
+	}
+
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#rdfType", minOccurs = 0, maxOccurs = 1)
+	public void setRdfType(RDFType rdftype) {
+		this.rdftype = rdftype;
+	}
+
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#isInternal", maxOccurs = 1)
+	public void setIsInternal(boolean isInternal) {
+		this.isInternal = isInternal;
+	}
+
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#implementationType", minOccurs = 1, maxOccurs = 1)
+	public void setImplementationType(ImplementationType implementationType) {
+		this.implementationType = implementationType;
+	}
+
+	public ImplementationType getImplementationType() {
+		return implementationType;
+	}
+
+	public ParameterType getValuesType() {
+		return valuesType;
+	}
+
+	public boolean isLiteral() {
+		if (!isRdfType()) {
+			return false;
+		}
+		return rdftype.isLiteral();
+	}
+
+	public boolean isUri() {
+		if (!isRdfType()) {
+			return false;
+		}
+		return rdftype.isUri();
+	}
+
+	public boolean isRdfType() {
+		if (rdftype != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public RDFType getRdfType() {
+		return rdftype;
+	}
+
+	public SerializationType getSerializationType() {
+		return serializationType;
+	}
+
 	@Override
 	public void dereference() {
+	}
+
+	public boolean isArray() {
+		return getImplementationType().getClassName().getCanonicalName().equals("java.util.ArrayList");
+	}
+
+	public boolean isInternal() {
+		return isInternal;
+	}
+
+	public boolean isJsonObject() {
+		return getImplementationType().getClassName().getCanonicalName()
+				.equals("edu.cornell.mannlib.vitro.webapp.dynapi.data.types.JsonObject");
 	}
 }

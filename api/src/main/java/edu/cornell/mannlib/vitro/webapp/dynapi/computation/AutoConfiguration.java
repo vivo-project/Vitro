@@ -18,7 +18,7 @@ public class AutoConfiguration {
     public static void computeParams(Action action) {
         Parameters required = action.getRequiredParams();
         Parameters provided = action.getProvidedParams();
-        Parameters local = action.getLocalParams();
+        Parameters internal = action.getInternalParams();
 
         ExecutionTree tree = new ExecutionTree(action);
         List<StepInfo> exits = tree.getLeafs();
@@ -30,7 +30,7 @@ public class AutoConfiguration {
         }
         for (List<StepInfo> path: paths) {
             Parameters computed = computeActionRequirements(path, provided);
-            mergeParameters(required, local, computed);
+            mergeParameters(required, internal, computed);
         }
         if( log.isDebugEnabled()) {
             Set<String> names = action.getRequiredParams().getNames();
@@ -39,12 +39,12 @@ public class AutoConfiguration {
         }
     }
 
-    private static void mergeParameters(Parameters required, Parameters local, Parameters computed) {
+    private static void mergeParameters(Parameters required, Parameters internal, Parameters computed) {
         //TODO: Support optional steps
         for (String name : computed.getNames()) {
             Parameter param = computed.get(name);
-            if (param.isLocal()) {
-                local.add(param);
+            if (param.isInternal()) {
+                internal.add(param);
             } else {
                 required.add(param);
             }

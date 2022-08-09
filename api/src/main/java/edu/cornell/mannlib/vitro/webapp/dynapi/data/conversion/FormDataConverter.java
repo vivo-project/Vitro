@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
@@ -39,9 +38,10 @@ public class FormDataConverter {
 		}
 	}
 
-	private static void readParam(DataStore dataStore, String name, String[] values, Parameter param) {
+	private static void readParam(DataStore dataStore, String name, String[] values, Parameter param) throws ConversionException {
 		RawData data = new RawData(param);
 		data.setRawString(values[0]);
+		data.earlyInitialization();
 		dataStore.addData(name, data);
 	}
 
@@ -55,8 +55,7 @@ public class FormDataConverter {
 		dataStore.addData(name, data);
 	}
 
-	public static void convert(HttpServletResponse response, Action action, OperationData operationData,
-			DataStore dataStore) throws ConversionException {
+	public static void convert(HttpServletResponse response, Action action, DataStore dataStore) throws ConversionException {
 		throw new ConversionException("Not implemented!");		
 	}
 

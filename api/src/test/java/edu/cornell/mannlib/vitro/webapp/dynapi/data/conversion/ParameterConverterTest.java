@@ -19,7 +19,7 @@ public class ParameterConverterTest {
 	@Test
 	public void stringDeserialization() throws ClassNotFoundException, ConversionException {
 		final String className = "java.lang.String";
-		ParameterType type = createType(className, "toString", "", false);
+		ParameterType type = createType(className, "toString", "", false, false);
 		final String input = "serialized string";
 		Object result = ParameterConverter.deserialize(type, input);
 		assertEquals(className, result.getClass().getCanonicalName());
@@ -29,7 +29,7 @@ public class ParameterConverterTest {
 	@Test
 	public void stringSerialization() throws ClassNotFoundException, ConversionException {
 		final String className = "java.lang.String";
-		ParameterType type = createType(className, "toString", "", false);
+		ParameterType type = createType(className, "toString", "", false, true);
 		final String input = "deserialized string";
 		Object result = ParameterConverter.serialize(type, input);
 		assertEquals("java.lang.String", result.getClass().getCanonicalName());
@@ -40,7 +40,7 @@ public class ParameterConverterTest {
 	@Test
 	public void integerDerialization() throws ClassNotFoundException, ConversionException {
 		final String className = "java.lang.Integer";
-		ParameterType type = createType(className, "parseInt", "input", true);
+		ParameterType type = createType(className, "parseInt", "input", true, false);
 		final String input = "42";
 		Object result = ParameterConverter.deserialize(type, input);
 		assertEquals(className, result.getClass().getCanonicalName());
@@ -50,7 +50,7 @@ public class ParameterConverterTest {
 	@Test
 	public void IntegerSerialization() throws ClassNotFoundException, ConversionException {
 		final String className = "java.lang.Integer";
-		ParameterType type = createType(className, "toString", "", false);
+		ParameterType type = createType(className, "toString", "", false, true);
 		final Integer input = 42;
 		Object result = ParameterConverter.serialize(type, input);
 		assertEquals("java.lang.String", result.getClass().getCanonicalName());
@@ -61,7 +61,7 @@ public class ParameterConverterTest {
 	@Test
 	public void bigIntegerDeserialization() throws ClassNotFoundException, ConversionException {
 		final String className = "java.math.BigInteger";
-		ParameterType type = createType(className, "", "input", false);
+		ParameterType type = createType(className, "", "input", false, false);
 		final String input = "42";
 		Object result = ParameterConverter.deserialize(type, input);
 		assertEquals(className, result.getClass().getCanonicalName());
@@ -71,7 +71,7 @@ public class ParameterConverterTest {
 	@Test
 	public void bigIntegerSerialization() throws ClassNotFoundException, ConversionException {
 		final String className = "java.math.BigInteger";
-		ParameterType type = createType(className, "toString", "", false);
+		ParameterType type = createType(className, "toString", "", false, true);
 		final BigInteger input = new BigInteger("42");
 		Object result = ParameterConverter.serialize(type, input);
 		assertEquals("java.lang.String", result.getClass().getCanonicalName());
@@ -81,7 +81,7 @@ public class ParameterConverterTest {
 	@Test
 	public void arrayOfStringDeserialization() throws ClassNotFoundException, ConversionException {
 		final String className = "edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList";
-		ParameterType type = createArrayType("deserialize", "input type", true, "java.lang.String", "toString", "", false);
+		ParameterType type = createArrayType("deserialize", "input type", true, "java.lang.String", "toString", "", false, false);
 		final String input = "[\"42\", \"42\"]";
 		Object result = ParameterConverter.deserialize(type, input);
 		assertEquals("java.util.ArrayList", result.getClass().getCanonicalName());
@@ -91,7 +91,7 @@ public class ParameterConverterTest {
 	@Test
 	public void arrayOfStringSerialization() throws ClassNotFoundException, ConversionException {
 		final String className = "edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList";
-		ParameterType type = createArrayType("serialize", "input", true, "java.lang.String", "toString", "", false);
+		ParameterType type = createArrayType("serialize", "input", true, "java.lang.String", "toString", "", false, true);
 		ArrayList input = new ArrayList(Arrays.asList("42", "42"));
 		Object result = ParameterConverter.serialize(type, input);
 		assertEquals("java.lang.String", result.getClass().getCanonicalName());
@@ -101,7 +101,7 @@ public class ParameterConverterTest {
 	@Test
 	public void arrayOfIntegerDeserialization() throws ClassNotFoundException, ConversionException {
 		final String className = "edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList";
-		ParameterType type = createArrayType("deserialize", "input type", true, "java.lang.Integer", "parseInt", "input", true);
+		ParameterType type = createArrayType("deserialize", "input type", true, "java.lang.Integer", "parseInt", "input", true, false);
 		final String input = "[42, 42]";
 		Object result = ParameterConverter.deserialize(type, input);
 		assertEquals("java.util.ArrayList", result.getClass().getCanonicalName());
@@ -111,7 +111,7 @@ public class ParameterConverterTest {
 	@Test
 	public void arrayOfIntegerSerialization() throws ClassNotFoundException, ConversionException {
 		final String className = "edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList";
-		ParameterType type = createArrayType("serialize", "input", true, "java.lang.Integer", "toString", "", false);
+		ParameterType type = createArrayType("serialize", "input", true, "java.lang.Integer", "toString", "", false, true);
 		ArrayList input = new ArrayList(Arrays.asList(42, 42));
 		Object result = ParameterConverter.serialize(type, input);
 		assertEquals("java.lang.String", result.getClass().getCanonicalName());
@@ -119,30 +119,38 @@ public class ParameterConverterTest {
 	}
 
 	private ParameterType createArrayType(String arrayMethod, String arrayArgs, boolean arrayIsStatic,
-	String elementClassName, String elemMethodName, String elemArgs, boolean elemIsStatic) throws ClassNotFoundException {
+	String elementClassName, String elemMethodName, String elemArgs, boolean elemIsStatic, boolean serialization) throws ClassNotFoundException {
 		final String arrayClassName = "edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList";
 		ArrayParameterType arrayType = new ArrayParameterType();
 		ImplementationType arrayImplType = new ImplementationType();
 		arrayType.setImplementationType(arrayImplType);
 		ImplementationConfig arrayConfig = new ImplementationConfig();
-		arrayImplType.setDeserializationConfig(arrayConfig);
+		if (serialization) {
+			arrayImplType.setSerializationConfig(arrayConfig);
+		} else {
+			arrayImplType.setDeserializationConfig(arrayConfig);			
+		}
 		arrayConfig.setClassName(arrayClassName);
 		arrayConfig.setMethodName(arrayMethod);
 		arrayConfig.setMethodArguments(arrayArgs);
 		arrayConfig.setStaticMethod(arrayIsStatic);
 
-		ParameterType elementType = createType(elementClassName, elemMethodName, elemArgs, elemIsStatic);
+		ParameterType elementType = createType(elementClassName, elemMethodName, elemArgs, elemIsStatic, serialization);
 		arrayType.setValuesType(elementType);
 		return arrayType;
 	}
 
-	private ParameterType createType(String className, String methodName, String args, boolean isStatic)
+	private ParameterType createType(String className, String methodName, String args, boolean isStatic, boolean serialization)
 			throws ClassNotFoundException {
 		ParameterType type = new ParameterType();
 		ImplementationType impType = new ImplementationType();
 		type.setImplementationType(impType);
 		ImplementationConfig config = new ImplementationConfig();
-		impType.setDeserializationConfig(config);
+		if (serialization) {
+			impType.setSerializationConfig(config);
+		} else {
+			impType.setDeserializationConfig(config);			
+		}
 		config.setClassName(className);
 		config.setMethodName(methodName);
 		config.setMethodArguments(args);

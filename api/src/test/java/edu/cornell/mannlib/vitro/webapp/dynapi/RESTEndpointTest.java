@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 
 @RunWith(Parameterized.class)
 public class RESTEndpointTest {
@@ -130,7 +131,7 @@ public class RESTEndpointTest {
         when(request.getMethod()).thenReturn(testMethod);
         when(request.getPathInfo()).thenReturn(testPathInfo);
 
-        when(action.run(any(OperationData.class)))
+        when(action.run(any(DataStore.class)))
             .thenReturn(new OperationResult(testExpectedStatus));
 
         when(httpMethod.getName()).thenReturn(testMethod);

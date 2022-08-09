@@ -289,6 +289,12 @@
              rdfs:range xsd:string ;
              rdfs:label "description"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#isInternal
+:isInternal rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :ParameterType ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "is internal parameter type"@en-US 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#isOptional
 :isOptional rdf:type owl:DatatypeProperty ,
@@ -568,6 +574,7 @@
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#Model
 :Model rdf:type owl:Class ;
+       rdfs:subClassOf :Parameter ;
        rdfs:label "Model"@en-US .
 
 

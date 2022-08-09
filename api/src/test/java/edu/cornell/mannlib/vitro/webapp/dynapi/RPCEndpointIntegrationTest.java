@@ -7,6 +7,8 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
@@ -19,18 +21,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory;
 
 @RunWith(Parameterized.class)
 public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private final static String URI_BASE = "http://localhost:8080" + RPC_SERVLET_PATH;
+
+    private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
     private RPCEndpoint rpcEndpoint;
 
@@ -63,6 +72,16 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
     @Parameter(6)
     public String testMessage;
 
+    @BeforeClass
+    public static void setupStaticObjects() {
+    	dynapiModelFactory = mockStatic(DynapiModelFactory.class);
+    }
+    
+    @AfterClass
+    public static void after() {
+        	dynapiModelFactory.close();    		
+    }
+    
     @Before
     public void beforeEach() throws Exception {
         actionPool = ActionPool.getInstance();
@@ -78,6 +97,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         when(request.getServletContext()).thenReturn(servletContext);
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
+        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(ontModel);
         
         if (testAction != null) {
             StringBuffer buffer = new StringBuffer(URI_BASE + "/" + testAction);

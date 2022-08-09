@@ -30,15 +30,12 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.RESTEndpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.converters.IOJsonMessageConverter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.ObjectData;
 
 public class JSONConverter {
 
@@ -67,7 +64,7 @@ public class JSONConverter {
 		}
 	}
 
-	public static void convert(HttpServletResponse response, Action action, OperationData operationData,
+	public static void convert(HttpServletResponse response, Action action,
 			DataStore dataStore) throws ConversionException {
 		response.setContentType(dataStore.getResponseType().toString());
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -78,9 +75,9 @@ public class JSONConverter {
 		// Set<ValidationMessage> result = schema.validate(jsonResponse);
 
 		try (PrintWriter writer = response.getWriter()) {
-			ObjectData resultData = operationData.getRootData().filter(params.getNames());
-			String newResultBody = createOutputJson(dataStore, action);
-			String resultBody = IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData);
+			//ObjectData resultData = operationData.getRootData().filter(params.getNames());
+			String resultBody = createOutputJson(dataStore, action);
+			//resultBody = IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData);
 			writer.print(resultBody);
 			writer.flush();
 		} catch (IOException e) {
@@ -104,9 +101,11 @@ public class JSONConverter {
 			RawData data = dataStore.getData(name);
 			//TODO: General schema for objects, arrays and simple values is to get 
 			//the serialised by RawData and the put to the context here. 
-			
-			
-			//ctx.put(path, name, data.getJsonValue());
+			if (data.getParam().isJsonObject()) {
+				ctx.put(path, name, data.getObject());
+			} else {
+				ctx.put(path, name, data.getJsonValue());				
+			}
 		}
 		return ctx.jsonString();
 	}
@@ -189,7 +188,7 @@ public class JSONConverter {
 		if (StringUtils.isBlank(paramPath)) {
 			paramPath = action.getOutputPath();
 			if (StringUtils.isBlank(paramPath)) {
-				paramPath = JSON_ROOT + ".result[0]";
+				paramPath = JSON_ROOT ; //+ ".result[0]";
 			}
 		}
 		return paramPath;

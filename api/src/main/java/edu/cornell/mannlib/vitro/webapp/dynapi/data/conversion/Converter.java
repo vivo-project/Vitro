@@ -14,10 +14,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.HttpHeaders;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
 
 public class Converter {
 
@@ -41,6 +42,16 @@ public class Converter {
 			String message = String.format("No suitable converter found for input content type %s", contentType);
 			throw new ConversionException(message);
 		}
+		convertInternalParams(action, dataStore);
+	}
+
+	private static void convertInternalParams(Action action, DataStore dataStore) throws ConversionException {
+		Parameters params = action.getInternalParams();
+		for (String name : params.getNames()) {
+			RawData data = new RawData(params.get(name));
+			data.earlyInitialization();
+			dataStore.addData(name, data);
+		}
 	}
 
 	private static ContentType getResponseType(HttpServletRequest request, ContentType requestType) {
@@ -53,12 +64,12 @@ public class Converter {
 	}
 
 	public static void convert(HttpServletResponse response, Action action, OperationResult operationResult,
-			OperationData operationData, DataStore dataStore) throws ConversionException {
+			DataStore dataStore) throws ConversionException {
 		if (!operationResult.hasSuccess()) {
 			operationResult.prepareResponse(response);
 			return;
 		}
-		if (!action.isOutputValid(operationData)) {
+		if (!action.isOutputValid(dataStore)) {
 			response.setStatus(500);
 			return;
 		}
@@ -66,9 +77,9 @@ public class Converter {
 		// TODO: test accepted content types and prepare response according to it
 		ContentType responseType = dataStore.getResponseType();
 		if (isJson(responseType)) {
-			JSONConverter.convert(response, action, operationData, dataStore);
+			JSONConverter.convert(response, action, dataStore);
 		} else if (isForm(responseType)) {
-			FormDataConverter.convert(response, action, operationData, dataStore);
+			FormDataConverter.convert(response, action, dataStore);
 		} else {
 			String message = String.format("No suitable converter found for output content type %s", responseType);
 			throw new ConversionException(message);

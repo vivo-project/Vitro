@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.http.entity.ContentType;
@@ -48,4 +49,15 @@ public class DataStore {
 		this.acceptLangs.addAll(acceptLangs);
 	}
 
+	public boolean contains(String name) {
+		return dataMap.containsKey(name);
+	}
+
+	protected Set<Entry<String, RawData>> entrySet() {
+		return dataMap.entrySet();
+	}
+	
+	protected Set<String> keySet() {
+		return dataMap.keySet();
+	}
 }

@@ -10,9 +10,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.AutoConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class Action extends Operation implements Poolable<String>, StepInfo {
@@ -26,7 +27,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     private Parameters providedParams = new Parameters();
     private Parameters requiredParams = new Parameters();
-    private Parameters localParams = new Parameters();
+    private Parameters internalParams = new Parameters();
 
     @Override
     public void dereference() {
@@ -37,8 +38,8 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     }
 
     @Override
-    public OperationResult run(OperationData input) {
-        return firstStep.run(input);
+    public OperationResult run(DataStore dataStore) {
+        return firstStep.run(dataStore);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
@@ -104,8 +105,8 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         return !clients.isEmpty();
     }
     
-    public Parameters getLocalParams() {
-        return localParams;
+    public Parameters getInternalParams() {
+        return internalParams;
     }
     
     @Override
@@ -119,7 +120,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     }
 
     @Override
-    public boolean isOutputValid(OperationData inputOutput) {
+    public boolean isOutputValid(DataStore inputOutput) {
         if (!(super.isOutputValid(inputOutput))) {
             return false;
         }
@@ -127,8 +128,8 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         if (providedParams != null) {
             for (String name : providedParams.getNames()) {
                 Parameter param = providedParams.get(name);
-                String[] outputValues = inputOutput.get(name);
-                if (!param.isValid(name, outputValues)) {
+                RawData data = inputOutput.getData(name);
+                if (!param.isValid(name, data)) {
                     return false;
                 }
             }
