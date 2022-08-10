@@ -21,8 +21,8 @@ public class SolrQuery extends Operation {
 
     private static final Log log = LogFactory.getLog(SolrQuery.class);
 
-    private Parameters requiredParams = new Parameters();
-    private Parameters providedParams = new Parameters();
+    private Parameters inputParams = new Parameters();
+    private Parameters outputParams = new Parameters();
 
     private String queryText;
     private String offset;
@@ -35,13 +35,13 @@ public class SolrQuery extends Operation {
     // region @Property Setters
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-    public void addRequiredParameter(Parameter param) {
-        requiredParams.add(param);
+    public void addInputParameter(Parameter param) {
+        inputParams.add(param);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
-    public void addProvidedParameter(Parameter param) {
-        providedParams.add(param);
+    public void addOutputParameter(Parameter param) {
+        outputParams.add(param);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText", maxOccurs = 1)
@@ -84,13 +84,13 @@ public class SolrQuery extends Operation {
     // region Getters
 
     @Override
-    public Parameters getRequiredParams() {
-        return requiredParams;
+    public Parameters getInputParams() {
+        return inputParams;
     }
 
     @Override
-    public Parameters getProvidedParams() {
-        return providedParams;
+    public Parameters getOutputParams() {
+        return outputParams;
     }
 
     public String getQueryText() {

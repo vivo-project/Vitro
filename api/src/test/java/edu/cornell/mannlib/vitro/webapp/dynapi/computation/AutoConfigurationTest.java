@@ -31,14 +31,14 @@ public class AutoConfigurationTest {
         step2.setOperation(query(arr("B","C","E"), arr("D")));
         step3.setOperation(query(arr("D","F","G"), arr("D")));
 
-        assertEquals(0, action.getRequiredParams().size());
+        assertEquals(0, action.getInputParams().size());
         AutoConfiguration.computeParams(action);
-        assertEquals(5, action.getRequiredParams().size());
-        assertTrue(action.getRequiredParams().contains("A"));
-        assertTrue(action.getRequiredParams().contains("B"));
-        assertTrue(action.getRequiredParams().contains("E"));
-        assertTrue(action.getRequiredParams().contains("F"));
-        assertTrue(action.getRequiredParams().contains("G"));
+        assertEquals(5, action.getInputParams().size());
+        assertTrue(action.getInputParams().contains("A"));
+        assertTrue(action.getInputParams().contains("B"));
+        assertTrue(action.getInputParams().contains("E"));
+        assertTrue(action.getInputParams().contains("F"));
+        assertTrue(action.getInputParams().contains("G"));
     }
 
     @Test
@@ -53,9 +53,9 @@ public class AutoConfigurationTest {
         step1.setOperation(query(arr(), arr("A")));
         step2.setOperation(query(arr("A"), arr()));
 
-        assertEquals(0, action.getRequiredParams().size());
+        assertEquals(0, action.getInputParams().size());
         AutoConfiguration.computeParams(action);
-        assertEquals(0, action.getRequiredParams().size());
+        assertEquals(0, action.getInputParams().size());
     }
     
     @Test
@@ -72,11 +72,11 @@ public class AutoConfigurationTest {
         step2.setOperation(query(arr("B"), arr("A")));
         step3.setOperation(query(arr("A"), arr("B")));
 
-        assertEquals(0, action.getRequiredParams().size());
+        assertEquals(0, action.getInputParams().size());
         AutoConfiguration.computeParams(action);
-        assertEquals(2, action.getRequiredParams().size());
-        assertTrue(action.getRequiredParams().contains("A"));
-        assertTrue(action.getRequiredParams().contains("B"));
+        assertEquals(2, action.getInputParams().size());
+        assertTrue(action.getInputParams().contains("A"));
+        assertTrue(action.getInputParams().contains("B"));
 
     }
     
@@ -91,11 +91,11 @@ public class AutoConfigurationTest {
         step1.setNextIfNotSatisfied(step2);
         step2.setOperation(query(arr("B"), arr("A")));
 
-        assertEquals(0, action.getRequiredParams().size());
+        assertEquals(0, action.getInputParams().size());
         AutoConfiguration.computeParams(action);
-        assertEquals(2, action.getRequiredParams().size());
-        assertTrue(action.getRequiredParams().contains("A"));
-        assertTrue(action.getRequiredParams().contains("B"));
+        assertEquals(2, action.getInputParams().size());
+        assertTrue(action.getInputParams().contains("A"));
+        assertTrue(action.getInputParams().contains("B"));
 
     }
     
@@ -108,10 +108,10 @@ public class AutoConfigurationTest {
     private SPARQLQuery query(String[] required, String[] provided) {
         SPARQLQuery query = new SPARQLQuery();
         for (int i = 0; i < required.length; i++) {
-            query.addRequiredParameter(param(required[i]));
+            query.addInputParameter(param(required[i]));
         }
         for (int i = 0; i < provided.length; i++) {
-            query.addProvidedParameter(param(provided[i]));
+            query.addOutputParameter(param(provided[i]));
         }
         return query;
     }

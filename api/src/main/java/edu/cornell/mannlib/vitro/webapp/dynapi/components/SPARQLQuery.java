@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonObjectView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
@@ -32,8 +32,8 @@ public class SPARQLQuery extends Operation {
 	private static final Log log = LogFactory.getLog(SPARQLQuery.class);
 
 	private String queryText;
-	private Parameters requiredParams = new Parameters();
-	private Parameters providedParams = new Parameters();
+	private Parameters inputParams = new Parameters();
+	private Parameters outputParams = new Parameters();
 
 	@Override
 	public void dereference() {
@@ -41,13 +41,13 @@ public class SPARQLQuery extends Operation {
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addRequiredParameter(Parameter param) {
-		requiredParams.add(param);
+	public void addInputParameter(Parameter param) {
+		inputParams.add(param);
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
-	public void addProvidedParameter(Parameter param) {
-		providedParams.add(param);
+	public void addOutputParameter(Parameter param) {
+		outputParams.add(param);
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText", minOccurs = 1, maxOccurs = 1)
@@ -57,17 +57,17 @@ public class SPARQLQuery extends Operation {
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setQueryModel(Parameter model) {
-		requiredParams.add(model);
+		inputParams.add(model);
 	}
 
 	@Override
-	public Parameters getRequiredParams() {
-		return requiredParams;
+	public Parameters getInputParams() {
+		return inputParams;
 	}
 
 	@Override
-	public Parameters getProvidedParams() {
-		return providedParams;
+	public Parameters getOutputParams() {
+		return outputParams;
 	}
 
 	@Override
@@ -76,17 +76,17 @@ public class SPARQLQuery extends Operation {
 			return new OperationResult(500);
 		}
 		int resultCode = 200;
-		Model queryModel = ModelView.getFirstModel(dataStore, requiredParams);
+		Model queryModel = ModelView.getFirstModel(dataStore, inputParams);
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
-		for (String paramName : RdfView.getLiteralNames(requiredParams)) {
+		for (String paramName : RdfView.getLiteralNames(inputParams)) {
 			pss.setLiteral(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore),
-					requiredParams.get(paramName).getType().getRdfType().getRDFDataType());
+					inputParams.get(paramName).getType().getRdfType().getRDFDataType());
 		}
 		pss.setCommandText(queryText);
-		Map<String,ArrayNode> jsonArrays = JsonObjectView.getJsonArrays(providedParams);
+		Map<String,ArrayNode> jsonArrays = JsonObjectView.getJsonArrays(outputParams);
 
 		//Map<String, List> singleDimensionalArrays = ArrayView.getSingleDimensionalArrays(providedParams);
-		List<String> simpleData = SimpleDataView.getNames(providedParams);
+		List<String> simpleData = SimpleDataView.getNames(outputParams);
 		queryModel.enterCriticalSection(Lock.READ);
 		try {
 			QueryExecution qexec = QueryExecutionFactory.create(pss.toString(), queryModel);
@@ -131,7 +131,7 @@ public class SPARQLQuery extends Operation {
 		for (String key : jsonArrays.keySet()) {
 			ArrayNode node = jsonArrays.get(key);
 			if (!dataStore.contains(key)) {
-				RawData data = new RawData(providedParams.get(key));
+				Data data = new Data(outputParams.get(key));
 				data.setObject(node);
 				dataStore.addData(key, data);
 			}
@@ -149,7 +149,7 @@ public class SPARQLQuery extends Operation {
 			log.debug(var + " : " + solution.get(var));
 			if (simpleData.contains(var) && solution.contains(var)) {
 				RDFNode solVar = solution.get(var);
-				RawData data = new RawData(providedParams.get(var));
+				Data data = new Data(outputParams.get(var));
 				//TODO: new data should be created based on it's RDF type and parameter type
 				data.setRawString(solVar.toString());
 				data.earlyInitialization();

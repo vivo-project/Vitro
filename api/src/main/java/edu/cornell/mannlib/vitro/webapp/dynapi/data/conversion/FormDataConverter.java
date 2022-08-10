@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class FormDataConverter {
 
@@ -20,7 +20,7 @@ public class FormDataConverter {
 
 
 	public static void convert(HttpServletRequest request, Action action, DataStore dataStore) throws ConversionException {
-		Parameters required = action.getRequiredParams();
+		Parameters required = action.getInputParams();
 		Map<String, String[]> received = request.getParameterMap();
 		for (String name : required.getNames()) {
 			String[] values = received.get(name);
@@ -39,14 +39,14 @@ public class FormDataConverter {
 	}
 
 	private static void readParam(DataStore dataStore, String name, String[] values, Parameter param) throws ConversionException {
-		RawData data = new RawData(param);
+		Data data = new Data(param);
 		data.setRawString(values[0]);
 		data.earlyInitialization();
 		dataStore.addData(name, data);
 	}
 
 	private static void readArray(DataStore dataStore, String name, String[] values, Parameter param) {
-		RawData data = new RawData(param);
+		Data data = new Data(param);
 		ArrayNode node = mapper.createArrayNode();
 		for (int i = 0; i< values.length;i++) {
 			node.add(values[i]);

@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.StringView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestAccessor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
@@ -61,13 +61,13 @@ public class ConditionTest extends ServletContextTest{
         servletContext = new ServletContextStub();
         Action action = loader.loadInstance("test:action", Action.class);
         assertTrue(action.isValid());
-        Parameters parameters = action.getRequiredParams();
+        Parameters parameters = action.getInputParams();
         DataStore store = new DataStore();
-        RawData inputData = new RawData(parameters.get(INPUT_PARAM));
+        Data inputData = new Data(parameters.get(INPUT_PARAM));
         inputData.setRawString(input);
         inputData.earlyInitialization();
         store.addData(INPUT_PARAM, inputData);
-        RawData modelData = new RawData(action.getInternalParams().get(MODEL_PARAM));
+        Data modelData = new Data(action.getInternalParams().get(MODEL_PARAM));
         TestAccessor.setObject(modelData, storeModel);
         
         store.addData(MODEL_PARAM, modelData);

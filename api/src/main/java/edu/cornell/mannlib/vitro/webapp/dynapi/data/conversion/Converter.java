@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class Converter {
 
@@ -48,7 +48,7 @@ public class Converter {
 	private static void convertInternalParams(Action action, DataStore dataStore) throws ConversionException {
 		Parameters params = action.getInternalParams();
 		for (String name : params.getNames()) {
-			RawData data = new RawData(params.get(name));
+			Data data = new Data(params.get(name));
 			data.earlyInitialization();
 			dataStore.addData(name, data);
 		}

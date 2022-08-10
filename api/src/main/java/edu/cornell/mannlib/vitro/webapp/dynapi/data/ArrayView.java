@@ -25,7 +25,7 @@ public class ArrayView implements View {
 		if (!isArray(dataStore, propertyVar)) {
 			return false;
 		}
-		RawData data = dataStore.getData(propertyVar);
+		Data data = dataStore.getData(propertyVar);
 		List list = (List) data.getObject();
 		if (list.size() > 1) {
 			return true;
@@ -34,11 +34,11 @@ public class ArrayView implements View {
 	}
 
 	public static boolean isArray(DataStore dataStore, String propertyVar) {
-		RawData data = dataStore.getData(propertyVar);
+		Data data = dataStore.getData(propertyVar);
 		return data.getParam().isArray();
 	}
 	
-	public static List getArray(RawData data) {
+	public static List getArray(Data data) {
 		return (List) data.getObject();
 	}
 

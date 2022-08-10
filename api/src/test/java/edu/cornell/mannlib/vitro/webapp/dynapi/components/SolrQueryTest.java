@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -100,7 +100,7 @@ public class SolrQueryTest extends ServletContextTest {
     @Test
     public void requiredParameterMissingFromInput(){
         //when(parameter1.getName()).thenReturn("testParameter");
-        solrQuery.addRequiredParameter(parameter1);
+        solrQuery.addInputParameter(parameter1);
         assertTrue(solrQuery.run(dataStore).hasError());
         //verify(parameter1, times(1)).getName();
         //verify(dataStore,times(1)).contains("testParameter");
@@ -108,18 +108,18 @@ public class SolrQueryTest extends ServletContextTest {
 
     @Test
     public void requiredParameterPresentButInvalid(){
-    	RawData data = new RawData(parameter1);
+    	Data data = new Data(parameter1);
     	dataStore.addData("anotherParameter", data);
-        solrQuery.addRequiredParameter(parameter1);
+        solrQuery.addInputParameter(parameter1);
         assertTrue(solrQuery.run(dataStore).hasError());
     }
 
     @Test
     public void requiredParameterPresentAndValid() throws ClassNotFoundException{
-        RawData data = new RawData(parameter1);
+        Data data = new Data(parameter1);
         data.setObject("testValue");
     	dataStore.addData(parameter1.getName(), data);
-    	solrQuery.addRequiredParameter(parameter1);
+    	solrQuery.addInputParameter(parameter1);
         assertFalse(solrQuery.run(dataStore).hasError());
     }
 
@@ -141,10 +141,10 @@ public class SolrQueryTest extends ServletContextTest {
     @Test
     public void queryWithVariableInsideTextSearchWithSubstitution(){
         solrQuery.setQueryText("testSearchText OR ?testParameter");
-        RawData data = new RawData(parameter1);
+        Data data = new Data(parameter1);
         data.setObject("testValue");
     	dataStore.addData(parameter1.getName(), data);
-    	solrQuery.addRequiredParameter(parameter1);
+    	solrQuery.addInputParameter(parameter1);
         assertFalse(solrQuery.run(dataStore).hasError());
         verify(searchQuery,times(1)).setQuery("testSearchText OR testValue");
     }
@@ -154,12 +154,12 @@ public class SolrQueryTest extends ServletContextTest {
         when(searchQuery.setQuery(any(String.class))).thenReturn(searchQuery);
         solrQuery.setQueryText("?testParam1 OR ?testParam2");
         Parameter param = createStringParameter("testParam1");
-        RawData data = new RawData(param);
+        Data data = new Data(param);
         data.setObject("testValue1");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
-        RawData data2 = new RawData(param2);
+        Data data2 = new Data(param2);
         data2.setObject("testValue2");
     	dataStore.addData(param2.getName(), data2);
 
@@ -172,12 +172,12 @@ public class SolrQueryTest extends ServletContextTest {
         when(searchQuery.setStart(anyInt())).thenReturn(searchQuery);
         
         Parameter param = createStringParameter("testParam1");
-        RawData data = new RawData(param);
+        Data data = new Data(param);
         data.setObject("11");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
-        RawData data2 = new RawData(param2);
+        Data data2 = new Data(param2);
         data2.setObject("testValue2");
     	dataStore.addData(param2.getName(), data2);
         
@@ -202,23 +202,23 @@ public class SolrQueryTest extends ServletContextTest {
         solrQuery.addSort("?testParam2  ?testParam3");
 
     	Parameter param = createStringParameter("testParam1");
-        RawData data = new RawData(param);
+        Data data = new Data(param);
         data.setObject("field1");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
-        RawData data2 = new RawData(param2);
+        Data data2 = new Data(param2);
         data2.setObject("field2");
     	dataStore.addData(param2.getName(), data2);
     	
     	Parameter param3 = createStringParameter("testParam3");
-        RawData data3 = new RawData(param3);
+        Data data3 = new Data(param3);
         data3.setObject("field3");
     	dataStore.addData(param3.getName(), data3);
     	
-    	solrQuery.addRequiredParameter(param);
-    	solrQuery.addRequiredParameter(param2);
-    	solrQuery.addRequiredParameter(param3);
+    	solrQuery.addInputParameter(param);
+    	solrQuery.addInputParameter(param2);
+    	solrQuery.addInputParameter(param3);
 
         assertTrue(solrQuery.run(dataStore).hasError());
         assertEquals(solrQuery.getSorts().size(),2);
@@ -230,17 +230,17 @@ public class SolrQueryTest extends ServletContextTest {
         when(searchQuery.addSortField(anyString(),any())).thenReturn(searchQuery);
         
     	Parameter param = createStringParameter("testParam1");
-        RawData data = new RawData(param);
+        Data data = new Data(param);
         data.setObject("field1");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
-        RawData data2 = new RawData(param2);
+        Data data2 = new Data(param2);
         data2.setObject("field2");
     	dataStore.addData(param2.getName(), data2);
     	
     	Parameter param3 = createStringParameter("testParam3");
-        RawData data3 = new RawData(param3);
+        Data data3 = new Data(param3);
         data3.setObject("asc");
     	dataStore.addData(param3.getName(), data3);
         //when(input.getData("testParam1")).thenReturn(new String[]{"field1"});

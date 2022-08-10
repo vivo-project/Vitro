@@ -96,17 +96,17 @@ public class ConditionalStep implements Step {
     }
 
     @Override
-    public Parameters getProvidedParams() {
+    public Parameters getOutputParams() {
         return new Parameters();
     }
     
     @Override
-    public Parameters getRequiredParams() {
-        Parameters requiredParams = new Parameters();
+    public Parameters getInputParams() {
+        Parameters inputParams = new Parameters();
         for (Condition condition: conditions) {
-            requiredParams.addAll(condition.getRequiredParams());
+            inputParams.addAll(condition.getInputParams());
         }
-        return requiredParams;
+        return inputParams;
     }
 
     @Override

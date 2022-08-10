@@ -7,7 +7,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
@@ -97,8 +97,8 @@ public class N3TemplateTest extends ServletContextTest {
 
         N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
         assertNotNull(n3Template);
-        assertEquals(0, n3Template.getProvidedParams().size());
-        assertEquals(4, n3Template.getRequiredParams().size());
+        assertEquals(0, n3Template.getOutputParams().size());
+        assertEquals(4, n3Template.getInputParams().size());
         assertEquals("?testSubject <http://has> ?testObject. ?testSubject2 <http://has> ?testObject", n3Template.getN3TextAdditions());
         assertEquals("?testSubject <http://has> ?testObject", n3Template.getN3TextRetractions());
     }
@@ -111,7 +111,7 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(model);
         addModel(n3Template);
         Parameter uri1Param = createUriParameter("uri1");
-        n3Template.addRequiredParameter(uri1Param);
+        n3Template.addInputParameter(uri1Param);
         addData(n3Template, "uri1", "http://testSubject");
 
         assertTrue(n3Template.run(dataStore).hasError());
@@ -129,8 +129,8 @@ public class N3TemplateTest extends ServletContextTest {
         Parameter param1 =  createUriParameter("uri1");
         Parameter param2 = createUriParameter("uri2");
 
-        n3Template.addRequiredParameter(param1);
-        n3Template.addRequiredParameter(param2);
+        n3Template.addInputParameter(param1);
+        n3Template.addInputParameter(param2);
 
         addData(n3Template, "uri1", "http://testSubject");
         addData(n3Template, "uri2", "http://testObject");
@@ -154,8 +154,8 @@ public class N3TemplateTest extends ServletContextTest {
         Parameter param1 = createUriParameter("uri1");
         Parameter param2 = createStringParameter("literal1");
 
-        n3Template.addRequiredParameter(param1);
-        n3Template.addRequiredParameter(param2);
+        n3Template.addInputParameter(param1);
+        n3Template.addInputParameter(param2);
 
         addData(n3Template, "uri1", "http://testSubject");
         addData(n3Template, "literal1", "testLiteral");
@@ -180,9 +180,9 @@ public class N3TemplateTest extends ServletContextTest {
         Parameter param2 = createStringParameter("literal1");
         Parameter param3 = createBooleanParameter("literal2");
 
-        n3Template.addRequiredParameter(param1);
-        n3Template.addRequiredParameter(param2);
-        n3Template.addRequiredParameter(param3);
+        n3Template.addInputParameter(param1);
+        n3Template.addInputParameter(param2);
+        n3Template.addInputParameter(param3);
         
         addData(n3Template, "uri1", "http://testSubject");
         addData(n3Template, "literal1", "testLiteral");
@@ -247,8 +247,8 @@ public class N3TemplateTest extends ServletContextTest {
 
 
 	private void addModel(N3Template n3Template) throws ConversionException {
-		Parameter modelParam = n3Template.getRequiredParams().get("FULL_UNION");
-        final RawData data = new RawData(modelParam);
+		Parameter modelParam = n3Template.getInputParams().get("FULL_UNION");
+        final Data data = new Data(modelParam);
         data.earlyInitialization();
 		dataStore.addData(modelParam.getName(), data);
 	}
@@ -287,8 +287,8 @@ public class N3TemplateTest extends ServletContextTest {
     
 
 	private void addData(N3Template n3Template, String name, Object value) {
-		Parameter testSubjectParam = n3Template.getRequiredParams().get(name);
-		RawData testSubject = new RawData(testSubjectParam);
+		Parameter testSubjectParam = n3Template.getInputParams().get(name);
+		Data testSubject = new Data(testSubjectParam);
 		testSubject.setObject(value);
 		dataStore.addData(name, testSubject);
 	}

@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
@@ -46,7 +46,7 @@ public class Parameter implements Removable {
         validators.add(validator);
     }
 
-    public boolean isValid(String name, RawData data) {
+    public boolean isValid(String name, Data data) {
         return validators.isAllValid(name, data);
     }
 

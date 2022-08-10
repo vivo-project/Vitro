@@ -76,13 +76,13 @@ public class OperationalStep implements Step {
     }
 
     @Override
-    public Parameters getRequiredParams() {
-        return operation.getRequiredParams();
+    public Parameters getInputParams() {
+        return operation.getInputParams();
     }
 
     @Override
-    public Parameters getProvidedParams() {
-        return operation.getProvidedParams();
+    public Parameters getOutputParams() {
+        return operation.getOutputParams();
     }
 
 }

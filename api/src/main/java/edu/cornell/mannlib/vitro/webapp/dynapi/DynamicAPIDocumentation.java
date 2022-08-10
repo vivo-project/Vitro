@@ -424,7 +424,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -475,7 +475,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -507,7 +507,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -578,7 +578,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -617,7 +617,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getProvidedParams());
+        buildObjectSchema(schema, action.getOutputParams());
 
         mediaType.schema(schema);
 

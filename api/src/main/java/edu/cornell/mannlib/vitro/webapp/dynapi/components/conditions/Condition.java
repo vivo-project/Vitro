@@ -7,6 +7,6 @@ public interface Condition {
     
     public boolean isSatisfied(DataStore input);
 
-    public Parameters getRequiredParams();
+    public Parameters getInputParams();
 
 }

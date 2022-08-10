@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.NumericRang
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.RegularExpressionValidator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.StringLengthRangeValidator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -128,13 +128,13 @@ public class ValidatorsTest {
         assertFalse(validator1.isValid(fieldName, createData(values3)));
     }
     
-    public RawData createData(Object input) {
+    public Data createData(Object input) {
     	Parameter param = new Parameter();
     	ParameterType paramType = new ParameterType();
     	param.setType(paramType);
     	ImplementationType impType = new ImplementationType();
     	paramType.setImplementationType(impType);
-    	RawData data = new RawData(param);
+    	Data data = new Data(param);
     	if (input instanceof String[]) {
     		try {
 				impType.setName("java.util.ArrayList");

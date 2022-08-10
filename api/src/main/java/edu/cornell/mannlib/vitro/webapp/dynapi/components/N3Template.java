@@ -18,19 +18,19 @@ public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
-	private Parameters requiredParams = new Parameters();
+	private Parameters inputParams = new Parameters();
 	private String n3TextAdditions = "";
 	private String n3TextRetractions = "";
 	// region @Property Setters
 	
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setTemplateModel(Parameter param){ 
-		requiredParams.add(param);
+		inputParams.add(param);
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addRequiredParameter(Parameter param) {
-		requiredParams.add(param);
+	public void addInputParameter(Parameter param) {
+		inputParams.add(param);
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
@@ -48,12 +48,12 @@ public class N3Template extends Operation implements Template {
 	// region Getters
 
 	@Override
-	public Parameters getRequiredParams() {
-		return requiredParams;
+	public Parameters getInputParams() {
+		return inputParams;
 	}
 
 	@Override
-	public Parameters getProvidedParams() {
+	public Parameters getOutputParams() {
 		return new Parameters();
 	}
 
@@ -97,7 +97,7 @@ public class N3Template extends Operation implements Template {
 		AdditionsAndRetractions changes = new AdditionsAndRetractions(additionModels, retractionModels);
 
 		try {
-			Model writeModel = ModelView.getFirstModel(dataStore, requiredParams);
+			Model writeModel = ModelView.getFirstModel(dataStore, inputParams);
 			ProcessRdfForm.applyChangesToWriteModel(changes, null, writeModel,"");
 		} catch(Exception e) {
 			log.error(e,e);
@@ -115,13 +115,13 @@ public class N3Template extends Operation implements Template {
 		List<String> n3WithParameters = Arrays.asList(n3Text);
 
 		//region Substitute IRI variables
-		Map<String, List<String>> parametersToUris = RdfView.getUrisMap(input, requiredParams);
+		Map<String, List<String>> parametersToUris = RdfView.getUrisMap(input, inputParams);
 
 		gen.subInMultiUris(parametersToUris, n3WithParameters);
 		//endregion
 
 		//region Substitute other (literal) variables
-		Map<String, List<Literal>> parametersToLiterals = RdfView.getLiteralsMap(input, requiredParams);
+		Map<String, List<Literal>> parametersToLiterals = RdfView.getLiteralsMap(input, inputParams);
 
 		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
 		//endregion

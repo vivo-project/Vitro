@@ -41,12 +41,12 @@ public class NullStep implements Step {
     }
 
     @Override
-    public Parameters getRequiredParams() {
+    public Parameters getInputParams() {
         return new Parameters();
     }
 
     @Override
-    public Parameters getProvidedParams() {
+    public Parameters getOutputParams() {
         return new Parameters();
     }
 

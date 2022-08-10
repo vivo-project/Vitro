@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class RegularExpressionValidator extends AbstractValidator {
@@ -27,7 +27,7 @@ public class RegularExpressionValidator extends AbstractValidator {
     }
 
     @Override
-    public boolean isValid(String name, RawData data) {
+    public boolean isValid(String name, Data data) {
     	
     	if (data.getParam().isArray()) {
     		List array = ArrayView.getArray(data);

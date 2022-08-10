@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class JSONConverter {
 
@@ -56,7 +56,7 @@ public class JSONConverter {
 		if (!messages.isEmpty()) {
 			validationFailed(jsonRequest, messages);
 		}
-		Parameters required = action.getRequiredParams();
+		Parameters required = action.getInputParams();
 		ReadContext ctx = JsonPath.using(jsonPathConfig).parse(jsonRequest.toString());
 		for (String name : required.getNames()) {
 			Parameter param = required.get(name);
@@ -69,7 +69,7 @@ public class JSONConverter {
 		response.setContentType(dataStore.getResponseType().toString());
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		Parameters params = action.getProvidedParams();
+		Parameters params = action.getOutputParams();
 		// TODO: Validate output
 		// JsonSchema schema = getOutputSchema(action);
 		// Set<ValidationMessage> result = schema.validate(jsonResponse);
@@ -93,12 +93,12 @@ public class JSONConverter {
 	}
 
 	private static String createOutputJson(DataStore dataStore, Action action) throws ConversionException {
-		Parameters params = action.getProvidedParams();
+		Parameters params = action.getOutputParams();
 		DocumentContext ctx = getOutputTemplate(action);
 		for (String name : params.getNames()) {
 			final Parameter param = params.get(name);
 			String path = getOutputPathPrefix(param, action);
-			RawData data = dataStore.getData(name);
+			Data data = dataStore.getData(name);
 			//TODO: General schema for objects, arrays and simple values is to get 
 			//the serialised by RawData and the put to the context here. 
 			if (data.getParam().isJsonObject()) {
@@ -127,7 +127,7 @@ public class JSONConverter {
 	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param, Action action) throws ConversionException {
 		String paramPath = getReadPath(name, param, action);
 		JsonNode node = ctx.read(paramPath, JsonNode.class);
-		RawData data = new RawData(param);
+		Data data = new Data(param);
 		data.setRawString(node.toString());
 		data.earlyInitialization();
 		dataStore.addData(name, data);
@@ -141,7 +141,7 @@ public class JSONConverter {
 			return readJson(jsonString);
 		}
 
-		Parameters params = action.getRequiredParams();
+		Parameters params = action.getInputParams();
 		Parameter param = params.get(RESTEndpoint.RESOURCE_ID);
 
 		if (param == null) {
@@ -214,7 +214,7 @@ public class JSONConverter {
 
 	private static JsonSchema getInputSchema(Action action, String resourceId) throws ConversionException {
 		String serializedSchema = action.getInputSerializedSchema();
-		Parameters params = action.getRequiredParams();
+		Parameters params = action.getInputParams();
 		JsonNode nativeSchema = deserializeSchema(serializedSchema);
 		if (nativeSchema != null) {
 			JsonSchema jsonSchema = factory.getSchema(nativeSchema);

@@ -7,14 +7,14 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ParameterConverter;
 
-public class RawData {
+public class Data {
 
     private Set<String> types = null;
     private String string = null;
     private Object object = null;
     private Parameter param = null;
 
-    public RawData(Parameter param){
+    public Data(Parameter param){
         types = new HashSet<>();
         this.param = param;
     }

@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class Validators implements Removable {
 
@@ -19,7 +19,7 @@ public class Validators implements Removable {
         validators.add(validator);
     }
 
-    public boolean isAllValid(String name, RawData data) {
+    public boolean isAllValid(String name, Data data) {
         for (Validator validator : validators) {
             if (!validator.isValid(name, data)) {
                 log.error("Parameter " + name + " is invalid. Validator failed " + validator.getClass().getSimpleName());

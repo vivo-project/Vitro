@@ -16,8 +16,8 @@ public class AutoConfiguration {
     private static final Log log = LogFactory.getLog(AutoConfiguration.class);
 
     public static void computeParams(Action action) {
-        Parameters required = action.getRequiredParams();
-        Parameters provided = action.getProvidedParams();
+        Parameters required = action.getInputParams();
+        Parameters provided = action.getOutputParams();
         Parameters internal = action.getInternalParams();
 
         ExecutionTree tree = new ExecutionTree(action);
@@ -33,7 +33,7 @@ public class AutoConfiguration {
             mergeParameters(required, internal, computed);
         }
         if( log.isDebugEnabled()) {
-            Set<String> names = action.getRequiredParams().getNames();
+            Set<String> names = action.getInputParams().getNames();
             String toLog = String.join(", ", names);
             log.debug("Required params: " + toLog);    
         }
@@ -59,8 +59,8 @@ public class AutoConfiguration {
         position--;
         while (position > 0) {
             StepInfo step =  list.get(position);
-            Parameters stepRequired = step.getRequiredParams();
-            Parameters stepProvided = step.getProvidedParams();
+            Parameters stepRequired = step.getInputParams();
+            Parameters stepProvided = step.getOutputParams();
             requirements.removeAll(stepProvided);
             requirements.addAll(stepRequired);
             position--;

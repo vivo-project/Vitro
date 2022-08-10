@@ -7,14 +7,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class IsNotBlank extends AbstractValidator {
 
     private static final Log log = LogFactory.getLog(IsNotBlank.class);
 
     @Override
-    public boolean isValid(String name, RawData data) {
+    public boolean isValid(String name, Data data) {
     	
     	if (data.getParam().isArray()) {
     		List array = ArrayView.getArray(data);

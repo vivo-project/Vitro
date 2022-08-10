@@ -5,7 +5,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionExcepti
 
 public class DataInitializer {
 	
-	public static void initialize(Parameter param, RawData data) throws ConversionException {
+	public static void initialize(Parameter param, Data data) throws ConversionException {
 		
 		if (param.isArray()) {
 			initializeArray(param, data);
@@ -16,14 +16,14 @@ public class DataInitializer {
 		}
 	}
 
-	private static void initializeJsonObject(Parameter param, RawData data) {
+	private static void initializeJsonObject(Parameter param, Data data) {
 	}
 
-	private static void initializeData(Parameter param, RawData data) throws ConversionException {
+	private static void initializeData(Parameter param, Data data) throws ConversionException {
 		
 	}
 
-	private static void initializeArray(Parameter param, RawData data) {
+	private static void initializeArray(Parameter param, Data data) {
 		
 	}
 }

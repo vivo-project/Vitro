@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class StringLengthRangeValidator extends IsNotBlank {
@@ -37,7 +37,7 @@ public class StringLengthRangeValidator extends IsNotBlank {
     }
 
     @Override
-    public boolean isValid(String name, RawData data) {
+    public boolean isValid(String name, Data data) {
         if (!super.isValid(name, data)) {
             return false;
         }

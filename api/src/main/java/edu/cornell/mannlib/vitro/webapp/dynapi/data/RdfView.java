@@ -19,13 +19,13 @@ public class RdfView implements View {
 		for (String name : params.getNames()) {
 			Parameter param = params.get(name);
 			if (param.getType().isLiteral()) {
-				RawData data = dataStore.getData(name);
+				Data data = dataStore.getData(name);
 				Literal literal = ResourceFactory.createTypedLiteral(data.getObject().toString(),
 						param.getType().getRdfType().getRDFDataType());
 				List<Literal> list = Collections.singletonList( literal );
 				result.put(name, list);
 			} else if( param.isArray() && param.getType().getValuesType().isLiteral()) {
-				RawData data = dataStore.getData(name);
+				Data data = dataStore.getData(name);
 				List objList = (List) data.getObject();
 				List<Literal> list = new LinkedList<>();
 				for (Object object : objList) {
@@ -44,11 +44,11 @@ public class RdfView implements View {
 		for (String name : params.getNames()) {
 			Parameter param = params.get(name);
 			if (param.getType().isUri()) {
-				RawData data = dataStore.getData(name);
+				Data data = dataStore.getData(name);
 				List<String> list = Collections.singletonList( data.getObject().toString() );
 				result.put(name, list);
 			} else if( param.isArray() && param.getType().getValuesType().isUri()) {
-				RawData data = dataStore.getData(name);
+				Data data = dataStore.getData(name);
 				List objList = (List) data.getObject();
 				List<String> list = new LinkedList<>();
 				for (Object object : objList) {

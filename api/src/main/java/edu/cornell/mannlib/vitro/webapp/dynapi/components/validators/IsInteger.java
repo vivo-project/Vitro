@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RawData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class IsInteger extends IsNotBlank {
@@ -16,7 +16,7 @@ public class IsInteger extends IsNotBlank {
     private static final Log log = LogFactory.getLog(IsInteger.class);
 
     @Override
-    public boolean isValid(String name, RawData data) {
+    public boolean isValid(String name, Data data) {
         if (!super.isValid(name, data)) {
             return false;
         }

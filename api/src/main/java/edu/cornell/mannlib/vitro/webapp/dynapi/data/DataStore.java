@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.LangTag;
 
 public class DataStore {
 
-	protected Map<String, RawData> dataMap = new HashMap<>();
+	protected Map<String, Data> dataMap = new HashMap<>();
 	private ContentType responseType = ContentType.APPLICATION_JSON;
 	private Set<LangTag> acceptLangs = new HashSet<>();
 	private String resourceId = "";
@@ -21,11 +21,11 @@ public class DataStore {
 	public DataStore() {
 	}
 
-	public void addData(String name, RawData data) {
+	public void addData(String name, Data data) {
         dataMap.put(name, data);
     }
 	
-	public RawData getData(String name) {
+	public Data getData(String name) {
 		return dataMap.get(name);
 	}
 	
@@ -53,7 +53,7 @@ public class DataStore {
 		return dataMap.containsKey(name);
 	}
 
-	protected Set<Entry<String, RawData>> entrySet() {
+	protected Set<Entry<String, Data>> entrySet() {
 		return dataMap.entrySet();
 	}
 	
