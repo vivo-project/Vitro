@@ -187,7 +187,7 @@
         rdfs:label                          "read continents sparql query 1"@en-US ;
         dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/continents> ;
-        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}" .
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Continent>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ASC(?label)" .
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfContinentsOperationalStep>
