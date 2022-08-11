@@ -1,0 +1,420 @@
+@prefix rdf:  			<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  			<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   			<http://www.w3.org/2002/07/owl#> .
+@prefix vitro: 			<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: 		<https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: 	<java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: 			<http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  			<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  			<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   			<http://www.w3.org/2002/07/owl#> .
+@prefix vitro: 			<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: 		<https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: 	<java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix xsd: 			<http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/createCountry>
+        a                        			dynapi:action ;
+        rdfs:label               			"creation of a country"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createCountryRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/createCountryStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/createCountryStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a country step 1"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createCountryTypeN3Template> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/createCountryStep2>.
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createCountryTypeN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"create country N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/countries> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri> ;
+        dynapi:N3TextAdditions   			"?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing> . " .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/createCountryStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a country step 2"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createCountryLabelN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createCountryLabelN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"create country label N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> ;
+        dynapi:N3TextAdditions   			"?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label " .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/deleteCountry>
+        a                        			dynapi:action ;
+        rdfs:label               			"removing of a country"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteCountryRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteCountryStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteCountryStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a country"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountryForDeletionSparqlQuery> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteCountryStep2> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountryForDeletionSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read countries sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countryForDeleting> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = IRI(?resource_id)) \n}" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteCountryStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a country label"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteCountryLabelN3Template> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteCountryStep3> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteCountryLabelN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"delete country label N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countryForDeleting> ;
+        dynapi:N3TextRetractions 			"?stateOrProvinceForDeleting.0.uri <http://www.w3.org/2000/01/rdf-schema#label> ?stateOrProvinceForDeleting.0.label " .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/deleteCountryStep3>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a country type"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteCountryTypeN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteCountryTypeN3Template>
+        a                        			dynapi:operation, dynapi:N3Template ;
+        rdfs:label               			"delete country type N3 Template"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/countries> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countryForDeleting> ;
+        dynapi:N3TextRetractions 			"?stateOrProvinceForDeleting.0.uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing> . " .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/readCountries>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching countries"@en-US ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count>;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readCountriesRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitSortByConditionalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitSortByConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading which might include limit and sortBy"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitSortByOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesSortByConditionalStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readCountriesLimitSortByCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readCountriesLimitSortByCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if limit and offset and sortBy and order are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitSortByOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read countries step with limit"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesLimitSortBySparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfCountriesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesLimitSortBySparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read countries sparql query with limit and sort by"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> , <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ?order(??sortBy) \n LIMIT ?limit OFFSET ?offset" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesSortByConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading which might include sort by and order"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesSortByOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitConditionalStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readCountriesSortByCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readCountriesSortByCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if sort by and order are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesSortByOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read countries step with sortBy"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesSortBySparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfCountriesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesSortBySparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read countries sparql query with sorting"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ?order(??sortBy)" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitConditionalStep>
+        a                                   dynapi:Step, dynapi:ConditionalStep ;
+        rdfs:label                          "conditional step for reading with pagination (limit and offset)"@en-US ;
+        dynapi:nextIfSatisfied              <https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitOperationalStep> ;
+        dynapi:nextIfNotSatisfied           <https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesStep> ;
+        dynapi:hasCondition                 <https://vivoweb.org/ontology/vitro-dynamic-api/condition/readCountriesLimitCondition> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/condition/readCountriesLimitCondition>
+        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
+        rdfs:label                          "condition if limit and offset are defined"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesLimitOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read countries step with limit"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesLimitSparqlQuery> ;
+		dynapi:hasNextStep					<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfCountriesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesLimitSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read countries sparql query with pagination (limit and offset)"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries> ;
+		dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>, <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} LIMIT ?limit OFFSET ?offset" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountriesStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "read countries step 1"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesSparqlQuery> ;
+		dynapi:hasNextStep						<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfCountriesOperationalStep> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountriesSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read countries sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n} ORDER BY ASC(?label)" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readNumberOfCountriesOperationalStep>
+        a                                   dynapi:Step, dynapi:operationalStep ;
+        rdfs:label                          "number of countries step "@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readNumberOfCountriesSparqlQuery> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readNumberOfCountriesSparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "number of countries sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count> ;
+        dynapi:sparqlQueryText              "SELECT (count(distinct ?uri) as ?total) WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing>\n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/readCountry>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching a country"@en-US ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries> ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readCountryRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountryStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/readCountryStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a country"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountrySparqlQuery> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountrySparqlQuery>
+        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        rdfs:label                          "read countries sparql query 1"@en-US ;
+        dynapi:hasModel 					<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:requiresParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId> ;
+        dynapi:providesParameter 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries> ;
+        dynapi:sparqlQueryText              "SELECT ?uri ?label\n WHERE \n {\n      ?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://aims.fao.org/aos/geopolitical.owl#self_governing>\n OPTIONAL { ?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n FILTER (?uri = IRI(?resource_id)) \n}" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/updateCountry>
+        a                                   dynapi:action ;
+        rdfs:label                          "Fetching a country"@en-US ;
+        dynapi:hasAssignedRPC 				<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateCountryRPC> ;
+        dynapi:hasFirstStep 				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep1> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep1>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"reading of a country"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/readCountryForDeletionSparqlQuery> ;
+        dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep2> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep2>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a country label"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteCountryLabelN3Template> ;
+		dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep3> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep3>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"deleting of a country type"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/deleteCountryTypeN3Template> ;
+		dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep4> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep4>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a country type"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createCountryTypeN3Template> ;
+		dynapi:hasNextStep  				<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep5> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/step/updateCountryStep5>
+        a                        			dynapi:Step, dynapi:operationalStep ;
+        rdfs:label               			"creation of a country label"@en-US ;
+        dynapi:hasOperation 				<https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/createCountryLabelN3Template> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countries>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "countries"@en-US ;
+        dynapi:name                         "result" ;
+        dynapi:description                  "List of available countries and number" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Result (uri, label) array type"@en-US ;
+        dynapi:name                         "array of results" ;
+        dynapi:hasElementsOfType 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uriLabelObjectType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uriLabelObjectType>
+        a                                   dynapi:parameterType ,
+											dynapi:objectParameterType ,
+											dynapi_java:types.ParameterType ,
+											dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Data (uri, label) object type"@en-US ;
+        dynapi:name                         "object uri label" ;
+        dynapi:hasInternalElement 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri> ,
+											<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/count>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "Number of fetched countries"@en-US ;
+        dynapi:name                         "count" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultCountArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultCountArrayType>
+        a                                   dynapi:parameterType ,
+                                            dynapi:arrayParameterType ,
+                                            dynapi_java:types.ParameterType ,
+                                            dynapi_java:types.ArrayParameterType ;
+        rdfs:label                          "Result (uri, label) array type"@en-US ;
+        dynapi:name                         "array of total numbers" ;
+        dynapi:hasElementsOfType 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/totalCountObjectType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/totalCountObjectType>
+        a                                   dynapi:parameterType ,
+											dynapi:objectParameterType ,
+											dynapi_java:types.ParameterType ,
+											dynapi_java:types.ObjectParameterType ;
+        rdfs:label                          "Counts (total) object type"@en-US ;
+        dynapi:name                         "object" ;
+        dynapi:hasInternalElement 			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/total> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/countryForDeleting>
+        a                                   dynapi:parameter ;
+        rdfs:label                          "country for deleting"@en-US ;
+        dynapi:name                         "stateOrProvinceForDeleting" ;
+        dynapi:description                  "List of available countries" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/resultUriLabelArrayType> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/uri>
+        a                       			dynapi:parameter ;
+        dynapi:name             			"uri" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label              			"uri"@en-US .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/label>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"label" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               			"label"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resourceId>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"resource_id" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        rdfs:label               			"resource uri"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/total>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"total" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"total"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/limit>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"limit" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"limit"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/offset>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"offset" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        rdfs:label               			"offset"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortBy>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"sortBy" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               			"sortBy"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/order>
+        a                        			dynapi:parameter ;
+        dynapi:name              			"order" ;
+        dynapi:hasType 						<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDanyURI> ;
+        rdfs:label               			"order"@en-US .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/countries>
+        a                       dynapi:model ;
+        dynapi:name             "http://vitro.mannlib.cornell.edu/filegraph/abox/geopolitical.abox.ver1.1-11-18-11.owl" ;
+        rdfs:label              "countries model"@en-US ;
+        vitro:mostSpecificType  dynapi:model .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createCountryRPC>
+        a                            		dynapi:rpc ;
+        rdfs:label                     		"remote procedure call endpoint for creation of a country"@en-US ;
+        dynapi:name                   		"remote procedure call endpoint for creation of a country" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:minAPIVersionMin      		"1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteCountryRPC>
+        a                            		dynapi:rpc ;
+        rdfs:label                     		"remote procedure call endpoint for removing of a country"@en-US ;
+        dynapi:name                   		"remote procedure call endpoint for removing of a country" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:minAPIVersionMin      		"1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readCountryRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for fetching a country"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for fetching a country" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateCountryRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for updating a country"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for updating a country" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readCountriesRPC>
+        a                                   dynapi:rpc ;
+        rdfs:label                          "remote procedure call endpoint for fetching countries"@en-US ;
+        dynapi:name                         "remote procedure call endpoint for fetching countries" ;
+        dynapi:hasDefaultMethod 			<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
+
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/country>
+        a                                   dynapi:resourceAPI ;
+        rdfs:label                          "country resourceAPI 1"@en-US ;
+        dynapi:name                         "country" ;
+        dynapi:minAPIVersion                "1.0.0" ;
+        dynapi:onPost 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/createCountryRPC> ;
+        dynapi:onDelete 					<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/deleteCountryRPC> ;
+        dynapi:onGet 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readCountryRPC> ;
+        dynapi:onPut 						<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/updateCountryRPC> ;
+        dynapi:onGetAll 					<https://vivoweb.org/ontology/vitro-dynamic-api/rpc/readCountriesRPC> .
