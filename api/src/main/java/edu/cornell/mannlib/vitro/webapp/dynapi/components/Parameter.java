@@ -1,9 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
@@ -19,7 +18,8 @@ public class Parameter implements Removable {
     }
     
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasType", minOccurs = 1, maxOccurs = 1)
-    public void setType(ParameterType type) {
+    public void setType(ParameterType type) throws InitializationException {
+        type.initialize();
         this.type = type;
     }
     
@@ -48,26 +48,6 @@ public class Parameter implements Removable {
 
     public boolean isValid(String name, Data data) {
         return validators.isAllValid(name, data);
-    }
-
-    public String computePrefix(String fieldName) {
-        String retVal = "";
-        SerializationType serializationType = type.getSerializationType();
-        if (serializationType instanceof PrimitiveSerializationType) {
-            retVal = (name.equals(fieldName)) ? "" : null;
-        } else if (!(fieldName.contains("."))) {
-            retVal = null;
-        } else {
-            String fieldNameFirstPart = fieldName.substring(0, fieldName.indexOf("."));
-            if (!(name.equals(fieldNameFirstPart))) {
-                String restOfPrefix = serializationType.computePrefix(fieldName);
-                retVal = (restOfPrefix != null) ? name + "." + restOfPrefix: null;
-            } else {
-                retVal = serializationType.computePrefix(fieldName.substring(fieldName.indexOf(".") + 1));
-            }
-        }
-
-        return retVal;
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ParameterConverter;
 
 public class DynapiArrayList {
 
@@ -32,7 +31,8 @@ public class DynapiArrayList {
 		ArrayNode array = (ArrayNode) jsonNode;
 		for (int i=0;i < array.size();i++){
 			JsonNode item = array.get(i);
-			Object itemObject = ParameterConverter.deserialize(type.getValuesType(), item.toString());
+			final ParameterType valuesType = type.getValuesType();
+			Object itemObject = valuesType.getImplementationType().deserialize(valuesType, item.toString());
 			listData.add(itemObject);
 		}
 		return listData;

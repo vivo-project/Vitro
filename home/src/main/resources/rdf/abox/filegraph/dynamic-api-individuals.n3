@@ -203,7 +203,7 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/json-object>
         a                       dynapi:ImplementationType, dynapi_types:ImplementationType ;
-        dynapi:className        "edu.cornell.mannlib.vitro.webapp.dynapi.data.types.JsonObject" ;
+        dynapi:className        "com.fasterxml.jackson.databind.JsonNode" ;
 		dynapi:serializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/json-object> ;
 		dynapi:deserializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/json-object> ;
         rdfs:label              "Json Object"@en-US ;
@@ -335,8 +335,8 @@
         rdfs:label              "Integer serialization config"@en-US ;
 		dynapi:className 		"java.lang.Integer" ;
 		dynapi:methodName 		"toString";
-		dynapi:methodArguments	"input";
-		dynapi:isStaticMethod	"true"^^xsd:boolean ;
+		dynapi:methodArguments	"";
+		dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/boolean>

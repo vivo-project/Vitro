@@ -43,7 +43,6 @@ public class IsInteger extends IsNotBlank {
     }
 
     private boolean isInteger(String string) {
-    	System.out.println(string);
     	try {
     		Integer.parseInt(string);
     		return true;

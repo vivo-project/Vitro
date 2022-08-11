@@ -17,8 +17,7 @@ public abstract class SerializationType implements Removable {
         // TODO Auto-generated method stub
     }
 
-    public abstract String computePrefix(String fieldName);
-	
+
 	public String getName() {
 		return name;
 	}

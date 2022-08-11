@@ -22,7 +22,7 @@ public class Validators implements Removable {
     public boolean isAllValid(String name, Data data) {
         for (Validator validator : validators) {
             if (!validator.isValid(name, data)) {
-                log.error("Parameter " + name + " is invalid. Validator failed " + validator.getClass().getSimpleName());
+                log.error("Parameter " + name + " is invalid. Validator " + validator.getClass().getSimpleName());
                 return false;
             }
         }

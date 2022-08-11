@@ -2,6 +2,9 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ParameterType implements Removable {
@@ -92,7 +95,24 @@ public class ParameterType implements Removable {
 	}
 
 	public boolean isJsonObject() {
-		return getImplementationType().getClassName().getCanonicalName()
-				.equals("edu.cornell.mannlib.vitro.webapp.dynapi.data.types.JsonObject");
+		final String canonicalName = getImplementationType().getClassName().getCanonicalName();
+		final String jsonNode = "com.fasterxml.jackson.databind.JsonNode";
+		if (jsonNode.equals(canonicalName)){
+			return true;
+		}
+		return false;
+	}
+
+	public void initialize() throws InitializationException {
+		if (implementationType == null) {
+			throw new InitializationException("implementation type is null");
+		}
+		if (implementationType.getDeserializationConfig() != null) {
+			implementationType.getDeserializationConfig().setConversionMethod(new ConversionMethod(this, false));
+		}
+		if (implementationType.getSerializationConfig() != null) {
+			implementationType.getSerializationConfig().setConversionMethod(new ConversionMethod(this, true));
+		}
+
 	}
 }

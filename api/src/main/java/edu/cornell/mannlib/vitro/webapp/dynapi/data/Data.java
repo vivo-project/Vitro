@@ -1,21 +1,17 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ParameterConverter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class Data {
 
-    private Set<String> types = null;
     private String string = null;
     private Object object = null;
     private Parameter param = null;
 
     public Data(Parameter param){
-        types = new HashSet<>();
         this.param = param;
     }
     
@@ -40,17 +36,21 @@ public class Data {
     }
 
 	public void earlyInitialization() throws ConversionException {
+		final ParameterType type = param.getType();
+		final ImplementationType implementationType = type.getImplementationType();
 		if (param.isInternal()) {
-			object = ParameterConverter.deserialize(param.getType(), param.getName());
+			object = implementationType.deserialize(type, param.getName());
 			return;
 		} 
-		object = ParameterConverter.deserialize(param.getType(), string);
+		object = implementationType.deserialize(type, string);
 	}
 
 	public String getJsonValue() throws ConversionException {
+		final ParameterType type = param.getType();
+		final ImplementationType implementationType = type.getImplementationType();
 		if (object == null) {
-			object = ParameterConverter.deserialize(param.getType(), string);
+			object = implementationType.deserialize(type, string);
 		}
-		return ParameterConverter.serialize(param.getType(), object);
+		return implementationType.serialize(type, object).toString();
 	}
 }

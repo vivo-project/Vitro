@@ -119,7 +119,7 @@ public class N3TemplateTest extends ServletContextTest {
 
 
     @Test
-    public void testInsertMultipleUris() throws ClassNotFoundException, IOException, ConfigurationBeanLoaderException, ConversionException {
+    public void testInsertMultipleUris() throws Exception {
         n3Template.setN3TextAdditions("?uri1 <http:has> ?uri2");
     	loadDefaultModel();
         Parameter model = loader.loadInstance(MODEL_PATH, Parameter.class);
@@ -228,7 +228,7 @@ public class N3TemplateTest extends ServletContextTest {
 
 
     @Test
-    public void loadAndExecuteN3operationWithAdditionAndRetraction() throws IOException, ConfigurationBeanLoaderException, ClassNotFoundException, ConversionException {
+    public void loadAndExecuteN3operationWithAdditionAndRetraction() throws Exception {
         loadDefaultModel();
         loadModels(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
         N3Template n3Template = loader.loadInstance(TEST_N3TEMPLATE_URI, N3Template.class);
@@ -256,7 +256,7 @@ public class N3TemplateTest extends ServletContextTest {
 
 
     @Test
-    public void loadAndExecuteN3operationMultipleTimes() throws IOException, ConfigurationBeanLoaderException, ConversionException {
+    public void loadAndExecuteN3operationMultipleTimes() throws Exception {
         loadDefaultModel();
         loadModels(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
 
@@ -293,7 +293,7 @@ public class N3TemplateTest extends ServletContextTest {
 		dataStore.addData(name, testSubject);
 	}
     
-    private Parameter createStringParameter(String name) throws ClassNotFoundException {
+    private Parameter createStringParameter(String name) throws Exception {
 		Parameter uri1Param = new Parameter();
         ParameterType uri1ParamType = new ParameterType();
         ImplementationType impltype = new ImplementationType();
@@ -313,13 +313,14 @@ public class N3TemplateTest extends ServletContextTest {
 		uri1ParamType.setRdfType(rdfType);
 
 		uri1ParamType.setImplementationType(impltype );
-        uri1Param.setType(uri1ParamType);
+		uri1Param.setType(uri1ParamType);
+		
         uri1ParamType.setSerializationType(stringType);
         uri1Param.setName(name);
 		return uri1Param;
 	}
     
-    private Parameter createBooleanParameter(String name) throws ClassNotFoundException {
+    private Parameter createBooleanParameter(String name) throws Exception {
 		Parameter uri1Param = new Parameter();
         ParameterType uri1ParamType = new ParameterType();
         ImplementationType uri1ImplType = new ImplementationType();
@@ -339,13 +340,13 @@ public class N3TemplateTest extends ServletContextTest {
 		uri1ParamType.setRdfType(rdfType);
 		
 		uri1ParamType.setImplementationType(uri1ImplType );
-        uri1Param.setType(uri1ParamType);
+		uri1Param.setType(uri1ParamType);
         uri1ParamType.setSerializationType(anyURI);
         uri1Param.setName(name);
 		return uri1Param;
 	}
     
-    private Parameter createUriParameter(String name) throws ClassNotFoundException {
+    private Parameter createUriParameter(String name) throws Exception {
 		Parameter uri1Param = new Parameter();
         ParameterType uri1ParamType = new ParameterType();
         ImplementationType uri1ImplType = new ImplementationType();
@@ -371,7 +372,7 @@ public class N3TemplateTest extends ServletContextTest {
 		return uri1Param;
 	}
     
-    private Parameter createModel() throws ClassNotFoundException {
+    private Parameter createModel() throws Exception {
 		Parameter uri1Param = new Parameter();
         ParameterType modelParamType = new ParameterType();
         ImplementationType modelType = new ImplementationType();
@@ -395,7 +396,7 @@ public class N3TemplateTest extends ServletContextTest {
         modelParamType.setIsInternal(true);
 
 		modelParamType.setImplementationType(modelType );
-        uri1Param.setType(modelParamType);
+		uri1Param.setType(modelParamType);
         uri1Param.setName("FULL_UNION");
 		return uri1Param;
 	}

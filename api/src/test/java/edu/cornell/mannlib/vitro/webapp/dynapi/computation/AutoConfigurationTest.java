@@ -10,6 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SPARQLQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -17,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 
 public class AutoConfigurationTest {
     @Test
-    public void testActionRequirements1() {
+    public void testActionRequirements1() throws InitializationException {
         Action action = new Action();
         OperationalStep step1 = new OperationalStep();
         OperationalStep step2 = new OperationalStep();
@@ -42,7 +43,7 @@ public class AutoConfigurationTest {
     }
 
     @Test
-    public void testActionRequirements2() {
+    public void testActionRequirements2() throws InitializationException {
         Action action = new Action();
         OperationalStep step1 = new OperationalStep();
         OperationalStep step2 = new OperationalStep();
@@ -59,7 +60,7 @@ public class AutoConfigurationTest {
     }
     
     @Test
-    public void testConditionalInActionRequirements() {
+    public void testConditionalInActionRequirements() throws InitializationException {
         Action action = new Action();
         ConditionalStep step1 = new ConditionalStep();
         OperationalStep step2 = new OperationalStep();
@@ -81,7 +82,7 @@ public class AutoConfigurationTest {
     }
     
     @Test
-    public void testConditionalWithNullStepInActionRequirements() {
+    public void testConditionalWithNullStepInActionRequirements() throws InitializationException {
         Action action = new Action();
         action.addProvidedParameter(param("A"));
         ConditionalStep step1 = new ConditionalStep();
@@ -105,7 +106,7 @@ public class AutoConfigurationTest {
         
     }
     
-    private SPARQLQuery query(String[] required, String[] provided) {
+    private SPARQLQuery query(String[] required, String[] provided) throws InitializationException {
         SPARQLQuery query = new SPARQLQuery();
         for (int i = 0; i < required.length; i++) {
             query.addInputParameter(param(required[i]));
@@ -116,7 +117,7 @@ public class AutoConfigurationTest {
         return query;
     }
 
-    private Parameter param(String name) {
+    private Parameter param(String name) throws InitializationException {
         Parameter param = new Parameter();
         ParameterType uri1ParamType = new ParameterType();
         ImplementationType uri1ImplType = new ImplementationType();

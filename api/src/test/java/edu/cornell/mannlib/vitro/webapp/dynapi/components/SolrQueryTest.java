@@ -73,7 +73,7 @@ public class SolrQueryTest extends ServletContextTest {
     }
 
     @Before
-    public void setupQuery() throws ClassNotFoundException{
+    public void setupQuery() throws Exception{
         when(ApplicationUtils.instance()).thenReturn(application);
         when(application.getSearchEngine()).thenReturn(searchEngine);
         when(searchEngine.createQuery()).thenReturn(searchQuery);
@@ -83,7 +83,7 @@ public class SolrQueryTest extends ServletContextTest {
     }
 
     @Test
-    public void testLoadingAndPropertiesSetup() throws IOException, ConfigurationBeanLoaderException {
+    public void testLoadingAndPropertiesSetup() throws Exception {
         loadDefaultModel();
         loadModels(TEST_DATA_PATH.split("\\.")[1], TEST_DATA_PATH);
 
@@ -150,7 +150,7 @@ public class SolrQueryTest extends ServletContextTest {
     }
 
     @Test
-    public void queryWithMultipleVariableInsideTextSearchWithSubstitution() throws ClassNotFoundException{
+    public void queryWithMultipleVariableInsideTextSearchWithSubstitution() throws Exception{
         when(searchQuery.setQuery(any(String.class))).thenReturn(searchQuery);
         solrQuery.setQueryText("?testParam1 OR ?testParam2");
         Parameter param = createStringParameter("testParam1");
@@ -168,7 +168,7 @@ public class SolrQueryTest extends ServletContextTest {
     }
 
     @Test
-    public void queryWithLimitAndOffsetWrongValue() throws ClassNotFoundException{
+    public void queryWithLimitAndOffsetWrongValue() throws Exception{
         when(searchQuery.setStart(anyInt())).thenReturn(searchQuery);
         
         Parameter param = createStringParameter("testParam1");
@@ -191,7 +191,7 @@ public class SolrQueryTest extends ServletContextTest {
     }
 
     @Test
-    public void queryWithMultipleSortsBadInput() throws ClassNotFoundException{
+    public void queryWithMultipleSortsBadInput() throws Exception{
        // when(dataStore.contains(anyString())).thenReturn(true);
         //when(input.getData("testParam1")).thenReturn(new String[]{"field1"});
         //when(input.getData("testParam2")).thenReturn(new String[]{"field2"});
@@ -226,7 +226,7 @@ public class SolrQueryTest extends ServletContextTest {
     }
 
     @Test
-    public void queryWithMultipleSorts() throws ClassNotFoundException{
+    public void queryWithMultipleSorts() throws Exception{
         when(searchQuery.addSortField(anyString(),any())).thenReturn(searchQuery);
         
     	Parameter param = createStringParameter("testParam1");
@@ -256,7 +256,7 @@ public class SolrQueryTest extends ServletContextTest {
         verify(searchQuery,times(2)).addSortField(anyString(),any());
     }
     
-    private Parameter createStringParameter(String name) throws ClassNotFoundException {
+    private Parameter createStringParameter(String name) throws Exception {
 		Parameter uri1Param = new Parameter();
         ParameterType paramType = new ParameterType();
         ImplementationType impltype = new ImplementationType();

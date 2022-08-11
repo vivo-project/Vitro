@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 public class ValidatorsTest {
 
     @Test
-    public void testIsIntegerValidator() {
+    public void testIsIntegerValidator() throws Exception {
 
         Validator validator = new IsInteger();
 
@@ -36,7 +36,7 @@ public class ValidatorsTest {
     }
 
     @Test
-    public void testIsNotBlankValidator() {
+    public void testIsNotBlankValidator() throws Exception {
 
         Validator validator = new IsNotBlank();
 
@@ -53,7 +53,7 @@ public class ValidatorsTest {
     }
 
     @Test
-    public void testNumericRangeValidator() {
+    public void testNumericRangeValidator() throws Exception {
 
         NumericRangeValidator validator1 = new NumericRangeValidator();
         validator1.setMaxValue(40.3f);
@@ -82,7 +82,7 @@ public class ValidatorsTest {
     }
 
     @Test
-    public void testStringLengthRangeValidator() {
+    public void testStringLengthRangeValidator() throws Exception {
 
         StringLengthRangeValidator validator1 = new StringLengthRangeValidator();
         validator1.setMaxLength(7);
@@ -111,7 +111,7 @@ public class ValidatorsTest {
     }
 
     @Test
-    public void testRegularExpressionValidator() {
+    public void testRegularExpressionValidator() throws Exception {
 
         RegularExpressionValidator validator1 = new RegularExpressionValidator();
         validator1.setRegularExpression("^(.+)@(\\S+)$");
@@ -128,39 +128,31 @@ public class ValidatorsTest {
         assertFalse(validator1.isValid(fieldName, createData(values3)));
     }
     
-    public Data createData(Object input) {
+    public Data createData(Object input) throws Exception {
     	Parameter param = new Parameter();
     	ParameterType paramType = new ParameterType();
-    	param.setType(paramType);
-    	ImplementationType impType = new ImplementationType();
-    	paramType.setImplementationType(impType);
+    	
+    	ImplementationType implType = new ImplementationType();
+    	paramType.setImplementationType(implType);
     	Data data = new Data(param);
     	if (input instanceof String[]) {
-    		try {
-				impType.setName("java.util.ArrayList");
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			implType.setName("java.util.ArrayList");
         	data.setObject(Arrays.asList((String[])input));
     	} else {
-    		try {
-				impType.setName("java.lang.String");
-				ImplementationConfig config = new ImplementationConfig();
-				
-				config.setClassName("java.lang.String");
-				config.setMethodArguments("");
-				config.setMethodName("toString");
-				config.setStaticMethod(false);
-				impType.setSerializationConfig(config);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    		
+			implType.setName("java.lang.String");
+			ImplementationConfig config = new ImplementationConfig();
+			
+			config.setClassName("java.lang.String");
+			config.setMethodArguments("");
+			config.setMethodName("toString");
+			config.setStaticMethod(false);
+			implType.setSerializationConfig(config);
+			
         	data.setObject(input);
 
     	}
-
+    	param.setType(paramType);
 		return data;
     }
 
