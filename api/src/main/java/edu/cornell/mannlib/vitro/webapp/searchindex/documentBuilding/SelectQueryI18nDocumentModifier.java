@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
 
 /**
- * A variation on SelectQueryDocument where the suffix of target field is defined.
+ * A variation on SelectQueryDocumentModifier where the suffix of target field is defined.
  * Multiple queries are performed for each of locales configured in runtime.properties
  * 
  * Target field names are composed of locale + fieldSuffix.
@@ -36,9 +36,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
  * strings and added to the field.
  *
  */
-public class SelectQueryDocumentModifierDynamicTargetField extends SelectQueryDocumentModifier
+public class SelectQueryI18nDocumentModifier extends SelectQueryDocumentModifier
 		implements DocumentModifier, ContextModelsUser, ConfigurationReader {
-	private static final Log log = LogFactory.getLog(SelectQueryDocumentModifierDynamicTargetField.class);
+	private static final Log log = LogFactory.getLog(SelectQueryI18nDocumentModifier.class);
 
 	private String fieldSuffix = "";
 
