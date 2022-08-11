@@ -9,7 +9,8 @@
     :hasTargetSuffix "_label_display" ;
     :hasSelectQuery """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        SELECT ( MIN(?label) as ?singleLabel ) WHERE {
+        SELECT (MIN(?label) AS ?singleLabel ) WHERE {
             ?uri rdfs:label ?label .
-        }
+            BIND (LANG(?label) as ?lang )
+        } GROUP BY ?lang ORDER BY ?lang
     """ .

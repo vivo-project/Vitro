@@ -95,7 +95,8 @@ public class SelectQueryDocumentModifierDynamicTargetField extends SelectQueryDo
 		if (!StringUtils.isBlank(property)) {
 			String[] values = property.trim().split("\\s*,\\s*");
 			for (String value : values) {
-				addLocale(value);
+				String locale = value.replace("_", "-");
+				addLocale(locale);
 			}
 		}
 	}
