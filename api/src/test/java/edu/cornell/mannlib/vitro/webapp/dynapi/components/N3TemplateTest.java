@@ -7,6 +7,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory;
@@ -120,7 +121,7 @@ public class N3TemplateTest extends ServletContextTest {
 
     @Test
     public void testInsertMultipleUris() throws Exception {
-        n3Template.setN3TextAdditions("?uri1 <http:has> ?uri2");
+        n3Template.setN3Template("?uri1 <http:has> ?uri2");
     	loadDefaultModel();
         Parameter model = loader.loadInstance(MODEL_PATH, Parameter.class);
         n3Template.setTemplateModel(model);
@@ -145,7 +146,7 @@ public class N3TemplateTest extends ServletContextTest {
     @Test
     public void testInsertOneUriOneLiteral() throws Exception {
        // when(modelComponent.getName()).thenReturn("test");
-        n3Template.setN3TextAdditions("?uri1 <http:has> ?literal1");
+        n3Template.setN3Template("?uri1 <http:has> ?literal1");
     	loadDefaultModel();
         Parameter model = loader.loadInstance(MODEL_PATH, Parameter.class);
         n3Template.setTemplateModel(model);
@@ -169,7 +170,7 @@ public class N3TemplateTest extends ServletContextTest {
 
     @Test
     public void testMultipleStatements() throws Exception{
-        n3Template.setN3TextAdditions("?uri1 <http://has> ?literal1 .\n?uri1 <http://was> ?literal2");
+        n3Template.setN3Template("?uri1 <http://has> ?literal1 .\n?uri1 <http://was> ?literal2");
 
         loadDefaultModel();
         Parameter model = loader.loadInstance(MODEL_PATH, Parameter.class);
@@ -289,7 +290,7 @@ public class N3TemplateTest extends ServletContextTest {
 	private void addData(N3Template n3Template, String name, Object value) {
 		Parameter testSubjectParam = n3Template.getInputParams().get(name);
 		Data testSubject = new Data(testSubjectParam);
-		testSubject.setObject(value);
+		TestView.setObject(testSubject, value);
 		dataStore.addData(name, testSubject);
 	}
     

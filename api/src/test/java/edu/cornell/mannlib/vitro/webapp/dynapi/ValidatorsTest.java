@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.RegularExpr
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.StringLengthRangeValidator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -137,7 +138,7 @@ public class ValidatorsTest {
     	Data data = new Data(param);
     	if (input instanceof String[]) {
 			implType.setName("java.util.ArrayList");
-        	data.setObject(Arrays.asList((String[])input));
+			TestView.setObject(data, Arrays.asList((String[])input));
     	} else {
     		
 			implType.setName("java.lang.String");
@@ -148,9 +149,7 @@ public class ValidatorsTest {
 			config.setMethodName("toString");
 			config.setStaticMethod(false);
 			implType.setSerializationConfig(config);
-			
-        	data.setObject(input);
-
+			TestView.setObject(data,input);
     	}
     	param.setType(paramType);
 		return data;

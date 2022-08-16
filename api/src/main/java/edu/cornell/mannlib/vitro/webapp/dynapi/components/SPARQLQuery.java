@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonObjectView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
@@ -128,12 +129,11 @@ public class SPARQLQuery extends Operation {
 
 	private void populateJsonArrayFromSolution(DataStore dataStore, Map<String, ArrayNode> jsonArrays, List<String> vars,
 			QuerySolution solution) throws ConversionException {
-		for (String key : jsonArrays.keySet()) {
-			ArrayNode node = jsonArrays.get(key);
-			if (!dataStore.contains(key)) {
-				Data data = new Data(outputParams.get(key));
-				data.setObject(node);
-				dataStore.addData(key, data);
+		for (String name : jsonArrays.keySet()) {
+			ArrayNode node = jsonArrays.get(name);
+			if (!dataStore.contains(name)) {
+				final Parameter arrayParam = outputParams.get(name);
+				JsonObjectView.addData(dataStore, name, arrayParam, node ); 
 			}
 			ObjectNode object = JsonObjectView.getObject(node);
 			for (String var : vars) {

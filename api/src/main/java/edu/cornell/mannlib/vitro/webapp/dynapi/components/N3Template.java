@@ -34,7 +34,7 @@ public class N3Template extends Operation implements Template {
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
-	public void setN3TextAdditions(String n3TextAdditions) {
+	public void setN3Template(String n3TextAdditions) {
 		this.n3TextAdditions = n3TextAdditions;
 	}
 
@@ -66,7 +66,7 @@ public class N3Template extends Operation implements Template {
 	@Override
 	public OperationResult run(DataStore dataStore) {
 		if (!isInputValid(dataStore)) {
-			return new OperationResult(500);
+			return OperationResult.internalServerError();
 		}
 
 		String substitutedN3AdditionsTemplate;
@@ -101,10 +101,10 @@ public class N3Template extends Operation implements Template {
 			ProcessRdfForm.applyChangesToWriteModel(changes, null, writeModel,"");
 		} catch(Exception e) {
 			log.error(e,e);
-			return new OperationResult(500);
+			return OperationResult.internalServerError();
 		}
 
-		return new OperationResult(200);
+		return OperationResult.ok();
 	}
 
 	private String insertParameters(DataStore input, String n3Text) throws InputMismatchException{

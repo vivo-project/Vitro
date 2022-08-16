@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
@@ -117,7 +118,7 @@ public class SolrQueryTest extends ServletContextTest {
     @Test
     public void requiredParameterPresentAndValid() throws ClassNotFoundException{
         Data data = new Data(parameter1);
-        data.setObject("testValue");
+        TestView.setObject(data, "testValue");
     	dataStore.addData(parameter1.getName(), data);
     	solrQuery.addInputParameter(parameter1);
         assertFalse(solrQuery.run(dataStore).hasError());
@@ -142,7 +143,7 @@ public class SolrQueryTest extends ServletContextTest {
     public void queryWithVariableInsideTextSearchWithSubstitution(){
         solrQuery.setQueryText("testSearchText OR ?testParameter");
         Data data = new Data(parameter1);
-        data.setObject("testValue");
+        TestView.setObject(data, "testValue");
     	dataStore.addData(parameter1.getName(), data);
     	solrQuery.addInputParameter(parameter1);
         assertFalse(solrQuery.run(dataStore).hasError());
@@ -155,12 +156,12 @@ public class SolrQueryTest extends ServletContextTest {
         solrQuery.setQueryText("?testParam1 OR ?testParam2");
         Parameter param = createStringParameter("testParam1");
         Data data = new Data(param);
-        data.setObject("testValue1");
+        TestView.setObject(data, "testValue1");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
         Data data2 = new Data(param2);
-        data2.setObject("testValue2");
+        TestView.setObject(data2, "testValue2");
     	dataStore.addData(param2.getName(), data2);
 
         assertFalse(solrQuery.run(dataStore).hasError());
@@ -173,12 +174,12 @@ public class SolrQueryTest extends ServletContextTest {
         
         Parameter param = createStringParameter("testParam1");
         Data data = new Data(param);
-        data.setObject("11");
+        TestView.setObject(data, "11");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
         Data data2 = new Data(param2);
-        data2.setObject("testValue2");
+        TestView.setObject(data2, "testValue2");
     	dataStore.addData(param2.getName(), data2);
         
         solrQuery.setOffset("?testParam1");
@@ -203,17 +204,17 @@ public class SolrQueryTest extends ServletContextTest {
 
     	Parameter param = createStringParameter("testParam1");
         Data data = new Data(param);
-        data.setObject("field1");
+        TestView.setObject(data, "field1");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
         Data data2 = new Data(param2);
-        data2.setObject("field2");
+        TestView.setObject(data2, "field2");
     	dataStore.addData(param2.getName(), data2);
     	
     	Parameter param3 = createStringParameter("testParam3");
         Data data3 = new Data(param3);
-        data3.setObject("field3");
+        TestView.setObject(data3, "field3");
     	dataStore.addData(param3.getName(), data3);
     	
     	solrQuery.addInputParameter(param);
@@ -231,17 +232,17 @@ public class SolrQueryTest extends ServletContextTest {
         
     	Parameter param = createStringParameter("testParam1");
         Data data = new Data(param);
-        data.setObject("field1");
+        TestView.setObject(data,"field1");
     	dataStore.addData(param.getName(), data);
     	
     	Parameter param2 = createStringParameter("testParam2");
         Data data2 = new Data(param2);
-        data2.setObject("field2");
+        TestView.setObject(data2, "field2");
     	dataStore.addData(param2.getName(), data2);
     	
     	Parameter param3 = createStringParameter("testParam3");
         Data data3 = new Data(param3);
-        data3.setObject("asc");
+        TestView.setObject(data3,"asc");
     	dataStore.addData(param3.getName(), data3);
         //when(input.getData("testParam1")).thenReturn(new String[]{"field1"});
         //when(input.getData("testParam2")).thenReturn(new String[]{"field2"});

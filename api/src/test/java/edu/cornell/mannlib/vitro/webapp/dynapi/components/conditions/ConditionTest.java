@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.StringView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestAccessor;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import stubs.javax.servlet.ServletContextStub;
@@ -68,7 +68,7 @@ public class ConditionTest extends ServletContextTest{
         inputData.earlyInitialization();
         store.addData(INPUT_PARAM, inputData);
         Data modelData = new Data(action.getInternalParams().get(MODEL_PARAM));
-        TestAccessor.setObject(modelData, storeModel);
+        TestView.setObject(modelData, storeModel);
         
         store.addData(MODEL_PARAM, modelData);
         //data.add("input_param", new StringData(input));

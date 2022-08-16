@@ -34,4 +34,10 @@ public class JsonObjectView {
 		node.add(object);
 		return object;
 	}
+
+	public static void addData(DataStore dataStore, String name, Parameter arrayParam, ArrayNode node) {
+		Data data = new Data(arrayParam);
+		data.setObject(node);
+		dataStore.addData(name, data);		
+	}
 }

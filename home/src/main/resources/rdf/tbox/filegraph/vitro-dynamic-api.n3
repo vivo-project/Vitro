@@ -247,6 +247,26 @@
                    rdfs:range :Parameter ;
                    rdfs:label "requires parameter"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#additionModel
+:additionModel rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ModelWriter ;
+                   rdfs:range :Model ;
+                   rdfs:label "addition model parameter"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#retractionModel
+:retractionModel rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ModelWriter ;
+                   rdfs:range :Model ;
+                   rdfs:label "retraction model parameter"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#targetModel
+:targetModel rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ModelWriter ;
+                   rdfs:range :Model ;
+                   rdfs:label "target model parameter"@en-US .
 
 #################################################################
 #    Data properties
@@ -582,6 +602,11 @@
 :N3Template rdf:type owl:Class ;
             rdfs:subClassOf :Template ;
             rdfs:label "N3 template"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ModelWriter
+:ModelWriter rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ; 
+            rdfs:label "Model writer"@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#NumericRangeValidator

@@ -6,7 +6,12 @@ import org.apache.commons.lang3.Range;
 
 public class OperationResult {
 
-    private int responseCode;
+    private static final OperationResult OK = new OperationResult(HttpServletResponse.SC_OK);
+	private static final OperationResult INTERNAL_SERVER_ERROR = new OperationResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	private static final OperationResult METHOD_NOT_ALLOWED = new OperationResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+	private static final OperationResult NOT_FOUND = new OperationResult(HttpServletResponse.SC_NOT_FOUND);
+	private static final OperationResult BAD_REQUEST = new OperationResult(HttpServletResponse.SC_BAD_REQUEST);
+	private int responseCode;
     private static Range<Integer> errors = Range.between(400, 599);
 
     public OperationResult(int responseCode) {
@@ -29,19 +34,23 @@ public class OperationResult {
     }
 
     public static OperationResult badRequest() {
-        return new OperationResult(HttpServletResponse.SC_BAD_REQUEST);
+        return BAD_REQUEST;
     }
 
     public static OperationResult notFound() {
-        return new OperationResult(HttpServletResponse.SC_NOT_FOUND);
+        return NOT_FOUND;
     }
 
     public static OperationResult methodNotAllowed() {
-        return new OperationResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        return METHOD_NOT_ALLOWED;
     }
 
     public static OperationResult internalServerError() {
-        return new OperationResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        return INTERNAL_SERVER_ERROR;
+    }
+    
+    public static OperationResult ok() {
+        return OK;
     }
 
 }

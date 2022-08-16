@@ -1,0 +1,48 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:action>
+        a                                   dynapi:Action ;
+        rdfs:label                          "action"@en-US ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:hasAssignedRPC               <test:rpc1> .
+
+<test:step1>
+        a                                   dynapi:Step, dynapi:OperationalStep ;
+        rdfs:label                          "step 1"@en-US ;
+        dynapi:hasOperation                 <test:modelWriter> .
+
+<test:modelWriter> 
+        a                                   dynapi:ModelWriter , dynapi:Operation ;
+        rdfs:label                          "test model writer"@en-US ;
+        dynapi:retractionModel              <test:retraction_model> ;
+        dynapi:additionModel                <test:addition_model> ;
+        dynapi:targetModel                  <test:target_model> .
+
+<test:rpc1>
+        a                                   dynapi:Rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "test_action" .
+
+
+<test:retraction_model>
+        a                                   dynapi:Parameter, dynapi:Model ;
+        rdfs:label                          "retraction model param"@en-US ;
+        dynapi:name                         "retraction" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
+
+<test:addition_model>
+        a                                   dynapi:Parameter, dynapi:Model ;
+        rdfs:label                          "addition model param"@en-US ;
+        dynapi:name                         "addition" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
+
+<test:target_model>
+        a                                   dynapi:Parameter, dynapi:Model ;
+        rdfs:label                          "addition model param"@en-US ;
+        dynapi:name                         "target" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
