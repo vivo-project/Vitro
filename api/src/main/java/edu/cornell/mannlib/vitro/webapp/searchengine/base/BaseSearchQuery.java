@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.searchengine.base;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
