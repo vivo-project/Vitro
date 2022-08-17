@@ -1,7 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.LABEL_DISPLAY_SUFFIX;
-import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.SORT_SUFFIX;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.LABEL_SORT_SUFFIX;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import org.apache.solr.common.util.SimpleOrderedMap;
 public class SolrFieldInitializer {
 
 	static void initializeFields(SolrClient queryEngine, ConcurrentUpdateSolrClient updateEngine) throws Exception {
-		Set<String> fieldSuffixes = new HashSet<>(Arrays.asList(SORT_SUFFIX, LABEL_DISPLAY_SUFFIX));
+		Set<String> fieldSuffixes = new HashSet<>(Arrays.asList(LABEL_SORT_SUFFIX, LABEL_DISPLAY_SUFFIX));
 		excludeMatchedFields(fieldSuffixes, queryEngine, "dynamicFields");
 		excludeMatchedFields(fieldSuffixes, queryEngine, "fields");
 		createMissingFields(fieldSuffixes, updateEngine);

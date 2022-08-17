@@ -72,7 +72,7 @@ public class VitroSearchTermNames {
 	public static final String SITE_NAME = "siteName";
 	
 	/** Multilingual sort field suffix */
-	public static final String SORT_SUFFIX = "_label_sort";
+	public static final String LABEL_SORT_SUFFIX = "_label_sort";
 	
 	/** Multilingual label field suffix */
 	public static final String LABEL_DISPLAY_SUFFIX = "_label_display";

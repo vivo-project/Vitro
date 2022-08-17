@@ -209,7 +209,7 @@ public class SearchQueryUtils {
     }
     
     public static String getSortFieldNameForLocale(Locale locale) {
-        return locale.toString().replace('_', '-') + VitroSearchTermNames.SORT_SUFFIX;
+        return locale.toString().replace('_', '-') + VitroSearchTermNames.LABEL_SORT_SUFFIX;
     }
     
     public static String getLabelFieldNameForLocale(Locale locale) {
