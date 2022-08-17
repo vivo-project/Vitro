@@ -159,14 +159,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
             int page, String alpha, VitroRequest vreq)
     throws SearchException{
    	 	try{
-            ConfigurationProperties props = ConfigurationProperties.getBean(vreq);
-            boolean languageFilter = Boolean.valueOf(props.getProperty(
-                    LANGUAGE_FILTER_PROPERTY, "false"));
-            List<String> classUris = Collections.singletonList(vclassURI);
-			IndividualListQueryResults results = buildAndExecuteVClassQuery(
-			        classUris, alpha, ((languageFilter) ? vreq.getLocale() : null),
-			        page, INDIVIDUALS_PER_PAGE, vreq.getWebappDaoFactory().getIndividualDao());
-	        return getResultsForVClassQuery(results, page, INDIVIDUALS_PER_PAGE, alpha, vreq);
+   	        List<String> classUris = Collections.singletonList(vclassURI);
+            return buildAndExecuteVClassQuery(classUris, page, INDIVIDUALS_PER_PAGE, alpha, vreq);
    	 	} catch (SearchEngineException e) {
    	 	    String msg = "An error occurred retrieving results for vclass query";
    	 	    log.error(msg, e);
@@ -179,20 +173,25 @@ public class IndividualListController extends FreemarkerHttpServlet {
     }
 
     public static IndividualListResults getResultsForVClassIntersections(
-            List<String> vclassURIs, int page, int pageSize, String alpha, VitroRequest vreq) {
+            List<String> classUris, int page, int pageSize, String alpha, VitroRequest vreq) {
         try{
-            ConfigurationProperties props = ConfigurationProperties.getBean(vreq);
-            boolean languageFilter = Boolean.valueOf(props.getProperty(
-                    LANGUAGE_FILTER_PROPERTY, "false"));
-            IndividualListQueryResults results = buildAndExecuteVClassQuery(
-                    vclassURIs, alpha, ((languageFilter) ? vreq.getLocale() : null),
-                    page, pageSize, vreq.getWebappDaoFactory().getIndividualDao());
-	        return getResultsForVClassQuery(results, page, pageSize, alpha, vreq);
+            return buildAndExecuteVClassQuery(classUris, page, pageSize, alpha, vreq);
         } catch(Throwable th) {
-       	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
+       	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + classUris.toString(), th);
        	    return IndividualListResults.EMPTY;
         }
     }
+
+	private static IndividualListResults buildAndExecuteVClassQuery(List<String> classUris, int page, int pageSize,
+			String alpha, VitroRequest vreq) throws SearchEngineException {
+		ConfigurationProperties props = ConfigurationProperties.getBean(vreq);
+		boolean languageFilter = Boolean.valueOf(props.getProperty(LANGUAGE_FILTER_PROPERTY, "false"));
+		IndividualListQueryResults results = buildAndExecuteVClassQuery(classUris, alpha,
+				((languageFilter) ? vreq.getLocale() : null), page, pageSize,
+				vreq.getWebappDaoFactory().getIndividualDao());
+		IndividualListResults indListResults = getResultsForVClassQuery(results, page, pageSize, alpha, vreq);
+		return indListResults;
+	}
 
     public static IndividualListResults getRandomResultsForVClass(String vclassURI, int page, int pageSize, VitroRequest vreq) {
    	 	try{
