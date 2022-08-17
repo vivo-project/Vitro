@@ -82,7 +82,6 @@ public class RPCEndpointTest {
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(PATH_INFO);
         when(action.run(any(DataStore.class))).thenReturn(result);
-        when(response.getWriter()).thenReturn(new PrintWriter(System.out));
         rpcEndpoint.doPost(request, response);
         verify(action, times(1)).run(any());
         verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);

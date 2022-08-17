@@ -35,6 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.junit.AfterClass;
@@ -134,6 +136,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         when(request.getRequestURI()).thenReturn(BASE_URL + REST_SERVLET_PATH + testRequestPath);
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(testRequestPath);
+        when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
 
         if (testRequestParamsFile != null) {
             String filePath = format("%s/rest/request/params/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(), testRequestParamsFile);

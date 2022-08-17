@@ -1,9 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,13 +25,16 @@ public class Converter {
 
 	private static final Log log = LogFactory.getLog(Converter.class.getName());
 	private static final String SPLIT_BY_COMMA_AND_TRIM_REGEX = "\\s*,\\s*";
-	private static Set<ContentType> supportedContentTypes = new HashSet<>(
-			Arrays.asList(ContentType.APPLICATION_JSON, ContentType.MULTIPART_FORM_DATA));
+	private static final String SPLIT_CONTENT_TYPE_AND_WEIGHT_REGEX = "\\s*;\\s*q=";
+	private static Set<String> supportedContentTypes = new HashSet<>(
+			Arrays.asList(ContentType.APPLICATION_JSON.toString(), 
+			ContentType.MULTIPART_FORM_DATA.toString(), 
+			ContentType.WILDCARD.toString()));
 
 	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
 			throws ConversionException {
 		ContentType contentType = getContentType(request);
-		ContentType responseType = getResponseType(request, contentType);
+		ContentType responseType = getResponseType(request.getHeader(HttpHeaders.ACCEPT), contentType);
 		dataStore.setResponseType(responseType);
 		Set<LangTag> acceptLangs = getAcceptLanguages(request);
 		dataStore.setAcceptLangs(acceptLangs);
@@ -39,7 +43,7 @@ public class Converter {
 		} else if (isForm(contentType)) {
 			FormDataConverter.convert(request, action, dataStore);
 		} else {
-			String message = String.format("No suitable converter found for input content type %s", contentType);
+			String message = inputContentTypeExceptionMessage(contentType);
 			throw new ConversionException(message);
 		}
 		convertInternalParams(action, dataStore);
@@ -54,13 +58,58 @@ public class Converter {
 		}
 	}
 
-	private static ContentType getResponseType(HttpServletRequest request, ContentType requestType) {
-		// TODO:Content negotiation: if accept header isn't empty, filter unsupported
-		// types and select
-		// type with highest weight. If no supported types found throw exception.
-		// If accept header is empty, use request type
-		// Set<ContentType> responseTypes = getAcceptContentTypes(request);
-		return ContentType.APPLICATION_JSON;
+	protected static ContentType getResponseType(String header, ContentType requestType)
+			throws ConversionException {
+		TreeMap<Double, ContentType> types = new TreeMap<>(Collections.reverseOrder());
+		if (StringUtils.isBlank(header)) {
+			if (supportedContentTypes.contains(requestType.toString())) {
+				return requestType;
+			} else {
+				String message = outputContentTypeExceptionMessage(requestType);
+				throw new ConversionException(message);
+			}
+		}
+		String[] weightedTypes = header.trim().split(SPLIT_BY_COMMA_AND_TRIM_REGEX);
+		for (String wType : weightedTypes) {
+			String[] typeInfo = wType.split(SPLIT_CONTENT_TYPE_AND_WEIGHT_REGEX);
+			final String typeName = typeInfo[0];
+			if (StringUtils.isBlank(typeName)) {
+				continue;
+			}
+			ContentType contentType = null;
+			try {
+				contentType = ContentType.parse(typeName);
+			} catch (Exception e) {
+				log.error(e, e);
+			}
+			if (contentType == null) {
+				continue;
+			}
+			if (!supportedContentTypes.contains(typeName)) {
+				continue;
+			}
+			Double weight = 1.0;
+			if (typeInfo.length == 2) {
+				final String qfactor = typeInfo[1];
+				if (qfactor.length() < 6 && qfactor.matches("^[0-1](\\.[0-9]{1,3})?$")) {
+					try {
+						weight = Double.parseDouble(qfactor);
+					} catch (Exception e) {
+						log.error(e, e);
+					}
+				}
+			}
+			types.put(weight, contentType);
+		}
+		if (types.isEmpty()) {
+			String message = outputContentTypeExceptionMessage(requestType);
+			throw new ConversionException(message);
+		}
+		final ContentType mostAppropriateType = types.entrySet().iterator().next().getValue();
+		if (mostAppropriateType.toString().equals(ContentType.WILDCARD.toString())) {
+			return ContentType.APPLICATION_JSON;
+		}
+		return mostAppropriateType;
 	}
 
 	public static void convert(HttpServletResponse response, Action action, OperationResult operationResult,
@@ -101,20 +150,6 @@ public class Converter {
 		return result;
 	}
 
-	private static Set<ContentType> getAcceptContentTypes(HttpServletRequest request) {
-		Set<ContentType> result = new HashSet<>();
-		String header = request.getHeader(HttpHeaders.ACCEPT);
-		if (StringUtils.isBlank(header)) {
-			return result;
-		}
-		String[] types = header.trim().split(SPLIT_BY_COMMA_AND_TRIM_REGEX);
-		for (String type : types) {
-			ContentType contentType = ContentType.parse(type);
-			result.add(contentType);
-		}
-		return result;
-	}
-
 	private static ContentType getContentType(HttpServletRequest request) {
 		String header = request.getContentType();
 		if (StringUtils.isBlank(header)) {
@@ -135,6 +170,14 @@ public class Converter {
 			return true;
 		}
 		return false;
+	}
+
+	private static String inputContentTypeExceptionMessage(ContentType contentType) {
+		return String.format("No suitable converter found for request content type %s", contentType);
+	}
+
+	private static String outputContentTypeExceptionMessage(ContentType contentType) {
+		return String.format("No suitable converter found for response content type %s", contentType);
 	}
 
 }

@@ -20,6 +20,8 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -106,6 +108,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         }
 
         when(request.getParameterMap()).thenReturn(parameterMap);
+        when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
         when(response.getWriter()).thenReturn(new PrintWriter(System.out));
         mockParameterIntoMap("limit", testLimit);
         mockParameterIntoMap("email", testEmail);
