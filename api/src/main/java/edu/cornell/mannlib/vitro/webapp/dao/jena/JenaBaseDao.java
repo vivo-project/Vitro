@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.BlankNodeId;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.iri.IRI;
@@ -643,13 +644,22 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
                 if (existingValue == null ) {
                      model.add(res, prop, model.createResource(uri));
-                } else if (!(existingValue.getURI()).equals(uri)) {
+                } else if (!isEqual(uri, existingValue)) {
              		 model.removeAll(res, prop, null);
               		 model.add(res, prop, model.createResource(uri));
                 }
             }
         }
     }
+
+	private boolean isEqual(String uri, Resource existingValue) {
+		if (existingValue.asNode().isBlank()) {
+			final String blankNodeId = existingValue.asNode().getBlankNodeId().toString();
+			return uri.endsWith(blankNodeId);
+		} else {
+			return existingValue.getURI().equals(uri);			
+		}
+	}
 
     /**
      * convenience method for use with functional object properties
