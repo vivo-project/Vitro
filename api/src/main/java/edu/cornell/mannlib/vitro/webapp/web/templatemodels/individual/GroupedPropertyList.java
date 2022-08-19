@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption.LANGUAGE_NEUTRAL;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption.POLICY_NEUTRAL;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -280,8 +277,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
 
 	private ObjectProperty assembleObjectProperty(PropertyInstance pi) {
-		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory(
-				LANGUAGE_NEUTRAL, POLICY_NEUTRAL);
+		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory();
 		ObjectPropertyDao opDao = rawWadf.getObjectPropertyDao();
 		FauxPropertyDao fpDao = rawWadf.getFauxPropertyDao();
 
