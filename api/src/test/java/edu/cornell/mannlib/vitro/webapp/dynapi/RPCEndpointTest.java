@@ -77,7 +77,7 @@ public class RPCEndpointTest {
 
     @Test
     public void doPostTest() throws IOException {
-        OperationResult result = new OperationResult(HttpServletResponse.SC_OK);
+        OperationResult result = OperationResult.ok();
 
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(PATH_INFO);

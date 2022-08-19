@@ -70,4 +70,14 @@ public class RdfView implements View {
 		return result;
 	}
 
+	public static List<String> getUriNames(Parameters params) {
+		List<String> result = new LinkedList<>();
+		for (String name : params.getNames()) {
+			if (params.get(name).getType().isUri()) {
+				result.add(name);
+			}
+		}
+		return result;
+	}
+
 }

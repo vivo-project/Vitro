@@ -126,7 +126,7 @@ public class SolrQuery extends Operation {
     @Override
     public OperationResult run(DataStore input) {
         if (!isInputValid(input)) {
-            return new OperationResult(400);
+            return OperationResult.badRequest();
         }
 
         SearchQuery searchQuery;
@@ -135,7 +135,7 @@ public class SolrQuery extends Operation {
         } catch (Exception e) {
             log.error("Error while parsing input data for query");
             log.error(e);
-            return new OperationResult(400);
+            return OperationResult.badRequest();
         }
 
         SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
@@ -145,10 +145,10 @@ public class SolrQuery extends Operation {
         } catch (SearchEngineException e) {
             log.error("Error while executing Solr Query:");
             log.error(e.getMessage());
-            return new OperationResult(500);
+            return OperationResult.internalServerError();
         }
 
-        return new OperationResult(200);
+        return OperationResult.ok();
     }
 
     private SearchQuery createSearchQuery(DataStore dataStore)

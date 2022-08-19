@@ -18,7 +18,7 @@ public class NullStep implements Step {
     
     @Override
     public OperationResult run(DataStore input) {
-        return new OperationResult(200);
+        return OperationResult.ok();
     }
 
     @Override

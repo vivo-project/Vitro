@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
@@ -11,10 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
@@ -26,7 +23,6 @@ import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,8 +44,8 @@ public class N3TemplateTest extends ServletContextTest {
     private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/testN3Template";
     private final static String MODEL_PATH="https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union";
 
-    static SerializationType anyURI;
-    static SerializationType stringType;
+    public static SerializationType anyURI;
+    public static SerializationType stringType;
     static SerializationType booleanType;
 
     DataStore dataStore;
@@ -90,7 +86,6 @@ public class N3TemplateTest extends ServletContextTest {
         dataStore = new DataStore();
     }
 
-
     @Test
     public void testLoadingAndPropertiesSetup() throws IOException, ConfigurationBeanLoaderException {
         loadDefaultModel();
@@ -111,7 +106,7 @@ public class N3TemplateTest extends ServletContextTest {
         Parameter model = loader.loadInstance(MODEL_PATH, Parameter.class);
         n3Template.setTemplateModel(model);
         addModel(n3Template);
-        Parameter uri1Param = createUriParameter("uri1");
+        Parameter uri1Param = ParameterUtils.createUriParameter("uri1");
         n3Template.addInputParameter(uri1Param);
         addData(n3Template, "uri1", "http://testSubject");
 
@@ -127,8 +122,8 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(model);
         addModel(n3Template);
         
-        Parameter param1 =  createUriParameter("uri1");
-        Parameter param2 = createUriParameter("uri2");
+        Parameter param1 =  ParameterUtils.createUriParameter("uri1");
+        Parameter param2 = ParameterUtils.createUriParameter("uri2");
 
         n3Template.addInputParameter(param1);
         n3Template.addInputParameter(param2);
@@ -152,8 +147,8 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(model);
         addModel(n3Template);
 
-        Parameter param1 = createUriParameter("uri1");
-        Parameter param2 = createStringParameter("literal1");
+        Parameter param1 = ParameterUtils.createUriParameter("uri1");
+        Parameter param2 = ParameterUtils.createStringParameter("literal1");
 
         n3Template.addInputParameter(param1);
         n3Template.addInputParameter(param2);
@@ -177,9 +172,9 @@ public class N3TemplateTest extends ServletContextTest {
         n3Template.setTemplateModel(model);
         addModel(n3Template);
         
-        Parameter param1 = createUriParameter("uri1");
-        Parameter param2 = createStringParameter("literal1");
-        Parameter param3 = createBooleanParameter("literal2");
+        Parameter param1 = ParameterUtils.createUriParameter("uri1");
+        Parameter param2 = ParameterUtils.createStringParameter("literal1");
+        Parameter param3 = ParameterUtils.createBooleanParameter("literal2");
 
         n3Template.addInputParameter(param1);
         n3Template.addInputParameter(param2);
@@ -211,7 +206,7 @@ public class N3TemplateTest extends ServletContextTest {
     }
 
     @Test
-    public void removingATriplet() throws ConfigurationBeanLoaderException, ConversionException, IOException {
+    public void removingATriplet() throws Exception {
     	n3Template.setN3TextRetractions("<http://testSubject> <http:has> <http://testObject>");
     	loadDefaultModel();
         Parameter model = loader.loadInstance(MODEL_PATH, Parameter.class);
@@ -246,16 +241,6 @@ public class N3TemplateTest extends ServletContextTest {
         );
     }
 
-
-	private void addModel(N3Template n3Template) throws ConversionException {
-		Parameter modelParam = n3Template.getInputParams().get("FULL_UNION");
-        final Data data = new Data(modelParam);
-        data.earlyInitialization();
-		dataStore.addData(modelParam.getName(), data);
-	}
-
-
-
     @Test
     public void loadAndExecuteN3operationMultipleTimes() throws Exception {
         loadDefaultModel();
@@ -286,120 +271,18 @@ public class N3TemplateTest extends ServletContextTest {
 
     }
     
+	private void addModel(N3Template n3Template) throws ConversionException {
+		Parameter modelParam = n3Template.getInputParams().get("FULL_UNION");
+        final Data data = new Data(modelParam);
+        data.earlyInitialization();
+		dataStore.addData(modelParam.getName(), data);
+	}
 
 	private void addData(N3Template n3Template, String name, Object value) {
 		Parameter testSubjectParam = n3Template.getInputParams().get(name);
 		Data testSubject = new Data(testSubjectParam);
 		TestView.setObject(testSubject, value);
 		dataStore.addData(name, testSubject);
-	}
-    
-    private Parameter createStringParameter(String name) throws Exception {
-		Parameter uri1Param = new Parameter();
-        ParameterType uri1ParamType = new ParameterType();
-        ImplementationType impltype = new ImplementationType();
-        
-        ImplementationConfig config = new ImplementationConfig();
-		
-		config.setClassName("java.lang.String");
-		config.setMethodArguments("");
-		config.setMethodName("toString");
-		config.setStaticMethod(false);
-		impltype.setDeserializationConfig(config);
-		impltype.setSerializationConfig(config);
-		impltype.setName("java.lang.String");
-		
-		RDFType rdfType = new RDFType();
-		rdfType.setName("string");
-		uri1ParamType.setRdfType(rdfType);
-
-		uri1ParamType.setImplementationType(impltype );
-		uri1Param.setType(uri1ParamType);
-		
-        uri1ParamType.setSerializationType(stringType);
-        uri1Param.setName(name);
-		return uri1Param;
-	}
-    
-    private Parameter createBooleanParameter(String name) throws Exception {
-		Parameter uri1Param = new Parameter();
-        ParameterType uri1ParamType = new ParameterType();
-        ImplementationType uri1ImplType = new ImplementationType();
-        
-        ImplementationConfig config = new ImplementationConfig();
-		
-		config.setClassName("java.lang.String");
-		config.setMethodArguments("");
-		config.setMethodName("toString");
-		config.setStaticMethod(false);
-		uri1ImplType.setDeserializationConfig(config);
-		uri1ImplType.setSerializationConfig(config);
-		uri1ImplType.setName("java.lang.String");
-
-		RDFType rdfType = new RDFType();
-		rdfType.setName("boolean");
-		uri1ParamType.setRdfType(rdfType);
-		
-		uri1ParamType.setImplementationType(uri1ImplType );
-		uri1Param.setType(uri1ParamType);
-        uri1ParamType.setSerializationType(anyURI);
-        uri1Param.setName(name);
-		return uri1Param;
-	}
-    
-    private Parameter createUriParameter(String name) throws Exception {
-		Parameter uri1Param = new Parameter();
-        ParameterType uri1ParamType = new ParameterType();
-        ImplementationType uri1ImplType = new ImplementationType();
-        
-        ImplementationConfig config = new ImplementationConfig();
-		
-		config.setClassName("java.lang.String");
-		config.setMethodArguments("");
-		config.setMethodName("toString");
-		config.setStaticMethod(false);
-		uri1ImplType.setDeserializationConfig(config);
-		uri1ImplType.setSerializationConfig(config);
-		uri1ImplType.setName("java.lang.String");
-
-		RDFType rdfType = new RDFType();
-		rdfType.setName("anyURI");
-		uri1ParamType.setRdfType(rdfType);
-		
-		uri1ParamType.setImplementationType(uri1ImplType );
-        uri1Param.setType(uri1ParamType);
-        uri1ParamType.setSerializationType(anyURI);
-        uri1Param.setName(name);
-		return uri1Param;
-	}
-    
-    private Parameter createModel() throws Exception {
-		Parameter uri1Param = new Parameter();
-        ParameterType modelParamType = new ParameterType();
-        ImplementationType modelType = new ImplementationType();
-        modelType.setName("org.apache.jena.rdf.model.Model");
-        ImplementationConfig deserConfig = new ImplementationConfig();
-		
-		deserConfig.setClassName("edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory");
-		deserConfig.setMethodArguments("input");
-		deserConfig.setMethodName("getModel");
-		deserConfig.setStaticMethod(true);
-		
-        ImplementationConfig serConfig = new ImplementationConfig();
-		
-		serConfig.setClassName("edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiInMemoryOntModel");
-		serConfig.setMethodArguments("input");
-		serConfig.setMethodName("serialize");
-		serConfig.setStaticMethod(true);
-		modelType.setDeserializationConfig(deserConfig);
-		modelType.setSerializationConfig(serConfig);
-		modelType.setName("org.apache.jena.rdf.model.Model");
-        modelParamType.setIsInternal(true);
-
-		modelParamType.setImplementationType(modelType );
-		uri1Param.setType(modelParamType);
-        uri1Param.setName("FULL_UNION");
-		return uri1Param;
 	}
 
 }

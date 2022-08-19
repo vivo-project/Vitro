@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -66,7 +67,7 @@ public class ModelWriterIntegrationTest extends ServletContextTest {
 
         OntModelImpl additionModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
         if(!StringUtils.isBlank(additionLiteral)){
-        	ModelWriterTest.addStatement(additionModel, "test:uri1", "test:property", additionLiteral);
+        	ParameterUtils.addStatement(additionModel, "test:uri1", "test:property", additionLiteral);
         }
 
         Data additionsData = new Data(parameters.get(ADDITIONS_NAME));
@@ -77,7 +78,7 @@ public class ModelWriterIntegrationTest extends ServletContextTest {
         OntModelImpl retractionModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
         
         if(!StringUtils.isBlank(retractionLiteral)){
-        	ModelWriterTest.addStatement(retractionModel, "test:uri1", "test:property", retractionLiteral);
+        	ParameterUtils.addStatement(retractionModel, "test:uri1", "test:property", retractionLiteral);
         }
         	
         Data retractionData = new Data(parameters.get(RETRACTIONS_NAME));

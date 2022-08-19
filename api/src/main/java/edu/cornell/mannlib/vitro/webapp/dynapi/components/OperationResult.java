@@ -3,6 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.Range;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class OperationResult {
 
@@ -52,5 +54,31 @@ public class OperationResult {
     public static OperationResult ok() {
         return OK;
     }
-
+    
+    @Override
+    public boolean equals(Object object) {
+    	if (!(object instanceof OperationResult)) {
+    		return false;
+    	}
+    	if (object == this) {
+    		return true;
+    	}
+        OperationResult or = (OperationResult) object;
+        
+        return new EqualsBuilder()
+        	.append(responseCode, or.responseCode)
+        	.isEquals();
+    }
+    
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(41, 505)
+        	.append(responseCode)
+        	.toHashCode();
+    }
+    
+    @Override
+    public String toString() {
+    	return String.valueOf(responseCode);
+    }
 }

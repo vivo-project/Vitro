@@ -18,7 +18,7 @@ public class ModelWriter extends Operation{
 	Parameters additionModelParams = new Parameters();
 	Parameters retractionModelParams = new Parameters();
 	Parameters inputParams = new Parameters();
-	private Parameter targetParam;
+	private Parameter targetModelParam;
 	
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#additionModel")
 	public void addAdditions(Parameter param) throws InitializationException {
@@ -43,13 +43,13 @@ public class ModelWriter extends Operation{
 		if (!ModelView.isModel(param)) {
 			throw new InitializationException(ERROR_MESSAGE);
 		}
-		targetParam = param;
+		targetModelParam = param;
 		inputParams.add(param);
 	}
 	
 	@Override
 	public OperationResult run(DataStore dataStore) {
-		if (targetParam == null) {
+		if (targetModelParam == null) {
 			return OperationResult.internalServerError();
 		}
 		if (!isInputValid(dataStore)) {
@@ -58,12 +58,12 @@ public class ModelWriter extends Operation{
 		
 		List<Model> additions = ModelView.getModels(additionModelParams, dataStore);
 		List<Model> retractions = ModelView.getModels(retractionModelParams, dataStore);
-		Model target = ModelView.getModel(targetParam, dataStore);
+		Model target = ModelView.getModel(dataStore, targetModelParam);
 		AdditionsAndRetractions changes = new AdditionsAndRetractions(additions, retractions);
 		//TODO: set editor uri instead of ""
 		ProcessRdfForm.applyChangesToWriteModel(changes, null, target, "");
 		
-		return new OperationResult(200);
+		return OperationResult.ok();
 	}
 
 	@Override

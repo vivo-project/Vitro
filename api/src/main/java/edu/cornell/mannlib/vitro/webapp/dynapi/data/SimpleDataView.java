@@ -20,7 +20,8 @@ public class SimpleDataView {
 	}
 	
 	public static String getStringRepresentation(String name, DataStore store){
-		return store.getData(name).getObject().toString();
+		final Data data = store.getData(name);
+		return data.getObject().toString();
 	}
 
 }
