@@ -643,13 +643,22 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
                 if (existingValue == null ) {
                      model.add(res, prop, model.createResource(uri));
-                } else if (!(existingValue.getURI()).equals(uri)) {
+                } else if (!isEqual(uri, existingValue)) {
              		 model.removeAll(res, prop, null);
               		 model.add(res, prop, model.createResource(uri));
                 }
             }
         }
     }
+
+	private boolean isEqual(String uri, Resource existingValue) {
+		if (existingValue.asNode().isBlank()) {
+			final String blankNodeId = existingValue.asNode().getBlankNodeId().toString();
+			return uri.endsWith(blankNodeId);
+		} else {
+			return existingValue.getURI().equals(uri);			
+		}
+	}
 
     /**
      * convenience method for use with functional object properties
