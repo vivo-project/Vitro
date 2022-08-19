@@ -314,7 +314,7 @@
                      owl:FunctionalProperty ;
             rdfs:domain :ParameterType ;
             rdfs:range xsd:boolean ;
-            rdfs:label "is internal parameter type"@en-US 
+            rdfs:label "is internal parameter type"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#isOptional
 :isOptional rdf:type owl:DatatypeProperty ,
