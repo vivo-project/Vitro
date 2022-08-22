@@ -4,7 +4,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 
 public class Initializer implements ServletContextListener {
 

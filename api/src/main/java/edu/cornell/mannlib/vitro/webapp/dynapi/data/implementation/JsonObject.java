@@ -1,10 +1,5 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
+package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
-import java.util.ArrayList;
-
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 

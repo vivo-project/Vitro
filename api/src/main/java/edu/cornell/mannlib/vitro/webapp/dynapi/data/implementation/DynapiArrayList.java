@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
+package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ArrayParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class DynapiArrayList {
 

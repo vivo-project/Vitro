@@ -34,7 +34,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 
 @RunWith(Parameterized.class)
 public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {

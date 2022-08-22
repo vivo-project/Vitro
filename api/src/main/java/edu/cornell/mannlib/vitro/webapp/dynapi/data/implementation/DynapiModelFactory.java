@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
+package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
 import javax.servlet.ServletContext;
 

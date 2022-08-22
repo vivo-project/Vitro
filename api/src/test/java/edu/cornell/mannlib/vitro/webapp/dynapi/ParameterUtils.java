@@ -2,6 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -31,7 +32,7 @@ public class ParameterUtils {
 		Parameter uri1Param = new Parameter();
 		ParameterType paramType = new ParameterType();
 		ImplementationType implType = new ImplementationType();
-		implType.setName("org.apache.jena.rdf.model.Model");
+		implType.setName(Model.class.getCanonicalName());
 		paramType.setImplementationType(implType);
 	
 		ImplementationConfig serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serialize", true);

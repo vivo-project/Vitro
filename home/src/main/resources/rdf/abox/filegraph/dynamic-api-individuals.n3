@@ -216,7 +216,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/internal-model>
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Jena internal model deserialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiModelFactory" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory" ;
 		dynapi:methodName 		"getModel";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -225,7 +225,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/internal-model> 
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Jena internal model serialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiInMemoryOntModel" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
 		dynapi:methodName 		"serialize";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -234,7 +234,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/model>
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Jena model deserialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiInMemoryOntModel" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
 		dynapi:methodName 		"deserialize";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -243,7 +243,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/model> 
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Jena model serialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiInMemoryOntModel" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
 		dynapi:methodName 		"serialize";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -252,7 +252,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/json-object>
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Json object deserialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.JsonObject" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject" ;
 		dynapi:methodName 		"deserialize";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -261,7 +261,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/json-object> 
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Json object serialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.JsonObject" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject" ;
 		dynapi:methodName 		"serialize";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -270,7 +270,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/array>
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Array list deserialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiArrayList" ;
 		dynapi:methodName 		"deserialize";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -279,7 +279,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/array> 
         a                       dynapi:ImplementationConfig, dynapi_types:ImplementationConfig ;
         rdfs:label              "Array list serialization config"@en-US ;
-		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DynapiArrayList" ;
+		dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiArrayList" ;
 		dynapi:methodName 		"serialize";
 		dynapi:methodArguments	"input";
 		dynapi:isStaticMethod	"true"^^xsd:boolean ;
