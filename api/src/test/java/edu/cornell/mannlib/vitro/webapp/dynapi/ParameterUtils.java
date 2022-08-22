@@ -79,7 +79,7 @@ public class ParameterUtils {
 		return uri1Param;
 	}
 
-	public static Parameter createStringParameter(String name) throws Exception {
+	public static Parameter createStringLiteralParameter(String name) throws Exception {
 		Parameter uri1Param = new Parameter();
 	    ParameterType uri1ParamType = new ParameterType();
 	    ImplementationType impltype = new ImplementationType();

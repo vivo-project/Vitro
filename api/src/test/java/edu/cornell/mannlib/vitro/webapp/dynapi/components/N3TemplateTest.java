@@ -148,7 +148,7 @@ public class N3TemplateTest extends ServletContextTest {
         addModel(n3Template);
 
         Parameter param1 = ParameterUtils.createUriParameter("uri1");
-        Parameter param2 = ParameterUtils.createStringParameter("literal1");
+        Parameter param2 = ParameterUtils.createStringLiteralParameter("literal1");
 
         n3Template.addInputParameter(param1);
         n3Template.addInputParameter(param2);
@@ -173,7 +173,7 @@ public class N3TemplateTest extends ServletContextTest {
         addModel(n3Template);
         
         Parameter param1 = ParameterUtils.createUriParameter("uri1");
-        Parameter param2 = ParameterUtils.createStringParameter("literal1");
+        Parameter param2 = ParameterUtils.createStringLiteralParameter("literal1");
         Parameter param3 = ParameterUtils.createBooleanParameter("literal2");
 
         n3Template.addInputParameter(param1);

@@ -20,9 +20,10 @@ public class SPARQLQueryTest {
 	private static final String MODEL = "model";
 	private static final String STR_VAR = "str";
 	private static final String S_VAR = "s";
+	private static final String O_VAR = "o";
 	private static final String QUERY_NO_VARS = "SELECT ?str WHERE { BIND(\"test\" as ?str) } ";
 	private static final String QUERY_OBJ_VAR = "SELECT ?s WHERE { ?s <test:property> ?str . } " ;
-	private static final String QUERY_SUBJ_VAR = "SELECT ?o WHERE { ?s <test:property> ?o . } " ;
+	private static final String QUERY_SUBJ_VAR = "SELECT ?o WHERE { ?str <test:property> ?o . } " ;
 	private OntModelImpl model;
 	private DataStore dataStore;
 	private SPARQLQuery sparql;
@@ -45,7 +46,7 @@ public class SPARQLQueryTest {
 		TestView.setObject(modelData, model);
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
 		dataStore.addData(MODEL, modelData);
-		Parameter strParam = ParameterUtils.createStringParameter(STR_VAR);
+		Parameter strParam = ParameterUtils.createStringLiteralParameter(STR_VAR);
 		sparql.addOutputParameter(strParam);
 		
 		assertEquals(OperationResult.ok(), sparql.run(dataStore));
@@ -57,15 +58,15 @@ public class SPARQLQueryTest {
 	}
 	
 	@Test
-	public void literalInput() throws Exception {
+	public void stringliteralInput() throws Exception {
 		sparql.setQueryText(QUERY_OBJ_VAR);
 		Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
 		sparql.setQueryModel(modelParam);
 		Data modelData = new Data(modelParam);
-		Statement stmt = ParameterUtils.addStatement(model, "test:resource", "test:property", "alice" );
+		ParameterUtils.addStatement(model, "test:resource", "test:property", "alice" );
 		TestView.setObject(modelData, model);
 		dataStore.addData(MODEL, modelData);
-		Parameter strParam = ParameterUtils.createStringParameter(STR_VAR);
+		Parameter strParam = ParameterUtils.createStringLiteralParameter(STR_VAR);
 		sparql.addInputParameter(strParam);
 		//Not enough params
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
@@ -74,12 +75,40 @@ public class SPARQLQueryTest {
 		dataStore.addData(STR_VAR, strData);
 		assertEquals(OperationResult.ok(), sparql.run(dataStore));
 		assertFalse(dataStore.contains(S_VAR));
-		Parameter sParam = ParameterUtils.createStringParameter(S_VAR);
+		Parameter sParam = ParameterUtils.createUriParameter(S_VAR);
 		sparql.addOutputParameter(sParam);
 		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertTrue(dataStore.contains(STR_VAR));
 		if (dataStore.contains(STR_VAR)) {
-			Data data = dataStore.getData(STR_VAR);
 			assertEquals("test:resource", SimpleDataView.getStringRepresentation(S_VAR, dataStore));
+		}
+
+	}
+	
+	@Test
+	public void uriInput() throws Exception {
+		sparql.setQueryText(QUERY_SUBJ_VAR);
+		Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
+		sparql.setQueryModel(modelParam);
+		Data modelData = new Data(modelParam);
+		ParameterUtils.addStatement(model, "test:resource", "test:property", "alice" );
+		TestView.setObject(modelData, model);
+		dataStore.addData(MODEL, modelData);
+		Parameter strParam = ParameterUtils.createUriParameter(STR_VAR);
+		sparql.addInputParameter(strParam);
+		//Not enough params
+		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
+		Data strData = new Data(strParam);
+		TestView.setObject(strData, "test:resource");
+		dataStore.addData(STR_VAR, strData);
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertFalse(dataStore.contains(O_VAR));
+		Parameter sParam = ParameterUtils.createStringLiteralParameter(O_VAR);
+		sparql.addOutputParameter(sParam);
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertTrue(dataStore.contains(O_VAR));
+		if (dataStore.contains(O_VAR)) {
+			assertEquals("alice", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
 		}
 
 	}
