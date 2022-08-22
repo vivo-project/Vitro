@@ -12,7 +12,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 
-public class RdfView implements View {
+public class RdfView {
 
 	public static Map<String, List<Literal>> getLiteralsMap(DataStore dataStore, Parameters params) {
 		Map<String, List<Literal>> result = new HashMap<>();

@@ -8,7 +8,7 @@ import java.util.Map;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 
-public class ArrayView implements View {
+public class ArrayView {
 
 	public static Map<String,List> getSingleDimensionalArrays(Parameters params) {
 		Map<String,List> result = new HashMap<>();

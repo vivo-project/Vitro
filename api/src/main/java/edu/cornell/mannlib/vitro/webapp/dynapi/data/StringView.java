@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 import java.util.List;
 
 
-public class StringView implements View {
+public class StringView {
 
     public static String getFirstStringValue(DataStore dataStore, String name) {
     	Data data = dataStore.getData(name);

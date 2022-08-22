@@ -28,7 +28,4 @@ public class ActionPool extends AbstractPool<String, Action, ActionPool> {
         return Action.class;
     }
 
-    public static ContextModelAccess getModelAccess() {
-		return modelAccess;
-    }
 }

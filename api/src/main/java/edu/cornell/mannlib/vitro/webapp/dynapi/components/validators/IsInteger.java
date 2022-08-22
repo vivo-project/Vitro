@@ -30,7 +30,7 @@ public class IsInteger extends IsNotBlank {
 			}
     	} else {
     		try {
-				if (!isInteger(data.getJsonValue())) {
+				if (!isInteger(data.getSerializedValue())) {
 				    return false;
 				}
 			} catch (ConversionException e) {

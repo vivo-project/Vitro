@@ -9,64 +9,64 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class Parameter implements Removable {
 
 	private String name;
-    private String description;
-    private Validators validators = new Validators();
-    private ParameterType type;
-    
-    public String getName() {
-        return name;
-    }
-    
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasType", minOccurs = 1, maxOccurs = 1)
-    public void setType(ParameterType type) throws InitializationException {
-        type.initialize();
-        this.type = type;
-    }
-    
-    public ParameterType getType() {
-    	return type;
-    }
+	private String description;
+	private Validators validators = new Validators();
+	private ParameterType type;
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasType", minOccurs = 1, maxOccurs = 1)
+	public void setType(ParameterType type) throws InitializationException {
+		type.initialize();
+		this.type = type;
+	}
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#description", maxOccurs = 1)
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator")
-    public void addValidator(Validator validator) {
-        validators.add(validator);
-    }
+	public ParameterType getType() {
+		return type;
+	}
 
-    public boolean isValid(String name, Data data) {
-        return validators.isAllValid(name, data);
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @Override
-    public void dereference() {
+	public String getDescription() {
+		return description;
+	}
 
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#description", maxOccurs = 1)
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public boolean isInternal() {
-        return type.isInternal();
-    }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator")
+	public void addValidator(Validator validator) {
+		validators.add(validator);
+	}
+
+	public boolean isValid(String name, Data data) {
+		return validators.isAllValid(name, data);
+	}
+
+	@Override
+	public void dereference() {
+
+	}
+
+	public boolean isInternal() {
+		return type.isInternal();
+	}
 
 	public boolean isArray() {
-		return type.isArray() ;
+		return type.isArray();
 	}
 
 	public String getInputPath() {
 		return "";
 	}
-	
+
 	public String getOutputPath() {
 		return "";
 	}
@@ -78,6 +78,4 @@ public class Parameter implements Removable {
 	public boolean isJsonObject() {
 		return type.isJsonObject();
 	}
-
-
 }

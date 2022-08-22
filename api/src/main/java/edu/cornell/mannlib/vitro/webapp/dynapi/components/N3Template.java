@@ -42,7 +42,7 @@ public class N3Template extends Operation implements Template {
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
-	public void setN3Template(String n3TextAdditions) {
+	public void setN3TextAdditions(String n3TextAdditions) {
 		this.n3TextAdditions = n3TextAdditions;
 	}
 

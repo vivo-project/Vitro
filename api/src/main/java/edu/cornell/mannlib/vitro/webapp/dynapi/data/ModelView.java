@@ -8,7 +8,7 @@ import org.apache.jena.rdf.model.Model;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 
-public class ModelView implements View {
+public class ModelView {
 
 	private static final String ORG_APACHE_JENA_RDF_MODEL_MODEL = "org.apache.jena.rdf.model.Model";
 	private static final String MODEL_CANONICAL_NAME = "org.apache.jena.rdf.model.Model";

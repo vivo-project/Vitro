@@ -634,17 +634,17 @@ public class DynamicAPIDocumentation {
         }
         for (String parameterName : parameters.getNames()) {
             Parameter parameter = parameters.get(parameterName);
-            SerializationType parameterType = parameter.getType().getSerializationType();
+            SerializationType serializationType = parameter.getType().getSerializationType();
 
-            if (parameterType instanceof PrimitiveSerializationType) {
+            if (serializationType instanceof PrimitiveSerializationType) {
 
-                Schema<?> primitiveParameter = toPrimativeSchema(parameterType);
+                Schema<?> primitiveParameter = toPrimativeSchema(serializationType);
 
                 primitiveParameter.setDescription(parameter.getDescription());
 
                 objectSchema.addProperties(parameterName, primitiveParameter);
 
-            } else if (parameterType instanceof JsonObjectSerializationType) {
+            } else if (serializationType instanceof JsonObjectSerializationType) {
 
                 ObjectSchema objectParameter = new ObjectSchema();
 
@@ -652,9 +652,9 @@ public class DynamicAPIDocumentation {
 
                 objectSchema.addProperties(parameterName, objectParameter);
 
-                buildObjectSchema(objectParameter, ((JsonObjectSerializationType) parameterType).getInternalElements());
+                buildObjectSchema(objectParameter, ((JsonObjectSerializationType) serializationType).getInternalElements());
 
-            } else if (parameterType instanceof ArraySerializationType) {
+            } else if (serializationType instanceof ArraySerializationType) {
 
                 ArraySchema arraySchema = new ArraySchema();
 

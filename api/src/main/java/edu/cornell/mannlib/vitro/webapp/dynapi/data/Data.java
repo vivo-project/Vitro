@@ -45,7 +45,7 @@ public class Data {
 		object = implementationType.deserialize(type, string);
 	}
 
-	public String getJsonValue() throws ConversionException {
+	public String getSerializedValue() throws ConversionException {
 		final ParameterType type = param.getType();
 		final ImplementationType implementationType = type.getImplementationType();
 		if (object == null) {

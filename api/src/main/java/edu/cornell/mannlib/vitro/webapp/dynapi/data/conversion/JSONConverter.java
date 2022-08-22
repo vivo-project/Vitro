@@ -104,7 +104,7 @@ public class JSONConverter {
 			if (data.getParam().isJsonObject()) {
 				ctx.put(path, name, data.getObject());
 			} else {
-				ctx.put(path, name, data.getJsonValue());				
+				ctx.put(path, name, data.getSerializedValue());				
 			}
 		}
 		return ctx.jsonString();
