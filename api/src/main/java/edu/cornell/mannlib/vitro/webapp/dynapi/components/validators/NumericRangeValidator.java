@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class NumericRangeValidator extends IsNotBlank {
@@ -52,7 +53,7 @@ public class NumericRangeValidator extends IsNotBlank {
 	            }
 			}
     	} else {
-    		if (!isInRange(data.getObject().toString())) {
+    		if (!isInRange(SimpleDataView.getStringRepresentation(data))) {
     			log.debug("Length of " + name + " is not in range [" + ((minValue != null) ? minValue : " ") + "-"
                         + ((maxValue != null) ? maxValue : " ") + "].");
                 return false;

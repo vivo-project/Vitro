@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class RegularExpressionValidator extends AbstractValidator {
@@ -47,7 +48,7 @@ public class RegularExpressionValidator extends AbstractValidator {
 			}
     			
     	} else {
-    		if (!isMatches(data.getObject().toString())) {
+    		if (!isMatches(SimpleDataView.getStringRepresentation(data))) {
                 log.debug("Value of " + name + " is not in accordance with the pattern \"" + regularExpression + "\"");
                 return false;
             }

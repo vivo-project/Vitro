@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class StringLengthRangeValidator extends IsNotBlank {
@@ -50,7 +51,7 @@ public class StringLengthRangeValidator extends IsNotBlank {
 	            }
 			}
     	} else {
-    		if (!isLengthInRange(data.getObject().toString())) {
+    		if (!isLengthInRange(SimpleDataView.getStringRepresentation(data))) {
     			log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"
                         + ((maxLength != null) ? maxLength : " ") + "].");
                 return false;

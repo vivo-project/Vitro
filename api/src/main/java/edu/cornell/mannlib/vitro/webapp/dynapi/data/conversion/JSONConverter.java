@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonObjectView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class JSONConverter {
@@ -102,7 +103,7 @@ public class JSONConverter {
 			//TODO: General schema for objects, arrays and simple values is to get 
 			//the serialised by RawData and the put to the context here. 
 			if (data.getParam().isJsonObject()) {
-				ctx.put(path, name, data.getObject());
+				ctx.put(path, name, JsonObjectView.getJsonNode(data));
 			} else {
 				ctx.put(path, name, data.getSerializedValue());				
 			}

@@ -23,5 +23,9 @@ public class SimpleDataView {
 		final Data data = store.getData(name);
 		return data.getObject().toString();
 	}
+	
+	public static String getStringRepresentation( Data data){
+		return data.getObject().toString();
+	}
 
 }

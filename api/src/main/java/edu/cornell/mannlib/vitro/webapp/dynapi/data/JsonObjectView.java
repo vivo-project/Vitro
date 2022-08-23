@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -28,7 +29,7 @@ public class JsonObjectView {
 		return result;
 	}
 
-	public static ObjectNode getObject(ArrayNode node) {
+	public static ObjectNode createArrayObjectNode(ArrayNode node) {
 		ObjectNode object = mapper.createObjectNode();
 		node.add(object);
 		return object;
@@ -38,5 +39,9 @@ public class JsonObjectView {
 		Data data = new Data(arrayParam);
 		data.setObject(node);
 		dataStore.addData(name, data);		
+	}
+	
+	public static JsonNode getJsonNode(Data data) {
+		return (JsonNode) data.getObject();
 	}
 }

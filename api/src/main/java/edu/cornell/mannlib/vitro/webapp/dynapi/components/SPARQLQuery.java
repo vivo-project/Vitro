@@ -174,7 +174,7 @@ public class SPARQLQuery extends Operation {
 				final Parameter arrayParam = outputParams.get(name);
 				JsonObjectView.addData(dataStore, name, arrayParam, node ); 
 			}
-			ObjectNode object = JsonObjectView.getObject(node);
+			ObjectNode object = JsonObjectView.createArrayObjectNode(node);
 			for (String var : vars) {
 				RDFNode solVar = solution.get(var);
 				object.put(var, solVar.toString());

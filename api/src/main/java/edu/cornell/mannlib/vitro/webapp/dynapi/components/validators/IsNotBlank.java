@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 
 public class IsNotBlank extends AbstractValidator {
 
@@ -29,7 +30,7 @@ public class IsNotBlank extends AbstractValidator {
 				}
 			}
     	} else {
-    		return isValidValue(name, data.getObject().toString());
+    		return isValidValue(name, SimpleDataView.getStringRepresentation(data));
     	}
         
         return true;

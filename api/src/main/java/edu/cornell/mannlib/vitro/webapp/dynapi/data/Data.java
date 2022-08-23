@@ -19,7 +19,7 @@ public class Data {
         this.object = object;
     }
     
-    public Object getObject() {
+    protected Object getObject() {
         return object;
     }
     
