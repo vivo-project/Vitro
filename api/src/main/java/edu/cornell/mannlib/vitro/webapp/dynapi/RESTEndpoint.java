@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.OperationData.RESOURCE_ID;
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.REST_SERVLET_PATH;
 import static java.lang.String.format;
 
@@ -22,9 +21,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
-import edu.cornell.mannlib.vitro.webapp.dynapi.io.data.StringData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
-import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
 public class RESTEndpoint extends VitroHttpServlet {
@@ -33,6 +33,8 @@ public class RESTEndpoint extends VitroHttpServlet {
 
     private ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
     private ActionPool actionPool = ActionPool.getInstance();
+
+    public final static String RESOURCE_ID = "resource_id";
 
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -139,13 +141,25 @@ public class RESTEndpoint extends VitroHttpServlet {
             actionPool.printKeys();
         }
         Action action = actionPool.get(actionName);
-        OperationData input = new OperationData(request);
+        DataStore dataStore = new DataStore();
         if (requestPath.isResourceRequest()) {
-            input.add(RESOURCE_ID, new StringData(requestPath.getResourceId()));
+            dataStore.setResourceID(requestPath.getResourceId());
         }
+		try {
+			Converter.convert(request, action, dataStore);
+		} catch (ConversionException e) {
+			log.error(e,e);
+			response.setStatus(500);
+			return;
+		}
+
         try {
-            OperationResult result = action.run(input);
-            result.prepareResponse(response, ContentType.JSON.getMediaType(), action, input);
+            OperationResult result = action.run(dataStore);
+            Converter.convert(response, action, result, dataStore);
+        } catch (ConversionException e) {
+        	log.error(e,e);
+        	response.setStatus(500);
+        	return;
         } finally {
             action.removeClient();
         }

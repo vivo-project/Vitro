@@ -3,12 +3,12 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Step;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ConditionalStep implements Step {
@@ -21,7 +21,7 @@ public class ConditionalStep implements Step {
     Step nextIfSatisfied = NullStep.getInstance();
 
     @Override
-    public OperationResult run(OperationData data) {
+    public OperationResult run(DataStore data) {
         Step next;
         if (isSatisfied(data)) {
             next = nextIfSatisfied;
@@ -31,7 +31,7 @@ public class ConditionalStep implements Step {
         return next.run(data);
     }
 
-    private boolean isSatisfied(OperationData data) {
+    private boolean isSatisfied(DataStore data) {
         if (allConditionsRequired) {
             return areAllSatisfied(data);
         } else {
@@ -39,7 +39,7 @@ public class ConditionalStep implements Step {
         }
     }
 
-    private boolean isAtLeastOneSatisfied(OperationData data) {
+    private boolean isAtLeastOneSatisfied(DataStore data) {
         for (Condition condition : conditions) {
             if (condition.isSatisfied(data)){
                 return true;
@@ -48,7 +48,7 @@ public class ConditionalStep implements Step {
         return false;
     }
 
-    private boolean areAllSatisfied(OperationData data) {
+    private boolean areAllSatisfied(DataStore data) {
         for (Condition condition : conditions) {
             if (!condition.isSatisfied(data)){
                 return false;
@@ -96,17 +96,17 @@ public class ConditionalStep implements Step {
     }
 
     @Override
-    public Parameters getProvidedParams() {
+    public Parameters getOutputParams() {
         return new Parameters();
     }
     
     @Override
-    public Parameters getRequiredParams() {
-        Parameters requiredParams = new Parameters();
+    public Parameters getInputParams() {
+        Parameters inputParams = new Parameters();
         for (Condition condition: conditions) {
-            requiredParams.addAll(condition.getRequiredParams());
+            inputParams.addAll(condition.getInputParams());
         }
-        return requiredParams;
+        return inputParams;
     }
 
     @Override

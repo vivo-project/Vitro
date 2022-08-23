@@ -36,7 +36,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     private ConcurrentNavigableMap<K, C> components;
     private ServletContext ctx;
     private ConfigurationBeanLoader loader;
-    private ContextModelAccess modelAccess;
     private OntModel dynamicAPIModel;
     private ConcurrentLinkedQueue<C> obsoleteComponents;
 
@@ -152,7 +151,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     public void init(ServletContext ctx) {
         this.ctx = ctx;
-        modelAccess = ModelAccess.on(ctx);
+        ContextModelAccess modelAccess = ModelAccess.on(ctx);
         dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
         loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
         log.debug("Context Initialization ...");

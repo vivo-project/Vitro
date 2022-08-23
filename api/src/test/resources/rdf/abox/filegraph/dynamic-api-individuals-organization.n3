@@ -6,68 +6,68 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testOrganizationAction1>
-        a                                   dynapi:action ;
+        a                                   dynapi:Action ;
         rdfs:label                          "Test organization action 1"@en-US ;
         dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
         dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateOrganizationRPC1> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testOrganizationStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testOrganizationStep1>
-        a                                   dynapi:Step, dynapi:operationalStep ;
+        a                                   dynapi:Step, dynapi:OperationalStep ;
         rdfs:label                          "Test organization operational step 1"@en-US ;
         dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateOrganizationRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc create organization 1"@en-US ;
         dynapi:name                         "test_organization" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetOrganizationRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get organization 1"@en-US ;
         dynapi:name                         "test_organization" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllOrganizationRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get all organization 1"@en-US ;
         dynapi:name                         "test_organization" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateOrganizationRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc update organization 1"@en-US ;
         dynapi:name                         "test_organization" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchOrganizationRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc patch organization 1"@en-US ;
         dynapi:name                         "test_organization" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteOrganizationRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc delete organization 1"@en-US ;
         dynapi:name                         "test_organization" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_organization_custom_action1>
-        a                                   dynapi:customRESTAction ;
+        a                                   dynapi:CustomRESTAction ;
         rdfs:label                          "Test organization custom action 1"@en-US ;
         dynapi:name                         "test_organization_custom_action_name" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateOrganizationRPC1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testOrganizationResource1>
-        a                                   dynapi:resourceAPI ;
+        a                                   dynapi:ResourceAPI ;
         rdfs:label                          "Test organization resourceAPI 1"@en-US ;
         dynapi:name                         "test_organization_resource" ;
         dynapi:minAPIVersion                "1.0.0" ;

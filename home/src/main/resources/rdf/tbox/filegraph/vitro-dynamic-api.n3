@@ -1,0 +1,749 @@
+@prefix : <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo
+:forwardsTo rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf owl:topObjectProperty ;
+            rdf:type owl:FunctionalProperty ;
+            rdfs:domain :CustomRESTAction ;
+            rdfs:range :Rpc ;
+            rdfs:label "forward to RPC"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC
+:hasAssignedRPC rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf owl:topObjectProperty ;
+                rdfs:domain :Action ;
+                rdfs:range :Rpc ;
+                rdfs:label "assigned rpc"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasCondition
+:hasCondition rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdfs:domain :Parameter ;
+              rdfs:range :Condition ;
+              rdfs:label "has validator"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction
+:hasCustomRESTAction rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf owl:topObjectProperty ;
+                     rdfs:domain :ResourceAPI ;
+                     rdfs:range :CustomRESTAction ;
+                     rdfs:label "has custom action"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasDefaultMethod
+:hasDefaultMethod rdf:type owl:ObjectProperty ;
+                  rdfs:subPropertyOf owl:topObjectProperty ;
+                  rdfs:domain [ rdf:type owl:Class ;
+                                owl:unionOf ( :CustomRESTAction
+                                              :Rpc
+                                            )
+                              ] ;
+                  rdfs:range :HttpMethod ;
+                  rdfs:label "default http method"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasElementsOfType
+:hasElementsOfType rdf:type owl:ObjectProperty ,
+                            owl:FunctionalProperty ;
+                   rdfs:domain :ArraySerializationType ;
+                   rdfs:range :SerializationType ;
+                   rdfs:label "type of elements in an array"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep
+:hasFirstStep rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdfs:domain :Action ;
+              rdfs:range :Step ;
+              rdfs:label "first step"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement
+:hasInternalElement rdf:type owl:ObjectProperty ;
+                    rdfs:domain :JsonObjectSerializationType ;
+                    rdfs:range :Parameter ;
+                    rdfs:label "has internal element"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasModel
+:hasModel rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf owl:topObjectProperty ;
+          rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( :SparqlQuery
+                                      :Template
+                                    )
+                      ] ;
+          rdfs:range :Model ;
+          rdfs:label "has query model"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep
+:hasNextStep rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf owl:topObjectProperty ;
+             rdfs:domain :OperationalStep ;
+             rdfs:range :Step ;
+             rdfs:label "next"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation
+:hasOperation rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdf:type owl:FunctionalProperty ;
+              rdfs:domain :OperationalStep ;
+              rdfs:range :Operation ;
+              rdfs:label "has operation"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#rdfType
+:rdfType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :ParameterType ;
+         rdfs:range :RDFType ;
+         rdfs:label "has RDF data type"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#implementationType
+:implementationType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :ParameterType ;
+         rdfs:range :ImplementationType ;
+         rdfs:label "has implementation type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasType
+:serializationType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :Parameter ;
+         rdfs:range :ParameterType ;
+         rdfs:label "has type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#serializationType
+:serializationType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :ParameterType ;
+         rdfs:range :SerializationType ;
+         rdfs:label "has type"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#containsType
+:containsType rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:FunctionalProperty ;
+         rdfs:domain :ArrayParameterType ;
+         rdfs:range :ParameterType ;
+         rdfs:label "array contains type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasValidator
+:hasValidator rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdfs:domain :Parameter ;
+              rdfs:range :Validator ;
+              rdfs:label "has validator"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#nextIfNotSatisfied
+:nextIfNotSatisfied rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf owl:topObjectProperty ;
+                    rdfs:domain :ConditionalStep ;
+                    rdfs:range :Step ;
+                    rdfs:label "next step if condition not satisfied"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#nextIfSatisfied
+:nextIfSatisfied rdf:type owl:ObjectProperty ;
+                 rdfs:subPropertyOf owl:topObjectProperty ;
+                 rdfs:domain :ConditionalStep ;
+                 rdfs:range :Step ;
+                 rdfs:label "next step if condition is satisfied"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#onDelete
+:onDelete rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf owl:topObjectProperty ;
+          rdfs:domain :ResourceAPI ;
+          rdfs:range :Rpc ;
+          rdfs:label "on DELETE"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#onGet
+:onGet rdf:type owl:ObjectProperty ;
+       rdfs:subPropertyOf owl:topObjectProperty ;
+       rdfs:domain :ResourceAPI ;
+       rdfs:range :Rpc ;
+       rdfs:label "on GET"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll
+:onGetAll rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf owl:topObjectProperty ;
+          rdfs:domain :ResourceAPI ;
+          rdfs:range :Rpc ;
+          rdfs:label "on GET"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#onPatch
+:onPatch rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf owl:topObjectProperty ;
+         rdfs:domain :ResourceAPI ;
+         rdfs:range :Rpc ;
+         rdfs:label "on PATCH"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#onPost
+:onPost rdf:type owl:ObjectProperty ;
+        rdfs:subPropertyOf owl:topObjectProperty ;
+        rdfs:domain :ResourceAPI ;
+        rdfs:range :Rpc ;
+        rdfs:label "on POST"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#onPut
+:onPut rdf:type owl:ObjectProperty ;
+       rdfs:subPropertyOf owl:topObjectProperty ;
+       rdfs:domain :ResourceAPI ;
+       rdfs:range :Rpc ;
+       rdfs:label "on PUT"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter
+:providesParameter rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ParameterProvider ;
+                   rdfs:range :Parameter ;
+                   rdfs:label "provides parameter"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess
+:requiresAccess rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf owl:topObjectProperty ;
+                rdfs:domain :Action ;
+                rdfs:range :Role ;
+                rdfs:label "requires access"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter
+:requiresParameter rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ParameterReceiver ;
+                   rdfs:range :Parameter ;
+                   rdfs:label "requires parameter"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#additionModel
+:additionModel rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ModelWriter ;
+                   rdfs:range :Model ;
+                   rdfs:label "addition model parameter"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#retractionModel
+:retractionModel rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ModelWriter ;
+                   rdfs:range :Model ;
+                   rdfs:label "retraction model parameter"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#targetModel
+:targetModel rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ModelWriter ;
+                   rdfs:range :Model ;
+                   rdfs:label "target model parameter"@en-US .
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions
+:N3TextAdditions rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:domain :N3Template ;
+                 rdfs:range xsd:string ;
+                 rdfs:label "N3 text"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#N3TextRetractions
+:N3TextRetractions rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf owl:topDataProperty ;
+                   rdfs:domain :N3Template ;
+                   rdfs:range xsd:string ;
+                   rdfs:label "N3 text"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#allConditionsRequired
+:allConditionsRequired rdf:type owl:DatatypeProperty ;
+                       rdfs:subPropertyOf owl:topDataProperty ;
+                       rdf:type owl:FunctionalProperty ;
+                       rdfs:domain :ConditionalStep ;
+                       rdfs:range xsd:boolean ;
+                       rdfs:label "Should all conditions be satisfied or one satisfied condition is enough (true by default)"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#description
+:description rdf:type owl:DatatypeProperty ,
+                      owl:FunctionalProperty ;
+             rdfs:domain [ rdf:type owl:Class ;
+                           owl:unionOf ( :Api
+                                         :Parameter
+                                         :Rpc
+                                       )
+                         ] ;
+             rdfs:range xsd:string ;
+             rdfs:label "description"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#isInternal
+:isInternal rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :ParameterType ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "is internal parameter type"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#isOptional
+:isOptional rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :OperationalStep ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "is optional"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion
+:maxAPIVersion rdf:type owl:DatatypeProperty ,
+                        owl:FunctionalProperty ;
+               rdfs:domain [ rdf:type owl:Class ;
+                             owl:unionOf ( :ResourceAPI
+                                           :Rpc
+                                         )
+                           ] ;
+               rdfs:range xsd:string ;
+               rdfs:label "API maximum version"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#maxLength
+:maxLength rdf:type owl:DatatypeProperty ,
+                    owl:FunctionalProperty ;
+           rdfs:domain :StringLengthRangeValidator ;
+           rdfs:range xsd:int ;
+           rdfs:label "validator max length "@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#maxValue
+:maxValue rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
+          rdfs:domain :NumericRangeValidator ;
+          rdfs:range xsd:float ;
+          rdfs:label "validator max value"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion
+:minAPIVersion rdf:type owl:DatatypeProperty ,
+                        owl:FunctionalProperty ;
+               rdfs:domain [ rdf:type owl:Class ;
+                             owl:unionOf ( :ResourceAPI
+                                           :Rpc
+                                         )
+                           ] ;
+               rdfs:range xsd:string ;
+               rdfs:label "API minimum version"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#minLength
+:minLength rdf:type owl:DatatypeProperty ,
+                    owl:FunctionalProperty ;
+           rdfs:domain :StringLengthRangeValidator ;
+           rdfs:range xsd:int ;
+           rdfs:label "validator min length "@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#minValue
+:minValue rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
+          rdfs:domain :NumericRangeValidator ;
+          rdfs:range xsd:float ;
+          rdfs:label "validator min value"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#name
+:name rdf:type owl:DatatypeProperty ,
+               owl:FunctionalProperty ;
+      rdfs:domain [ rdf:type owl:Class ;
+                    owl:unionOf ( :CustomRESTAction
+                                  :HttpMethod
+                                  :Model
+                                  :Parameter
+                                  :SerializationType
+								  :ParameterType
+                                  :ResourceAPI
+								  :RDFType
+                                  :Rpc
+                                )
+                  ] ;
+      rdfs:range xsd:string ;
+      rdfs:label "name"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#className
+:className rdf:type owl:DatatypeProperty,
+					owl:FunctionalProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain [ rdf:type owl:Class ;
+                       owl:unionOf ( :ImplementationType
+                                     :ImplementationConfig
+                                   )
+                     ] ;
+          rdfs:range xsd:string ;
+          rdfs:label "Fully-qualified implementation class name"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#methodName
+:methodName rdf:type owl:DatatypeProperty,
+					owl:FunctionalProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ImplementationConfig ;
+          rdfs:range xsd:string ;
+          rdfs:label "Method name"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#methodArguments
+:methodArguments rdf:type owl:DatatypeProperty,
+					owl:FunctionalProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ImplementationConfig ;
+          rdfs:range xsd:string ;
+          rdfs:label "Method arguments"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#isStaticMethod
+:isStaticMethod rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :ImplementationConfig ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "is static method or not"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#question
+:question rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :ConditionalStep ;
+          rdfs:range xsd:string ;
+          rdfs:label "question"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression
+:regularExpression rdf:type owl:DatatypeProperty ,
+                            owl:FunctionalProperty ;
+                   rdfs:domain :RegularExpressionValidator ;
+                   rdfs:range xsd:string ;
+                   rdfs:label "validator regular expression "@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#solrFacet
+:solrFacet rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:domain :SolrQuery ;
+           rdfs:range xsd:string ;
+           rdfs:label "solr query facet parameter"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#solrField
+:solrField rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:domain :SolrQuery ;
+           rdfs:range xsd:string ;
+           rdfs:label "solr query fields to be returned"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#solrFilter
+:solrFilter rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdfs:domain :SolrQuery ;
+            rdfs:range xsd:string ;
+            rdfs:label "solr query filter"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#solrLimit
+:solrLimit rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdf:type owl:FunctionalProperty ;
+           rdfs:domain :SolrQuery ;
+           rdfs:range xsd:string ;
+           rdfs:label "solr query limit parameter"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#solrOffset
+:solrOffset rdf:type owl:DatatypeProperty ;
+            rdfs:subPropertyOf owl:topDataProperty ;
+            rdf:type owl:FunctionalProperty ;
+            rdfs:domain :SolrQuery ;
+            rdfs:range xsd:string ;
+            rdfs:label "solr query offset parameter"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText
+:solrQueryText rdf:type owl:DatatypeProperty ;
+               rdfs:subPropertyOf owl:topDataProperty ;
+               rdf:type owl:FunctionalProperty ;
+               rdfs:domain :SolrQuery ;
+               rdfs:range xsd:string ;
+               rdfs:label "solr query text"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#solrSort
+:solrSort rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :SolrQuery ;
+          rdfs:range xsd:string ;
+          rdfs:label "solr query sort parameter"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText
+:sparqlQueryText rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdf:type owl:FunctionalProperty ;
+                 rdfs:domain :SparqlQuery ;
+                 rdfs:range xsd:string ;
+                 rdfs:label "SPARQL query text"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#title
+:title rdf:type owl:DatatypeProperty ,
+                owl:FunctionalProperty ;
+       rdfs:domain :Api ;
+       rdfs:range xsd:string ;
+       rdfs:label "title"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#version
+:version rdf:type owl:DatatypeProperty ,
+                  owl:FunctionalProperty ;
+         rdfs:domain :Api ,
+                     [ rdf:type owl:Class ;
+                       owl:unionOf ( :Action
+                                     :Api
+                                     :ResourceAPI
+                                   )
+                     ] ;
+         rdfs:range xsd:string ;
+         rdfs:label "version"@en-US .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Action
+:Action rdf:type owl:Class ;
+        rdfs:subClassOf :Operation ,
+                        :ParameterProvider ;
+        rdfs:label "Action"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Api
+:Api rdf:type owl:Class ;
+     rdfs:label "API description"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ArraySerializationType
+:ArraySerializationType rdf:type owl:Class ;
+                    rdfs:subClassOf :SerializationType ;
+                    rdfs:label "Array parameter type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Condition
+:Condition rdf:type owl:Class ;
+           rdfs:subClassOf :ParameterReceiver ;
+           rdfs:label "Condition interface"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionIsNotEmpty
+:ConditionIsNotEmpty rdf:type owl:Class ;
+                     rdfs:subClassOf :Condition ;
+                     rdfs:label "Condition interface"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep
+:ConditionalStep rdf:type owl:Class ;
+                 rdfs:subClassOf :Step ;
+                 rdfs:label "Conditional step"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#CustomRESTAction
+:CustomRESTAction rdf:type owl:Class ;
+                  rdfs:label "Custom REST action"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#HttpMethod
+:HttpMethod rdf:type owl:Class ;
+            rdfs:label "HTTP method"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Model
+:Model rdf:type owl:Class ;
+       rdfs:subClassOf :Parameter ;
+       rdfs:label "Model"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#N3Template
+:N3Template rdf:type owl:Class ;
+            rdfs:subClassOf :Template ;
+            rdfs:label "N3 template"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ModelWriter
+:ModelWriter rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ; 
+            rdfs:label "Model writer"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#NumericRangeValidator
+:NumericRangeValidator rdf:type owl:Class ;
+                       rdfs:subClassOf :Validator ;
+                       rdfs:label "Numeric Range Validator"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#JsonObjectSerializationType
+:JsonObjectSerializationType rdf:type owl:Class ;
+                     rdfs:subClassOf :SerializationType ;
+                     rdfs:label "Object parameter type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Operation
+:Operation rdf:type owl:Class ;
+           rdfs:label "Operation interface"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#OperationalStep
+:OperationalStep rdf:type owl:Class ;
+                 rdfs:subClassOf :Step ;
+                 rdfs:label "Operational step"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Parameter
+:Parameter rdf:type owl:Class ;
+           rdfs:label "Parameter"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ParameterProvider
+:ParameterProvider rdf:type owl:Class ;
+                   rdfs:label "Parameter provider interface"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ParameterReceiver
+:ParameterReceiver rdf:type owl:Class ;
+                   rdfs:label "Parameter receiver interface"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ParameterType
+:ParameterType rdf:type owl:Class ;
+               rdfs:label "Parameter type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ArrayParameterType
+:ArrayParameterType rdf:type owl:Class ;
+               rdfs:subClassOf :ParameterType ;
+               rdfs:label "Array parameter type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#SerializationType
+:SerializationType rdf:type owl:Class ;
+               rdfs:label "Serialization type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#RDFType
+:RDFType rdf:type owl:Class ;
+               rdfs:label "RDF data type type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ImplementationType
+:ImplementationType rdf:type owl:Class ;
+               rdfs:label "Implementation type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ImplementationConfig
+:ImplementationConfig rdf:type owl:Class ;
+               rdfs:label "Parameter implementation configuration"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#PrimitiveSerializationType
+:PrimitiveSerializationType rdf:type owl:Class ;
+                        rdfs:subClassOf :SerializationType ;
+                        rdfs:label "Primitive parameter type"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#RegularExpressionValidator
+:RegularExpressionValidator rdf:type owl:Class ;
+                            rdfs:subClassOf :Validator ;
+                            rdfs:label "Regular Expression Validator"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ResourceAPI
+:ResourceAPI rdf:type owl:Class ;
+             rdfs:label "Resource API"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Role
+:Role rdf:type owl:Class ;
+      rdfs:subClassOf owl:Thing ;
+      rdfs:label "Role"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Rpc
+:Rpc rdf:type owl:Class ;
+     rdfs:label "RPC"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#SolrQuery
+:SolrQuery rdf:type owl:Class ;
+           rdfs:subClassOf :Operation ,
+                           :ParameterProvider ,
+                           :ParameterReceiver ;
+           rdfs:label "SolrQuery"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#SparqlQuery
+:SparqlQuery rdf:type owl:Class ;
+             rdfs:subClassOf :Operation ,
+                             :ParameterProvider ,
+                             :ParameterReceiver ;
+             rdfs:label "sparql Query"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Step
+:Step rdf:type owl:Class ;
+      rdfs:subClassOf owl:Thing ;
+      rdfs:label "Step"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#StringLengthRangeValidator
+:StringLengthRangeValidator rdf:type owl:Class ;
+                            rdfs:subClassOf :Validator ;
+                            rdfs:label "String Length Range Validator"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Template
+:Template rdf:type owl:Class ;
+          rdfs:subClassOf :Operation ,
+                          :ParameterReceiver ;
+          rdfs:label "Template"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Validator
+:Validator rdf:type owl:Class ;
+           rdfs:label "Validator"@en-US .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

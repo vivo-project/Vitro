@@ -1,30 +1,52 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class IsInteger extends IsNotBlank {
 
     private static final Log log = LogFactory.getLog(IsInteger.class);
 
     @Override
-    public boolean isValid(String name, String[] values) {
-        if (!super.isValid(name, values)) {
+    public boolean isValid(String name, Data data) {
+        if (!super.isValid(name, data)) {
             return false;
         }
-
-        if (!isInteger(values[0])) {
-            return false;
-        }
-
+        
+        if (data.getParam().isArray()) {
+    		List array = ArrayView.getArray(data);
+			for (Object value : array) {
+				if (!isInteger(value.toString())) {
+				    return false;
+				}
+			}
+    	} else {
+    		try {
+				if (!isInteger(data.getSerializedValue())) {
+				    return false;
+				}
+			} catch (ConversionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+         
         return true;
     }
 
     private boolean isInteger(String string) {
-        if (NumberUtils.isDigits(string)) {
-            return true;
-        }
+    	try {
+    		Integer.parseInt(string);
+    		return true;
+    	} catch(Exception e) {
+    		log.debug(e,e);
+    	}
         log.debug("Value is not a number. Validation failed.");
         return false;
     }
