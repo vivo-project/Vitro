@@ -6,8 +6,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class OperationalStep implements Step {
@@ -46,7 +46,7 @@ public class OperationalStep implements Step {
         this.optional = optional;
     }
 
-    public OperationResult run(OperationData data) {
+    public OperationResult run(DataStore data) {
         OperationResult result = OperationResult.badRequest();
         log.debug("Processing in STEP");
         log.debug("Execution step is optional? " + optional);
@@ -76,13 +76,13 @@ public class OperationalStep implements Step {
     }
 
     @Override
-    public Parameters getRequiredParams() {
-        return operation.getRequiredParams();
+    public Parameters getInputParams() {
+        return operation.getInputParams();
     }
 
     @Override
-    public Parameters getProvidedParams() {
-        return operation.getProvidedParams();
+    public Parameters getOutputParams() {
+        return operation.getOutputParams();
     }
 
 }

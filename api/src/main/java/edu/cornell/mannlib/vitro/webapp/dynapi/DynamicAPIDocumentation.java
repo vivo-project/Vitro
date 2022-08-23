@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.OperationData.RESOURCE_ID;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static java.lang.String.format;
 
@@ -17,7 +16,7 @@ import org.apache.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.APIInformation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.CustomRESTAction;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullAction;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -26,10 +25,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ArrayParameterType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ObjectParameterType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.ParameterType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.types.PrimitiveParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.ArraySerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.JsonObjectSerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
@@ -124,7 +123,7 @@ public class DynamicAPIDocumentation {
                 paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
                 // resource individual API
-                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESOURCE_ID);
+                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESTEndpoint.RESOURCE_ID);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
 
@@ -156,7 +155,7 @@ public class DynamicAPIDocumentation {
                 paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
                 // resource individual API
-                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESOURCE_ID);
+                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESTEndpoint.RESOURCE_ID);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
 
@@ -217,7 +216,7 @@ public class DynamicAPIDocumentation {
 
             Action action = ActionPool.getInstance().get(actionName);
 
-            if (!(action instanceof DefaultAction)) {
+            if (!(action instanceof NullAction)) {
                 Tag tag = tag(action);
                 openApi.addTagsItem(tag);
 
@@ -425,7 +424,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -476,7 +475,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -508,7 +507,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -579,7 +578,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getRequiredParams());
+        buildObjectSchema(schema, action.getInputParams());
 
         mediaType.schema(schema);
         content.addMediaType("application/json", mediaType);
@@ -602,7 +601,7 @@ public class DynamicAPIDocumentation {
     private PathParameter individualPathParameter() {
         PathParameter pathParameter = new PathParameter();
 
-        pathParameter.setName(RESOURCE_ID);
+        pathParameter.setName(RESTEndpoint.RESOURCE_ID);
         pathParameter.description("Base64 encoded URI of the resource");
         StringSchema schema = new StringSchema();
         pathParameter.schema(schema);
@@ -618,7 +617,7 @@ public class DynamicAPIDocumentation {
         MediaType mediaType = new MediaType();
         ObjectSchema schema = new ObjectSchema();
 
-        buildObjectSchema(schema, action.getProvidedParams());
+        buildObjectSchema(schema, action.getOutputParams());
 
         mediaType.schema(schema);
 
@@ -635,17 +634,17 @@ public class DynamicAPIDocumentation {
         }
         for (String parameterName : parameters.getNames()) {
             Parameter parameter = parameters.get(parameterName);
-            ParameterType parameterType = parameter.getType();
+            SerializationType serializationType = parameter.getType().getSerializationType();
 
-            if (parameterType instanceof PrimitiveParameterType) {
+            if (serializationType instanceof PrimitiveSerializationType) {
 
-                Schema<?> primitiveParameter = toPrimativeSchema(parameterType);
+                Schema<?> primitiveParameter = toPrimativeSchema(serializationType);
 
                 primitiveParameter.setDescription(parameter.getDescription());
 
                 objectSchema.addProperties(parameterName, primitiveParameter);
 
-            } else if (parameterType instanceof ObjectParameterType) {
+            } else if (serializationType instanceof JsonObjectSerializationType) {
 
                 ObjectSchema objectParameter = new ObjectSchema();
 
@@ -653,9 +652,9 @@ public class DynamicAPIDocumentation {
 
                 objectSchema.addProperties(parameterName, objectParameter);
 
-                buildObjectSchema(objectParameter, ((ObjectParameterType) parameterType).getInternalElements());
+                buildObjectSchema(objectParameter, ((JsonObjectSerializationType) serializationType).getInternalElements());
 
-            } else if (parameterType instanceof ArrayParameterType) {
+            } else if (serializationType instanceof ArraySerializationType) {
 
                 ArraySchema arraySchema = new ArraySchema();
 
@@ -669,24 +668,24 @@ public class DynamicAPIDocumentation {
     }
 
     private void buildArraySchema(ArraySchema arraySchema, Parameter parameter) {
-        ParameterType parameterType = parameter.getType();
+        SerializationType parameterType = parameter.getType().getSerializationType();
 
-        ParameterType arrayParameterType = ((ArrayParameterType) parameterType).getElementsType();
+        SerializationType arrayParameterType = ((ArraySerializationType) parameterType).getElementsType();
 
         Schema<?> primitiveParameter = null;
 
-        if (arrayParameterType instanceof PrimitiveParameterType) {
+        if (arrayParameterType instanceof PrimitiveSerializationType) {
             primitiveParameter = toPrimativeSchema(arrayParameterType);
-        } else if (arrayParameterType instanceof ObjectParameterType) {
+        } else if (arrayParameterType instanceof JsonObjectSerializationType) {
 
             primitiveParameter = new ObjectSchema();
 
             primitiveParameter.setDescription(parameter.getDescription());
 
             buildObjectSchema((ObjectSchema) primitiveParameter,
-                    ((ObjectParameterType) arrayParameterType).getInternalElements());
+                    ((JsonObjectSerializationType) arrayParameterType).getInternalElements());
 
-        } else if (parameterType instanceof ArrayParameterType) {
+        } else if (parameterType instanceof ArraySerializationType) {
 
             primitiveParameter = new ArraySchema();
 
@@ -698,7 +697,7 @@ public class DynamicAPIDocumentation {
         arraySchema.setItems(primitiveParameter);
     }
 
-    private Schema<?> toPrimativeSchema(ParameterType parameterType) {
+    private Schema<?> toPrimativeSchema(SerializationType parameterType) {
         Schema<?> propertySchema;
 
         if (parameterType.getName().equals("boolean")) {
