@@ -1,9 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 
 public interface RunnableComponent extends Removable {
 
-    public OperationResult run(OperationData input);
+    public OperationResult run(DataStore dataStore);
 
 }

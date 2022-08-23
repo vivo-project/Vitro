@@ -10,9 +10,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.AutoConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class Action extends Operation implements Poolable<String>, StepInfo {
@@ -24,8 +25,9 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
-    private Parameters providedParams = new Parameters();
-    private Parameters requiredParams = new Parameters();
+    private Parameters outputParams = new Parameters();
+    private Parameters inputParams = new Parameters();
+    private Parameters internalParams = new Parameters();
 
     @Override
     public void dereference() {
@@ -36,8 +38,8 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     }
 
     @Override
-    public OperationResult run(OperationData input) {
-        return firstStep.run(input);
+    public OperationResult run(DataStore dataStore) {
+        return firstStep.run(dataStore);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
@@ -52,7 +54,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
     public void addProvidedParameter(Parameter param) {
-        providedParams.add(param);
+        outputParams.add(param);
     }
 
     @Override
@@ -102,29 +104,31 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     public boolean hasClients() {
         return !clients.isEmpty();
     }
-
-
+    
+    public Parameters getInternalParams() {
+        return internalParams;
+    }
+    
     @Override
-    public Parameters getRequiredParams() {
-        return requiredParams;
+    public Parameters getInputParams() {
+        return inputParams;
+    }
+    
+    @Override
+    public Parameters getOutputParams() {
+        return outputParams;
     }
 
     @Override
-    public Parameters getProvidedParams() {
-        return providedParams;
-    }
-
-    @Override
-    public boolean isOutputValid(OperationData inputOutput) {
-        if (!(super.isOutputValid(inputOutput))) {
+    public boolean isOutputValid(DataStore dataStore) {
+        if (!(super.isOutputValid(dataStore))) {
             return false;
         }
-        Parameters providedParams = getRequiredParams();
-        if (providedParams != null) {
-            for (String name : providedParams.getNames()) {
-                Parameter param = providedParams.get(name);
-                String[] outputValues = inputOutput.get(name);
-                if (!param.isValid(name, outputValues)) {
+        if (inputParams != null) {
+            for (String name : inputParams.getNames()) {
+                Parameter param = inputParams.get(name);
+                Data data = dataStore.getData(name);
+                if (!param.isValid(name, data)) {
                     return false;
                 }
             }
@@ -149,7 +153,28 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Override
     public boolean isOptional() {
-        return false;
+		// TODO Auto-generated method stub
+    	return false;
     }
+
+	public String getInputSerializedSchema() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	public String getOutputTemplate() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	public String getInputPath() {
+		// TODO Auto-generated method stub
+		return "";
+	}
+
+	public String getOutputPath() {
+		// TODO Auto-generated method stub
+		return "";
+	}
 
 }

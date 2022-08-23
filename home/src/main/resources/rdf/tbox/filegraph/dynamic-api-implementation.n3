@@ -3,11 +3,11 @@
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
+dynapi:Action rdfs:subClassOf dynapi_java:Action .
 
-dynapi:action rdfs:subClassOf dynapi_java:Action .
-
-dynapi:operationalStep rdfs:subClassOf dynapi_java:OperationalStep .
+dynapi:OperationalStep rdfs:subClassOf dynapi_java:OperationalStep .
 
 dynapi:ConditionalStep rdfs:subClassOf dynapi_java:conditions.ConditionalStep .
 
@@ -16,29 +16,41 @@ dynapi:Step rdfs:subClassOf dynapi_java:Step .
 dynapi:N3Template rdfs:subClassOf dynapi_java:N3Template,
 dynapi_java:Operation .
 
-dynapi:sparqlQuery rdfs:subClassOf dynapi_java:SPARQLQuery, dynapi_java:Operation .
+dynapi:SparqlQuery rdfs:subClassOf dynapi_java:SPARQLQuery, dynapi_java:Operation .
 
-dynapi:solrQuery rdfs:subClassOf dynapi_java:SolrQuery, dynapi_java:Operation .
+dynapi:SolrQuery rdfs:subClassOf dynapi_java:SolrQuery, dynapi_java:Operation .
 
-dynapi:model rdfs:subClassOf dynapi_java:ModelComponent .
+dynapi:Model rdfs:subClassOf dynapi_java:Parameter .
 
-dynapi:parameter rdfs:subClassOf dynapi_java:Parameter .
+dynapi:ModelWriter rdfs:subClassOf dynapi_java:ModelWriter , dynapi_java:Operation .
 
-dynapi:primitiveParameterType rdfs:subClassOf dynapi_java:types.PrimitiveParameterType, dynapi_java:types.ParameterType .
+dynapi:Parameter rdfs:subClassOf dynapi_java:Parameter .
 
-dynapi:arrayParameterType rdfs:subClassOf dynapi_java:types.ArrayParameterType, dynapi_java:types.ParameterType .
+dynapi:ParameterType rdfs:subClassOf dynapi_types:ParameterType .
 
-dynapi:objectParameterType rdfs:subClassOf dynapi_java:types.ObjectParameterType, dynapi_java:types.ParameterType .
+dynapi:ArrayParameterType rdfs:subClassOf dynapi_types:ParameterType, dynapi_types:ArrayParameterType .
 
-dynapi:resourceAPI rdfs:subClassOf dynapi_java:ResourceAPI .
+dynapi:RDFType rdfs:subClassOf dynapi_types:RDFType .
 
-dynapi:rpc rdfs:subClassOf dynapi_java:RPC .
+dynapi:ImplementationType rdfs:subClassOf dynapi_types:ImplementationType .
 
-dynapi:httpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
+dynapi:ImplementationConfig rdfs:subClassOf dynapi_types:ImplementationConfig .
 
-dynapi:customRESTAction rdfs:subClassOf dynapi_java:CustomRESTAction .
+dynapi:PrimitiveSerializationType rdfs:subClassOf dynapi_java:serialization.PrimitiveSerializationType, dynapi_java:serialization.SerializationType .
 
-dynapi:api rdfs:subClassOf dynapi_java:APIInformation .
+dynapi:ArraySerializationType rdfs:subClassOf dynapi_java:serialization.ArraySerializationType, dynapi_java:serialization.SerializationType .
+
+dynapi:JsonObjectSerializationType rdfs:subClassOf dynapi_java:serialization.JsonObjectSerializationType, dynapi_java:serialization.SerializationType .
+
+dynapi:ResourceAPI rdfs:subClassOf dynapi_java:ResourceAPI .
+
+dynapi:Rpc rdfs:subClassOf dynapi_java:RPC .
+
+dynapi:HttpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
+
+dynapi:CustomRESTAction rdfs:subClassOf dynapi_java:CustomRESTAction .
+
+dynapi:Api rdfs:subClassOf dynapi_java:APIInformation .
 
 dynapi:Condition rdfs:subClassOf dynapi_java:conditions.Condition .
 

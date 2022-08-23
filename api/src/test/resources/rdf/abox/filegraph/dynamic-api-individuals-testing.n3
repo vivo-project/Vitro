@@ -8,31 +8,31 @@
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1>
-        a                                   dynapi:action ;
+        a                                   dynapi:Action ;
         rdfs:label                          "Test action"@en-US ;
         dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
         dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1>
-        a                                   dynapi:Step, dynapi:operationalStep ;
+        a                                   dynapi:Step, dynapi:OperationalStep ;
         rdfs:label                          "Test operational step 1"@en-US ;
         dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1>
-        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        a                                   dynapi:Operation, dynapi:SparqlQuery ;
         rdfs:label                          "Test sparql query 1"@en-US ;
         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam2> ;
         dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
-        dynapi:sparqlQueryText              "SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .
+        dynapi:sparqlQueryText              "SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#Action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "Test parameter 1 for query 1"@en-US ;
         dynapi:name                         "limit" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDinteger> ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer-literal> ;
         dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger> ,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator> .
 
@@ -45,10 +45,10 @@
         dynapi:maxValue                     30.5 .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam2>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "Test parameter 2 for query 1"@en-US ;
         dynapi:name                         "email" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> ;
         dynapi:hasValidator                 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator> .
 
@@ -60,103 +60,84 @@
         dynapi:minLength                    5 .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "Result parameter 1 for query 1"@en-US ;
         dynapi:name                         "result" ;
         dynapi:description                  "Test action result" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonObjectArrayOfPairs> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultArray>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "Test result array structure"@en-US ;
         dynapi:name                         "result" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType> .
-
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultArrayType>
-        a                                   dynapi:parameterType ,
-                                            dynapi:arrayParameterType ,
-                                            dynapi_java:types.ParameterType ,
-                                            dynapi_java:types.ArrayParameterType ;
-        rdfs:label                          "Test result array type"@en-US ;
-        dynapi:name                         "test result array type" ;
-        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType> .
-
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/TestResultActionType>
-        a                                   dynapi:parameterType ,
-                                            dynapi:objectParameterType ,
-                                            dynapi_java:types.ParameterType ,
-                                            dynapi_java:types.ObjectParameterType ;
-        rdfs:label                          "Test result action object type"@en-US ;
-        dynapi:name                         "test result action object type" ;
-        dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction> ,
-                                            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonObjectArrayOfPairs> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "Test result action parameter"@en-US ;
         dynapi:name                         "action" ;
         dynapi:description                  "Test action result element action" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "Test result label parameter"@en-US ;
         dynapi:name                         "label" ;
         dynapi:description                  "Test action result element label" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc create individual"@en-US ;
         dynapi:name                         "test_action" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:minAPIVersion                "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get individual"@en-US ;
         dynapi:name                         "test_action" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get all individual"@en-US ;
         dynapi:name                         "test_action" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc update individual"@en-US ;
         dynapi:name                         "test_action" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:minAPIVersion                "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc patch individual"@en-US ;
         dynapi:name                         "test_action" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
         dynapi:minAPIVersion                "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc delete individual"@en-US ;
         dynapi:name                         "test_action" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
         dynapi:minAPIVersion                "0.1.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_custom_action1>
-        a                                   dynapi:customRESTAction ;
+        a                                   dynapi:CustomRESTAction ;
         rdfs:label                          "Test custom action"@en-US ;
         dynapi:name                         "test_custom_action_name" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateRPC1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testResource1>
-        a                                   dynapi:resourceAPI ;
+        a                                   dynapi:ResourceAPI ;
         rdfs:label                          "Test resourceAPI 1"@en-US ;
         dynapi:name                         "test_resource" ;
         dynapi:minAPIVersion                "0.1.0" ;

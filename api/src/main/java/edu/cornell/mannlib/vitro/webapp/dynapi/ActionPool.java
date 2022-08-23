@@ -1,7 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullAction;
 
 public class ActionPool extends AbstractPool<String, Action, ActionPool> {
 
@@ -18,7 +18,7 @@ public class ActionPool extends AbstractPool<String, Action, ActionPool> {
 
     @Override
     public Action getDefault() {
-        return new DefaultAction();
+        return new NullAction();
     }
 
     @Override

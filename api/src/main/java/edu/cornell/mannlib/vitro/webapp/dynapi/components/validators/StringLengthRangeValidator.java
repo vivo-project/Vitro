@@ -1,8 +1,13 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class StringLengthRangeValidator extends IsNotBlank {
@@ -32,18 +37,27 @@ public class StringLengthRangeValidator extends IsNotBlank {
     }
 
     @Override
-    public boolean isValid(String name, String[] values) {
-        if (!super.isValid(name, values)) {
+    public boolean isValid(String name, Data data) {
+        if (!super.isValid(name, data)) {
             return false;
         }
-
-        for (String value : values) {
-            if (!isLengthInRange(value)) {
-                log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"
+    	if (data.getParam().isArray()) {
+    		List array = ArrayView.getArray(data);
+			for (Object value : array) {
+				if (!isLengthInRange(value.toString())) {
+	                log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"
+	                        + ((maxLength != null) ? maxLength : " ") + "].");
+	                return false;
+	            }
+			}
+    	} else {
+    		if (!isLengthInRange(SimpleDataView.getStringRepresentation(data))) {
+    			log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"
                         + ((maxLength != null) ? maxLength : " ") + "].");
                 return false;
-            }
-        }
+    		}
+    		
+    	}
         return true;
     }
 

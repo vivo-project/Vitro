@@ -8,7 +8,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.StringView;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
@@ -19,8 +21,8 @@ public class SolrQuery extends Operation {
 
     private static final Log log = LogFactory.getLog(SolrQuery.class);
 
-    private Parameters requiredParams = new Parameters();
-    private Parameters providedParams = new Parameters();
+    private Parameters inputParams = new Parameters();
+    private Parameters outputParams = new Parameters();
 
     private String queryText;
     private String offset;
@@ -33,13 +35,13 @@ public class SolrQuery extends Operation {
     // region @Property Setters
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-    public void addRequiredParameter(Parameter param) {
-        requiredParams.add(param);
+    public void addInputParameter(Parameter param) {
+        inputParams.add(param);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
-    public void addProvidedParameter(Parameter param) {
-        providedParams.add(param);
+    public void addOutputParameter(Parameter param) {
+        outputParams.add(param);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#solrQueryText", maxOccurs = 1)
@@ -82,13 +84,13 @@ public class SolrQuery extends Operation {
     // region Getters
 
     @Override
-    public Parameters getRequiredParams() {
-        return requiredParams;
+    public Parameters getInputParams() {
+        return inputParams;
     }
 
     @Override
-    public Parameters getProvidedParams() {
-        return providedParams;
+    public Parameters getOutputParams() {
+        return outputParams;
     }
 
     public String getQueryText() {
@@ -122,9 +124,9 @@ public class SolrQuery extends Operation {
     // endregion
 
     @Override
-    public OperationResult run(OperationData input) {
+    public OperationResult run(DataStore input) {
         if (!isInputValid(input)) {
-            return new OperationResult(400);
+            return OperationResult.badRequest();
         }
 
         SearchQuery searchQuery;
@@ -133,7 +135,7 @@ public class SolrQuery extends Operation {
         } catch (Exception e) {
             log.error("Error while parsing input data for query");
             log.error(e);
-            return new OperationResult(400);
+            return OperationResult.badRequest();
         }
 
         SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
@@ -143,40 +145,40 @@ public class SolrQuery extends Operation {
         } catch (SearchEngineException e) {
             log.error("Error while executing Solr Query:");
             log.error(e.getMessage());
-            return new OperationResult(500);
+            return OperationResult.internalServerError();
         }
 
-        return new OperationResult(200);
+        return OperationResult.ok();
     }
 
-    private SearchQuery createSearchQuery(OperationData input)
+    private SearchQuery createSearchQuery(DataStore dataStore)
             throws InputMismatchException, IllegalArgumentException {
         SearchQuery searchQuery = ApplicationUtils.instance().getSearchEngine().createQuery();
 
         if (queryText != null) {
-            searchQuery = searchQuery.setQuery(replaceVariablesWithInput(queryText, input));
+            searchQuery = searchQuery.setQuery(replaceVariablesWithInput(queryText, dataStore));
         }
         if (offset != null) {
-            searchQuery = searchQuery.setStart(Integer.parseInt(replaceVariablesWithInput(offset, input)));
+            searchQuery = searchQuery.setStart(Integer.parseInt(replaceVariablesWithInput(offset, dataStore)));
         }
         if (limit != null) {
-            searchQuery = searchQuery.setRows(Integer.parseInt(replaceVariablesWithInput(limit, input)));
+            searchQuery = searchQuery.setRows(Integer.parseInt(replaceVariablesWithInput(limit, dataStore)));
         }
         for (String field : fields) {
-            searchQuery = searchQuery.addFields(replaceVariablesWithInput(field, input));
+            searchQuery = searchQuery.addFields(replaceVariablesWithInput(field, dataStore));
         }
         for (String filter : filters) {
-            searchQuery = searchQuery.addFilterQuery(replaceVariablesWithInput(filter, input));
+            searchQuery = searchQuery.addFilterQuery(replaceVariablesWithInput(filter, dataStore));
         }
         for (String sort : sorts) {
-            sort = replaceVariablesWithInput(sort, input);
+            sort = replaceVariablesWithInput(sort, dataStore);
             String[] sortTokens = sort.trim().split(" ");
             searchQuery = searchQuery.addSortField(sortTokens[0], SearchQuery.Order.valueOf(sortTokens[sortTokens.length - 1].toUpperCase()));
         }
         return searchQuery;
     }
 
-    private String replaceVariablesWithInput(String property, OperationData input)
+    private String replaceVariablesWithInput(String property, DataStore dataStore)
             throws InputMismatchException {
 
         String[] propertyVariables = Arrays.stream(property.split(":| |,"))
@@ -185,10 +187,13 @@ public class SolrQuery extends Operation {
                 .toArray(String[]::new);
 
         for (String propertyVar : propertyVariables) {
-            if (!input.has(propertyVar) || input.get(propertyVar).length > 1) {
-                throw new InputMismatchException();
+            if (!dataStore.contains(propertyVar) ) {
+                throw new InputMismatchException("Data store doesn't contain value " + propertyVar);
             }
-            property = property.replace("?" + propertyVar, input.get(propertyVar)[0]);
+            if ( ArrayView.isMultiValuedArray(dataStore, propertyVar)) {
+            	throw new InputMismatchException(propertyVar + " is multivalued array");
+            }
+            property = property.replace("?" + propertyVar, StringView.getFirstStringValue(dataStore, propertyVar));
         }
 
         return property;

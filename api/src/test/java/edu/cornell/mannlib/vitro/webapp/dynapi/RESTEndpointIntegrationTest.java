@@ -6,7 +6,9 @@ import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,12 +32,22 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
+
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.impl.OntModelImpl;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
@@ -44,7 +56,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     private final static String BASE_URL = "http://localhost:8080";
 
     private final static String MOCK_BASE_PATH = "src/test/resources/dynapi/mock";
-
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private RESTEndpoint restEndpoint;
@@ -83,6 +95,18 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     @Parameter(6)
     public String testMessage;
 
+    private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
+
+    @BeforeClass
+    public static void setupStaticObjects() {
+    	dynapiModelFactory = mockStatic(DynapiModelFactory.class);
+    }
+    
+    @AfterClass
+    public static void after() {
+    	dynapiModelFactory.close();
+    }
+    
     @Before
     public void beforeEach() throws IOException {
         actionPool = ActionPool.getInstance();
@@ -101,8 +125,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         MockitoAnnotations.openMocks(this);
 
-        when(request.getServletContext()).thenReturn(servletContext);
-
+        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(ontModel);
         mockStatus(response);
     }
 
@@ -113,6 +136,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         when(request.getRequestURI()).thenReturn(BASE_URL + REST_SERVLET_PATH + testRequestPath);
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(testRequestPath);
+        when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
 
         if (testRequestParamsFile != null) {
             String filePath = format("%s/rest/request/params/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(), testRequestParamsFile);
@@ -122,7 +146,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         if (testRequestBodyFile != null) {
             String filePath = format("%s/rest/request/body/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(), testRequestParamsFile);
-
+            when(request.getContentType()).thenReturn("application/json;UTF-8");
             when(request.getReader()).thenReturn(new BufferedReader(new FileReader(filePath)));
         }
 
