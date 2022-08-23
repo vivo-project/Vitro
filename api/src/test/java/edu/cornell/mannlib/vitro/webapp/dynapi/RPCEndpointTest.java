@@ -8,6 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -25,6 +27,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RPCEndpointTest {
@@ -32,8 +35,6 @@ public class RPCEndpointTest {
     private final static String PATH_INFO = "/test";
 
     private Map<String, String[]> params;
-
-    private ServletContext context;
 
     private MockedStatic<ActionPool> actionPoolStatic;
 
@@ -58,7 +59,6 @@ public class RPCEndpointTest {
         when(actionPool.get(any(String.class))).thenReturn(action);
 
         when(request.getParameterMap()).thenReturn(params);
-        when(request.getServletContext()).thenReturn(context);
 
         rpcEndpoint = new RPCEndpoint();
     }
@@ -76,13 +76,12 @@ public class RPCEndpointTest {
     }
 
     @Test
-    public void doPostTest() {
-        OperationResult result = new OperationResult(HttpServletResponse.SC_OK);
+    public void doPostTest() throws IOException {
+        OperationResult result = OperationResult.ok();
 
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(PATH_INFO);
-        when(action.run(any(OperationData.class))).thenReturn(result);
-
+        when(action.run(any(DataStore.class))).thenReturn(result);
         rpcEndpoint.doPost(request, response);
         verify(action, times(1)).run(any());
         verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);

@@ -6,7 +6,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <test:action>
-        a                                   dynapi:action ;
+        a                                   dynapi:Action ;
         rdfs:label                          "action"@en-US ;
         dynapi:providesParameter            <test:result_param> ;
         dynapi:hasFirstStep                 <test:step1> ;
@@ -25,42 +25,48 @@
         dynapi:requiresParameter            <test:input_param> .
 
 <test:step2>
-        a                                   dynapi:Step, dynapi:operationalStep ;
+        a                                   dynapi:Step, dynapi:OperationalStep ;
         rdfs:label                          "step 2"@en-US ;
-        dynapi:providesParameter            <test:result_param> ;
         dynapi:hasOperation                 <test:query2> .
 
 <test:step3>
-        a                                   dynapi:Step, dynapi:operationalStep ;
+        a                                   dynapi:Step, dynapi:OperationalStep ;
         rdfs:label                          "step 3"@en-US ;
-        dynapi:providesParameter            <test:result_param> ;
         dynapi:hasOperation                 <test:query3> .
 
 <test:rpc1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc create individual"@en-US ;
         dynapi:name                         "test_action" .
 
 <test:input_param>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "input param"@en-US ;
         dynapi:name                         "input_param" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
+<test:model_param>
+        a                                   dynapi:Parameter, dynapi:Model ;
+        rdfs:label                          "model param"@en-US ;
+        dynapi:name                         "model" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
 
 <test:result_param>
-        a                                   dynapi:parameter ;
+        a                                   dynapi:Parameter ;
         rdfs:label                          "result param"@en-US ;
         dynapi:name                         "label" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <test:query2>
-        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        a                                   dynapi:Operation, dynapi:SparqlQuery ;
         rdfs:label                          "sparql query 2"@en-US ;
-        dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+		dynapi:hasModel        			    <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter            <test:result_param> ;
         dynapi:sparqlQueryText              "SELECT ?label WHERE { <test:uri2> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }" . 
 
 <test:query3>
-        a                                   dynapi:operation, dynapi:sparqlQuery ;
+        a                                   dynapi:Operation, dynapi:SparqlQuery ;
         rdfs:label                          "sparql query 3"@en-US ;
-        dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+		dynapi:hasModel        			    <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        dynapi:providesParameter            <test:result_param> ;
         dynapi:sparqlQueryText              "SELECT ?label WHERE { <test:uri3> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }" . 

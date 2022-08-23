@@ -6,18 +6,18 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/solrTestAction>
-        a                           dynapi:action ;
+        a                           dynapi:Action ;
         rdfs:label                  "Solr test action"@en-US ;
         dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/solrTestRPC1> ;
         dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/solrTestStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/solrTestStep1>
-        a                           dynapi:Step, dynapi:operationalStep ;
+        a                           dynapi:Step, dynapi:OperationalStep ;
         rdfs:label                  "Solr Test operational step 1"@en-US ;
         dynapi:hasOperation         <https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery>
-        a                           dynapi:operation, dynapi:solrQuery ;
+        a                           dynapi:Operation, dynapi:SolrQuery ;
         rdfs:label                  "Test solr query 1"@en-US ;
         dynapi:requiresParameter    <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam> ;
         dynapi:solrQueryText        "http" ;
@@ -29,25 +29,25 @@
         dynapi:solrFacet            "ALLTEXT" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/textSearchParam>
-        a                           dynapi:parameter ;
+        a                           dynapi:Parameter ;
         rdfs:label                  "Search text for solr query 1"@en-US ;
         dynapi:name                 "searchText" ;
-        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortFieldParam>
-        a                           dynapi:parameter ;
+        a                           dynapi:Parameter ;
         rdfs:label                  "Choose document field for sorting"@en-US ;
         dynapi:name                 "fildForSorting" ;
-        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/sortFieldDirection>
-        a                           dynapi:parameter ;
+        a                           dynapi:Parameter ;
         rdfs:label                  "Choose sort direction"@en-US ;
         dynapi:paramName            "sordDirection" ;
-        dynapi:hasParameterType     <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/XSDstring> .
+        dynapi:hasType     <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/solrTestRPC1>
-        a                           dynapi:rpc ;
+        a                           dynapi:Rpc ;
         dynapi:name                 "solr_test_action"@en-US ;
         dynapi:hasDefaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:minAPIVersionMin     "0.1.0" .

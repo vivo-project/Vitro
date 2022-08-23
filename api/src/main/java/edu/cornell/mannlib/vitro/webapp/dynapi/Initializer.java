@@ -4,6 +4,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
+
 public class Initializer implements ServletContextListener {
 
     public Initializer() {
@@ -31,9 +33,15 @@ public class Initializer implements ServletContextListener {
         initializeActionPool(ctx);
         initializeResourcePool(ctx);
         initializeDynamicAPIDocumentation(ctx);
+        initializeDynamicAPIModelFactory(ctx);
     }
 
-    @Override
+    private void initializeDynamicAPIModelFactory(ServletContext ctx) {
+		DynapiModelFactory factory = DynapiModelFactory.getInstance();
+		factory.init(ctx);
+	}
+
+	@Override
     public void contextDestroyed(ServletContextEvent sce) {
         // TODO Auto-generated method stub
     }

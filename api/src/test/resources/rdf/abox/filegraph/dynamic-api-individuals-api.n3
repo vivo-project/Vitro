@@ -6,21 +6,21 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv1>
-        a                                   dynapi:api ;
+        a                                   dynapi:Api ;
         rdfs:label                          "Test API"@en-US ;
         dynapi:title                        "Test API" ;
         dynapi:description                  "A test dynamic API" ;
         dynapi:version                      "1" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv2>
-        a                                   dynapi:api ;
+        a                                   dynapi:Api ;
         rdfs:label                          "Newer Test API"@en-US ;
         dynapi:title                        "Newer Test API" ;
         dynapi:description                  "A test of the newer dynamic API" ;
         dynapi:version                      "2" .
         
 <https://vivoweb.org/ontology/vitro-dynamic-api/testAPIv4>
-        a                                   dynapi:api ;
+        a                                   dynapi:Api ;
         rdfs:label                          "Improved Test API"@en-US ;
         dynapi:title                        "Improved Test API" ;
         dynapi:description                  "A test of thew improved newer dynamic API" ;

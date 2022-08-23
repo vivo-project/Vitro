@@ -1,11 +1,15 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetractions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Literal;
@@ -17,20 +21,25 @@ public class N3Template extends Operation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 
-	private Parameters requiredParams = new Parameters();
+	private Parameters inputParams = new Parameters();
 	private String n3TextAdditions = "";
 	private String n3TextRetractions = "";
-	private ModelComponent templateModel;
-
+	private Parameter modelParam;
 	// region @Property Setters
-
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addRequiredParameter(Parameter param) {
-		requiredParams.add(param);
+	
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
+	public void setTemplateModel(Parameter param) throws InitializationException{
+		if (!ModelView.isModel(param)) {
+			throw new InitializationException("Only model parameters accepted on setQueryModel");
+		}
+		modelParam = param;
+		inputParams.add(param);
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
-	public void setTemplateModel(ModelComponent templateModel){ this.templateModel = templateModel; }
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+	public void addInputParameter(Parameter param) {
+		inputParams.add(param);
+	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
 	public void setN3TextAdditions(String n3TextAdditions) {
@@ -47,12 +56,12 @@ public class N3Template extends Operation implements Template {
 	// region Getters
 
 	@Override
-	public Parameters getRequiredParams() {
-		return requiredParams;
+	public Parameters getInputParams() {
+		return inputParams;
 	}
 
 	@Override
-	public Parameters getProvidedParams() {
+	public Parameters getOutputParams() {
 		return new Parameters();
 	}
 
@@ -63,19 +72,18 @@ public class N3Template extends Operation implements Template {
 	//endregion
 
 	@Override
-	public OperationResult run(OperationData input) {
-		if (!isInputValid(input)) {
-			return new OperationResult(500);
-		}
-
+	public OperationResult run(DataStore dataStore) {
+		if (!isValid(dataStore)) {
+			return OperationResult.internalServerError();
+		}		
 		String substitutedN3AdditionsTemplate;
 		String substitutedN3RetractionsTemplate;
 		try {
-			substitutedN3AdditionsTemplate = insertParameters(input, n3TextAdditions);
-			substitutedN3RetractionsTemplate = insertParameters(input, n3TextRetractions);
+			substitutedN3AdditionsTemplate = insertParameters(dataStore, n3TextAdditions);
+			substitutedN3RetractionsTemplate = insertParameters(dataStore, n3TextRetractions);
 		}catch (InputMismatchException e){
 			log.error(e);
-			return new OperationResult(500);
+			return OperationResult.internalServerError();
 		}
 
 		List<Model> additionModels;
@@ -90,17 +98,44 @@ public class N3Template extends Operation implements Template {
 					ProcessRdfForm.N3ParseType.REQUIRED);
 		} catch (Exception e) {
 			log.error("Error while trying to parse N3Template string and create a Jena rdf Model", e);
-			return new OperationResult(500);
+			return OperationResult.internalServerError();
 		}
 
 		AdditionsAndRetractions changes = new AdditionsAndRetractions(additionModels, retractionModels);
-		Model writeModel = ModelAccess.on(input.getContext()).getOntModel(templateModel.getName());
-		ProcessRdfForm.applyChangesToWriteModel(changes, null, writeModel,"");
+		
+		if (!ModelView.hasModel(dataStore, modelParam)) {
+			log.error("Model not found in input parameters");
+			return OperationResult.internalServerError();
+		}
+		Model writeModel = ModelView.getModel(dataStore, modelParam);
+		try {
+			ProcessRdfForm.applyChangesToWriteModel(changes, null, writeModel,"");
+		} catch(Exception e) {
+			log.error(e,e);
+			return OperationResult.internalServerError();
+		}
 
-		return new OperationResult(200);
+		return OperationResult.ok();
 	}
 
-	private String insertParameters(OperationData input, String n3Text) throws InputMismatchException{
+	private boolean isValid(DataStore dataStore) {
+		boolean result = isValid();
+		if (!isInputValid(dataStore)) {
+			result = false;
+		}
+		return result;
+	}
+	
+	private boolean isValid() {
+		boolean result = true;
+		if (modelParam == null) {
+			log.error("Model param is not provided in configuration");
+			result = false;
+		}
+		return result;
+	}
+
+	private String insertParameters(DataStore input, String n3Text) throws InputMismatchException{
 
 		EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
 
@@ -108,13 +143,13 @@ public class N3Template extends Operation implements Template {
 		List<String> n3WithParameters = Arrays.asList(n3Text);
 
 		//region Substitute IRI variables
-		Map<String, List<String>> parametersToUris = requiredParams.getUrisMap(input);
+		Map<String, List<String>> parametersToUris = RdfView.getUrisMap(input, inputParams);
 
 		gen.subInMultiUris(parametersToUris, n3WithParameters);
 		//endregion
 
 		//region Substitute other (literal) variables
-		Map<String, List<Literal>> parametersToLiterals = requiredParams.getLiteralsMap(input);
+		Map<String, List<Literal>> parametersToLiterals = RdfView.getLiteralsMap(input, inputParams);
 
 		gen.subInMultiLiterals(parametersToLiterals, n3WithParameters);
 		//endregion

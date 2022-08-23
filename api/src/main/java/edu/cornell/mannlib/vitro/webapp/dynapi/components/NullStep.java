@@ -3,8 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import java.util.Collections;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 
 public class NullStep implements Step {
 
@@ -17,8 +17,8 @@ public class NullStep implements Step {
     private NullStep() {}
     
     @Override
-    public OperationResult run(OperationData input) {
-        return new OperationResult(200);
+    public OperationResult run(DataStore input) {
+        return OperationResult.ok();
     }
 
     @Override
@@ -41,12 +41,12 @@ public class NullStep implements Step {
     }
 
     @Override
-    public Parameters getRequiredParams() {
+    public Parameters getInputParams() {
         return new Parameters();
     }
 
     @Override
-    public Parameters getProvidedParams() {
+    public Parameters getOutputParams() {
         return new Parameters();
     }
 

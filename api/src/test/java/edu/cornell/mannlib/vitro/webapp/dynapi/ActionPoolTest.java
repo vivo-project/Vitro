@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultAction;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullAction;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
 public class ActionPoolTest extends ServletContextTest {
@@ -44,7 +44,7 @@ public class ActionPoolTest extends ServletContextTest {
         ActionPool actionPool = ActionPool.getInstance();
         Action action = actionPool.get(TEST_ACTION_NAME);
         assertNotNull(action);
-        assertTrue(action instanceof DefaultAction);
+        assertTrue(action instanceof NullAction);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         reset();
 
-        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof NullAction);
 
         actionPool.add(TEST_PERSON_ACTION_URI, action);
     }
@@ -139,7 +139,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         Action action = actionPool.get(TEST_PERSON_ACTION_NAME);
 
-        assertFalse(action instanceof DefaultAction);
+        assertFalse(action instanceof NullAction);
 
         action.removeClient();
 
@@ -149,7 +149,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof NullAction);
     }
 
     @Test
@@ -162,7 +162,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         Action actionHasClient = actionPool.get(TEST_PERSON_ACTION_NAME);
 
-        assertFalse(actionHasClient instanceof DefaultAction);
+        assertFalse(actionHasClient instanceof NullAction);
 
         setup();
 
@@ -172,7 +172,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertEquals(1, actionPool.obsoleteCount());
 
-        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_PERSON_ACTION_NAME) instanceof NullAction);
 
         actionHasClient.removeClient();
     }
@@ -196,7 +196,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         Action action = actionPool.get(TEST_PERSON_ACTION_NAME);
 
-        assertTrue(action instanceof DefaultAction);
+        assertTrue(action instanceof NullAction);
 
         actionPool.reload(TEST_PERSON_ACTION_URI);
 
@@ -305,7 +305,7 @@ public class ActionPoolTest extends ServletContextTest {
 
     private void assertAction(String expectedName, Action actualAction) {
         assertNotNull(actualAction);
-        assertFalse(format("%s not loaded!", expectedName), actualAction instanceof DefaultAction);
+        assertFalse(format("%s not loaded!", expectedName), actualAction instanceof NullAction);
         assertTrue(actualAction.isValid());
         assertEquals(expectedName, actualAction.getKey());
         assertTrue(actualAction.hasClients());
