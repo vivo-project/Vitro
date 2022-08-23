@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
-import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,7 +51,6 @@ public class SPARQLQueryTest {
 		assertEquals(OperationResult.ok(), sparql.run(dataStore));
 		assertTrue(dataStore.contains(STR_VAR));
 		if (dataStore.contains(STR_VAR)) {
-			Data data = dataStore.getData(STR_VAR);
 			assertTrue(SimpleDataView.getStringRepresentation(STR_VAR, dataStore).equals("test"));
 		}
 	}
@@ -82,7 +80,6 @@ public class SPARQLQueryTest {
 		if (dataStore.contains(STR_VAR)) {
 			assertEquals("test:resource", SimpleDataView.getStringRepresentation(S_VAR, dataStore));
 		}
-
 	}
 	
 	@Test
@@ -110,7 +107,6 @@ public class SPARQLQueryTest {
 		if (dataStore.contains(O_VAR)) {
 			assertEquals("alice", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
 		}
-
 	}
 	
 }

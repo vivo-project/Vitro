@@ -1,4 +1,4 @@
-	package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
+package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;

@@ -2,8 +2,6 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

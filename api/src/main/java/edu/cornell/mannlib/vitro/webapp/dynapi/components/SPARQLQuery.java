@@ -15,14 +15,12 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.Lock;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonObjectView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
@@ -101,14 +99,12 @@ public class SPARQLQuery extends Operation {
 				List<String> vars = results.getResultVars();
 				log.debug("Query vars: " + String.join(", ", vars));
 
-				int j = 0;
 				while (results.hasNext()) {
 					QuerySolution solution = results.nextSolution();
 					log.debug("Query solution " + i++);
 					
 					populateJsonArrayFromSolution(dataStore, jsonArrays, vars, solution);
 					populateSimpleDataFromSolution(dataStore, simpleData, vars, solution);
-					j++;
 				}
 
 			} catch (Exception e) {
