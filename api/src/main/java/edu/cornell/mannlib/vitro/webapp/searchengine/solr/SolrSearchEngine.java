@@ -76,7 +76,9 @@ public class SolrSearchEngine implements SearchEngine {
 			// no apparent 7.4.0 analogy to `setPollQueueTime(25)`
 
 			updateEngine = updateBuilder.build();
-
+			
+			SolrFieldInitializer.initializeFields(queryEngine, updateEngine);
+			
 			css.info("Set up the Solr search engine; URL = '" + solrServerUrlString + "'.");
 		} catch (Exception e) {
 			css.fatal("Could not set up the Solr search engine", e);

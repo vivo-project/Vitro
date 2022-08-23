@@ -52,13 +52,13 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 	private static final Log log = LogFactory
 			.getLog(SelectQueryDocumentModifier.class);
 
-	private RDFService rdfService;
+	protected RDFService rdfService;
 
 	/** A name to be used in logging, to identify this instance. */
-	private String label;
+	protected String label;
 
 	/** The queries to be executed. There must be at least one. */
-	private List<String> queries = new ArrayList<>();
+	protected List<String> queries = new ArrayList<>();
 
 	/**
 	 * The names of the fields where the results of the queries will be stored.
@@ -128,7 +128,7 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 		}
 	}
 
-	private boolean passesTypeRestrictions(Individual ind) {
+	protected boolean passesTypeRestrictions(Individual ind) {
 		if (typeRestrictions.isEmpty()) {
 			return true;
 		} else {
