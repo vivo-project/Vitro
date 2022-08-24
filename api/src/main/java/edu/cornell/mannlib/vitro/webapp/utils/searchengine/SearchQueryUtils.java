@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.searchengine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -150,19 +151,38 @@ public class SearchQueryUtils {
     }
 
 	/**
-     * builds a query with a type clause for each type in vclassUris, NAME_LOWERCASE filetred by
-     * alpha, and just the hits for the page for pageSize.
+     * builds a query with a type clause for each type in vclassUris,
+     * NAME_LOWERCASE filtered by alpha, and just the hits for the page for pageSize.
+     * @param locale may be null.  If null, default sort field will be used.
+     *            Otherwise, query will be sorted by locale-specific sort field. 
      */
-    public static SearchQuery getQuery(List<String> vclassUris, String alpha, int page, int pageSize){
+    public static SearchQuery getQuery(List<String> vclassUris, String alpha,
+            Locale locale, int page, int pageSize){
         String queryText = "";
         SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
 
         try {
             queryText = makeMultiClassQuery(vclassUris);
-
+                        
+            String localeSpecificField = null;
+            
+            if (locale != null) {
+                localeSpecificField = getSortFieldNameForLocale(locale); 
+            }
+            
         	 // Add alpha filter if applicable
             if ( alpha != null && !"".equals(alpha) && alpha.length() == 1) {
-                queryText += VitroSearchTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
+                if (locale == null) {
+                    queryText += VitroSearchTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
+                } else {
+                    // Retrieve items matching the appropriate alpha char
+                    // on the i18ned field if that field exists.  For records
+                    // where the field does not exist, fall back to NAME_LOWERCASE
+                    queryText += "(" + localeSpecificField + ":" + alpha.toLowerCase()
+                           + "* OR (-" + localeSpecificField + ":[* TO *] AND "
+                           + VitroSearchTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*))";
+                    log.debug("Multiclass query text: " + queryText);
+                }
             }
 
             SearchQuery query = searchEngine.createQuery(queryText);
@@ -172,6 +192,11 @@ public class SearchQueryUtils {
             query.setStart( startRow ).setRows( pageSize );
 
             // Need a single-valued field for sorting
+            // Sort first by sort field for locale; fall back to
+            // NAME_LOWERCASE_SINGLE_VALUED if not available.
+            if(locale != null) {
+                query.addSortField(localeSpecificField, Order.ASC);
+            }
             query.addSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED, Order.ASC);
 
             log.debug("Query is " + query.toString());
@@ -181,6 +206,14 @@ public class SearchQueryUtils {
             log.error("Could not make the search query",ex);
             return searchEngine.createQuery();
         }
+    }
+    
+    public static String getSortFieldNameForLocale(Locale locale) {
+        return locale.toString().replace('_', '-') + VitroSearchTermNames.LABEL_SORT_SUFFIX;
+    }
+    
+    public static String getLabelFieldNameForLocale(Locale locale) {
+        return locale.toString().replace('_', '-') + VitroSearchTermNames.LABEL_DISPLAY_SUFFIX;
     }
 
     public static SearchQuery getRandomQuery(List<String> vclassUris, int page, int pageSize){

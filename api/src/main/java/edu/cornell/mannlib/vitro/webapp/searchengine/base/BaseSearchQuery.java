@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.searchengine.base;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class BaseSearchQuery implements SearchQuery {
 	private int rows = -1;
 
 	private final Set<String> fieldsToReturn = new HashSet<>();
-	private final Map<String, SearchQuery.Order> sortFields = new HashMap<>();
+	private final Map<String, SearchQuery.Order> sortFields = new LinkedHashMap <>();
 	private final Set<String> filters = new HashSet<>();
 
 	private final Set<String> facetFields = new HashSet<>();

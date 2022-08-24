@@ -64,6 +64,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private DataPropertyListConfig config;
     private String objectKey;
     private String queryString;
+    private String publicDescription;
     private String rangeDatatypeURI;
     private Set<String> constructQueries;
     private int displayLimit;
@@ -82,6 +83,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
         queryString = getSelectQuery();
         constructQueries = getConstructQueries();
+        publicDescription = dp.getPublicDescription();
 
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
 		displayLimit = dp.getDisplayLimit();
@@ -158,6 +160,10 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         return Route.DATA_PROPERTY_EDIT;
     }
 
+	public String getPublicDescription() {
+		return publicDescription;
+	}
+    
 	@Override
 	public int getDisplayLimit() {
 			return displayLimit;
