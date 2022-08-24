@@ -4,13 +4,13 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-languages-home-core</artifactId>
-    <version>1.14.1-SNAPSHOT</version>
+    <version>1.13.0</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
         <artifactId>vitro-languages-core</artifactId>
-        <version>1.14.1-SNAPSHOT</version>
+        <version>1.13.0</version>
         <relativePath>..</relativePath>
     </parent>
 
