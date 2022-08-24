@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.vivoweb</groupId>
 		<artifactId>vitro-languages</artifactId>
-		<version>1.13.0</version>
+		<version>1.13.1-SNAPSHOT</version>
 	</parent>
 
 
 	<groupId>org.vivoweb</groupId>
 	<artifactId>vitro-languages-fr_CA</artifactId>
-	<version>1.13.0</version>
+	<version>1.13.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Vitro Languages fr_CA</name>
