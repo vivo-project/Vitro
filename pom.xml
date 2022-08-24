@@ -4,7 +4,7 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-languages</artifactId>
-    <version>1.13.1-SNAPSHOT</version>
+    <version>1.12.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Vitro Languages</name>
