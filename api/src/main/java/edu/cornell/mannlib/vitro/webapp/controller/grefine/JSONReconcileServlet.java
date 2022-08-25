@@ -338,7 +338,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 							}
 
 							resultJson.put("type", typesJsonArr);
-							resultJson.put("match", "false");
+							resultJson.put("match", false);
 							resultJsonArr.add(resultJson);
 
 						} catch (Exception e) {
