@@ -70,4 +70,8 @@ public class Parameters implements Removable {
 		params = null;
 	}
 
+	public Parameter getFirst() {
+		return params.entrySet().iterator().next().getValue();
+	}
+
 }

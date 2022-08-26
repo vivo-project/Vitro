@@ -84,7 +84,8 @@
 :hasModel rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
           rdfs:domain [ rdf:type owl:Class ;
-                        owl:unionOf ( :SparqlQuery
+                        owl:unionOf ( :SparqlSelectQuery
+                                      :SparqlConstructQuery
                                       :Template
                                     )
                       ] ;
@@ -515,7 +516,12 @@
 :sparqlQueryText rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdf:type owl:FunctionalProperty ;
-                 rdfs:domain :SparqlQuery ;
+                 rdfs:domain :SparqlSelectQuery ;
+                 rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( :SparqlSelectQuery
+                                      :SparqlConstructQuery
+                                    )
+                      ] ;
                  rdfs:range xsd:string ;
                  rdfs:label "SPARQL query text"@en-US .
 
@@ -714,12 +720,19 @@
            rdfs:label "SolrQuery"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#SparqlQuery
-:SparqlQuery rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#SparqlSelectQuery
+:SparqlSelectQuery rdf:type owl:Class ;
              rdfs:subClassOf :Operation ,
                              :ParameterProvider ,
                              :ParameterReceiver ;
-             rdfs:label "sparql Query"@en-US .
+             rdfs:label "Sparql select query"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#SparqlConstructQuery
+:SparqlConstructQuery rdf:type owl:Class ;
+             rdfs:subClassOf :Operation ,
+                             :ParameterProvider ,
+                             :ParameterReceiver ;
+             rdfs:label "Sparql construct query"@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#Step
