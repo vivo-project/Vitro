@@ -1,0 +1,50 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:action>
+        a                                   dynapi:Action ;
+        rdfs:label                          "action"@en-US ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:providesParameter            <test:object_param> ;
+        dynapi:hasAssignedRPC               <test:rpc1> .
+
+<test:step1>
+        a                                   dynapi:Step, dynapi:OperationalStep ;
+        rdfs:label                          "step 1"@en-US ;
+        dynapi:hasOperation                 <test:selectQuery> .
+
+<test:selectQuery> 
+        a                                   dynapi:SparqlSelectQuery, dynapi:Operation ;
+        rdfs:label                          "Test SparqlConstructQuery component"@en-US ;
+		dynapi:sparqlQueryText              "SELECT ?object WHERE { ?uri <test:property> ?object . } " ;
+        dynapi:providesParameter            <test:object_param> ;
+        dynapi:requiresParameter            <test:query_model> ;
+        dynapi:requiresParameter            <test:uri_param> ;
+        dynapi:hasModel                     <test:query_model> .
+
+<test:uri_param>
+        a                                   dynapi:Parameter;
+        rdfs:label                          "output model param"@en-US ;
+        dynapi:name                         "uri" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
+
+<test:rpc1>
+        a                                   dynapi:Rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "test_action" .
+
+<test:object_param>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "object param"@en-US ;
+        dynapi:name                         "object" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
+<test:query_model>
+        a                                   dynapi:Parameter, dynapi:Model ;
+        rdfs:label                          "query model param"@en-US ;
+        dynapi:name                         "query" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
