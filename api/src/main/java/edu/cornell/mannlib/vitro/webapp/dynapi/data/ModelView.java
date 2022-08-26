@@ -47,9 +47,12 @@ public class ModelView {
 		return false;
 	}
 	
-	public static List<Model> getModels( Parameters params, DataStore dataStore ) {
+	public static List<Model> getExistingModels( Parameters params, DataStore dataStore ) {
 		List<Model> list = new LinkedList<>();
 		for (String name : params.getNames()) {
+			if (!dataStore.contains(name)) {
+				continue;
+			}
 			Data data = dataStore.getData(name);
 			if (isModel(data)) {
 				Model model = (Model) data.getObject();
@@ -57,6 +60,12 @@ public class ModelView {
 			}
 		}
 		return list;
+	}
+
+	public static void addModel(DataStore dataStore, Model model, Parameter outputParam) {
+		Data modelData = new Data(outputParam);
+		modelData.setObject(model);
+		dataStore.addData(outputParam.getName(), modelData);
 	}
 
 }

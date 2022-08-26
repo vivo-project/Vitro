@@ -17,6 +17,8 @@ dynapi:N3Template rdfs:subClassOf dynapi_java:N3Template, dynapi_java:Operation 
 
 dynapi:SparqlSelectQuery rdfs:subClassOf dynapi_java:SparqlSelectQuery, dynapi_java:Operation .
 
+dynapi:SparqlConstructQuery rdfs:subClassOf dynapi_java:SparqlConstructQuery, dynapi_java:Operation .
+
 dynapi:SolrQuery rdfs:subClassOf dynapi_java:SolrQuery, dynapi_java:Operation .
 
 dynapi:Model rdfs:subClassOf dynapi_java:Parameter .
