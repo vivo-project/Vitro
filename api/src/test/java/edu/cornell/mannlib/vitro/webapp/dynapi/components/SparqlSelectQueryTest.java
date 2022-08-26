@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 
-public class SPARQLQueryTest {
+public class SparqlSelectQueryTest {
 	private static final String MODEL = "model";
 	private static final String STR_VAR = "str";
 	private static final String S_VAR = "s";
@@ -25,11 +25,11 @@ public class SPARQLQueryTest {
 	private static final String QUERY_SUBJ_VAR = "SELECT ?o WHERE { ?str <test:property> ?o . } " ;
 	private OntModelImpl model;
 	private DataStore dataStore;
-	private SPARQLQuery sparql;
+	private SparqlSelectQuery sparql;
 
 	@Before
 	public void init() throws Exception {
-		sparql = new SPARQLQuery();
+		sparql = new SparqlSelectQuery();
 		dataStore = new DataStore();
 		model = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
 	}
