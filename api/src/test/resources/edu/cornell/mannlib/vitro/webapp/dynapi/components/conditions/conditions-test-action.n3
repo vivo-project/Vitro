@@ -58,14 +58,14 @@
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <test:query2>
-        a                                   dynapi:Operation, dynapi:SparqlQuery ;
+        a                                   dynapi:Operation, dynapi:SparqlSelectQuery ;
         rdfs:label                          "sparql query 2"@en-US ;
 		dynapi:hasModel        			    <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:providesParameter            <test:result_param> ;
         dynapi:sparqlQueryText              "SELECT ?label WHERE { <test:uri2> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }" . 
 
 <test:query3>
-        a                                   dynapi:Operation, dynapi:SparqlQuery ;
+        a                                   dynapi:Operation, dynapi:SparqlSelectQuery ;
         rdfs:label                          "sparql query 3"@en-US ;
 		dynapi:hasModel        			    <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:providesParameter            <test:result_param> ;
