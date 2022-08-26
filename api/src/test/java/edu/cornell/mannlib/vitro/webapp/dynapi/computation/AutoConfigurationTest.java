@@ -8,7 +8,7 @@ import org.junit.Test;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.SPARQLQuery;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.SparqlSelectQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
@@ -106,8 +106,8 @@ public class AutoConfigurationTest {
         
     }
     
-    private SPARQLQuery query(String[] required, String[] provided) throws InitializationException {
-        SPARQLQuery query = new SPARQLQuery();
+    private SparqlSelectQuery query(String[] required, String[] provided) throws InitializationException {
+        SparqlSelectQuery query = new SparqlSelectQuery();
         for (int i = 0; i < required.length; i++) {
             query.addInputParameter(param(required[i]));
         }

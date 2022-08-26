@@ -20,7 +20,7 @@
         dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1>
-        a                                   dynapi:Operation, dynapi:SparqlQuery ;
+        a                                   dynapi:Operation, dynapi:SparqlSelectQuery ;
         rdfs:label                          "Test sparql query 1"@en-US ;
         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>,
