@@ -7,6 +7,8 @@ import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class ModelView {
 
@@ -30,7 +32,9 @@ public class ModelView {
 	}
 	
 	public static boolean isModel(Parameter param) {
-		String name = param.getType().getImplementationType().getClassName().getCanonicalName();
+		final ParameterType type = param.getType();
+		final ImplementationType implementationType = type.getImplementationType();
+		String name = implementationType.getClassName().getCanonicalName();
 		return MODEL_CANONICAL_NAME.equals(name);
 	}
 
