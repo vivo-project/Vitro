@@ -28,9 +28,9 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionExcepti
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class SPARQLQuery extends Operation {
+public class SparqlSelectQuery extends Operation {
 
-	private static final Log log = LogFactory.getLog(SPARQLQuery.class);
+	private static final Log log = LogFactory.getLog(SparqlSelectQuery.class);
 
 	private String queryText;
 	private Parameters inputParams = new Parameters();
