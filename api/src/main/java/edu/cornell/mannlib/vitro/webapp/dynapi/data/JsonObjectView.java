@@ -2,7 +2,11 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.RDFNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +15,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class JsonObjectView {
 
@@ -43,5 +48,21 @@ public class JsonObjectView {
 	
 	public static JsonNode getJsonNode(Data data) {
 		return (JsonNode) data.getObject();
+	}
+
+	public static void addFromSolution(DataStore dataStore, Map<String, ArrayNode> jsonArrays, List<String> vars,
+			QuerySolution solution, Parameters outputParams) throws ConversionException {
+		for (String name : jsonArrays.keySet()) {
+			ArrayNode node = jsonArrays.get(name);
+			if (!dataStore.contains(name)) {
+				final Parameter arrayParam = outputParams.get(name);
+				addData(dataStore, name, arrayParam, node ); 
+			}
+			ObjectNode object = createArrayObjectNode(node);
+			for (String var : vars) {
+				RDFNode solVar = solution.get(var);
+				object.put(var, solVar.toString());
+			}
+		}
 	}
 }

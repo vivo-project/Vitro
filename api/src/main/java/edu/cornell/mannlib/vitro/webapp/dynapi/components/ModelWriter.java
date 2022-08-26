@@ -56,8 +56,8 @@ public class ModelWriter extends Operation{
 			return OperationResult.internalServerError();
 		}
 		
-		List<Model> additions = ModelView.getModels(additionModelParams, dataStore);
-		List<Model> retractions = ModelView.getModels(retractionModelParams, dataStore);
+		List<Model> additions = ModelView.getExistingModels(additionModelParams, dataStore);
+		List<Model> retractions = ModelView.getExistingModels(retractionModelParams, dataStore);
 		Model target = ModelView.getModel(dataStore, targetModelParam);
 		AdditionsAndRetractions changes = new AdditionsAndRetractions(additions, retractions);
 		//TODO: set editor uri instead of ""
