@@ -43,7 +43,7 @@ public class RPCEndpoint extends VitroHttpServlet {
             }
             try {
             	Converter.convert(request, action, dataStore);
-            } catch (ConversionException e) {
+            } catch (Exception e) {
             	log.error(e,e);
             	response.setStatus(500);
             	return;

@@ -1,7 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,11 +11,10 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.Lock;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonObjectView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DefaultDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
@@ -37,10 +35,7 @@ public class SparqlSelectQuery extends SparqlQuery {
 		OperationResult result = OperationResult.ok();
 		Model queryModel = ModelView.getModel(dataStore, queryModelParam);
 		final String preparedQueryString = prepareQuery(dataStore);
-
-		Map<String,ArrayNode> jsonArrays = JsonObjectView.getJsonArrays(outputParams);
-		//Map<String, List> singleDimensionalArrays = ArrayView.getSingleDimensionalArrays(providedParams);
-		List<String> simpleData = SimpleDataView.getNames(outputParams);
+		DefaultDataView.createDefaultOutput(dataStore, outputParams);
 
 		queryModel.enterCriticalSection(Lock.READ);
 		try {
@@ -54,8 +49,8 @@ public class SparqlSelectQuery extends SparqlQuery {
 				while (results.hasNext()) {
 					QuerySolution solution = results.nextSolution();
 					log.debug("Query solution " + i++);
-					JsonObjectView.addFromSolution(dataStore, jsonArrays, vars, solution, outputParams);
-					SimpleDataView.addFromSolution(dataStore, simpleData, vars, solution, outputParams);
+					JsonObjectView.addFromSolution(dataStore, vars, solution, outputParams);
+					SimpleDataView.addFromSolution(dataStore, vars, solution, outputParams);
 				}
 
 			} catch (Exception e) {
@@ -77,5 +72,6 @@ public class SparqlSelectQuery extends SparqlQuery {
 		}
 		return result;
 	}
+
 
 }
