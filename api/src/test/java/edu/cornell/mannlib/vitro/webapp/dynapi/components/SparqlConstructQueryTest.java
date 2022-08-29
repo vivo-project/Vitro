@@ -1,7 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.graph.NodeFactory;
@@ -14,7 +13,6 @@ import org.junit.Test;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 
 public class SparqlConstructQueryTest {

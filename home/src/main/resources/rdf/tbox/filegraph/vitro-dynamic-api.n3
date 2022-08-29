@@ -288,6 +288,12 @@
                    rdfs:range xsd:string ;
                    rdfs:label "N3 text"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue
+:defaultValue rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf owl:topDataProperty ;
+                   rdfs:domain :ImplementationType ;
+                   rdfs:range xsd:string ;
+                   rdfs:label "Default value"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#allConditionsRequired
 :allConditionsRequired rdf:type owl:DatatypeProperty ;
