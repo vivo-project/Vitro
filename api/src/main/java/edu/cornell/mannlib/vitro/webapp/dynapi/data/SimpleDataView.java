@@ -33,8 +33,9 @@ public class SimpleDataView {
 		return data.getObject().toString();
 	}
 
-	public static void addFromSolution(DataStore dataStore, List<String> simpleData, List<String> vars,
+	public static void addFromSolution(DataStore dataStore, List<String> vars,
 			QuerySolution solution, Parameters outputParams) throws ConversionException {
+		List<String> simpleData = getNames(outputParams);
 		for (String var : vars) {
 			SparqlSelectQuery.log.debug(var + " : " + solution.get(var));
 			if (simpleData.contains(var) && solution.contains(var)) {
