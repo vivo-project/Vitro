@@ -32,13 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.ontology.impl.OntModelImpl;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;

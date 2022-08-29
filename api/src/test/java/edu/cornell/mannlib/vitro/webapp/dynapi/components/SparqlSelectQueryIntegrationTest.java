@@ -76,7 +76,9 @@ public class SparqlSelectQueryIntegrationTest extends ServletContextTest {
         OperationResult opResult = action.run(store);
         assertFalse(opResult.hasError());	
         assertTrue(store.contains(OBJECT));
-        assertEquals(value, store.getData(OBJECT).getSerializedValue());
+        final Data data = store.getData(OBJECT);
+        assertTrue(TestView.getObject(data) != null);
+		assertEquals(value, data.getSerializedValue());
     }
     
     @Parameterized.Parameters
@@ -85,6 +87,8 @@ public class SparqlSelectQueryIntegrationTest extends ServletContextTest {
         	{ "test:uri1", "literal1"},
         	{ "test:uri2", "literal2"},
         	{ "test:uri3", "literal3"},
+        	{ "test:uri4", ""},
+
             
         });
     }

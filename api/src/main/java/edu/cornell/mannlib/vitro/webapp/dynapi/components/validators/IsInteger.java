@@ -7,7 +7,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class IsInteger extends IsNotBlank {
 
@@ -27,13 +26,8 @@ public class IsInteger extends IsNotBlank {
 				}
 			}
     	} else {
-    		try {
-				if (!isInteger(data.getSerializedValue())) {
-				    return false;
-				}
-			} catch (ConversionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (!isInteger(data.getSerializedValue())) {
+			    return false;
 			}
     	}
          
