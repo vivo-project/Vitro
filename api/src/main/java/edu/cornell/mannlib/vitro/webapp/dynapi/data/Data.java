@@ -1,12 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class Data {
-
+	
     private String string = null;
     private Object object = null;
     private Parameter param = null;
@@ -35,7 +34,17 @@ public class Data {
         return string;
     }
 
-	public void earlyInitialization() throws ConversionException {
+	public void earlyInitialization() {
+		final ParameterType type = param.getType();
+		final ImplementationType implementationType = type.getImplementationType();
+		if (param.isInternal()) {
+			object = implementationType.deserialize(type, param.getName());
+			return;
+		} 
+		object = implementationType.deserialize(type, string);
+	}
+	
+	public void initialization() {
 		final ParameterType type = param.getType();
 		final ImplementationType implementationType = type.getImplementationType();
 		if (param.isInternal()) {
@@ -45,7 +54,7 @@ public class Data {
 		object = implementationType.deserialize(type, string);
 	}
 
-	public String getSerializedValue() throws ConversionException {
+	public String getSerializedValue() {
 		final ParameterType type = param.getType();
 		final ImplementationType implementationType = type.getImplementationType();
 		if (object == null) {
@@ -53,4 +62,12 @@ public class Data {
 		}
 		return implementationType.serialize(type, object).toString();
 	}
+
+	public void initializeDefault()  {
+		ParameterType type = param.getType();
+		ImplementationType implementationType = type.getImplementationType();
+		String defaultValue = type.getImplementationType().getDefaultValue();		
+		object = implementationType.deserialize(type, defaultValue);
+	}
+	
 }
