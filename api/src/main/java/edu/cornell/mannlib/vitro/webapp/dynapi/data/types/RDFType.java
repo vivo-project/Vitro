@@ -8,7 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class RDFType implements Removable {
 	
-	private static final String ANY_URI = "http://www.w3.org/2001/XMLSchema#anyURI";
+	public static final String ANY_URI = "http://www.w3.org/2001/XMLSchema#anyURI";
 
     protected String name;
     private RDFDatatype rdfDataType;

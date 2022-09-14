@@ -4,6 +4,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +28,9 @@ public class URIResourceParam extends Parameter {
     		implType.setSerializationConfig(serializationConfig);
     		implType.setDeserializationConfig(deserializationConfig);	
 			implType.setClassName(Resource.class.getCanonicalName());
+			RDFType rdfType = new RDFType();
+			rdfType.setName(RDFType.ANY_URI);
+			type.setRdfType(rdfType);
 			this.setType(type);
 		} catch (Exception e) {
 			log.error(e, e);
@@ -52,6 +56,4 @@ public class URIResourceParam extends Parameter {
 		serializationConfig.setStaticMethod(true);
 		return serializationConfig;
 	}
-
-
 }

@@ -31,7 +31,6 @@ public class DynapiJsonObjectTest {
 	@Test
 	public void testPutData() {
 		DynapiJsonObject object = createJsonObject();
-		 
 	}
 	
 
