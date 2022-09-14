@@ -4,6 +4,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiJsonObject;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ParameterType implements Removable {
@@ -95,8 +96,7 @@ public class ParameterType implements Removable {
 
 	public boolean isJsonObject() {
 		final String canonicalName = getImplementationType().getClassName().getCanonicalName();
-		final String jsonNode = "com.fasterxml.jackson.databind.JsonNode";
-		if (jsonNode.equals(canonicalName)){
+		if (DynapiJsonObject.class.getCanonicalName().equals(canonicalName)){
 			return true;
 		}
 		return false;

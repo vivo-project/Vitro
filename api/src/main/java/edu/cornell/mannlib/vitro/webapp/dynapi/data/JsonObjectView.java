@@ -5,52 +5,79 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiJsonObject;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiJsonObject.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.LiteralParamFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIResourceParam;
 
 public class JsonObjectView {
 
-	private static final ObjectMapper mapper = new ObjectMapper();
-	private static final String ARRAY_OF_PAIRS = "arrayOfPairs";
+	private static final String JSON_ARRAY = "jsonArray";
 
-	public static Map<String, ArrayNode> getJsonArrays(Parameters params, DataStore dataStore) {
-		Map<String, ArrayNode> jsonArrays = new HashMap<>();
+	public static Map<String, DynapiJsonObject> getJsonArrays(Parameters params, DataStore dataStore) {
+		Map<String, DynapiJsonObject> jsonArrays = new HashMap<>();
 		for (String name : params.getNames()) {
 			Parameter param = params.get(name);
-			if (param.isJsonObject() && ARRAY_OF_PAIRS.equals(param.getType().getName())) {
-				ArrayNode arrayNode = (ArrayNode) dataStore.getData(name).getObject();
+			if (param.isJsonObject() && JSON_ARRAY.equals(param.getType().getName())) {
+				DynapiJsonObject arrayNode = (DynapiJsonObject) dataStore.getData(name).getObject();
 				jsonArrays.put(name, arrayNode);
 			}
 		}
 		return jsonArrays;
 	}
-
-	public static ObjectNode createArrayObjectNode(ArrayNode node) {
-		ObjectNode object = mapper.createObjectNode();
-		node.add(object);
-		return object;
-	}
-
-	public static JsonNode getJsonNode(Data data) {
-		return (JsonNode) data.getObject();
-	}
-
-	public static void addFromSolution(DataStore dataStore, List<String> vars, QuerySolution solution, Parameters outputParams) {
-		Map<String, ArrayNode> jsonArrays = getJsonArrays(outputParams, dataStore);
-		for (String name : jsonArrays.keySet()) {
-			ArrayNode node = jsonArrays.get(name);
-			ObjectNode object = createArrayObjectNode(node);
-			for (String var : vars) {
-				RDFNode solVar = solution.get(var);
-				object.put(var, solVar.toString());
+	
+	public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {
+		for (String name : params.getNames()) {
+			Parameter param = params.get(name);
+			if (param.isJsonObject() && JSON_ARRAY.equals(param.getType().getName())) {
+				return true;
 			}
 		}
+		return false;
+	}
+
+	public static JsonNode asJsonNode(Data data) {
+		final DynapiJsonObject object = (DynapiJsonObject) data.getObject();
+		return object.asJsonNode();
+	}
+
+	public static void addSolutionRow(DataStore dataStore, List<String> vars, QuerySolution solution, Parameters outputParams) {
+		if (!hasJsonArrays(outputParams, dataStore)) {
+			return;
+		}
+		DynapiJsonObject row = getRowMap(vars, solution);
+		Map<String, DynapiJsonObject> jsonArrays = getJsonArrays(outputParams, dataStore);
+		for ( DynapiJsonObject array  : jsonArrays.values()) {
+			array.addRow(DynapiJsonObject.PATH_ROOT, row);
+		}
+	}
+
+	private static DynapiJsonObject getRowMap(List<String> vars, QuerySolution solution) {
+		DynapiJsonObject row = new DynapiJsonObject(Type.EmptyObject);
+
+		for (String var : vars) {
+			RDFNode node = solution.get(var);
+			if (node.isLiteral()) {
+				Literal literal = (Literal) node;
+				Parameter param = LiteralParamFactory.createLiteral(literal, var);
+				Data data = new Data(param);
+				data.setObject(node);
+				row.addKeyValue(var, data);
+			} else 
+			if (node.isURIResource()){
+				Parameter param = new URIResourceParam(var);
+				Data data = new Data(param);
+				data.setObject(node);
+				row.addKeyValue(var, data);
+			} 
+		}
+		return row;
 	}
 }

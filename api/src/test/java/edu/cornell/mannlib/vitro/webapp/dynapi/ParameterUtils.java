@@ -32,7 +32,7 @@ public class ParameterUtils {
 		Parameter uri1Param = new Parameter();
 		ParameterType paramType = new ParameterType();
 		ImplementationType implType = new ImplementationType();
-		implType.setName(Model.class.getCanonicalName());
+		implType.setClassName(Model.class.getCanonicalName());
 		paramType.setImplementationType(implType);
 	
 		ImplementationConfig serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serialize", true);
@@ -66,7 +66,7 @@ public class ParameterUtils {
 		config.setStaticMethod(false);
 		uri1ImplType.setDeserializationConfig(config);
 		uri1ImplType.setSerializationConfig(config);
-		uri1ImplType.setName("java.lang.String");
+		uri1ImplType.setClassName("java.lang.String");
 	
 		RDFType rdfType = new RDFType();
 		rdfType.setName("anyURI");
@@ -92,7 +92,7 @@ public class ParameterUtils {
 		config.setStaticMethod(false);
 		impltype.setDeserializationConfig(config);
 		impltype.setSerializationConfig(config);
-		impltype.setName("java.lang.String");
+		impltype.setClassName("java.lang.String");
 		
 		RDFType rdfType = new RDFType();
 		rdfType.setName("string");
@@ -119,7 +119,7 @@ public class ParameterUtils {
 		config.setStaticMethod(false);
 		uri1ImplType.setDeserializationConfig(config);
 		uri1ImplType.setSerializationConfig(config);
-		uri1ImplType.setName("java.lang.String");
+		uri1ImplType.setClassName("java.lang.String");
 	
 		RDFType rdfType = new RDFType();
 		rdfType.setName("boolean");

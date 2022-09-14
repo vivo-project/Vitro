@@ -26,7 +26,7 @@ public class ImplementationType {
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#className", minOccurs = 1, maxOccurs = 1)
-	public void setName(String className) throws ClassNotFoundException {
+	public void setClassName(String className) throws ClassNotFoundException {
 		this.className = Class.forName(className);
 	}
 
