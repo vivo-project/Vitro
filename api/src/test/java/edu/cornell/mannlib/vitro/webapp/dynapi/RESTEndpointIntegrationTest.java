@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -43,6 +44,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
@@ -53,6 +55,8 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     private final static String BASE_URL = "http://localhost:8080";
 
     private final static String MOCK_BASE_PATH = "src/test/resources/dynapi/mock";
+    
+    private final static boolean overwrite = false;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -159,7 +163,9 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
             if (testResponseBodyFile != null) {
                 String filePath = format("rest/response/body/%s/%s", testRequestMethod.toLowerCase(), testRequestParamsFile);
                 String expectedReponseBody = readMockFile(filePath);
-
+                if (overwrite) {
+                	overwrite(filePath);	
+                }
                 verify(responsePrintWriter, times(1)).print(expectedReponseBody);
                 verify(responsePrintWriter, times(1)).flush();
             }
@@ -170,6 +176,15 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         assertEquals("Invalid Status for test: " + testMessage, status, response.getStatus());
     }
+
+	private void overwrite(String filePath) throws FileNotFoundException {
+		final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(responsePrintWriter).print(captor.capture());
+		final String argument = captor.getValue();
+		PrintWriter out = new PrintWriter(getTestFilePath(filePath));
+		out.print(argument);
+		out.flush();
+	}
 
     private void run(String method) {
         switch (method) {
