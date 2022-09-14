@@ -7,69 +7,69 @@
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testNoValidAction1>
-        a                                   dynapi:action ;
+        a                                   dynapi:Action ;
         rdfs:label                          "Test no valid action 1"@en-US ;
         dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
         dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateNoValidRPC1> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testNoValidStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testNoValidStep1>
-        a                                   dynapi:Step, dynapi:operationalStep ;
+        a                                   dynapi:Step, dynapi:OperationalStep ;
         rdfs:label                          "Test NoValid operational step 1"@en-US ;
         dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateNoValidRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc create NoValid 1"@en-US ;
         dynapi:name                         "test%NoValid" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetNoValidRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get NoValid 1"@en-US ;
         dynapi:name                         "test_NoValid" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllNoValidRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get all NoValid 1"@en-US ;
         dynapi:name                         "test_NoValid" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateNoValidRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc update NoValid 1"@en-US ;
         dynapi:name                         "test_NoValid" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchNoValidRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc patch NoValid 1"@en-US ;
         dynapi:name                         "test_NoValid" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteNoValidRPC1>
-        a                                   dynapi:rpc ;
+        a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc delete NoValid 1"@en-US ;
         dynapi:name                         "test_NoValid" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
         dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_NoValid_custom_action1>
-        a                                   dynapi:customRESTAction ;
+        a                                   dynapi:CustomRESTAction ;
         rdfs:label                          "Test NoValid custom action 1"@en-US ;
         dynapi:name                         "test_NoValid_custom_action_name" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateNoValidRPC1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testNoValidResource1>
-        a                                   dynapi:resourceAPI ;
+        a                                   dynapi:ResourceAPI ;
         rdfs:label                          "Test NoValid resourceAPI 1"@en-US ;
         dynapi:name                         "test_NoValid_resource" ;
         dynapi:minAPIVersion                "1.0.0" ;

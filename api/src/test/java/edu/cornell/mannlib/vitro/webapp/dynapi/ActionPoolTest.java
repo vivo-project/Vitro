@@ -246,7 +246,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
 
-        modelValidator = new SHACLBeanValidator(ontModel, schemeModel, "https://vivoweb.org/ontology/vitro-dynamic-api#action", null);
+        modelValidator = new SHACLBeanValidator(ontModel, schemeModel, "https://vivoweb.org/ontology/vitro-dynamic-api#Action", null);
 
         loadTestModel();
         loadNotValidAction();
@@ -256,7 +256,7 @@ public class ActionPoolTest extends ServletContextTest {
         assertEquals(8, actionPool.count());
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertTrue(actionPool.get(TEST_NOT_VALID_ACTION_URI) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_NOT_VALID_ACTION_URI) instanceof NullAction);
     }
 
     @Test
@@ -275,7 +275,7 @@ public class ActionPoolTest extends ServletContextTest {
         assertEquals(8, actionPool.count());
         assertEquals(0, actionPool.obsoleteCount());
 
-        assertTrue(actionPool.get(TEST_NOT_VALID_ACTION_URI) instanceof DefaultAction);
+        assertTrue(actionPool.get(TEST_NOT_VALID_ACTION_URI) instanceof NullAction);
     }
 
     @Test
