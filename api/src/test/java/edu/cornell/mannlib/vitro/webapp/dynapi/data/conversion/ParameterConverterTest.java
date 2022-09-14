@@ -36,7 +36,22 @@ public class ParameterConverterTest {
 		assertEquals("java.lang.String", result.getClass().getCanonicalName());
 		assertEquals(input, result);
 	}
-
+	
+	/*
+	 * @Test public void stringLiteralDeserialization() throws Exception { final
+	 * String className = "java.lang.String"; ParameterType type =
+	 * createType(className, "toString", "", false, false); final String input =
+	 * "serialized string"; Object result = ParameterConverter.deserialize(type,
+	 * input); assertEquals(className, result.getClass().getCanonicalName());
+	 * assertEquals(input, result); }
+	 * 
+	 * @Test public void stringLiteralSerialization() throws Exception { final
+	 * String className = "java.lang.String"; ParameterType type =
+	 * createType(className, "toString", "", false, true); final String input =
+	 * "deserialized string"; Object result = ParameterConverter.serialize(type,
+	 * input); assertEquals("java.lang.String",
+	 * result.getClass().getCanonicalName()); assertEquals(input, result); }
+	 */
 	// Static method
 	@Test
 	public void integerDerialization() throws Exception {
@@ -131,7 +146,7 @@ public class ParameterConverterTest {
 		} else {
 			arrayImplType.setDeserializationConfig(arrayConfig);			
 		}
-		arrayImplType.setName("java.util.ArrayList");
+		arrayImplType.setClassName("java.util.ArrayList");
 		arrayConfig.setClassName(arrayClassName);
 		arrayConfig.setMethodName(arrayMethod);
 		arrayConfig.setMethodArguments(arrayArgs);
@@ -154,7 +169,7 @@ public class ParameterConverterTest {
 		} else {
 			implType.setDeserializationConfig(config);	
 		}
-		implType.setName(className);
+		implType.setClassName(className);
 		config.setClassName(className);
 		config.setMethodName(methodName);
 		config.setMethodArguments(args);
