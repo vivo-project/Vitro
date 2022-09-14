@@ -131,7 +131,7 @@ public class AutoConfigurationTest {
 			config.setStaticMethod(false);
 			uri1ImplType.setDeserializationConfig(config);
 			uri1ImplType.setSerializationConfig(config);
-			uri1ImplType.setName("java.lang.String");
+			uri1ImplType.setClassName("java.lang.String");
 
 			RDFType rdfType = new RDFType();
 			rdfType.setName("anyURI");
