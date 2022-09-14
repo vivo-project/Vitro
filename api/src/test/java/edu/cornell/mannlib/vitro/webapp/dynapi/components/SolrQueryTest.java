@@ -266,7 +266,7 @@ public class SolrQueryTest extends ServletContextTest {
 		config.setStaticMethod(false);
 		impltype.setDeserializationConfig(config);
 		impltype.setSerializationConfig(config);
-		impltype.setName("java.lang.String");
+		impltype.setClassName("java.lang.String");
 		
 		RDFType rdfType = new RDFType();
 		rdfType.setName("string");

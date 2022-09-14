@@ -103,9 +103,9 @@ public class JSONConverter {
 			//TODO: General schema for objects, arrays and simple values is to get 
 			//the serialised by RawData and the put to the context here. 
 			if (data.getParam().isJsonObject()) {
-				ctx.put(path, name, JsonObjectView.getJsonNode(data));
+				ctx.put(path, name, JsonObjectView.asJsonNode(data));
 			} else {
-				ctx.put(path, name, data.getSerializedValue());				
+				ctx.put(path, name, data.getSerializedValue());		
 			}
 		}
 		return ctx.jsonString();

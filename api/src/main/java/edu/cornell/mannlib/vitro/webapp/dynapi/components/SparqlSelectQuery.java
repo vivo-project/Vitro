@@ -49,7 +49,7 @@ public class SparqlSelectQuery extends SparqlQuery {
 				while (results.hasNext()) {
 					QuerySolution solution = results.nextSolution();
 					log.debug("Query solution " + i++);
-					JsonObjectView.addFromSolution(dataStore, vars, solution, outputParams);
+					JsonObjectView.addSolutionRow(dataStore, vars, solution, outputParams);
 					SimpleDataView.addFromSolution(dataStore, vars, solution, outputParams);
 				}
 
