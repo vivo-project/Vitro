@@ -18,6 +18,7 @@ import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class DynapiJsonObject {
@@ -103,8 +104,10 @@ public class DynapiJsonObject {
 	}
 
 	private JsonNode getDataValue(Data data) {
-		JsonNode node = mapper.convertValue(data.getSerializedValue(), JsonNode.class);
-		return node;
+		if (RdfView.isRdfNode(data)) {
+			return RdfView.getAsJsonNode(data);
+		} 
+		return mapper.convertValue(data.getSerializedValue(), JsonNode.class);
 	}	
 
 	private String jsonString() {
