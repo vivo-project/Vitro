@@ -28,11 +28,15 @@ public abstract class ServletContextIntegrationTest extends ServletContextTest {
     }
 
     protected String readMockFile(String path) throws IOException {
-        return readFile("src/test/resources/dynapi/mock/" + path);
+        return readFile(getTestFilePath(path));
     }
 
+	protected String getTestFilePath(String path) {
+		return "src/test/resources/dynapi/mock/" + path;
+	}
+
     protected InputStream readMockFileAsInputStream(String path) throws IOException {
-        return readFileAsInputStream("src/test/resources/dynapi/mock/" + path);
+        return readFileAsInputStream(getTestFilePath(path));
     }
 
     protected void mockParameterIntoMap(String name, String value) {
