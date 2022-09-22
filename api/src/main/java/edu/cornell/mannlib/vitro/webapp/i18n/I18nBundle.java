@@ -26,30 +26,20 @@ public class I18nBundle {
 	private static final String START_SEP = "\u25a4";
 	private static final String END_SEP = "\u25a5";
 	public static final String INT_SEP = "\u25a6";
-	private static final String MESSAGE_BUNDLE_NOT_FOUND = "Text bundle ''{0}'' not found.";
 	private static final String MESSAGE_KEY_NOT_FOUND = "Text bundle ''{0}'' has no text for ''{1}''";
 
-	public static I18nBundle emptyBundle(String bundleName,
-			I18nLogger i18nLogger) {
-		return new I18nBundle(bundleName, i18nLogger);
-	}
 
 	private final String bundleName;
 	private final ResourceBundle resources;
 	private final String notFoundMessage;
 	private final I18nLogger i18nLogger;
 
-	private I18nBundle(String bundleName, I18nLogger i18nLogger) {
-		this(bundleName, new EmptyResourceBundle(), MESSAGE_BUNDLE_NOT_FOUND,
-				i18nLogger);
-	}
-
 	public I18nBundle(String bundleName, ResourceBundle resources,
 			I18nLogger i18nLogger) {
 		this(bundleName, resources, MESSAGE_KEY_NOT_FOUND, i18nLogger);
 	}
 
-	private I18nBundle(String bundleName, ResourceBundle resources,
+	protected I18nBundle(String bundleName, ResourceBundle resources,
 			String notFoundMessage, I18nLogger i18nLogger) {
 		if (bundleName == null) {
 			throw new IllegalArgumentException("bundleName may not be null");

@@ -9,17 +9,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shared.Lock;
+
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 
 /**
  * Works like a PropertyResourceBundle with two exceptions:
@@ -48,6 +53,8 @@ import org.apache.commons.logging.LogFactory;
 public class VitroResourceBundle extends ResourceBundle {
 	private static final Log log = LogFactory.getLog(VitroResourceBundle.class);
 
+	private static final String BUNDLE_DIRECTORY = "i18n/";
+
 	private static final String FILE_FLAG = "@@file ";
 	private static final String MESSAGE_FILE_NOT_FOUND = "File {1} not found for property {0}.";
 
@@ -56,6 +63,30 @@ public class VitroResourceBundle extends ResourceBundle {
 	static {
 		addAppPrefix("vitro");
 	}
+
+	private static final String SPARQL_LANGUAGE_QUERY = " PREFIX : <http://vivoweb.org/ontology/core/properties#>\n" +
+														"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+														"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n" +
+														"SELECT ?key ?translation\n" +
+														"WHERE {\n" +
+														"  ?uri :key ?key .\n" +
+														"  ?uri rdfs:label ?translationWithLocale .\t\n" +
+														"  OPTIONAL { \n" +
+														"    ?uri :theme ?found_theme .\n" +
+														"  }\n" +
+														"  OPTIONAL { \n" +
+														"    ?uri :application ?found_application .\n" +
+														"  }\n" +
+														"  BIND(COALESCE(?found_theme, \"none\") as ?theme ) .\n" +
+														"  BIND(COALESCE(?found_application, \"none\") as ?application ) .\n" +
+														"  BIND(IF(?current_theme = ?theme, 100, 0) AS ?priority1 ) .\n" +
+														"  BIND(IF(\"local\" = ?application, xsd:integer(?priority1)+50, xsd:integer(?priority1)) AS ?priority2 ) .\n" +
+														"  BIND(IF(\"VIVO\" = ?application, xsd:integer(?priority2)+10, xsd:integer(?priority2)) AS ?priority3 ) .\n" +
+														"  BIND(IF(\"Vitro\" = ?application, xsd:integer(?priority3)+5, xsd:integer(?priority3)) AS ?priority4 ) .\n" +
+														"  BIND (STR(?translationWithLocale)  AS ?translation) .\n" +
+														"  FILTER ( lang(?translationWithLocale) = ?locale ) .\n" +
+														"} \n" +
+														"ORDER by ASC(?priority4) " ;
 
 	public static void addAppPrefix(String prefix) {
 		if (!prefix.endsWith("-") && !prefix.endsWith("_")) {
@@ -89,11 +120,10 @@ public class VitroResourceBundle extends ResourceBundle {
 	 * @return the populated bundle or null.
 	 */
 	public static VitroResourceBundle getBundle(String bundleName,
-			ServletContext ctx, String appI18nPath, String themeI18nPath,
-			Control control) {
+												ServletContext ctx, Locale locale, String themeDirectory,
+												Control control) {
 		try {
-			return new VitroResourceBundle(bundleName, ctx, appI18nPath,
-					themeI18nPath, control);
+			return new VitroResourceBundle(bundleName, ctx, locale, themeDirectory, control);
 		} catch (FileNotFoundException e) {
 			log.debug(e.getMessage());
 			return null;
@@ -113,12 +143,23 @@ public class VitroResourceBundle extends ResourceBundle {
 	private final String themeI18nPath;
 	private final Control control;
 	private final Properties properties;
+	private final String locale;
+	private final String theme;
 
 	private VitroResourceBundle(String bundleName, ServletContext ctx,
-			String appI18nPath, String themeI18nPath, Control control)
+			Locale locale, String themeDirectory, Control control)
 			throws IOException {
+
+		String themeI18nPath = "/" + themeDirectory + BUNDLE_DIRECTORY;
+		String appI18nPath = "/" + BUNDLE_DIRECTORY;
+
+		log.debug("Paths are '" + themeI18nPath + "' and '" + appI18nPath
+				+ "'");
 		this.bundleName = bundleName;
 		this.ctx = ctx;
+		//TODO ask Veljko do we have some issue with the line below regarding Serbian two scripts
+		this.locale = locale.toLanguageTag();
+		this.theme = ApplicationBean.ThemeInfo.themeNameFromDir(themeDirectory);
 		this.appI18nPath = appI18nPath;
 		this.themeI18nPath = themeI18nPath;
 		this.control = control;
@@ -127,8 +168,50 @@ public class VitroResourceBundle extends ResourceBundle {
 	}
 
 	private Properties loadProperties() throws IOException {
+		Properties translations = new Properties();
+		translations = loadTranslationsFromTriplestore(translations);
+		translations = loadTranslationsFromFiles(translations);
+		return translations;
+	}
+
+	private Properties loadTranslationsFromTriplestore(Properties props) throws IOException {
+		ParameterizedSparqlString pss = new ParameterizedSparqlString();
+		pss.setCommandText(SPARQL_LANGUAGE_QUERY);
+		pss.setLiteral("locale", locale);
+		pss.setLiteral("current_theme", theme);
+//		pss.setLiteral("current_application", "");
+		ContextModelAccess modelAccess = ModelAccess.on(ctx);
+		Model queryModel = modelAccess.getOntModel(DISPLAY);
+		if (queryModel != null){
+			queryModel.enterCriticalSection(Lock.READ);
+			try {
+				QueryExecution qexec = QueryExecutionFactory.create(pss.toString(), queryModel);
+				try {
+					ResultSet results = qexec.execSelect();
+
+					while (results.hasNext()) {
+						QuerySolution solution = results.nextSolution();
+						props.put(solution.get("key").toString(), solution.get("translation").toString());
+					}
+
+				} catch (Exception e) {
+					log.error(e.getLocalizedMessage());
+					e.printStackTrace();
+				} finally {
+					qexec.close();
+				}
+			} catch (Exception e) {
+				log.error(e.getLocalizedMessage());
+				e.printStackTrace();
+			} finally {
+				queryModel.leaveCriticalSection();
+			}
+		}
+		return props;
+	}
+
+	private Properties loadTranslationsFromFiles(Properties props) throws IOException {
 		String resourceName = control.toResourceName(bundleName, "properties");
-		Properties props = null;
 
 		File defaultsPath = locateFile(joinPath(appI18nPath, resourceName));
 		File propertiesPath = locateFile(joinPath(themeI18nPath, resourceName));

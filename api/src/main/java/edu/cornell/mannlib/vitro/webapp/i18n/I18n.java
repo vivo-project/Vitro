@@ -3,20 +3,13 @@
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,6 +48,8 @@ public class I18n {
 	private static I18n instance;
 
 	private final ServletContext ctx;
+
+
 
 	protected I18n(ServletContext ctx) {
 		this.ctx = ctx;
@@ -180,11 +175,11 @@ public class I18n {
 		} catch (MissingResourceException e) {
 			log.warn("Didn't find text bundle '" + bundleName + "'");
 
-			return I18nBundle.emptyBundle(bundleName, i18nLogger);
+			return NullI18nBundle.getInstance(bundleName, i18nLogger);
 		} catch (Exception e) {
 			log.error("Failed to create text bundle '" + bundleName + "'", e);
 
-			return I18nBundle.emptyBundle(bundleName, i18nLogger);
+			return NullI18nBundle.getInstance(bundleName, i18nLogger);
 		}
 	}
 
@@ -266,14 +261,16 @@ public class I18n {
 	 * the application i18n directory.
 	 */
 	static class ThemeBasedControl extends ResourceBundle.Control {
-		private static final String BUNDLE_DIRECTORY = "i18n/";
+
 		private final ServletContext ctx;
 		private final String themeDirectory;
+
 
 		public ThemeBasedControl(ServletContext ctx, String themeDirectory) {
 			this.ctx = ctx;
 			this.themeDirectory = themeDirectory;
 		}
+
 
 		/**
 		 * Don't look for classes to satisfy the request, just property files.
@@ -303,14 +300,7 @@ public class I18n {
 				throw new NullPointerException("bundleName may not be null.");
 			}
 
-			String themeI18nPath = "/" + themeDirectory + BUNDLE_DIRECTORY;
-			String appI18nPath = "/" + BUNDLE_DIRECTORY;
-
-			log.debug("Paths are '" + themeI18nPath + "' and '" + appI18nPath
-					+ "'");
-
-			return VitroResourceBundle.getBundle(bundleName, ctx, appI18nPath,
-					themeI18nPath, this);
+			return VitroResourceBundle.getBundle(bundleName, ctx, locale, themeDirectory, this);
 		}
 
 		/**
