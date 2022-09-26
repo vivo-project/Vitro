@@ -200,6 +200,80 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 		assertEquals(model.size(),1);
 		assertEquals(model.listStatements().next().getObject().toString(), "no tag label");
 	}
+	
+	@Test
+	public void sparqlConstructQueryTestPrivateFallback1() throws RDFServiceException {
+		preferredLanguages = list("fr-CA");
+		OntModel model;
+		createLanguageFilter("LangFilteringTestModelPrivateFallback.n3");
+		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
+		assertEquals(model.size(),1);
+		final String expected = "fr@fr";
+		assertEquals(expected, model.listStatements().next().getObject().toString());
+	}
+
+	@Test
+	public void sparqlConstructQueryTestPrivateFallback2() throws RDFServiceException {
+		preferredLanguages = list("fr");
+		OntModel model;
+		createLanguageFilter("LangFilteringTestModelPrivateFallback2.n3");
+		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
+		assertEquals(model.size(),1);
+		final String expected = "TIB FR ca@fr-CA-x-tib";
+		assertEquals(expected, model.listStatements().next().getObject().toString());
+	}
+
+	@Test
+	public void sparqlConstructQueryTestPrivateFallback3() throws RDFServiceException {
+		preferredLanguages = list("fr-CA-x-tib");
+		OntModel model;
+		createLanguageFilter("LangFilteringTestModelPrivateFallback3.n3");
+		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
+		assertEquals(model.size(),1);
+		final String expected = "fr@fr";
+		assertEquals(expected, model.listStatements().next().getObject().toString());
+	}
+	
+	@Test
+	public void sparqlConstructQueryTestPrivate() throws RDFServiceException {
+		preferredLanguages = list("fr-CA-x-tib");
+		OntModel model;
+		createLanguageFilter("LangFilteringTestModelPrivate.n3");
+		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
+		assertEquals(model.size(),1);
+		final String expected = "TIB FR ca@fr-CA-x-tib";
+		assertEquals(expected, model.listStatements().next().getObject().toString());
+	}
+	
+	@Test
+	public void sparqlConstructQueryTestFallback1() throws RDFServiceException {
+		preferredLanguages = list("fr-CA");
+		OntModel model;
+		createLanguageFilter("LangFilteringTestModelFallback.n3");
+		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
+		assertEquals(model.size(),1);
+		final String expected = "fr CH@fr-CH";
+		assertEquals(expected, model.listStatements().next().getObject().toString());
+	}
+	
+	@Test
+	public void sparqlConstructQueryTestFallback2() throws RDFServiceException {
+		preferredLanguages = list("fr");
+		OntModel model;
+		createLanguageFilter("LangFilteringTestModelFallback.n3");
+		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
+		assertEquals(model.size(),1);
+		final String expected = "fr CH@fr-CH";
+		assertEquals(expected, model.listStatements().next().getObject().toString());
+	}
+
+
 
 	// ----------------------------------------------------------------------
 	// Helper methods

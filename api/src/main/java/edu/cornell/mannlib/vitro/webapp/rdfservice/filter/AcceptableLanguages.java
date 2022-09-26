@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.filter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -12,6 +13,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AcceptableLanguages extends ArrayList<String>{
     
+    private static final String SEPARATOR = "-";
+    private static final String PRIVATE_USE_SUBTAG = "x";
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AcceptableLanguages.class);
     
@@ -25,9 +28,17 @@ public class AcceptableLanguages extends ArrayList<String>{
         log.debug("Raw language strings:" + rawLanguageStrs);
         for (String lang : rawLanguageStrs) {
             this.add(lang);
-            String baseLang = lang.split("-")[0];
-            if (!lang.equals(baseLang) && !this.contains(baseLang)) {
-                this.add(baseLang);
+            String[] subtags = lang.split(SEPARATOR);
+            int length = subtags.length;
+            for (int i = 1; i < length; i++) {
+                int lastIndex = length - i;
+                if (PRIVATE_USE_SUBTAG.equals(subtags[lastIndex - 1])) {
+                    continue;
+                }
+                String baseLang = String.join(SEPARATOR, Arrays.copyOfRange(subtags, 0, lastIndex));
+                if (!lang.equals(baseLang) && !this.contains(baseLang)) {
+                    this.add(baseLang);
+                }
             }
         }
         log.debug("Normalized language strings:" + this);
