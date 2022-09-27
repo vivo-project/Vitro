@@ -272,5 +272,10 @@
             <artifactId>javax.mail</artifactId>
             <version>1.6.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.haulmont.yarg</groupId>
+            <artifactId>yarg</artifactId>
+            <version>2.2.18</version>
+        </dependency>
     </dependencies>
 </project>
