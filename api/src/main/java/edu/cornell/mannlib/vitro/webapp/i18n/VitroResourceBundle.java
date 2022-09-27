@@ -16,15 +16,15 @@ import javax.servlet.ServletContext;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shared.Lock;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 
 /**
  * Works like a PropertyResourceBundle with two exceptions:
@@ -84,7 +84,6 @@ public class VitroResourceBundle extends ResourceBundle {
 														"  BIND(IF(?current_theme = lcase(str(?theme)), 100, 0) AS ?priority1 ) .\n" +
 														"  BIND(IF(?current_application = lcase(str(?application)), xsd:integer(?priority1)+10, xsd:integer(?priority1)) AS ?priority2 ) .\n" +
 														"  BIND (STR(?translationWithLocale) AS ?translation) .\n" +
-														"  FILTER ( lang(?translationWithLocale) = ?locale ) .\n" +
 														"} \n" +
 														"ORDER by ASC(?priority2) " ;
 
@@ -146,6 +145,7 @@ public class VitroResourceBundle extends ResourceBundle {
 	private final Properties properties;
 	private final String locale;
 	private final String theme;
+	private final OntModel displayModel;
 
 	private VitroResourceBundle(String bundleName, ServletContext ctx,
 			Locale locale, String themeDirectory, Control control)
@@ -158,8 +158,9 @@ public class VitroResourceBundle extends ResourceBundle {
 				+ "'");
 		this.bundleName = bundleName;
 		this.ctx = ctx;
-		//TODO ask Veljko do we have some issue with the line below regarding Serbian two scripts
 		this.locale = locale.toLanguageTag();
+		ContextModelAccess modelAccess = ModelAccess.on(ctx);
+		this.displayModel = modelAccess.getOntModel(DISPLAY);
 		this.theme = ApplicationBean.ThemeInfo.themeNameFromDir(themeDirectory);
 		this.appI18nPath = appI18nPath;
 		this.themeI18nPath = themeI18nPath;
@@ -178,13 +179,10 @@ public class VitroResourceBundle extends ResourceBundle {
 	private Properties loadTranslationsFromTriplestore(Properties props) throws IOException {
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
 		pss.setCommandText(SPARQL_LANGUAGE_QUERY);
-		pss.setLiteral("locale", locale);
 		pss.setLiteral("current_theme", theme);
 		pss.setLiteral("current_application", applicationName);
-		ContextModelAccess modelAccess = ModelAccess.on(ctx);
-		Model queryModel = modelAccess.getOntModel(DISPLAY);
-		if (queryModel != null){
-			queryModel.enterCriticalSection(Lock.READ);
+		if (displayModel != null){
+			Model queryModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(displayModel, locale);
 			try {
 				QueryExecution qexec = QueryExecutionFactory.create(pss.toString(), queryModel);
 				try {
@@ -204,8 +202,6 @@ public class VitroResourceBundle extends ResourceBundle {
 			} catch (Exception e) {
 				log.error(e.getLocalizedMessage());
 				e.printStackTrace();
-			} finally {
-				queryModel.leaveCriticalSection();
 			}
 		}
 		return props;

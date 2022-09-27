@@ -381,9 +381,14 @@ public class I18n {
 		public int compare(Locale o1, Locale o2) {
 			int c = o1.getLanguage().compareTo(o2.getLanguage());
 			if (c == 0) {
-				c = o1.getCountry().compareTo(o2.getCountry());
+				c = o1.getScript().compareTo(o2.getScript());
 				if (c == 0) {
-					c = o1.getVariant().compareTo(o2.getVariant());
+					c = o1.getCountry().compareTo(o2.getCountry());
+					if (c == 0) {
+						c = o1.getVariant().compareTo(o2.getVariant());
+					} if (c == 0) {
+						c = (o1.getExtensionKeys().size() >= o2.getExtensionKeys().size())?1:-1;
+					}
 				}
 			}
 			return c;
