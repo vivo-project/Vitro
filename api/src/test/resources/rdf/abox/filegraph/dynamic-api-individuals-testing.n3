@@ -64,13 +64,13 @@
         rdfs:label                          "Result parameter 1 for query 1"@en-US ;
         dynapi:name                         "result" ;
         dynapi:description                  "Test action result" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonObjectArrayOfPairs> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArray> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultArray>
         a                                   dynapi:Parameter ;
         rdfs:label                          "Test result array structure"@en-US ;
         dynapi:name                         "result" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonObjectArrayOfPairs> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArray> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction>
         a                                   dynapi:Parameter ;
