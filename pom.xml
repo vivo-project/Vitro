@@ -483,6 +483,14 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>repo-cuba-platform-work</id>
+            <name>repo</name>
+            <url>https://repo.cuba-platform.com/content/groups/work</url>
+        </repository>
     </repositories>
 
 </project>
