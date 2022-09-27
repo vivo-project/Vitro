@@ -75,7 +75,7 @@ public class Parameter implements Removable {
 		return false;
 	}
 
-	public boolean isJsonObject() {
-		return type.isJsonObject();
+	public boolean isJsonContainer() {
+		return type.isJsonContainer();
 	}
 }
