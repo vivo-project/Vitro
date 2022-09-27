@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
-public class DynapiJsonObject {
+public class JsonContainer {
 	
 	public static final String PATH_ROOT = "$";
 	private static final String EMPTY_OBJECT = "{}";
@@ -34,11 +34,11 @@ public class DynapiJsonObject {
 
 	private DocumentContext ctx;
 
-	public DynapiJsonObject(String jsonString) {
+	public JsonContainer(String jsonString) {
 		ctx = JsonPath.using(jsonPathConfig).parse(jsonString);
 	}
 	
-	public DynapiJsonObject(Type type) {
+	public JsonContainer(Type type) {
 		if (type.equals(Type.EmptyArray)) {
 			ctx = JsonPath.using(jsonPathConfig).parse(EMPTY_ARRAY);
 		} else {
@@ -54,7 +54,7 @@ public class DynapiJsonObject {
 		return UUID.randomUUID().toString();
 	}
 	
-	public static String serialize(DynapiJsonObject object){
+	public static String serialize(JsonContainer object){
 		return object.jsonString();
 	}
 	
@@ -114,8 +114,8 @@ public class DynapiJsonObject {
 		return ctx.jsonString();
 	}
 	
-	public static DynapiJsonObject deserialize(String input) throws ConversionException{
-		DynapiJsonObject object = new DynapiJsonObject(input);
+	public static JsonContainer deserialize(String input) throws ConversionException{
+		JsonContainer object = new JsonContainer(input);
 		return object;
 	}
 	
@@ -129,7 +129,7 @@ public class DynapiJsonObject {
 			.build();
 	}
 
-	public void addRow(String jsonPath, DynapiJsonObject row) {
+	public void addRow(String jsonPath, JsonContainer row) {
 		dataMap.putAll(row.dataMap);
 		ctx.add(jsonPath, row.ctx.json());
 	}
