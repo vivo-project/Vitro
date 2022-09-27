@@ -60,6 +60,8 @@ public class VitroResourceBundle extends ResourceBundle {
 
 	private static final List<String> appPrefixes = new ArrayList<>();
 
+	private static String applicationName = null;
+
 	static {
 		addAppPrefix("vitro");
 	}
@@ -79,14 +81,12 @@ public class VitroResourceBundle extends ResourceBundle {
 														"  }\n" +
 														"  BIND(COALESCE(?found_theme, \"none\") as ?theme ) .\n" +
 														"  BIND(COALESCE(?found_application, \"none\") as ?application ) .\n" +
-														"  BIND(IF(?current_theme = ?theme, 100, 0) AS ?priority1 ) .\n" +
-														"  BIND(IF(\"local\" = ?application, xsd:integer(?priority1)+50, xsd:integer(?priority1)) AS ?priority2 ) .\n" +
-														"  BIND(IF(\"VIVO\" = ?application, xsd:integer(?priority2)+10, xsd:integer(?priority2)) AS ?priority3 ) .\n" +
-														"  BIND(IF(\"Vitro\" = ?application, xsd:integer(?priority3)+5, xsd:integer(?priority3)) AS ?priority4 ) .\n" +
-														"  BIND (STR(?translationWithLocale)  AS ?translation) .\n" +
+														"  BIND(IF(?current_theme = lcase(str(?theme)), 100, 0) AS ?priority1 ) .\n" +
+														"  BIND(IF(?current_application = lcase(str(?application)), xsd:integer(?priority1)+10, xsd:integer(?priority1)) AS ?priority2 ) .\n" +
+														"  BIND (STR(?translationWithLocale) AS ?translation) .\n" +
 														"  FILTER ( lang(?translationWithLocale) = ?locale ) .\n" +
 														"} \n" +
-														"ORDER by ASC(?priority4) " ;
+														"ORDER by ASC(?priority2) " ;
 
 	public static void addAppPrefix(String prefix) {
 		if (!prefix.endsWith("-") && !prefix.endsWith("_")) {
@@ -95,6 +95,7 @@ public class VitroResourceBundle extends ResourceBundle {
 
 		if (!appPrefixes.contains(prefix)) {
 			appPrefixes.add(prefix);
+			applicationName = prefix.substring(0, prefix.length()-1);
 		}
 	}
 
@@ -179,7 +180,7 @@ public class VitroResourceBundle extends ResourceBundle {
 		pss.setCommandText(SPARQL_LANGUAGE_QUERY);
 		pss.setLiteral("locale", locale);
 		pss.setLiteral("current_theme", theme);
-//		pss.setLiteral("current_application", "");
+		pss.setLiteral("current_application", applicationName);
 		ContextModelAccess modelAccess = ModelAccess.on(ctx);
 		Model queryModel = modelAccess.getOntModel(DISPLAY);
 		if (queryModel != null){
