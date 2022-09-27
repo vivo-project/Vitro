@@ -4,7 +4,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiJsonObject;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ParameterType implements Removable {
@@ -94,9 +94,9 @@ public class ParameterType implements Removable {
 		return isInternal;
 	}
 
-	public boolean isJsonObject() {
+	public boolean isJsonContainer() {
 		final String canonicalName = getImplementationType().getClassName().getCanonicalName();
-		if (DynapiJsonObject.class.getCanonicalName().equals(canonicalName)){
+		if (JsonContainer.class.getCanonicalName().equals(canonicalName)){
 			return true;
 		}
 		return false;

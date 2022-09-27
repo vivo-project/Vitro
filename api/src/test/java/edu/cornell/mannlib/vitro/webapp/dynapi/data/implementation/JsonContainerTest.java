@@ -12,25 +12,25 @@ import org.junit.runners.Parameterized;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 @RunWith(Parameterized.class)
-public class DynapiJsonObjectTest {
+public class JsonContainerTest {
 
 	@org.junit.runners.Parameterized.Parameter(0)
 	public String jsonString;
 
-	public DynapiJsonObject createJsonObject()  {
-		DynapiJsonObject object = null;
+	public JsonContainer createJsonContainder()  {
+		JsonContainer container = null;
 		try {
-			object = DynapiJsonObject.deserialize(jsonString);
-			 assertTrue(object != null);
+			container = JsonContainer.deserialize(jsonString);
+			 assertTrue(container != null);
 		} catch (ConversionException e) {
 			e.printStackTrace();
 		}
-		 return object;
+		 return container;
 	}
 
 	@Test
 	public void testPutData() {
-		DynapiJsonObject object = createJsonObject();
+		JsonContainer object = createJsonContainder();
 	}
 	
 
