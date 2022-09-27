@@ -12,21 +12,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiJsonObject;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiJsonObject.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.LiteralParamFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIResourceParam;
 
-public class JsonObjectView {
+public class JsonContainerView {
 
-	private static final String JSON_ARRAY = "jsonArray";
+	private static final String JSON_ARRAY = "json array";
 
-	public static Map<String, DynapiJsonObject> getJsonArrays(Parameters params, DataStore dataStore) {
-		Map<String, DynapiJsonObject> jsonArrays = new HashMap<>();
+	public static Map<String, JsonContainer> getJsonArrays(Parameters params, DataStore dataStore) {
+		Map<String, JsonContainer> jsonArrays = new HashMap<>();
 		for (String name : params.getNames()) {
 			Parameter param = params.get(name);
-			if (param.isJsonObject() && JSON_ARRAY.equals(param.getType().getName())) {
-				DynapiJsonObject arrayNode = (DynapiJsonObject) dataStore.getData(name).getObject();
+			if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
+				JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
 				jsonArrays.put(name, arrayNode);
 			}
 		}
@@ -36,7 +36,7 @@ public class JsonObjectView {
 	public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {
 		for (String name : params.getNames()) {
 			Parameter param = params.get(name);
-			if (param.isJsonObject() && JSON_ARRAY.equals(param.getType().getName())) {
+			if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
 				return true;
 			}
 		}
@@ -44,7 +44,7 @@ public class JsonObjectView {
 	}
 
 	public static JsonNode asJsonNode(Data data) {
-		final DynapiJsonObject object = (DynapiJsonObject) data.getObject();
+		final JsonContainer object = (JsonContainer) data.getObject();
 		return object.asJsonNode();
 	}
 
@@ -52,15 +52,15 @@ public class JsonObjectView {
 		if (!hasJsonArrays(outputParams, dataStore)) {
 			return;
 		}
-		DynapiJsonObject row = getRowMap(vars, solution);
-		Map<String, DynapiJsonObject> jsonArrays = getJsonArrays(outputParams, dataStore);
-		for ( DynapiJsonObject array  : jsonArrays.values()) {
-			array.addRow(DynapiJsonObject.PATH_ROOT, row);
+		JsonContainer row = getRowMap(vars, solution);
+		Map<String, JsonContainer> jsonArrays = getJsonArrays(outputParams, dataStore);
+		for ( JsonContainer array  : jsonArrays.values()) {
+			array.addRow(JsonContainer.PATH_ROOT, row);
 		}
 	}
 
-	private static DynapiJsonObject getRowMap(List<String> vars, QuerySolution solution) {
-		DynapiJsonObject row = new DynapiJsonObject(Type.EmptyObject);
+	private static JsonContainer getRowMap(List<String> vars, QuerySolution solution) {
+		JsonContainer row = new JsonContainer(Type.EmptyObject);
 
 		for (String var : vars) {
 			RDFNode node = solution.get(var);

@@ -9,7 +9,7 @@ public class DataInitializer {
 		
 		if (param.isArray()) {
 			initializeArray(param, data);
-		} else if (param.isJsonObject()){
+		} else if (param.isJsonContainer()){
 			initializeJsonObject(param, data);
 		} else {
 			initializeData(param, data);
