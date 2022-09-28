@@ -12,8 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class ModelView {
 
-	private static final String ORG_APACHE_JENA_RDF_MODEL_MODEL = "org.apache.jena.rdf.model.Model";
-	private static final String MODEL_CANONICAL_NAME = "org.apache.jena.rdf.model.Model";
+	private static final String MODEL_CANONICAL_NAME = Model.class.getCanonicalName();
 
 	public static Model getModel(DataStore dataStore, Parameter param) {
 		String name = param.getName();
@@ -45,7 +44,7 @@ public class ModelView {
 			}
 			Data data = input.getData(name);
 			String className = data.getParam().getType().getImplementationType().getClassName().getCanonicalName();
-			if (className.equals(ORG_APACHE_JENA_RDF_MODEL_MODEL)) {
+			if (className.equals(MODEL_CANONICAL_NAME)) {
 				return true;
 			}
 		return false;

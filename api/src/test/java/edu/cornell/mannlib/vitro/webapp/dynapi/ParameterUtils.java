@@ -8,9 +8,12 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ModelWriterTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.N3TemplateTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -60,13 +63,13 @@ public class ParameterUtils {
 	    
 	    ImplementationConfig config = new ImplementationConfig();
 		
-		config.setClassName("java.lang.String");
+		config.setClassName(String.class.getCanonicalName());
 		config.setMethodArguments("");
 		config.setMethodName("toString");
 		config.setStaticMethod(false);
 		uri1ImplType.setDeserializationConfig(config);
 		uri1ImplType.setSerializationConfig(config);
-		uri1ImplType.setClassName("java.lang.String");
+		uri1ImplType.setClassName(String.class.getCanonicalName());
 	
 		RDFType rdfType = new RDFType();
 		rdfType.setName("anyURI");
@@ -86,13 +89,13 @@ public class ParameterUtils {
 	    
 	    ImplementationConfig config = new ImplementationConfig();
 		
-		config.setClassName("java.lang.String");
+		config.setClassName(String.class.getCanonicalName());
 		config.setMethodArguments("");
 		config.setMethodName("toString");
 		config.setStaticMethod(false);
 		impltype.setDeserializationConfig(config);
 		impltype.setSerializationConfig(config);
-		impltype.setClassName("java.lang.String");
+		impltype.setClassName(String.class.getCanonicalName());
 		
 		RDFType rdfType = new RDFType();
 		rdfType.setName("string");
@@ -113,13 +116,13 @@ public class ParameterUtils {
 	    
 	    ImplementationConfig config = new ImplementationConfig();
 		
-		config.setClassName("java.lang.String");
+		config.setClassName(String.class.getCanonicalName());
 		config.setMethodArguments("");
 		config.setMethodName("toString");
 		config.setStaticMethod(false);
 		uri1ImplType.setDeserializationConfig(config);
 		uri1ImplType.setSerializationConfig(config);
-		uri1ImplType.setClassName("java.lang.String");
+		uri1ImplType.setClassName(String.class.getCanonicalName());
 	
 		RDFType rdfType = new RDFType();
 		rdfType.setName("boolean");
@@ -131,5 +134,39 @@ public class ParameterUtils {
 	    uri1Param.setName(name);
 		return uri1Param;
 	}
+
+    public static Parameter createJsonParameter(String allVar) throws Exception{
+        Parameter jsonParam = new Parameter();
+        ParameterType jsonParamType = new ParameterType();
+        ImplementationType jsonImplType = new ImplementationType();
+        
+        jsonImplType.setDeserializationConfig(getJsonDeserializationConfig());
+        jsonImplType.setSerializationConfig(getJsonSerializationConfig());
+        jsonImplType.setClassName(JsonNode.class.getCanonicalName());
+        jsonImplType.setDefaultValue("{ }");
+        jsonParamType.setImplementationType(jsonImplType );
+        jsonParam.setType(jsonParamType);
+        jsonParamType.setSerializationType(N3TemplateTest.stringType);
+        jsonParam.setName(allVar);
+        return jsonParam;
+    }
+
+    private static ImplementationConfig getJsonDeserializationConfig() throws ClassNotFoundException {
+        ImplementationConfig config = new ImplementationConfig();
+        config.setClassName(JsonFasterxmlNode.class.getCanonicalName());
+        config.setMethodArguments("input");
+        config.setMethodName("deserialize");
+        config.setStaticMethod(true);
+        return config;
+    }
+    
+    private static ImplementationConfig getJsonSerializationConfig() throws ClassNotFoundException {
+        ImplementationConfig config = new ImplementationConfig();
+        config.setClassName(JsonFasterxmlNode.class.getCanonicalName());
+        config.setMethodArguments("input");
+        config.setMethodName("serialize");
+        config.setStaticMethod(true);
+        return config;
+    }
 
 }
