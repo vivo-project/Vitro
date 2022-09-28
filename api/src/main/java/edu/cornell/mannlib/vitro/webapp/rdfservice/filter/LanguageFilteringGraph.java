@@ -21,17 +21,32 @@ public class LanguageFilteringGraph extends AbstractGraphDecorator
 
     private List<String> langs;
     private LanguageFilterModel filterModel = new LanguageFilterModel();
+    private boolean includeInexact = true;
     
     /**
      * Return a graph wrapped in a decorator that will filter find() results
-     * according to the supplied list of acceptable languages  
+     * according to the supplied list of acceptable languages, including inexact responses,
+     * meaning fr_FR is acceptable if fr_CA is requested
      * @param g the graph to wrap with language awareness. May not be null.
      * @param preferredLanguages a list of preferred language strings. May not 
      * be null.
      */
     protected LanguageFilteringGraph(Graph g, List<String> preferredLanguages) {
+        this(g, preferredLanguages, true);
+    }
+
+    /**
+     * Return a graph wrapped in a decorator that will filter find() results
+     * according to the supplied list of acceptable languages
+     * @param g the graph to wrap with language awareness. May not be null.
+     * @param preferredLanguages a list of preferred language strings. May not
+     * be null.
+     * @param includeInexact if this parameter is true, fr_FR is acceptable if fr_CA is requested
+     */
+    protected LanguageFilteringGraph(Graph g, List<String> preferredLanguages, Boolean includeInexact) {
         super(g);
         this.langs = preferredLanguages;
+        this.includeInexact = includeInexact;
     }
 
     @Override
@@ -52,7 +67,7 @@ public class LanguageFilteringGraph extends AbstractGraphDecorator
             tmp.add(t);
         }
         Model filteredModel = filterModel.filterModel(
-                ModelFactory.createModelForGraph(tmp), langs);
+                ModelFactory.createModelForGraph(tmp), langs, includeInexact);
         return filteredModel.getGraph().find();
     }
 

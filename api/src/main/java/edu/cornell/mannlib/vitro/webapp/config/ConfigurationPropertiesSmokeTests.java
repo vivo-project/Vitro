@@ -10,12 +10,15 @@ import java.util.Arrays;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.utils.LocaleUtility;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -157,8 +160,9 @@ public class ConfigurationPropertiesSmokeTests implements
 		if (selectableLanguages) {
 			List<String> selectableLanguagesList = Arrays.asList(selectString.split("\\s*,\\s*"));
 			for (String language : selectableLanguagesList) {
-				String vivoBundle = VIVO_BUNDLE_PREFIX + language + ".properties";
-				String vitroBundle = VITRO_BUNDLE_PREFIX + language + ".properties";
+				Locale locale = LocaleUtility.languageStringToLocale(language);
+				String vivoBundle = VIVO_BUNDLE_PREFIX + locale.stripExtensions().toString() + ".properties";
+				String vitroBundle = VITRO_BUNDLE_PREFIX + locale.stripExtensions().toString() + ".properties";
 				if (!i18nNames.contains(vivoBundle) && !i18nNames.contains(vitroBundle)) {
 					ss.warning(this, language + " was found in the value for "
 						+ PROPERTY_LANGUAGE_SELECTABLE + " but no corresponding "

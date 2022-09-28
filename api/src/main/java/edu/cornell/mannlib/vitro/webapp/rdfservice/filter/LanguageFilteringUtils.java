@@ -109,7 +109,7 @@ public class LanguageFilteringUtils {
 	}
 
 	/**
-	 * Add a Language Filtering layer to an OntModel for a certain locale
+	 * Add a Language Filtering layer to an OntModel for a certain locale (not include inexact)
 	 */
 	public static OntModel wrapOntModelInALanguageFilter(OntModel rawModel,
 			String locale) {
@@ -118,7 +118,7 @@ public class LanguageFilteringUtils {
 			locales.add(locale);
 		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
 				ModelFactory.createModelForGraph(new LanguageFilteringGraph(
-						rawModel.getGraph(), new AcceptableLanguages(locales))));
+						rawModel.getGraph(), locales, false)));
 	}
 
 	private LanguageFilteringUtils() {

@@ -18,14 +18,26 @@ import org.apache.jena.rdf.model.StmtIterator;
 public class LanguageFilterModel {
 
     private static final Log log = LogFactory.getLog(LanguageFilterModel.class);
-    
+
+    /**
+     *
+     * @param m the model to filter. May not be null.
+     * @param langs list of strings of type 'en-US'. May not be null.
+     * @return model with language-inappropriate literal statements filtered out. fr_FR is acceptable if fr_CA is requested
+     */
+    public Model filterModel(Model m, List<String> langs) {
+        return filterModel(m, langs, true);
+    }
+
+
     /**
      * 
      * @param m the model to filter. May not be null.
      * @param langs list of strings of type 'en-US'. May not be null.
+     * @param includeInexact if this parameter is true, fr_FR is acceptable if fr_CA is requested
      * @return model with language-inappropriate literal statements filtered out.
      */
-    public Model filterModel(Model m, List<String> langs) {
+    public Model filterModel(Model m, List<String> langs, boolean includeInexact) {
         log.debug("filterModel");
         List<Statement> retractions = new ArrayList<Statement>();
         StmtIterator stmtIt = m.listStatements();
@@ -52,6 +64,10 @@ public class LanguageFilterModel {
                     String lang = s.getObject().asLiteral().getLanguage();
                     if (langRegister == null) {
                         langRegister = lang;
+                        if (!includeInexact) {
+                            if (!langs.contains(langRegister))
+                                retractions.add(s);
+                        }
                     } else if (!langRegister.equals(lang)) {
                         chuckRemaining = true;
                         retractions.add(s);
