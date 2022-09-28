@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.ArraySerializationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.JsonObjectSerializationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.JsonContainerSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
@@ -644,7 +644,7 @@ public class DynamicAPIDocumentation {
 
                 objectSchema.addProperties(parameterName, primitiveParameter);
 
-            } else if (serializationType instanceof JsonObjectSerializationType) {
+            } else if (serializationType instanceof JsonContainerSerializationType) {
 
                 ObjectSchema objectParameter = new ObjectSchema();
 
@@ -652,7 +652,7 @@ public class DynamicAPIDocumentation {
 
                 objectSchema.addProperties(parameterName, objectParameter);
 
-                buildObjectSchema(objectParameter, ((JsonObjectSerializationType) serializationType).getInternalElements());
+                buildObjectSchema(objectParameter, ((JsonContainerSerializationType) serializationType).getInternalElements());
 
             } else if (serializationType instanceof ArraySerializationType) {
 
@@ -676,14 +676,14 @@ public class DynamicAPIDocumentation {
 
         if (arrayParameterType instanceof PrimitiveSerializationType) {
             primitiveParameter = toPrimativeSchema(arrayParameterType);
-        } else if (arrayParameterType instanceof JsonObjectSerializationType) {
+        } else if (arrayParameterType instanceof JsonContainerSerializationType) {
 
             primitiveParameter = new ObjectSchema();
 
             primitiveParameter.setDescription(parameter.getDescription());
 
             buildObjectSchema((ObjectSchema) primitiveParameter,
-                    ((JsonObjectSerializationType) arrayParameterType).getInternalElements());
+                    ((JsonContainerSerializationType) arrayParameterType).getInternalElements());
 
         } else if (parameterType instanceof ArraySerializationType) {
 

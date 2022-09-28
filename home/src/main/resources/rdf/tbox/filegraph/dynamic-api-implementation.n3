@@ -41,7 +41,7 @@ dynapi:PrimitiveSerializationType rdfs:subClassOf dynapi_java:serialization.Prim
 
 dynapi:ArraySerializationType rdfs:subClassOf dynapi_java:serialization.ArraySerializationType, dynapi_java:serialization.SerializationType .
 
-dynapi:JsonObjectSerializationType rdfs:subClassOf dynapi_java:serialization.JsonObjectSerializationType, dynapi_java:serialization.SerializationType .
+dynapi:JsonContainerSerializationType rdfs:subClassOf dynapi_java:serialization.JsonContainerSerializationType, dynapi_java:serialization.SerializationType .
 
 dynapi:ResourceAPI rdfs:subClassOf dynapi_java:ResourceAPI .
 

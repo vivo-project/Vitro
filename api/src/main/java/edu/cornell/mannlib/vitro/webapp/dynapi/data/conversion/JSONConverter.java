@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class JSONConverter {
@@ -104,7 +105,9 @@ public class JSONConverter {
 			//the serialised by RawData and the put to the context here. 
 			if (data.getParam().isJsonContainer()) {
 				ctx.put(path, name, JsonContainerView.asJsonNode(data));
-			} else {
+			} else if (JsonView.isJsonNode(data.getParam())) {
+                ctx.put(path, name, JsonView.getJsonNode(data));
+            } else {
 				ctx.put(path, name, data.getSerializedValue());		
 			}
 		}

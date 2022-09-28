@@ -75,7 +75,7 @@
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasInternalElement
 :hasInternalElement rdf:type owl:ObjectProperty ;
-                    rdfs:domain :JsonObjectSerializationType ;
+                    rdfs:domain :JsonContainerSerializationType ;
                     rdfs:range :Parameter ;
                     rdfs:label "has internal element"@en-US .
 
@@ -627,8 +627,8 @@
                        rdfs:label "Numeric Range Validator"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#JsonObjectSerializationType
-:JsonObjectSerializationType rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#JsonContainerSerializationType
+:JsonContainerSerializationType rdf:type owl:Class ;
                      rdfs:subClassOf :SerializationType ;
                      rdfs:label "Object parameter type"@en-US .
 
