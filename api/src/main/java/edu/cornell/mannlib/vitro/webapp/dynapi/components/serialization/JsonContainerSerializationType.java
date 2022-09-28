@@ -4,7 +4,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class JsonObjectSerializationType extends SerializationType {
+public class JsonContainerSerializationType extends SerializationType {
 
     private Parameters internalElements = new Parameters();
 
