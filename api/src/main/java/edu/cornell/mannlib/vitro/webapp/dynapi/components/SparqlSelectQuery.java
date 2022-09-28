@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -9,12 +8,12 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DefaultDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
@@ -44,9 +43,7 @@ public class SparqlSelectQuery extends SparqlQuery {
 			QueryExecution qexec = QueryExecutionFactory.create(preparedQueryString, queryModel);
 			try {
 				ResultSet results = qexec.execSelect();
-				//ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				//ResultSetFormatter.outputAsJSON(baos, results);
-				//String json = new String(baos.toByteArray());
+                JsonView.addSparqlSelectResult(dataStore, outputParams, results);
 				int i = 1;
 				List<String> vars = results.getResultVars();
 				log.debug("Query vars: " + String.join(", ", vars));
