@@ -9,4 +9,9 @@ public class JsonView {
         return false;
     }
 
+    public static String getJsonString(DataStore dataStore, Parameter dataSourceParam) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
