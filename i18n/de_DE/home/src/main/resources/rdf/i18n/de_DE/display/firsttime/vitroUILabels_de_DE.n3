@@ -7,13 +7,6 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-:research_capitalized.VIVO
-:key "research_capitalized";
-a :PropertyKey ;
-  a owl:NamedIndividual ;
-  rdfs:label "Forschung"@de-DE ;
-  :application "vivo" .
-
 :research_capitalized.Vitro
 :key "research_capitalized";
 a :PropertyKey ;
@@ -21,11 +14,4 @@ a :PropertyKey ;
   rdfs:label "Forschung"@de-DE ;
   :application "vitro" .
 
-:research_capitalized.wilma
- :key "research_capitalized";
- a :PropertyKey ;
-   a owl:NamedIndividual ;
-   rdfs:label "Forschung"@de-DE ;
-   :application "vivo" ;
-   :theme "wilma" .
 

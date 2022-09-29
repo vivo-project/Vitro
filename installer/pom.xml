@@ -106,6 +106,7 @@
     <modules>
         <module>home</module>
         <module>webapp</module>
+        <module>../i18n</module>
     </modules>
 
     <dependencyManagement>

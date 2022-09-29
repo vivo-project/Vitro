@@ -3,18 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.vivoweb</groupId>
-    <artifactId>vivo-languages-home-de_DE</artifactId>
+    <artifactId>vitro-languages-home-de_DE</artifactId>
     <version>1.13.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
-        <artifactId>vivo-languages_de_DE</artifactId>
+        <artifactId>vitro-languages-de_DE</artifactId>
         <version>1.13.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
-    <name>VIVO Languages for Home de_DE</name>
+    <name>Vitro Languages for Home de_DE</name>
 
     <build>
         <plugins>

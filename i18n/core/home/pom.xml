@@ -23,6 +23,48 @@
             <version>${project.version}</version>
             <type>tar.gz</type>
         </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-home-de_DE</artifactId>
+            <version>${project.version}</version>
+            <type>tar.gz</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-home-es</artifactId>
+            <version>${project.version}</version>
+            <type>tar.gz</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-home-fr_CA</artifactId>
+            <version>${project.version}</version>
+            <type>tar.gz</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-home-pt_BR</artifactId>
+            <version>${project.version}</version>
+            <type>tar.gz</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-home-en_CA</artifactId>
+            <version>${project.version}</version>
+            <type>tar.gz</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-home-sr_Latn_RS</artifactId>
+            <version>${project.version}</version>
+            <type>tar.gz</type>
+        </dependency>
+        <dependency>
+            <groupId>org.vivoweb</groupId>
+            <artifactId>vitro-languages-home-ru_RU</artifactId>
+            <version>${project.version}</version>
+            <type>tar.gz</type>
+        </dependency>
     </dependencies>
 
     <build>
