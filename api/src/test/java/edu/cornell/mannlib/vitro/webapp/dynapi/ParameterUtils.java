@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ModelWriterTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.N3TemplateTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
@@ -166,6 +167,40 @@ public class ParameterUtils {
         config.setMethodArguments("input");
         config.setMethodName("serialize");
         config.setStaticMethod(true);
+        return config;
+    }
+
+    public static Parameter createByteArrayParameter(String name) throws Exception{
+        Parameter param = new Parameter();
+        ParameterType paramType = new ParameterType();
+        ImplementationType implType = new ImplementationType();
+        
+        implType.setDeserializationConfig(getByteArrayDeserializationConfig());
+        implType.setSerializationConfig(getByteArraySerializationConfig());
+        implType.setClassName(ByteArray.class.getCanonicalName());
+        implType.setDefaultValue("");
+        paramType.setImplementationType(implType );
+        param.setType(paramType);
+        paramType.setSerializationType(N3TemplateTest.stringType);
+        param.setName(name);
+        return param;
+    }
+
+    private static ImplementationConfig getByteArrayDeserializationConfig() throws ClassNotFoundException {
+        ImplementationConfig config = new ImplementationConfig();
+        config.setClassName(ByteArray.class.getCanonicalName());
+        config.setMethodArguments("input");
+        config.setMethodName("deserialize");
+        config.setStaticMethod(true);
+        return config;
+    }
+    
+    private static ImplementationConfig getByteArraySerializationConfig() throws ClassNotFoundException {
+        ImplementationConfig config = new ImplementationConfig();
+        config.setClassName(ByteArray.class.getCanonicalName());
+        config.setMethodArguments("");
+        config.setMethodName("serialize");
+        config.setStaticMethod(false);
         return config;
     }
 
