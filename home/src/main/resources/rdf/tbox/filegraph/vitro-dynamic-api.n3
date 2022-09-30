@@ -262,6 +262,27 @@
                    rdfs:range :Model ;
                    rdfs:label "retraction model parameter"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#temlateFile
+:temlateFile rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ReportGenerator ;
+                   rdfs:range :Parameter ;
+                   rdfs:label "template file parameter"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#resultFile
+:resultFile rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ReportGenerator ;
+                   rdfs:range :Parameter ;
+                   rdfs:label "resultFile file parameter"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#dataSource
+:dataSource rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain :ReportGenerator ;
+                   rdfs:range :Parameter ;
+                   rdfs:label "dataSource parameter"@en-US 
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#targetModel
 :targetModel rdf:type owl:ObjectProperty ;
                    rdfs:subPropertyOf owl:topObjectProperty ;
@@ -614,6 +635,13 @@
 :N3Template rdf:type owl:Class ;
             rdfs:subClassOf :Template ;
             rdfs:label "N3 template"@en-US .
+
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ReportGenerator
+:ReportGenerator rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ; 
+            rdfs:label "Report generator"@en-US .
+
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ModelWriter
 :ModelWriter rdf:type owl:Class ;
