@@ -55,7 +55,7 @@ public class ReportGenerator extends Operation {
     private Parameter templateParam;
     private Parameter reportParam;
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#temlateFile", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#template", minOccurs = 1, maxOccurs = 1)
     public void addTemplate(Parameter templateParam) throws InitializationException {
         if (!BinaryView.isByteArray(templateParam)) {
             throw new InitializationException("Only file parameters accepted on setTemplateFile");
@@ -73,7 +73,7 @@ public class ReportGenerator extends Operation {
         dataSources.add(dataSource);
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#resultFile", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#report", minOccurs = 1, maxOccurs = 1)
     public void addReport(Parameter reportParam) throws InitializationException {
         if (!BinaryView.isByteArray(reportParam)) {
             throw new InitializationException("Only file parameters accepted on addReportFile");

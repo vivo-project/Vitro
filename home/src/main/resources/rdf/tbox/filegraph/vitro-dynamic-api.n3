@@ -262,15 +262,15 @@
                    rdfs:range :Model ;
                    rdfs:label "retraction model parameter"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#temlateFile
-:temlateFile rdf:type owl:ObjectProperty ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#temlate
+:temlate rdf:type owl:ObjectProperty ;
                    rdfs:subPropertyOf owl:topObjectProperty ;
                    rdfs:domain :ReportGenerator ;
                    rdfs:range :Parameter ;
                    rdfs:label "template file parameter"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#resultFile
-:resultFile rdf:type owl:ObjectProperty ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#report
+:report rdf:type owl:ObjectProperty ;
                    rdfs:subPropertyOf owl:topObjectProperty ;
                    rdfs:domain :ReportGenerator ;
                    rdfs:range :Parameter ;
@@ -325,6 +325,18 @@
                        rdfs:label "Should all conditions be satisfied or one satisfied condition is enough (true by default)"@en-US .
 
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue
+:defaultValue rdf:type owl:DatatypeProperty ,
+                      owl:FunctionalProperty ;
+             rdfs:domain [ rdf:type owl:Class ;
+                           owl:unionOf ( :ImplementationType
+                                         :Parameter
+                                       )
+                         ] ;
+             rdfs:range xsd:string ;
+             rdfs:label "default serialized value"@en-US .
+
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#description
 :description rdf:type owl:DatatypeProperty ,
                       owl:FunctionalProperty ;
@@ -340,7 +352,11 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#isInternal
 :isInternal rdf:type owl:DatatypeProperty ,
                      owl:FunctionalProperty ;
-            rdfs:domain :ParameterType ;
+            rdfs:domain [ rdf:type owl:Class ;
+                             owl:unionOf ( :ParameterType
+                                           :Parameter
+                                         )
+                           ] ;
             rdfs:range xsd:boolean ;
             rdfs:label "is internal parameter type"@en-US .
 
