@@ -232,7 +232,6 @@
 		dynapi:deserializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/internal-model> ;
         dynapi:className        "org.apache.jena.rdf.model.Model" ;
         rdfs:label              "Jena internal model"@en-US ;
-		dynapi:defaultValue		"";
         vitro:mostSpecificType  dynapi:ImplementationType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/json-container>
@@ -590,6 +589,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_assertions>
         a                       dynapi:Parameter, dynapi:Model ;
         dynapi:name             "TBOX_ASSERTIONS" ;
+		dynapi:defaultValue		"TBOX_ASSERTIONS" ;
         rdfs:label              "tbox assertions model"@en-US ;
 		dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
@@ -597,6 +597,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions>
         a                       dynapi:Parameter, dynapi:Model ;
         dynapi:name             "ABOX_ASSERTIONS" ;
+		dynapi:defaultValue		"ABOX_ASSERTIONS" ;
         rdfs:label              "abox assertions model"@en-US ;
 		dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
@@ -604,6 +605,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_union>
         a                       dynapi:Parameter, dynapi:Model ;
         dynapi:name             "ABOX_UNION" ;
+		dynapi:defaultValue		"ABOX_UNION" ;
         rdfs:label              "abox union model"@en-US ;
 		dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
@@ -611,6 +613,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_union>
         a                       dynapi:Parameter, dynapi:Model ;
         dynapi:name             "TBOX_UNION" ;
+		dynapi:defaultValue		"TBOX_UNION" ;
         rdfs:label              "tbox union model"@en-US ;
 		dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
@@ -618,6 +621,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union>
         a                       dynapi:Parameter, dynapi:Model ;
         dynapi:name             "FULL_UNION" ;
+		dynapi:defaultValue		"FULL_UNION" ;
         rdfs:label              "full union model"@en-US ;
 		dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
@@ -625,6 +629,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/application_metadata>
         a                       dynapi:Parameter, dynapi:Model ;
         dynapi:name             "APPLICATION_METADATA" ;
+		dynapi:defaultValue		"APPLICATION_METADATA" ;
         rdfs:label              "application metadata model"@en-US ;
 		dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
@@ -632,6 +637,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/user_accounts>
         a                       dynapi:Parameter, dynapi:Model ;
         dynapi:name             "USER_ACCOUNTS" ;
+		dynapi:defaultValue		"USER_ACCOUNTS" ;
         rdfs:label              "user accounts model"@en-US ;
 		dynapi:hasType			<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .

@@ -1,0 +1,74 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:action>
+        a                                   dynapi:Action ;
+        rdfs:label                          "action"@en-US ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:providesParameter            <test:report> ;
+        dynapi:hasAssignedRPC               <test:rpc1> .
+
+<test:step1>
+        a                                   dynapi:Step, dynapi:OperationalStep ;
+        rdfs:label                          "step 1"@en-US ;
+        dynapi:hasNextStep                  <test:step2> ;
+        dynapi:hasOperation                 <test:selectQuery> .
+
+<test:step2>
+        a                                   dynapi:Step, dynapi:OperationalStep ;
+        rdfs:label                          "step 2"@en-US ;
+        dynapi:hasOperation                 <test:reportGenerator> .
+
+<test:selectQuery> 
+        a                                   dynapi:SparqlSelectQuery, dynapi:Operation ;
+        rdfs:label                          "Test sparql select query"@en-US ;
+		dynapi:sparqlQueryText              "SELECT ?uri ?object WHERE { ?uri <test:property> ?object . } " ;
+        dynapi:providesParameter            <test:dataSource> ;
+        dynapi:hasModel                     <test:query_model> .
+
+<test:reportGenerator> 
+        a                                   dynapi:ReportGenerator, dynapi:Operation ;
+        rdfs:label                          "Test report generator"@en-US ;
+		dynapi:dataSource					<test:dataSource> ;
+		dynapi:template						<test:template> ;
+        dynapi:report			            <test:report> ;
+        dynapi:hasModel                     <test:query_model> .
+
+<test:query_model>
+        a                                   dynapi:Parameter, dynapi:Model ;
+        rdfs:label                          "query model param"@en-US ;
+        dynapi:name                         "querymodel" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
+
+<test:dataSource>
+        a                                   dynapi:Parameter;
+        rdfs:label                          "output model param"@en-US ;
+        dynapi:name                         "dataSource" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/json> .
+
+
+
+<test:report>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "report param"@en-US ;
+        dynapi:name                         "report" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> .
+
+<test:rpc1>
+        a                                   dynapi:Rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "test_action" .
+
+<test:template>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "template param"@en-US ;
+		dynapi:isInternal					"true"^^xsd:boolean ;
+        dynapi:name                         "template" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> ;
+		dynapi:defaultValue					"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" .
+
+
