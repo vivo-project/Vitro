@@ -35,22 +35,16 @@ public class Data {
     }
 
 	public void earlyInitialization() {
-		final ParameterType type = param.getType();
-		final ImplementationType implementationType = type.getImplementationType();
-		if (param.isInternal()) {
-			object = implementationType.deserialize(type, param.getName());
-			return;
-		} 
-		object = implementationType.deserialize(type, string);
+	    initialization();
 	}
 	
 	public void initialization() {
-		final ParameterType type = param.getType();
-		final ImplementationType implementationType = type.getImplementationType();
 		if (param.isInternal()) {
-			object = implementationType.deserialize(type, param.getName());
+		    initializeDefault();
 			return;
 		} 
+	    final ParameterType type = param.getType();
+	    final ImplementationType implementationType = type.getImplementationType();
 		object = implementationType.deserialize(type, string);
 	}
 
@@ -66,7 +60,7 @@ public class Data {
 	public void initializeDefault()  {
 		ParameterType type = param.getType();
 		ImplementationType implementationType = type.getImplementationType();
-		String defaultValue = type.getImplementationType().getDefaultValue();		
+		String defaultValue = param.getDefaultValue(); 		
 		object = implementationType.deserialize(type, defaultValue);
 	}
 	
