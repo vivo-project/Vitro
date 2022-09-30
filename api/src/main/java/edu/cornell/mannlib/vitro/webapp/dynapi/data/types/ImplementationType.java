@@ -34,7 +34,7 @@ public class ImplementationType {
 		return className;
 	}
 	
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue", minOccurs = 0, maxOccurs = 1)
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
 	}

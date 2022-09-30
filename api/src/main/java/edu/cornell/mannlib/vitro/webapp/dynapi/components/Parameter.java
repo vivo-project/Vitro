@@ -12,8 +12,10 @@ public class Parameter implements Removable {
 	private String description;
 	private Validators validators = new Validators();
 	private ParameterType type;
+	private String defaultValue;
+	private Boolean internal;
 
-	public String getName() {
+    public String getName() {
 		return name;
 	}
 
@@ -26,6 +28,16 @@ public class Parameter implements Removable {
 	public ParameterType getType() {
 		return type;
 	}
+
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue", minOccurs = 0, maxOccurs = 1)
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+	
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#isInternal", minOccurs = 0, maxOccurs = 1)
+	public void setInternal(boolean internal) {
+	    this.internal = internal;
+    }
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
@@ -56,6 +68,9 @@ public class Parameter implements Removable {
 	}
 
 	public boolean isInternal() {
+	    if (internal != null) {
+	        return internal;
+	    }
 		return type.isInternal();
 	}
 
@@ -78,4 +93,11 @@ public class Parameter implements Removable {
 	public boolean isJsonContainer() {
 		return type.isJsonContainer();
 	}
+
+    public String getDefaultValue() {
+        if (defaultValue != null) {
+            return defaultValue;
+        }
+        return type.getImplementationType().getDefaultValue();
+    }
 }
