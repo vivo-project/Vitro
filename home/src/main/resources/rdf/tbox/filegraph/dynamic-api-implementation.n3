@@ -21,6 +21,8 @@ dynapi:SparqlConstructQuery rdfs:subClassOf dynapi_java:SparqlConstructQuery, dy
 
 dynapi:SolrQuery rdfs:subClassOf dynapi_java:SolrQuery, dynapi_java:Operation .
 
+dynapi:ReportGenerator rdfs:subClassOf dynapi_java:ReportGenerator, dynapi_java:Operation .
+
 dynapi:Model rdfs:subClassOf dynapi_java:Parameter .
 
 dynapi:ModelWriter rdfs:subClassOf dynapi_java:ModelWriter , dynapi_java:Operation .
