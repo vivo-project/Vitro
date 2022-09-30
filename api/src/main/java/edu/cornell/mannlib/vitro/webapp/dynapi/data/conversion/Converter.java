@@ -49,7 +49,7 @@ public class Converter {
 		convertInternalParams(action, dataStore);
 	}
 
-	private static void convertInternalParams(Action action, DataStore dataStore) throws ConversionException {
+	public static void convertInternalParams(Action action, DataStore dataStore) throws ConversionException {
 		Parameters params = action.getInternalParams();
 		for (String name : params.getNames()) {
 			Data data = new Data(params.get(name));
