@@ -368,6 +368,18 @@
             rdfs:label "is optional"@en-US .
 
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#languageFiltering
+:languageFiltering rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain [ rdf:type owl:Class ;
+                owl:unionOf ( :SparqlSelectQuery
+                              :SparqlConstructQuery
+                            )
+              			] ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "Language filtering"@en-US .
+
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion
 :maxAPIVersion rdf:type owl:DatatypeProperty ,
                         owl:FunctionalProperty ;
@@ -559,7 +571,6 @@
 :sparqlQueryText rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdf:type owl:FunctionalProperty ;
-                 rdfs:domain :SparqlSelectQuery ;
                  rdfs:domain [ rdf:type owl:Class ;
                         owl:unionOf ( :SparqlSelectQuery
                                       :SparqlConstructQuery
