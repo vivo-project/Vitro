@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class SparqlConstructQuery extends SparqlQuery {
@@ -33,36 +33,25 @@ public class SparqlConstructQuery extends SparqlQuery {
 			return OperationResult.internalServerError();
 		}
 		OperationResult result = OperationResult.ok();
-		Model queryModel = ModelView.getModel(dataStore, queryModelParam);
 		final String preparedQueryString = prepareQuery(dataStore);
+        RDFService localRdfService = getRDFService(dataStore);
 
-		queryModel.enterCriticalSection(Lock.READ);
-		try {
-			QueryExecution qexec = QueryExecutionFactory.create(preparedQueryString, queryModel);
 			try {
 				List<Model> models = ModelView.getExistingModels(outputParams, dataStore);
 				if (models.isEmpty()) {
-					Model results = qexec.execConstruct();
-					ModelView.addModel(dataStore, results, outputParams.getFirst());	
+					Model resultModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
+			        localRdfService.sparqlConstructQuery(preparedQueryString, resultModel);
+					ModelView.addModel(dataStore, resultModel, outputParams.getFirst());	
 				} else {
 					//Extend existing model
-					qexec.execConstruct(models.get(0));
+			        localRdfService.sparqlConstructQuery(preparedQueryString, models.get(0));
 				}
 				
 			} catch (Exception e) {
 				log.error(e.getLocalizedMessage());
 				e.printStackTrace();
 				result = OperationResult.internalServerError();
-			} finally {
-				qexec.close();
-			}
-		} catch (Exception e) {
-			log.error(e.getLocalizedMessage());
-			e.printStackTrace();
-			result = OperationResult.internalServerError();
-		} finally {
-			queryModel.leaveCriticalSection();
-		}
+			} 
 		
 		if (!isOutputValid(dataStore)) {
 			return OperationResult.internalServerError();
