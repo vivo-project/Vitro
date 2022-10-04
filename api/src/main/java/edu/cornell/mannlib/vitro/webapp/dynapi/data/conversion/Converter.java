@@ -1,9 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -38,7 +38,7 @@ public class Converter {
 		ContentType contentType = getContentType(request);
 		ContentType responseType = getResponseType(request.getHeader(HttpHeaders.ACCEPT), contentType);
 		dataStore.setResponseType(responseType);
-		List<String> acceptLangs = getAcceptLanguages(request);
+		List<String> acceptLangs = getAcceptLanguages(request.getHeader(HttpHeaders.ACCEPT_LANGUAGE));
 		dataStore.setAcceptLangs(acceptLangs);
 		if (isJson(contentType)) {
 			JSONConverter.convert(request, action, dataStore);
@@ -113,7 +113,7 @@ public class Converter {
 		}
 		return mostAppropriateType;
 	}
-
+	
 	public static void convert(HttpServletResponse response, Action action, OperationResult operationResult,
 			DataStore dataStore) throws ConversionException {
 		if (!operationResult.hasSuccess()) {
@@ -137,17 +137,32 @@ public class Converter {
 		}
 	}
 
-	private static List<String> getAcceptLanguages(HttpServletRequest request) {
-		List<String> result = new LinkedList<>();
-		String header = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
+	protected static List<String> getAcceptLanguages(String header) {
+		TreeMap<Double, String> languages = new TreeMap<>(Collections.reverseOrder());
 		if (StringUtils.isBlank(header)) {
-			return result;
+			return Collections.emptyList();
 		}
-		String[] rawTags = header.trim().split(SPLIT_BY_COMMA_AND_TRIM_REGEX);
-		for (String rawTag : rawTags) {
-			result.add(rawTag);
+		String[] weightedLangs = header.trim().split(SPLIT_BY_COMMA_AND_TRIM_REGEX);
+		for (String wType : weightedLangs) {
+			String[] langInfo = wType.split(SPLIT_CONTENT_TYPE_AND_WEIGHT_REGEX);
+			final String langTag = langInfo[0];
+			if (StringUtils.isBlank(langTag)) {
+				continue;
+			}
+			Double weight = 1.0;
+			if (langInfo.length == 2) {
+				final String qfactor = langInfo[1];
+				if (qfactor.length() < 6 && qfactor.matches("^[0-1](\\.[0-9]{1,3})?$")) {
+					try {
+						weight = Double.parseDouble(qfactor);
+					} catch (Exception e) {
+						log.error(e, e);
+					}
+				}
+			}
+			languages.put(weight, langTag);
 		}
-		return result;
+		return new ArrayList<>(languages.values());
 	}
 
 	private static ContentType getContentType(HttpServletRequest request) {
