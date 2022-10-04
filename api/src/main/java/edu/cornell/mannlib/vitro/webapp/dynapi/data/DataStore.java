@@ -48,6 +48,7 @@ public class DataStore {
 	}
 
 	public void setAcceptLangs(List<String> acceptLangs) {
+	    this.acceptLangs.clear();
 		this.acceptLangs.addAll(acceptLangs);
 	}
 	
