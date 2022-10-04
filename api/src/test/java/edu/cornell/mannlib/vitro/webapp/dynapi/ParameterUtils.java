@@ -51,7 +51,13 @@ public class ParameterUtils {
 	public static Statement addStatement(OntModelImpl additionModel, String s, String p, String o) {
 		final Resource resource = ResourceFactory.createResource(s);
 		final Property property = ResourceFactory.createProperty(p);
-		final Literal literal = ResourceFactory.createPlainLiteral(o);
+		Literal literal;
+		if (o.contains("@")) {
+		    String[] parts = o.split("@");
+		    literal = ResourceFactory.createLangLiteral(parts[0], parts[1]);    
+		} else {
+		    literal = ResourceFactory.createPlainLiteral(o);
+		}
 		Statement stmt = ResourceFactory.createStatement(resource, property, literal);
 		additionModel.add(stmt);
 		return stmt;
