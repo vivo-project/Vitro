@@ -24,10 +24,10 @@ public class SparqlSelectQuery extends SparqlQuery {
 	public void addOutputParameter(Parameter param) {
 		outputParams.add(param);
 	}
-	
+
 	@Override
 	public OperationResult run(DataStore dataStore) {
-		if(!isValid(dataStore)) {
+		if (!isValid(dataStore)) {
 			return OperationResult.internalServerError();
 		}
 		OperationResult result = OperationResult.ok();
@@ -35,12 +35,12 @@ public class SparqlSelectQuery extends SparqlQuery {
 		final String preparedQueryString = prepareQuery(dataStore);
 		DefaultDataView.createDefaultOutput(dataStore, outputParams);
 		try {
-		    ResultSet results = RDFServiceUtils.sparqlSelectQuery(preparedQueryString, localRdfService);
-            JsonView.addSparqlSelectResult(dataStore, outputParams, results);
+			ResultSet results = RDFServiceUtils.sparqlSelectQuery(preparedQueryString, localRdfService);
+			JsonView.addSparqlSelectResult(dataStore, outputParams, results);
 			int i = 1;
 			List<String> vars = results.getResultVars();
 			log.debug("Query vars: " + String.join(", ", vars));
-			
+
 			while (results.hasNext()) {
 				QuerySolution solution = results.nextSolution();
 				log.debug("Query solution " + i++);
@@ -51,8 +51,8 @@ public class SparqlSelectQuery extends SparqlQuery {
 			log.error(e.getLocalizedMessage());
 			e.printStackTrace();
 			result = OperationResult.internalServerError();
-		} 
-		
+		}
+
 		if (!isOutputValid(dataStore)) {
 			return OperationResult.internalServerError();
 		}

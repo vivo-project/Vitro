@@ -106,9 +106,9 @@ public class JSONConverter {
 			if (data.getParam().isJsonContainer()) {
 				ctx.put(path, name, JsonContainerView.asJsonNode(data));
 			} else if (JsonView.isJsonNode(data.getParam())) {
-                ctx.put(path, name, JsonView.getJsonNode(data));
-            } else {
-				ctx.put(path, name, data.getSerializedValue());		
+				ctx.put(path, name, JsonView.getJsonNode(data));
+			} else {
+				ctx.put(path, name, data.getSerializedValue());
 			}
 		}
 		return ctx.jsonString();

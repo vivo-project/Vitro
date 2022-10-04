@@ -22,13 +22,16 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class JsonContainer {
-	
+
 	public static final String PATH_ROOT = "$";
 	private static final String EMPTY_OBJECT = "{}";
 	private static final String EMPTY_ARRAY = "[]";
 	private static ObjectMapper mapper = new ObjectMapper();
-	public static enum Type { EmptyArray, EmptyObject } ;
-	
+
+	public static enum Type {
+		EmptyArray, EmptyObject
+	};
+
 	private Map<String, Data> dataMap = new HashMap<>();
 	private static final Configuration jsonPathConfig = prepareJsonPathConfig();
 
@@ -37,27 +40,23 @@ public class JsonContainer {
 	public JsonContainer(String jsonString) {
 		ctx = JsonPath.using(jsonPathConfig).parse(jsonString);
 	}
-	
+
 	public JsonContainer(Type type) {
 		if (type.equals(Type.EmptyArray)) {
 			ctx = JsonPath.using(jsonPathConfig).parse(EMPTY_ARRAY);
 		} else {
-			ctx = JsonPath.using(jsonPathConfig).parse(EMPTY_OBJECT);	
+			ctx = JsonPath.using(jsonPathConfig).parse(EMPTY_OBJECT);
 		}
 	}
-	
-	public void putData(String jsonPath, Data data) {
-		String randomKey = getRandomKey();
-	}
-	
+
 	private String getRandomKey() {
 		return UUID.randomUUID().toString();
 	}
-	
-	public static String serialize(JsonContainer object){
+
+	public static String serialize(JsonContainer object) {
 		return object.jsonString();
 	}
-	
+
 	public JsonNode asJsonNode() {
 		JsonNode parsedModel = ctx.json();
 		JsonNode deepCopy = parsedModel.deepCopy();
@@ -71,7 +70,7 @@ public class JsonContainer {
 			Iterator<Entry<String, JsonNode>> it = objectNode.fields();
 			while (it.hasNext()) {
 				Map.Entry<String, JsonNode> entry = it.next();
-				replaceKeys(entry.getKey(),entry.getValue(), objectNode);
+				replaceKeys(entry.getKey(), entry.getValue(), objectNode);
 			}
 		} else if (node.isArray()) {
 			ArrayNode array = (ArrayNode) node;
@@ -82,13 +81,13 @@ public class JsonContainer {
 				replaceKeys(child, array, i);
 				i++;
 			}
-		} 
+		}
 	}
-	
+
 	private void replaceKeys(String key, JsonNode node, ObjectNode parent) {
 		if (node.isContainerNode()) {
 			replaceKeys(node);
-		} else if (node.isValueNode() && dataMap.containsKey(node.asText())){
+		} else if (node.isValueNode() && dataMap.containsKey(node.asText())) {
 			Data data = dataMap.get(node.asText());
 			parent.set(key, getDataValue(data));
 		}
@@ -106,27 +105,23 @@ public class JsonContainer {
 	private JsonNode getDataValue(Data data) {
 		if (RdfView.isRdfNode(data)) {
 			return RdfView.getAsJsonNode(data);
-		} 
+		}
 		return mapper.convertValue(data.getSerializedValue(), JsonNode.class);
-	}	
+	}
 
 	private String jsonString() {
 		return ctx.jsonString();
 	}
-	
-	public static JsonContainer deserialize(String input) throws ConversionException{
+
+	public static JsonContainer deserialize(String input) throws ConversionException {
 		JsonContainer object = new JsonContainer(input);
 		return object;
 	}
-	
+
 	private static Configuration prepareJsonPathConfig() {
 		return Configuration.builder().jsonProvider(new JacksonJsonNodeJsonProvider(mapper))
-			.mappingProvider(new JacksonMappingProvider(mapper))
-			.options(
-					Option.DEFAULT_PATH_LEAF_TO_NULL, 
-					Option.SUPPRESS_EXCEPTIONS
-					)
-			.build();
+				.mappingProvider(new JacksonMappingProvider(mapper))
+				.options(Option.DEFAULT_PATH_LEAF_TO_NULL, Option.SUPPRESS_EXCEPTIONS).build();
 	}
 
 	public void addRow(String jsonPath, JsonContainer row) {
@@ -136,8 +131,8 @@ public class JsonContainer {
 
 	public void addKeyValue(String var, Data data) {
 		String id = getRandomKey();
-		if(dataMap.containsKey(id)) {
-			//TODO:fix that
+		if (dataMap.containsKey(id)) {
+			// TODO:fix that
 			throw new RuntimeException();
 		}
 		ctx.put(PATH_ROOT, var, id);
