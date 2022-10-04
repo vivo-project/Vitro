@@ -4,21 +4,29 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public abstract class SparqlQuery extends Operation{
+public abstract class SparqlQuery extends Operation implements ContextModelsUser {
 	
 	private static final Log log = LogFactory.getLog(SparqlQuery.class);
 	protected String queryText;
 	protected Parameters inputParams = new Parameters();
 	protected Parameters outputParams = new Parameters();
 	protected Parameter queryModelParam;
+    protected boolean langFiltering = false;
+    protected RDFService rdfService;
 
 	@Override
 	public Parameters getOutputParams() {
@@ -34,12 +42,17 @@ public abstract class SparqlQuery extends Operation{
 		inputParams.add(param);
 	}
 
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#languageFiltering", minOccurs = 0, maxOccurs = 1)
+    public void setLanguageFiltering(boolean langFiltering) {
+        this.langFiltering  = langFiltering;
+    }
+	
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText", minOccurs = 1, maxOccurs = 1)
 	public void setQueryText(String queryText) {
 		this.queryText = queryText;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 0, maxOccurs = 1)
 	public void setQueryModel(Parameter model) throws InitializationException {
 		if (!ModelView.isModel(model)) {
 			throw new InitializationException("Only model parameters accepted on setQueryModel");
@@ -62,7 +75,7 @@ public abstract class SparqlQuery extends Operation{
 	protected void setLiterals(DataStore dataStore, ParameterizedSparqlString pss) {
 		for (String paramName : RdfView.getLiteralNames(inputParams)) {
 			pss.setLiteral(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore),
-					inputParams.get(paramName).getType().getRdfType().getRDFDataType());
+			inputParams.get(paramName).getType().getRdfType().getRDFDataType());
 		}
 	}
 
@@ -77,10 +90,6 @@ public abstract class SparqlQuery extends Operation{
 	
 	protected boolean isValid(DataStore dataStore) {
 		boolean valid = isValid();
-		if (valid && !ModelView.hasModel(dataStore, queryModelParam)) {
-			log.error("Model not found in input parameters");
-			valid = false;
-		}
 		if (!isInputValid(dataStore)) {
 			log.error("Input data is invalid");
 			valid = false;
@@ -94,10 +103,25 @@ public abstract class SparqlQuery extends Operation{
 			log.error("Query text is not set");
 			valid = false;
 		}
-		if (queryModelParam == null) {
-			log.error("Model param is not provided in configuration");
-			valid = false;
-		}
 		return valid;
 	}
+
+    public void setContextModels(ContextModelAccess models) {
+        rdfService = models.getRDFService();
+    }
+
+    protected RDFService getRDFService(DataStore dataStore) {
+        RDFService localRdfService = null;
+        if (queryModelParam != null) {
+            Model queryModel = ModelView.getModel(dataStore, queryModelParam);
+            localRdfService = new RDFServiceModel(queryModel);
+        } else {
+            localRdfService = rdfService;
+        }
+        if (langFiltering) {
+            return new LanguageFilteringRDFService(localRdfService, dataStore.getAcceptLangs());
+        }
+        return localRdfService;
+    }
+
 }
