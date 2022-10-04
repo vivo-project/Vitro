@@ -19,41 +19,40 @@ public class DataStore {
 	private List<String> acceptLangs = new LinkedList<>();
 	private String resourceId = "";
 
-
 	public DataStore() {
 	}
 
 	public void addData(String name, Data data) {
-        dataMap.put(name, data);
-    }
-	
+		dataMap.put(name, data);
+	}
+
 	public Data getData(String name) {
 		return dataMap.get(name);
 	}
-	
+
 	public String getResourceId() {
 		return resourceId;
 	}
-	
+
 	public void setResourceID(String resourceId) {
-		this.resourceId  = resourceId;
+		this.resourceId = resourceId;
 	}
 
 	public ContentType getResponseType() {
-		return responseType;	
+		return responseType;
 	}
-	
+
 	public void setResponseType(ContentType contentType) {
-		this.responseType = contentType;	
+		this.responseType = contentType;
 	}
 
 	public void setAcceptLangs(List<String> acceptLangs) {
-	    this.acceptLangs.clear();
+		this.acceptLangs.clear();
 		this.acceptLangs.addAll(acceptLangs);
 	}
-	
+
 	public List<String> getAcceptLangs() {
-	    return acceptLangs;
+		return acceptLangs;
 	}
 
 	public boolean contains(String name) {
@@ -63,7 +62,7 @@ public class DataStore {
 	protected Set<Entry<String, Data>> entrySet() {
 		return dataMap.entrySet();
 	}
-	
+
 	protected Set<String> keySet() {
 		return dataMap.keySet();
 	}

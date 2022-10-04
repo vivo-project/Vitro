@@ -19,20 +19,20 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public abstract class SparqlQuery extends Operation implements ContextModelsUser {
-	
+
 	private static final Log log = LogFactory.getLog(SparqlQuery.class);
 	protected String queryText;
 	protected Parameters inputParams = new Parameters();
 	protected Parameters outputParams = new Parameters();
 	protected Parameter queryModelParam;
-    protected boolean langFiltering = false;
-    protected RDFService rdfService;
+	protected boolean langFiltering = false;
+	protected RDFService rdfService;
 
 	@Override
 	public Parameters getOutputParams() {
 		return outputParams;
 	}
-	
+
 	@Override
 	public void dereference() {
 	}
@@ -42,11 +42,11 @@ public abstract class SparqlQuery extends Operation implements ContextModelsUser
 		inputParams.add(param);
 	}
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#languageFiltering", minOccurs = 0, maxOccurs = 1)
-    public void setLanguageFiltering(boolean langFiltering) {
-        this.langFiltering  = langFiltering;
-    }
-	
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#languageFiltering", minOccurs = 0, maxOccurs = 1)
+	public void setLanguageFiltering(boolean langFiltering) {
+		this.langFiltering = langFiltering;
+	}
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#sparqlQueryText", minOccurs = 1, maxOccurs = 1)
 	public void setQueryText(String queryText) {
 		this.queryText = queryText;
@@ -65,7 +65,7 @@ public abstract class SparqlQuery extends Operation implements ContextModelsUser
 	public Parameters getInputParams() {
 		return inputParams;
 	}
-	
+
 	protected void setUris(DataStore dataStore, ParameterizedSparqlString pss) {
 		for (String paramName : RdfView.getUriNames(inputParams)) {
 			pss.setIri(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore));
@@ -75,7 +75,7 @@ public abstract class SparqlQuery extends Operation implements ContextModelsUser
 	protected void setLiterals(DataStore dataStore, ParameterizedSparqlString pss) {
 		for (String paramName : RdfView.getLiteralNames(inputParams)) {
 			pss.setLiteral(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore),
-			inputParams.get(paramName).getType().getRdfType().getRDFDataType());
+					inputParams.get(paramName).getType().getRdfType().getRDFDataType());
 		}
 	}
 
@@ -87,7 +87,7 @@ public abstract class SparqlQuery extends Operation implements ContextModelsUser
 		final String preparedQueryString = pss.toString();
 		return preparedQueryString;
 	}
-	
+
 	protected boolean isValid(DataStore dataStore) {
 		boolean valid = isValid();
 		if (!isInputValid(dataStore)) {
@@ -103,29 +103,29 @@ public abstract class SparqlQuery extends Operation implements ContextModelsUser
 			log.error("Query text is not set");
 			valid = false;
 		}
-	    if (queryModelParam == null && rdfService == null) {
-	        log.error("Either query model param or rdfService should be set");
-	        valid = false;
-	    }
+		if (queryModelParam == null && rdfService == null) {
+			log.error("Either query model param or rdfService should be set");
+			valid = false;
+		}
 		return valid;
 	}
 
-    public void setContextModels(ContextModelAccess models) {
-        rdfService = models.getRDFService();
-    }
+	public void setContextModels(ContextModelAccess models) {
+		rdfService = models.getRDFService();
+	}
 
-    protected RDFService getRDFService(DataStore dataStore) {
-        RDFService localRdfService = null;
-        if (queryModelParam != null) {
-            Model queryModel = ModelView.getModel(dataStore, queryModelParam);
-            localRdfService = new RDFServiceModel(queryModel);
-        } else {
-            localRdfService = rdfService;
-        }
-        if (langFiltering) {
-            return new LanguageFilteringRDFService(localRdfService, dataStore.getAcceptLangs());
-        }
-        return localRdfService;
-    }
+	protected RDFService getRDFService(DataStore dataStore) {
+		RDFService localRdfService = null;
+		if (queryModelParam != null) {
+			Model queryModel = ModelView.getModel(dataStore, queryModelParam);
+			localRdfService = new RDFServiceModel(queryModel);
+		} else {
+			localRdfService = rdfService;
+		}
+		if (langFiltering) {
+			return new LanguageFilteringRDFService(localRdfService, dataStore.getAcceptLangs());
+		}
+		return localRdfService;
+	}
 
 }

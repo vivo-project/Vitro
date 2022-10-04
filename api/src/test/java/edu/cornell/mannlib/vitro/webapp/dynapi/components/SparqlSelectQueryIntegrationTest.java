@@ -33,75 +33,72 @@ public class SparqlSelectQueryIntegrationTest extends ServletContextTest {
 	private static final String URI = "uri";
 
 	private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-    private static final String TEST_ACTION = RESOURCES_PATH + "sparql-select-test-action.n3";
-    private static final String TEST_STORE = RESOURCES_PATH + "sparql-select-test-store.n3";
+	private static final String TEST_ACTION = RESOURCES_PATH + "sparql-select-test-action.n3";
+	private static final String TEST_STORE = RESOURCES_PATH + "sparql-select-test-store.n3";
 
-    
-    Model storeModel;
-    
-    @org.junit.runners.Parameterized.Parameter(0)
-    public String uri;
-    
-    @org.junit.runners.Parameterized.Parameter(1)
-    public String value;
-    
-    @Before
-    public void beforeEach() {
-        storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
-    }
-    
-    @Test
-    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException {
-        loadOntology(ontModel);
-        loadModel(ontModel, TEST_ACTION);
-        loadModel(storeModel, TEST_STORE);
-       // servletContext = new ServletContextStub();
-        Action action = loader.loadInstance("test:action", Action.class);
-        assertTrue(action.isValid());
-        Parameters inputParameters = action.getInputParams();
-        DataStore store = new DataStore();
+	Model storeModel;
 
-        Parameter paramQuery = inputParameters.get(QUERY);
-        assertNotNull(paramQuery);
+	@org.junit.runners.Parameterized.Parameter(0)
+	public String uri;
+
+	@org.junit.runners.Parameterized.Parameter(1)
+	public String value;
+
+	@Before
+	public void beforeEach() {
+		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
+	}
+
+	@Test
+	public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException {
+		loadOntology(ontModel);
+		loadModel(ontModel, TEST_ACTION);
+		loadModel(storeModel, TEST_STORE);
+		// servletContext = new ServletContextStub();
+		Action action = loader.loadInstance("test:action", Action.class);
+		assertTrue(action.isValid());
+		Parameters inputParameters = action.getInputParams();
+		DataStore store = new DataStore();
+
+		Parameter paramQuery = inputParameters.get(QUERY);
+		assertNotNull(paramQuery);
 		Data queryData = new Data(paramQuery);
-        TestView.setObject(queryData, storeModel);
-        store.addData(QUERY, queryData);
-        
-        final Parameter paramUri = inputParameters.get(URI);
-        assertNotNull(paramUri);
+		TestView.setObject(queryData, storeModel);
+		store.addData(QUERY, queryData);
+
+		final Parameter paramUri = inputParameters.get(URI);
+		assertNotNull(paramUri);
 		Data uriData = new Data(paramUri);
-        store.addData(URI, uriData);
+		store.addData(URI, uriData);
 
-        TestView.setObject(uriData, uri);
-        OperationResult opResult = action.run(store);
-        assertFalse(opResult.hasError());	
-        assertTrue(store.contains(OBJECT));
-        final Data data = store.getData(OBJECT);
-        assertTrue(TestView.getObject(data) != null);
+		TestView.setObject(uriData, uri);
+		OperationResult opResult = action.run(store);
+		assertFalse(opResult.hasError());
+		assertTrue(store.contains(OBJECT));
+		final Data data = store.getData(OBJECT);
+		assertTrue(TestView.getObject(data) != null);
 		assertEquals(value, data.getSerializedValue());
-    }
-    
-    @Parameterized.Parameters
-    public static Collection<Object[]> requests() {
-        return Arrays.asList(new Object[][] {
-        	{ "test:uri1", "literal1"},
-        	{ "test:uri2", "literal2"},
-        	{ "test:uri3", "literal3"},
-        	{ "test:uri4", ""},
+	}
 
-            
-        });
-    }
-    
-    protected void loadModel(Model model, String... files) throws IOException {
-        for (String file : files) {
-            String rdf = readFile(file);
-            model.read(new StringReader(rdf), null, "n3");
-        }
-    }
-    
-    public void loadOntology(OntModel ontModel) throws IOException {
-        loadModel(ontModel, "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3");
-        loadModel(ontModel, "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3");
-    }
+	@Parameterized.Parameters
+	public static Collection<Object[]> requests() {
+		return Arrays.asList(new Object[][] {
+			{ "test:uri1", "literal1"},
+			{ "test:uri2", "literal2"},
+			{ "test:uri3", "literal3"},
+			{ "test:uri4", ""},
+		});
+	}
+
+	protected void loadModel(Model model, String... files) throws IOException {
+		for (String file : files) {
+			String rdf = readFile(file);
+			model.read(new StringReader(rdf), null, "n3");
+		}
+	}
+
+	public void loadOntology(OntModel ontModel) throws IOException {
+		loadModel(ontModel, "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3");
+		loadModel(ontModel, "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3");
+	}
 }
