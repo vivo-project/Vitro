@@ -24,11 +24,11 @@ public class SparqlSelectQueryTest {
 	private static final String STR_VAR = "str";
 	private static final String S_VAR = "s";
 	private static final String O_VAR = "o";
-    private static final String ALL_VAR = "all";
+	private static final String ALL_VAR = "all";
 	private static final String QUERY_NO_VARS = "SELECT ?str WHERE { BIND(\"test\" as ?str) } ";
-	private static final String QUERY_OBJ_VAR = "SELECT ?s WHERE { ?s <test:property> ?str . } " ;
-	private static final String QUERY_SUBJ_VAR = "SELECT ?o WHERE { ?str <test:property> ?o . } " ;
-    private static final String QUERY_LABEL = "SELECT ?o WHERE { ?str <http://www.w3.org/2000/01/rdf-schema#label> ?o . } " ;
+	private static final String QUERY_OBJ_VAR = "SELECT ?s WHERE { ?s <test:property> ?str . } ";
+	private static final String QUERY_SUBJ_VAR = "SELECT ?o WHERE { ?str <test:property> ?o . } ";
+	private static final String QUERY_LABEL = "SELECT ?o WHERE { ?str <http://www.w3.org/2000/01/rdf-schema#label> ?o . } ";
 
 	private OntModelImpl model;
 	private DataStore dataStore;
@@ -40,7 +40,7 @@ public class SparqlSelectQueryTest {
 		dataStore = new DataStore();
 		model = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
 	}
-	
+
 	@Test
 	public void emptyConfiguration() throws Exception {
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
@@ -49,26 +49,26 @@ public class SparqlSelectQueryTest {
 		sparql.rdfService = new RDFServiceModel(model);
 		Parameter strParam = ParameterUtils.createStringLiteralParameter(STR_VAR);
 		sparql.addOutputParameter(strParam);
-		
+
 		assertEquals(OperationResult.ok(), sparql.run(dataStore));
 		assertTrue(dataStore.contains(STR_VAR));
 		if (dataStore.contains(STR_VAR)) {
 			assertTrue(SimpleDataView.getStringRepresentation(STR_VAR, dataStore).equals("test"));
 		}
 	}
-	
+
 	@Test
 	public void stringliteralInput() throws Exception {
 		sparql.setQueryText(QUERY_OBJ_VAR);
 		Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
 		sparql.setQueryModel(modelParam);
 		Data modelData = new Data(modelParam);
-		ParameterUtils.addStatement(model, "test:resource", "test:property", "alice" );
+		ParameterUtils.addStatement(model, "test:resource", "test:property", "alice");
 		TestView.setObject(modelData, model);
 		dataStore.addData(MODEL, modelData);
 		Parameter strParam = ParameterUtils.createStringLiteralParameter(STR_VAR);
 		sparql.addInputParameter(strParam);
-		//Not enough params
+		// Not enough params
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
 		Data strData = new Data(strParam);
 		TestView.setObject(strData, "alice");
@@ -83,19 +83,19 @@ public class SparqlSelectQueryTest {
 			assertEquals("test:resource", SimpleDataView.getStringRepresentation(S_VAR, dataStore));
 		}
 	}
-	
+
 	@Test
 	public void uriInput() throws Exception {
 		sparql.setQueryText(QUERY_SUBJ_VAR);
 		Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
 		sparql.setQueryModel(modelParam);
 		Data modelData = new Data(modelParam);
-		ParameterUtils.addStatement(model, "test:resource", "test:property", "alice" );
+		ParameterUtils.addStatement(model, "test:resource", "test:property", "alice");
 		TestView.setObject(modelData, model);
 		dataStore.addData(MODEL, modelData);
 		Parameter strParam = ParameterUtils.createUriParameter(STR_VAR);
 		sparql.addInputParameter(strParam);
-		//Not enough params
+		// Not enough params
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
 		Data strData = new Data(strParam);
 		TestView.setObject(strData, "test:resource");
@@ -110,75 +110,77 @@ public class SparqlSelectQueryTest {
 			assertEquals("alice", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
 		}
 	}
-	
-    @Test
-    public void languageFiltering() throws Exception {
-        sparql.setQueryText(QUERY_LABEL);
-        Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
-        sparql.setQueryModel(modelParam);
-        sparql.setLanguageFiltering(true);
-        Data modelData = new Data(modelParam);
-        ParameterUtils.addStatement(model, "test:resource", "http://www.w3.org/2000/01/rdf-schema#label", "Alicia@es");
-        ParameterUtils.addStatement(model, "test:resource", "http://www.w3.org/2000/01/rdf-schema#label", "Alice@en-US");
-        ParameterUtils.addStatement(model, "test:resource", "http://www.w3.org/2000/01/rdf-schema#label", "Алиса@ru-RU");
-        TestView.setObject(modelData, model);
-        dataStore.addData(MODEL, modelData);
-        Parameter strParam = ParameterUtils.createUriParameter(STR_VAR);
-        sparql.addInputParameter(strParam);
-        // Not enough params
-        assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
-        Data strData = new Data(strParam);
-        TestView.setObject(strData, "test:resource");
-        dataStore.addData(STR_VAR, strData);
-        assertEquals(OperationResult.ok(), sparql.run(dataStore));
-        assertFalse(dataStore.contains(O_VAR));
-        Parameter sParam = ParameterUtils.createStringLiteralParameter(O_VAR);
-        sparql.addOutputParameter(sParam);
-        dataStore.setAcceptLangs(Arrays.asList("ru-RU"));
-        assertEquals(OperationResult.ok(), sparql.run(dataStore));
-        assertTrue(dataStore.contains(O_VAR));
-        if (dataStore.contains(O_VAR)) {
-            assertEquals("Алиса@ru-RU", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
-        }
-        dataStore.setAcceptLangs(Arrays.asList("es"));
-        assertEquals(OperationResult.ok(), sparql.run(dataStore));
-        assertTrue(dataStore.contains(O_VAR));
-        if (dataStore.contains(O_VAR)) {
-            assertEquals("Alicia@es", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
-        }
-        dataStore.setAcceptLangs(Arrays.asList("Alice@en-US"));
-        assertEquals(OperationResult.ok(), sparql.run(dataStore));
-        assertTrue(dataStore.contains(O_VAR));
-        if (dataStore.contains(O_VAR)) {
-            assertEquals("Alice@en-US", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
-        }
-    }
-	
-    @Test
-    public void jsonOutput() throws Exception {
-        sparql.setQueryText(QUERY_SUBJ_VAR);
-        Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
-        sparql.setQueryModel(modelParam);
-        Data modelData = new Data(modelParam);
-        ParameterUtils.addStatement(model, "test:resource", "test:property", "alice");
-        TestView.setObject(modelData, model);
-        dataStore.addData(MODEL, modelData);
-        Parameter strParam = ParameterUtils.createUriParameter(STR_VAR);
-        sparql.addInputParameter(strParam);
-        // Not enough params
-        assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
-        Data strData = new Data(strParam);
-        TestView.setObject(strData, "test:resource");
-        dataStore.addData(STR_VAR, strData);
-        assertEquals(OperationResult.ok(), sparql.run(dataStore));
-        assertFalse(dataStore.contains(ALL_VAR));
-        Parameter outParam = ParameterUtils.createJsonParameter(ALL_VAR);
-        sparql.addOutputParameter(outParam);
-        assertEquals(OperationResult.ok(), sparql.run(dataStore));
-        assertTrue(dataStore.contains(ALL_VAR));
-        if (dataStore.contains(ALL_VAR)) {
-            assertEquals("{\"head\":{\"vars\":[\"o\"]},\"results\":{\"bindings\":[{\"o\":{\"type\":\"literal\",\"value\":\"alice\"}}]}}", JsonView.getJsonString(dataStore, outParam));
-        }
-    }
-	    
+
+	@Test
+	public void languageFiltering() throws Exception {
+		sparql.setQueryText(QUERY_LABEL);
+		Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
+		sparql.setQueryModel(modelParam);
+		sparql.setLanguageFiltering(true);
+		Data modelData = new Data(modelParam);
+		ParameterUtils.addStatement(model, "test:resource", "http://www.w3.org/2000/01/rdf-schema#label", "Alicia@es");
+		ParameterUtils.addStatement(model, "test:resource", "http://www.w3.org/2000/01/rdf-schema#label", "Alice@en-US");
+		ParameterUtils.addStatement(model, "test:resource", "http://www.w3.org/2000/01/rdf-schema#label", "Алиса@ru-RU");
+		TestView.setObject(modelData, model);
+		dataStore.addData(MODEL, modelData);
+		Parameter strParam = ParameterUtils.createUriParameter(STR_VAR);
+		sparql.addInputParameter(strParam);
+		// Not enough params
+		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
+		Data strData = new Data(strParam);
+		TestView.setObject(strData, "test:resource");
+		dataStore.addData(STR_VAR, strData);
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertFalse(dataStore.contains(O_VAR));
+		Parameter sParam = ParameterUtils.createStringLiteralParameter(O_VAR);
+		sparql.addOutputParameter(sParam);
+		dataStore.setAcceptLangs(Arrays.asList("ru-RU"));
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertTrue(dataStore.contains(O_VAR));
+		if (dataStore.contains(O_VAR)) {
+			assertEquals("Алиса@ru-RU", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
+		}
+		dataStore.setAcceptLangs(Arrays.asList("es"));
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertTrue(dataStore.contains(O_VAR));
+		if (dataStore.contains(O_VAR)) {
+			assertEquals("Alicia@es", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
+		}
+		dataStore.setAcceptLangs(Arrays.asList("Alice@en-US"));
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertTrue(dataStore.contains(O_VAR));
+		if (dataStore.contains(O_VAR)) {
+			assertEquals("Alice@en-US", SimpleDataView.getStringRepresentation(O_VAR, dataStore));
+		}
+	}
+
+	@Test
+	public void jsonOutput() throws Exception {
+		sparql.setQueryText(QUERY_SUBJ_VAR);
+		Parameter modelParam = ParameterUtils.createModelParameter(MODEL);
+		sparql.setQueryModel(modelParam);
+		Data modelData = new Data(modelParam);
+		ParameterUtils.addStatement(model, "test:resource", "test:property", "alice");
+		TestView.setObject(modelData, model);
+		dataStore.addData(MODEL, modelData);
+		Parameter strParam = ParameterUtils.createUriParameter(STR_VAR);
+		sparql.addInputParameter(strParam);
+		// Not enough params
+		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
+		Data strData = new Data(strParam);
+		TestView.setObject(strData, "test:resource");
+		dataStore.addData(STR_VAR, strData);
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertFalse(dataStore.contains(ALL_VAR));
+		Parameter outParam = ParameterUtils.createJsonParameter(ALL_VAR);
+		sparql.addOutputParameter(outParam);
+		assertEquals(OperationResult.ok(), sparql.run(dataStore));
+		assertTrue(dataStore.contains(ALL_VAR));
+		if (dataStore.contains(ALL_VAR)) {
+			assertEquals(
+					"{\"head\":{\"vars\":[\"o\"]},\"results\":{\"bindings\":[{\"o\":{\"type\":\"literal\",\"value\":\"alice\"}}]}}",
+					JsonView.getJsonString(dataStore, outParam));
+		}
+	}
+
 }

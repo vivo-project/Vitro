@@ -26,39 +26,39 @@ public class SparqlConstructQuery extends SparqlQuery {
 		}
 		outputParams.add(param);
 	}
-	
+
 	@Override
 	public OperationResult run(DataStore dataStore) {
-		if(!isValid(dataStore)) {
+		if (!isValid(dataStore)) {
 			return OperationResult.internalServerError();
 		}
 		OperationResult result = OperationResult.ok();
 		final String preparedQueryString = prepareQuery(dataStore);
-        RDFService localRdfService = getRDFService(dataStore);
+		RDFService localRdfService = getRDFService(dataStore);
 
-			try {
-				List<Model> models = ModelView.getExistingModels(outputParams, dataStore);
-				if (models.isEmpty()) {
-					Model resultModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
-			        localRdfService.sparqlConstructQuery(preparedQueryString, resultModel);
-					ModelView.addModel(dataStore, resultModel, outputParams.getFirst());	
-				} else {
-					//Extend existing model
-			        localRdfService.sparqlConstructQuery(preparedQueryString, models.get(0));
-				}
-				
-			} catch (Exception e) {
-				log.error(e.getLocalizedMessage());
-				e.printStackTrace();
-				result = OperationResult.internalServerError();
-			} 
-		
+		try {
+			List<Model> models = ModelView.getExistingModels(outputParams, dataStore);
+			if (models.isEmpty()) {
+				Model resultModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
+				localRdfService.sparqlConstructQuery(preparedQueryString, resultModel);
+				ModelView.addModel(dataStore, resultModel, outputParams.getFirst());
+			} else {
+				// Extend existing model
+				localRdfService.sparqlConstructQuery(preparedQueryString, models.get(0));
+			}
+
+		} catch (Exception e) {
+			log.error(e.getLocalizedMessage());
+			e.printStackTrace();
+			result = OperationResult.internalServerError();
+		}
+
 		if (!isOutputValid(dataStore)) {
 			return OperationResult.internalServerError();
 		}
 		return result;
 	}
-	
+
 	protected boolean isValid(DataStore dataStore) {
 		if (!isValid()) {
 			return false;
@@ -68,7 +68,7 @@ public class SparqlConstructQuery extends SparqlQuery {
 		}
 		return true;
 	}
-	
+
 	public boolean isValid() {
 		if (!super.isValid()) {
 			return false;

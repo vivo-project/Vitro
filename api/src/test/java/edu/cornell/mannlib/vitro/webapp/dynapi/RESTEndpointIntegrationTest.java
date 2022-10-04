@@ -175,7 +175,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         }
 
         assertEquals("Invalid Status for test: " + testMessage, status, response.getStatus());
-    }
+	}
 
 	private void overwrite(String filePath) throws FileNotFoundException {
 		final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
@@ -186,7 +186,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 		out.flush();
 	}
 
-    private void run(String method) {
+	private void run(String method) {
         switch (method) {
             case "POST":
                 restEndpoint.doPost(request, response);
