@@ -3,6 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -36,7 +38,7 @@ public class Converter {
 		ContentType contentType = getContentType(request);
 		ContentType responseType = getResponseType(request.getHeader(HttpHeaders.ACCEPT), contentType);
 		dataStore.setResponseType(responseType);
-		Set<LangTag> acceptLangs = getAcceptLanguages(request);
+		List<String> acceptLangs = getAcceptLanguages(request);
 		dataStore.setAcceptLangs(acceptLangs);
 		if (isJson(contentType)) {
 			JSONConverter.convert(request, action, dataStore);
@@ -135,17 +137,15 @@ public class Converter {
 		}
 	}
 
-	private static Set<LangTag> getAcceptLanguages(HttpServletRequest request) {
-		Set<LangTag> result = new HashSet<>();
+	private static List<String> getAcceptLanguages(HttpServletRequest request) {
+		List<String> result = new LinkedList<>();
 		String header = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
 		if (StringUtils.isBlank(header)) {
-			// Default
-			result.add(new LangTag("*"));
 			return result;
 		}
 		String[] rawTags = header.trim().split(SPLIT_BY_COMMA_AND_TRIM_REGEX);
 		for (String rawTag : rawTags) {
-			result.add(new LangTag(rawTag));
+			result.add(rawTag);
 		}
 		return result;
 	}

@@ -2,6 +2,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,7 +16,7 @@ public class DataStore {
 
 	protected Map<String, Data> dataMap = new HashMap<>();
 	private ContentType responseType = ContentType.APPLICATION_JSON;
-	private Set<LangTag> acceptLangs = new HashSet<>();
+	private List<String> acceptLangs = new LinkedList<>();
 	private String resourceId = "";
 
 
@@ -45,8 +47,12 @@ public class DataStore {
 		this.responseType = contentType;	
 	}
 
-	public void setAcceptLangs(Set<LangTag> acceptLangs) {
+	public void setAcceptLangs(List<String> acceptLangs) {
 		this.acceptLangs.addAll(acceptLangs);
+	}
+	
+	public List<String> getAcceptLangs() {
+	    return acceptLangs;
 	}
 
 	public boolean contains(String name) {
