@@ -103,6 +103,10 @@ public abstract class SparqlQuery extends Operation implements ContextModelsUser
 			log.error("Query text is not set");
 			valid = false;
 		}
+	    if (queryModelParam == null && rdfService == null) {
+	        log.error("Either query model param or rdfService should be set");
+	        valid = false;
+	    }
 		return valid;
 	}
 
