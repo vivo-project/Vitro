@@ -262,8 +262,8 @@
                    rdfs:range :Model ;
                    rdfs:label "retraction model parameter"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#temlate
-:temlate rdf:type owl:ObjectProperty ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#template
+:template rdf:type owl:ObjectProperty ;
                    rdfs:subPropertyOf owl:topObjectProperty ;
                    rdfs:domain :ReportGenerator ;
                    rdfs:range :Parameter ;
