@@ -281,7 +281,7 @@
                    rdfs:subPropertyOf owl:topObjectProperty ;
                    rdfs:domain :ReportGenerator ;
                    rdfs:range :Parameter ;
-                   rdfs:label "dataSource parameter"@en-US 
+                   rdfs:label "dataSource parameter"@en-US . 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#targetModel
 :targetModel rdf:type owl:ObjectProperty ;
