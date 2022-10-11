@@ -8,7 +8,7 @@ import static javax.mail.Message.RecipientType.TO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
@@ -67,7 +69,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         // error templates
         ERROR_DISPLAY("error-display.ftl"),
-        ERROR_EMAIL("error-email.ftl"),
         ERROR_MESSAGE("error-message.ftl"),
         STANDARD_ERROR("error-standard.ftl"),
         TITLED_ERROR_MESSAGE("error-titled.ftl"),
@@ -161,7 +162,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             }
             adminErrorData.put("cause", cause);
 
-            adminErrorData.put("datetime", new Date());
+            SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+            adminErrorData.put("datetime", dateformat.format(new Date()));
 
             templateMap.put("errorOnHomePage", this instanceof HomePageController);
 
@@ -175,7 +177,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             } else if (FreemarkerEmailFactory.isConfigured(vreq)) {
                 FreemarkerEmailMessage email = FreemarkerEmailFactory.createNewMessage(vreq);
                 email.addRecipient(TO, email.getReplyToAddress());
-                email.setTemplate(Template.ERROR_EMAIL.toString());
+                I18nBundle i18n = I18n.bundle(vreq);
+                adminErrorData.put("subject", i18n.text("application_error_email_subject"));
+                adminErrorData.put("textMessage", i18n.text("application_error_email_plain_text"));
+                adminErrorData.put("htmlMessage", i18n.text("application_error_email_html_text"));
                 email.setBodyMap(adminErrorData);
                 email.processTemplate();
                 sentEmail = email.send();

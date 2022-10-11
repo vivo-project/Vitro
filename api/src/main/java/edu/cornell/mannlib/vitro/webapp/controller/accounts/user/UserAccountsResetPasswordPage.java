@@ -26,8 +26,6 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 
 	private static final String TEMPLATE_NAME = "userAccounts-resetPassword.ftl";
 
-	private static final String EMAIL_TEMPLATE = "userAccounts-passwordResetCompleteEmail.ftl";
-
 	protected UserAccountsResetPasswordPage(VitroRequest vreq) {
 		super(vreq);
 	}
@@ -68,14 +66,16 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 
 	private void notifyUser() {
 		Map<String, Object> body = new HashMap<String, Object>();
+		FreemarkerEmailMessage email = FreemarkerEmailFactory.createNewMessage(vreq);
+		final String subject = i18n.text("password_changed_subject");
+		email.setSubject(subject);
+
 		body.put("userAccount", userAccount);
 		body.put("siteName", getSiteName());
-
-		FreemarkerEmailMessage email = FreemarkerEmailFactory
-				.createNewMessage(vreq);
+		body.put("subject", subject);
+		body.put("textMessage", i18n.text("password_reset_complete_email_plain_text"));
+		body.put("htmlMessage", i18n.text("password_reset_complete_email_html_text"));
 		email.addRecipient(TO, userAccount.getEmailAddress());
-		email.setSubject(i18n.text("password_changed_subject"));
-		email.setTemplate(EMAIL_TEMPLATE);
 		email.setBodyMap(body);
 		email.processTemplate();
 		email.send();

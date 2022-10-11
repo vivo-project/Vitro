@@ -52,8 +52,6 @@ public abstract class UserAccountsFirstTimeExternalPageStrategy extends
 	public static class EmailStrategy extends
 			UserAccountsFirstTimeExternalPageStrategy {
 
-		private static final String EMAIL_TEMPLATE = "userAccounts-firstTimeExternalEmail.ftl";
-
 		public EmailStrategy(VitroRequest vreq,
 				UserAccountsFirstTimeExternalPage page) {
 			super(vreq, page);
@@ -73,8 +71,11 @@ public abstract class UserAccountsFirstTimeExternalPageStrategy extends
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, ua.getEmailAddress());
-			email.setSubject(i18n.text("account_created_subject", getSiteName()));
-			email.setTemplate(EMAIL_TEMPLATE);
+			final String subject = i18n.text("account_created_subject", getSiteName());
+			email.setSubject(subject);
+			body.put("subject", subject);
+			body.put("textMessage", i18n.text("first_time_external_email_plain_text"));
+			body.put("htmlMessage", i18n.text("first_time_external_email_html_text"));
 			email.setBodyMap(body);
 			email.processTemplate();
 			email.send();
