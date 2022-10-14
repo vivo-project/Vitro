@@ -5,6 +5,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ResourceGenerator;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class Initializer implements ServletContextListener {
 
@@ -34,9 +36,15 @@ public class Initializer implements ServletContextListener {
         initializeResourcePool(ctx);
         initializeDynamicAPIDocumentation(ctx);
         initializeDynamicAPIModelFactory(ctx);
+        initializeNewResourceGenerator(ctx);
     }
 
-    private void initializeDynamicAPIModelFactory(ServletContext ctx) {
+    private void initializeNewResourceGenerator(ServletContext ctx) {
+    	ResourceGenerator resourceGenerator = ResourceGenerator.getInstance();
+    	resourceGenerator.init(ModelAccess.on(ctx).getWebappDaoFactory());
+	}
+
+	private void initializeDynamicAPIModelFactory(ServletContext ctx) {
 		DynapiModelFactory factory = DynapiModelFactory.getInstance();
 		factory.init(ctx);
 	}
