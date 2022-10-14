@@ -630,7 +630,8 @@ var customForm = {
         if ( this.templateDefinedAcTypes && !this.defaultAcType.length ) {
             this.defaultAcType = this.acTypes[acTypeKey];
         }
-        if (selectedType.val().length) {
+        var selectedTypeLength = selectedType.val().length;
+        if ( selectedTypeLength !== 'undefined') {
             this.acTypes[acTypeKey] = selectedType.val();
             this.typeName = selectedType.html();
             if ( this.editMode == 'edit' ) {
@@ -744,5 +745,9 @@ var customForm = {
 };
 
 $(document).ready(function() {
-    customForm.onLoad();
+	try{
+	    customForm.onLoad();
+	} catch(error){
+		console.log(error.message);
+	}
 });
