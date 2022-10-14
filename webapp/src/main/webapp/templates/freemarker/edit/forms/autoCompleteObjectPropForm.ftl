@@ -58,7 +58,7 @@
 
             <#---This section should become autocomplete instead-->
             <p>
-				<label for="object"> ${propertyNameForDisplay?capitalize} ${i18n().name_capitalized}<span class='requiredHint'> *</span></label>
+				<label for="object">  ${i18n().name_capitalized?cap_first} <span class='requiredHint'> *</span></label>
 				<input class="acSelector" size="50"  type="text" id="object" name="objectLabel" acGroupName="object" value="${objectLabel}" />
 			</p>
 
@@ -107,26 +107,26 @@ the parameter should not be passed at all to the search.
 Also multiple types parameter set to true only if more than one type returned-->
     <script type="text/javascript">
     var customFormData  = {
-        acUrl: '${urls.base}/autocomplete?tokenize=true',
+        acUrl: "${urls.base}/autocomplete?tokenize=true",
         <#if objectTypesExist = true>
-            acTypes: {object: '${objectTypes}'},
+            acTypes: {object: "${objectTypes}"},
         </#if>
         <#if multipleTypes = true>
-            acMultipleTypes: 'true',
+            acMultipleTypes: "true",
         </#if>
-        editMode: '${editMode}',
-        typeName:'${propertyNameForDisplay}',
-        acSelectOnly: 'true',
-        sparqlForAcFilter: '${sparqlForAcFilter}',
-        sparqlQueryUrl: '${sparqlQueryUrl}',
+        editMode: "${editMode}",
+        typeName:"${propertyNameForDisplay}",
+        acSelectOnly: "true",
+        sparqlForAcFilter: "${sparqlForAcFilter}",
+        sparqlQueryUrl: "${sparqlQueryUrl}",
         acFilterForIndividuals: ${acFilterForIndividuals},
-        defaultTypeName: '${propertyNameForDisplay}', // used in repair mode to generate button text
-        baseHref: '${urls.base}/individual?uri='
+        defaultTypeName: "${propertyNameForDisplay}", // used in repair mode to generate button text
+        baseHref: "${urls.base}/individual?uri="
     };
     var i18nStrings = {
-        selectAnExisting: '${i18n().select_an_existing?js_string}',
-        orCreateNewOne: '${i18n().or_create_new_one?js_string}',
-        selectedString: '${i18n().selected?js_string}'
+        selectAnExisting: "${i18n().select_an_existing?js_string}",
+        orCreateNewOne: "${i18n().or_create_new_one?js_string}",
+        selectedString: "${i18n().selected?js_string}"
     };
     </script>
 <#--
