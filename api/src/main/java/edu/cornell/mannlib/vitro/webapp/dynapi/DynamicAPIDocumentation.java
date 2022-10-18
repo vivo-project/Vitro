@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static java.lang.String.format;
 
 import java.util.Collection;
@@ -11,7 +10,6 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.APIInformation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
@@ -63,7 +61,6 @@ public class DynamicAPIDocumentation {
 
     private ConfigurationBeanLoader loader;
     private ContextModelAccess modelAccess;
-    private OntModel dynamicAPIModel;
 
     public static DynamicAPIDocumentation getInstance() {
         return INSTANCE;
@@ -71,8 +68,7 @@ public class DynamicAPIDocumentation {
 
     public void init(ServletContext ctx) {
         modelAccess = ModelAccess.on(ctx);
-        dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
-        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
+        loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel(), ctx);
     }
 
     public OpenAPI generate(DocsRequestPath requestPath) throws ConfigurationBeanLoaderException {

@@ -57,7 +57,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
         loadDefaultModel();
         loadTestModel();
 
-        loadModels("n3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-api.n3");
+        loadModels("n3", TEST_PREFIX + "dynamic-api-individuals-api.n3");
 
         ActionPool actionPool = ActionPool.getInstance();
 
