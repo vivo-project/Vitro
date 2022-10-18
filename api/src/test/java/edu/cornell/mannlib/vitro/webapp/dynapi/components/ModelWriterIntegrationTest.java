@@ -115,7 +115,7 @@ public class ModelWriterIntegrationTest extends ServletContextTest {
     }
     
     public void loadOntology(OntModel ontModel) throws IOException {
-        loadModel(ontModel, "../home/src/main/resources/rdf/tbox/filegraph/dynamic-api-implementation.n3");
-        loadModel(ontModel, "../home/src/main/resources/rdf/abox/filegraph/dynamic-api-individuals.n3");
+        loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
+        loadModel(ontModel, INDIVIDUALS_FILE_PATH);
     }
 }

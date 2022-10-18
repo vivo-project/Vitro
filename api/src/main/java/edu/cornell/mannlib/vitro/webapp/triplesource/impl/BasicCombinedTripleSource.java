@@ -4,14 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.triplesource.impl;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_INFERENCES;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_UNION;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_INFERENCES;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_INFERENCES;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_UNION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.*;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -70,7 +63,7 @@ public class BasicCombinedTripleSource implements CombinedTripleSource {
 		sources = new EnumMap<>(WhichService.class);
 		sources.put(CONTENT, contentSource);
 		sources.put(CONFIGURATION, configurationSource);
-
+		
 		ontModels = new EnumMap<>(WhichService.class);
 		ontModels.put(CONTENT, new UnionModelsOntModelsCache(
 				new ModelMakerOntModelCache(getModelMaker(CONTENT)),
