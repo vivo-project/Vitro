@@ -63,7 +63,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
         loadPersonVersion2Model();
         loadPersonVersion4_3_7Model();
 
-        loadModels("n3", "src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-api.n3");
+        loadModels("n3", TEST_PREFIX + "dynamic-api-individuals-api.n3");
 
         ActionPool actionPool = ActionPool.getInstance();
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
