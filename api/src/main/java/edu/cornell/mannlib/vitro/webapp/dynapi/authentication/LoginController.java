@@ -58,7 +58,7 @@ public class LoginController extends VitroHttpServlet {
             return;
         }
 
-        request.getSession().setAttribute("logged_in_user", user);
+        request.getSession().setAttribute("user", user);
         response.setStatus(200);
     }
 

@@ -29,10 +29,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 
 import org.apache.http.HttpHeaders;
@@ -72,6 +74,12 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     @Mock
     private HttpServletResponse response;
 
+    @Mock
+    private HttpSession session;
+
+    @Mock
+    private UserAccount user;
+    
     @Mock
     private PrintWriter responsePrintWriter;
 
@@ -137,6 +145,11 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         when(request.getRequestURI()).thenReturn(BASE_URL + REST_SERVLET_PATH + testRequestPath);
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(testRequestPath);
+        when(request.getSession(false)).thenReturn(session);
+        when(session.getAttribute("user")).thenReturn(user);
+        when(user.isRootUser()).thenReturn(true);
+
+
         when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
 
         if (testRequestParamsFile != null) {

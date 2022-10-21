@@ -125,7 +125,7 @@ public class LoginControllerTest {
         verify(request, times(1)).getParameter("password");
         verify(request, times(1)).getSession();
 
-        verify(session, times(1)).setAttribute("logged_in_user", testUser);
+        verify(session, times(1)).setAttribute("user", testUser);
 
         verify(response, times(1)).setStatus(200);
     }
