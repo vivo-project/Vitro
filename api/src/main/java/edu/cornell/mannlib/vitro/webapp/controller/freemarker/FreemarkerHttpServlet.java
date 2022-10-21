@@ -178,6 +178,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
                 FreemarkerEmailMessage email = FreemarkerEmailFactory.createNewMessage(vreq);
                 email.addRecipient(TO, email.getReplyToAddress());
                 I18nBundle i18n = I18n.bundle(vreq);
+                addSiteName(vreq, adminErrorData);
                 adminErrorData.put("subject", i18n.text("application_error_email_subject"));
                 adminErrorData.put("textMessage", i18n.text("application_error_email_plain_text"));
                 adminErrorData.put("htmlMessage", i18n.text("application_error_email_html_text"));
@@ -197,6 +198,16 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             throw new ServletException();
         }
     }
+
+	private void addSiteName(VitroRequest vreq, Map<String, Object> adminErrorData) {
+		try { 
+			ApplicationBean appBean = vreq.getAppBean();
+			String appName = appBean.getApplicationName();
+			adminErrorData.put("siteName", appName);
+		} catch (Exception e) {
+			log.error(e,e);
+		}
+	}
 
     @Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
