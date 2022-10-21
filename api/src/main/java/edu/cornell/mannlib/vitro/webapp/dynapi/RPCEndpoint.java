@@ -5,11 +5,14 @@ import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.BasicAuthenticator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -20,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 @WebServlet(name = "RPCEndpoint", urlPatterns = { RPC_SERVLET_PATH + "/*" })
 public class RPCEndpoint extends VitroHttpServlet {
 
-    private static final Log log = LogFactory.getLog(RESTEndpoint.class);
+    private static final Log log = LogFactory.getLog(RPCEndpoint.class);
 
     private ActionPool actionPool = ActionPool.getInstance();
 
@@ -37,6 +40,11 @@ public class RPCEndpoint extends VitroHttpServlet {
                 actionPool.printKeys();
             }
             Action action = actionPool.get(requestPath.getActionName());
+			UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
+	        if (!action.hasPermissions(user)) {
+	        	OperationResult.notAuthorized().prepareResponse(response);
+	        	return;
+	        } 
             DataStore dataStore = new DataStore();
             if (requestPath.isResourceRequest()) {
                 dataStore.setResourceID(requestPath.getResourceId());
