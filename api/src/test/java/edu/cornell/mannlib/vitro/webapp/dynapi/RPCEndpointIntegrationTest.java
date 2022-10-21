@@ -19,6 +19,7 @@ import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
@@ -34,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 
 @RunWith(Parameterized.class)
@@ -52,6 +54,12 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @Mock
     private HttpServletResponse response;
+
+    @Mock
+    private HttpSession session;
+
+    @Mock
+    private UserAccount user;
 
     @Parameter(0)
     public String testAction;
@@ -99,6 +107,9 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         when(request.getServletContext()).thenReturn(servletContext);
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
+        when(request.getSession(false)).thenReturn(session);
+        when(session.getAttribute("user")).thenReturn(user);
+        when(user.isRootUser()).thenReturn(true);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(ontModel);
         
         if (testAction != null) {

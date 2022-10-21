@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.BasicAuthenticator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
@@ -141,6 +143,11 @@ public class RESTEndpoint extends VitroHttpServlet {
             actionPool.printKeys();
         }
         Action action = actionPool.get(actionName);
+		UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
+        if (!action.hasPermissions(user)) {
+        	OperationResult.notAuthorized().prepareResponse(response);
+        	return;
+        } 
         DataStore dataStore = new DataStore();
         if (requestPath.isResourceRequest()) {
             dataStore.setResourceID(requestPath.getResourceId());
