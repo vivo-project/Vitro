@@ -2,6 +2,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +12,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.access.AccessWhitelist;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.AutoConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -28,6 +32,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     private Parameters outputParams = new Parameters();
     private Parameters inputParams = new Parameters();
     private Parameters internalParams = new Parameters();
+    private List<AccessWhitelist> accessWhitelists = new LinkedList<AccessWhitelist>();
 
     @Override
     public void dereference() {
@@ -38,6 +43,12 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         return firstStep.run(dataStore);
     }
 
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#accessWhiteList")
+    public void addAccessFilter(AccessWhitelist whiteList) {
+        accessWhitelists.add(whiteList);
+        whiteList.setActionName(rpc.getName());
+    }
+    
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
     public void setStep(Step step) {
         this.firstStep = step;
@@ -171,6 +182,28 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 	public String getOutputPath() {
 		// TODO Auto-generated method stub
 		return "";
+	}
+
+	public boolean hasPermissions(UserAccount user) {
+		if (isPublicAccessible()) {
+			return true;
+		}
+		if (user == null) {
+			return false;
+		}
+		if (user.isRootUser()) {
+			return true;
+		}
+		for (AccessWhitelist filter : accessWhitelists) {
+			if (filter.isAuthorized(user)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isPublicAccessible() {
+		return false;
 	}
 
 }

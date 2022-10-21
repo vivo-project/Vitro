@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,6 +24,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -38,6 +40,12 @@ public class RPCEndpointTest {
 
     private RPCEndpoint rpcEndpoint;
 
+    @Mock
+    private HttpSession session;
+
+    @Mock
+    private UserAccount user;
+    
     @Mock
     private ActionPool actionPool;
 
@@ -57,6 +65,9 @@ public class RPCEndpointTest {
         when(actionPool.get(any(String.class))).thenReturn(action);
 
         when(request.getParameterMap()).thenReturn(params);
+        when(request.getSession(false)).thenReturn(session);
+        when(session.getAttribute("user")).thenReturn(user);
+        when(user.isRootUser()).thenReturn(true);
 
         rpcEndpoint = new RPCEndpoint();
     }
