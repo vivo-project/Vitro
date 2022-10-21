@@ -3,7 +3,7 @@
 <#if origination?has_content && origination == "helpLink">
     <h2>${i18n().search_tips_header}</h2>
     <span id="searchHelp">
-        <a href="#" onClick="history.back();return false;" title="back to results">${i18n().back_to_results}</a>
+        <a href="#" onClick="history.back();return false;" title="${i18n().back_to_results}">${i18n().back_to_results}</a>
     </span>
 <#else>
     <h3>${i18n().search_tips_header}</h3>
