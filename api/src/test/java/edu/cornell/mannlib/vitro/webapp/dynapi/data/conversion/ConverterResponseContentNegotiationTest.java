@@ -46,10 +46,11 @@ public class ConverterResponseContentNegotiationTest {
     @Parameterized.Parameters
     public static Collection<Object[]> parameters() {
         return Arrays.asList(new Object[][] {
+            { "application/json", APPLICATION_JSON, false, APPLICATION_JSON.toString() },
+            { "Application/json", APPLICATION_JSON, false, APPLICATION_JSON.toString() },
             { "", APPLICATION_JSON, false, APPLICATION_JSON.toString() },
             { "", MULTIPART_FORM_DATA, false, MULTIPART_FORM_DATA.toString() },
             { "", APPLICATION_ATOM_XML, true, null },
-            { APPLICATION_JSON.toString() + "bad", APPLICATION_JSON, true, null },
             { APPLICATION_JSON.toString() + "bad, " + APPLICATION_JSON.toString(), APPLICATION_JSON, false, APPLICATION_JSON.toString() },
             { MULTIPART_FORM_DATA.toString(), APPLICATION_JSON, false, MULTIPART_FORM_DATA.toString() },
             { APPLICATION_JSON.toString(), MULTIPART_FORM_DATA, false, APPLICATION_JSON.toString() },
