@@ -31,10 +31,6 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Override
     public void dereference() {
-        firstStep.dereference();
-        firstStep = null;
-        rpc.dereference();
-        rpc = null;
     }
 
     @Override
