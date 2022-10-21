@@ -29,13 +29,13 @@ public class Converter {
 	private static final String SPLIT_BY_COMMA_AND_TRIM_REGEX = "\\s*,\\s*";
 	private static final String SPLIT_CONTENT_TYPE_AND_WEIGHT_REGEX = "\\s*;\\s*q=";
 	private static Set<String> supportedContentTypes = new HashSet<>(
-			Arrays.asList(ContentType.APPLICATION_JSON.toString(), 
-			ContentType.MULTIPART_FORM_DATA.toString(), 
-			ContentType.WILDCARD.toString()));
+			Arrays.asList(ContentType.APPLICATION_JSON.getMimeType().toString(), 
+			ContentType.MULTIPART_FORM_DATA.getMimeType().toString(), 
+			ContentType.WILDCARD.getMimeType().toString()));
 
 	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
 			throws ConversionException {
-		ContentType contentType = getContentType(request);
+		ContentType contentType = getContentType(request.getContentType());
 		ContentType responseType = getResponseType(request.getHeader(HttpHeaders.ACCEPT), contentType);
 		dataStore.setResponseType(responseType);
 		List<String> acceptLangs = getAcceptLanguages(request.getHeader(HttpHeaders.ACCEPT_LANGUAGE));
@@ -64,7 +64,7 @@ public class Converter {
 			throws ConversionException {
 		TreeMap<Double, ContentType> types = new TreeMap<>(Collections.reverseOrder());
 		if (StringUtils.isBlank(header)) {
-			if (supportedContentTypes.contains(requestType.toString())) {
+			if (supportedContentTypes.contains(requestType.getMimeType().toString())) {
 				return requestType;
 			} else {
 				String message = outputContentTypeExceptionMessage(requestType);
@@ -80,14 +80,14 @@ public class Converter {
 			}
 			ContentType contentType = null;
 			try {
-				contentType = ContentType.parse(typeName);
+				contentType = getKnownContentType(typeName);
 			} catch (Exception e) {
 				log.error(e, e);
 			}
 			if (contentType == null) {
 				continue;
 			}
-			if (!supportedContentTypes.contains(typeName)) {
+			if (!supportedContentTypes.contains(contentType.getMimeType().toString())) {
 				continue;
 			}
 			Double weight = 1.0;
@@ -113,7 +113,7 @@ public class Converter {
 		}
 		return mostAppropriateType;
 	}
-	
+
 	public static void convert(HttpServletResponse response, Action action, OperationResult operationResult,
 			DataStore dataStore) throws ConversionException {
 		if (!operationResult.hasSuccess()) {
@@ -165,12 +165,24 @@ public class Converter {
 		return new ArrayList<>(languages.values());
 	}
 
-	private static ContentType getContentType(HttpServletRequest request) {
-		String header = request.getContentType();
+	private static ContentType getKnownContentType(String typeName) throws ConversionException {
+		if (typeName.toLowerCase().startsWith("application/json")) {
+			return ContentType.APPLICATION_JSON;
+		}
+		if (typeName.toLowerCase().startsWith("multipart/form-data")) {
+			return ContentType.MULTIPART_FORM_DATA;
+		}
+		if (typeName.equals("*/*")||typeName.equals("*") ) {
+			return ContentType.WILDCARD;
+		}
+		throw new ConversionException("Content type not supported " + typeName);
+	}
+	
+	private static ContentType getContentType(String header) throws ConversionException {
 		if (StringUtils.isBlank(header)) {
 			return ContentType.MULTIPART_FORM_DATA;
 		}
-		return ContentType.parse(header);
+		return getKnownContentType(header);
 	}
 
 	private static boolean isForm(ContentType type) {
