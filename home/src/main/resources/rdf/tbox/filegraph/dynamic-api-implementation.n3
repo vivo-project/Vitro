@@ -2,6 +2,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi_access: <java:edu.cornell.mannlib.vitro.webapp.dynapi.access#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
@@ -57,4 +58,10 @@ dynapi:Api rdfs:subClassOf dynapi_java:APIInformation .
 
 dynapi:Condition rdfs:subClassOf dynapi_java:conditions.Condition .
 
-dynapi:ConditionIsNotEmpty rdfs:subClassOf dynapi_java:conditions.ConditionIsNotEmpty
+dynapi:ConditionIsNotEmpty rdfs:subClassOf dynapi_java:conditions.ConditionIsNotEmpty .
+
+dynapi:UserGroup rdfs:subClassOf dynapi_access:UserGroup .
+
+dynapi:AccessWhitelist rdfs:subClassOf dynapi_access:AccessWhitelist .
+
+dynapi:GroupAccessWhitelist rdfs:subClassOf dynapi_access:GroupAccessWhitelist .
