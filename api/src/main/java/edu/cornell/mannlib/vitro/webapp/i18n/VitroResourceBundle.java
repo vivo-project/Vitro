@@ -66,26 +66,27 @@ public class VitroResourceBundle extends ResourceBundle {
 		addAppPrefix("vitro");
 	}
 
-	private static final String SPARQL_LANGUAGE_QUERY = " PREFIX : <http://vivoweb.org/ontology/core/properties#>\n" +
+	private static final String SPARQL_LANGUAGE_QUERY = " PREFIX : <http://vivoweb.org/ontology/core/properties/vocabulary#>\n" +
 														"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
 														"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n" +
 														"SELECT ?key ?translation\n" +
 														"WHERE {\n" +
-														"  ?uri :key ?key .\n" +
+														"  ?uri :hasKey ?key .\n" +
 														"  ?uri rdfs:label ?translationWithLocale .\t\n" +
 														"  OPTIONAL { \n" +
-														"    ?uri :theme ?found_theme .\n" +
+														"    ?uri :hasTheme ?found_theme .\n" +
 														"  }\n" +
 														"  OPTIONAL { \n" +
-														"    ?uri :application ?found_application .\n" +
+														"    ?uri :hasApp ?found_application .\n" +
 														"  }\n" +
 														"  BIND(COALESCE(?found_theme, \"none\") as ?theme ) .\n" +
 														"  BIND(COALESCE(?found_application, \"none\") as ?application ) .\n" +
-														"  BIND(IF(?current_theme = lcase(str(?theme)), 100, 0) AS ?priority1 ) .\n" +
-														"  BIND(IF(?current_application = lcase(str(?application)), xsd:integer(?priority1)+10, xsd:integer(?priority1)) AS ?priority2 ) .\n" +
+														"  BIND(IF(?current_theme = lcase(str(?theme)), 50, 0) AS ?priority1 ) .\n" +
+														"  BIND(IF(?current_theme = \"none\", xsd:integer(?priority1)+10, xsd:integer(?priority1)) AS ?priority2 ) .\n" +
+														"  BIND(IF(?current_application = lcase(str(?application)), xsd:integer(?priority2)+5, xsd:integer(?priority2)) AS ?priority3 ) .\n" +
 														"  BIND (STR(?translationWithLocale) AS ?translation) .\n" +
 														"} \n" +
-														"ORDER by ASC(?priority2) " ;
+														"ORDER by ASC(?priority3) " ;
 
 	public static void addAppPrefix(String prefix) {
 		if (!prefix.endsWith("-") && !prefix.endsWith("_")) {
