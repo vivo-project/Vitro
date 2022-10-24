@@ -5,14 +5,12 @@ import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.BasicAuthenticator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
