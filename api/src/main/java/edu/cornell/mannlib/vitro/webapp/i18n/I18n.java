@@ -176,15 +176,15 @@ public class I18n {
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
 					locale, control);
 
-			return new I18nBundle(bundleName, rb, i18nLogger);
+			return new I18nBundleImpl(bundleName, rb, i18nLogger);
 		} catch (MissingResourceException e) {
 			log.warn("Didn't find text bundle '" + bundleName + "'");
 
-			return I18nBundle.emptyBundle(bundleName, i18nLogger);
+			return I18nBundleImpl.emptyBundle(bundleName, i18nLogger);
 		} catch (Exception e) {
 			log.error("Failed to create text bundle '" + bundleName + "'", e);
 
-			return I18nBundle.emptyBundle(bundleName, i18nLogger);
+			return I18nBundleImpl.emptyBundle(bundleName, i18nLogger);
 		}
 	}
 

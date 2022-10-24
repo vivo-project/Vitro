@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundleImpl;
 import stubs.javax.servlet.ServletContextStub;
 
 /**
@@ -55,7 +56,7 @@ public class I18nStub extends I18n {
 		return new I18nBundleStub(bundleName);
 	}
 
-	private class I18nBundleStub extends I18nBundle {
+	private class I18nBundleStub extends I18nBundleImpl {
 		public I18nBundleStub(String bundleName) {
 			super(bundleName, new DummyResourceBundle(), null);
 		}
