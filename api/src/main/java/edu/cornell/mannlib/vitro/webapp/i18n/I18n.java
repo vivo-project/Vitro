@@ -263,6 +263,7 @@ public class I18n {
 
 		private final ServletContext ctx;
 		private final String themeDirectory;
+		private Locale localeForLoading;
 
 
 		public ThemeBasedControl(ServletContext ctx, String themeDirectory) {
@@ -325,6 +326,7 @@ public class I18n {
 				approximateMatches.remove(locale);
 			}
 			if (approximateMatches.isEmpty()) {
+				localeForLoading = (usualList!=null)?usualList.get(0):null;
 				return usualList;
 			}
 
@@ -338,7 +340,20 @@ public class I18n {
 				mergedList.addAll(rootLocaleHere, approximateMatches);
 			}
 
+			localeForLoading = (mergedList!=null)?mergedList.get(0):null;
 			return mergedList;
+		}
+
+		@Override
+		public long getTimeToLive(String baseName, Locale locale) {
+			if (baseName == null) {
+				throw new NullPointerException();
+			} else if (locale == null) {
+				throw new NullPointerException();
+			} else if ((localeForLoading) != null && (!localeForLoading.equals(locale))){
+				return ResourceBundle.Control.TTL_DONT_CACHE;
+			}
+			return ResourceBundle.Control.TTL_NO_EXPIRATION_CONTROL;
 		}
 
 		private SortedSet<Locale> findApproximateMatches(Locale locale) {
