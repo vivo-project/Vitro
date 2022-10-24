@@ -34,6 +34,8 @@ public class ModelNames {
 	public static final String DISPLAY_TBOX_FIRSTTIME_BACKUP = DISPLAY_TBOX + "FirsttimeBackup";
 	public static final String DISPLAY_DISPLAY = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
 	public static final String DISPLAY_DISPLAY_FIRSTTIME_BACKUP = DISPLAY_DISPLAY + "FirsttimeBackup";
+	public static final String INTERFACE_I18N = "http://vitro.mannlib.cornell.edu/default/interface-i18n";
+
 
 	/**
 	 * A map of the URIS, keyed by their short names, intended only for display
@@ -64,6 +66,7 @@ public class ModelNames {
 		map.put("DISPLAY_TBOX_FIRSTTIME_BACKUP", DISPLAY_TBOX_FIRSTTIME_BACKUP);
 		map.put("DISPLAY_DISPLAY", DISPLAY_DISPLAY);
 		map.put("DISPLAY_DISPLAY_FIRSTTIME_BACKUP", DISPLAY_DISPLAY_FIRSTTIME_BACKUP);
+		map.put("INTERFACE_I18N", INTERFACE_I18N);
 		return Collections.unmodifiableMap(map);
 	}
 
