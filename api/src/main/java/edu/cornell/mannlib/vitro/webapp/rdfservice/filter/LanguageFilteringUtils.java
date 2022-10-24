@@ -33,7 +33,7 @@ public class LanguageFilteringUtils {
      * (as in RDF language specifiers).
      */
     public static String localeToLanguage(Locale locale) {
-        return locale.toLanguageTag().toString().replace(UNDERSCORE, HYPHEN);
+        return locale.toString().replace(UNDERSCORE, HYPHEN);
     }
 	
     /**
@@ -69,7 +69,7 @@ public class LanguageFilteringUtils {
 		List<String> langs = new ArrayList<>();
 		while (locales.hasMoreElements()) {
 			Locale locale = (Locale) locales.nextElement();
-			langs.add(locale.toLanguageTag().toString().replace(UNDERSCORE, HYPHEN));
+			langs.add(locale.toString().replace(UNDERSCORE, HYPHEN));
 		}
 		if (langs.isEmpty()) {
 			langs.add(DEFAULT_LANG_STRING);
@@ -106,19 +106,6 @@ public class LanguageFilteringUtils {
 		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
 		        ModelFactory.createModelForGraph(new LanguageFilteringGraph(
 		                rawModel.getGraph(), languages)));
-	}
-
-	/**
-	 * Add a Language Filtering layer to an OntModel for a certain locale
-	 */
-	public static OntModel wrapOntModelInALanguageFilter(OntModel rawModel,
-			String locale) {
-		List<String> locales = new ArrayList<>();
-		if(locale != null)
-			locales.add(locale);
-		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
-				ModelFactory.createModelForGraph(new LanguageFilteringGraph(
-						rawModel.getGraph(), new AcceptableLanguages(locales))));
 	}
 
 	private LanguageFilteringUtils() {
