@@ -154,7 +154,7 @@ public class LocaleSelectionSetup implements ServletContextListener {
 		Locale locale = LocaleUtility.languageStringToLocale(localeString);
 
 		if (!"es_GO".equals(localeString) && // No complaint about bogus locale
-				!LocaleUtils.isAvailableLocale(locale.stripExtensions())) {
+				!LocaleUtils.isAvailableLocale(locale)) {
 			ssWarning("'" + locale + "' is not a recognized locale.");
 		}
 
