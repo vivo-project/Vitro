@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -320,10 +321,6 @@ public class I18n {
 			// are not already in the list, we're done.
 			SortedSet<Locale> approximateMatches = findApproximateMatches(locale);
 			approximateMatches.removeAll(usualList);
-			if ((! usualList.contains(locale)) && (approximateMatches.contains(locale))){
-				usualList.add(0, locale);
-				approximateMatches.remove(locale);
-			}
 			if (approximateMatches.isEmpty()) {
 				return usualList;
 			}
@@ -337,7 +334,6 @@ public class I18n {
 			} else {
 				mergedList.addAll(rootLocaleHere, approximateMatches);
 			}
-
 			return mergedList;
 		}
 

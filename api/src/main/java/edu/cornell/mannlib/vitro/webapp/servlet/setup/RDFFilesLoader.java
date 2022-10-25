@@ -32,7 +32,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import sun.util.locale.LanguageTag;
 
 import javax.servlet.ServletContext;
 
@@ -137,7 +136,7 @@ public class RDFFilesLoader {
 		// Which locales are enabled in runtime.properties?
 		List<Locale> locales = SelectedLocale.getSelectableLocales(ctx);
 		for (Locale locale : locales) {
-			enabledLocales.add(locale.stripExtensions().toLanguageTag().replace('-', '_'));
+			enabledLocales.add(locale.toLanguageTag().replace('-', '_'));
 		}
 
 		// If no languages were enabled in runtime.properties, add a fallback as the default
