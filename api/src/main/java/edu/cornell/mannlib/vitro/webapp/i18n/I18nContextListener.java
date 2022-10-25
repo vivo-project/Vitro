@@ -9,6 +9,13 @@ public class I18nContextListener implements ServletContextListener{
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		initializeTranslationProvider(sce);
+		initializeTranslationConverter(sce);
+	}
+
+	private void initializeTranslationConverter(ServletContextEvent sce) {
+		ServletContext ctx = sce.getServletContext();
+		TranslationConverter.getInstance().initialize(ctx);
+
 	}
 
 	private void initializeTranslationProvider(ServletContextEvent sce) {
