@@ -1,8 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -37,18 +40,25 @@ import org.apache.jena.shared.Lock;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class TranslationConverter {
 
-	private static final String ALL = "all";
-	private OntModel model;
+	private OntModel memModel;
 	private ServletContext ctx;
+	private static final boolean BEGIN = true;
+	private static final boolean END = !BEGIN;
 	private static final int SUFFIX_LENGTH = ".properties".length();
 	private static final Log log = LogFactory.getLog(TranslationConverter.class);
 	private static final TranslationConverter INSTANCE = new TranslationConverter();
 	private static final String THEMES = "themes";
+	private static final String ALL = "all";
 	private static final String APP_I18N_PATH = "/i18n/";
 	private static final String LOCAL_I18N_PATH = "/local/i18n/";
 	private static final String THEMES_PATH = "/themes/";
@@ -96,8 +106,39 @@ public class TranslationConverter {
 
 	public void initialize(ServletContext ctx) {
 		this.ctx = ctx;
-		model = ModelAccess.on(ctx).getOntModel(ModelNames.INTERFACE_I18N);
+		OntModel tdbModel = ModelAccess.on(ctx).getOntModel(ModelNames.INTERFACE_I18N);
+		RDFService rdfService = ModelAccess.on(ctx).getRDFService();
+		memModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		memModel.add(tdbModel);
 		convertAll();
+		cleanTdbModel(tdbModel, rdfService);
+		updateTDBModel(rdfService);
+	}
+
+	private void cleanTdbModel(OntModel storedModel, RDFService rdfService) {
+		ChangeSet cs = makeChangeSet(rdfService);
+		ByteArrayOutputStream removeOS = new ByteArrayOutputStream();
+		storedModel.write(removeOS, "N3");
+		InputStream removeIS = new ByteArrayInputStream(removeOS.toByteArray());
+		cs.addRemoval(removeIS, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.INTERFACE_I18N);
+		try {
+			rdfService.changeSetUpdate(cs);
+		} catch (RDFServiceException e) {
+			log.error(e,e);
+		}
+	}
+
+	private void updateTDBModel(RDFService rdfService) {
+		ChangeSet cs = makeChangeSet(rdfService);
+		ByteArrayOutputStream addOS = new ByteArrayOutputStream();
+		memModel.write(addOS, "N3");
+		InputStream addIS = new ByteArrayInputStream(addOS.toByteArray());
+		cs.addAddition(addIS, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.INTERFACE_I18N);
+		try {
+			rdfService.changeSetUpdate(cs);
+		} catch (RDFServiceException e) {
+			log.error(e,e);
+		}
 	}
 	
 	public void convertAll() {
@@ -105,7 +146,7 @@ public class TranslationConverter {
 		List<String> prefixes = VitroResourceBundle.getAppPrefixes();
 		prefixes.add("");
 		String prefixesRegex = "(" + StringUtils.join(prefixes, ALL + "|") + ALL + ")";
-		log.error("prefixesRegex " + prefixesRegex);
+		log.debug("prefixesRegex " + prefixesRegex);
 		for (String dir : i18nDirs) {
 			File realDir = new File(ctx.getRealPath(dir));
 			Collection<File> files = FileUtils.listFiles(realDir, new RegexFileFilter(prefixesRegex + ".*\\.properties"), DirectoryFileFilter.DIRECTORY);
@@ -125,7 +166,7 @@ public class TranslationConverter {
 		if (props == null || props.isEmpty()) {
 			return;
 		}
-		log.error("Converting properties " + file.getAbsolutePath());
+		log.info("Converting properties " + file.getAbsolutePath());
 		String theme = getTheme(file);
 		String application = getApplication(file);
 		String language = getLanguage(file);
@@ -156,14 +197,14 @@ public class TranslationConverter {
 		OntModel removeModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		addModel.read(new StringReader(additions.toString()), null, "n3");
 		removeModel.read(new StringReader(retractionsN3.toString()), null, "n3");
-		model.enterCriticalSection(Lock.WRITE);
+		memModel.enterCriticalSection(Lock.WRITE);
 		try {
-			model.remove(removeModel);
-			model.add(addModel);
+			memModel.remove(removeModel);
+			memModel.add(addModel);
 		} finally {
-			model.leaveCriticalSection();	
+			memModel.leaveCriticalSection();	
 		}
-		log.error("Conversion finished for properties " + file.getAbsolutePath());
+		log.info("Conversion finished for properties " + file.getAbsolutePath());
 
 	}
 
@@ -224,7 +265,7 @@ public class TranslationConverter {
 			query = QueryFactory.create(queryWithTheme(langTag));
 			bindings.add("theme", ResourceFactory.createStringLiteral(theme));
 		}
-		QueryExecution qexec = QueryExecutionFactory.create(query, model, bindings);
+		QueryExecution qexec = QueryExecutionFactory.create(query, memModel, bindings);
 		return qexec;
 	}
 
@@ -274,4 +315,11 @@ public class TranslationConverter {
 		return getTheme(parent);
 	}
 
+	private ChangeSet makeChangeSet(RDFService rdfService) {
+		ChangeSet cs = rdfService.manufactureChangeSet();
+		cs.addPreChangeEvent(new BulkUpdateEvent(null, BEGIN));
+		cs.addPostChangeEvent(new BulkUpdateEvent(null, END));
+		return cs;
+	}
+	
 }
