@@ -695,10 +695,10 @@ var customForm = {
         // ac fields there are cases where we also have to check if the help text is already there
         if (!$(selectedObj).val() || $(selectedObj).hasClass(this.acHelpTextClass) || $(selectedObj).val().substring(0, 18) == customForm.selectAnExisting ) {
         	typeText = this.getTypeNameForLabels($(selectedObj));
-        	var helpText = customForm.selectAnExisting + " " + typeText + " " + customForm.orCreateNewOne ;
+        	var helpText = customForm.selectAnExistingOrCreateNewOne ;
         	//Different for object property autocomplete
         	if ( this.acSelectOnly ) {
-        		helpText = customForm.selectAnExisting + " " + typeText;
+        		helpText = customForm.selectAnExisting;
         	}
     		$(selectedObj).val(helpText)
     	               .addClass(this.acHelpTextClass);
