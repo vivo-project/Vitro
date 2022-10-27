@@ -3,16 +3,20 @@ package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,8 +35,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.Lock;
 
-import com.ibm.icu.impl.LocaleUtility;
-
 import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -40,10 +42,16 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 public class TranslationConverter {
 
+	private static final String ALL = "all";
+	private OntModel model;
+	private ServletContext ctx;
 	private static final int SUFFIX_LENGTH = ".properties".length();
 	private static final Log log = LogFactory.getLog(TranslationConverter.class);
 	private static final TranslationConverter INSTANCE = new TranslationConverter();
 	private static final String THEMES = "themes";
+	private static final String APP_I18N_PATH = "/i18n/";
+	private static final String LOCAL_I18N_PATH = "/local/i18n/";
+	private static final String THEMES_PATH = "/themes/";
 	private static final String TEMPLATE_BODY = ""
 			+ "?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .\n"
 			+ "?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> .\n"
@@ -86,24 +94,42 @@ public class TranslationConverter {
 		return INSTANCE;
 	}
 
-	private OntModel model;
-
 	public void initialize(ServletContext ctx) {
+		this.ctx = ctx;
 		model = ModelAccess.on(ctx).getOntModel(ModelNames.INTERFACE_I18N);
+		convertAll();
+	}
+	
+	public void convertAll() {
+		List<String> i18nDirs = new LinkedList<>(Arrays.asList(APP_I18N_PATH, LOCAL_I18N_PATH, THEMES_PATH));
+		List<String> prefixes = VitroResourceBundle.getAppPrefixes();
+		prefixes.add("");
+		String prefixesRegex = "(" + StringUtils.join(prefixes, ALL + "|") + ALL + ")";
+		log.error("prefixesRegex " + prefixesRegex);
+		for (String dir : i18nDirs) {
+			File realDir = new File(ctx.getRealPath(dir));
+			Collection<File> files = FileUtils.listFiles(realDir, new RegexFileFilter(prefixesRegex + ".*\\.properties"), DirectoryFileFilter.DIRECTORY);
+			for (File file : files) {
+				convert(file);
+			}
+		}
 	}
 
-	public void convert(File file) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+	private void convert(File file) {
 		Properties props = new Properties();
 		try (Reader reader = new InputStreamReader( new FileInputStream(file), "UTF-8")) {
 			props.load(reader);
+		} catch (Exception e) {
+			log.error(e,e);
 		} 
 		if (props == null || props.isEmpty()) {
 			return;
 		}
+		log.error("Converting properties " + file.getAbsolutePath());
 		String theme = getTheme(file);
 		String application = getApplication(file);
 		String language = getLanguage(file);
-		String langTag = LocaleUtility.getLocaleFromName(language).toLanguageTag();
+		String langTag = getLanguageTag(language);
 		StringWriter additions = new StringWriter();
 		StringWriter retractionsN3 = new StringWriter();
 		for (Object key : props.keySet()) {
@@ -130,7 +156,6 @@ public class TranslationConverter {
 		OntModel removeModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		addModel.read(new StringReader(additions.toString()), null, "n3");
 		removeModel.read(new StringReader(retractionsN3.toString()), null, "n3");
-		//TODO: Copy tmp model contents into inMemoryModel
 		model.enterCriticalSection(Lock.WRITE);
 		try {
 			model.remove(removeModel);
@@ -138,6 +163,12 @@ public class TranslationConverter {
 		} finally {
 			model.leaveCriticalSection();	
 		}
+		log.error("Conversion finished for properties " + file.getAbsolutePath());
+
+	}
+
+	private String getLanguageTag(String language) {
+		return language.replaceAll("_","-");
 	}
 
 	private String getLabel(QuerySolution solution) {

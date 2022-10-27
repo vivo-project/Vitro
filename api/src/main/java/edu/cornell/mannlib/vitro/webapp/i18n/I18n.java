@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -138,7 +139,7 @@ public class I18n {
 
 		Locale locale = req.getLocale();
 
-		return getBundle(bundleName, locale);
+		return new I18nSemanticBundle(Collections.singletonList(locale));
 	}
 
 	/**
@@ -162,7 +163,7 @@ public class I18n {
 
 		Locale locale = SelectedLocale.getPreferredLocale(ctx, preferredLocales);
 
-		return getBundle(bundleName, locale);
+		return new I18nSemanticBundle(Collections.singletonList(locale));
 	}
 
 	/**

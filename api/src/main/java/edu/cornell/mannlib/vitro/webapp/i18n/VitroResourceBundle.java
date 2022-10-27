@@ -57,6 +57,10 @@ public class VitroResourceBundle extends ResourceBundle {
 		addAppPrefix("vitro");
 	}
 
+	public static List<String> getAppPrefixes(){
+		return appPrefixes;
+	}
+	
 	public static void addAppPrefix(String prefix) {
 		if (!prefix.endsWith("-") && !prefix.endsWith("_")) {
 			prefix = prefix + "_";
