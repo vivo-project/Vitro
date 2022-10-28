@@ -27,6 +27,7 @@ public class TranslationProvider {
 	private static final String MESSAGE_KEY_NOT_FOUND = "ERROR: Translation not found ''{0}''";
 	private static final TranslationProvider INSTANCE = new TranslationProvider();
 	private static final Log log = LogFactory.getLog(TranslationProvider.class);
+	private static final I18nLogger i18nLogger = new I18nLogger();
 	private static String application = "Vitro";
 	private static final String QUERY = "" 
 	+ "PREFIX : <http://vivoweb.org/ontology/core/properties/vocabulary#>\n"
@@ -77,15 +78,15 @@ public class TranslationProvider {
 			return cache.get(tk);
 		}
 		String text = getText(preferredLocales, key);
-		String message = formatString(text, parameters);
-		
+		String formattedText = formatString(text, parameters);
+		i18nLogger.log(key, parameters, text, formattedText);
 		if (needExportInfo()) {
-			return prepareExportInfo(key, parameters, text, message);
+			return prepareExportInfo(key, parameters, text, formattedText);
 		} else {
-			cache.put(tk, message);
+			cache.put(tk, formattedText);
 			log.debug("Added to cache " + key);
 			log.debug("Returned value from request for " + key);
-			return message;
+			return formattedText;
 		}
 	}
 

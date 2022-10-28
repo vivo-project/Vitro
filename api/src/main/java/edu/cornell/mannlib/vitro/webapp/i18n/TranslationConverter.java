@@ -193,6 +193,8 @@ public class TranslationConverter {
 			String addition = fillOutTemplate(uri, key.toString(), value.toString(), theme, application, langTag);
 			additions.append(addition);
 		}
+		log.debug("Remove from model" + retractionsN3.toString());
+		log.debug("Add to model" + additions.toString());
 		OntModel addModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		OntModel removeModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		addModel.read(new StringReader(additions.toString()), null, "n3");
