@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import static edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.createSelectQueryContext;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -61,7 +62,7 @@ public class TranslationProvider {
 		RevisionInfoBean info = (RevisionInfoBean) ctx.getAttribute(RevisionInfoBean.ATTRIBUTE_NAME);
 		List<LevelRevisionInfo> levelInfos = info.getLevelInfos();
 		setApplication(levelInfos);
-		rdfService = ModelAccess.on(ctx).getRDFService();
+		rdfService = ModelAccess.on(ctx).getRDFService(CONFIGURATION);
 	}
 
 	private void setApplication(List<LevelRevisionInfo> levelInfos) {

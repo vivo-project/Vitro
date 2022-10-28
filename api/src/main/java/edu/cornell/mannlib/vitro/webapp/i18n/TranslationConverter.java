@@ -49,6 +49,9 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
+
+
 public class TranslationConverter {
 
 	private OntModel memModel;
@@ -108,7 +111,7 @@ public class TranslationConverter {
 	public void initialize(ServletContext ctx) {
 		this.ctx = ctx;
 		OntModel tdbModel = ModelAccess.on(ctx).getOntModel(ModelNames.INTERFACE_I18N);
-		RDFService rdfService = ModelAccess.on(ctx).getRDFService();
+		RDFService rdfService = ModelAccess.on(ctx).getRDFService(CONFIGURATION);
 		memModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		memModel.add(tdbModel);
 		convertAll();
