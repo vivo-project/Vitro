@@ -2,8 +2,13 @@ package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,6 +50,7 @@ public class TranslationProvider {
 	+ "ORDER by ASC(?priority3)";
 
 	private RDFService rdfService;
+	private Map<TranslationKey, String> cache = new ConcurrentHashMap<>(); 
 
 	public static TranslationProvider getInstance() {
 		return INSTANCE;
@@ -65,31 +71,51 @@ public class TranslationProvider {
 	}
 
 	public String getTranslation(List<String> preferredLocales, String key, Object[] parameters) {
-		QueryHolder queryHolder = new QueryHolder(QUERY).bindToPlainLiteral("current_application", application)
-				.bindToPlainLiteral("key", key).bindToPlainLiteral("locale", preferredLocales.get(0));
+		TranslationKey tk = new TranslationKey(preferredLocales, key, parameters);
+		if (cache.containsKey(tk) && !needExportInfo()) {
+			log.debug("Returned value from cache for " + key);
+			return cache.get(tk);
+		}
+		String text = getText(preferredLocales, key);
+		String message = formatString(text, parameters);
+		
+		if (needExportInfo()) {
+			return prepareExportInfo(key, parameters, text, message);
+		} else {
+			cache.put(tk, message);
+			log.debug("Added to cache " + key);
+			log.debug("Returned value from request for " + key);
+			return message;
+		}
+	}
+
+	private String prepareExportInfo(String key, Object[] parameters, String text, String message) {
+		String separatedArgs = "";
+		for (int i = 0; i < parameters.length; i++) {
+			separatedArgs += parameters[i] + I18nBundle.INT_SEP;
+		}
+		log.debug("Returned value with export info for " + key );
+		return I18nBundle.START_SEP + key + I18nBundle.INT_SEP + text + I18nBundle.INT_SEP + separatedArgs
+				+ message + I18nBundle.END_SEP;
+	}
+
+	private String getText(List<String> preferredLocales, String key) {
+		String textString;
+		QueryHolder queryHolder = new QueryHolder(QUERY)
+				.bindToPlainLiteral("current_application", application)
+				.bindToPlainLiteral("key", key)
+				.bindToPlainLiteral("locale", preferredLocales.get(0));
 		LanguageFilteringRDFService lfrs = new LanguageFilteringRDFService(rdfService, preferredLocales);
 		List<String> list = createSelectQueryContext(lfrs, queryHolder).execute().toStringFields().flatten();
-		String textString;
 		if (list.isEmpty()) {
 			textString = notFound(key);
 		} else {
 			textString = list.get(0);
 		}
-		String message = formatString(list.get(0), parameters);
-		if (isNeedExportInfo()) {
-			String separatedArgs = "";
-			for (int i = 0; i < parameters.length; i++) {
-				separatedArgs += parameters[i] + I18nBundle.INT_SEP;
-			}
-
-			return I18nBundle.START_SEP + key + I18nBundle.INT_SEP + textString + I18nBundle.INT_SEP + separatedArgs
-					+ message + I18nBundle.END_SEP;
-		} else {
-			return message;
-		}
+		return textString;
 	}
 
-	private static boolean isNeedExportInfo() {
+	private static boolean needExportInfo() {
 		return DeveloperSettings.getInstance().getBoolean(Key.I18N_ONLINE_TRANSLATION);
 	}
 
@@ -103,6 +129,50 @@ public class TranslationProvider {
 
 	private String notFound(String key) {
 		return MessageFormat.format(MESSAGE_KEY_NOT_FOUND, key);
+	}
+
+	public void clearCache() {
+		cache.clear();
+		log.info("Translation cache cleared");
+	}
+	
+	private class TranslationKey {
+
+		private List<String> preferredLocales;
+		private String key;
+		private Object[] parameters;
+		
+		public TranslationKey(List<String> preferredLocales, String key, Object[] parameters) {
+			this.preferredLocales = preferredLocales;
+			this.key = key;
+			this.parameters = parameters;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (! (obj instanceof TranslationKey)) {
+				return false;
+			}
+			TranslationKey other = (TranslationKey) obj;
+	        return new EqualsBuilder()
+                .append(preferredLocales, other.preferredLocales)
+                .append(key, other.key)
+                .append(parameters, other.parameters)
+                .isEquals();
+		}
+		
+		@Override
+		public int hashCode(){
+		    return new HashCodeBuilder()
+		        .append(preferredLocales)
+		        .append(key)
+		        .append(parameters)
+		        .toHashCode();
+		}
+		
 	}
 
 }

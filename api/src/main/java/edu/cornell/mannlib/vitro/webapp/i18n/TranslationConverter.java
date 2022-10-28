@@ -76,20 +76,20 @@ public class TranslationConverter {
 		return
 			  "SELECT ?uri ?label WHERE {"
 			+ TEMPLATE_BODY
-        	+ optionalLabel(langTag)
+			+ optionalLabel(langTag)
 			+ TEMPLATE_THEME
 			+ "}";
 	}
 	
 	private static final String queryNoTheme(String langTag) { 
         return
-			  "SELECT ?uri ?label WHERE {"
-        	+ TEMPLATE_BODY
-        	+ optionalLabel(langTag)
-        	+ "FILTER NOT EXISTS {"
-			+ TEMPLATE_THEME
-			+ "}"
-        	+ "}";
+            "SELECT ?uri ?label WHERE {"
+            + TEMPLATE_BODY
+            + optionalLabel(langTag)
+            + "FILTER NOT EXISTS {"
+            + TEMPLATE_THEME
+            + "}"
+            + "}";
 	}
 	
 	private static final String optionalLabel(String langTag) {

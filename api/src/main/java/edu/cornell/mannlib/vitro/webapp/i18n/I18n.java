@@ -205,7 +205,7 @@ public class I18n {
 	private void checkDevelopmentMode() {
 		if (DeveloperSettings.getInstance().getBoolean(Key.I18N_DEFEAT_CACHE)) {
 			log.debug("In development mode - clearing the cache.");
-			ResourceBundle.clearCache();
+			clearCache();
 		}
 	}
 
@@ -242,9 +242,13 @@ public class I18n {
 			if (!currentDir.equals(previousDir)) {
 				log.debug("Theme directory changed from '" + previousDir + "' to '"
 						+ currentDir + "' - clearing the cache.");
-				ResourceBundle.clearCache();
+				clearCache();
 			}
 		}
+	}
+
+	private void clearCache() {
+		TranslationProvider.getInstance().clearCache();
 	}
 
 	/** Only clear the cache one time per request. */
@@ -252,7 +256,7 @@ public class I18n {
 		if (req.getAttribute(ATTRIBUTE_CACHE_CLEARED) != null) {
 			log.debug("Cache was already cleared on this request.");
 		} else {
-			ResourceBundle.clearCache();
+			clearCache();
 			log.debug("Cache cleared.");
 			req.setAttribute(ATTRIBUTE_CACHE_CLEARED, Boolean.TRUE);
 		}
