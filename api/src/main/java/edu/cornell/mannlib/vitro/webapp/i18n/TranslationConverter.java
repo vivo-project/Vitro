@@ -35,6 +35,7 @@ import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.Lock;
 
@@ -219,7 +220,7 @@ public class TranslationConverter {
 		if (label == null) {
 			return "";
 		}
-		return label.toString();
+		return ((Literal)label).getLexicalForm();
 	}
 	
 	private boolean labelAreadyExists(Object value, String label) {
