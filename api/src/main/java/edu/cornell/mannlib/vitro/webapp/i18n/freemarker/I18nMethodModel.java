@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import freemarker.core.Environment;
-import freemarker.template.TemplateMethodModel;
+import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
 /**
@@ -21,30 +21,15 @@ import freemarker.template.TemplateModelException;
  *
  * If the bundle name is not provided, the default bundle is assumed.
  */
-public class I18nMethodModel implements TemplateMethodModel {
+public class I18nMethodModel implements TemplateMethodModelEx  {
 	private static final Log log = LogFactory.getLog(I18nMethodModel.class);
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Object exec(List args) throws TemplateModelException {
-		if (args.size() > 1) {
-			throw new TemplateModelException("Too many arguments: "
-					+ "displayText method only requires a bundle name.");
-		}
-		Object arg = args.isEmpty() ? I18n.DEFAULT_BUNDLE_NAME : args.get(0);
-		if (!(arg instanceof String)) {
-			throw new IllegalArgumentException(
-					"Arguments to a TemplateMethodModel are supposed to be Strings!");
-		}
-
-		log.debug("Asking for this bundle: " + arg);
-		String bundleName = (String) arg;
-
 		Environment env = Environment.getCurrentEnvironment();
-		HttpServletRequest request = (HttpServletRequest) env
-				.getCustomAttribute("request");
-		I18nBundle tb = I18n.bundle(bundleName, request);
-		return new I18nBundleTemplateModel(bundleName, tb);
+		HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
+		I18nBundle tb = I18n.bundle(request);
+		return new I18nBundleTemplateModel(tb);
 	}
 
 }

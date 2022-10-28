@@ -2,17 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
-import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletContext;
@@ -39,8 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
  */
 public class I18n {
 	private static final Log log = LogFactory.getLog(I18n.class);
-
-	public static final String DEFAULT_BUNDLE_NAME = "all";
 
 	/**
 	 * If this attribute is present on the request, then the cache has already
@@ -75,14 +66,6 @@ public class I18n {
 	}
 
 	/**
-	 * A convenience method to get a bundle and format the text.
-	 */
-	public static String text(String bundleName, HttpServletRequest req,
-			String key, Object... parameters) {
-		return bundle(bundleName, req).text(key, parameters);
-	}
-
-	/**
 	 * A convenience method to get the default bundle and format the text.
 	 */
 	public static String text(HttpServletRequest req, String key,
@@ -91,24 +74,17 @@ public class I18n {
 	}
 
 	/**
-	 * Get a request I18nBundle by this name.
-	 */
-	public static I18nBundle bundle(String bundleName, HttpServletRequest req) {
-		return instance.getBundle(bundleName, req);
-	}
-
-	/**
 	 * Get the default request I18nBundle.
 	 */
 	public static I18nBundle bundle(HttpServletRequest req) {
-		return instance.getBundle(DEFAULT_BUNDLE_NAME, req);
+		return instance.getBundle(req);
 	}
 
 	/**
 	 * Get the default context I18nBundle for preferred locales.
 	 */
 	public static I18nBundle bundle(List<Locale> preferredLocales) {
-		return instance.getBundle(DEFAULT_BUNDLE_NAME, preferredLocales);
+		return instance.getBundle(preferredLocales);
 	}
 
 	// ----------------------------------------------------------------------
@@ -131,14 +107,10 @@ public class I18n {
 	 *
 	 * Declared 'protected' so it can be overridden in unit tests.
 	 */
-	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
-		log.debug("Getting request bundle '" + bundleName + "'");
-
+	protected I18nBundle getBundle(HttpServletRequest req) {
 		checkDevelopmentMode(req);
 		checkForChangeInThemeDirectory(req);
-
 		Locale locale = req.getLocale();
-
 		return new I18nSemanticBundle(Collections.singletonList(locale));
 	}
 
@@ -155,38 +127,11 @@ public class I18n {
 	 *
 	 * Declared 'protected' so it can be overridden in unit tests.
 	 */
-	protected I18nBundle getBundle(String bundleName, List<Locale> preferredLocales) {
-		log.debug("Getting context bundle '" + bundleName + "'");
-
+	protected I18nBundle getBundle( List<Locale> preferredLocales) {
 		checkDevelopmentMode();
 		checkForChangeInThemeDirectory(ctx);
-
 		Locale locale = SelectedLocale.getPreferredLocale(ctx, preferredLocales);
-
 		return new I18nSemanticBundle(Collections.singletonList(locale));
-	}
-
-	/**
-	 * Get an I18nBundle by this name, context, and locale.
-	 */
-	private I18nBundle getBundle(String bundleName, Locale locale) {
-		I18nLogger i18nLogger = new I18nLogger();
-		try {
-			String dir = themeDirectory.get();
-			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
-			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
-					locale, control);
-
-			return new I18nBundleImpl(bundleName, rb, i18nLogger);
-		} catch (MissingResourceException e) {
-			log.warn("Didn't find text bundle '" + bundleName + "'");
-
-			return I18nBundleImpl.emptyBundle(bundleName, i18nLogger);
-		} catch (Exception e) {
-			log.error("Failed to create text bundle '" + bundleName + "'", e);
-
-			return I18nBundleImpl.emptyBundle(bundleName, i18nLogger);
-		}
 	}
 
 	/**
@@ -261,143 +206,5 @@ public class I18n {
 			req.setAttribute(ATTRIBUTE_CACHE_CLEARED, Boolean.TRUE);
 		}
 	}
-
-	// ----------------------------------------------------------------------
-	// Control classes for instantiating ResourceBundles
-	// ----------------------------------------------------------------------
-
-	/**
-	 * Instead of looking in the classpath, look in the theme i18n directory and
-	 * the application i18n directory.
-	 */
-	static class ThemeBasedControl extends ResourceBundle.Control {
-		private static final String BUNDLE_DIRECTORY = "i18n/";
-		private final ServletContext ctx;
-		private final String themeDirectory;
-
-		public ThemeBasedControl(ServletContext ctx, String themeDirectory) {
-			this.ctx = ctx;
-			this.themeDirectory = themeDirectory;
-		}
-
-		/**
-		 * Don't look for classes to satisfy the request, just property files.
-		 */
-		@Override
-		public List<String> getFormats(String baseName) {
-			return FORMAT_PROPERTIES;
-		}
-
-		/**
-		 * Don't look in the class path, look in the current servlet context, in
-		 * the bundle directory under the theme directory and in the bundle
-		 * directory under the application directory.
-		 */
-		@Override
-		public ResourceBundle newBundle(String baseName, Locale locale,
-				String format, ClassLoader loader, boolean reload)
-				throws IllegalAccessException, InstantiationException,
-				IOException {
-			checkArguments(baseName, locale, format);
-
-			log.debug("Creating bundle for '" + baseName + "', " + locale
-					+ ", '" + format + "', " + reload);
-
-			String bundleName = toBundleName(baseName, locale);
-			if (bundleName == null) {
-				throw new NullPointerException("bundleName may not be null.");
-			}
-
-			String themeI18nPath = "/" + themeDirectory + BUNDLE_DIRECTORY;
-			String appI18nPath = "/" + BUNDLE_DIRECTORY;
-
-			log.debug("Paths are '" + themeI18nPath + "' and '" + appI18nPath
-					+ "'");
-
-			return VitroResourceBundle.getBundle(bundleName, ctx, appI18nPath,
-					themeI18nPath, this);
-		}
-
-		/**
-		 * When creating the chain of acceptable Locales, include approximate
-		 * matches before giving up and using the root Locale.
-		 *
-		 * Check the list of supported Locales to see if any have the same
-		 * language but different region. If we find any, sort them and insert
-		 * them into the usual result list, just before the root Locale.
-		 */
-		@Override
-		public List<Locale> getCandidateLocales(String baseName, Locale locale) {
-			// Find the list of Locales that would normally be returned.
-			List<Locale> usualList = super
-					.getCandidateLocales(baseName, locale);
-
-			// If our "selectable locales" include no approximate matches that
-			// are not already in the list, we're done.
-			SortedSet<Locale> approximateMatches = findApproximateMatches(locale);
-			approximateMatches.removeAll(usualList);
-			if (approximateMatches.isEmpty()) {
-				return usualList;
-			}
-
-			// Otherwise, insert those approximate matches into the list just
-			// before the ROOT locale.
-			List<Locale> mergedList = new LinkedList<>(usualList);
-			int rootLocaleHere = mergedList.indexOf(Locale.ROOT);
-			if (rootLocaleHere == -1) {
-				mergedList.addAll(approximateMatches);
-			} else {
-				mergedList.addAll(rootLocaleHere, approximateMatches);
-			}
-			return mergedList;
-		}
-
-		private SortedSet<Locale> findApproximateMatches(Locale locale) {
-			SortedSet<Locale> set = new TreeSet<>(new LocaleComparator());
-
-			for (Locale l : SelectedLocale.getSelectableLocales(ctx)) {
-				if (locale.getLanguage().equals(l.getLanguage())) {
-					set.add(l);
-				}
-			}
-
-			return set;
-		}
-
-		/**
-		 * The documentation for ResourceBundle.Control.newBundle() says I
-		 * should throw these exceptions.
-		 */
-		private void checkArguments(String baseName, Locale locale,
-				String format) {
-			if (baseName == null) {
-				throw new NullPointerException("baseName may not be null.");
-			}
-			if (locale == null) {
-				throw new NullPointerException("locale may not be null.");
-			}
-			if (format == null) {
-				throw new NullPointerException("format may not be null.");
-			}
-			if (!FORMAT_DEFAULT.contains(format)) {
-				throw new IllegalArgumentException(
-						"format must be one of these: " + FORMAT_DEFAULT);
-			}
-		}
-
-	}
-
-	private static class LocaleComparator implements Comparator<Locale> {
-		@Override
-		public int compare(Locale o1, Locale o2) {
-			int c = o1.getLanguage().compareTo(o2.getLanguage());
-			if (c == 0) {
-				c = o1.getCountry().compareTo(o2.getCountry());
-				if (c == 0) {
-					c = o1.getVariant().compareTo(o2.getVariant());
-				}
-			}
-			return c;
-		}
-	}
+	
 }
