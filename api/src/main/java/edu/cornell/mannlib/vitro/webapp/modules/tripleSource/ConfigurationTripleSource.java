@@ -14,6 +14,8 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_FI
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX_FIRSTTIME_BACKUP;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY_FIRSTTIME_BACKUP;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N ;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N_FIRSTTIME_BACKUP;
+
 
 
 import org.apache.jena.rdf.model.ModelMaker;
@@ -39,6 +41,7 @@ public abstract class ConfigurationTripleSource implements TripleSource {
 			DISPLAY_TBOX_FIRSTTIME_BACKUP, 
 			DISPLAY_DISPLAY_FIRSTTIME_BACKUP, 
 			INTERFACE_I18N,
+			INTERFACE_I18N_FIRSTTIME_BACKUP,
 	};
 
 	/**
