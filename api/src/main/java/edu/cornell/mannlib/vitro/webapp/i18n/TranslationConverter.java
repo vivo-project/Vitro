@@ -54,8 +54,8 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichServ
 
 public class TranslationConverter {
 
-	private OntModel memModel;
-	private ServletContext ctx;
+	protected OntModel memModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+	protected ServletContext ctx;
 	private static final boolean BEGIN = true;
 	private static final boolean END = !BEGIN;
 	private static final int SUFFIX_LENGTH = ".properties".length();
@@ -63,9 +63,9 @@ public class TranslationConverter {
 	private static final TranslationConverter INSTANCE = new TranslationConverter();
 	private static final String THEMES = "themes";
 	private static final String ALL = "all";
-	private static final String APP_I18N_PATH = "/i18n/";
-	private static final String LOCAL_I18N_PATH = "/local/i18n/";
-	private static final String THEMES_PATH = "/themes/";
+	protected static final String APP_I18N_PATH = "/i18n/";
+	protected static final String LOCAL_I18N_PATH = "/local/i18n/";
+	protected static final String THEMES_PATH = "/themes/";
 	private static final String TEMPLATE_BODY = ""
 			+ "?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .\n"
 			+ "?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> .\n"
@@ -112,7 +112,6 @@ public class TranslationConverter {
 		this.ctx = ctx;
 		OntModel tdbModel = ModelAccess.on(ctx).getOntModel(ModelNames.INTERFACE_I18N);
 		RDFService rdfService = ModelAccess.on(ctx).getRDFService(CONFIGURATION);
-		memModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		memModel.add(tdbModel);
 		convertAll();
 		cleanTdbModel(tdbModel, rdfService);
