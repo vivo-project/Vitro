@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import java.text.MessageFormat;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,13 +12,16 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 
-import static edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.createSelectQueryContext;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
@@ -29,13 +33,14 @@ public class TranslationProvider {
 	private static final TranslationProvider INSTANCE = new TranslationProvider();
 	private static final Log log = LogFactory.getLog(TranslationProvider.class);
 	private static final I18nLogger i18nLogger = new I18nLogger();
-	private static String application = "Vitro";
 	private static final String QUERY = "" 
 	+ "PREFIX : <http://vivoweb.org/ontology/core/properties/vocabulary#>\n"
 	+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
 	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
-	+ "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n" + "SELECT ?translation\n" + "WHERE {\n"
-	+ "  GRAPH <http://vitro.mannlib.cornell.edu/default/interface-i18n> {\n" + "	  ?uri :hasKey ?key .\n"
+	+ "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n" 
+	+ "SELECT ?translation ?found_application ?current_theme ?theme ?application ?current_application ?found_application ?sumOrder ?themeOrder ?applicationOrder\n" + "WHERE {\n"
+	+ "  GRAPH <http://vitro.mannlib.cornell.edu/default/interface-i18n> {\n" 
+	+ "	  ?uri :hasKey ?key .\n"
 	+ "	  ?uri rdfs:label ?translation .\n" 
 	+ "	  OPTIONAL { \n"
 	+ "		?uri :hasTheme ?found_theme .\n"
@@ -44,20 +49,20 @@ public class TranslationProvider {
 	+ "		?uri :hasApp ?found_application .\n" 
 	+ "   }\n"
 	+ "   GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata> {\n"
-	+ "     OPTIONAL{\n"
-	+ "	   ?portal vitro:themeDir ?themePath .\n"
-	+ "       BIND(SUBSTR(?themePath, 8, STRLEN(?themePath) - 1) as ?current_theme) .\n"
-	+ "     }\n"
+	+ "	    ?portal vitro:themeDir ?themePath .\n"
+    + "     BIND(SUBSTR(?themePath, 8, STRLEN(?themePath) -8 ) as ?current_theme) .\n"
 	+ "	  }\n"
 	+ "	  BIND(COALESCE(?found_theme, \"none\") as ?theme ) .\n"
+	+ "	  FILTER(?theme = \"none\" || ?theme = ?current_theme) . "
 	+ "	  BIND(COALESCE(?found_application, \"none\") as ?application ) .\n"
-	+ "	  BIND(IF(?current_theme = lcase(str(?theme)), 50, 0) AS ?priority1 ) .\n"
-	+ "	  BIND(IF(?current_theme = \"none\", xsd:integer(?priority1)+10, xsd:integer(?priority1)) AS ?priority2 ) .\n"
-	+ "	  BIND(IF(?current_application = lcase(str(?application)), xsd:integer(?priority2)+5, xsd:integer(?priority2)) AS ?priority3 ) .\n"
+	+ "	  BIND(IF(?current_application = ?application && ?current_theme = ?theme, 3, "
+	+ "		   	IF(?current_theme = ?theme, 2, "
+	+ "				IF(?current_application = ?application, 1, 0)) ) AS ?order ) .\n"
 	+ "   }\n" + "} \n"
-	+ "ORDER by ASC(?priority3)";
+	+ "ORDER by DESC(?order)";
 
-	private RDFService rdfService;
+	protected RDFService rdfService;
+	protected String application = "Vitro";
 	private Map<TranslationKey, String> cache = new ConcurrentHashMap<>(); 
 
 	public static TranslationProvider getInstance() {
@@ -114,7 +119,30 @@ public class TranslationProvider {
 				.bindToPlainLiteral("key", key)
 				.bindToPlainLiteral("locale", preferredLocales.get(0));
 		LanguageFilteringRDFService lfrs = new LanguageFilteringRDFService(rdfService, preferredLocales);
-		List<String> list = createSelectQueryContext(lfrs, queryHolder).execute().toStringFields().flatten();
+		List<String> list = new LinkedList<>();
+		try {
+			lfrs.sparqlSelectQuery(queryHolder.getQueryString(), new ResultSetConsumer() {
+			    @Override
+			    protected void processQuerySolution(QuerySolution qs) {
+			        Literal translation = qs.getLiteral("translation");
+			        Literal current_theme = qs.getLiteral("current_theme");
+			        Literal found_application = qs.getLiteral("found_application");
+			        Literal current_application = qs.getLiteral("current_application");
+			        Literal application = qs.getLiteral("application");
+			        Literal theme = qs.getLiteral("theme");
+			        Literal applicationO = qs.getLiteral("applicationOrder");
+			        Literal themeO = qs.getLiteral("themeOrder");
+			        Literal sumOrder = qs.getLiteral("sumOrder");
+			        if (translation != null) {
+			        	list.add(translation.getLexicalForm());
+			        }
+			    }
+			    
+			});
+		} catch (RDFServiceException e) {
+			log.error(e,e);
+		}
+		
 		if (list.isEmpty()) {
 			textString = notFound(key);
 		} else {
