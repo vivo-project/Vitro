@@ -34,37 +34,36 @@ public class TranslationConverterTest {
 	
 	@Test
 	public void testConversion() throws FileNotFoundException {
-    	VitroResourceBundle.addAppPrefix("customprefix");
-    	VitroResourceBundle.addAppPrefix("vivo");
-    	TranslationConverter converter = TranslationConverter.getInstance();	
-    	model = converter.memModel;
-    	File n3 = new File(INIT_N3_FILE); 
-    	assertTrue(model.isEmpty());
-    	model.read(new FileReader(n3), null, "n3");
-    	assertFalse(model.isEmpty());
-    	File appI18n = new File(ROOT_PATH + TranslationConverter.APP_I18N_PATH);
-    	File localI18n = new File(ROOT_PATH + TranslationConverter.LOCAL_I18N_PATH);
-    	File themes = new File(ROOT_PATH + TranslationConverter.THEMES_PATH);
-    	ctx.setRealPath(TranslationConverter.APP_I18N_PATH, appI18n.getAbsolutePath());
-    	ctx.setRealPath(TranslationConverter.LOCAL_I18N_PATH, localI18n.getAbsolutePath());
-    	ctx.setRealPath(TranslationConverter.THEMES_PATH, themes.getAbsolutePath());
-    	converter.ctx = ctx;
-    	converter.convertAll();
-    	
-    	assertEquals(2, getCount(HAS_KEY,"test_key_all_en_US"));
-    	assertEquals(2, getCount(HAS_KEY,"test_key_all_en_CA"));
-    	
-    	assertEquals(2, getCount(HAS_KEY,"test_key_all"));
-    	
-    	assertEquals(1, getCount(HAS_KEY,"property_to_overwrite"));
+		VitroResourceBundle.addAppPrefix("customprefix");
+		VitroResourceBundle.addAppPrefix("vivo");
+		TranslationConverter converter = TranslationConverter.getInstance();
+		model = converter.memModel;
+		File n3 = new File(INIT_N3_FILE);
+		assertTrue(model.isEmpty());
+		model.read(new FileReader(n3), null, "n3");
+		assertFalse(model.isEmpty());
+		File appI18n = new File(ROOT_PATH + TranslationConverter.APP_I18N_PATH);
+		File localI18n = new File(ROOT_PATH + TranslationConverter.LOCAL_I18N_PATH);
+		File themes = new File(ROOT_PATH + TranslationConverter.THEMES_PATH);
+		ctx.setRealPath(TranslationConverter.APP_I18N_PATH, appI18n.getAbsolutePath());
+		ctx.setRealPath(TranslationConverter.LOCAL_I18N_PATH, localI18n.getAbsolutePath());
+		ctx.setRealPath(TranslationConverter.THEMES_PATH, themes.getAbsolutePath());
+		converter.ctx = ctx;
+		converter.convertAll();
 
-    	assertTrue(n3TranslationValueIsOverwrittenByProperty(model));
+		assertEquals(2, getCount(HAS_KEY, "test_key_all_en_US"));
+		assertEquals(2, getCount(HAS_KEY, "test_key_all_en_CA"));
 
-    	assertEquals(3, getCount(HAS_THEME, WILMA));
-    	assertEquals(6, getCount(HAS_APP, VITRO));
-    	assertEquals(3, getCount(HAS_APP, VIVO));
-    	
-		//printResultModel();
+		assertEquals(2, getCount(HAS_KEY, "test_key_all"));
+
+		assertEquals(1, getCount(HAS_KEY, "property_to_overwrite"));
+
+		assertTrue(n3TranslationValueIsOverwrittenByProperty(model));
+
+		assertEquals(3, getCount(HAS_THEME, WILMA));
+		assertEquals(6, getCount(HAS_APP, VITRO));
+		assertEquals(3, getCount(HAS_APP, VIVO));
+		// printResultModel();
 	}
 
 	private void printResultModel() {
@@ -75,12 +74,12 @@ public class TranslationConverterTest {
 	
 	private int getCount(String hasTheme, String wilma) {
 		Selector selector = new SimpleSelector(null, new PropertyImpl(hasTheme), wilma);
-    	StmtIterator it = model.listStatements(selector);
-    	int count = 0;
-    	while (it.hasNext()) {
-    		count++;
-    		it.next();
-    	}
+		StmtIterator it = model.listStatements(selector);
+		int count = 0;
+		while (it.hasNext()) {
+			count++;
+			it.next();
+		}
 		return count;
 	}
 	
