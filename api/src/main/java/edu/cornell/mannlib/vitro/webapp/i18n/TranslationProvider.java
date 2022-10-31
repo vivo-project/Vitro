@@ -38,7 +38,7 @@ public class TranslationProvider {
 	+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
 	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
 	+ "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n" 
-	+ "SELECT ?translation ?found_application ?current_theme ?theme ?application ?current_application ?found_application ?sumOrder ?themeOrder ?applicationOrder\n" + "WHERE {\n"
+	+ "SELECT ?translation \n" + "WHERE {\n"
 	+ "  GRAPH <http://vitro.mannlib.cornell.edu/default/interface-i18n> {\n" 
 	+ "	  ?uri :hasKey ?key .\n"
 	+ "	  ?uri rdfs:label ?translation .\n" 
@@ -125,19 +125,10 @@ public class TranslationProvider {
 			    @Override
 			    protected void processQuerySolution(QuerySolution qs) {
 			        Literal translation = qs.getLiteral("translation");
-			        Literal current_theme = qs.getLiteral("current_theme");
-			        Literal found_application = qs.getLiteral("found_application");
-			        Literal current_application = qs.getLiteral("current_application");
-			        Literal application = qs.getLiteral("application");
-			        Literal theme = qs.getLiteral("theme");
-			        Literal applicationO = qs.getLiteral("applicationOrder");
-			        Literal themeO = qs.getLiteral("themeOrder");
-			        Literal sumOrder = qs.getLiteral("sumOrder");
 			        if (translation != null) {
 			        	list.add(translation.getLexicalForm());
 			        }
 			    }
-			    
 			});
 		} catch (RDFServiceException e) {
 			log.error(e,e);
@@ -208,7 +199,5 @@ public class TranslationProvider {
 		        .append(parameters)
 		        .toHashCode();
 		}
-		
 	}
-
 }

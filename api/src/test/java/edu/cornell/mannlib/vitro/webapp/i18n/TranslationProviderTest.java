@@ -1,7 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,10 +19,7 @@ public class TranslationProviderTest {
 
 	private static final String VITRO = "Vitro";
 	private static final String VIVO = "VIVO";
-
-
 	private static final String ROOT = "src/test/resources/edu/cornell/mannlib/vitro/webapp/i18n/TranslationProviderTest/";
-
 	private static final String TRANSLATIONS_N3_FILE = ROOT + "modelInitContent.n3";
 	private static final String WILMA = ROOT + "appMetadataWilma.n3";
 	private static final String NEMO = ROOT + "appMetadataNemo.n3";
@@ -33,15 +29,11 @@ public class TranslationProviderTest {
 	private RDFServiceModel rdfService;
 	private TranslationProvider tp;
 
-	public void init(String i18nFile, String themeMetaFilePath, String appName) {
+	public void init(String i18nFile, String themeMetaFilePath, String appName) throws FileNotFoundException {
 		i18nModel = ModelFactory.createDefaultModel();
 		appMetaModel = ModelFactory.createDefaultModel();
-		try {
-			i18nModel.read(new FileReader(new File(i18nFile)), null, "n3");
-			appMetaModel.read(new FileReader(new File(themeMetaFilePath)), null, "n3");
-		} catch(Exception e) {
-			
-		}
+		i18nModel.read(new FileReader(new File(i18nFile)), null, "n3");
+		appMetaModel.read(new FileReader(new File(themeMetaFilePath)), null, "n3");
 		Dataset ds = DatasetFactory.createTxnMem();
 		ds.addNamedModel("http://vitro.mannlib.cornell.edu/default/interface-i18n", i18nModel);
 		ds.addNamedModel("http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata", appMetaModel);
@@ -55,108 +47,118 @@ public class TranslationProviderTest {
 	@Test
 	public void testNotExistingKey() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, WILMA, VITRO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("en-US"), "non_existing_key", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "non_existing_key", array);
 		assertEquals("ERROR: Translation not found 'non_existing_key'", translation);
 	}
-	
+
 	@Test
-	public void testVitroWilmaEnUS() {
+	public void testVitroWilmaEnUS() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, WILMA, VITRO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array);
 		assertEquals("testkey Vitro wilma en-US", translation);
 	}
-	
+
 	@Test
-	public void testVitroWilmaDeDE() {
+	public void testVitroWilmaDeDE() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, WILMA, VITRO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array);
 		assertEquals("testkey Vitro wilma de-DE", translation);
 	}
-	
+
 	@Test
-	public void testVIVOWilmaEnUS() {
+	public void testVIVOWilmaEnUS() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, WILMA, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array);
 		assertEquals("testkey VIVO wilma en-US", translation);
 	}
-	
+
 	@Test
-	public void testVIVOWilmaDeDE() {
+	public void testVIVOWilmaDeDE() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, WILMA, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array);
 		assertEquals("testkey VIVO wilma de-DE", translation);
 	}
-	
+
 	@Test
-	public void testThemeFallbackVitroNemoEnUS() {
+	public void testThemeFallbackVitroNemoEnUS() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, NEMO, VITRO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array);
 		assertEquals("testkey Vitro no theme en-US", translation);
 	}
-	
+
 	@Test
-	public void testThemeFallbackVitroNemoDeDE() {
+	public void testThemeFallbackVitroNemoDeDE() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, NEMO, VITRO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array);
 		assertEquals("testkey Vitro no theme de-DE", translation);
 	}
-	
+
 	@Test
-	public void testThemeFallbackVIVONemoEnUS() {
+	public void testThemeFallbackVIVONemoEnUS() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, NEMO, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array);
 		assertEquals("testkey VIVO no theme en-US", translation);
 	}
-	
+
 	@Test
-	public void testThemeFallbackVIVONemoDeDE() {
+	public void testThemeFallbackVIVONemoDeDE() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, NEMO, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey", array);
 		assertEquals("testkey VIVO no theme de-DE", translation);
 	}
 
 	@Test
-	public void testAppFallbackVIVONemoEnUS() {
+	public void testAppFallbackVIVONemoEnUS() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, WILMA, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey_app_fallback", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey_app_fallback", array);
 		assertEquals("testkey_app_fallback Vitro wilma en-US", translation);
 	}
-	
+
 	@Test
-	public void testAppFallbackVIVONemoDeDE() {
+	public void testAppFallbackVIVONemoDeDE() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, WILMA, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey_app_fallback", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey_app_fallback", array);
 		assertEquals("testkey_app_fallback Vitro wilma de-DE", translation);
 	}
-	
+
 	@Test
-	public void testAppAndThemeFallbackVIVONemoEnUS() {
+	public void testAppAndThemeFallbackVIVONemoEnUS() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, NEMO, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey_app_fallback", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey_app_fallback", array);
 		assertEquals("testkey_app_fallback Vitro no theme en-US", translation);
 	}
-	
+
 	@Test
-	public void testAppAndThemeFallbackVIVONemoDeDE() {
+	public void testAppAndThemeFallbackVIVONemoDeDE() throws FileNotFoundException {
 		init(TRANSLATIONS_N3_FILE, NEMO, VIVO);
-		Object array[]={};
-		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey_app_fallback", array );
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("de-DE"), "testkey_app_fallback", array);
 		assertEquals("testkey_app_fallback Vitro no theme de-DE", translation);
 	}
 
-
-	
-	
+	@Test
+	public void testCache() throws FileNotFoundException {
+		init(TRANSLATIONS_N3_FILE, WILMA, VITRO);
+		Object array[] = {};
+		String translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array);
+		assertEquals("testkey Vitro wilma en-US", translation);
+		tp.application = VIVO;
+		translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array);
+		assertEquals("testkey Vitro wilma en-US", translation);
+		tp.clearCache();
+		translation = tp.getTranslation(Collections.singletonList("en-US"), "testkey", array);
+		assertEquals("testkey VIVO wilma en-US", translation);
+	}
 }
