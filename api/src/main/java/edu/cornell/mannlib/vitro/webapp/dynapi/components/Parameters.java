@@ -46,32 +46,12 @@ public class Parameters implements Removable {
 		return params.containsKey(name);
 	}
 
-	/*
-	 * // Substitute IRI parameters with their values in specific request public
-	 * Map<String, List<String>> substituteIRIVariables(DataStore input) { return
-	 * params.values().stream() .filter(value -> value.getType().isUri()).collect(
-	 * Collectors.toMap(param -> param.getName(), param ->
-	 * Arrays.asList(input.get(param.getName())))); }
-	 * 
-	 * // Substitute parameters that represent RDF literals with their values in //
-	 * specific request public Map<String, List<Literal>>
-	 * substituteLiteralVariables(DataStore input) { return params.values().stream()
-	 * .filter(value -> value.getType().isLiteral()) .collect(Collectors.toMap(param
-	 * -> param.getName(), param ->
-	 * Arrays.asList(ResourceFactory.createTypedLiteral(input.get(param.getName())[0
-	 * ], param.getType().getRdfType().getRDFDataType())))); }
-	 */
-
 	@Override
 	public void dereference() {
 		for (String name : params.keySet()) {
 			params.get(name).dereference();
 		}
 		params = null;
-	}
-
-	public Parameter getFirst() {
-		return params.entrySet().iterator().next().getValue();
 	}
 
 }
