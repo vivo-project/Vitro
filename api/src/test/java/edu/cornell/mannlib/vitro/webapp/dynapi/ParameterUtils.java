@@ -33,7 +33,7 @@ public class ParameterUtils {
 	}
 
 	public static Parameter createModelParameter(String name) throws Exception {
-		Parameter uri1Param = new Parameter();
+		Parameter uriParam = new Parameter();
 		ParameterType paramType = new ParameterType();
 		ImplementationType implType = new ImplementationType();
 		implType.setClassName(Model.class.getCanonicalName());
@@ -45,9 +45,9 @@ public class ParameterUtils {
 		ImplementationConfig desConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "deserialize",
 				true);
 		implType.setDeserializationConfig(desConfig);
-		uri1Param.setType(paramType);
-		uri1Param.setName(name);
-		return uri1Param;
+		uriParam.setType(paramType);
+		uriParam.setName(name);
+		return uriParam;
 	}
 
 	public static Statement addStatement(OntModelImpl additionModel, String s, String p, String o) {
@@ -67,7 +67,7 @@ public class ParameterUtils {
 
 	public static Parameter createUriParameter(String name) throws Exception {
 		Parameter uri1Param = new Parameter();
-		ParameterType uri1ParamType = new ParameterType();
+		ParameterType uriParamType = new ParameterType();
 		ImplementationType uri1ImplType = new ImplementationType();
 
 		ImplementationConfig config = new ImplementationConfig();
@@ -82,11 +82,11 @@ public class ParameterUtils {
 
 		RDFType rdfType = new RDFType();
 		rdfType.setName("anyURI");
-		uri1ParamType.setRdfType(rdfType);
+		uriParamType.setRdfType(rdfType);
 
-		uri1ParamType.setImplementationType(uri1ImplType);
-		uri1Param.setType(uri1ParamType);
-		uri1ParamType.setSerializationType(N3TemplateTest.anyURI);
+		uriParamType.setImplementationType(uri1ImplType);
+		uri1Param.setType(uriParamType);
+		uriParamType.setSerializationType(N3TemplateTest.anyURI);
 		uri1Param.setName(name);
 		return uri1Param;
 	}
@@ -119,9 +119,9 @@ public class ParameterUtils {
 	}
 
 	public static Parameter createBooleanParameter(String name) throws Exception {
-		Parameter uri1Param = new Parameter();
-		ParameterType uri1ParamType = new ParameterType();
-		ImplementationType uri1ImplType = new ImplementationType();
+		Parameter uriParam = new Parameter();
+		ParameterType uriParamType = new ParameterType();
+		ImplementationType uriImplType = new ImplementationType();
 
 		ImplementationConfig config = new ImplementationConfig();
 
@@ -129,19 +129,19 @@ public class ParameterUtils {
 		config.setMethodArguments("");
 		config.setMethodName("toString");
 		config.setStaticMethod(false);
-		uri1ImplType.setDeserializationConfig(config);
-		uri1ImplType.setSerializationConfig(config);
-		uri1ImplType.setClassName(String.class.getCanonicalName());
+		uriImplType.setDeserializationConfig(config);
+		uriImplType.setSerializationConfig(config);
+		uriImplType.setClassName(String.class.getCanonicalName());
 
 		RDFType rdfType = new RDFType();
 		rdfType.setName("boolean");
-		uri1ParamType.setRdfType(rdfType);
+		uriParamType.setRdfType(rdfType);
 
-		uri1ParamType.setImplementationType(uri1ImplType);
-		uri1Param.setType(uri1ParamType);
-		uri1ParamType.setSerializationType(N3TemplateTest.anyURI);
-		uri1Param.setName(name);
-		return uri1Param;
+		uriParamType.setImplementationType(uriImplType);
+		uriParam.setType(uriParamType);
+		uriParamType.setSerializationType(N3TemplateTest.anyURI);
+		uriParam.setName(name);
+		return uriParam;
 	}
 
 	public static Parameter createJsonParameter(String allVar) throws Exception {
