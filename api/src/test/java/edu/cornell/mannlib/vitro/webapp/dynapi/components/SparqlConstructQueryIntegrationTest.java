@@ -55,7 +55,6 @@ public class SparqlConstructQueryIntegrationTest extends ServletContextTest {
         loadOntology(ontModel);
         loadModel(ontModel, TEST_ACTION);
         loadModel(storeModel, TEST_STORE);
-       // servletContext = new ServletContextStub();
         Action action = loader.loadInstance("test:action", Action.class);
         assertTrue(action.isValid());
         Parameters inputParameters = action.getInputParams();
