@@ -25,11 +25,12 @@ public class GroupAccessWhitelist implements AccessWhitelist {
 	public boolean isAuthorized(UserAccount user) {
 		Set<String> uris = user.getPermissionSetUris();
 		for (String uri : uris) {
+			UserGroup userGroup = groups.get(uri);
 			if (groups.containsKey(uri)) {
-				UserGroup userGroup = groups.get(uri);
-				log.debug("Group '" + userGroup.getLabel() + "' member '" + user.getEmailAddress() + "' is allowed to access action '" + actionName + "'");
+				log.debug("Group '" + userGroup.getLabel() + "' membership allows '" + user.getEmailAddress() + "' to access action '" + actionName + "'");
 				return true;
 			}
+			log.debug("Group '" + userGroup.getLabel() + "' membership doesn't allow '" + user.getEmailAddress() + "' to access action '" + actionName + "'");
 		}
 		log.debug("Whitelist is doesn't allow user '" + user.getEmailAddress() + "' to access action '" + actionName + "'");
 		return false;
