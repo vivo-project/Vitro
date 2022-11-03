@@ -38,7 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 @RunWith(MockitoJUnitRunner.class)
 public class SolrQueryTest extends ServletContextTest {
 
-    private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-solr-test.n3";
+    private static final String JAVA_LANG_STRING = String.class.getCanonicalName();
+	private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-solr-test.n3";
     private final static String TEST_SOLR_QUERY_URI="https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery";
 
     private static MockedStatic<ApplicationUtils> applicationUtils;
@@ -95,11 +96,8 @@ public class SolrQueryTest extends ServletContextTest {
 
     @Test
     public void requiredParameterMissingFromInput(){
-        //when(parameter1.getName()).thenReturn("testParameter");
         solrQuery.addInputParameter(parameter1);
         assertTrue(solrQuery.run(dataStore).hasError());
-        //verify(parameter1, times(1)).getName();
-        //verify(dataStore,times(1)).contains("testParameter");
     }
 
     @Test
@@ -182,18 +180,10 @@ public class SolrQueryTest extends ServletContextTest {
 
         assertTrue(solrQuery.run(dataStore).hasError());
         verify(searchQuery,times(0)).setQuery(any());
-        //verify(searchQuery,times(1)).setStart(11);
-        //verify(searchQuery,times(0)).setRows(anyInt());
     }
 
     @Test
     public void queryWithMultipleSortsBadInput() throws Exception{
-       // when(dataStore.contains(anyString())).thenReturn(true);
-        //when(input.getData("testParam1")).thenReturn(new String[]{"field1"});
-        //when(input.getData("testParam2")).thenReturn(new String[]{"field2"});
-        //Should fail because in this case testParam3 must be keyword desc or asc
-        //when(input.getData("testParam3")).thenReturn(new String[]{"field3"});
-        //more spaces are added on purpose to simulate RDF input that's not well formatted
         solrQuery.addSort("   ?testParam1    desc ");
         solrQuery.addSort("?testParam2  ?testParam3");
 
@@ -218,7 +208,6 @@ public class SolrQueryTest extends ServletContextTest {
 
         assertTrue(solrQuery.run(dataStore).hasError());
         assertEquals(solrQuery.getSorts().size(),2);
-        //verify(searchQuery,times(1)).addSortField(anyString(),any());
     }
 
     @Test
@@ -239,10 +228,6 @@ public class SolrQueryTest extends ServletContextTest {
         Data data3 = new Data(param3);
         TestView.setObject(data3,"asc");
     	dataStore.addData(param3.getName(), data3);
-        //when(input.getData("testParam1")).thenReturn(new String[]{"field1"});
-        //when(input.getData("testParam2")).thenReturn(new String[]{"field2"});
-        //Should fail because in this case testParam3 must be keyword desc or asc
-        //when(input.getData("testParam3")).thenReturn(new String[]{"asc"});
         //more spaces are added on purpose to simulate RDF input that's not well formatted
         solrQuery.addSort("   ?testParam1    desc ");
         solrQuery.addSort("?testParam2  ?testParam3");
@@ -260,13 +245,13 @@ public class SolrQueryTest extends ServletContextTest {
         
         ImplementationConfig config = new ImplementationConfig();
 		
-		config.setClassName("java.lang.String");
+		config.setClassName(JAVA_LANG_STRING);
 		config.setMethodArguments("");
 		config.setMethodName("toString");
 		config.setStaticMethod(false);
 		impltype.setDeserializationConfig(config);
 		impltype.setSerializationConfig(config);
-		impltype.setClassName("java.lang.String");
+		impltype.setClassName(JAVA_LANG_STRING);
 		
 		RDFType rdfType = new RDFType();
 		rdfType.setName("string");
