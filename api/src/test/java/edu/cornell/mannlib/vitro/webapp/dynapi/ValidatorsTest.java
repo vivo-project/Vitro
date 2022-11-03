@@ -137,7 +137,7 @@ public class ValidatorsTest {
     	paramType.setImplementationType(implType);
     	Data data = new Data(param);
     	if (input instanceof String[]) {
-			implType.setClassName("java.util.ArrayList");
+			implType.setClassName(ArrayList.class.getCanonicalName());
 			TestView.setObject(data, Arrays.asList((String[])input));
     	} else {
     		
