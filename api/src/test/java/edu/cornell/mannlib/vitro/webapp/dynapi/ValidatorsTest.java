@@ -144,7 +144,7 @@ public class ValidatorsTest {
 			implType.setClassName("java.lang.String");
 			ImplementationConfig config = new ImplementationConfig();
 			
-			config.setClassName("java.lang.String");
+			config.setClassName(String.class.getCanonicalName());
 			config.setMethodArguments("");
 			config.setMethodName("toString");
 			config.setStaticMethod(false);
