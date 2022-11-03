@@ -29,7 +29,7 @@ public class LangStringLiteralParam extends Parameter {
 			implType.setDeserializationConfig(getDeserializationConfig());	
 			implType.setClassName(Literal.class.getCanonicalName());
 			RDFType rdfType = new RDFType();
-			rdfType.setName("string");
+			rdfType.setName("langString");
 			type.setRdfType(rdfType);
 			this.setType(type);
 		} catch (Exception e) {
