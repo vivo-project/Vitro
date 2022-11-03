@@ -18,12 +18,14 @@ public class SparqlConstructQuery extends SparqlQuery {
 
 	private static final Log log = LogFactory.getLog(SparqlConstructQuery.class);
 	private static final String ERROR_MESSAGE = "Only model supported as an output parameter";
+	private Parameter outputParam;
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter", maxOccurs = 1)
 	public void addOutputParameter(Parameter param) throws InitializationException {
 		if (!ModelView.isModel(param)) {
 			throw new InitializationException(ERROR_MESSAGE);
 		}
+		outputParam = param;
 		outputParams.add(param);
 	}
 
@@ -41,7 +43,7 @@ public class SparqlConstructQuery extends SparqlQuery {
 			if (models.isEmpty()) {
 				Model resultModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
 				localRdfService.sparqlConstructQuery(preparedQueryString, resultModel);
-				ModelView.addModel(dataStore, resultModel, outputParams.getFirst());
+				ModelView.addModel(dataStore, resultModel, outputParam);
 			} else {
 				// Extend existing model
 				localRdfService.sparqlConstructQuery(preparedQueryString, models.get(0));
