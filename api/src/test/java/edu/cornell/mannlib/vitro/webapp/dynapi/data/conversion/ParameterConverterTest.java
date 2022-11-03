@@ -146,7 +146,7 @@ public class ParameterConverterTest {
 		} else {
 			arrayImplType.setDeserializationConfig(arrayConfig);			
 		}
-		arrayImplType.setClassName("java.util.ArrayList");
+		arrayImplType.setClassName(ArrayList.class.getCanonicalName());
 		arrayConfig.setClassName(arrayClassName);
 		arrayConfig.setMethodName(arrayMethod);
 		arrayConfig.setMethodArguments(arrayArgs);
