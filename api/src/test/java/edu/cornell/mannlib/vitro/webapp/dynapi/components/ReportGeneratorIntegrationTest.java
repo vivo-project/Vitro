@@ -4,11 +4,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-/*import java.io.File;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Base64;
-*/
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -76,13 +76,15 @@ public class ReportGeneratorIntegrationTest extends ServletContextTest {
 		assertTrue(TestView.getObject(data) != null);
 		final String base64EncodedReport = data.getSerializedValue();
 		assertTrue(!StringUtils.isEmpty(base64EncodedReport));
-		
-		/*
-		 * byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport); File
-		 * file = new File(RESOURCES_PATH + "integration-test-report" + extension); try
-		 * (OutputStream os = new FileOutputStream(file)) { os.write(reportBytes); }
-		 */
-		 
+
+		boolean manualDebugging = false;
+		if (manualDebugging) {
+			byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport);
+			File file = new File(RESOURCES_PATH + "integration-test-report" + extension);
+			try (OutputStream os = new FileOutputStream(file)) {
+				os.write(reportBytes);
+			}	
+		}
 	}
 
 	@Parameterized.Parameters
