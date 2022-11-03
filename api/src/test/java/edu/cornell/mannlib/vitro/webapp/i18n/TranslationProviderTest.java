@@ -21,25 +21,22 @@ public class TranslationProviderTest {
 	private static final String VIVO = "VIVO";
 	private static final String ROOT = "src/test/resources/edu/cornell/mannlib/vitro/webapp/i18n/TranslationProviderTest/";
 	private static final String TRANSLATIONS_N3_FILE = ROOT + "modelInitContent.n3";
-	private static final String WILMA = ROOT + "appMetadataWilma.n3";
-	private static final String NEMO = ROOT + "appMetadataNemo.n3";
+	private static final String WILMA = "wilma";
+	private static final String NEMO = "nemo";
 
 	private Model i18nModel;
-	private Model appMetaModel;
 	private RDFServiceModel rdfService;
 	private TranslationProvider tp;
 
-	public void init(String i18nFile, String themeMetaFilePath, String appName) throws FileNotFoundException {
+	public void init(String i18nFile, String themeName, String appName) throws FileNotFoundException {
 		i18nModel = ModelFactory.createDefaultModel();
-		appMetaModel = ModelFactory.createDefaultModel();
 		i18nModel.read(new FileReader(new File(i18nFile)), null, "n3");
-		appMetaModel.read(new FileReader(new File(themeMetaFilePath)), null, "n3");
 		Dataset ds = DatasetFactory.createTxnMem();
 		ds.addNamedModel("http://vitro.mannlib.cornell.edu/default/interface-i18n", i18nModel);
-		ds.addNamedModel("http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata", appMetaModel);
 		rdfService = new RDFServiceModel(ds);
 		tp = TranslationProvider.getInstance();
 		tp.rdfService = rdfService;
+		tp.setTheme(themeName);
 		tp.application = appName;
 		tp.clearCache();
 	}

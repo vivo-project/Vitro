@@ -18,6 +18,7 @@ import org.apache.jena.rdf.model.Literal;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -48,10 +49,6 @@ public class TranslationProvider {
 	+ "	  OPTIONAL { \n"
 	+ "		?uri :hasApp ?found_application .\n" 
 	+ "   }\n"
-	+ "   GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata> {\n"
-	+ "	    ?portal vitro:themeDir ?themePath .\n"
-    + "     BIND(SUBSTR(?themePath, 8, STRLEN(?themePath) -8 ) as ?current_theme) .\n"
-	+ "	  }\n"
 	+ "	  BIND(COALESCE(?found_theme, \"none\") as ?theme ) .\n"
 	+ "	  FILTER(?theme = \"none\" || ?theme = ?current_theme) . "
 	+ "	  BIND(COALESCE(?found_application, \"none\") as ?application ) .\n"
@@ -63,7 +60,11 @@ public class TranslationProvider {
 
 	protected RDFService rdfService;
 	protected String application = "Vitro";
-	private Map<TranslationKey, String> cache = new ConcurrentHashMap<>(); 
+	private Map<TranslationKey, String> cache = new ConcurrentHashMap<>();
+	private String theme = "vitro";
+	private int prefixLen = "themes/".length();
+	private int suffixLen = "/".length();
+	private WebappDaoFactory wdf; 
 
 	public static TranslationProvider getInstance() {
 		return INSTANCE;
@@ -74,6 +75,18 @@ public class TranslationProvider {
 		List<LevelRevisionInfo> levelInfos = info.getLevelInfos();
 		setApplication(levelInfos);
 		rdfService = ModelAccess.on(ctx).getRDFService(CONFIGURATION);
+		wdf = ModelAccess.on(ctx).getWebappDaoFactory();
+		updateTheme();
+	}
+
+	private void updateTheme() {
+		final String themeDir = wdf.getApplicationDao().getApplicationBean().getThemeDir();
+		final int length = themeDir.length();
+		theme = themeDir.substring(prefixLen, length - suffixLen);
+	}
+	
+	public void setTheme(String theme) {
+		this.theme = theme;
 	}
 
 	private void setApplication(List<LevelRevisionInfo> levelInfos) {
@@ -117,7 +130,9 @@ public class TranslationProvider {
 		QueryHolder queryHolder = new QueryHolder(QUERY)
 				.bindToPlainLiteral("current_application", application)
 				.bindToPlainLiteral("key", key)
+				.bindToPlainLiteral("current_theme", theme)
 				.bindToPlainLiteral("locale", preferredLocales.get(0));
+		
 		LanguageFilteringRDFService lfrs = new LanguageFilteringRDFService(rdfService, preferredLocales);
 		List<String> list = new LinkedList<>();
 		try {
@@ -159,6 +174,9 @@ public class TranslationProvider {
 	}
 
 	public void clearCache() {
+		if (wdf != null) {
+			updateTheme();
+		}
 		cache.clear();
 		log.info("Translation cache cleared");
 	}
