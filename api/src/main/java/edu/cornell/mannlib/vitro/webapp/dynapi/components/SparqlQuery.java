@@ -89,12 +89,14 @@ public abstract class SparqlQuery extends Operation implements ContextModelsUser
 	}
 
 	protected boolean isValid(DataStore dataStore) {
-		boolean valid = isValid();
+		if (!isValid()) {
+			return false;
+		}
 		if (!isInputValid(dataStore)) {
 			log.error("Input data is invalid");
-			valid = false;
+			return false;
 		}
-		return valid;
+		return true;
 	}
 
 	public boolean isValid() {
