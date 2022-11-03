@@ -142,7 +142,7 @@ public class ValidatorsTest {
 			TestView.setObject(data, Arrays.asList((String[])input));
     	} else {
     		
-			implType.setClassName("java.lang.String");
+			implType.setClassName(String.class.getCanonicalName());
 			ImplementationConfig config = new ImplementationConfig();
 			
 			config.setClassName(String.class.getCanonicalName());
