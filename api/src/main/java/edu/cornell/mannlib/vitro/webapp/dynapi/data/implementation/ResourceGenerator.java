@@ -1,12 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
 import java.math.BigInteger;
-import java.util.Random;
 import java.util.UUID;
-
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
@@ -15,11 +10,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class ResourceGenerator {
 
-	private static final Log log = LogFactory.getLog(ResourceGenerator.class.getName());
-
-	protected static Object JAVA_UUID = "java_uuid";
-	protected static Object OLD_NUMBER = "old_number";
-	protected static Object UUID_NUMBER = "uuid_number";
+	private static final String BASE62_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	protected static String JAVA_UUID = "java_uuid";
+	protected static String JAVA_UUID_NO_DASH = "java_uuid_no_dash";
+	protected static String UUID_NUMBER = "uuid_number";
+	protected static String UUID_BASE62 = "uuid_base62";
+	
+	private final String LEAD_ZEROS = "00000000000000000000000";
+	private BigInteger base = BigInteger.valueOf(62);
+	private BigInteger zero = BigInteger.valueOf(0);
 
 	private static ResourceGenerator INSTANCE = new ResourceGenerator();
 
@@ -34,17 +33,15 @@ public class ResourceGenerator {
 	}
 
 	/**
-	 * Creates a resource from input comma separated list of uri part names Values
-	 * of each parts calculated independently and concatenated result returned If
-	 * part name is not defined in the class, then it is added to the uri name If
-	 * part name is {@value #JAVA_UUID}, then new generated UUID will be used as a
-	 * part If part name is {@value #UUID_NUMBER}, then new generated UUID
-	 * represented as a string of 40 numbers will be used as a part If part name is
-	 * {@value #OLD_NUMBER} and it is the last one, then old individual uri should
-	 * be created. All previously defined parts will be used as a new namespace.
+	 * Creates a resource from input comma separated list of keys.
+	 * Values of each parts calculated independently and concatenated result returned.
+	 * If part name is not known, then it will be returned as a value.
+	 * Key {@value #JAVA_UUID} returns value in format [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+	 * Key {@value #JAVA_UUID_NO_DASH} returns value in format [0-9a-f]{32}
+	 * Key {@value #UUID_NUMBER} returns value in format [0-9]{40} 
+ 	 * Key {@value #UUID_BASE62} returns value in format [0-9a-zA-Z]{23} 
 	 * @throws InitializationException 
 	 */
-
 	public Resource getUriFromFormat(String input) throws InitializationException {
 		String uri = getUri(input);
 		Resource res = new ResourceImpl(uri);
@@ -56,9 +53,6 @@ public class ResourceGenerator {
 		StringBuilder uriBuilder = new StringBuilder();
 		for (int i = 0; i < parts.length; i++) {
 			String partName = parts[i].trim();
-			if (isOldFormatRequested(parts, i, partName) && wadf != null) {
-				return getOldURI(uriBuilder.toString());
-			}
 			uriBuilder.append(getUriPart(partName));
 		}
 		if (uriBuilder.length() == 0) {
@@ -71,64 +65,50 @@ public class ResourceGenerator {
 		return uri;
 	}
 
-	private boolean isOldFormatRequested(String[] parts, int i, String part) {
-		return parts.length == i + 1 && OLD_NUMBER.equals(part);
-	}
-
-	private static String getUriPart(String keyword) {
+	private String getUriPart(String keyword) {
 		if (JAVA_UUID.equals(keyword)) {
 			return getJavaUUID();
+		}
+		if (JAVA_UUID_NO_DASH.equals(keyword)) {
+			return getJavaUUIDwithoutDashes();
 		}
 		if (UUID_NUMBER.equals(keyword)) {
 			return getJavaUUIDNumber();
 		}
-		//If wadf is not available fallback to use of UUID_NUMBER
-		if (OLD_NUMBER.equals(keyword)) {
-			return getJavaUUIDNumber();
+		if (UUID_BASE62.equals(keyword)) {
+			return getJavaUUIDAlphaNum();
 		}
 		return keyword;
 	}
 
 	private static String getJavaUUIDNumber() {
-		final UUID randomUUID = UUID.randomUUID();
-		final String base16String = randomUUID.toString().replace("-", "");
+		String base16String = getJavaUUIDwithoutDashes();
 		return String.format("%040d", new BigInteger(base16String, 16));
+	}
+	
+	private String getJavaUUIDAlphaNum() {
+		String base16String = getJavaUUIDwithoutDashes();
+		BigInteger number = new BigInteger(base16String, 16);
+
+		StringBuilder stringBuilder = new StringBuilder(23);
+		while (number.compareTo(zero) > 0) {
+			stringBuilder.insert(0, BASE62_CHARS.charAt(number.mod(base).intValue()));
+			number = number.divide(base);
+		}
+		String base62String = stringBuilder.toString();
+		return (LEAD_ZEROS + base62String).substring(base62String.length());
 	}
 
 	private static String getJavaUUID() {
 		return UUID.randomUUID().toString();
+	} 
+	
+	private static String getJavaUUIDwithoutDashes() {
+		return getJavaUUID().replace("-", "");
 	}
 
 	public void init(WebappDaoFactory webappDaoFactory) {
 		wadf = webappDaoFactory;
-	}
-
-	private String getOldURI(String newNamespace) throws InitializationException {
-		String uri = null;
-		String errMsg = null;
-		Random random = new Random();
-		boolean uriIsGood = false;
-		int attempts = 0;
-
-		while (!uriIsGood && attempts < 30) {
-			uri = newNamespace + random.nextInt(Math.min(Integer.MAX_VALUE, (int) Math.pow(2, attempts + 13)));
-			errMsg = wadf.checkURI(uri);
-			if (errMsg != null) {
-				uri = null;
-			} else {
-				uriIsGood = true;
-			}
-			attempts++;
-		}
-		if (uri == null) {
-			log.error("Generated uri is null, fallback to generate uri in new format");
-			uri = newNamespace + getJavaUUIDNumber();
-		}
-		if (wadf.checkURI(uri) != null) {
-			throw new InitializationException("Uri check failed");
-		}
-
-		return uri;
-	}
+	}	
 
 }
