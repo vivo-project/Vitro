@@ -1,20 +1,26 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
 import java.math.BigInteger;
+import java.util.Random;
 import java.util.UUID;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class ResourceGenerator {
 
 	private static final String BASE62_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	private static final Log log = LogFactory.getLog(ResourceGenerator.class.getName());
+
 	protected static String JAVA_UUID = "java_uuid";
 	protected static String JAVA_UUID_NO_DASH = "java_uuid_no_dash";
 	protected static String JAVA_UUID_NUMBER = "java_uuid_number";
 	protected static String JAVA_UUID_BASE62 = "java_uuid_base62";
+	protected static Object OLD_NUMBER = "old_number";
 	
 	private BigInteger base = BigInteger.valueOf(62);
 	private BigInteger zero = BigInteger.valueOf(0);
@@ -39,6 +45,7 @@ public class ResourceGenerator {
 	 * Key {@value #JAVA_UUID_NO_DASH} returns value in format [0-9a-f]{32}
 	 * Key {@value #JAVA_UUID_NUMBER} returns value in format [0-9]{40} 
  	 * Key {@value #JAVA_UUID_BASE62} returns value in format [0-9a-zA-Z]{1,23} 
+ 	 * Key {@value #OLD_NUMBER} returns number between 0 and Integer.MAX_VALUE
 	 * @throws InitializationException 
 	 */
 	public Resource getUriFromFormat(String input) throws InitializationException {
@@ -52,7 +59,7 @@ public class ResourceGenerator {
 		StringBuilder uriBuilder = new StringBuilder();
 		for (int i = 0; i < parts.length; i++) {
 			String partName = parts[i].trim();
-			uriBuilder.append(getUriPart(partName));
+			uriBuilder.append(getUriPart(partName, uriBuilder));
 		}
 		if (uriBuilder.length() == 0) {
 			uriBuilder.append(getJavaUUID());
@@ -64,7 +71,7 @@ public class ResourceGenerator {
 		return uri;
 	}
 
-	private String getUriPart(String keyword) {
+	private String getUriPart(String keyword, StringBuilder uriBuilder) {
 		if (JAVA_UUID.equals(keyword)) {
 			return getJavaUUID();
 		}
@@ -77,7 +84,39 @@ public class ResourceGenerator {
 		if (JAVA_UUID_BASE62.equals(keyword)) {
 			return getJavaUUIDAlphaNum();
 		}
+		if (OLD_NUMBER.equals(keyword)) {
+			return getNumber(uriBuilder.toString());
+		}
 		return keyword;
+	}
+
+	private String getNumber(String prefix) {
+		String uri = null;
+		String errMsg = null;
+		Random random = new Random();
+		boolean uriIsGood = false;
+		int attempts = 0;
+		int number = 0;
+		while (!uriIsGood && attempts < 30) {
+			number = random.nextInt(Math.min(Integer.MAX_VALUE, (int) Math.pow(2, attempts + 13)));
+			uri = prefix + number;
+			errMsg = wadf.checkURI(uri);
+			if (errMsg != null) {
+				uri = null;
+			} else {
+				uriIsGood = true;
+			}
+			attempts++;
+		}
+		if (uri == null) {
+			log.error("Generated old_number is null, fallback to default");
+			return getDefaultFormat();
+		}
+		return String.valueOf(number);
+	}
+
+	private String getDefaultFormat() {
+		return getJavaUUIDAlphaNum();
 	}
 
 	private static String getJavaUUIDNumber() {

@@ -51,6 +51,7 @@ public class ResourceGeneratorTest {
 				{ NAMESPACE + "," + ResourceGenerator.JAVA_UUID_NO_DASH, NAMESPACE + "[0-9a-f]{32}" }, 
 				{ NAMESPACE + "," + ResourceGenerator.JAVA_UUID_BASE62, NAMESPACE + "[0-9a-zA-Z]{1,23}" }, 
 				{ NAMESPACE + "n," + ResourceGenerator.JAVA_UUID_NUMBER, NAMESPACE + "n[0-9]{40}" },
+				{ NAMESPACE + "n," + ResourceGenerator.OLD_NUMBER, NAMESPACE + "n[0-9]{1,10}" },
 			});
 	}
 }
