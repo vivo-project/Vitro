@@ -16,7 +16,6 @@ public class ResourceGenerator {
 	protected static String UUID_NUMBER = "uuid_number";
 	protected static String UUID_BASE62 = "uuid_base62";
 	
-	private final String LEAD_ZEROS = "00000000000000000000000";
 	private BigInteger base = BigInteger.valueOf(62);
 	private BigInteger zero = BigInteger.valueOf(0);
 
@@ -39,7 +38,7 @@ public class ResourceGenerator {
 	 * Key {@value #JAVA_UUID} returns value in format [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
 	 * Key {@value #JAVA_UUID_NO_DASH} returns value in format [0-9a-f]{32}
 	 * Key {@value #UUID_NUMBER} returns value in format [0-9]{40} 
- 	 * Key {@value #UUID_BASE62} returns value in format [0-9a-zA-Z]{23} 
+ 	 * Key {@value #UUID_BASE62} returns value in format [0-9a-zA-Z]{1,23} 
 	 * @throws InitializationException 
 	 */
 	public Resource getUriFromFormat(String input) throws InitializationException {
@@ -90,13 +89,12 @@ public class ResourceGenerator {
 		String base16String = getJavaUUIDwithoutDashes();
 		BigInteger number = new BigInteger(base16String, 16);
 
-		StringBuilder stringBuilder = new StringBuilder(23);
+		StringBuilder base62Builder = new StringBuilder(23);
 		while (number.compareTo(zero) > 0) {
-			stringBuilder.insert(0, BASE62_CHARS.charAt(number.mod(base).intValue()));
+			base62Builder.insert(0, BASE62_CHARS.charAt(number.mod(base).intValue()));
 			number = number.divide(base);
 		}
-		String base62String = stringBuilder.toString();
-		return (LEAD_ZEROS + base62String).substring(base62String.length());
+		return base62Builder.toString();
 	}
 
 	private static String getJavaUUID() {

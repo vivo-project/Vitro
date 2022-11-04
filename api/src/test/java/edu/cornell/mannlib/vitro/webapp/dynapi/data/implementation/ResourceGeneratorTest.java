@@ -49,7 +49,7 @@ public class ResourceGeneratorTest {
 			new Object[][] { 
 				{ NAMESPACE + "," + ResourceGenerator.JAVA_UUID, NAMESPACE + "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" }, 
 				{ NAMESPACE + "," + ResourceGenerator.JAVA_UUID_NO_DASH, NAMESPACE + "[0-9a-f]{32}" }, 
-				{ NAMESPACE + "," + ResourceGenerator.UUID_BASE62, NAMESPACE + "[0-9a-zA-Z]{23}" }, 
+				{ NAMESPACE + "," + ResourceGenerator.UUID_BASE62, NAMESPACE + "[0-9a-zA-Z]{1,23}" }, 
 				{ NAMESPACE + "n," + ResourceGenerator.UUID_NUMBER, NAMESPACE + "n[0-9]{40}" },
 			});
 	}
