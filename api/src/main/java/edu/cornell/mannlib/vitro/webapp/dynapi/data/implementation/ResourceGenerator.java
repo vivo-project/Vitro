@@ -13,8 +13,8 @@ public class ResourceGenerator {
 	private static final String BASE62_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	protected static String JAVA_UUID = "java_uuid";
 	protected static String JAVA_UUID_NO_DASH = "java_uuid_no_dash";
-	protected static String UUID_NUMBER = "uuid_number";
-	protected static String UUID_BASE62 = "uuid_base62";
+	protected static String JAVA_UUID_NUMBER = "java_uuid_number";
+	protected static String JAVA_UUID_BASE62 = "java_uuid_base62";
 	
 	private BigInteger base = BigInteger.valueOf(62);
 	private BigInteger zero = BigInteger.valueOf(0);
@@ -37,8 +37,8 @@ public class ResourceGenerator {
 	 * If part name is not known, then it will be returned as a value.
 	 * Key {@value #JAVA_UUID} returns value in format [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
 	 * Key {@value #JAVA_UUID_NO_DASH} returns value in format [0-9a-f]{32}
-	 * Key {@value #UUID_NUMBER} returns value in format [0-9]{40} 
- 	 * Key {@value #UUID_BASE62} returns value in format [0-9a-zA-Z]{1,23} 
+	 * Key {@value #JAVA_UUID_NUMBER} returns value in format [0-9]{40} 
+ 	 * Key {@value #JAVA_UUID_BASE62} returns value in format [0-9a-zA-Z]{1,23} 
 	 * @throws InitializationException 
 	 */
 	public Resource getUriFromFormat(String input) throws InitializationException {
@@ -71,10 +71,10 @@ public class ResourceGenerator {
 		if (JAVA_UUID_NO_DASH.equals(keyword)) {
 			return getJavaUUIDwithoutDashes();
 		}
-		if (UUID_NUMBER.equals(keyword)) {
+		if (JAVA_UUID_NUMBER.equals(keyword)) {
 			return getJavaUUIDNumber();
 		}
-		if (UUID_BASE62.equals(keyword)) {
+		if (JAVA_UUID_BASE62.equals(keyword)) {
 			return getJavaUUIDAlphaNum();
 		}
 		return keyword;
