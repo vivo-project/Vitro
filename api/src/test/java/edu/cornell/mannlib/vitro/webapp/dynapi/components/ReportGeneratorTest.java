@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-/*import java.io.FileOutputStream;
-import java.io.OutputStream;*/
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -74,11 +74,14 @@ public class ReportGeneratorTest {
 		assertTrue(dataStore.contains(REPORT));
 		byte[] reportBytes = BinaryView.getByteArray(dataStore, reportParam);
 		assertTrue(reportBytes.length > templateByteArray.length);
-		/*
-		 * File file = new File(RESOURCES_PATH + "result-" + templatePath); try
-		 * (OutputStream os = new FileOutputStream(file)) { os.write(reportBytes); }
-		 */
-
+		
+		boolean manualDebugging = false;
+		if (manualDebugging) {
+			File file = new File(RESOURCES_PATH + "result-" + templatePath);
+			try (OutputStream os = new FileOutputStream(file)) {
+				os.write(reportBytes);
+			}
+		}
 	}
 
 }
