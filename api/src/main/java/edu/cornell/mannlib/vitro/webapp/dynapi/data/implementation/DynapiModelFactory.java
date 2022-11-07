@@ -6,6 +6,7 @@ import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 public class DynapiModelFactory {
 
@@ -21,7 +22,8 @@ public class DynapiModelFactory {
 	}
 
 	public static Model getModel(String modelName) {
-		Model model = modelAccess.getOntModel(modelName);
+		String uri = ModelNames.namesMap.get(modelName);
+		Model model = modelAccess.getOntModel(uri);
 		return model;
 	}
 }
