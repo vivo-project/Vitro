@@ -91,6 +91,10 @@ public class ResourceGenerator {
 	}
 
 	private String getNumber(String prefix) {
+		if (wadf == null) {
+			log.error("WebappDaoFactory is null, fallback to default");
+			return getDefaultFormat();
+		}
 		String uri = null;
 		String errMsg = null;
 		Random random = new Random();
