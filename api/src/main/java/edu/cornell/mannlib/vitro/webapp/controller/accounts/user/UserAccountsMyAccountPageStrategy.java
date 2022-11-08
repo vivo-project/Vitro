@@ -108,8 +108,6 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 		private static final String ERROR_WRONG_PASSWORD_LENGTH = "errorPasswordIsWrongLength";
 		private static final String ERROR_PASSWORDS_DONT_MATCH = "errorPasswordsDontMatch";
 
-		private static final String EMAIL_TEMPLATE = "userAccounts-confirmEmailChangedEmail.ftl";
-
 		private final String originalEmail;
 
 		private String newPassword;
@@ -179,8 +177,11 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUserAccount().getEmailAddress());
-			email.setSubject(i18n.text("email_changed_subject", getSiteName()));
-			email.setTemplate(EMAIL_TEMPLATE);
+			final String subject = i18n.text("email_changed_subject", getSiteName());
+			email.setSubject(subject);
+			body.put("subject", subject);
+			body.put("textMessage", i18n.text("confirm_email_changed_email_plain_text"));
+			body.put("htmlMessage", i18n.text("confirm_email_changed_email_html_text"));
 			email.setBodyMap(body);
 			email.processTemplate();
 			email.send();

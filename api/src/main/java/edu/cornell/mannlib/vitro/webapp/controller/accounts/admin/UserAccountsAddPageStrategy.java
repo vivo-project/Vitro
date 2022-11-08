@@ -57,8 +57,6 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 	private static class EmailStrategy extends UserAccountsAddPageStrategy {
 		public static final String CREATE_PASSWORD_URL = "/accounts/createPassword";
-		private static final String EMAIL_TEMPLATE_WITH_PASSWORD = "userAccounts-acctCreatedEmail.ftl";
-		private static final String EMAIL_TEMPLATE_NO_PASSWORD = "userAccounts-acctCreatedExternalOnlyEmail.ftl";
 
 		private boolean sentEmail;
 
@@ -100,15 +98,19 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 			body.put("userAccount", page.getAddedAccount());
 			body.put("passwordLink", buildCreatePasswordLink());
 			body.put("siteName", getSiteName());
-
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getAddedAccount().getEmailAddress());
-			email.setSubject(i18n.text("account_created_subject", getSiteName()));
+			String subject = i18n.text("account_created_subject", getSiteName());
+			email.setSubject(subject);
 			if (page.isExternalAuthOnly()) {
-				email.setTemplate(EMAIL_TEMPLATE_NO_PASSWORD);
+				body.put("subject", subject);
+				body.put("textMessage", i18n.text("acct_created_external_only_email_plain_text"));
+				body.put("htmlMessage", i18n.text("acct_created_external_only_email_html_text"));
 			} else {
-				email.setTemplate(EMAIL_TEMPLATE_WITH_PASSWORD);
+				body.put("subject", subject);
+				body.put("textMessage", i18n.text("acct_created_email_plain_text"));
+				body.put("htmlMessage", i18n.text("acct_created_email_html_text"));
 			}
 			email.setBodyMap(body);
 			email.processTemplate();

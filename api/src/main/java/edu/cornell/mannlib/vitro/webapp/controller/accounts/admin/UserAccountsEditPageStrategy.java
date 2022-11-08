@@ -56,8 +56,6 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 	private static class EmailStrategy extends UserAccountsEditPageStrategy {
 		private static final String PARAMETER_RESET_PASSWORD = "resetPassword";
-		private static final String EMAIL_TEMPLATE = "userAccounts-passwordResetPendingEmail.ftl";
-
 		public static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
 
 		private boolean resetPassword;
@@ -107,11 +105,13 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 			body.put("userAccount", page.getUpdatedAccount());
 			body.put("passwordLink", buildResetPasswordLink());
 			body.put("siteName", getSiteName());
+			body.put("subject", i18n.text("password_reset_pending_email_subject"));
+			body.put("textMessage",i18n.text("password_reset_pending_email_plain_text"));
+			body.put("htmlMessage", i18n.text("password_reset_pending_email_html_text"));
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUpdatedAccount().getEmailAddress());
-			email.setTemplate(EMAIL_TEMPLATE);
 			email.setBodyMap(body);
 			email.processTemplate();
 			email.send();
