@@ -44,6 +44,7 @@ public class RPCEndpoint extends VitroHttpServlet {
 	        	return;
 	        } 
             DataStore dataStore = new DataStore();
+            dataStore.setUser(user);
             if (requestPath.isResourceRequest()) {
                 dataStore.setResourceID(requestPath.getResourceId());
             }
