@@ -34,6 +34,8 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     private Parameters internalParams = new Parameters();
     private List<AccessWhitelist> accessWhitelists = new LinkedList<AccessWhitelist>();
 
+	private boolean publicAcess = false;
+
     @Override
     public void dereference() {
     }
@@ -62,6 +64,11 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
     public void addProvidedParameter(Parameter param) {
         outputParams.add(param);
+    }
+    
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#publicAccess")
+    public void setPublicAccess(boolean access) {
+        publicAcess = access;
     }
 
     @Override
@@ -185,7 +192,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 	}
 
 	public boolean hasPermissions(UserAccount user) {
-		if (isPublicAccessible()) {
+		if (isPublicAccess()) {
 			return true;
 		}
 		if (user == null) {
@@ -202,8 +209,8 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 		return false;
 	}
 
-	private boolean isPublicAccessible() {
-		return false;
+	private boolean isPublicAccess() {
+		return publicAcess ;
 	}
 
 }
