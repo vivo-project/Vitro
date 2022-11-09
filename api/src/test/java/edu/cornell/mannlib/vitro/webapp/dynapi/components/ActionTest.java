@@ -21,6 +21,8 @@ public class ActionTest {
 		Action action = new Action();
 		UserAccount user = new UserAccount();
 		assertFalse(action.hasPermissions(user));
+		user.setRootUser(true);
+		assertTrue(action.hasPermissions(user));
 	}
 
 	@Test
