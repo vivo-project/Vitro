@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory.BulkUpdatingUnion;
@@ -52,6 +53,10 @@ public class RDFServiceBulkUnionUpdater extends AbstractBulkUpdater {
 			updater = new RDFServiceBulkUnionUpdater((BulkUpdatingUnion) graph);
 		} else if (graph instanceof RDFServiceGraph) {
 			updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
+		} else if (hasBlankNodeFilterginGraphInnerRdfServiceGraph(graph)) {
+			BlankNodeFilteringGraph blankNodeGraph = (BlankNodeFilteringGraph) graph;
+			RDFServiceGraph rdfServiceGraph = (RDFServiceGraph)blankNodeGraph.getInnerGraph();
+			updater = new RDFServiceBulkUpdater(rdfServiceGraph);
 		} else if (graph instanceof BulkUpdatingUnion) {
 			updater = new RDFServiceBulkUnionUpdater((BulkUpdatingUnion) graph);
 		} else if (graph instanceof SparqlGraph) {
@@ -60,6 +65,18 @@ public class RDFServiceBulkUnionUpdater extends AbstractBulkUpdater {
 			updater = null;
 		}
 		return updater;
+	}
+
+	private boolean hasBlankNodeFilterginGraphInnerRdfServiceGraph(Graph graph) {
+		if (!(graph instanceof BlankNodeFilteringGraph)) {
+			return false;
+		}
+		BlankNodeFilteringGraph blankNodeGraph = (BlankNodeFilteringGraph) graph;
+		final Graph innerGraph = blankNodeGraph.getInnerGraph();
+		if (innerGraph instanceof RDFServiceGraph) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
