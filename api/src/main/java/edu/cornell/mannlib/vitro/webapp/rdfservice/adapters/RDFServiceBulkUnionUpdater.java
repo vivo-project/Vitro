@@ -41,13 +41,13 @@ public class RDFServiceBulkUnionUpdater extends AbstractBulkUpdater {
 	private AbstractBulkUpdater getUpdater(Model model) {
 		AbstractBulkUpdater updater = null;
 		if (model instanceof BulkUpdatingOntModel) {
-			updater = ((BulkUpdatingOntModel) model).updater;
-			return updater;
-		} else if (model instanceof BulkUpdatingModel) {
-			updater = ((BulkUpdatingModel) model).updater;
-			return updater;
-		}
-		Graph graph = GraphUtils.unwrapUnionGraphs(model.getGraph());
+            updater = ((BulkUpdatingOntModel) model).updater;
+            return updater;
+        } else if (model instanceof BulkUpdatingModel) {
+            updater = ((BulkUpdatingModel) model).updater;
+            return updater;
+        } 
+	    Graph graph = GraphUtils.unwrapUnionGraphs(model.getGraph());
 		if (graph instanceof BulkUpdatingUnion) {
 			updater = new RDFServiceBulkUnionUpdater((BulkUpdatingUnion) graph);
 		} else if (graph instanceof RDFServiceGraph) {
@@ -67,7 +67,7 @@ public class RDFServiceBulkUnionUpdater extends AbstractBulkUpdater {
 		if (leftUpdater != null) {
 			leftUpdater.performAddModel(model);
 		} else if (baseModel != null) {
-			baseModel.remove(model);
+			baseModel.add(model);
 		}
 	}
 
