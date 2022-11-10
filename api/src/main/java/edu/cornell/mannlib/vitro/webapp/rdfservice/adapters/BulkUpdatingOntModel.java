@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory.BulkUpdatingUnion;
+
 import org.apache.jena.graph.Graph;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
@@ -23,30 +25,18 @@ import java.util.List;
 
 public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
     private static final RDFReaderF readerFactory = new RDFReaderFImpl();
-    private AbstractBulkUpdater updater;
+    protected AbstractBulkUpdater updater;
 
     protected BulkUpdatingOntModel(OntModel m) {
         super(m);
+        Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
+        if(graph instanceof BulkUpdatingUnion){
+            updater = new RDFServiceBulkUnionUpdater((BulkUpdatingUnion) graph);
+            return;
+        } 
         if (m instanceof BulkUpdatingOntModel) {
             this.updater = ((BulkUpdatingOntModel) m).updater;
         } else {
-            Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
-            if (graph instanceof RDFServiceGraph) {
-                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
-            } else if (graph instanceof SparqlGraph) {
-                updater = new SparqlBulkUpdater((SparqlGraph) graph);
-            } else {
-                updater = null;
-            }
-        }
-    }
-
-    protected BulkUpdatingOntModel(OntModel m, OntModel baseModel) {
-        super(m);
-        if (baseModel instanceof BulkUpdatingOntModel) {
-            this.updater = ((BulkUpdatingOntModel) baseModel).updater;
-        } else {
-            Graph graph = GraphUtils.unwrapUnionGraphs(baseModel.getGraph());
             if (graph instanceof RDFServiceGraph) {
                 updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
             } else if (graph instanceof SparqlGraph) {
