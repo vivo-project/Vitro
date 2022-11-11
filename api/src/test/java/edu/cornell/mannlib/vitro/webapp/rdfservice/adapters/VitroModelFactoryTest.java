@@ -346,10 +346,13 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	public void addMultipleToVitroUnion() {
 		umg = new VitroUnionModelGroup();
 		umg.m.add(MULTIPLE_STATEMENTS);
-		new MethodCalls().add(umg.base.g, "add", "add")
-				.add(umg.base.l, "addedStatement", "addedStatement")
-				.add(umg.plus.g).add(umg.plus.l)
-				.add(umg.l, "addedStatements").test();
+		new MethodCalls()
+				.add(umg.base.g, "performAdd", "performAdd")
+				.add(umg.base.l, "addedStatements", "addedStatements")
+				.add(umg.plus.g)
+				.add(umg.plus.l)
+				.add(umg.l)
+				.test();
 	}
 
 	// ----------------------------------------------------------------------
@@ -452,10 +455,12 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	public void addMultipleToVitroOntUnion() {
 		uomg = new VitroUnionOntModelGroup();
 		uomg.om.add(MULTIPLE_STATEMENTS);
-		new MethodCalls().add(uomg.base.g, "add", "add")
+		new MethodCalls()
+				.add(uomg.base.g, "add", "add")
 				.add(uomg.base.l, "addedStatement", "addedStatement")
 				.add(uomg.plus.g).add(uomg.plus.l)
-				.add(uomg.l, "addedStatements").test();
+				.add(uomg.l)
+				.test();
 	}
 
 	// ----------------------------------------------------------------------
@@ -566,12 +571,16 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	public void addMultipleToVitroOntModeledUnionModel() {
 		omumg = new VitroOntModelUnionModelGroup();
 		omumg.om.add(MULTIPLE_STATEMENTS);
-		new MethodCalls().add(omumg.om, "add").add(omumg.ol, "addedStatements")
-				.add(omumg.union.base.g, "add", "add")
-				.add(omumg.union.base.m)
-				.add(omumg.union.base.l, "addedStatement", "addedStatement")
+		new MethodCalls()
+				.add(omumg.om, "add")
+				.add(omumg.ol)
+				.add(omumg.union.base.g, "performAdd", "performAdd")
+				.add(omumg.union.base.m, "add", "add")
+				.add(omumg.union.base.l, "addedStatements", "addedStatements")
 				.add(omumg.union.plus.g)
-				.add(omumg.union.plus.m).add(omumg.union.plus.l).test();
+				.add(omumg.union.plus.m)
+				.add(omumg.union.plus.l)
+				.test();
 	}
 
 	// ----------------------------------------------------------------------
