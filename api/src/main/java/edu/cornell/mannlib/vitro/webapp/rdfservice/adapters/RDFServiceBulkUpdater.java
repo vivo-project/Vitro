@@ -6,15 +6,20 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import org.apache.jena.graph.GraphEvents;
 import org.apache.jena.rdf.model.Model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 public class RDFServiceBulkUpdater extends AbstractBulkUpdater {
     RDFServiceGraph graph;
+	private static final int chunkSize = 50000;
+    private static final String REMOVE_CHUNK_QUERY = 
+			"CONSTRUCT { ?s ?p ?o } " +
+			"WHERE { ?s ?p ?o } " +
+			"LIMIT " + chunkSize;
 
     public RDFServiceBulkUpdater(RDFServiceGraph graph) {
         this.graph = graph;
@@ -53,49 +58,35 @@ public class RDFServiceBulkUpdater extends AbstractBulkUpdater {
     @Override
     protected void performRemoveAll() {
         String graphURI = graph.getGraphURI();
-
-        String findPattern = "?s ?p ?o";
-
-        StringBuilder findQuery = new StringBuilder("CONSTRUCT { ")
-                .append(findPattern)
-                .append(" } WHERE { \n");
+        String queryString;
         if (graphURI != null) {
-            findQuery.append("  GRAPH <").append(graphURI).append("> { ");
+        	queryString = getRemoveGraphChunkPattern(graphURI);
+        } else {
+        	queryString = REMOVE_CHUNK_QUERY;	
         }
-        findQuery.append(findPattern);
-        if (graphURI != null) {
-            findQuery.append(" } ");
-        }
-        findQuery.append("\n}");
-
-        String queryString = findQuery.toString();
-
-        int chunkSize = 50000;
-        boolean done = false;
-
-        while (!done) {
-            String chunkQueryString = queryString + " LIMIT " + chunkSize;
-
+        while (!graph.isEmpty()) {
             try {
-                Model chunkToRemove = RDFServiceUtils.parseModel(
-                        graph.getRDFService().sparqlConstructQuery(
-                                chunkQueryString, RDFService.ModelSerializationFormat.N3),
-                        RDFService.ModelSerializationFormat.N3);
-                if (chunkToRemove.size() > 0) {
-                    ChangeSet cs = graph.getRDFService().manufactureChangeSet();
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    chunkToRemove.write(out, "N-TRIPLE");
-                    cs.addRemoval(new ByteArrayInputStream(out.toByteArray()),
-                            RDFService.ModelSerializationFormat.N3, graphURI);
-                    graph.getRDFService().changeSetUpdate(cs);
-                } else {
-                    done = true;
-                }
+                InputStream chunkToRemove = graph.getRDFService().sparqlConstructQuery(
+                queryString, RDFService.ModelSerializationFormat.N3);
+                ChangeSet cs = graph.getRDFService().manufactureChangeSet();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                cs.addRemoval(chunkToRemove, RDFService.ModelSerializationFormat.N3, graphURI);
+                graph.getRDFService().changeSetUpdate(cs);
             } catch (RDFServiceException e) {
                 throw new RuntimeException(e);
             }
         }
-
         graph.getEventManager().notifyEvent(graph, GraphEvents.removeAll);
+    }
+    
+    private static String getRemoveGraphChunkPattern(String uri) {
+    	return 
+    			"CONSTRUCT { ?s ?p ?o } " +
+    			"WHERE { " +
+    				"GRAPH <" + uri + "> {" +
+    					"?s ?p ?o " +
+    				"} "+
+    			"} "+ 
+    			"LIMIT " + chunkSize;
     }
 }
