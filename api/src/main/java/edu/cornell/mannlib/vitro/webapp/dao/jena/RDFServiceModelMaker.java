@@ -103,7 +103,7 @@ public class RDFServiceModelMaker implements ModelMaker {
 	@Override
 	public void removeModel(String name) {
 		Model m = getModel(name);
-		m.removeAll(null, null, null);
+		m.removeAll();
 	}
 
 	@Override
