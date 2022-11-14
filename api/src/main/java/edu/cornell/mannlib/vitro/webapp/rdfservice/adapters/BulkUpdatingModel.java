@@ -26,17 +26,18 @@ public class BulkUpdatingModel extends AbstractModelDecorator {
     private static final RDFReaderF readerFactory = new RDFReaderFImpl();
     protected AbstractBulkUpdater updater;
 
-    protected BulkUpdatingModel(Model m) {
+    public BulkUpdatingModel(Model m) {
         super(m);
-        if(m.getGraph() instanceof BulkUpdatingUnion){
-            updater = new RDFServiceBulkUnionUpdater((BulkUpdatingUnion) m.getGraph());
+        Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
+        if(graph instanceof BulkUpdatingUnion){
+            updater = new RDFServiceBulkUnionUpdater((BulkUpdatingUnion) graph);
             return;
         } 
-        
-        if (m instanceof BulkUpdatingModel) {
+        if (m instanceof BulkUpdatingOntModel) {
+            this.updater = ((BulkUpdatingOntModel) m).updater;
+        } else  if (m instanceof BulkUpdatingModel) {
             this.updater = ((BulkUpdatingModel) m).updater;
         } else {
-            Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
             if (graph instanceof RDFServiceGraph) {
                 updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
             } else if (graph instanceof SparqlGraph) {

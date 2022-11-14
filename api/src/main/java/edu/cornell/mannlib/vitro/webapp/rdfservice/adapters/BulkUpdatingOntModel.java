@@ -36,6 +36,8 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
         } 
         if (m instanceof BulkUpdatingOntModel) {
             this.updater = ((BulkUpdatingOntModel) m).updater;
+        } else  if (m instanceof BulkUpdatingModel) {
+            this.updater = ((BulkUpdatingModel) m).updater;
         } else {
             if (graph instanceof RDFServiceGraph) {
                 updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
