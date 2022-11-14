@@ -6,14 +6,11 @@ import static org.apache.jena.ontology.OntModelSpec.OWL_MEM;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.compose.Union;
 import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.impl.ModelCom;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
@@ -24,17 +21,21 @@ public class VitroModelFactory {
 	private static final Log log = LogFactory.getLog(VitroModelFactory.class);
 
 	public static Model createModel() {
-		return ModelFactory.createDefaultModel();
+		return createBulkInMemoryModel();
+	}
+
+	private static BulkModelCom createBulkInMemoryModel() {
+		return new BulkModelCom(new BulkGraphMem());
 	}
 
 	public static OntModel createOntologyModel() {
-		return ModelFactory.createOntologyModel(OWL_MEM);
+		return new BulkOntModelImpl(OWL_MEM, createBulkInMemoryModel());
 	}
 
 	public static OntModel createOntologyModel(Model model) {
 		Graph graph = model.getGraph();
-		Model bareModel = new ModelCom(graph);
-		OntModel ontModel = new OntModelImpl(OWL_MEM, bareModel);
+		Model bareModel = new BulkModelCom(graph);
+		OntModel ontModel = new BulkOntModelImpl(OWL_MEM, bareModel);
 		return new BulkUpdatingOntModel(ontModel);
 	}
 
