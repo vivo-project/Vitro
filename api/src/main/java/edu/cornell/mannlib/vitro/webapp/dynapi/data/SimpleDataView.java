@@ -52,4 +52,16 @@ public class SimpleDataView {
 		}
 	}
 
+    public static List<String> getPlainStringList(Parameters params, DataStore dataStore) {
+        List<String> uris = new LinkedList<String>();
+        for (String paramName : params.getNames()) {
+            Data data = dataStore.getData(paramName);
+            if (data.getParam().isString()) {
+                String uri = data.getSerializedValue();
+                uris.add(uri);    
+            }
+        }
+        return uris;
+    }
+
 }

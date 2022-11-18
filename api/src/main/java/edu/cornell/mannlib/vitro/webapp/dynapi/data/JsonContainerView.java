@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,27 @@ public class JsonContainerView {
 		return jsonArrays;
 	}
 	
+    public static List<String> getStringListFromJsonArrays(Parameters params, DataStore dataStore){
+        List<String> uris = new LinkedList<>();
+        List<JsonContainer> jsonArrays = getJsonArrayList(params, dataStore);
+        for (JsonContainer array : jsonArrays) {
+            uris.addAll(array.getDataAsStringList());
+        }
+        return uris;
+    }
+    
+    private static List<JsonContainer> getJsonArrayList(Parameters params, DataStore dataStore) {
+        List<JsonContainer> jsonArrays = new LinkedList<>();
+        for (String name : params.getNames()) {
+            Parameter param = params.get(name);
+            if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
+                JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
+                jsonArrays.add(arrayNode);
+            }
+        }
+        return jsonArrays;
+    }
+
 	public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {
 		for (String name : params.getNames()) {
 			Parameter param = params.get(name);
