@@ -5,10 +5,7 @@ import static edu.cornell.mannlib.vitro.webapp.utils.configuration.Configuration
 import static java.lang.String.format;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentNavigableMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.servlet.ServletContext;
 
@@ -32,17 +29,17 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     private static final Object mutex = new Object();
 
-    private ConcurrentNavigableMap<K, C> components;
+    private MultiAccessComponents<K, C> components;
     private ServletContext ctx;
     private ConfigurationBeanLoader loader;
     private ConcurrentLinkedQueue<C> obsoleteComponents;
 
     protected AbstractPool() {
-        components = new ConcurrentSkipListMap<>();
+        components = new MultiAccessComponents<>();
         obsoleteComponents = new ConcurrentLinkedQueue<>();
     }
 
-    protected ConcurrentNavigableMap<K, C> getComponents() {
+    protected MultiAccessComponents<K, C> getComponents() {
         return components;
     }
 
@@ -74,6 +71,14 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         log.info(format("Adding component %s with URI %s", key, uri));
         if (isInModel(uri)) {
             synchronized (mutex) {
+                K oldKey = components.putUriMapping(uri, key);
+                if (oldKey != null && !oldKey.equals(key)) {
+                	C oldComponent = components.get(oldKey);
+                	if (oldComponent != null) {
+                        obsoleteComponents.add(oldComponent);
+                        unloadObsoleteComponents();
+                    }
+                }
                 C oldComponent = components.put(key, component);
                 if (oldComponent != null) {
                     obsoleteComponents.add(oldComponent);
@@ -86,21 +91,27 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         }
     }
 
-    public void remove(String uri, K key) {
-        log.info(format("Removing component %s with URI %s", key, uri));
-        if (!isInModel(uri)) {
-            synchronized (mutex) {
-                C oldComponent = components.remove(key);
-                if (oldComponent != null) {
-                    obsoleteComponents.add(oldComponent);
-                    unloadObsoleteComponents();
-                }
-            }
-        } else {
-            throw new RuntimeException(format("%s %s with URI %s still exists in model. Not removing from pool.",
-                    getType().getName(), key, uri));
-        }
+    public void remove(K key) {
+        log.info(format("Removing component with key %s", key));
+		synchronized (mutex) {
+			C oldComponent = components.remove(key);
+			if (oldComponent != null) {
+				obsoleteComponents.add(oldComponent);
+				unloadObsoleteComponents();
+			}
+		}
     }
+    
+	public void unload(String uri) {
+		log.info(format("Removing component with URI %s", uri));
+		synchronized (mutex) {
+			C oldComponent = components.removeByUri(uri);
+			if (oldComponent != null) {
+				obsoleteComponents.add(oldComponent);
+				unloadObsoleteComponents();
+			}
+		}
+	}
 
     private boolean isInModel(String uri) {
     	Model dynamicAPIModel = DynapiModelProvider.getInstance().getModel();
@@ -119,8 +130,8 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
         return false;
     }
-
-    public void reload(String uri) {
+    
+    public void load(String uri) {
         try {
             add(uri, loader.loadInstance(uri, getType()));
         } catch (ConfigurationBeanLoaderException e) {
@@ -137,13 +148,13 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
             log.error(format("Loader is null. Can't reload %s.", this.getClass().getName()));
             return;
         }
-        ConcurrentNavigableMap<K, C> newActions = new ConcurrentSkipListMap<>();
-        loadComponents(newActions);
-        ConcurrentNavigableMap<K, C> oldActions = this.components;
-        components = newActions;
-        for (Map.Entry<K, C> component : oldActions.entrySet()) {
+        MultiAccessComponents<K, C> newComponents = new MultiAccessComponents<>();
+        loadComponents(newComponents);
+        MultiAccessComponents<K, C> oldComponents = this.components;
+        components = newComponents;
+        for (Map.Entry<K, C> component : oldComponents.entrySet()) {
             obsoleteComponents.add(component.getValue());
-            oldActions.remove(component.getKey());
+            oldComponents.remove(component.getKey());
         }
         unloadObsoleteComponents();
     }
@@ -156,14 +167,18 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         loadComponents(components);
     }
 
-    private void loadComponents(ConcurrentNavigableMap<K, C> components) {
-        Set<C> newActions = loader.loadEach(getType());
+    private void loadComponents(MultiAccessComponents<K, C> components) {
+        Map<String, C> uriToCompMap = loader.loadEach(getType());
         log.debug(format("Context Initialization. %s %s(s) currently loaded.", components.size(), getType().getName()));
-        for (C component : newActions) {
-            if (component.isValid()) {
-                components.put(component.getKey(), component);
+        for (Map.Entry<String, C> entry : uriToCompMap.entrySet()) {
+        	String uri = entry.getKey();
+        	C component = entry.getValue();
+			K key = component.getKey();
+			if (component.isValid()) {
+                components.put(key, component);
+                components.putUriMapping(uri, key);
             } else {
-                log.error(format("%s with rpcName %s is invalid.", getType().getName(), component.getKey()));
+                log.error(format("Component uri '%s', name %s with rpcName %s is invalid.", uri, getType().getName(), key));
             }
         }
         log.debug(format("Context Initialization finished. %s %s(s) loaded.", components.size(), getType().getName()));

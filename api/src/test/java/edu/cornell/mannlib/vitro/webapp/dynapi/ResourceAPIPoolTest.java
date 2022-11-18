@@ -343,7 +343,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         reset();
 
-        resourceAPIPool.remove(TEST_PERSON_RESOURCE_URI, TEST_PERSON_RESOURCE_KEY);
+        resourceAPIPool.unload(TEST_PERSON_RESOURCE_URI);
 
         assertEquals(0, resourceAPIPool.obsoleteCount());
 
@@ -366,7 +366,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         resourceAPIPool.init(servletContext);
 
-        resourceAPIPool.remove(TEST_PERSON_RESOURCE_URI, TEST_PERSON_RESOURCE_KEY);
+        resourceAPIPool.unload(TEST_PERSON_RESOURCE_URI);
 
         assertEquals(1, resourceAPIPool.obsoleteCount());
 
@@ -375,7 +375,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         resourceAPIHasClient.removeClient();
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testRemoveWithModelLoaded() throws IOException, ConfigurationBeanLoaderException {
         ResourceAPIPool resourceAPIPool = initWithDefaultModel();
 
@@ -383,7 +383,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         resourceAPIPool.reload();
 
-        resourceAPIPool.remove(TEST_PERSON_RESOURCE_URI, TEST_PERSON_RESOURCE_KEY);
+        resourceAPIPool.unload(TEST_PERSON_RESOURCE_URI);
     }
 
     @Test
@@ -396,7 +396,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         assertTrue(resourceAPI instanceof DefaultResourceAPI);
 
-        resourceAPIPool.reload(TEST_PERSON_RESOURCE_URI);
+        resourceAPIPool.load(TEST_PERSON_RESOURCE_URI);
 
         assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_ACTION_NAME, resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
     }
