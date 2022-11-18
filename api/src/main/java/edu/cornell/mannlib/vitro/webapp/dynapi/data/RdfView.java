@@ -93,6 +93,17 @@ public class RdfView {
 		}
 		return result;
 	}
+	
+	public static List<String> getUris(DataStore dataStore, Parameters params){
+	    List<String> uris = new LinkedList<String>();
+        List<String> uriParamNames = RdfView.getUriNames(params);
+        for (String paramName :uriParamNames) {
+            Data data = dataStore.getData(paramName);
+            String uri = SimpleDataView.getStringRepresentation(data);
+            uris.add(uri);
+        }
+        return uris;
+	}
 
 	public static boolean isRdfNode(Data data) {
 		return data.getParam().getType().isRdfType();

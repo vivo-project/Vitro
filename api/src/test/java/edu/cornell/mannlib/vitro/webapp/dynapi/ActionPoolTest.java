@@ -218,6 +218,31 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertAction(TEST_PERSON_ACTION_NAME, actionPool.get(TEST_PERSON_ACTION_NAME));
     }
+    
+    @Test
+    public void testUnload() throws IOException {
+        ActionPool actionPool = initWithDefaultModel();
+
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
+
+        actionPool.unload();
+
+        assertEquals(0, actionPool.count());
+    }
+    
+    @Test
+    public void testUnloadUri() throws IOException {
+        ActionPool actionPool = initWithDefaultModel();
+
+        long actionCount = actionPool.count();
+        
+        assertAction(TEST_ACTION_NAME, actionPool.get(TEST_ACTION_NAME));
+
+        actionPool.unload("https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1");
+
+        assertEquals(actionCount - 1, actionPool.count());
+    }
+
 
     @Test
     public void testReloadThreadSafety() throws IOException {

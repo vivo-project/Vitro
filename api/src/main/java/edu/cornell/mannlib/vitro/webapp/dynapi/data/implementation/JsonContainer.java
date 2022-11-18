@@ -2,6 +2,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -49,6 +51,14 @@ public class JsonContainer {
 		}
 	}
 
+	public List<String> getDataAsStringList() {
+	    List<String> result = new LinkedList<>();
+	    for (Data data : dataMap.values()) {
+	        result.add(data.getSerializedValue());
+	    }
+	    return result;
+	}
+	
 	private String getRandomKey() {
 		return UUID.randomUUID().toString();
 	}
