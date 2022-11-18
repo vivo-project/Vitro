@@ -89,6 +89,14 @@ public class ParameterType implements Removable {
 	public boolean isArray() {
 		return getImplementationType().getClassName().getCanonicalName().equals("java.util.ArrayList");
 	}
+	
+    public boolean isString() {
+        return getImplementationType().getClassName().getCanonicalName().equals(String.class.getCanonicalName());
+    }
+    
+    public boolean isPlainString() {
+        return isString() && !isRdfType();
+    }
 
 	public boolean isInternal() {
 		return isInternal;

@@ -416,6 +416,30 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_ACTION_NAME, resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
     }
+    
+    @Test
+    public void testUnload() throws IOException {
+        ResourceAPIPool resourceAPIPool = initWithDefaultModel();
+
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourceAPIPool.get(TEST_RESOURCE_KEY));
+
+        resourceAPIPool.unload();
+
+        assertEquals(0, resourceAPIPool.count());
+    }
+    
+    @Test
+    public void testUnloadUri() throws IOException {
+        ResourceAPIPool resourceAPIPool = initWithDefaultModel();
+        
+        long resourceCount = resourceAPIPool.count();
+
+        assertResource(TEST_RESOURCE_KEY, TEST_ACTION_NAME, resourceAPIPool.get(TEST_RESOURCE_KEY));
+
+        resourceAPIPool.unload("https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testResource1");
+
+        assertEquals(resourceCount - 1, resourceAPIPool.count());
+    }
 
     @Test
     public void testReloadThreadSafety() throws IOException {
