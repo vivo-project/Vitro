@@ -78,6 +78,14 @@ public class Parameter implements Removable {
 		return type.isArray();
 	}
 
+	public boolean isString() {
+	    return type.isString();
+	}
+	
+	public boolean isPlainString() {
+        return type.isPlainString();
+    }
+	
 	public String getInputPath() {
 		return "";
 	}
