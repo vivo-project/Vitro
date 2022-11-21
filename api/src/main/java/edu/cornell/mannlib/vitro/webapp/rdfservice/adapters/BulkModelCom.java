@@ -12,9 +12,9 @@ public class BulkModelCom extends ModelCom {
 
 	@Override
 	public Model remove(Model m) {
-		if (GraphUtils.isBulkGraphMem(graph)) {
-			BulkGraphMem bulkGraphMem = (BulkGraphMem) GraphUtils.unwrapUnionGraphs(graph);
-			GraphUtils.deleteFrom(bulkGraphMem, m.getGraph());	
+		Graph unwrappedGraph = GraphUtils.unwrapUnionGraphs(graph);
+		if (unwrappedGraph instanceof BulkGraphMem) {
+			GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());	
 		} else {
 			super.remove(m);
 		}
@@ -23,9 +23,9 @@ public class BulkModelCom extends ModelCom {
 
 	@Override
 	public Model add(Model m) {
-		if (GraphUtils.isBulkGraphMem(graph)) {
-			BulkGraphMem bulkGraphMem = (BulkGraphMem) GraphUtils.unwrapUnionGraphs(graph);
-			GraphUtils.addInto(bulkGraphMem, m.getGraph());
+		Graph unwrappedGraph = GraphUtils.unwrapUnionGraphs(graph);
+		if (unwrappedGraph instanceof BulkGraphMem) {
+			GraphUtils.addInto((BulkGraphMem) unwrappedGraph, m.getGraph());
 		} else {
 			super.add(m);
 		}

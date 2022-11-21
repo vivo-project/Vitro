@@ -33,10 +33,6 @@ final public class GraphUtils {
 		return graph;
 	}
 
-	public static boolean isBulkGraphMem(Graph graph) {
-		return unwrapUnionGraphs(graph) instanceof BulkGraphMem;
-	}
-
 	public static void deleteFrom(BulkGraphMem bulkGraphMem, Graph srcGraph) {
 		boolean events = bulkGraphMem.getEventManager().listening();
 		if (bulkGraphMem == srcGraph && !events) {
