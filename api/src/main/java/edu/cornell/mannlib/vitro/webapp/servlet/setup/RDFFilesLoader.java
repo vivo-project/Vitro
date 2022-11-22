@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.BulkUpdatingModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
