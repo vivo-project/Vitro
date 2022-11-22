@@ -50,6 +50,7 @@ public class ProcessRdfForm {
     private EditN3GeneratorVTwo populator;
 
     private Map<String,String> urisForNewResources = null;
+    private static final String langStringDatatypeUri = RDF.dtLangString.getURI();
 //	private VitroRequest _vreq;
    /**
      * Construct the ProcessRdfForm object.
@@ -368,7 +369,8 @@ public class ProcessRdfForm {
 					if (obj.isLiteral()) {
 						Literal lit = obj.asLiteral();
 						String lang = lit.getLanguage();
-						if (! linguisticContext.equals(lang)) {
+						if (langStringDatatypeUri.equals(lit.getDatatypeURI()) &&
+							! linguisticContext.equals(lang)) {
 							//UQAM Remove if linguisticContext != lang of the Literal
 							model.remove(subj, pred, obj);
 						}
