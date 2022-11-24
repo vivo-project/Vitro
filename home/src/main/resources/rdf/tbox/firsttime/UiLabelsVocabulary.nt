@@ -7,7 +7,7 @@
 <http://vivoweb.org/ontology/core/properties/vocabulary#ftlUrl> <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the FTL file containing the key" .
 <http://vivoweb.org/ontology/core/properties/vocabulary#ftlUrl> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
 <http://vivoweb.org/ontology/core/properties/vocabulary#ftlUrl> <http://www.w3.org/2000/01/rdf-schema#domain> <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> .
-<http://vivoweb.org/ontology/core/properties/vocabulary#hasKey> <http://www.w3.org/2000/01/rdf-schema#label> "Propertie file url " .
+<http://vivoweb.org/ontology/core/properties/vocabulary#hasKey> <http://www.w3.org/2000/01/rdf-schema#label> "Properties file url " .
 <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> .
 <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey> <http://www.w3.org/2000/01/rdf-schema#comment> "Value of the key" .
 <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
