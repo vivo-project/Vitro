@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -127,10 +128,16 @@ public class FauxPropertyRetryController extends BaseEditController {
 			this.baseProperty = req.getUnfilteredWebappDaoFactory()
 					.getObjectPropertyDao()
 					.getObjectPropertyByURI(beanForEditing.getURI());
+			if (this.baseProperty == null) {
+				this.baseProperty = req.getUnfilteredWebappDaoFactory()
+						.getDataPropertyDao()
+						.getDataPropertyByURI(beanForEditing.getURI());
+					
+			}
 
 			addCheckboxValuesToTheRequest();
 
-			setFieldValidators();
+			//setFieldValidators();
 			setListeners();
 			setForwarders();
 
@@ -150,8 +157,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 				return newFauxProperty(baseUri);
 			}
 
-			FauxProperty bean = fpDao.getFauxPropertyByUris(domainUri, baseUri,
-					rangeUri);
+			FauxProperty bean = fpDao.getFauxPropertyByUris(domainUri, baseUri,	rangeUri);
 			if (bean == null) {
 				throw new IllegalArgumentException(
 						"FauxProperty does not exist for <" + domainUri
@@ -168,7 +174,11 @@ public class FauxPropertyRetryController extends BaseEditController {
 		private FauxProperty newFauxProperty(String baseUri) {
 			FauxProperty fp = new FauxProperty(null, baseUri, null);
 			ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
-			ObjectProperty base = opDao.getObjectPropertyByURI(baseUri);
+			DataPropertyDao dpDao = wadf.getDataPropertyDao();
+			Property base = opDao.getObjectPropertyByURI(baseUri);
+			if (base == null) {
+				base = dpDao.getDataPropertyByURI(baseUri);
+			}
 			fp.setGroupURI(base.getGroupURI());
 			fp.setRangeURI(base.getRangeVClassURI());
 			fp.setDomainURI(base.getDomainVClassURI());

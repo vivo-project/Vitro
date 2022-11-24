@@ -13,12 +13,14 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
@@ -28,13 +30,12 @@ import javax.servlet.annotation.WebServlet;
 @WebServlet(name = "ListFauxPropertiesController", urlPatterns = {"/listFauxProperties"} )
 public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 
+	private static final long serialVersionUID = 1L;
+
 	private static final Log log = LogFactory.getLog(ListFauxPropertiesController.class.getName());
 
     private static final String TEMPLATE_NAME = "siteAdmin-fauxPropertiesList.ftl";
 
-    private ObjectPropertyDao opDao = null;
-    private PropertyGroupDao pgDao = null;
-    private FauxPropertyDao fpDao = null;
 	private String notFoundMessage = "";
 
     @Override
@@ -64,21 +65,18 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
             else {
                 body.put("pageTitle", "Faux Properties by Base Property");
             }
+			List<ObjectProperty> objectProps = getOPDao(vreq).getRootObjectProperties();
+            List<DataProperty> dataProps = getDPDao(vreq).getRootDataProperties();
+            Map<String, Object> allFauxProps = new TreeMap<String, Object>();
 
-            opDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
-			fpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getFauxPropertyDao();
-			pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
-
-			List<ObjectProperty> objectProps = null;
-            objectProps = opDao.getRootObjectProperties();
-
-			Map<String, Object> allFauxProps = new TreeMap<String, Object>();
 			// get the faux depending on the display option
 			if ( displayOption.equals("listing") ) {
-                allFauxProps = getFauxPropertyList(objectProps);
+                allFauxProps.putAll(getFauxPropertyList(objectProps, vreq));
+                allFauxProps.putAll(getFauxDataPropertyList(dataProps, vreq));
             }
 			else {
-				allFauxProps = getFauxByBaseList(objectProps);
+				allFauxProps.putAll(getFauxByBaseList(objectProps, vreq));
+				allFauxProps.putAll(getFauxDataPropsByBaseList(dataProps, vreq));
 			}
 
 			log.debug(allFauxProps.toString());
@@ -91,13 +89,29 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 			}
 
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error(t, t);
         }
         return new TemplateResponseValues(TEMPLATE_NAME, body);
 
     }
 
-	private TreeMap<String, Object> getFauxPropertyList(List<ObjectProperty> objectProps) {
+	private PropertyGroupDao getPGDao(VitroRequest vreq) {
+		return vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
+	}
+
+	private FauxPropertyDao getFPDao(VitroRequest vreq) {
+		return vreq.getUnfilteredAssertionsWebappDaoFactory().getFauxPropertyDao();
+	}
+
+	private DataPropertyDao getDPDao(VitroRequest vreq) {
+		return vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
+	}
+
+	private ObjectPropertyDao getOPDao(VitroRequest vreq) {
+		return vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
+	}
+
+	private TreeMap<String, Object> getFauxPropertyList(List<ObjectProperty> objectProps, VitroRequest vreq) {
 		List<FauxProperty> fauxProps = null;
 		TreeMap<String, Object> theFauxProps = new TreeMap<String, Object>();
         if ( objectProps != null ) {
@@ -110,7 +124,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 
                     ObjectProperty op = opIt.next();
 					String baseURI = op.getURI();
-                    fauxProps = fpDao.getFauxPropertiesForBaseUri(baseURI);
+                    fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
 					if ( fauxProps != null ) {
 						Iterator<FauxProperty> fpIt = fauxProps.iterator();
 						if ( !fpIt.hasNext()) {
@@ -132,7 +146,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								String domainURI = fp.getDomainURI();
 								String groupURI = fp.getGroupURI();
 								// FauxProperty only gets groupURI but we want the label
-								PropertyGroup pGroup = pgDao.getGroupByURI(groupURI);
+								PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
 								String groupLabel = ( pGroup == null ) ? "unspecified" : pGroup.getName();
 								// store all the strings in a hash with the faux property label as the key
 								Map<String, Object> tmpHash = new HashMap<String, Object>();
@@ -143,6 +157,8 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								tmpHash.put("rangeURI", rangeURI);
 								tmpHash.put("domain", domainLabel);
 								tmpHash.put("domainURI", domainURI);
+								tmpHash.put("editUrl", "propertyEdit");
+
 								// add the faux and its details to the treemap
 								theFauxProps.put(fauxLabel + "@@" + domainLabel, tmpHash);
 							}
@@ -154,9 +170,10 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
         return theFauxProps;
 	}
 
-	private TreeMap<String, Object> getFauxByBaseList(List<ObjectProperty> objectProps) {
+	private TreeMap<String, Object> getFauxByBaseList(List<ObjectProperty> objectProps, VitroRequest vreq) {
 		List<FauxProperty> fauxProps = null;
 		TreeMap<String, Object> fauxByBaseProps = new TreeMap<String, Object>();
+
         if ( objectProps != null ) {
             Iterator<ObjectProperty> opIt = objectProps.iterator();
             if ( !opIt.hasNext()) {
@@ -167,7 +184,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 					TreeMap<String, Object> fauxForGivenBase = new TreeMap<String, Object>();
                     ObjectProperty op = opIt.next();
 					String baseURI = op.getURI();
-                    fauxProps = fpDao.getFauxPropertiesForBaseUri(baseURI);
+                    fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
 
 					if ( fauxProps != null ) {
 						Iterator<FauxProperty> fpIt = fauxProps.iterator();
@@ -189,7 +206,124 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								String domainURI = fp.getDomainURI();
 								String groupURI = fp.getGroupURI();
 								// FauxProperty only gets groupURI but we want the label
-								PropertyGroup pGroup = pgDao.getGroupByURI(groupURI);
+								PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
+								String groupLabel = ( pGroup == null ) ? "unspecified" : pGroup.getName();
+								// store all the strings in a hash with the faux property label as the key
+								Map<String, Object> tmpHash = new HashMap<String, Object>();
+								tmpHash.put("baseURI", baseURI);
+								tmpHash.put("group", groupLabel);
+								tmpHash.put("range", rangeLabel);
+								tmpHash.put("rangeURI", rangeURI);
+								tmpHash.put("domain", domainLabel);
+								tmpHash.put("domainURI", domainURI);
+
+								// add the faux and its details to the treemap
+								fauxForGivenBase.put(fauxLabel + "@@" + domainLabel, tmpHash);
+								fauxForGivenBase.put("editUrl", "propertyEdit");
+							}
+							 fauxByBaseProps.put(baseLabel, fauxForGivenBase);
+						}
+					}
+            	}
+            }
+        }
+        return fauxByBaseProps;
+	}
+	
+	private TreeMap<String, Object> getFauxDataPropertyList(List<DataProperty> objectProps, VitroRequest vreq) {
+		List<FauxProperty> fauxProps = null;
+		TreeMap<String, Object> theFauxProps = new TreeMap<String, Object>();
+        if ( objectProps != null ) {
+            Iterator<DataProperty> opIt = objectProps.iterator();
+            if ( !opIt.hasNext()) {
+                notFoundMessage = "No object properties found.";
+            }
+			else {
+                while (opIt.hasNext()) {
+
+                	DataProperty op = opIt.next();
+					String baseURI = op.getURI();
+                    fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
+					if ( fauxProps != null ) {
+						Iterator<FauxProperty> fpIt = fauxProps.iterator();
+						if ( !fpIt.hasNext()) {
+							notFoundMessage = "No faux properties found.";
+						}
+						else {
+							while (fpIt.hasNext()) {
+								// No point in getting these unless we have a faux property
+								String baseLabel = "(no name)";
+								String baseLocalName = op.getLocalNameWithPrefix();
+								baseLabel = baseLabel.substring(0,baseLabel.indexOf("("));
+								baseLabel += "(" + baseLocalName + ")";
+								// get the info we need from the faux property
+								FauxProperty fp = fpIt.next();
+								String fauxLabel = fp.getDisplayName();
+								String rangeLabel = fp.getRangeLabel();
+								String rangeURI = fp.getRangeURI();
+								String domainLabel = fp.getDomainLabel();
+								String domainURI = fp.getDomainURI();
+								String groupURI = fp.getGroupURI();
+								// FauxProperty only gets groupURI but we want the label
+								PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
+								String groupLabel = ( pGroup == null ) ? "unspecified" : pGroup.getName();
+								// store all the strings in a hash with the faux property label as the key
+								Map<String, Object> tmpHash = new HashMap<String, Object>();
+								tmpHash.put("base", baseLabel);
+								tmpHash.put("baseURI", baseURI);
+								tmpHash.put("group", groupLabel);
+								tmpHash.put("range", rangeLabel);
+								tmpHash.put("rangeURI", rangeURI);
+								tmpHash.put("domain", domainLabel);
+								tmpHash.put("domainURI", domainURI);
+								tmpHash.put("editUrl", "datapropEdit");
+								// add the faux and its details to the treemap
+								theFauxProps.put(fauxLabel + "@@" + domainLabel, tmpHash);
+							}
+						}
+					}
+            	}
+            }
+        }
+        return theFauxProps;
+	}
+
+	private TreeMap<String, Object> getFauxDataPropsByBaseList(List<DataProperty> objectProps, VitroRequest vreq) {
+		List<FauxProperty> fauxProps = null;
+		TreeMap<String, Object> fauxByBaseProps = new TreeMap<String, Object>();
+        if ( objectProps != null ) {
+            Iterator<DataProperty> opIt = objectProps.iterator();
+            if ( !opIt.hasNext()) {
+                notFoundMessage = "No object properties found.";
+            }
+			else {
+                while (opIt.hasNext()) {
+					TreeMap<String, Object> fauxForGivenBase = new TreeMap<String, Object>();
+					DataProperty op = opIt.next();
+					String baseURI = op.getURI();
+                    fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
+
+					if ( fauxProps != null ) {
+						Iterator<FauxProperty> fpIt = fauxProps.iterator();
+						if ( !fpIt.hasNext()) {
+							notFoundMessage = "No faux properties found.";
+						}
+						else {
+							String baseLabel = "(no name)";
+							String baseLocalName = op.getLocalNameWithPrefix();
+							baseLabel = baseLabel.substring(0,baseLabel.indexOf("("));
+							baseLabel += "(" + baseLocalName + ")" + "|" + baseURI;
+							while (fpIt.hasNext()) {
+								// get the info we need from the faux property
+								FauxProperty fp = fpIt.next();
+								String fauxLabel = fp.getDisplayName();
+								String rangeLabel = fp.getRangeLabel();
+								String rangeURI = fp.getRangeURI();
+								String domainLabel = fp.getDomainLabel();
+								String domainURI = fp.getDomainURI();
+								String groupURI = fp.getGroupURI();
+								// FauxProperty only gets groupURI but we want the label
+								PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
 								String groupLabel = ( pGroup == null ) ? "unspecified" : pGroup.getName();
 								// store all the strings in a hash with the faux property label as the key
 								Map<String, Object> tmpHash = new HashMap<String, Object>();
@@ -201,6 +335,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								tmpHash.put("domainURI", domainURI);
 								// add the faux and its details to the treemap
 								fauxForGivenBase.put(fauxLabel + "@@" + domainLabel, tmpHash);
+								fauxForGivenBase.put("editUrl", "datapropEdit");
 							}
 							 fauxByBaseProps.put(baseLabel, fauxForGivenBase);
 						}

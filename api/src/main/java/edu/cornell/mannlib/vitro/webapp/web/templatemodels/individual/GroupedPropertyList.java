@@ -296,6 +296,25 @@ public class GroupedPropertyList extends BaseTemplateModel {
 		}
 		return op;
 	}
+	
+	private DataProperty assembleDataProperty(DataProperty dp) {
+		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory();
+		FauxPropertyDao fpDao = rawWadf.getFauxPropertyDao();
+
+		String base = dp.getURI();
+		String domain = dp.getDomainClassURI();
+		String range = dp.getRangeDatatypeURI();
+
+		try {
+			FauxProperty fp = fpDao.getFauxPropertyByUris(domain, base, range);
+			if (fp != null) {
+				return new FauxDataPropertyWrapper(dp, fp);
+			}
+		} catch (Exception e) {
+			log.warn("Couldn't look up the faux property", e);
+		}
+		return dp;
+	}
 
 	/**
 	* Don't know what the real problem is with VIVO-976, but somehow we have the same property
@@ -379,7 +398,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     if (dp.getURI() == null) {
                         log.error("DataProperty dp returned with null propertyURI from dpDao.getAllPossibleDatapropsForIndividual()");
                     } else if (!alreadyOnPropertyList(propertyList, dp)) {
-                        propertyList.add(dp);
+                    	DataProperty wrappedDp = assembleDataProperty(dp);
+                        propertyList.add(wrappedDp);
                     }
                 } else {
                     log.error("a data property in the Collection created in DataPropertyDao.getAllPossibleDatapropsForIndividual() is unexpectedly null)");

@@ -624,8 +624,11 @@ public class FauxObjectPropertyWrapper extends ObjectProperty {
     @Override
 	public String toString() {
 		return String.format("FauxObjectPropertyWrapper[ %s <==> %s | %s ==> %s ==> %s, statementCount=%d, group=%s, customEntryForm=%s ]",
-				getDomainPublic(), getRangePublic(),
-				localName(getDomainVClassURI()), localName(getURI()), localName(getRangeVClassURI()),
+				getDomainPublic(), 
+				getRangePublic(),
+				localName(getDomainVClassURI()), 
+				localName(getURI()),
+				localName(getRangeVClassURI()),
 				(getObjectPropertyStatements() == null ? 0: getObjectPropertyStatements().size()),
 				localName(getGroupURI()),
 				simpleName(getCustomEntryForm()));
