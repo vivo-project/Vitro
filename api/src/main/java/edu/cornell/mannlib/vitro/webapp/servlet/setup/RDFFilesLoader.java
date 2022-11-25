@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -182,12 +183,16 @@ public class RDFFilesLoader {
 	private static void readOntologyFileIntoModel(Path p, Model model) {
 		String format = getRdfFormat(p);
 		log.debug("Loading " + p);
+		Model memModel = ModelFactory.createDefaultModel();
 		try (InputStream stream = new FileInputStream(p.toFile())) {
-			model.read(stream, null, format);
+			memModel.read(stream, null, format);
+			model.add(memModel);
 			log.debug("...successful");
 		} catch (Exception e) {
 			log.warn("Could not load file '" + p + "' as " + format
 					+ ". Check that it contains valid data.", e);
+		} finally {
+			memModel.close();
 		}
 	}
 

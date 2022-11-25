@@ -24,6 +24,10 @@ public class BlankNodeFilteringGraph implements Graph {
 
     private Graph graph;
 
+	public Graph getInnerGraph() {
+		return graph;
+	}
+
 	public BlankNodeFilteringGraph(Graph graph) {
         this.graph = graph;
     }

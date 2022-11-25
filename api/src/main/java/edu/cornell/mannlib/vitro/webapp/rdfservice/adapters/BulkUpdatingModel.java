@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory.BulkUpdatingUnion;
+
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -22,30 +24,20 @@ import java.util.List;
 
 public class BulkUpdatingModel extends AbstractModelDecorator {
     private static final RDFReaderF readerFactory = new RDFReaderFImpl();
-    private AbstractBulkUpdater updater;
+    protected AbstractBulkUpdater updater;
 
-    protected BulkUpdatingModel(Model m) {
+    public BulkUpdatingModel(Model m) {
         super(m);
-        if (m instanceof BulkUpdatingModel) {
+        Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
+        if(graph instanceof BulkUpdatingUnion){
+            updater = new RDFServiceBulkUnionUpdater((BulkUpdatingUnion) graph);
+            return;
+        } 
+        if (m instanceof BulkUpdatingOntModel) {
+            this.updater = ((BulkUpdatingOntModel) m).updater;
+        } else  if (m instanceof BulkUpdatingModel) {
             this.updater = ((BulkUpdatingModel) m).updater;
         } else {
-            Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
-            if (graph instanceof RDFServiceGraph) {
-                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
-            } else if (graph instanceof SparqlGraph) {
-                updater = new SparqlBulkUpdater((SparqlGraph) graph);
-            } else {
-                updater = null;
-            }
-        }
-    }
-
-    protected BulkUpdatingModel(Model m, Model baseModel) {
-        super(m);
-        if (baseModel instanceof BulkUpdatingModel) {
-            this.updater = ((BulkUpdatingModel) baseModel).updater;
-        } else {
-            Graph graph = GraphUtils.unwrapUnionGraphs(baseModel.getGraph());
             if (graph instanceof RDFServiceGraph) {
                 updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
             } else if (graph instanceof SparqlGraph) {
