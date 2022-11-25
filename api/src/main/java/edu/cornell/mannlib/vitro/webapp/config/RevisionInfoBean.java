@@ -41,7 +41,7 @@ public class RevisionInfoBean {
 			new Date(0), Collections.singleton(LevelRevisionInfo.DUMMY_LEVEL));
 
 	/** The bean is attached to the session by this name. */
-	static final String ATTRIBUTE_NAME = RevisionInfoBean.class.getName();
+	public static final String ATTRIBUTE_NAME = RevisionInfoBean.class.getName();
 
 	// ----------------------------------------------------------------------
 	// static methods

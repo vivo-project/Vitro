@@ -37,13 +37,10 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	private static final Log log = LogFactory
 			.getLog(I18nStringTemplateModel.class);
 
-	private final String bundleName;
 	private final String key;
 	private final String textString;
 
-	public I18nStringTemplateModel(String bundleName, String key,
-			String textString) {
-		this.bundleName = bundleName;
+	public I18nStringTemplateModel( String key,	String textString) {
 		this.key = key;
 		this.textString = textString;
 	}
@@ -56,8 +53,7 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Object exec(List args) throws TemplateModelException {
-		log.debug("Formatting string '" + key + "' from bundle '" + bundleName
-				+ "' with these arguments: " + args);
+		log.debug("Formatting string '" + key + "' with these arguments: " + args);
 
 		if (args.isEmpty()) {
 			return textString;
@@ -74,8 +70,7 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 					return MessageFormat.format(textString, unwrappedArgs);	
 				}
 			} catch (Exception e) {
-				String message = "Can't format '" + key + "' from bundle '"
-						+ bundleName + "', wrong argument types: " + args
+				String message = "Can't format '" + key + "', wrong argument types: " + args
 						+ " for message format'" + textString + "'";
 				log.warn(message);
 				return message;

@@ -15,21 +15,17 @@ import freemarker.template.TemplateModelException;
  * wrapper around an I18nBundle.
  */
 public class I18nBundleTemplateModel implements TemplateHashModel {
-	private static final Log log = LogFactory
-			.getLog(I18nBundleTemplateModel.class);
+	private static final Log log = LogFactory.getLog(I18nBundleTemplateModel.class);
 
-	private final String bundleName;
 	private final I18nBundle textBundle;
 
-	public I18nBundleTemplateModel(String bundleName, I18nBundle textBundle) {
-		this.bundleName = bundleName;
+	public I18nBundleTemplateModel( I18nBundle textBundle) {
 		this.textBundle = textBundle;
 	}
 
 	@Override
 	public TemplateModel get(String key) throws TemplateModelException {
-		return new I18nStringTemplateModel(bundleName, key,
-				textBundle.text(key));
+		return new I18nStringTemplateModel(key,	textBundle.text(key));
 	}
 
 	@Override

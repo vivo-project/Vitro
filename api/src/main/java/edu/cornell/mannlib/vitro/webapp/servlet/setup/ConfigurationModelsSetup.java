@@ -6,6 +6,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -13,17 +14,10 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -46,6 +40,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			setupModel(ctx, DISPLAY_TBOX, "displayTbox");
 			setupModel(ctx, DISPLAY_DISPLAY, "displayDisplay");
 			setupModel(ctx, USER_ACCOUNTS, "auth");
+			setupModel(ctx, INTERFACE_I18N, "interface-i18n");
 			ss.info(this, "Set up the display models and the user accounts model.");
 		} catch (Exception e) {
 			ss.fatal(this, e.getMessage(), e.getCause());

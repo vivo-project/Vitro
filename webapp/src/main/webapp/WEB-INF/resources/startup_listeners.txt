@@ -52,6 +52,7 @@ edu.ucsf.vitro.opensocial.OpenSocialSmokeTests
 
 # For multiple language support
 edu.cornell.mannlib.vitro.webapp.i18n.selection.LocaleSelectionSetup
+edu.cornell.mannlib.vitro.webapp.i18n.I18nContextListener
 
 # The search indexer uses a "public" permission, so the PropertyRestrictionPolicyHelper
 #   and the PermissionRegistry must already be set up.

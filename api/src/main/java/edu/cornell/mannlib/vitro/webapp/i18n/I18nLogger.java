@@ -13,32 +13,29 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 /**
  * If enabled in developer mode, write a message to the log each time someone
  * asks for a language string.
- *
- * The I18nBundle has a life span of one HTTP request, and so does this.
  */
 public class I18nLogger {
 	private static final Log log = LogFactory.getLog(I18nLogger.class);
-
-	private final boolean isLogging;
+	private DeveloperSettings settings;
 
 	public I18nLogger() {
-		DeveloperSettings settings = DeveloperSettings.getInstance();
-		this.isLogging = settings.getBoolean(Key.I18N_LOG_STRINGS)
-				&& log.isInfoEnabled();
+		settings = DeveloperSettings.getInstance();
 	}
 
-	public void log(String bundleName, String key, Object[] parameters,
-			String rawText, String formattedText) {
-		if (isLogging) {
+	public void log(String key, Object[] parameters, String rawText, String formattedText) {
+		if (isI18nLoggingTurnedOn()) {
 			String message = String.format(
-					"Retrieved from %s.%s with %s: '%s'", bundleName, key,
+					"Retrieved from %s with %s: '%s'", key,
 					Arrays.toString(parameters), rawText);
 
 			if (!rawText.equals(formattedText)) {
 				message += String.format(" --> '%s'", formattedText);
 			}
-
 			log.info(message);
 		}
+	}
+
+	private boolean isI18nLoggingTurnedOn() {
+		return settings.getBoolean(Key.I18N_LOG_STRINGS) && log.isInfoEnabled();
 	}
 }
