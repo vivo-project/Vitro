@@ -264,6 +264,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         } catch (ProfileException pe) {
             // Current language profile does not support disjointWith axioms.
             // We'd prefer to return an empty list instead of throwing an exception.
+        	log.error(pe, pe);
         } finally {
             getOntModel().leaveCriticalSection();
         }
