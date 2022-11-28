@@ -28,5 +28,5 @@ jobs:
 
       - name: Maven Build
         run: |
-          cd ../Vitro
+          cd ./Vitro
           mvn clean install
