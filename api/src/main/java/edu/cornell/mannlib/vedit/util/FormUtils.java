@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -270,6 +272,39 @@ public class FormUtils {
 		options.sort((o1, o2) -> o1.getBody().compareTo(o2.getBody()));
 
 		return options;
+	}
+
+	public static List<Option> makeOptionListOfNotDisjointClasses(WebappDaoFactory wadf,
+			String baseVclassUri, String selectedUri) {
+		VClassDao vClassDao = wadf.getVClassDao();
+		Set<String> uris = getNotDisjointClassUris(wadf, baseVclassUri, vClassDao);
+		uris.add(baseVclassUri);
+
+		List<Option> options = new LinkedList<>();
+		for (String vclassUri: uris) {
+			VClass vclass = vClassDao.getVClassByURI(vclassUri);
+        	Option option = new Option();
+        	option.setValue(vclass.getURI());
+        	option.setBody(vclass.getPickListName());
+        	options.add(option);
+        	if(Objects.equals(selectedUri, vclass.getURI())) {
+        	    option.setSelected(true);
+        	}
+		}
+		options.sort((o1, o2) -> o1.getBody().compareTo(o2.getBody()));
+		return options;
+	}
+
+	private static Set<String> getNotDisjointClassUris(WebappDaoFactory wadf, String classUri,
+			VClassDao vClassDao) {
+		Set<String> allClasses = wadf.getVClassDao()
+				.getAllVclasses()
+				.stream()
+				.map(vclass -> vclass.getURI())
+				.collect(Collectors.toSet());
+		Set<String> disjointClasses = new HashSet<>(vClassDao.getDisjointWithClassURIs(classUri));
+		allClasses.removeAll(disjointClasses);
+		return allClasses;
 	}
 
     public static void beanSet(Object newObj, String field, String value) {

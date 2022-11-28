@@ -87,6 +87,11 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     public String getRangeDatatypeURI() {
         return rangeDatatypeURI;
     }
+    
+    @Override
+    public String getRangeVClassURI() {
+        return rangeDatatypeURI;
+    }
 
     public void setRangeDatatypeURI(String rangeDatatypeURI) {
         this.rangeDatatypeURI = rangeDatatypeURI;

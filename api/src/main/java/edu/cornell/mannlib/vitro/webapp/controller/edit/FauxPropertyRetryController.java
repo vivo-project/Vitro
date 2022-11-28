@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
+import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -99,6 +100,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 		private FauxProperty beanForEditing;
 		private Property baseProperty;
+		
+		private boolean isFauxDataProperty = false;
 
 		EpoPopulator(HttpServletRequest req, EditProcessObject epo) {
 			this.req = new VitroRequest(req);
@@ -132,12 +135,16 @@ public class FauxPropertyRetryController extends BaseEditController {
 				this.baseProperty = req.getUnfilteredWebappDaoFactory()
 						.getDataPropertyDao()
 						.getDataPropertyByURI(beanForEditing.getURI());
+				isFauxDataProperty = true;
 					
 			}
 
 			addCheckboxValuesToTheRequest();
 
-			//setFieldValidators();
+			if (!isFauxDataProperty) {
+				setFieldValidators();	
+			}
+			
 			setListeners();
 			setForwarders();
 
@@ -280,7 +287,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 				list.addAll(FormUtils.makeVClassOptionList(wadf,
 						beanForEditing.getDomainURI()));
 			} else {
-				list.addAll(FormUtils.makeOptionListOfSubVClasses(wadf,
+				list.addAll(FormUtils.makeOptionListOfNotDisjointClasses(wadf,
 						baseProperty.getDomainVClassURI(),
 						beanForEditing.getDomainURI()));
 			}
@@ -289,12 +296,20 @@ public class FauxPropertyRetryController extends BaseEditController {
 		}
 
 		private List<Option> buildRangeOptionList() {
+			if (isFauxDataProperty) {
+				return buildDataPropOptionList();
+			} else {
+				return buildObjectPropOptionList();	
+			}
+		}
+
+		private List<Option> buildObjectPropOptionList() {
 			List<Option> list = new ArrayList<>();
 			if (baseProperty.getRangeVClassURI() == null) {
 				list.addAll(FormUtils.makeVClassOptionList(wadf,
 						beanForEditing.getRangeURI()));
 			} else {
-				list.addAll(FormUtils.makeOptionListOfSubVClasses(wadf,
+				list.addAll(FormUtils.makeOptionListOfNotDisjointClasses(wadf,
 						baseProperty.getRangeVClassURI(),
 						beanForEditing.getRangeURI()));
 				if (containsVCardKind(list)) {
@@ -302,6 +317,26 @@ public class FauxPropertyRetryController extends BaseEditController {
 				}
 			}
 			list.add(0, new Option("", "(none specified)"));
+			return list;
+		}
+
+		private List<Option> buildDataPropOptionList() {
+			List<Option> list = new ArrayList<>();
+			String rangeUri = baseProperty.getRangeVClassURI();
+			if (rangeUri == null) {
+				Option option = new Option();
+	        	option.setValue("");
+	        	option.setBody("untyped (rdfs:Literal)");
+	        	option.setSelected(true);
+	        	list.add(option);
+			} else {
+				Datatype dataType = wadf.getDatatypeDao().getDatatypeByURI(rangeUri);
+				Option option = new Option();
+	        	option.setValue(dataType.getUri());
+	        	option.setBody(dataType.getName());
+	        	option.setSelected(true);
+	        	list.add(option);
+			}
 			return list;
 		}
 
