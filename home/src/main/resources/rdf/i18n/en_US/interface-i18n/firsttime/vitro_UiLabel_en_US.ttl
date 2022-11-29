@@ -353,7 +353,7 @@ prop-data:sparql_query_description_1.Vitro
 prop-data:acct_created_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@en-US ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nCongratulations!\n\nWe have created your new account on ${siteName},\nassociated with ${userAccount.emailAddress}.\n\nIf you did not request this new account you can safely ignore this email.\nThis request will expire if not acted upon for 30 days.\n\nPaste the link below into your browser's address bar to create your password\nfor your new account using our secure server.\n\n${passwordLink}\n\nThanks!"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1049,7 +1049,7 @@ prop-data:advanced_search_tip_one.Vitro
 prop-data:password_reset_complete_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@en-US ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nPassword successfully changed.\n\nYour new password associated with ${userAccount.emailAddress}\nhas been changed"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_complete_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1288,7 +1288,7 @@ prop-data:classes_by_classgroup.Vitro
 prop-data:confirm_email_changed_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "Dear ${userAccount.firstName} ${userAccount.lastName}"@en-US ;
+        rdfs:label       "Dear ${userAccount.firstName} ${userAccount.lastName}\n\nYou recently changed the email address associated with\n${userAccount.firstName} ${userAccount.lastName}\n\nThank you."@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "confirm_email_changed_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1520,7 +1520,7 @@ prop-data:all_x_properties.Vitro
 prop-data:password_created_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@en-US ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nPassword successfully created.\n\nYour new password associated with ${userAccount.emailAddress}\nhas been created.\n\nThank you."@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_created_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1624,7 +1624,7 @@ prop-data:browse_page_javascript_two.Vitro
 prop-data:password_created_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>"@en-US ;
+        rdfs:label       "<p>\n ${userAccount.firstName} ${userAccount.lastName}\n </p>\n\n <p>\n <strong>Password successfully created.</strong>\n </p>\n\n <p>\n Your new password associated with ${userAccount.emailAddress} has been created.\n </p>\n\n <p>\n Thank you.\n </p>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_created_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2143,7 +2143,7 @@ prop-data:to_manage_content.Vitro
 prop-data:acct_created_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>"@en-US ;
+        rdfs:label       "<p>\n ${userAccount.firstName} ${userAccount.lastName}\n </p>\n\n <p>\n <strong>Congratulations!</strong>\n </p>\n\n <p>\n We have created your new account on ${siteName}, associated with ${userAccount.emailAddress}.\n </p>\n\n <p>\n If you did not request this new account you can safely ignore this email.\n This request will expire if not acted upon for 30 days.\n </p>\n\n <p>\n Click the link below to create your password for your new account using our secure server.\n </p>\n\n <p>\n <a href=\"${passwordLink}\" title=\"password\">${passwordLink}</a>\n </p>\n\n <p>\n If the link above doesn't work, you can copy and paste the link directly into your browser's address bar.\n </p>\n\n <p>\n Thanks!\n </p>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2487,7 +2487,7 @@ prop-data:create_associated_profile.Vitro
 prop-data:password_reset_complete_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>"@en-US ;
+        rdfs:label       "<p>\n ${userAccount.firstName} ${userAccount.lastName}\n </p>\n\n <p>\n <strong>Password successfully changed.</strong>\n </p>\n\n <p>\n Your new password associated with ${userAccount.emailAddress} has been changed.\n </p>\n\n <p>\n Thank you.\n </p>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_complete_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2495,7 +2495,7 @@ prop-data:password_reset_complete_email_html_text.Vitro
 prop-data:first_time_external_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>"@en-US ;
+        rdfs:label       "<p>\n ${userAccount.firstName} ${userAccount.lastName}\n </p>\n\n <p>\n <strong>Congratulations!</strong>\n </p>\n\n <p>\n We have created your new VIVO account associated with ${userAccount.emailAddress}.\n </p>\n\n <p>\n Thanks!\n </p>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "first_time_external_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2615,7 +2615,7 @@ prop-data:ingest_tools.Vitro
 prop-data:application_error_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>An error occurred on your ${siteName!} web site at ${datetime!}"@en-US ;
+        rdfs:label       "<p>An error occurred on your ${siteName!} web site at ${datetime!}\n </p>\n\n <p>\n <strong>Requested url:</strong> ${requestedUrl!}\n </p>\n\n <p>\n <#if errorMessage?has_content>\n <strong>Error message:</strong> ${errorMessage!}\n </#if>\n </p>\n\n <p>\n <strong>Stack trace</strong> (full trace available in the log):\n <pre>${stackTrace!}</pre>\n </p>\n\n <#if cause?has_content>\n <p><strong>Caused by:</strong>\n <pre>${cause!}</pre>\n </p>\n </#if>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "application_error_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -4439,7 +4439,7 @@ prop-data:object.Vitro
 prop-data:confirm_email_changed_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>"@en-US ;
+        rdfs:label       "<p>\n Dear ${userAccount.firstName} ${userAccount.lastName}\n </p>\n\n <p>\n You recently changed the email address associated with\n ${userAccount.firstName} ${userAccount.lastName}\n </p>\n\n <p>\n Thank you.\n </p>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "confirm_email_changed_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -4783,7 +4783,7 @@ prop-data:if_blank_page_title_used.Vitro
 prop-data:password_reset_pending_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "Dear ${userAccount.firstName} ${userAccount.lastName}:"@en-US ;
+        rdfs:label       "Dear ${userAccount.firstName} ${userAccount.lastName}:\n\nWe have received a request to reset the password for your ${siteName} account\n(${userAccount.emailAddress}).\n\nPlease follow the instructions below to proceed with your password reset.\n\nIf you did not request this new account you can safely ignore this email.\nThis request will expire if not acted upon within 30 days.\n\nPaste the link below into your browser's address bar to reset your password\nusing our secure server.\n\n${passwordLink}\n\nThank you!\n"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_pending_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -5007,7 +5007,7 @@ prop-data:work_level.Vitro
 prop-data:acct_created_external_only_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>"@en-US ;
+        rdfs:label       "<p>\n ${userAccount.firstName} ${userAccount.lastName}\n </p>\n\n <p>\n <strong>Congratulations!</strong>\n </p>\n\n <p>\n We have created your new VIVO account associated with ${userAccount.emailAddress}.\n </p>\n\n <p>\n Thanks!\n </p>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_external_only_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -5151,7 +5151,7 @@ prop-data:log_out.Vitro
 prop-data:application_error_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "An error occurred on your ${siteName!} web site at ${datetime!}"@en-US ;
+        rdfs:label       "An error occurred on your ${siteName!} web site at ${datetime!}\n\nRequested url: ${requestedUrl!}\n\n<#if errorMessage?has_content>\n Error message: ${errorMessage!}\n</#if>\n\nStack trace (full trace available in the log):\n${stackTrace!}\n\n<#if cause?has_content>\nCaused by:\n${cause!}\n</#if>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "application_error_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -5599,7 +5599,7 @@ prop-data:numbers.Vitro
 prop-data:acct_created_external_only_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@en-US ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nCongratulations!\n\nWe have created your new VIVO account associated with\n${userAccount.emailAddress}.\n\nThanks!\n"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_external_only_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -5799,7 +5799,7 @@ prop-data:imageUpload.errorUnknown.Vitro
 prop-data:password_reset_pending_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>"@en-US ;
+        rdfs:label       "<p>\n Dear ${userAccount.firstName} ${userAccount.lastName}:\n </p>\n\n <p>\n We have received a request to reset the password for your ${siteName} account (${userAccount.emailAddress}).\n </p>\n\n <p>\n Please follow the instructions below to proceed with your password reset.\n </p>\n\n <p>\n If you did not request this new account you can safely ignore this email.\n This request will expire if not acted upon within 30 days.\n </p>\n\n <p>\n Click on the link below or paste it into your browser's address bar to reset your password\n using our secure server.\n </p>\n\n <p><a href=\"${passwordLink}\" title=\"password\">${passwordLink}</a> </p>\n\n <p>Thank you!</p>"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_pending_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -6254,7 +6254,7 @@ prop-data:first_time_login.Vitro
 prop-data:first_time_external_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@en-US ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nCongratulations!\n\nWe have created your new VIVO account associated with\n${userAccount.emailAddress}.\n\nThanks!"@en-US ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "first_time_external_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .

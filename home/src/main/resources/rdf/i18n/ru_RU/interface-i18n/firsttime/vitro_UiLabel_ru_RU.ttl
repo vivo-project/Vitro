@@ -351,7 +351,7 @@ prop-data:sparql_query_description_1.Vitro
 prop-data:acct_created_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@ru-RU ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nПоздравляем!\n\nМы создали новую учётную запись VIVO на ${siteName}, связанную с адресом\n${userAccount.emailAddress}.\n\nСпасибо!"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1046,7 +1046,7 @@ prop-data:advanced_search_tip_one.Vitro
 prop-data:password_reset_complete_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@ru-RU ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nПароль успешно изменён.\n\nВаш пароль, связанный с адресом ${userAccount.emailAddress}\nизменён.\n\nСпасибо.\n"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_complete_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1284,7 +1284,7 @@ prop-data:classes_by_classgroup.Vitro
 prop-data:confirm_email_changed_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "Здравствуйте, ${userAccount.firstName} ${userAccount.lastName}"@ru-RU ;
+        rdfs:label       "Здравствуйте, ${userAccount.firstName} ${userAccount.lastName}\n\nВы недавно изменили адрес электронной почты, связанный с\n${userAccount.firstName} ${userAccount.lastName}\n\nСпасибо."@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "confirm_email_changed_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1516,7 +1516,7 @@ prop-data:all_x_properties.Vitro
 prop-data:password_created_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@ru-RU ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nПароль успешно создан.\n\nВаш пароль, связанный с адресом ${userAccount.emailAddress}\nсоздан.\n\nСпасибо."@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_created_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -1620,7 +1620,7 @@ prop-data:browse_page_javascript_two.Vitro
 prop-data:password_created_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p> ${userAccount.firstName} ${userAccount.lastName}</p>"@ru-RU ;
+        rdfs:label       "<p> ${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p> <strong>Пароль успешно создан.</strong></p>\n\n <p>Ваш пароль, связанный с адресом ${userAccount.emailAddress} создан.</p>\n\n <p>Спасибо.</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_created_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2139,7 +2139,7 @@ prop-data:to_manage_content.Vitro
 prop-data:acct_created_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>${userAccount.firstName} ${userAccount.lastName}</p>"@ru-RU ;
+        rdfs:label       "<p>${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p><strong>Поздравляем!</strong></p>\n\n <p>Мы создали новую учётную запись на сайте ${siteName}, связанную с адресом ${userAccount.emailAddress}.</p>\n\n <p>Спасибо!</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2482,7 +2482,7 @@ prop-data:create_associated_profile.Vitro
 prop-data:password_reset_complete_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p> ${userAccount.firstName} ${userAccount.lastName}</p>"@ru-RU ;
+        rdfs:label       "<p> ${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p><strong>Пароль успешно изменён.</strong></p>\n\n <p>Ваш пароль, связанный с адресом ${userAccount.emailAddress} изменён.</p>\n\n <p>Спасибо.</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_complete_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2490,7 +2490,7 @@ prop-data:password_reset_complete_email_html_text.Vitro
 prop-data:first_time_external_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>${userAccount.firstName} ${userAccount.lastName}</p>"@ru-RU ;
+        rdfs:label       "<p>${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p><strong>Поздравляем!</strong></p>\n\n <p>Мы создали Вашу новую учётную запись VIVO, связанную с почтовым адресом ${userAccount.emailAddress}.</p>\n\n <p>Спасибо!</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "first_time_external_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2610,7 +2610,7 @@ prop-data:ingest_tools.Vitro
 prop-data:application_error_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>В ${datetime!} на сайте ${siteName!} произошла ошибка "@ru-RU ;
+        rdfs:label       "<p>В ${datetime!} на сайте ${siteName!} произошла ошибка \n </p>\n\n <p>\n <strong>Запрашиваемый url:</strong> ${requestedUrl!}\n </p>\n\n <p>\n <#if errorMessage?has_content>\n <strong>Сообщение об ошибке:</strong> ${errorMessage!}\n </#if>\n </p>\n\n <p>\n <strong>Трассировка стека</strong> (полная трассировка стека находится в лог файлах сервера приложений):\n <pre>${stackTrace!}</pre>\n </p>\n\n <#if cause?has_content>\n <p><strong>Причина:</strong>\n <pre>${cause!}</pre>\n </p>\n </#if>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "application_error_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -4430,7 +4430,7 @@ prop-data:object.Vitro
 prop-data:confirm_email_changed_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>Здравствуйте, ${userAccount.firstName} ${userAccount.lastName}</p>"@ru-RU ;
+        rdfs:label       "<p>Здравствуйте, ${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p>Вы недавно изменили адрес электронной почты, связанный с ${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p>Спасибо.</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "confirm_email_changed_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -4772,7 +4772,7 @@ prop-data:if_blank_page_title_used.Vitro
 prop-data:password_reset_pending_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "Здравствуйте ${userAccount.firstName} ${userAccount.lastName}:"@ru-RU ;
+        rdfs:label       "Здравствуйте ${userAccount.firstName} ${userAccount.lastName}:\n\nМы получили запрос на сброс пароля для вашей учётной записи на сайте ${siteName}, связанной с адресом\n(${userAccount.emailAddress}).\n\nПожалуйста, следуйте приведенным ниже инструкциям, чтобы выполнить сброс пароля.\n\nЕсли вы не запрашивали новую учетную запись, можете смело игнорировать это письмо.\nСрок действия этого запроса истечет, если в течение 30 дней не будет предпринято никаких действий.\n\nСкопируйте и вставьте приведённую ниже ссылку в адресную строку браузера, чтобы сбросить пароль\nпри помощи нашего защищенного сервера.\n\n${passwordLink}\n\nСпасибо!"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_pending_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -4994,7 +4994,7 @@ prop-data:work_level.Vitro
 prop-data:acct_created_external_only_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p> ${userAccount.firstName} ${userAccount.lastName}</p>"@ru-RU ;
+        rdfs:label       "<p> ${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p><strong>Поздравляем!</strong></p>\n\n <p>Мы создали новую учётную запись на сайте ${siteName}, связанную с адресом ${userAccount.emailAddress}.</p>\n\n <p>Если Вы не запрашивали создания учётной записи, просто проигнорируйте это электронное письмо. Если не предпринимать никаких действий через 30 дней срок действия этого запроса закончится.</p>\n\n <p>Нажмите на ссылку ниже, чтобы создать пароль для новой учетной записи с помощью нашего защищенного сервера.</p>\n\n <p> <a href=&quot;${passwordLink}&quot; title=&quot;password&quot;>${passwordLink}</a></p>\n\n <p>Если приведенная выше ссылка не работает, вы можете скопировать и вставить ссылку непосредственно в адресную строку вашего браузера.</p>\n\n <p>Спасибо!</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_external_only_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -5138,7 +5138,7 @@ prop-data:log_out.Vitro
 prop-data:application_error_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "В ${datetime!} на сайте ${siteName!} произошла ошибка "@ru-RU ;
+        rdfs:label       "В ${datetime!} на сайте ${siteName!} произошла ошибка \nЗапрашиваемый url: ${requestedUrl!}\n\n<#if errorMessage?has_content>\n Сообщение об ошибке: ${errorMessage!}\n</#if>\n\nТрассировка стека (полная трассировка стека находится в лог файлах сервера приложений):\n${stackTrace!}\n\n<#if cause?has_content>\nПричина:\n${cause!}\n</#if>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "application_error_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -5583,7 +5583,7 @@ prop-data:numbers.Vitro
 prop-data:acct_created_external_only_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@ru-RU ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nПоздравляем!\n\nМы создали новую учётную запись на сайте ${siteName},\nсвязанную с адресом ${userAccount.emailAddress}.\n\nЕсли Вы не запрашивали создания учётной записи, просто проигнорируйте это электронное письмо.\nЕсли не предпринимать никаких действий через 30 дней срок действия этого запроса закончится.\n\nЧтобы создать пароль для Вашей новой учетной записи при помощи нашего защищенного сервера,\nскопируйте и вставьте приведённую ниже ссылку в адресную строку вашего браузера.\n\n${passwordLink}\n\nСпасибо!"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_external_only_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -5781,7 +5781,7 @@ prop-data:imageUpload.errorUnknown.Vitro
 prop-data:password_reset_pending_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>Уважаемый пользователь ${userAccount.firstName} ${userAccount.lastName}:</p>"@ru-RU ;
+        rdfs:label       "<p>Уважаемый пользователь ${userAccount.firstName} ${userAccount.lastName}:</p>\n\n <p>Мы получили запрос на сброс пароля для вашей учётной записи на сайте ${siteName}, связанной с адресом (${userAccount.emailAddress}).</p>\n\n <p>Пожалуйста, следуйте приведенным ниже инструкциям, чтобы выполнить сброс пароля.</p>\n\n <p>Если вы не запрашивали новую учетную запись, можете смело игнорировать это письмо. Срок действия этого запроса истечет, если в течение 30 дней не будет предпринято никаких действий.</p>\n\n <p>Щёлкните по ссылке ниже или вставьте её в адресную строку браузера, чтобы сбросить пароль с помощью нашего защищенного сервера.</p>\n <p>\n <a href=&quot;${passwordLink}&quot; title=&quot;password&quot;>${passwordLink}</a>\n </p>\n\n <p>Спасибо!</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "password_reset_pending_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -6236,7 +6236,7 @@ prop-data:first_time_login.Vitro
 prop-data:first_time_external_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}"@ru-RU ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nПоздравляем!\n\nМы создали новую учётную запись VIVO, связанную с адресом\n${userAccount.emailAddress}.\n\nСпасибо!"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "first_time_external_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
