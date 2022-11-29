@@ -37,4 +37,3 @@ prop:hasApp  rdf:type  owl:DatatypeProperty ;
         rdfs:domain  prop:PropertyKey ;
         rdfs:label   "has application" ;
         rdfs:range   xsd:string .
-		
