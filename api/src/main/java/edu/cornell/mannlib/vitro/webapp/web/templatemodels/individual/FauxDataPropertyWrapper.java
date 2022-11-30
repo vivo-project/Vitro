@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
  * TODO This is a horrible kluge that should be discarded as soon as we can
  * rewrite GroupedPropertyList.
  */
-public class FauxDataPropertyWrapper extends DataProperty {
+public class FauxDataPropertyWrapper extends DataProperty implements FauxPropertyWrapper{
 	private final DataProperty innerDP;
 	private final FauxProperty faux;
 
@@ -314,6 +314,16 @@ public class FauxDataPropertyWrapper extends DataProperty {
 		} else {
 			return ResourceFactory.createResource(uri).getLocalName();
 		}
+	}
+
+	@Override
+	public FauxProperty getFauxProperty() {
+		return faux;
+	}
+
+	@Override
+	public String getContextUri() {
+		return faux.getContextUri();
 	}
 
 }

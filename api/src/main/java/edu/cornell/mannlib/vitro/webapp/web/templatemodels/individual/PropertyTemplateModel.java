@@ -17,7 +17,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
-import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -40,25 +39,32 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected String addUrl;
 
     private String name;
-    private FauxProperty fauxProperty;
     private int displayLimit;
 
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq, String name) {
         this.vreq = vreq;
         subjectUri = subject.getURI();
         this.property = property;
-        propertyUri = property.getURI();
-        localName = property.getLocalName();
-        this.name = name;
+        if (isFauxProperty(property)) {
+        	FauxProperty fauxProperty = getFauxProperty(property);
+			this.name = fauxProperty.getDisplayName();
+			this.displayLimit = fauxProperty.getDisplayLimit();
+			propertyUri = fauxProperty.getBaseURI();
+        } else {
+        	propertyUri = property.getURI();
+            this.name = name;
+        }
+        localName = property.getLocalName();	
+
         addUrl = "";
 
-        fauxProperty = isFauxProperty(property);
-        if (fauxProperty != null) {
-        	this.name = fauxProperty.getDisplayName();
-			this.displayLimit = fauxProperty.getDisplayLimit();
-        }
+        
         setVerboseDisplayValues(property);
     }
+
+	private FauxProperty getFauxProperty(Property property) {
+		return ((FauxPropertyWrapper)property).getFauxProperty();
+	}
 
     protected void setVerboseDisplayValues(Property property) {
 
@@ -104,14 +110,16 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         String editUrl = UrlBuilder.getUrl(getPropertyEditRoute(), "uri", property.getURI());
         verboseDisplay.put("propertyEditUrl", editUrl);
 
-        if (fauxProperty != null) {
-        	verboseDisplay.put("fauxProperty", assembleFauxPropertyValues(fauxProperty));
+        if (isFauxProperty(property)) {
+        	verboseDisplay.put("fauxProperty", assembleFauxPropertyValues(getFauxProperty(property)));
         }
     }
 
-	private FauxProperty isFauxProperty(Property prop) {
-		FauxPropertyDao fpDao = vreq.getUnfilteredWebappDaoFactory().getFauxPropertyDao();
-		return fpDao.getFauxPropertyByUris(prop.getDomainVClassURI(), prop.getURI(), prop.getRangeVClassURI());
+	private boolean isFauxProperty(Property prop) {
+		if ( prop instanceof FauxPropertyWrapper) {
+			return true;
+		}
+		return false;
 	}
 
 	private Map<String, Object> assembleFauxPropertyValues(FauxProperty fp) {
@@ -168,10 +176,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return (addUrl != null) ? addUrl : "";
     }
 
-    //check to see whether or not this property represents a faux property
-    public boolean getIsFauxProperty() {
-    	return (fauxProperty != null);
-    }
     public Map<String, Object> getVerboseDisplay() {
         return verboseDisplay;
     }

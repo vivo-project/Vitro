@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -25,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
@@ -63,53 +61,53 @@ public class GroupedPropertyList extends BaseTemplateModel {
 
     private List<PropertyGroupTemplateModel> groups;
 
-    GroupedPropertyList(Individual subject, VitroRequest vreq,
-            boolean editing) {
+    GroupedPropertyList(Individual subject, VitroRequest vreq, boolean editing) {
         this.vreq = vreq;
         this.subject = subject;
         this.wdf = vreq.getWebappDaoFactory();
 
         // Create the property list for the subject. The properties will be put
         // into groups later.
-        List<Property> propertyList = new ArrayList<Property>();
+        List<Property> allProperties = new ArrayList<Property>();
 
         // First get all the object properties that occur in statements in the
         // db with this subject as subject.
         // This may include properties that are not defined as
         // "possible properties" for a subject of this class,
         // so we cannot just rely on getting that list.
-        List<ObjectProperty> populatedObjectPropertyList = subject
-                .getPopulatedObjectPropertyList();
+        List<ObjectProperty> populatedOPs = subject.getPopulatedObjectPropertyList();
 
-        Map<String, List<String>> populatedObjTypes = makePopulatedObjTypeMap(
-                populatedObjectPropertyList);
+        Map<String, List<String>> populatedObjTypes = makePopulatedObjTypeMap(populatedOPs);
 
         // save applicable ranges before deduping to filter later
-        populatedObjectPropertyList = dedupe(populatedObjectPropertyList);
+        populatedOPs = dedupe(populatedOPs);
 
-        Collection<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
-                .getAdditionalFauxSubpropertiesForList(
-                        populatedObjectPropertyList, subject, vreq);
+        List<FauxObjectPropertyWrapper> populatedFauxOPs = ApplicationConfigurationOntologyUtils.getPopulatedFauxOPs(populatedOPs, subject, vreq);
 
-        additions = filterAdditions(additions, populatedObjTypes);
+        populatedFauxOPs = filterAdditions(populatedFauxOPs, populatedObjTypes);
 
         if (log.isDebugEnabled()) {
-            for (ObjectProperty t : additions) {
-                log.debug("addition: " + t);
+            for (ObjectProperty fauxOP : populatedFauxOPs) {
+                log.debug("faux object property: " + fauxOP);
             }
-            log.debug("Added " + additions.size() +
-                    " properties due to application configuration ontology");
+            log.debug("Added " + populatedFauxOPs.size() + " faux object properties due to application configuration ontology");
         }
 
-        populatedObjectPropertyList.addAll(additions);
+        if(editing) {
+            List<Property> possibleFauxProps = ApplicationConfigurationOntologyUtils.getPossibleFauxProps(populatedFauxOPs, subject, vreq, false);
+        	allProperties.addAll(possibleFauxProps);
+        }
+        
+        populatedOPs.addAll(populatedFauxOPs);
 
-        propertyList.addAll(populatedObjectPropertyList);
+        allProperties.addAll(populatedOPs);
 
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
-            propertyList = mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
+        	List<Property> possibleOPs = getPossibleOPs(populatedOPs, allProperties);
+        	allProperties.addAll(possibleOPs);
         }
 
         // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones
@@ -118,25 +116,36 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // DataPropertyStatements. Note that this does not apply to object properties, because the queries
         // can be customized and thus differ from property to property. So it's easier for now to keep the
         // two working in parallel.
-        List<DataProperty> populatedDataPropertyList = subject
-                .getPopulatedDataPropertyList();
-        propertyList.addAll(populatedDataPropertyList);
+        List<DataProperty> populatedDPs = subject.getPopulatedDataPropertyList();
 
         if (editing) {
-            mergeAllPossibleDataProperties(propertyList);
+        	List<Property> possibleDPs = getPossibleDPs(populatedDPs, allProperties);
+        	allProperties.addAll(possibleDPs);
         }
-        sort(propertyList);
+        
+        List<FauxDataPropertyWrapper> populatedFauxDPs = ApplicationConfigurationOntologyUtils.getPopulatedFauxDPs(populatedDPs, subject, vreq);
+        
+        if(editing) {
+            List<Property> possibleFauxProps = ApplicationConfigurationOntologyUtils.getPossibleFauxProps(populatedFauxDPs, subject, vreq, true);
+        	allProperties.addAll(possibleFauxProps);
+        }
+        
+        populatedDPs.addAll(populatedFauxDPs);
+
+        allProperties.addAll(populatedDPs);
+
+        sort(allProperties);
 
         // Put the list into groups
-        List<PropertyGroup> propertyGroupList = addPropertiesToGroups(propertyList);
+        List<PropertyGroup> propertyGroups = addPropertiesToGroups(allProperties);
 
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(
-                propertyGroupList.size());
-        for (PropertyGroup propertyGroup : propertyGroupList) {
+                propertyGroups.size());
+        for (PropertyGroup propertyGroup : propertyGroups) {
             groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup,
-                    subject, editing, populatedDataPropertyList,
-                    populatedObjectPropertyList));
+                    subject, editing, populatedDPs,
+                    populatedOPs));
         }
 
         if (!editing) {
@@ -160,10 +169,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return map;
     }
 
-    private List<ObjectProperty> filterAdditions(Collection<ObjectProperty> additions,
+    private List<FauxObjectPropertyWrapper> filterAdditions(List<FauxObjectPropertyWrapper> populatedFauxOPs,
             Map<String, List<String>> populatedObjTypes) {
-        List<ObjectProperty> filteredAdditions = new ArrayList<ObjectProperty>();
-        for (ObjectProperty prop : additions) {
+        List<FauxObjectPropertyWrapper> filteredAdditions = new ArrayList<FauxObjectPropertyWrapper>();
+        for (FauxObjectPropertyWrapper prop : populatedFauxOPs) {
             List<String> allowedTypes = populatedObjTypes.get(prop.getURI());
             if(allowedTypes != null && (allowedTypes.contains(prop.getRangeVClassURI())
                     || allowedTypes.contains(prop.getRangeEntityURI()) ) ) {
@@ -223,9 +232,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
 
-    private List<Property> mergeAllPossibleObjectProperties(
-            List<ObjectProperty> populatedObjectPropertyList,
-            List<Property> propertyList) {
+	private List<Property> getPossibleOPs(List<ObjectProperty> populatedOPs, List<Property> allProperties) {
 
         // There is no ObjectPropertyDao.getAllPossibleObjectPropertiesForIndividual() parallel to
         // DataPropertyDao.getAllPossibleDatapropsForIndividual(). The comparable method for object properties
@@ -234,27 +241,30 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // Getting Language-neutral WebappDaoFactory because the language-filtering
     	// breaks blank node structures in the restrictions that determine applicable properties.
         WebappDaoFactory wadf = vreq.getLanguageNeutralWebappDaoFactory();
+		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory();
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
+		ObjectPropertyDao opDao = rawWadf.getObjectPropertyDao();
 
-        Collection<PropertyInstance> allPossiblePI = piDao
-                .getAllPossiblePropInstForIndividual(subject.getURI());
+    	Map<String, Property> possiblePropertiesMap = new HashMap<String,Property>();
+
+        Collection<PropertyInstance> allPossiblePI = piDao.getAllPossiblePropInstForIndividual(subject.getURI());
         if (allPossiblePI != null) {
             for (PropertyInstance possiblePI : allPossiblePI) {
                 if (possiblePI != null) {
                     // use the language-aware wdf because redundancy check
                     // for display will depend on public label match
-                    ObjectProperty possibleOP = assembleObjectProperty(possiblePI);
+            		ObjectProperty possibleOP = opDao.getObjectPropertyByURI(possiblePI.getPropertyURI());
                     if (possibleOP == null) {
                         continue;
                     }
-                    boolean addToList = true;
-                    for(ObjectProperty populatedOP : populatedObjectPropertyList) {
+                    boolean addToMap = true;
+                    for(ObjectProperty populatedOP : populatedOPs) {
                     	if (redundant(populatedOP, possibleOP)) {
-                    		addToList = false;
+                    		addToMap = false;
                     	}
                     }
-                    if(addToList) {
-                        propertyList.add(possibleOP);
+                    if(addToMap) {
+                    	possiblePropertiesMap.put(possibleOP.getURI(), possibleOP);
                     }
                 } else {
                     log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
@@ -267,54 +277,15 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // These properties are outside the ontologies (in vitro and vitro public) but need to be added to the list.
         // In future, vitro ns props will be phased out. Vitro public properties should be changed so they do not
         // constitute a special case (i.e., included in piDao.getAllPossiblePropInstForIndividual()).
+        ArrayList<Property> possibleProperties = new ArrayList<>(possiblePropertiesMap.values());
+
         for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
-            if (!alreadyOnPropertyList(propertyList, propertyUri)) {
-                addObjectPropertyToPropertyList(propertyUri, null, null, propertyList);
+            if (!alreadyOnPropertyList(possibleProperties, propertyUri) && !alreadyOnPropertyList(allProperties, propertyUri)) {
+                addObjectPropertyToPropertyList(propertyUri, null, null, possibleProperties);
             }
         }
-
-        return propertyList;
+		return possibleProperties;
     }
-
-	private ObjectProperty assembleObjectProperty(PropertyInstance pi) {
-		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory();
-		ObjectPropertyDao opDao = rawWadf.getObjectPropertyDao();
-		FauxPropertyDao fpDao = rawWadf.getFauxPropertyDao();
-
-		String base = pi.getPropertyURI();
-		String domain = pi.getDomainClassURI();
-		String range = pi.getRangeClassURI();
-
-		ObjectProperty op = opDao.getObjectPropertyByURIs(base, domain, range);
-		try {
-			FauxProperty fp = fpDao.getFauxPropertyByUris(domain, base, range);
-			if (fp != null) {
-				return new FauxObjectPropertyWrapper(op, fp);
-			}
-		} catch (Exception e) {
-			log.warn("Couldn't look up the faux property", e);
-		}
-		return op;
-	}
-	
-	private DataProperty assembleDataProperty(DataProperty dp) {
-		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory();
-		FauxPropertyDao fpDao = rawWadf.getFauxPropertyDao();
-
-		String base = dp.getURI();
-		String domain = dp.getDomainClassURI();
-		String range = dp.getRangeDatatypeURI();
-
-		try {
-			FauxProperty fp = fpDao.getFauxPropertyByUris(domain, base, range);
-			if (fp != null) {
-				return new FauxDataPropertyWrapper(dp, fp);
-			}
-		} catch (Exception e) {
-			log.warn("Couldn't look up the faux property", e);
-		}
-		return dp;
-	}
 
 	/**
 	* Don't know what the real problem is with VIVO-976, but somehow we have the same property
@@ -386,20 +357,19 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
 
-    protected void mergeAllPossibleDataProperties(List<Property> propertyList) {
+    protected List<Property> getPossibleDPs(List<DataProperty> populatedDPs, List<Property> allProperties) {
         // see comments in mergeAllPossibleObjectProperties() for the reason
         // that we need a neutral WebappDaoFactory here.
         DataPropertyDao dpDao = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
-        Collection<DataProperty> allDatapropColl = dpDao
-                .getAllPossibleDatapropsForIndividual(subject.getURI());
+    	List<Property> possibleProperties = new ArrayList<Property>();
+        Collection<DataProperty> allDatapropColl = dpDao.getAllPossibleDatapropsForIndividual(subject.getURI());
         if (allDatapropColl != null) {
             for (DataProperty dp : allDatapropColl) {
                 if (dp != null) {
                     if (dp.getURI() == null) {
                         log.error("DataProperty dp returned with null propertyURI from dpDao.getAllPossibleDatapropsForIndividual()");
-                    } else if (!alreadyOnPropertyList(propertyList, dp)) {
-                    	DataProperty wrappedDp = assembleDataProperty(dp);
-                        propertyList.add(wrappedDp);
+                    } else if (!alreadyOnPropertyList(allProperties, dp) && !alreadyOnPropertyList(populatedDPs, dp)) {
+                    	possibleProperties.add(dp);
                     }
                 } else {
                     log.error("a data property in the Collection created in DataPropertyDao.getAllPossibleDatapropsForIndividual() is unexpectedly null)");
@@ -408,9 +378,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
         } else {
             log.error("a null Collection is returned from DataPropertyDao.getAllPossibleDatapropsForIndividual())");
         }
+        return possibleProperties;
     }
 
-    private boolean alreadyOnPropertyList(List<Property> propertyList,
+    private boolean alreadyOnPropertyList(List<? extends Property> propertyList,
             Property p) {
         if (p.getURI() == null) {
             log.error("Property p has no propertyURI in alreadyOnPropertyList()");
@@ -419,8 +390,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return (alreadyOnPropertyList(propertyList, p.getURI()));
     }
 
-    private boolean alreadyOnPropertyList(List<Property> propertyList,
-            String propertyUri) {
+    private boolean alreadyOnPropertyList(List<? extends Property> propertyList, String propertyUri) {
         for (Property p : propertyList) {
             String uri = p.getURI();
             if (uri != null && uri.equals(propertyUri)) {
