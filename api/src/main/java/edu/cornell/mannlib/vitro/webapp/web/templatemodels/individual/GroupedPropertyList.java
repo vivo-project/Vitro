@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,7 +108,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
-        	List<Property> possibleOPs = getPossibleOPs(populatedOPs, allProperties);
+        	List<Property> possibleOPs = getPossibleOPs(populatedOPs, allProperties, subject);
         	allProperties.addAll(possibleOPs);
         }
 
@@ -232,7 +234,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
 
-	private List<Property> getPossibleOPs(List<ObjectProperty> populatedOPs, List<Property> allProperties) {
+	private List<Property> getPossibleOPs(List<ObjectProperty> populatedOPs, List<Property> allProperties, Individual subject) {
 
         // There is no ObjectPropertyDao.getAllPossibleObjectPropertiesForIndividual() parallel to
         // DataPropertyDao.getAllPossibleDatapropsForIndividual(). The comparable method for object properties
@@ -241,10 +243,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // Getting Language-neutral WebappDaoFactory because the language-filtering
     	// breaks blank node structures in the restrictions that determine applicable properties.
         WebappDaoFactory wadf = vreq.getLanguageNeutralWebappDaoFactory();
-		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory();
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
-		ObjectPropertyDao opDao = rawWadf.getObjectPropertyDao();
-
+		ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
+		Set<String> vClassUris = subject.getVClasses().stream().map(vclass -> vclass.getURI()).collect(Collectors.toSet());
     	Map<String, Property> possiblePropertiesMap = new HashMap<String,Property>();
 
         Collection<PropertyInstance> allPossiblePI = piDao.getAllPossiblePropInstForIndividual(subject.getURI());
@@ -257,15 +258,15 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     if (possibleOP == null) {
                         continue;
                     }
-                    boolean addToMap = true;
                     for(ObjectProperty populatedOP : populatedOPs) {
                     	if (redundant(populatedOP, possibleOP)) {
-                    		addToMap = false;
+                    		continue;
                     	}
                     }
-                    if(addToMap) {
-                    	possiblePropertiesMap.put(possibleOP.getURI(), possibleOP);
+                    if (!vClassUris.contains(possibleOP.getDomainVClassURI())) {
+                    	continue;
                     }
+                    possiblePropertiesMap.put(possibleOP.getURI(), possibleOP);
                 } else {
                     log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
                 }
