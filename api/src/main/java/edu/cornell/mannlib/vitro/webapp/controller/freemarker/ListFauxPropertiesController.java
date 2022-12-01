@@ -135,7 +135,10 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								// No point in getting these unless we have a faux property
 								String baseLabel = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
 								String baseLocalName = op.getLocalNameWithPrefix();
-								baseLabel = baseLabel.substring(0,baseLabel.indexOf("("));
+								int indexOf = baseLabel.indexOf("(");
+								if (indexOf > 0) {
+									baseLabel = baseLabel.substring(0,indexOf);	
+								}
 								baseLabel += "(" + baseLocalName + ")";
 								// get the info we need from the faux property
 								FauxProperty fp = fpIt.next();
@@ -194,7 +197,10 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 						else {
 							String baseLabel = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
 							String baseLocalName = op.getLocalNameWithPrefix();
-							baseLabel = baseLabel.substring(0,baseLabel.indexOf("("));
+							int indexOf = baseLabel.indexOf("(");
+							if (indexOf > 0) {
+								baseLabel = baseLabel.substring(0,indexOf);	
+							}
 							baseLabel += "(" + baseLocalName + ")" + "|" + baseURI;
 							while (fpIt.hasNext()) {
 								// get the info we need from the faux property
@@ -254,7 +260,11 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								// No point in getting these unless we have a faux property
 								String baseLabel = "(no name)";
 								String baseLocalName = op.getLocalNameWithPrefix();
-								baseLabel = baseLabel.substring(0,baseLabel.indexOf("("));
+								int indexOf = baseLabel.indexOf("(");
+								if (indexOf > 0) {
+									baseLabel = baseLabel.substring(0,indexOf);	
+								}
+								baseLabel = baseLabel.substring(0,indexOf);
 								baseLabel += "(" + baseLocalName + ")";
 								// get the info we need from the faux property
 								FauxProperty fp = fpIt.next();
@@ -311,7 +321,10 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 						else {
 							String baseLabel = "(no name)";
 							String baseLocalName = op.getLocalNameWithPrefix();
-							baseLabel = baseLabel.substring(0,baseLabel.indexOf("("));
+							int indexOf = baseLabel.indexOf("(");
+							if (indexOf > 0) {
+								baseLabel = baseLabel.substring(0,indexOf);	
+							}
 							baseLabel += "(" + baseLocalName + ")" + "|" + baseURI;
 							while (fpIt.hasNext()) {
 								// get the info we need from the faux property
