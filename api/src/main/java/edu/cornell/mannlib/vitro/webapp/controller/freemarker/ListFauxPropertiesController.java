@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -16,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -133,13 +135,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 						else {
 							while (fpIt.hasNext()) {
 								// No point in getting these unless we have a faux property
-								String baseLabel = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
-								String baseLocalName = op.getLocalNameWithPrefix();
-								int indexOf = baseLabel.indexOf("(");
-								if (indexOf > 0) {
-									baseLabel = baseLabel.substring(0,indexOf);	
-								}
-								baseLabel += "(" + baseLocalName + ")";
+								String baseLabel = getBaseLabel(op, true);
 								// get the info we need from the faux property
 								FauxProperty fp = fpIt.next();
 								String fauxLabel = fp.getDisplayName();
@@ -195,13 +191,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 							notFoundMessage = "No faux properties found.";
 						}
 						else {
-							String baseLabel = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
-							String baseLocalName = op.getLocalNameWithPrefix();
-							int indexOf = baseLabel.indexOf("(");
-							if (indexOf > 0) {
-								baseLabel = baseLabel.substring(0,indexOf);	
-							}
-							baseLabel += "(" + baseLocalName + ")" + "|" + baseURI;
+							String baseLabel = getBaseLabel(op, true);
 							while (fpIt.hasNext()) {
 								// get the info we need from the faux property
 								FauxProperty fp = fpIt.next();
@@ -247,8 +237,8 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 			else {
                 while (opIt.hasNext()) {
 
-                	DataProperty op = opIt.next();
-					String baseURI = op.getURI();
+                	DataProperty dp = opIt.next();
+					String baseURI = dp.getURI();
                     fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
 					if ( fauxProps != null ) {
 						Iterator<FauxProperty> fpIt = fauxProps.iterator();
@@ -258,14 +248,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 						else {
 							while (fpIt.hasNext()) {
 								// No point in getting these unless we have a faux property
-								String baseLabel = "(no name)";
-								String baseLocalName = op.getLocalNameWithPrefix();
-								int indexOf = baseLabel.indexOf("(");
-								if (indexOf > 0) {
-									baseLabel = baseLabel.substring(0,indexOf);	
-								}
-								baseLabel = baseLabel.substring(0,indexOf);
-								baseLabel += "(" + baseLocalName + ")";
+								String baseLabel = getBaseLabel(dp,false);
 								// get the info we need from the faux property
 								FauxProperty fp = fpIt.next();
 								String fauxLabel = fp.getDisplayName();
@@ -309,8 +292,8 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 			else {
                 while (opIt.hasNext()) {
 					TreeMap<String, Object> fauxForGivenBase = new TreeMap<String, Object>();
-					DataProperty op = opIt.next();
-					String baseURI = op.getURI();
+					DataProperty dp = opIt.next();
+					String baseURI = dp.getURI();
                     fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
 
 					if ( fauxProps != null ) {
@@ -319,13 +302,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 							notFoundMessage = "No faux properties found.";
 						}
 						else {
-							String baseLabel = "(no name)";
-							String baseLocalName = op.getLocalNameWithPrefix();
-							int indexOf = baseLabel.indexOf("(");
-							if (indexOf > 0) {
-								baseLabel = baseLabel.substring(0,indexOf);	
-							}
-							baseLabel += "(" + baseLocalName + ")" + "|" + baseURI;
+							String baseLabel = getBaseLabel(dp, true);
 							while (fpIt.hasNext()) {
 								// get the info we need from the faux property
 								FauxProperty fp = fpIt.next();
@@ -359,15 +336,24 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
         return fauxByBaseProps;
 	}
 
-    /*
-     * should never be null
-     */
-    public static String getDisplayLabel(ObjectProperty op) {
-        String displayLabel = op.getPickListName();
-    	displayLabel = (displayLabel != null && displayLabel.length() > 0)
-			? displayLabel
-			: op.getLocalName();
-		return (displayLabel != null) ? displayLabel : "[object property]" ;
-    }
+	private String getBaseLabel(Property property, boolean addUri) {
+		String baseLabel = property.getPickListName();
+		if (StringUtils.isEmpty(baseLabel)) {
+			baseLabel = property.getLocalName();
+		}
+		if (StringUtils.isEmpty(baseLabel)) {
+			baseLabel = "[property]";
+		}
+		String baseLocalName = property.getLocalNameWithPrefix();
+		int indexOf = baseLabel.indexOf("(");
+		if (indexOf > 0) {
+			baseLabel = baseLabel.substring(0,indexOf);	
+		}
+		baseLabel += "(" + baseLocalName + ")";
+		if (addUri) {
+			baseLabel += "|" + property.getURI();
+		}
+		return baseLabel;
+	}
 
 }
