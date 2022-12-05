@@ -135,7 +135,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 						else {
 							while (fpIt.hasNext()) {
 								// No point in getting these unless we have a faux property
-								String baseLabel = getBaseLabel(op, true);
+								String baseLabel = getBaseLabel(op, false);
 								// get the info we need from the faux property
 								FauxProperty fp = fpIt.next();
 								String fauxLabel = fp.getDisplayName();
