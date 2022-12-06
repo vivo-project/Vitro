@@ -71,7 +71,7 @@ public class LanguageFilteringUtils {
 			Locale locale = (Locale) locales.nextElement();
 			langs.add(locale.toString().replace(UNDERSCORE, HYPHEN));
 		}
-		if (langs.isEmpty()) {
+		if (!langs.contains(DEFAULT_LANG_STRING)) {
 			langs.add(DEFAULT_LANG_STRING);
 		}
 
