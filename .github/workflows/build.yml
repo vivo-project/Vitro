@@ -14,12 +14,6 @@ jobs:
         with:
           path: Vitro
 
-      - name: Checkout vitro languages
-        uses: actions/checkout@v3
-        with:
-          repository: vivo-project/Vitro-languages
-          path: Vitro-languages
-
       - name: Maven Cache
         uses: actions/cache@v2
         with:
@@ -34,7 +28,5 @@ jobs:
 
       - name: Maven Build
         run: |
-          cd ./Vitro-languages
-          mvn clean install
-          cd ../Vitro
+          cd ./Vitro
           mvn clean install
