@@ -1,0 +1,2 @@
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+<http://test.edu/u> rdfs:label  "fr BE"@fr-BE, "fr-FR"@fr-FR, "fr CA"@fr-CA, "fr-CH"@fr-CH, "TIB FR ca"@fr-CA-x-tib, "en-US"@en-US, "no tag" .
