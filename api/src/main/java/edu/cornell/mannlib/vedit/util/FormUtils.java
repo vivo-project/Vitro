@@ -6,9 +6,6 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -274,29 +271,27 @@ public class FormUtils {
 		return options;
 	}
 
-	public static List<Option> makeOptionListOfNotDisjointClasses(WebappDaoFactory wadf,
-			String baseVclassUri, String selectedUri) {
-		VClassDao vClassDao = wadf.getVClassDao();
-		Set<String> uris = getNotDisjointClassUris(wadf, baseVclassUri, vClassDao);
-		uris.add(baseVclassUri);
+    public static List<Option> makeOptionListOfNotDisjointClasses(WebappDaoFactory wadf, String baseVclassUri, String selectedUri) {
+        VClassDao vClassDao = wadf.getVClassDao();
+        Set<String> uris = getNotDisjointClassUris(wadf, baseVclassUri, vClassDao);
+        uris.add(baseVclassUri);
 
-		List<Option> options = new LinkedList<>();
-		for (String vclassUri: uris) {
-			VClass vclass = vClassDao.getVClassByURI(vclassUri);
-        	Option option = new Option();
-        	option.setValue(vclass.getURI());
-        	option.setBody(vclass.getPickListName());
-        	options.add(option);
-        	if(Objects.equals(selectedUri, vclass.getURI())) {
-        	    option.setSelected(true);
-        	}
-		}
-		options.sort((o1, o2) -> o1.getBody().compareTo(o2.getBody()));
-		return options;
-	}
+        List<Option> options = new LinkedList<>();
+        for (String vclassUri : uris) {
+            VClass vclass = vClassDao.getVClassByURI(vclassUri);
+            Option option = new Option();
+            option.setValue(vclass.getURI());
+            option.setBody(vclass.getPickListName());
+            options.add(option);
+            if (Objects.equals(selectedUri, vclass.getURI())) {
+                option.setSelected(true);
+            }
+        }
+        options.sort((o1, o2) -> o1.getBody().compareTo(o2.getBody()));
+        return options;
+    }
 
-	private static Set<String> getNotDisjointClassUris(WebappDaoFactory wadf, String classUri,
-			VClassDao vClassDao) {
+	private static Set<String> getNotDisjointClassUris(WebappDaoFactory wadf, String classUri, VClassDao vClassDao) {
 		Set<String> allClasses = wadf.getVClassDao()
 				.getAllVclasses()
 				.stream()
