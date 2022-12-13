@@ -49,9 +49,9 @@ public class ApplicationConfigurationOntologyUtils {
                 "SELECT DISTINCT ?domain ?property ?context ?isData WHERE { \n" +
                 "    ?context config:configContextFor ?property . \n" +
                 (isData ? 
-                	 "?property a <http://www.w3.org/2002/07/owl#DatatypeProperty> . \n" 
-                		: 
-                	 "?property a <http://www.w3.org/2002/07/owl#ObjectProperty> . \n" ) +
+                     "?property a <http://www.w3.org/2002/07/owl#DatatypeProperty> . \n" 
+                        : 
+                     "?property a <http://www.w3.org/2002/07/owl#ObjectProperty> . \n" ) +
                 "    OPTIONAL {  ?context config:qualifiedBy ?range . } \n " +  
                 "    ?context config:hasConfiguration ?configuration . \n" +
                 "    ?configuration a config:ObjectPropertyDisplayConfig . \n" +
@@ -92,15 +92,15 @@ public class ApplicationConfigurationOntologyUtils {
     }
 
     private static List<FauxObjectPropertyWrapper> getPopulatedFauxObjectProperties(ObjectProperty op, Individual subject, VitroRequest vreq) {
-		Model displayModel = vreq.getDisplayModel();
+        Model displayModel = vreq.getDisplayModel();
         Model tboxModel = vreq.getOntModelSelector().getTBoxModel();
-		Model union = ModelFactory.createUnion(displayModel, tboxModel);
-		WebappDaoFactory wadf = new WebappDaoFactoryJena(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, union));
-		FauxPropertyDao fpDao = wadf.getFauxPropertyDao();
-        
-	    Query q = createQuery(op, false);
+        Model union = ModelFactory.createUnion(displayModel, tboxModel);
+        WebappDaoFactory wadf = new WebappDaoFactoryJena(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, union));
+        FauxPropertyDao fpDao = wadf.getFauxPropertyDao();
+
+        Query q = createQuery(op, false);
         QueryExecution qe = QueryExecutionFactory.create(q, union);
-	    List<FauxObjectPropertyWrapper> fauxObjectProps = new ArrayList<FauxObjectPropertyWrapper>();
+        List<FauxObjectPropertyWrapper> fauxObjectProps = new ArrayList<FauxObjectPropertyWrapper>();
         try {
             ResultSet rs = qe.execSelect();
             while (rs.hasNext()) {
@@ -112,12 +112,12 @@ public class ApplicationConfigurationOntologyUtils {
                 if (isDomainMatchSubject(domainURI, subject)) {
                     try {
                         FauxProperty fp = fpDao.getFauxPropertyFromContextUri(contextURI);
-            			if (fp != null) {
-            				 fauxObjectProps.add(new FauxObjectPropertyWrapper(op.clone(), fp));
-            			}
-            		} catch (Exception e) {
-            			log.warn("Couldn't look up the faux property", e);
-            		}
+                        if (fp != null) {
+                            fauxObjectProps.add(new FauxObjectPropertyWrapper(op.clone(), fp));
+                        }
+                    } catch (Exception e) {
+                        log.warn("Couldn't look up the faux property", e);
+                    }
                 }
             }
         } finally {
@@ -127,16 +127,16 @@ public class ApplicationConfigurationOntologyUtils {
     }
 	
     private static List<FauxDataPropertyWrapper> getPopulatedFauxDataProperties(DataProperty dp, Individual subject, VitroRequest vreq) {
-	    Model displayModel = vreq.getDisplayModel();
-	    Model tboxModel = vreq.getOntModelSelector().getTBoxModel();
-	    Model union = ModelFactory.createUnion(displayModel, tboxModel);
-	    WebappDaoFactory wadf = new WebappDaoFactoryJena(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, union));
-	    FauxPropertyDao fpDao = wadf.getFauxPropertyDao();
-        
-	    Query q = createQuery(dp, true);
-	    QueryExecution qe = QueryExecutionFactory.create(q, union);
-	    List<FauxDataPropertyWrapper> fauxDataProps = new ArrayList<FauxDataPropertyWrapper>();
-	    try {
+        Model displayModel = vreq.getDisplayModel();
+        Model tboxModel = vreq.getOntModelSelector().getTBoxModel();
+        Model union = ModelFactory.createUnion(displayModel, tboxModel);
+        WebappDaoFactory wadf = new WebappDaoFactoryJena(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, union));
+        FauxPropertyDao fpDao = wadf.getFauxPropertyDao();
+
+        Query q = createQuery(dp, true);
+        QueryExecution qe = QueryExecutionFactory.create(q, union);
+        List<FauxDataPropertyWrapper> fauxDataProps = new ArrayList<FauxDataPropertyWrapper>();
+        try {
             ResultSet rs = qe.execSelect();
             while (rs.hasNext()) {
                 QuerySolution qsoln = rs.nextSolution();
@@ -147,12 +147,12 @@ public class ApplicationConfigurationOntologyUtils {
                 if (isDomainMatchSubject(domainURI, subject)) {
                     try {
                         FauxProperty fp = fpDao.getFauxPropertyFromContextUri(contextURI);
-            			if (fp != null) {
-            				 fauxDataProps.add(new FauxDataPropertyWrapper(dp, fp));
-            			}
-            		} catch (Exception e) {
-            			log.warn("Couldn't look up the faux property", e);
-            		}
+                        if (fp != null) {
+                            fauxDataProps.add(new FauxDataPropertyWrapper(dp, fp));
+                        }
+                    } catch (Exception e) {
+                        log.warn("Couldn't look up the faux property", e);
+                    }
                 }
             }
         } finally {
@@ -161,19 +161,20 @@ public class ApplicationConfigurationOntologyUtils {
         return fauxDataProps;
     }
 
-	private static Query createQuery(Property op, boolean optionalRange) {
-		String queryStr = getFauxPropQuery(op.getURI(), optionalRange);
+    private static Query createQuery(Property op, boolean optionalRange) {
+        String queryStr = getFauxPropQuery(op.getURI(), optionalRange);
         log.debug(queryStr);
         Query q = QueryFactory.create(queryStr);
-		return q;
-	}
+        return q;
+    }
 
     private static boolean isDomainMatchSubject(String domainUri, Individual subject) {
         if (subject == null || domainUri == null) {
             return true;
         }
-        Set<String> vClassUris = subject.getVClasses().stream().map(vclass -> vclass.getURI()).collect(Collectors.toSet());
-		for (String vClassUri : vClassUris) {
+        Set<String> vClassUris = subject.getVClasses().stream().map(vclass -> vclass.getURI())
+                .collect(Collectors.toSet());
+        for (String vClassUri : vClassUris) {
             if (vClassUri != null && vClassUri.equals(domainUri)) {
                 return true;
             }
@@ -181,16 +182,17 @@ public class ApplicationConfigurationOntologyUtils {
         return false;
     }
 
-    public static List<Property> getPossibleFauxProps(List<? extends FauxPropertyWrapper> curProps, Individual subject,	VitroRequest vreq, boolean isData) {
+    public static List<Property> getPossibleFauxProps(List<? extends FauxPropertyWrapper> curProps, Individual subject, VitroRequest vreq, boolean isData) {
         Model displayModel = vreq.getDisplayModel();
         Model tboxModel = vreq.getOntModelSelector().getTBoxModel();
         Model union = ModelFactory.createUnion(displayModel, tboxModel);
-        Map<String, FauxProperty> curPropsMap = curProps.stream().collect(Collectors.toMap(FauxPropertyWrapper::getContextUri, FauxPropertyWrapper::getFauxProperty));
+        Map<String, FauxProperty> curPropsMap = curProps.stream()
+                .collect(Collectors.toMap(FauxPropertyWrapper::getContextUri, FauxPropertyWrapper::getFauxProperty));
         WebappDaoFactory wadf = new WebappDaoFactoryJena(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, union));
         FauxPropertyDao fpDao = wadf.getFauxPropertyDao();
         ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
         DataPropertyDao dpDao = wadf.getDataPropertyDao();
-        
+
         Query q = QueryFactory.create(getPossibleFauxQuery(isData));
         QueryExecution qe = QueryExecutionFactory.create(q, union);
         List<Property> fauxDataProps = new ArrayList<Property>();
@@ -203,11 +205,11 @@ public class ApplicationConfigurationOntologyUtils {
                 String basePropertyUri = qsoln.getResource("property").getURI();
                 String contextURI = qsoln.getResource("context").getURI();
                 if (isDomainMatchSubject(domainURI, subject) && !curPropsMap.containsKey(contextURI)) {
-                	if (isData) {
-                		addDataProperty(fauxDataProps, basePropertyUri, contextURI, fpDao, dpDao);
-                	} else {
-                		addObjectProperty(fauxDataProps, basePropertyUri, contextURI, fpDao, opDao);
-                	}
+                    if (isData) {
+                        addDataProperty(fauxDataProps, basePropertyUri, contextURI, fpDao, dpDao);
+                    } else {
+                        addObjectProperty(fauxDataProps, basePropertyUri, contextURI, fpDao, opDao);
+                    }
                 }
             }
         } finally {
@@ -216,29 +218,30 @@ public class ApplicationConfigurationOntologyUtils {
         return fauxDataProps;
     }
 
-    private static void addObjectProperty(List<Property> fauxProps, String basePropertyUri, String contextURI, FauxPropertyDao fpDao, ObjectPropertyDao opDao) {
+    private static void addObjectProperty(List<Property> fauxProps, String basePropertyUri, String contextURI,
+            FauxPropertyDao fpDao, ObjectPropertyDao opDao) {
         try {
             FauxProperty fp = fpDao.getFauxPropertyFromContextUri(contextURI);
-            ObjectProperty op = opDao.getObjectPropertyByURI(basePropertyUri); 
+            ObjectProperty op = opDao.getObjectPropertyByURI(basePropertyUri);
             if (fp != null && op != null) {
-                 fauxProps.add(new FauxObjectPropertyWrapper(op, fp));
+                fauxProps.add(new FauxObjectPropertyWrapper(op, fp));
             }
-	    } catch (Exception e) {
-		    log.warn("Couldn't look up the faux object property, contextUri " + contextURI, e);
-	    }
+        } catch (Exception e) {
+            log.warn("Couldn't look up the faux object property, contextUri " + contextURI, e);
+        }
     }
 
-	private static void addDataProperty(List<Property> fauxProps, String basePropertyUri, String contextURI, FauxPropertyDao fpDao, DataPropertyDao dpDao) {
-		try {
+    private static void addDataProperty(List<Property> fauxProps, String basePropertyUri, String contextURI,
+            FauxPropertyDao fpDao, DataPropertyDao dpDao) {
+        try {
             FauxProperty fp = fpDao.getFauxPropertyFromContextUri(contextURI);
-            DataProperty dp = dpDao.getDataPropertyByURI(basePropertyUri); 
-			if (fp != null && dp != null) {
-				 fauxProps.add(new FauxDataPropertyWrapper(dp, fp));
-			}
-		} catch (Exception e) {
-			log.warn("Couldn't look up the faux data property, contextUri " + contextURI, e);
-		}
-		
-	}
+            DataProperty dp = dpDao.getDataPropertyByURI(basePropertyUri);
+            if (fp != null && dp != null) {
+                fauxProps.add(new FauxDataPropertyWrapper(dp, fp));
+            }
+        } catch (Exception e) {
+            log.warn("Couldn't look up the faux data property, contextUri " + contextURI, e);
+        }
 
+    }
 }

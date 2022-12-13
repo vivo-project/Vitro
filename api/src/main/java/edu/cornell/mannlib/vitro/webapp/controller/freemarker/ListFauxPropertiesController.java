@@ -74,8 +74,8 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
                 allFauxProps.putAll(getFauxPropertyList(objectProps, vreq));
                 allFauxProps.putAll(getFauxDataPropertyList(dataProps, vreq));
             } else {
-	            allFauxProps.putAll(getFauxByBaseList(objectProps, vreq));
-	            allFauxProps.putAll(getFauxDataPropsByBaseList(dataProps, vreq));
+                allFauxProps.putAll(getFauxByBaseList(objectProps, vreq));
+                allFauxProps.putAll(getFauxDataPropsByBaseList(dataProps, vreq));
 			}
 
 			log.debug(allFauxProps.toString());
@@ -169,7 +169,6 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 	private TreeMap<String, Object> getFauxByBaseList(List<ObjectProperty> objectProps, VitroRequest vreq) {
 		List<FauxProperty> fauxProps = null;
 		TreeMap<String, Object> fauxByBaseProps = new TreeMap<String, Object>();
-
         if ( objectProps != null ) {
             Iterator<ObjectProperty> opIt = objectProps.iterator();
             if ( !opIt.hasNext()) {
@@ -223,134 +222,134 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
         return fauxByBaseProps;
 	}
 	
-	private TreeMap<String, Object> getFauxDataPropertyList(List<DataProperty> dataProps, VitroRequest vreq) {
-		List<FauxProperty> fauxProps = null;
-		TreeMap<String, Object> theFauxProps = new TreeMap<String, Object>();
-        if ( dataProps != null ) {
+    private TreeMap<String, Object> getFauxDataPropertyList(List<DataProperty> dataProps, VitroRequest vreq) {
+        List<FauxProperty> fauxProps = null;
+        TreeMap<String, Object> theFauxProps = new TreeMap<String, Object>();
+        if (dataProps != null) {
             Iterator<DataProperty> opIt = dataProps.iterator();
-            if ( !opIt.hasNext()) {
+            if (!opIt.hasNext()) {
                 notFoundMessage = "No data properties found.";
-            }
-			else {
+            } else {
                 while (opIt.hasNext()) {
-
-                	DataProperty dp = opIt.next();
-					String baseURI = dp.getURI();
+                    DataProperty dp = opIt.next();
+                    String baseURI = dp.getURI();
                     fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
-					if ( fauxProps != null ) {
-						Iterator<FauxProperty> fpIt = fauxProps.iterator();
-						if ( !fpIt.hasNext()) {
-							notFoundMessage = "No faux properties found.";
-						}
-						else {
-							while (fpIt.hasNext()) {
-								// No point in getting these unless we have a faux property
-								String baseLabel = getBaseLabel(dp,false);
-								// get the info we need from the faux property
-								FauxProperty fp = fpIt.next();
-								String fauxLabel = fp.getDisplayName();
-								String rangeLabel = fp.getRangeLabel();
-								String rangeURI = fp.getRangeURI();
-								String domainLabel = fp.getDomainLabel();
-								String domainURI = fp.getDomainURI();
-								String groupURI = fp.getGroupURI();
-								// FauxProperty only gets groupURI but we want the label
-								PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
-								String groupLabel = ( pGroup == null ) ? "unspecified" : pGroup.getName();
-								// store all the strings in a hash with the faux property label as the key
-								Map<String, Object> tmpHash = new HashMap<String, Object>();
-								tmpHash.put("base", baseLabel);
-								tmpHash.put("baseURI", baseURI);
-								tmpHash.put("group", groupLabel);
-								tmpHash.put("range", rangeLabel);
-								tmpHash.put("rangeURI", rangeURI);
-								tmpHash.put("domain", domainLabel);
-								tmpHash.put("domainURI", domainURI);
-								tmpHash.put("editUrl", "datapropEdit");
-								// add the faux and its details to the treemap
-								theFauxProps.put(fauxLabel + "@@" + domainLabel, tmpHash);
-							}
-						}
-					}
-            	}
+                    if (fauxProps != null) {
+                        Iterator<FauxProperty> fpIt = fauxProps.iterator();
+                        if (!fpIt.hasNext()) {
+                            notFoundMessage = "No faux properties found.";
+                        } else {
+                            while (fpIt.hasNext()) {
+                                // No point in getting these unless we have a
+                                // faux property
+                                String baseLabel = getBaseLabel(dp, false);
+                                // get the info we need from the faux property
+                                FauxProperty fp = fpIt.next();
+                                String fauxLabel = fp.getDisplayName();
+                                String rangeLabel = fp.getRangeLabel();
+                                String rangeURI = fp.getRangeURI();
+                                String domainLabel = fp.getDomainLabel();
+                                String domainURI = fp.getDomainURI();
+                                String groupURI = fp.getGroupURI();
+                                // FauxProperty only gets groupURI but we want
+                                // the label
+                                PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
+                                String groupLabel = (pGroup == null) ? "unspecified" : pGroup.getName();
+                                // store all the strings in a hash with the faux
+                                // property label as the key
+                                Map<String, Object> tmpHash = new HashMap<String, Object>();
+                                tmpHash.put("base", baseLabel);
+                                tmpHash.put("baseURI", baseURI);
+                                tmpHash.put("group", groupLabel);
+                                tmpHash.put("range", rangeLabel);
+                                tmpHash.put("rangeURI", rangeURI);
+                                tmpHash.put("domain", domainLabel);
+                                tmpHash.put("domainURI", domainURI);
+                                tmpHash.put("editUrl", "datapropEdit");
+                                // add the faux and its details to the treemap
+                                theFauxProps.put(fauxLabel + "@@" + domainLabel, tmpHash);
+                            }
+                        }
+                    }
+                }
             }
         }
         return theFauxProps;
-	}
+    }
 
-	private TreeMap<String, Object> getFauxDataPropsByBaseList(List<DataProperty> dataProps, VitroRequest vreq) {
-		List<FauxProperty> fauxProps = null;
-		TreeMap<String, Object> fauxByBaseProps = new TreeMap<String, Object>();
-        if ( dataProps != null ) {
+    private TreeMap<String, Object> getFauxDataPropsByBaseList(List<DataProperty> dataProps, VitroRequest vreq) {
+        List<FauxProperty> fauxProps = null;
+        TreeMap<String, Object> fauxByBaseProps = new TreeMap<String, Object>();
+        if (dataProps != null) {
             Iterator<DataProperty> opIt = dataProps.iterator();
-            if ( !opIt.hasNext()) {
+            if (!opIt.hasNext()) {
                 notFoundMessage = "No data properties found.";
-            }
-			else {
+            } else {
                 while (opIt.hasNext()) {
-					TreeMap<String, Object> fauxForGivenBase = new TreeMap<String, Object>();
-					DataProperty dp = opIt.next();
-					String baseURI = dp.getURI();
+                    TreeMap<String, Object> fauxForGivenBase = new TreeMap<String, Object>();
+                    DataProperty dp = opIt.next();
+                    String baseURI = dp.getURI();
                     fauxProps = getFPDao(vreq).getFauxPropertiesForBaseUri(baseURI);
 
-					if ( fauxProps != null ) {
-						Iterator<FauxProperty> fpIt = fauxProps.iterator();
-						if ( !fpIt.hasNext()) {
-							notFoundMessage = "No faux properties found.";
-						}
-						else {
-							String baseLabel = getBaseLabel(dp, true);
-							while (fpIt.hasNext()) {
-								// get the info we need from the faux property
-								FauxProperty fp = fpIt.next();
-								String fauxLabel = fp.getDisplayName();
-								String rangeLabel = fp.getRangeLabel();
-								String rangeURI = fp.getRangeURI();
-								String domainLabel = fp.getDomainLabel();
-								String domainURI = fp.getDomainURI();
-								String groupURI = fp.getGroupURI();
-								// FauxProperty only gets groupURI but we want the label
-								PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
-								String groupLabel = ( pGroup == null ) ? "unspecified" : pGroup.getName();
-								// store all the strings in a hash with the faux property label as the key
-								Map<String, Object> tmpHash = new HashMap<String, Object>();
-								tmpHash.put("baseURI", baseURI);
-								tmpHash.put("group", groupLabel);
-								tmpHash.put("range", rangeLabel);
-								tmpHash.put("rangeURI", rangeURI);
-								tmpHash.put("domain", domainLabel);
-								tmpHash.put("domainURI", domainURI);
-								// add the faux and its details to the treemap
-								fauxForGivenBase.put(fauxLabel + "@@" + domainLabel, tmpHash);
-								fauxForGivenBase.put("editUrl", "datapropEdit");
-							}
-							 fauxByBaseProps.put(baseLabel, fauxForGivenBase);
-						}
-					}
-            	}
+                    if (fauxProps != null) {
+                        Iterator<FauxProperty> fpIt = fauxProps.iterator();
+                        if (!fpIt.hasNext()) {
+                            notFoundMessage = "No faux properties found.";
+                        } else {
+                            String baseLabel = getBaseLabel(dp, true);
+                            while (fpIt.hasNext()) {
+                                // get the info we need from the faux property
+                                FauxProperty fp = fpIt.next();
+                                String fauxLabel = fp.getDisplayName();
+                                String rangeLabel = fp.getRangeLabel();
+                                String rangeURI = fp.getRangeURI();
+                                String domainLabel = fp.getDomainLabel();
+                                String domainURI = fp.getDomainURI();
+                                String groupURI = fp.getGroupURI();
+                                // FauxProperty only gets groupURI but we want
+                                // the label
+                                PropertyGroup pGroup = getPGDao(vreq).getGroupByURI(groupURI);
+                                String groupLabel = (pGroup == null) ? "unspecified" : pGroup.getName();
+                                // store all the strings in a hash with the faux
+                                // property label as the key
+                                Map<String, Object> tmpHash = new HashMap<String, Object>();
+                                tmpHash.put("baseURI", baseURI);
+                                tmpHash.put("group", groupLabel);
+                                tmpHash.put("range", rangeLabel);
+                                tmpHash.put("rangeURI", rangeURI);
+                                tmpHash.put("domain", domainLabel);
+                                tmpHash.put("domainURI", domainURI);
+                                // add the faux and its details to the treemap
+                                fauxForGivenBase.put(fauxLabel + "@@" + domainLabel, tmpHash);
+                                fauxForGivenBase.put("editUrl", "datapropEdit");
+                            }
+                            fauxByBaseProps.put(baseLabel, fauxForGivenBase);
+                        }
+                    }
+                }
             }
         }
         return fauxByBaseProps;
-	}
+    }
 
-	private String getBaseLabel(Property property, boolean addUri) {
-		String baseLabel = property.getPickListName();
-		if (StringUtils.isEmpty(baseLabel)) {
-			baseLabel = property.getLocalName();
-		}
-		if (StringUtils.isEmpty(baseLabel)) {
-			baseLabel = "[property]";
-		}
-		String baseLocalName = property.getLocalNameWithPrefix();
-		int indexOf = baseLabel.indexOf("(");
-		if (indexOf > 0) {
-			baseLabel = baseLabel.substring(0,indexOf);	
-		}
-		baseLabel += "(" + baseLocalName + ")";
-		if (addUri) {
-			baseLabel += "|" + property.getURI();
-		}
-		return baseLabel;
-	}
+    private String getBaseLabel(Property property, boolean addUri) {
+        String baseLabel = property.getPickListName();
+        if (StringUtils.isEmpty(baseLabel)) {
+            baseLabel = property.getLocalName();
+        }
+        if (StringUtils.isEmpty(baseLabel)) {
+            baseLabel = "[property]";
+        }
+        String baseLocalName = property.getLocalNameWithPrefix();
+        int indexOf = baseLabel.indexOf("(");
+        if (indexOf > 0) {
+            baseLabel = baseLabel.substring(0, indexOf);
+        }
+        baseLabel += "(" + baseLocalName + ")";
+        if (addUri) {
+            baseLabel += "|" + property.getURI();
+        }
+        return baseLabel;
+    }
 
 }
