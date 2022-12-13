@@ -6,7 +6,7 @@
     <#list selectLocale.locales as locale>
 
             <li <#if locale.selected>status="selected"</#if>>
-                	<a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}">${locale.label?capitalize}<#if locale.country?has_content> (${locale.country})</#if></a>
+                	<a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}">${locale.label?capitalize}<#if locale.country?has_content> (${locale.country})</#if><#if locale.institution?has_content> - ${locale.institution}</#if></a>
             </li>
     </#list>
     </ul>
@@ -21,6 +21,7 @@
  *       -- code
  *       -- label (tooltip displayed in original locale, not current locale)
  *       -- country (displayed in original locale, not current locale)
+ *       -- institution (abbreviation)
  *       -- selected (boolean)
 -->
 <script type="text/javascript">

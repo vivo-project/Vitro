@@ -136,7 +136,19 @@ public class RDFFilesLoader {
 		// Which locales are enabled in runtime.properties?
 		List<Locale> locales = SelectedLocale.getSelectableLocales(ctx);
 		for (Locale locale : locales) {
-			enabledLocales.add(locale.toLanguageTag().replace('-', '_'));
+			String localeString = locale.toLanguageTag().replace('-', '_');
+			if (! enabledLocales.contains(localeString)) {
+				enabledLocales.add(localeString);
+			}
+			// If a locale with fr_CA_x_uqam is used, the locale fr_CA should be also enabled for loading.
+			// Private tags (lang_CountryCode_x_InstitutionAbbreviation) are inteded to be just extension,
+			// therefore the basic locale (lang_CountryCode) should be loaded as well.
+			if(locale.hasExtensions()){
+				localeString = locale.stripExtensions().toLanguageTag().replace('-', '_');
+				if (! enabledLocales.contains(localeString)) {
+					enabledLocales.add(localeString);
+				}
+			}
 		}
 
 		// If no languages were enabled in runtime.properties, add a fallback as the default
