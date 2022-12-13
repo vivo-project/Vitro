@@ -81,8 +81,9 @@ public class LocaleSelectionDataGetter implements DataGetter {
 		for(final Locale locale: selectables) {
 			setOfLocalesBase.add(locale.stripExtensions().toLanguageTag());
 		}
-		if (setOfLocalesBase.size() < selectables.size())
+		if (setOfLocalesBase.size() < selectables.size()) {
 			includeAbbreviation = true;
+		}
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Locale locale : selectables) {
 			try {
@@ -102,8 +103,9 @@ public class LocaleSelectionDataGetter implements DataGetter {
 		map.put("code", locale.toLanguageTag().replace('-','_'));
 		map.put("label", locale.getDisplayLanguage(locale));
 		map.put("country", locale.getDisplayCountry(locale));
-		if (includeAbbreviation)
+		if (includeAbbreviation) {
 			map.put("institution", Optional.ofNullable(locale.getExtension(LocaleSelectionDataGetter.PRIVATE_USE_SUBTAG)).orElse("").toUpperCase());
+		}
 		map.put("selected", currentLocale.equals(locale));
 		return map;
 	}
