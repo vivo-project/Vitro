@@ -43,7 +43,7 @@ public class ApplicationConfigurationOntologyUtils {
     
     private static final String getPossibleFauxQuery(boolean isData) {
     	return
-    			"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
                 "SELECT DISTINCT ?domain ?property ?context ?isData WHERE { \n" +
@@ -61,7 +61,7 @@ public class ApplicationConfigurationOntologyUtils {
     
     private static String getFauxPropQuery(String baseUri, boolean optionalRange) {
 		return
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
 	            "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
 	            "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
 	            "SELECT DISTINCT ?domain ?context WHERE { \n" +
