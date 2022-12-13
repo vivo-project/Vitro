@@ -46,25 +46,22 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         subjectUri = subject.getURI();
         this.property = property;
         if (isFauxProperty(property)) {
-        	FauxProperty fauxProperty = getFauxProperty(property);
-			this.name = fauxProperty.getDisplayName();
-			this.displayLimit = fauxProperty.getDisplayLimit();
-			propertyUri = fauxProperty.getBaseURI();
+            FauxProperty fauxProperty = getFauxProperty(property);
+            this.name = fauxProperty.getDisplayName();
+            this.displayLimit = fauxProperty.getDisplayLimit();
+            propertyUri = fauxProperty.getBaseURI();
         } else {
-        	propertyUri = property.getURI();
+            propertyUri = property.getURI();
             this.name = name;
         }
-        localName = property.getLocalName();	
-
+        localName = property.getLocalName();
         addUrl = "";
-
-        
         setVerboseDisplayValues(property);
     }
 
-	private FauxProperty getFauxProperty(Property property) {
-		return ((FauxPropertyWrapper)property).getFauxProperty();
-	}
+    private FauxProperty getFauxProperty(Property property) {
+        return ((FauxPropertyWrapper) property).getFauxProperty();
+    }
 
     protected void setVerboseDisplayValues(Property property) {
 
@@ -111,16 +108,16 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         verboseDisplay.put("propertyEditUrl", editUrl);
 
         if (isFauxProperty(property)) {
-        	verboseDisplay.put("fauxProperty", assembleFauxPropertyValues(getFauxProperty(property)));
+            verboseDisplay.put("fauxProperty", assembleFauxPropertyValues(getFauxProperty(property)));
         }
     }
 
-	private boolean isFauxProperty(Property prop) {
-		if ( prop instanceof FauxPropertyWrapper) {
-			return true;
-		}
-		return false;
-	}
+    private boolean isFauxProperty(Property prop) {
+        if (prop instanceof FauxPropertyWrapper) {
+            return true;
+        }
+        return false;
+    }
 
 	private Map<String, Object> assembleFauxPropertyValues(FauxProperty fp) {
 		Map<String, Object> map = new HashMap<>();

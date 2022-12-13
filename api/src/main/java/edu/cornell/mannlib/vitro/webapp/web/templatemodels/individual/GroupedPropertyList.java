@@ -129,7 +129,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         if(editing) {
             List<Property> possibleFauxProps = ApplicationConfigurationOntologyUtils.getPossibleFauxProps(populatedFauxDPs, subject, vreq, true);
-        	allProperties.addAll(possibleFauxProps);
+            allProperties.addAll(possibleFauxProps);
         }
         
         populatedDPs.addAll(populatedFauxDPs);
@@ -244,8 +244,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
     	// breaks blank node structures in the restrictions that determine applicable properties.
         WebappDaoFactory wadf = vreq.getLanguageNeutralWebappDaoFactory();
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
-		ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
-		Set<String> vClassUris = subject.getVClasses().stream().map(vclass -> vclass.getURI()).collect(Collectors.toSet());
+        ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
+        Set<String> vClassUris = subject.getVClasses().stream().map(vclass -> vclass.getURI()).collect(Collectors.toSet());
     	Map<String, Property> possiblePropertiesMap = new HashMap<String,Property>();
 
         Collection<PropertyInstance> allPossiblePI = piDao.getAllPossiblePropInstForIndividual(subject.getURI());
