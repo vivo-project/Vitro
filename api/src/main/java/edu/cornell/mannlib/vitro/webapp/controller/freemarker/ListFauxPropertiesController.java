@@ -32,8 +32,6 @@ import javax.servlet.annotation.WebServlet;
 @WebServlet(name = "ListFauxPropertiesController", urlPatterns = {"/listFauxProperties"} )
 public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 
-	private static final long serialVersionUID = 1L;
-
 	private static final Log log = LogFactory.getLog(ListFauxPropertiesController.class.getName());
 
     private static final String TEMPLATE_NAME = "siteAdmin-fauxPropertiesList.ftl";
@@ -67,7 +65,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
             else {
                 body.put("pageTitle", "Faux Properties by Base Property");
             }
-			List<ObjectProperty> objectProps = getOPDao(vreq).getRootObjectProperties();
+            List<ObjectProperty> objectProps = getOPDao(vreq).getRootObjectProperties();
             List<DataProperty> dataProps = getDPDao(vreq).getRootDataProperties();
             Map<String, Object> allFauxProps = new TreeMap<String, Object>();
 
@@ -75,10 +73,9 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 			if ( displayOption.equals("listing") ) {
                 allFauxProps.putAll(getFauxPropertyList(objectProps, vreq));
                 allFauxProps.putAll(getFauxDataPropertyList(dataProps, vreq));
-            }
-			else {
-				allFauxProps.putAll(getFauxByBaseList(objectProps, vreq));
-				allFauxProps.putAll(getFauxDataPropsByBaseList(dataProps, vreq));
+            } else {
+	            allFauxProps.putAll(getFauxByBaseList(objectProps, vreq));
+	            allFauxProps.putAll(getFauxDataPropsByBaseList(dataProps, vreq));
 			}
 
 			log.debug(allFauxProps.toString());
@@ -226,13 +223,13 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
         return fauxByBaseProps;
 	}
 	
-	private TreeMap<String, Object> getFauxDataPropertyList(List<DataProperty> objectProps, VitroRequest vreq) {
+	private TreeMap<String, Object> getFauxDataPropertyList(List<DataProperty> dataProps, VitroRequest vreq) {
 		List<FauxProperty> fauxProps = null;
 		TreeMap<String, Object> theFauxProps = new TreeMap<String, Object>();
-        if ( objectProps != null ) {
-            Iterator<DataProperty> opIt = objectProps.iterator();
+        if ( dataProps != null ) {
+            Iterator<DataProperty> opIt = dataProps.iterator();
             if ( !opIt.hasNext()) {
-                notFoundMessage = "No object properties found.";
+                notFoundMessage = "No data properties found.";
             }
 			else {
                 while (opIt.hasNext()) {
@@ -281,13 +278,13 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
         return theFauxProps;
 	}
 
-	private TreeMap<String, Object> getFauxDataPropsByBaseList(List<DataProperty> objectProps, VitroRequest vreq) {
+	private TreeMap<String, Object> getFauxDataPropsByBaseList(List<DataProperty> dataProps, VitroRequest vreq) {
 		List<FauxProperty> fauxProps = null;
 		TreeMap<String, Object> fauxByBaseProps = new TreeMap<String, Object>();
-        if ( objectProps != null ) {
-            Iterator<DataProperty> opIt = objectProps.iterator();
+        if ( dataProps != null ) {
+            Iterator<DataProperty> opIt = dataProps.iterator();
             if ( !opIt.hasNext()) {
-                notFoundMessage = "No object properties found.";
+                notFoundMessage = "No data properties found.";
             }
 			else {
                 while (opIt.hasNext()) {

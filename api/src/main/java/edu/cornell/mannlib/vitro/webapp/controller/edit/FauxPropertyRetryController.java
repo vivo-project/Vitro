@@ -136,7 +136,6 @@ public class FauxPropertyRetryController extends BaseEditController {
 						.getDataPropertyDao()
 						.getDataPropertyByURI(beanForEditing.getURI());
 				isFauxDataProperty = true;
-					
 			}
 
 			addCheckboxValuesToTheRequest();
@@ -164,7 +163,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 				return newFauxProperty(baseUri);
 			}
 
-			FauxProperty bean = fpDao.getFauxPropertyByUris(domainUri, baseUri,	rangeUri);
+			FauxProperty bean = fpDao.getFauxPropertyByUris(domainUri, baseUri, rangeUri);
 			if (bean == null) {
 				throw new IllegalArgumentException(
 						"FauxProperty does not exist for <" + domainUri
@@ -325,17 +324,17 @@ public class FauxPropertyRetryController extends BaseEditController {
 			String rangeUri = baseProperty.getRangeVClassURI();
 			if (rangeUri == null) {
 				Option option = new Option();
-	        	option.setValue("");
-	        	option.setBody("untyped (rdfs:Literal)");
-	        	option.setSelected(true);
-	        	list.add(option);
+				option.setValue("");
+				option.setBody("untyped (rdfs:Literal)");
+				option.setSelected(true);
+				list.add(option);
 			} else {
 				Datatype dataType = wadf.getDatatypeDao().getDatatypeByURI(rangeUri);
 				Option option = new Option();
-	        	option.setValue(dataType.getUri());
-	        	option.setBody(dataType.getName());
-	        	option.setSelected(true);
-	        	list.add(option);
+				option.setValue(dataType.getUri());
+				option.setBody(dataType.getName());
+				option.setSelected(true);
+				list.add(option);
 			}
 			return list;
 		}

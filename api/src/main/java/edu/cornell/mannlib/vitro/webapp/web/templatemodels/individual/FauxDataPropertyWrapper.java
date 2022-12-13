@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
 /**
- * An ObjectProperty that has some of its values overridden by a FauxProperty.
+ * A DataProperty that has some of its values overridden by a FauxProperty.
  *
  * TODO This is a horrible kluge that should be discarded as soon as we can
  * rewrite GroupedPropertyList.
@@ -133,7 +133,7 @@ public class FauxDataPropertyWrapper extends DataProperty implements FauxPropert
 	}
 
 	// ----------------------------------------------------------------------
-	// Methods from ObjectProperty
+	// Methods from DataProperty
 	// ----------------------------------------------------------------------
 
 
