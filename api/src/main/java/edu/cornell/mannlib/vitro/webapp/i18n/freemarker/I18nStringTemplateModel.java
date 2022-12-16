@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.i18n.freemarker;
 import java.text.MessageFormat;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.TranslationProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,7 +68,7 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 				if(isOnlineTranslationsEnabled()) {
 					return getOnlineTranslationsFormattedMessage(textString, unwrappedArgs);
 				} else {
-					return MessageFormat.format(textString.replaceAll("''", "'").replaceAll("'", "''"), unwrappedArgs);
+					return MessageFormat.format(TranslationProvider.preprocessForFormating(textString), unwrappedArgs);
 				}
 			} catch (Exception e) {
 				String message = "Can't format '" + key + "', wrong argument types: " + args
@@ -89,7 +90,7 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	private String getOnlineTranslationsFormattedMessage(String preProcessed, Object[] args) {
 		String[] parts = preProcessed.split(I18nBundle.INT_SEP);
 		final int messageIndex = parts.length -1;
-		String message = MessageFormat.format(parts[messageIndex].replaceAll("''", "'").replaceAll("'", "''"), args);
+		String message = MessageFormat.format(TranslationProvider.preprocessForFormating(parts[messageIndex]), args);
 		String[] arguments = convertToArrayOfStrings(args);
 		parts[messageIndex] = "";
 		String result = String.join(I18nBundle.INT_SEP, parts) + 
