@@ -6,6 +6,8 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
 
 /**
@@ -20,7 +22,7 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	private String configUri;
 
 	// Must not be null on insert or update. Partial identifier on delete.
-	private String rangeURI;
+	private String rangeURI = "";
 	// May be null. Partial identifier on delete.
 	private String domainURI;
 
@@ -55,7 +57,7 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	 */
 	public FauxProperty(String domainURI, String baseURI, String rangeURI) {
 		super(Objects.requireNonNull(baseURI, "baseURI may not be null"));
-		this.rangeURI = rangeURI;
+		this.setRangeURI(rangeURI);
 		this.domainURI = domainURI;
 	}
 
@@ -93,7 +95,11 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	}
 
 	public void setRangeURI(String rangeURI) {
-		this.rangeURI = rangeURI;
+		if (StringUtils.isEmpty(rangeURI)) {
+			this.rangeURI = "";
+		} else {
+			this.rangeURI = rangeURI;	
+		}
 	}
 
 	public String getBaseLabel() {
@@ -105,7 +111,14 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	}
 
 	public String getRangeLabel() {
-		return (rangeLabel == null) ? localName(rangeURI) : rangeLabel;
+		if  (StringUtils.isEmpty(rangeLabel)) {
+			if (StringUtils.isEmpty(rangeURI)) {
+				return "untyped";
+			}
+			return localName(rangeURI);
+		} else {
+			return rangeLabel;
+		}
 	}
 
 	public void setRangeLabel(String rangeLabel) {

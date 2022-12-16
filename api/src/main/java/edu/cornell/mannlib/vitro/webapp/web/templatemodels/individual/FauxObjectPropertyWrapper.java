@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
  * TODO This is a horrible kluge that should be discarded as soon as we can
  * rewrite GroupedPropertyList.
  */
-public class FauxObjectPropertyWrapper extends ObjectProperty {
+public class FauxObjectPropertyWrapper extends ObjectProperty implements FauxPropertyWrapper{
 	private final ObjectProperty innerOP;
 	private final FauxProperty faux;
 
@@ -624,8 +624,11 @@ public class FauxObjectPropertyWrapper extends ObjectProperty {
     @Override
 	public String toString() {
 		return String.format("FauxObjectPropertyWrapper[ %s <==> %s | %s ==> %s ==> %s, statementCount=%d, group=%s, customEntryForm=%s ]",
-				getDomainPublic(), getRangePublic(),
-				localName(getDomainVClassURI()), localName(getURI()), localName(getRangeVClassURI()),
+				getDomainPublic(), 
+				getRangePublic(),
+				localName(getDomainVClassURI()), 
+				localName(getURI()),
+				localName(getRangeVClassURI()),
 				(getObjectPropertyStatements() == null ? 0: getObjectPropertyStatements().size()),
 				localName(getGroupURI()),
 				simpleName(getCustomEntryForm()));
@@ -645,6 +648,16 @@ public class FauxObjectPropertyWrapper extends ObjectProperty {
 		} else {
 			return ResourceFactory.createResource(uri).getLocalName();
 		}
+	}
+
+	@Override
+	public FauxProperty getFauxProperty() {
+		return faux;
+	}
+
+	@Override
+	public String getContextUri() {
+		return faux.getContextUri();
 	}
 
 }

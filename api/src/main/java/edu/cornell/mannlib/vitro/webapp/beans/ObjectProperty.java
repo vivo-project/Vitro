@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.beans.XMLEncoder;
 import java.text.Collator;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;

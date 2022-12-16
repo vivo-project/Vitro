@@ -32,12 +32,14 @@ import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
+import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -98,6 +100,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 		private FauxProperty beanForEditing;
 		private Property baseProperty;
+		
+		private boolean isFauxDataProperty = false;
 
 		EpoPopulator(HttpServletRequest req, EditProcessObject epo) {
 			this.req = new VitroRequest(req);
@@ -127,10 +131,19 @@ public class FauxPropertyRetryController extends BaseEditController {
 			this.baseProperty = req.getUnfilteredWebappDaoFactory()
 					.getObjectPropertyDao()
 					.getObjectPropertyByURI(beanForEditing.getURI());
+			if (this.baseProperty == null) {
+				this.baseProperty = req.getUnfilteredWebappDaoFactory()
+						.getDataPropertyDao()
+						.getDataPropertyByURI(beanForEditing.getURI());
+				isFauxDataProperty = true;
+			}
 
 			addCheckboxValuesToTheRequest();
 
-			setFieldValidators();
+			if (!isFauxDataProperty) {
+				setFieldValidators();	
+			}
+			
 			setListeners();
 			setForwarders();
 
@@ -150,8 +163,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 				return newFauxProperty(baseUri);
 			}
 
-			FauxProperty bean = fpDao.getFauxPropertyByUris(domainUri, baseUri,
-					rangeUri);
+			FauxProperty bean = fpDao.getFauxPropertyByUris(domainUri, baseUri, rangeUri);
 			if (bean == null) {
 				throw new IllegalArgumentException(
 						"FauxProperty does not exist for <" + domainUri
@@ -168,7 +180,11 @@ public class FauxPropertyRetryController extends BaseEditController {
 		private FauxProperty newFauxProperty(String baseUri) {
 			FauxProperty fp = new FauxProperty(null, baseUri, null);
 			ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
-			ObjectProperty base = opDao.getObjectPropertyByURI(baseUri);
+			DataPropertyDao dpDao = wadf.getDataPropertyDao();
+			Property base = opDao.getObjectPropertyByURI(baseUri);
+			if (base == null) {
+				base = dpDao.getDataPropertyByURI(baseUri);
+			}
 			fp.setGroupURI(base.getGroupURI());
 			fp.setRangeURI(base.getRangeVClassURI());
 			fp.setDomainURI(base.getDomainVClassURI());
@@ -270,7 +286,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 				list.addAll(FormUtils.makeVClassOptionList(wadf,
 						beanForEditing.getDomainURI()));
 			} else {
-				list.addAll(FormUtils.makeOptionListOfSubVClasses(wadf,
+				list.addAll(FormUtils.makeOptionListOfNotDisjointClasses(wadf,
 						baseProperty.getDomainVClassURI(),
 						beanForEditing.getDomainURI()));
 			}
@@ -279,12 +295,20 @@ public class FauxPropertyRetryController extends BaseEditController {
 		}
 
 		private List<Option> buildRangeOptionList() {
+			if (isFauxDataProperty) {
+				return buildDataPropOptionList();
+			} else {
+				return buildObjectPropOptionList();	
+			}
+		}
+
+		private List<Option> buildObjectPropOptionList() {
 			List<Option> list = new ArrayList<>();
 			if (baseProperty.getRangeVClassURI() == null) {
 				list.addAll(FormUtils.makeVClassOptionList(wadf,
 						beanForEditing.getRangeURI()));
 			} else {
-				list.addAll(FormUtils.makeOptionListOfSubVClasses(wadf,
+				list.addAll(FormUtils.makeOptionListOfNotDisjointClasses(wadf,
 						baseProperty.getRangeVClassURI(),
 						beanForEditing.getRangeURI()));
 				if (containsVCardKind(list)) {
@@ -292,6 +316,26 @@ public class FauxPropertyRetryController extends BaseEditController {
 				}
 			}
 			list.add(0, new Option("", "(none specified)"));
+			return list;
+		}
+
+		private List<Option> buildDataPropOptionList() {
+			List<Option> list = new ArrayList<>();
+			String rangeUri = baseProperty.getRangeVClassURI();
+			if (rangeUri == null) {
+				Option option = new Option();
+				option.setValue("");
+				option.setBody("untyped (rdfs:Literal)");
+				option.setSelected(true);
+				list.add(option);
+			} else {
+				Datatype dataType = wadf.getDatatypeDao().getDatatypeByURI(rangeUri);
+				Option option = new Option();
+				option.setValue(dataType.getUri());
+				option.setBody(dataType.getName());
+				option.setSelected(true);
+				list.add(option);
+			}
 			return list;
 		}
 
