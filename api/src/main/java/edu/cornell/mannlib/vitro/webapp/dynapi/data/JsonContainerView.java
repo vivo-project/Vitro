@@ -20,21 +20,22 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIReso
 
 public class JsonContainerView {
 
-	private static final String JSON_ARRAY = "json array";
+    private static final String JSON_ARRAY = "json array";
+    private static final String JSON_OBJECT = "json container";
 
-	public static Map<String, JsonContainer> getJsonArrays(Parameters params, DataStore dataStore) {
-		Map<String, JsonContainer> jsonArrays = new HashMap<>();
-		for (String name : params.getNames()) {
-			Parameter param = params.get(name);
-			if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
-				JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
-				jsonArrays.put(name, arrayNode);
-			}
-		}
-		return jsonArrays;
-	}
-	
-    public static List<String> getStringListFromJsonArrays(Parameters params, DataStore dataStore){
+    public static Map<String, JsonContainer> getJsonArrays(Parameters params, DataStore dataStore) {
+        Map<String, JsonContainer> jsonArrays = new HashMap<>();
+        for (String name : params.getNames()) {
+            Parameter param = params.get(name);
+            if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
+                JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
+                jsonArrays.put(name, arrayNode);
+            }
+        }
+        return jsonArrays;
+    }
+
+    public static List<String> getStringListFromJsonArrays(Parameters params, DataStore dataStore) {
         List<String> uris = new LinkedList<>();
         List<JsonContainer> jsonArrays = getJsonArrayList(params, dataStore);
         for (JsonContainer array : jsonArrays) {
@@ -42,8 +43,39 @@ public class JsonContainerView {
         }
         return uris;
     }
+
+    public static List<JsonContainer> getOutputJsonObjectList(Parameters params, DataStore dataStore) {
+        List<JsonContainer> jsonObjects = new LinkedList<>();
+        jsonObjects.addAll(getJsonArrayList(params, dataStore));
+        for (String name : params.getNames()) {
+            if (!dataStore.contains(name)) {
+                final JsonContainer jsonContainer = initializeJsonContainer(dataStore, params.get(name));
+                jsonObjects.add(jsonContainer);
+            }
+        }
+        return jsonObjects;
+    }
+
+    private static JsonContainer initializeJsonContainer(DataStore dataStore, Parameter param) {
+        Data data = new Data(param);
+        data.initializeDefault();
+        dataStore.addData(param.getName(), data);
+        return (JsonContainer) data.getObject();
+    }
+
+    public static List<JsonContainer> getJsonObjectList(Parameters params, DataStore dataStore) {
+        List<JsonContainer> jsonArrays = new LinkedList<>();
+        for (String name : params.getNames()) {
+            Parameter param = params.get(name);
+            if (param.isJsonContainer() && JSON_OBJECT.equals(param.getType().getName())) {
+                JsonContainer objectNode = (JsonContainer) dataStore.getData(name).getObject();
+                jsonArrays.add(objectNode);
+            }
+        }
+        return jsonArrays;
+    }
     
-    private static List<JsonContainer> getJsonArrayList(Parameters params, DataStore dataStore) {
+    public static List<JsonContainer> getJsonArrayList(Parameters params, DataStore dataStore) {
         List<JsonContainer> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
@@ -55,51 +87,52 @@ public class JsonContainerView {
         return jsonArrays;
     }
 
-	public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {
-		for (String name : params.getNames()) {
-			Parameter param = params.get(name);
-			if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {
+        for (String name : params.getNames()) {
+            Parameter param = params.get(name);
+            if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public static JsonNode asJsonNode(Data data) {
-		final JsonContainer object = (JsonContainer) data.getObject();
-		return object.asJsonNode();
-	}
+    public static JsonNode asJsonNode(Data data) {
+        final JsonContainer object = (JsonContainer) data.getObject();
+        return object.asJsonNode();
+    }
 
-	public static void addSolutionRow(DataStore dataStore, List<String> vars, QuerySolution solution, Parameters outputParams) {
-		if (!hasJsonArrays(outputParams, dataStore)) {
-			return;
-		}
-		JsonContainer row = getRowMap(vars, solution);
-		Map<String, JsonContainer> jsonArrays = getJsonArrays(outputParams, dataStore);
-		for ( JsonContainer array  : jsonArrays.values()) {
-			array.addRow(JsonContainer.PATH_ROOT, row);
-		}
-	}
+    public static void addSolutionRow(DataStore dataStore, List<String> vars, QuerySolution solution,
+            Parameters outputParams) {
+        if (!hasJsonArrays(outputParams, dataStore)) {
+            return;
+        }
+        JsonContainer row = getRowMap(vars, solution);
+        Map<String, JsonContainer> jsonArrays = getJsonArrays(outputParams, dataStore);
+        for (JsonContainer array : jsonArrays.values()) {
+            array.addRow(JsonContainer.PATH_ROOT, row);
+        }
+    }
 
-	private static JsonContainer getRowMap(List<String> vars, QuerySolution solution) {
-		JsonContainer row = new JsonContainer(Type.EmptyObject);
+    private static JsonContainer getRowMap(List<String> vars, QuerySolution solution) {
+        JsonContainer row = new JsonContainer(Type.EmptyObject);
 
-		for (String var : vars) {
-			RDFNode node = solution.get(var);
-			if (node.isLiteral()) {
-				Literal literal = (Literal) node;
-				Parameter param = LiteralParamFactory.createLiteral(literal, var);
-				Data data = new Data(param);
-				data.setObject(node);
-				row.addKeyValue(var, data);
-			} else 
-			if (node.isURIResource()){
-				Parameter param = new URIResourceParam(var);
-				Data data = new Data(param);
-				data.setObject(node);
-				row.addKeyValue(var, data);
-			} 
-		}
-		return row;
-	}
+        for (String var : vars) {
+            RDFNode node = solution.get(var);
+            if (node.isLiteral()) {
+                Literal literal = (Literal) node;
+                Parameter param = LiteralParamFactory.createLiteral(literal, var);
+                Data data = new Data(param);
+                data.setObject(node);
+                row.addKeyValue(var, data);
+            } else if (node.isURIResource()) {
+                Parameter param = new URIResourceParam(var);
+                Data data = new Data(param);
+                data.setObject(node);
+                row.addKeyValue(var, data);
+            }
+        }
+        return row;
+    }
+
 }

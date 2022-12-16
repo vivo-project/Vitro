@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.logging.Log;
@@ -8,7 +9,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public abstract class PoolOperation extends Operation {
@@ -88,4 +91,7 @@ public abstract class PoolOperation extends Operation {
         return true;
     };
 
+    protected List<JsonContainer> getOutputJsonObjects(DataStore dataStore) {
+        return JsonContainerView.getOutputJsonObjectList(outputParams, dataStore);
+    }
 }

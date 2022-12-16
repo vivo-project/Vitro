@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -8,12 +9,12 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class StringParam extends Parameter {
+public class JsonObjectParam extends Parameter {
 
-	private static final String TYPE_NAME = "plain string";
-	private static final Log log = LogFactory.getLog(StringParam.class);
+	private static final String TYPE_NAME = "json container";
+	private static final Log log = LogFactory.getLog(JsonObjectParam.class);
 
-	public StringParam(String var) {
+	public JsonObjectParam(String var) {
 		this.setName(var);
 		try {
 			ParameterType type = new ParameterType();
@@ -22,8 +23,9 @@ public class StringParam extends Parameter {
 			type.setImplementationType(implType);
 			implType.setSerializationConfig(getSerializationConfig());
 			implType.setDeserializationConfig(getDeserializationConfig());	
-			implType.setClassName(String.class.getCanonicalName());
+			implType.setClassName(JsonContainer.class.getCanonicalName());
 			this.setType(type);
+			this.setDefaultValue(JsonContainer.EMPTY_OBJECT);
 		} catch (Exception e) {
 			log.error(e, e);
 			throw new RuntimeException(e.getLocalizedMessage());
@@ -32,19 +34,19 @@ public class StringParam extends Parameter {
 	
 	private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
-		serializationConfig.setClassName(String.class.getCanonicalName());
-		serializationConfig.setMethodName("toString");
-		serializationConfig.setMethodArguments("");
-		serializationConfig.setStaticMethod(false);
+		serializationConfig.setClassName(JsonContainer.class.getCanonicalName());
+		serializationConfig.setMethodName("serialize");
+		serializationConfig.setMethodArguments("input");
+		serializationConfig.setStaticMethod(true);
 		return serializationConfig;
 	}
 	
 	private ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
-		serializationConfig.setClassName(String.class.getCanonicalName());
-		serializationConfig.setMethodName("toString");
-		serializationConfig.setMethodArguments("");
-		serializationConfig.setStaticMethod(false);
+		serializationConfig.setClassName(JsonContainer.class.getCanonicalName());
+		serializationConfig.setMethodName("deserialize");
+		serializationConfig.setMethodArguments("input");
+		serializationConfig.setStaticMethod(true);
 		return serializationConfig;
 	}
 }

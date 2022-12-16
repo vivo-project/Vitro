@@ -8,12 +8,12 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class StringParam extends Parameter {
+public class BooleanParam extends Parameter {
 
-	private static final String TYPE_NAME = "plain string";
-	private static final Log log = LogFactory.getLog(StringParam.class);
+	private static final String TYPE_NAME = "boolean";
+	private static final Log log = LogFactory.getLog(BooleanParam.class);
 
-	public StringParam(String var) {
+	public BooleanParam(String var) {
 		this.setName(var);
 		try {
 			ParameterType type = new ParameterType();
@@ -22,7 +22,7 @@ public class StringParam extends Parameter {
 			type.setImplementationType(implType);
 			implType.setSerializationConfig(getSerializationConfig());
 			implType.setDeserializationConfig(getDeserializationConfig());	
-			implType.setClassName(String.class.getCanonicalName());
+			implType.setClassName(Boolean.class.getCanonicalName());
 			this.setType(type);
 		} catch (Exception e) {
 			log.error(e, e);
@@ -32,7 +32,7 @@ public class StringParam extends Parameter {
 	
 	private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
-		serializationConfig.setClassName(String.class.getCanonicalName());
+		serializationConfig.setClassName(Boolean.class.getCanonicalName());
 		serializationConfig.setMethodName("toString");
 		serializationConfig.setMethodArguments("");
 		serializationConfig.setStaticMethod(false);
@@ -41,10 +41,11 @@ public class StringParam extends Parameter {
 	
 	private ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
-		serializationConfig.setClassName(String.class.getCanonicalName());
-		serializationConfig.setMethodName("toString");
-		serializationConfig.setMethodArguments("");
-		serializationConfig.setStaticMethod(false);
+		serializationConfig.setClassName(Boolean.class.getCanonicalName());
+		serializationConfig.setMethodName("parseBoolean");
+		serializationConfig.setMethodArguments("input");
+		serializationConfig.setStaticMethod(true);
 		return serializationConfig;
+		
 	}
 }
