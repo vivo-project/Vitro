@@ -67,7 +67,7 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 				if(isOnlineTranslationsEnabled()) {
 					return getOnlineTranslationsFormattedMessage(textString, unwrappedArgs);
 				} else {
-					return MessageFormat.format(textString, unwrappedArgs);	
+					return MessageFormat.format(textString.replaceAll("''", "'").replaceAll("'", "''"), unwrappedArgs);
 				}
 			} catch (Exception e) {
 				String message = "Can't format '" + key + "', wrong argument types: " + args
@@ -83,13 +83,13 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	 * and combines preProcessed string back to be used with online translations.
 	 * Substitutes arguments in message which is a part of preProcessed string  
 	 * @param preProcessed String "startSep + key + intSep + textString + intSep + message + endSep"
-	 * @param arguments that should be listed before message and substituted in the message itself 
+	 * @param args that should be listed before message and substituted in the message itself
 	 * @return
 	 */
 	private String getOnlineTranslationsFormattedMessage(String preProcessed, Object[] args) {
 		String[] parts = preProcessed.split(I18nBundle.INT_SEP);
 		final int messageIndex = parts.length -1;
-		String message = MessageFormat.format(parts[messageIndex], args);
+		String message = MessageFormat.format(parts[messageIndex].replaceAll("''", "'").replaceAll("'", "''"), args);
 		String[] arguments = convertToArrayOfStrings(args);
 		parts[messageIndex] = "";
 		String result = String.join(I18nBundle.INT_SEP, parts) + 

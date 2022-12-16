@@ -165,7 +165,7 @@ public class TranslationProvider {
 		if (parameters.length == 0) {
 			return textString;
 		} else {
-			return MessageFormat.format(textString, parameters);
+			return MessageFormat.format(textString.replaceAll("''", "'").replaceAll("'", "''"), parameters);
 		}
 	}
 
