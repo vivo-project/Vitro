@@ -26,8 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionExcepti
 public class JsonContainer {
 
 	public static final String PATH_ROOT = "$";
-	private static final String EMPTY_OBJECT = "{}";
-	private static final String EMPTY_ARRAY = "[]";
+	public static final String EMPTY_OBJECT = "{}";
+	public static final String EMPTY_ARRAY = "[]";
 	private static ObjectMapper mapper = new ObjectMapper();
 
 	public static enum Type {
@@ -64,7 +64,8 @@ public class JsonContainer {
 	}
 
 	public static String serialize(JsonContainer object) {
-		return object.jsonString();
+	    //TODO: Copy object and replace keys with values from data map
+	    return object.jsonString();
 	}
 
 	public JsonNode asJsonNode() {

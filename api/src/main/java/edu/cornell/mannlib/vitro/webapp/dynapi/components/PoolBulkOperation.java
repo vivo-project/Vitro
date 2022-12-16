@@ -5,7 +5,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.BooleanView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 
 public abstract class PoolBulkOperation extends PoolOperation {
 
@@ -13,6 +15,13 @@ public abstract class PoolBulkOperation extends PoolOperation {
 
 	protected OperationResult getComponentsStatus(DataStore dataStore) {
 	    List<String> uris = pool.getLoadedUris();
+	    List<JsonContainer> containers = getOutputJsonObjects(dataStore);
+	    for (String uri : uris) {
+            boolean loaded = pool.isInPool(uri);
+            for (JsonContainer container : containers) {
+                container.addKeyValue(uri, BooleanView.createData("status", loaded));
+            }
+        }
 		return OperationResult.internalServerError();
 	};
 
