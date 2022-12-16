@@ -6,10 +6,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.BooleanView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public abstract class PoolAtomicOperation extends PoolOperation {
@@ -23,12 +25,14 @@ public abstract class PoolAtomicOperation extends PoolOperation {
 	
 	protected OperationResult getComponentsStatus(DataStore dataStore) {
 	    List<String> uris = getComponentUris(dataStore);
-	    
+	    List<JsonContainer> containers = getOutputJsonObjects(dataStore);
 	    for (String uri : uris) {
 	        boolean loaded = pool.isInPool(uri);
+	        for (JsonContainer container : containers) {
+	            container.addKeyValue(uri, BooleanView.createData("status", loaded));
+	        }
 	    }
-	    
-		return OperationResult.internalServerError();
+		return OperationResult.ok();
 	};
 
     protected OperationResult loadComponents(DataStore dataStore) {
