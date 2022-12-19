@@ -106,15 +106,7 @@ public class JSONConverter {
 			final Parameter param = params.get(name);
 			String path = getOutputPathPrefix(param, action);
 			Data data = dataStore.getData(name);
-			//TODO: General schema for objects, arrays and simple values is to get 
-			//the serialised by RawData and the put to the context here. 
-			if (data.getParam().isJsonContainer()) {
-				ctx.put(path, name, JsonContainerView.asJsonNode(data));
-			} else if (JsonView.isJsonNode(data.getParam())) {
-				ctx.put(path, name, JsonView.getJsonNode(data));
-			} else {
-				ctx.put(path, name, convertDataValue(data));
-			}
+			ctx.put(path, name, convertDataValue(data));
 		}
 		return ctx.jsonString();
 	}
@@ -122,6 +114,12 @@ public class JSONConverter {
     public static JsonNode convertDataValue(Data data) {
         if (RdfView.isRdfNode(data)) {
             return RdfView.getAsJsonNode(data);
+        }
+        if (data.getParam().isJsonContainer()) {
+            return JsonContainerView.asJsonNode(data);
+        } 
+        if (JsonView.isJsonNode(data.getParam())) {
+            return JsonView.getJsonNode(data);
         }
         String serializedValue = data.getSerializedValue();
         if (BooleanView.isBoolean(data)) {

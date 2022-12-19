@@ -143,4 +143,14 @@ public class JsonContainer {
 		ctx.put(PATH_ROOT, var, id);
 		dataMap.put(id, data);
 	}
+	
+    public void addValue(Data data) {
+        String id = getRandomKey();
+        if (dataMap.containsKey(id)) {
+            // TODO:fix that
+            throw new RuntimeException();
+        }
+        ctx.add(PATH_ROOT, id);
+        dataMap.put(id, data);
+    }
 }
