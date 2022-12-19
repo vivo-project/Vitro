@@ -9,6 +9,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class BinaryView {
 
+    public static boolean isByteArray(Data data) {
+       return isByteArray(data.getParam());
+    }
+    
 	public static boolean isByteArray(Parameter param) {
 		ParameterType type = param.getType();
 		ImplementationType implType = type.getImplementationType();
