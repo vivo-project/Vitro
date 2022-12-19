@@ -6,6 +6,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +27,9 @@ public class StringPlainLiteralParam extends Parameter {
 			implType.setSerializationConfig(getSerializationConfig());
 			implType.setDeserializationConfig(getDeserializationConfig());	
 			implType.setClassName(Literal.class.getCanonicalName());
+	        RDFType rdfType = new RDFType();
+	        rdfType.setName("string");
+	        type.setRdfType(rdfType);
 			this.setType(type);
 		} catch (Exception e) {
 			log.error(e, e);

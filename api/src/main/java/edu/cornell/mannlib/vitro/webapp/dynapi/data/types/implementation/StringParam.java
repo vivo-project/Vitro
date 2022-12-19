@@ -47,4 +47,5 @@ public class StringParam extends Parameter {
 		serializationConfig.setStaticMethod(false);
 		return serializationConfig;
 	}
+	
 }
