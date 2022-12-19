@@ -72,6 +72,9 @@ public class ConversionMethod {
 		Object instance = null;
 		if (!isStatic) {
 			instance = input;
+			 if (instance == null ) {
+                 throw new ConversionException("input instance is null");
+             }
 		}
 		Object[] invokeArgs = prepareInvokeArgs(type, input);
 		try {

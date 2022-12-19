@@ -16,12 +16,12 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonObjectParam;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 
 public class ActionPoolAtomicOperationTest extends ServletContextTest{
 
-    private static final String JSON_ARRAY_PARAM = "jsonArrayParam";
+    private static final String JSON_OBJECT_PARAM = "jsonContainerParam";
     private static final String STRING_PARAM_NAME = "stringParam";
     private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1";
     private ActionPool actionPool;
@@ -77,8 +77,10 @@ public class ActionPoolAtomicOperationTest extends ServletContextTest{
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
-        Data data = dataStore.getData(JSON_ARRAY_PARAM);
+        Data data = dataStore.getData(JSON_OBJECT_PARAM);
         assertNotNull(data);
+        String expectedValue = "{\"" + TEST_ACTION_URI + "\":true}";
+        assertEquals(expectedValue, data.getSerializedValue());
     }
 
     private void addStringParam(DataStore dataStore, ActionPoolAtomicOperation apao) {
@@ -90,7 +92,7 @@ public class ActionPoolAtomicOperationTest extends ServletContextTest{
     }
     
     private void addJsonArrayParam(DataStore dataStore, ActionPoolAtomicOperation apao) {
-        Parameter jsonObjectParam = new JsonObjectParam(JSON_ARRAY_PARAM);
+        Parameter jsonObjectParam = new JsonContainerObjectParam(JSON_OBJECT_PARAM);
         apao.addOutputParameter(jsonObjectParam);
     }
     
