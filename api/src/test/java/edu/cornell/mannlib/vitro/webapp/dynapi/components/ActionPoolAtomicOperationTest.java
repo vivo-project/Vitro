@@ -79,8 +79,6 @@ public class ActionPoolAtomicOperationTest extends ServletContextTest{
         assertEquals(OperationResult.ok().toString(),result.toString());
         Data data = dataStore.getData(JSON_ARRAY_PARAM);
         assertNotNull(data);
-        System.out.println(data.getSerializedValue());
-              
     }
 
     private void addStringParam(DataStore dataStore, ActionPoolAtomicOperation apao) {
