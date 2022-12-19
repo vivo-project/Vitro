@@ -17,7 +17,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BinaryNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -37,6 +40,9 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.BinaryView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.BooleanView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class JSONConverter {
@@ -71,7 +77,6 @@ public class JSONConverter {
 		response.setContentType(dataStore.getResponseType().toString());
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		Parameters params = action.getOutputParams();
 		// TODO: Validate output
 		// JsonSchema schema = getOutputSchema(action);
 		// Set<ValidationMessage> result = schema.validate(jsonResponse);
@@ -108,11 +113,27 @@ public class JSONConverter {
 			} else if (JsonView.isJsonNode(data.getParam())) {
 				ctx.put(path, name, JsonView.getJsonNode(data));
 			} else {
-				ctx.put(path, name, data.getSerializedValue());
+				ctx.put(path, name, convertDataValue(data));
 			}
 		}
 		return ctx.jsonString();
 	}
+	
+    public static JsonNode convertDataValue(Data data) {
+        if (RdfView.isRdfNode(data)) {
+            return RdfView.getAsJsonNode(data);
+        }
+        String serializedValue = data.getSerializedValue();
+        if (BooleanView.isBoolean(data)) {
+            return mapper.convertValue(Boolean.parseBoolean(serializedValue), BooleanNode.class);
+        }
+        if (BinaryView.isByteArray(data)) {
+            return mapper.convertValue(Boolean.parseBoolean(serializedValue), BinaryNode.class);
+        }
+        // TODO: implement other types: BigIntegerNode, DecimalNode, DoubleNode,
+        // FloatNode, IntNode, LongNode, ShortNode
+        return mapper.convertValue(serializedValue, TextNode.class);
+    }
 
 	private static DocumentContext getOutputTemplate(Action action) {
 		String template = action.getOutputTemplate();
