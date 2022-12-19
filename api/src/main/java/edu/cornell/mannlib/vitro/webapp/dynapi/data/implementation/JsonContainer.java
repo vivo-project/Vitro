@@ -20,8 +20,8 @@ import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
 
 public class JsonContainer {
 
@@ -65,7 +65,7 @@ public class JsonContainer {
 
 	public static String serialize(JsonContainer object) {
 	    //TODO: Copy object and replace keys with values from data map
-	    return object.jsonString();
+	    return object.asJsonNode().toString();
 	}
 
 	public JsonNode asJsonNode() {
@@ -100,7 +100,8 @@ public class JsonContainer {
 			replaceKeys(node);
 		} else if (node.isValueNode() && dataMap.containsKey(node.asText())) {
 			Data data = dataMap.get(node.asText());
-			parent.set(key, getDataValue(data));
+			JsonNode dataValue = JSONConverter.convertDataValue(data);
+            parent.set(key, dataValue);
 		}
 	}
 
@@ -109,15 +110,8 @@ public class JsonContainer {
 			replaceKeys(node);
 		} else if (node.isValueNode() && dataMap.containsKey(node.asText())) {
 			Data data = dataMap.get(node.asText());
-			parent.set(i, getDataValue(data));
+			parent.set(i, JSONConverter.convertDataValue(data));
 		}
-	}
-
-	private JsonNode getDataValue(Data data) {
-		if (RdfView.isRdfNode(data)) {
-			return RdfView.getAsJsonNode(data);
-		}
-		return mapper.convertValue(data.getSerializedValue(), JsonNode.class);
 	}
 
 	private String jsonString() {

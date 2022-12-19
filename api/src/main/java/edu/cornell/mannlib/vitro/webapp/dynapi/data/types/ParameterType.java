@@ -94,6 +94,10 @@ public class ParameterType implements Removable {
         return getImplementationType().getClassName().getCanonicalName().equals(String.class.getCanonicalName());
     }
     
+    public boolean isBoolean() {
+        return getImplementationType().getClassName().getCanonicalName().equals(Boolean.class.getCanonicalName());
+    }
+    
     public boolean isPlainString() {
         return isString() && !isRdfType();
     }
