@@ -258,10 +258,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     if (possibleOP == null) {
                         continue;
                     }
-                    for(ObjectProperty populatedOP : populatedOPs) {
-                    	if (redundant(populatedOP, possibleOP)) {
-                    		continue;
-                    	}
+                    if (isInPopulatedOPs(populatedOPs, possibleOP)) {
+                    	continue;
                     }
                     if (!vClassUris.contains(possibleOP.getDomainVClassURI())) {
                     	continue;
@@ -287,6 +285,15 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
 		return possibleProperties;
     }
+
+	private boolean isInPopulatedOPs(List<ObjectProperty> populatedOPs, ObjectProperty possibleOP) {
+		for(ObjectProperty populatedOP : populatedOPs) {
+			if (redundant(populatedOP, possibleOP)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	* Don't know what the real problem is with VIVO-976, but somehow we have the same property
