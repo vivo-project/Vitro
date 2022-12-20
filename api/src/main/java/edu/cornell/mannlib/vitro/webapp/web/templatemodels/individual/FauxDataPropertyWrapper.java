@@ -162,7 +162,10 @@ public class FauxDataPropertyWrapper extends DataProperty implements FauxPropert
 		innerDP.setExample(example);
 	}
 
-	
+	@Override
+	public int getDisplayTier() {
+		return faux.getDisplayTier();
+	}
 
 	@Override
 	public boolean getFunctional() {
