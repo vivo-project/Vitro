@@ -603,6 +603,12 @@
          rdfs:range xsd:string ;
          rdfs:label "version"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#poolOperationType
+:poolOperationType rdf:type owl:DatatypeProperty ,
+                owl:FunctionalProperty ;
+       rdfs:domain :PoolOperation ;
+       rdfs:range xsd:string ;
+       rdfs:label "Pool operation type"@en-US .
 
 #################################################################
 #    Classes
@@ -836,4 +842,42 @@
 :GroupAccessWhitelist rdf:type owl:Class ;
            rdfs:subClassOf :AccessWhitelist ;
            rdfs:label "Group access white list"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#PoolOperation
+:PoolOperation rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ,
+                             :ParameterProvider ;
+            rdfs:label "Pool operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#PoolAtomicOperation
+:PoolAtomicOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolOperation,
+                            :ParameterReceiver  ; 
+            rdfs:label "Pool atomic operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#PoolBulkOperation
+:PoolBulkOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolOperation,
+                            :ParameterReceiver  ; 
+            rdfs:label "Pool bulk operation"@en-US .
+
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ActionPoolAtomicOperation
+:ActionPoolAtomicOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolAtomicOperation ; 
+            rdfs:label "Action pool atomic operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ResourceAPIPoolAtomicOperation
+:ResourceAPIPoolAtomicOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolAtomicOperation ; 
+            rdfs:label "Resource API pool atomic operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ActionPoolBulkOperation
+:ActionPoolBulkOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolBulkOperation ; 
+            rdfs:label "Action pool bulk operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ResourceAPIPoolBulkOperation
+:ResourceAPIPoolBulkOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolBulkOperation ; 
+            rdfs:label "Resource API pool bulk operation"@en-US .
 
