@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -22,11 +24,11 @@ import stubs.javax.servlet.ServletContextStub;
 
 public abstract class ServletContextTest {
 
-    public static final String ABOX_PREFIX = "../home/src/main/resources/rdf/dynapiAbox/firsttime/";
+    public static final String ABOX_PREFIX = "../home/src/main/resources/rdf/dynapiAbox/everytime/";
     public static final String TBOX_PREFIX = "../home/src/main/resources/rdf/dynapiTbox/everytime/";
     public static final String TEST_PREFIX = "src/test/resources/rdf/abox/filegraph/";
 
-    public static final String INDIVIDUALS_FILE_PATH = ABOX_PREFIX + "dynamic-api-individuals.n3";
+    //public static final String INDIVIDUALS_FILE_PATH = ABOX_PREFIX + "dynamic-api-individuals.n3";
     public static final String IMPLEMENTATION_FILE_PATH = TBOX_PREFIX + "dynamic-api-implementation.n3";
 	protected final static String TEST_ACTION_NAME = "test_action";
     protected final static ResourceAPIKey TEST_RESOURCE_KEY = ResourceAPIKey.of("test_resource", "0.1.0");
@@ -71,9 +73,34 @@ public abstract class ServletContextTest {
     protected void loadDefaultModel() throws IOException {
         loadModel(
             new RDFFile("N3", IMPLEMENTATION_FILE_PATH),
-            new RDFFile("N3", INDIVIDUALS_FILE_PATH),
             new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-testing.n3")
         );
+        loadModels("N3", getBaseIndividuals());
+    }
+    
+
+    private String[] getBaseIndividuals() {
+        return new String[]{
+                ABOX_PREFIX + "http_methods.n3", 
+                ABOX_PREFIX + "paramerter_types.n3", 
+                ABOX_PREFIX + "validators.n3",
+                ABOX_PREFIX + "user_groups.n3",
+                ABOX_PREFIX + "implementation_types.n3",
+                ABOX_PREFIX + "rdf_types.n3",
+                ABOX_PREFIX + "validators.n3",
+                ABOX_PREFIX + "model_parameters.n3",
+                ABOX_PREFIX + "serialization_types.n3"
+        };
+    }
+
+    protected String[] getFileList(String path) {
+        File dir = new File(path);
+        File[] files = dir.listFiles();
+        List<String> paths = new LinkedList<String>();
+        for (File file : files) {
+            paths.add(file.getAbsolutePath());
+        }
+        return paths.toArray(new String[0]);
     }
 
     protected void loadModel(RDFFile... rdfFiles) throws IOException {
