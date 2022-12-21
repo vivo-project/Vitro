@@ -67,3 +67,17 @@ dynapi:UserGroup rdfs:subClassOf dynapi_access:UserGroup .
 dynapi:AccessWhitelist rdfs:subClassOf dynapi_access:AccessWhitelist .
 
 dynapi:GroupAccessWhitelist rdfs:subClassOf dynapi_access:GroupAccessWhitelist .
+
+dynapi:PoolOperation rdfs:subClassOf dynapi_java:PoolOperation .
+
+dynapi:PoolAtomicOperation rdfs:subClassOf dynapi_java:PoolAtomicOperation .
+
+dynapi:PoolBulkOperation rdfs:subClassOf dynapi_java:PoolBulkOperation .
+
+dynapi:ActionPoolBulkOperation rdfs:subClassOf dynapi_java:ActionPoolBulkOperation .
+
+dynapi:ResourceAPIPoolBulkOperation rdfs:subClassOf dynapi_java:ResourceAPIPoolBulkOperation .
+
+dynapi:ActionPoolAtomicOperation rdfs:subClassOf dynapi_java:ActionPoolAtomicOperation .
+
+dynapi:ResourceAPIPoolAtomicOperation rdfs:subClassOf dynapi_java:ResourceAPIPoolAtomicOperation .
