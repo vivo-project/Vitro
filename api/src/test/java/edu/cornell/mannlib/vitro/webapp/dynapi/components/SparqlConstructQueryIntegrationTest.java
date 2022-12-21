@@ -107,6 +107,6 @@ public class SparqlConstructQueryIntegrationTest extends ServletContextTest {
     
     public void loadOntology(OntModel ontModel) throws IOException {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
-        loadModel(ontModel, INDIVIDUALS_FILE_PATH);
+        loadModel(ontModel, getFileList(ABOX_PREFIX));
     }
 }
