@@ -1,0 +1,33 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/user-group/editor>
+        a                       dynapi:UserGroup ;
+        rdfs:label              "Editor user group"@en-US ;
+		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR" ;
+        vitro:mostSpecificType  dynapi:UserGroup .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/user-group/self-editor>
+        a                       dynapi:UserGroup ;
+        rdfs:label              "Self editor user group"@en-US ;
+		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR" ;
+        vitro:mostSpecificType  dynapi:UserGroup .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/user-group/admin>
+        a                       dynapi:UserGroup ;
+        rdfs:label              "Admin user group"@en-US ;
+		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN" ;
+        vitro:mostSpecificType  dynapi:UserGroup .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/user-group/curator>
+        a                       dynapi:UserGroup ;
+        rdfs:label              "Curator user group"@en-US ;
+		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR" ;
+        vitro:mostSpecificType  dynapi:UserGroup .
+        

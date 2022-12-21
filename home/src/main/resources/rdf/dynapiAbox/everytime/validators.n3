@@ -1,0 +1,30 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/isNotBlank>
+        a                       dynapi:Validator ,
+                                dynapi_java:validators.Validator ,
+                                dynapi_java:validators.IsNotBlank ;
+        rdfs:label              "Is not blank"@en-US ;
+        vitro:mostSpecificType  dynapi:Validator .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger>
+        a                       dynapi:Validator ,
+                                dynapi_java:validators.Validator ,
+                                dynapi_java:validators.IsInteger ;
+        rdfs:label              "Is integer"@en-US ;
+        vitro:mostSpecificType  dynapi:Validator .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>
+        a                                   dynapi:Validator ,
+                                            dynapi_java:validators.Validator ,
+                                            dynapi_java:validators.RegularExpressionValidator ;
+        dynapi:regularExpression            "^(.+)@(\\S+)$" ;
+        rdfs:label                          "Is email"@en-US ;
+        vitro:mostSpecificType              dynapi:Validator .

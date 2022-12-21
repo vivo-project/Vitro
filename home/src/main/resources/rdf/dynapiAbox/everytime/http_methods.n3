@@ -1,0 +1,44 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get>
+        a                       dynapi:HttpMethod ;
+        dynapi:name             "GET" ;
+        rdfs:label              "HTTP GET method"@en-US ;
+        vitro:mostSpecificType  dynapi:HttpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post>
+        a                       dynapi:HttpMethod ;
+        dynapi:name             "POST" ;
+        rdfs:label              "HTTP POST method"@en-US ;
+        vitro:mostSpecificType  dynapi:HttpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put>
+        a                       dynapi:HttpMethod ;
+        dynapi:name             "PUT" ;
+        rdfs:label              "HTTP PUT method"@en-US ;
+        vitro:mostSpecificType  dynapi:HttpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch>
+        a                       dynapi:HttpMethod ;
+        dynapi:name             "PATCH" ;
+        rdfs:label              "HTTP PATCH method"@en-US ;
+        vitro:mostSpecificType  dynapi:HttpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete>
+        a                       dynapi:HttpMethod ;
+        dynapi:name             "DELETE" ;
+        rdfs:label              "HTTP DELETE method"@en-US ;
+        vitro:mostSpecificType  dynapi:HttpMethod .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/options>
+        a                       dynapi:HttpMethod ;
+        dynapi:name             "OPTIONS" ;
+        rdfs:label              "HTTP OPTIONS method"@en-US ;
+        vitro:mostSpecificType  dynapi:HttpMethod .
