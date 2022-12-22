@@ -1,0 +1,35 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action>
+        a                                   dynapi:Action ;
+        rdfs:label                          "Load action"@en-US ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/step1> ;
+        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/rpc1> .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/rpc1>
+	a                                   dynapi:Rpc ;
+	rdfs:label                          "Load action rpc endpoing"@en-US ;
+	dynapi:name                         "load_action" .
+	
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/step1>
+        a                                   dynapi:OperationalStep ;
+        rdfs:label                          "Step 1"@en-US ;
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/operation/load_action> .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/operation/load_action> 
+        a                                   dynapi:ActionPoolAtomicOperation ;
+        rdfs:label                          "Load action operation"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/operation/load_action/parameter/uri> ;
+        dynapi:poolOperationType            "load" .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/operation/load_action/parameter/uri>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "Action uri parameter"@en-US ;
+        dynapi:name                         "uri" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
