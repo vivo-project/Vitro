@@ -82,7 +82,7 @@ public class Converter {
 			try {
 				contentType = getKnownContentType(typeName);
 			} catch (Exception e) {
-				log.error(e, e);
+				log.debug(e, e);
 			}
 			if (contentType == null) {
 				continue;
