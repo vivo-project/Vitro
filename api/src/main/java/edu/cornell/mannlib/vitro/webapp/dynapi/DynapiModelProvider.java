@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -56,6 +57,10 @@ public class DynapiModelProvider {
 			log.debug("Union size " + union.size());
 			log.debug("memModel size " + memModel.size());
 			log.debug("unionWithInferencing size " + unionWithInferencing.size());
+			Model inf = unionWithInferencing.difference(memModel);
+			StringWriter writer = new StringWriter();
+			inf.write(writer, "N3");
+			log.debug(writer.toString());
 		}
 		return unionWithInferencing;
 	}
