@@ -165,7 +165,21 @@ public class TranslationProvider {
 		if (parameters.length == 0) {
 			return textString;
 		} else {
-			return MessageFormat.format(textString, parameters);
+			return MessageFormat.format(TranslationProvider.preprocessForFormating(textString), parameters);
+		}
+	}
+
+	/**
+	 * This method should prepare the inputText for MessageFormat.format method. At the moment it is replacing single
+	 * apostrophe with double, it might be extented in the future with some additional preprocessing.
+	 * @param inputText - string which should be preprocessed
+	 * @return preprocessed input string, i.e. string with replaced single apostrophe with double
+	 */
+	public static String preprocessForFormating(String inputText){
+		if (inputText != null) {
+			return inputText.replace("''", "'").replace("'", "''");
+		} else {
+			return "";
 		}
 	}
 
