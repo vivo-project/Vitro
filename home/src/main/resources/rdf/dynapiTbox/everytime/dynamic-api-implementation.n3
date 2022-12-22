@@ -14,19 +14,21 @@ dynapi:ConditionalStep rdfs:subClassOf dynapi_java:conditions.ConditionalStep .
 
 dynapi:Step rdfs:subClassOf dynapi_java:Step .
 
-dynapi:N3Template rdfs:subClassOf dynapi_java:N3Template, dynapi_java:Operation .
+dynapi:Operation rdfs:subClassOf dynapi_java:Operation .
 
-dynapi:SparqlSelectQuery rdfs:subClassOf dynapi_java:SparqlSelectQuery, dynapi_java:Operation .
+dynapi:N3Template rdfs:subClassOf dynapi_java:N3Template .
 
-dynapi:SparqlConstructQuery rdfs:subClassOf dynapi_java:SparqlConstructQuery, dynapi_java:Operation .
+dynapi:SparqlSelectQuery rdfs:subClassOf dynapi_java:SparqlSelectQuery .
 
-dynapi:SolrQuery rdfs:subClassOf dynapi_java:SolrQuery, dynapi_java:Operation .
+dynapi:SparqlConstructQuery rdfs:subClassOf dynapi_java:SparqlConstructQuery .
 
-dynapi:ReportGenerator rdfs:subClassOf dynapi_java:ReportGenerator, dynapi_java:Operation .
+dynapi:SolrQuery rdfs:subClassOf dynapi_java:SolrQuery .
+
+dynapi:ReportGenerator rdfs:subClassOf dynapi_java:ReportGenerator .
 
 dynapi:Model rdfs:subClassOf dynapi_java:Parameter .
 
-dynapi:ModelWriter rdfs:subClassOf dynapi_java:ModelWriter , dynapi_java:Operation .
+dynapi:ModelWriter rdfs:subClassOf dynapi_java:ModelWriter .
 
 dynapi:Parameter rdfs:subClassOf dynapi_java:Parameter .
 
