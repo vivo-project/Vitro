@@ -37,12 +37,12 @@ public class ResourceAPIPoolBulkOperationTest extends ServletContextTest{
         ResourceAPIPoolBulkOperation apao = new ResourceAPIPoolBulkOperation();
         DataStore dataStore = new DataStore();
 
-        apao.setOperationType(PoolOperation.Types.UNLOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.UNLOAD.toString());
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
         assertEquals(0, resourcePool.count());
         
-        apao.setOperationType(PoolOperation.Types.LOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.LOAD.toString());
          result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
         assertEquals(1, resourcePool.count());
@@ -53,7 +53,7 @@ public class ResourceAPIPoolBulkOperationTest extends ServletContextTest{
         assertEquals(1, resourcePool.count());
         ResourceAPI resource1 = resourcePool.getByUri(TEST_RESOURCE_URI);
         ResourceAPIPoolBulkOperation apao = new ResourceAPIPoolBulkOperation();
-        apao.setOperationType(PoolOperation.Types.RELOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
         DataStore dataStore = new DataStore();
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
