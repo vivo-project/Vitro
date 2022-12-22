@@ -1,0 +1,36 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions>
+        a                                   dynapi:Action ;
+        rdfs:label                          "list actions"@en-US ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/step1> ;
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions/parameter/actions> ;
+        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/rpc1> .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/rpc1>
+	a                                   dynapi:Rpc ;
+	rdfs:label                          "list action rpc endpoint"@en-US ;
+	dynapi:name                         "list_actions" .
+	
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/step1>
+        a                                   dynapi:OperationalStep ;
+        rdfs:label                          "Step 1"@en-US ;
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions> .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions> 
+        a                                   dynapi:ActionPoolBulkOperation ;
+        rdfs:label                          "list actions operation"@en-US ;
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions/parameter/actions> ;
+        dynapi:poolOperationType            "status" .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions/parameter/actions>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "Actions list"@en-US ;
+        dynapi:name                         "actions" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
+
