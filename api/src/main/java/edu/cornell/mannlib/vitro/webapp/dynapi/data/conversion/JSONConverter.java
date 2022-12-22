@@ -53,7 +53,8 @@ public class JSONConverter {
 	private static JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V6);
 	private static ObjectMapper mapper = new ObjectMapper();
 	private static final Configuration jsonPathConfig = prepareJsonPathConfig();
-	private static final String DEFAULT_OUTPUT_JSON = "{ \"result\" : [ {} ] }";
+	//private static final String DEFAULT_OUTPUT_JSON = "{ \"result\" : [ {} ] }";
+	private static final String DEFAULT_OUTPUT_JSON = "{}";
 
 	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
 			throws ConversionException {
