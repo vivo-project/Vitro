@@ -12,6 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,6 +24,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.apache.http.entity.ContentType;
+import org.apache.http.HttpHeaders;
 
 import org.junit.After;
 import org.junit.Before;
@@ -53,6 +58,8 @@ public class RESTEndpointTest {
     private MockedStatic<ResourceAPIPool> resourceAPIPoolStatic;
 
     private MockedStatic<ActionPool> actionPoolStatic;
+
+    private ByteArrayOutputStream baos;
 
     @Mock
     private ServletContext context;
@@ -109,6 +116,7 @@ public class RESTEndpointTest {
 
     @Before
     public void beforeEach() throws Exception{
+        baos = new ByteArrayOutputStream();
         MockitoAnnotations.openMocks(this);
         resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
         actionPoolStatic = mockStatic(ActionPool.class);
@@ -133,14 +141,22 @@ public class RESTEndpointTest {
     public void afterEach() {
         resourceAPIPoolStatic.close();
         actionPoolStatic.close();
+        try {
+            baos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
-    public void doTest() {
+    public void doTest() throws IOException {
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getMethod()).thenReturn(testMethod);
         when(request.getPathInfo()).thenReturn(testPathInfo);
+        when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
 
+        PrintWriter writer = new PrintWriter(baos, true);
+        when(response.getWriter()).thenReturn(writer);
         when(action.run(any(DataStore.class)))
             .thenReturn(new OperationResult(testExpectedStatus));
 
