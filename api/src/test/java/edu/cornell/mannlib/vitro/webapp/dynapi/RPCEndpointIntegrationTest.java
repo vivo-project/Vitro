@@ -11,6 +11,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -45,6 +47,8 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
+    private ByteArrayOutputStream baos;
+    
     private RPCEndpoint rpcEndpoint;
 
     private ActionPool actionPool;
@@ -104,6 +108,11 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         actionPool.reload();
 
         MockitoAnnotations.openMocks(this);
+        
+        baos = new ByteArrayOutputStream();
+        when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
+        PrintWriter writer = new PrintWriter(baos, true);
+        when(response.getWriter()).thenReturn(writer);
 
         when(request.getServletContext()).thenReturn(servletContext);
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
@@ -130,6 +139,11 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
     @After
     public void afterEach() throws Exception {
         runCallback(testAfter);
+        try {
+            baos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
