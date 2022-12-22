@@ -31,9 +31,13 @@ public class DynapiModelProvider {
 	public void init(OntModel abox, OntModel tbox) {
 		this.abox = abox;
 		this.tbox = tbox;
-		rules = Rule.parseRules("[rdfs9:  (?x rdfs:subClassOf ?y), (?a rdf:type ?x) -> (?a rdf:type ?y)]");
-		reasoner = new GenericRuleReasoner(rules);
+		initReasoner();
 	}
+
+    private void initReasoner() {
+        rules = Rule.parseRules("[rdfs9:  (?x rdfs:subClassOf ?y), (?a rdf:type ?x) -> (?a rdf:type ?y)]");
+		reasoner = new GenericRuleReasoner(rules);
+    }
 
 	public void setModel(OntModel model) {
 		this.permanentModel = model;
@@ -41,7 +45,11 @@ public class DynapiModelProvider {
 
 	public Model getModel() {
 		if (permanentModel != null) {
-			return permanentModel;
+		    if (reasoner == null) {
+		        initReasoner();
+		    }
+		    InfModel inferencingModel = ModelFactory.createInfModel(reasoner, permanentModel);
+			return inferencingModel;
 		}
 		return constructModel();
 	}
