@@ -17,22 +17,23 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public abstract class PoolOperation extends Operation {
 
     private static final Log log = LogFactory.getLog(PoolOperation.class);
-	public static enum Types {
+	public static enum OperationType {
 		LOAD, UNLOAD, RELOAD, STATUS
 	};
 
 	protected Parameters inputParams = new Parameters();
 	protected Parameters outputParams = new Parameters();
 	protected AbstractPool pool;
-	protected Types operationType;
+	protected OperationType operationType;
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#poolOperationType", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#poolOperationType", minOccurs = 1, maxOccurs = 1)
 	public void setOperationType(String type) throws InitializationException {
-		if (EnumUtils.isValidEnum(Types.class, type.toUpperCase())) {
-			operationType = EnumUtils.getEnum(Types.class, type);
+		String upperCaseType = type.toUpperCase();
+        if (EnumUtils.isValidEnum(OperationType.class, upperCaseType)) {
+			operationType = EnumUtils.getEnum(OperationType.class, upperCaseType);
 		} else {
 			String message = "Provided operation type '" + type + "' is not supported. Supported operations: "
-					+ Arrays.asList(Types.values());
+					+ Arrays.asList(OperationType.values());
 			throw new InitializationException(message);
 		}
 	}
@@ -47,13 +48,13 @@ public abstract class PoolOperation extends Operation {
 		if (!isValid(dataStore)) {
 			return OperationResult.internalServerError();
 		}
-		if (Types.LOAD.equals(operationType)) {
+		if (OperationType.LOAD.equals(operationType)) {
 			return loadComponents(dataStore);
-		} else if (Types.RELOAD.equals(operationType)) {
+		} else if (OperationType.RELOAD.equals(operationType)) {
 			return reloadComponents(dataStore);
-		} else if (Types.UNLOAD.equals(operationType)) {
+		} else if (OperationType.UNLOAD.equals(operationType)) {
 			return unloadComponents(dataStore);
-		} else if (Types.STATUS.equals(operationType)) {
+		} else if (OperationType.STATUS.equals(operationType)) {
 			return getComponentsStatus(dataStore);
 		} 
 		//Not implemented operation?

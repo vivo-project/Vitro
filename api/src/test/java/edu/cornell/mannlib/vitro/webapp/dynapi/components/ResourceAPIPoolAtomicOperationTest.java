@@ -37,14 +37,14 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
     @Test
     public void componentLoadUnloadTest() throws InitializationException {
         ResourceAPIPoolAtomicOperation apao = new ResourceAPIPoolAtomicOperation();
-        apao.setOperationType(PoolOperation.Types.LOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.LOAD.toString());
         DataStore dataStore = new DataStore();
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
         assertEquals(1, resourcePool.count());
         
-        apao.setOperationType(PoolOperation.Types.UNLOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.UNLOAD.toString());
         result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
         assertEquals(0, resourcePool.count());
@@ -54,7 +54,7 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
     public void componentReloadTest() throws InitializationException {
         assertEquals(0, resourcePool.count());
         ResourceAPIPoolAtomicOperation apao = new ResourceAPIPoolAtomicOperation();
-        apao.setOperationType(PoolOperation.Types.RELOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
         DataStore dataStore = new DataStore();
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);

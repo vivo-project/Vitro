@@ -42,13 +42,13 @@ public class ActionPoolAtomicOperationTest extends ServletContextTest{
         ActionPoolAtomicOperation apao = new ActionPoolAtomicOperation();
         DataStore dataStore = new DataStore();
         long counter = actionPool.count();
-        apao.setOperationType(PoolOperation.Types.UNLOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.UNLOAD.toString());
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
         assertEquals(counter - 1, actionPool.count());
         
-        apao.setOperationType(PoolOperation.Types.LOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.LOAD.toString());
         addStringParam(dataStore, apao);
         result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
@@ -60,7 +60,7 @@ public class ActionPoolAtomicOperationTest extends ServletContextTest{
         ActionPoolAtomicOperation apao = new ActionPoolAtomicOperation();
         DataStore dataStore = new DataStore();
         Action action1 = actionPool.getByUri(TEST_ACTION_URI);
-        apao.setOperationType(PoolOperation.Types.RELOAD.toString());
+        apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
@@ -73,7 +73,7 @@ public class ActionPoolAtomicOperationTest extends ServletContextTest{
         ActionPoolAtomicOperation apao = new ActionPoolAtomicOperation();
         DataStore dataStore = new DataStore();
         addJsonArrayParam(dataStore, apao);
-        apao.setOperationType(PoolOperation.Types.STATUS.toString());
+        apao.setOperationType(PoolOperation.OperationType.STATUS.toString());
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
