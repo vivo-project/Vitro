@@ -8,13 +8,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +39,8 @@ public class RPCEndpointTest {
     private final static String PATH_INFO = "/test";
 
     private Map<String, String[]> params;
+    
+    private ByteArrayOutputStream baos;
 
     private MockedStatic<ActionPool> actionPoolStatic;
 
@@ -60,6 +66,7 @@ public class RPCEndpointTest {
 
     @Before
     public void beforeEach() {
+        baos = new ByteArrayOutputStream();
         actionPoolStatic = mockStatic(ActionPool.class);
         when(ActionPool.getInstance()).thenReturn(actionPool);
         when(actionPool.get(any(String.class))).thenReturn(action);
@@ -70,11 +77,17 @@ public class RPCEndpointTest {
         when(user.isRootUser()).thenReturn(true);
 
         rpcEndpoint = new RPCEndpoint();
+        
     }
 
     @After
     public void afterEach() {
         actionPoolStatic.close();
+        try {
+            baos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -90,6 +103,9 @@ public class RPCEndpointTest {
 
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(PATH_INFO);
+        when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
+        PrintWriter writer = new PrintWriter(baos, true);
+        when(response.getWriter()).thenReturn(writer);
         when(action.run(any(DataStore.class))).thenReturn(result);
         rpcEndpoint.doPost(request, response);
         verify(action, times(1)).run(any());
