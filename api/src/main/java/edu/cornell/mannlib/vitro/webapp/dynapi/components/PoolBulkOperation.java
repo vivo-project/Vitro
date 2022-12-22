@@ -22,7 +22,7 @@ public abstract class PoolBulkOperation extends PoolOperation {
                 container.addKeyValue(uri, BooleanView.createData("status", loaded));
             }
         }
-		return OperationResult.internalServerError();
+		return OperationResult.ok();
 	};
 
 	protected OperationResult unloadComponents(DataStore dataStore) {
