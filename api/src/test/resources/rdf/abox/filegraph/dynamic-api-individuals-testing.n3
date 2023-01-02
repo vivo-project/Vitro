@@ -26,7 +26,7 @@
         dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam2> ;
         dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
-        dynapi:sparqlQueryText              "SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#Action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nLIMIT ?limit" .
+        dynapi:sparqlQueryText              "SELECT ?action ?label\nWHERE\n{\n      ?action <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://vivoweb.org/ontology/vitro-dynamic-api#Action>\n       OPTIONAL { ?action <http://www.w3.org/2000/01/rdf-schema#label> ?label } \n}\nORDER BY DESC(?action) LIMIT ?limit " .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>
         a                                   dynapi:Parameter ;
