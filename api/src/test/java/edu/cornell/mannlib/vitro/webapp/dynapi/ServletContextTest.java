@@ -30,6 +30,7 @@ public abstract class ServletContextTest {
 
     //public static final String INDIVIDUALS_FILE_PATH = ABOX_PREFIX + "dynamic-api-individuals.n3";
     public static final String IMPLEMENTATION_FILE_PATH = TBOX_PREFIX + "dynamic-api-implementation.n3";
+    public static final String ONTOLOGY_FILE_PATH = TBOX_PREFIX + "vitro-dynamic-api.n3";
 	protected final static String TEST_ACTION_NAME = "test_action";
     protected final static ResourceAPIKey TEST_RESOURCE_KEY = ResourceAPIKey.of("test_resource", "0.1.0");
 
@@ -73,6 +74,7 @@ public abstract class ServletContextTest {
     protected void loadDefaultModel() throws IOException {
         loadModel(
             new RDFFile("N3", IMPLEMENTATION_FILE_PATH),
+            new RDFFile("N3", ONTOLOGY_FILE_PATH),
             new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-testing.n3")
         );
         loadModels("N3", getBaseIndividuals());
