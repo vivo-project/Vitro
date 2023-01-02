@@ -683,6 +683,14 @@
             rdfs:subClassOf :Operation ; 
             rdfs:label "Model writer"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#LoopOperation
+:LoopOperation rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ; 
+            rdfs:label "Loop operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#FunctionDescriptor
+:FunctionDescriptor rdf:type owl:Class ;
+            rdfs:label "Function description"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#NumericRangeValidator
 :NumericRangeValidator rdf:type owl:Class ;
