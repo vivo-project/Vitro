@@ -199,11 +199,12 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 			if (component.isValid()) {
                 components.put(key, component);
                 components.putUriMapping(uri, key);
+                log.info(format("Loaded %s component, uri:'%s', key:'%s'.", getType().getSimpleName(), uri , key));
             } else {
-                log.error(format("Component uri '%s', name %s with rpcName %s is invalid.", uri, getType().getName(), key));
+                log.error(format("%s component, uri: '%s',  key:'%s' is invalid.", getType().getSimpleName(), uri , key));
             }
         }
-        log.debug(format("Context Initialization finished. %s %s(s) loaded.", components.size(), getType().getName()));
+        log.info(format("Context Initialization finished. %s %s(s) loaded.", components.size(), getType().getSimpleName()));
     }
 
     private void unloadObsoleteComponents() {
