@@ -128,7 +128,7 @@
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasType
-:serializationType rdf:type owl:ObjectProperty ;
+:hasType rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
          rdf:type owl:FunctionalProperty ;
          rdfs:domain :Parameter ;
