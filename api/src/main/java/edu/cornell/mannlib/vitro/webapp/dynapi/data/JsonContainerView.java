@@ -110,12 +110,12 @@ public class JsonContainerView {
         JsonContainer row = getRowMap(vars, solution);
         Map<String, JsonContainer> jsonArrays = getJsonArrays(outputParams, dataStore);
         for (JsonContainer array : jsonArrays.values()) {
-            array.addRow(JsonContainer.PATH_ROOT, row);
+            array.addRow(JsonContainer.PATH_ROOT_PREFIX, row);
         }
     }
 
     private static JsonContainer getRowMap(List<String> vars, QuerySolution solution) {
-        JsonContainer row = new JsonContainer(Type.EmptyObject);
+        JsonContainer row = new JsonContainer(Type.OBJECT);
 
         for (String var : vars) {
             RDFNode node = solution.get(var);
