@@ -13,7 +13,11 @@ public class MultiAccessComponents<K, C> extends ConcurrentSkipListMap<K, C> {
 	private ConcurrentMap<K, String> keyToUriMap = new ConcurrentHashMap<>();
 
 	public C getByUri(String uri) {
-		return this.get(uriToKeyMap.get(uri));
+		K key = uriToKeyMap.get(uri);
+		if (key == null) {
+		    return null;
+		}
+        return this.get(key);
 	}
 
 	public C removeByUri(String uri) {
