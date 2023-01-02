@@ -11,6 +11,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
@@ -25,14 +26,14 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
 
 public class JsonContainer {
 
-	public static final String PATH_ROOT = "$";
+	public static final String PATH_ROOT_PREFIX = "$";
 	public static final String EMPTY_OBJECT = "{}";
 	public static final String EMPTY_ARRAY = "[]";
 	private static ObjectMapper mapper = new ObjectMapper();
+	
+	private Type rootType;
 
-	public static enum Type {
-		EmptyArray, EmptyObject
-	};
+	public static enum Type { ARRAY, OBJECT };
 
 	private Map<String, Data> dataMap = new HashMap<>();
 	private static final Configuration jsonPathConfig = prepareJsonPathConfig();
@@ -40,14 +41,47 @@ public class JsonContainer {
 	private DocumentContext ctx;
 
 	public JsonContainer(String jsonString) {
-		ctx = JsonPath.using(jsonPathConfig).parse(jsonString);
+		init(jsonString);
 	}
 
+    private void init(String jsonString) {
+        setRootType(jsonString);
+        ctx =  JsonPath.using(jsonPathConfig).parse(jsonString);
+    }
+
+    private void setRootType(String jsonString) {
+        long cbIndex = jsonString.indexOf("{");
+        if (cbIndex == 0) {
+            rootType = Type.OBJECT;
+            return;
+        }
+        long sbIndex = jsonString.indexOf("[");
+        if (sbIndex == 0) {
+            rootType = Type.ARRAY;
+            return;
+        }
+        if (cbIndex < 0 && sbIndex > 0) {
+            rootType = Type.ARRAY;
+            return;
+        }
+        if (sbIndex < 0 && sbIndex > 0) {
+            rootType = Type.OBJECT;
+            return;
+        }
+        if (sbIndex < cbIndex) {
+            rootType = Type.ARRAY;
+            return;
+        }
+        if (sbIndex > cbIndex) {
+            rootType = Type.OBJECT;
+        }
+    }
+
 	public JsonContainer(Type type) {
-		if (type.equals(Type.EmptyArray)) {
-			ctx = JsonPath.using(jsonPathConfig).parse(EMPTY_ARRAY);
+		if (type.equals(Type.ARRAY)) {
+			init(EMPTY_ARRAY);
 		} else {
-			ctx = JsonPath.using(jsonPathConfig).parse(EMPTY_OBJECT);
+			init(EMPTY_OBJECT);
 		}
 	}
 
@@ -114,10 +148,6 @@ public class JsonContainer {
 		}
 	}
 
-	private String jsonString() {
-		return ctx.jsonString();
-	}
-
 	public static JsonContainer deserialize(String input) throws ConversionException {
 		JsonContainer object = new JsonContainer(input);
 		return object;
@@ -137,20 +167,33 @@ public class JsonContainer {
 	public void addKeyValue(String var, Data data) {
 		String id = getRandomKey();
 		if (dataMap.containsKey(id)) {
-			// TODO:fix that
 			throw new RuntimeException();
 		}
-		ctx.put(PATH_ROOT, var, id);
+		if (rootType.equals(Type.OBJECT)) {
+		    ctx.put(PATH_ROOT_PREFIX, var, id);    
+		} else {
+		    ObjectNode objectNode = mapper.createObjectNode();
+		    objectNode.put(var, id);
+            ctx.add(PATH_ROOT_PREFIX, objectNode);
+		}
 		dataMap.put(id, data);
 	}
 	
     public void addValue(Data data) {
         String id = getRandomKey();
         if (dataMap.containsKey(id)) {
-            // TODO:fix that
             throw new RuntimeException();
         }
-        ctx.add(PATH_ROOT, id);
+        if (rootType.equals(Type.ARRAY)) {
+            ctx.add(PATH_ROOT_PREFIX, id);
+        } else {
+            Object values = ctx.read(PATH_ROOT_PREFIX + "." + "values");
+            if (NullNode.getInstance().equals(values)) {
+                ArrayNode arrayNode = mapper.createArrayNode();
+                ctx.put(PATH_ROOT_PREFIX, "values", arrayNode);    
+            }
+            ctx.add(PATH_ROOT_PREFIX + ".values", id);
+        }
         dataMap.put(id, data);
     }
 }
