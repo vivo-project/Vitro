@@ -25,6 +25,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,7 +40,10 @@ import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.FormDataConverter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 
 @RunWith(Parameterized.class)
 public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
@@ -148,6 +153,13 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @Test
     public void doGetTest() {
+        //TODO: Improve tests
+        Logger.getLogger(RPCEndpoint.class).setLevel(Level.FATAL);
+        Logger.getLogger(FormDataConverter.class).setLevel(Level.FATAL);
+        Logger.getLogger(ConversionMethod.class).setLevel(Level.FATAL);
+        Logger.getLogger(ImplementationType.class).setLevel(Level.FATAL);
+
+
         rpcEndpoint.doGet(request, response);
 
         // For all permutations, this should return HTTP 405.
