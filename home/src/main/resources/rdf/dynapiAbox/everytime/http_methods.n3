@@ -4,8 +4,6 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
-@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
-@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get>
         a                       dynapi:HttpMethod ;
