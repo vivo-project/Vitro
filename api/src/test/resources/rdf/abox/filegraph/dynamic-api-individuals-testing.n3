@@ -15,12 +15,12 @@
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testStep1>
-        a                                   dynapi:Step, dynapi:OperationalStep ;
+        a                                   dynapi:OperationalStep ;
         rdfs:label                          "Test operational step 1"@en-US ;
         dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/sparqlQuery/testSparqlQuery1>
-        a                                   dynapi:Operation, dynapi:SparqlSelectQuery ;
+        a                                   dynapi:SparqlSelectQuery ;
         rdfs:label                          "Test sparql query 1"@en-US ;
         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/testParam1>,
@@ -38,7 +38,6 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestNumericRangeValidator>
         a                                   dynapi:Validator ,
-                                            dynapi_java:validators.Validator ,
                                             dynapi_java:validators.NumericRangeValidator ;
         rdfs:label                          "Test range validator for parameter 1"@en-US ;
         dynapi:minValue                     10 ;
@@ -54,7 +53,6 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/TestStringLengthRangeValidator>
         a                                   dynapi:Validator ,
-                                            dynapi_java:validators.Validator ,
                                             dynapi_java:validators.StringLengthRangeValidator ;
         rdfs:label                          "Test string length range validator for parameter 2"@en-US ;
         dynapi:minLength                    5 .
