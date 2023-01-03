@@ -4,29 +4,27 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
-@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
-@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/uri>
-        a                       dynapi:RDFType, dynapi_types:RDFType ;
+        a                       dynapi:RDFType;
         dynapi:name         	"anyURI" ;
         rdfs:label              "Individualized Resource Identifier rdf type"@en-US ;
         vitro:mostSpecificType  dynapi:RDFType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/integer>
-        a                       dynapi:RDFType, dynapi_types:RDFType ;
+        a                       dynapi:RDFType;
         dynapi:name         	"integer" ;
         rdfs:label              "Integer rdf type"@en-US ;
         vitro:mostSpecificType  dynapi:RDFType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/string>
-        a                       dynapi:RDFType, dynapi_types:RDFType ;
+        a                       dynapi:RDFType;
         dynapi:name         	"string" ;
         rdfs:label              "String rdf type"@en-US ;
         vitro:mostSpecificType  dynapi:RDFType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/boolean>
-        a                       dynapi:RDFType, dynapi_types:RDFType ;
+        a                       dynapi:RDFType;
         dynapi:name         	"boolean" ;
         rdfs:label              "Boolean rdf type"@en-US ;
         vitro:mostSpecificType  dynapi:RDFType .
