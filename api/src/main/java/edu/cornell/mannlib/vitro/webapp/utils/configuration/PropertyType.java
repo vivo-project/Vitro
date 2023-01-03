@@ -246,6 +246,7 @@ public enum PropertyType {
 		protected final PropertyType type;
 		protected final Method method;
 		protected final String propertyUri;
+		protected final boolean asString;
 		protected final int minOccurs;
 		protected final int maxOccurs;
 
@@ -257,6 +258,7 @@ public enum PropertyType {
 			this.propertyUri = annotation.uri();
 			this.minOccurs = annotation.minOccurs();
 			this.maxOccurs = annotation.maxOccurs();
+			this.asString = annotation.asString();
 			checkCardinalityBounds();
 		}
 
@@ -283,16 +285,21 @@ public enum PropertyType {
 		public int getMaxOccurs() {
 			return maxOccurs;
 		}
+		
+        public boolean getAsString() {
+            return asString;
+        }
 
-		public void confirmCompatible(PropertyStatement ps)
-				throws PropertyTypeException {
-			if (type != ps.getType() &&
-					! (isSubtype(ps.getType(), type))){
-				throw new PropertyTypeException(
-						"Can't apply statement of type " + ps.getType()
-								+ " to a method of type " + type);
-			}
-		}
+        public void confirmCompatible(PropertyStatement ps) throws PropertyTypeException {
+            final PropertyType psType = ps.getType();
+            if (asString && psType.equals(PropertyType.RESOURCE) && type.equals(PropertyType.STRING)) {
+                return;
+            }
+            if (type != psType && !(isSubtype(psType, type))) {
+                throw new PropertyTypeException(
+                        "Can't apply statement of type " + psType + " to a method of type " + type);
+            }
+        }
 
 		private boolean isSubtype(PropertyType subType, PropertyType superType){
 			if (subType.equals(INTEGER) && superType.equals(FLOAT))
