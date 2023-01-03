@@ -49,7 +49,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         whiteList.setActionName(rpc.getName());
     }
     
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", maxOccurs = 1)
     public void setStep(Step step) {
         this.firstStep = step;
     }
