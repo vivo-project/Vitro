@@ -14,6 +14,8 @@ import java.util.List;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
@@ -46,6 +48,8 @@ public abstract class ServletContextTest {
 
     @Before
     public void setup() {
+        //Do not print information about loaded actions and resources
+        silenceLoggers();
         servletContext = new ServletContextStub();
         modelAccessFactory = new ModelAccessFactoryStub();
 
@@ -58,6 +62,11 @@ public abstract class ServletContextTest {
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
+    public void silenceLoggers() {
+        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.ERROR);
+        Logger.getLogger(ActionPool.class).setLevel(Level.ERROR);
+    }
+    
     protected void loadTestModel() throws IOException {
         // all actions reuse testSparqlQuery1 from testing action
         loadModel(
