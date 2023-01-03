@@ -158,7 +158,7 @@ public class JsonContainerTest {
             container.addValue(data);
         }
         String expectedJson = expectedJsonObjectValue(expectedValue, n);
-        System.out.println(expectedJson);
+        //System.out.println(expectedJson);
         String actualJson = JsonContainer.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
@@ -169,7 +169,7 @@ public class JsonContainerTest {
         TestView.setObject(data, value);
         container.addKeyValue(varName, data);
         String expectedJson = expectedJsonObjectKeyValue(varName, expectedValue);
-        System.out.println(expectedJson);
+        //System.out.println(expectedJson);
         String actualJson = JsonContainer.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
@@ -180,7 +180,7 @@ public class JsonContainerTest {
         TestView.setObject(data, value);
         container.addKeyValue(varName, data);
         String expectedJson = expectedJsonArrayKeyValue(varName, expectedValue);
-        System.out.println(expectedJson);
+        //System.out.println(expectedJson);
         String actualJson = JsonContainer.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
@@ -194,7 +194,7 @@ public class JsonContainerTest {
             container.addValue(data);
         }
         String expectedJson = expectedJsonArrayValue(expectedValue, n);
-        System.out.println(expectedJson);
+        //System.out.println(expectedJson);
         String actualJson = JsonContainer.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
