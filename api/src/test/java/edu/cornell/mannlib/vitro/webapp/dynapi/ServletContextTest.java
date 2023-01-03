@@ -109,6 +109,9 @@ public abstract class ServletContextTest {
         File[] files = dir.listFiles();
         List<String> paths = new LinkedList<String>();
         for (File file : files) {
+            if (file.getName().startsWith("endpoint_")) {
+                continue;
+            }
             paths.add(file.getAbsolutePath());
         }
         return paths.toArray(new String[0]);
