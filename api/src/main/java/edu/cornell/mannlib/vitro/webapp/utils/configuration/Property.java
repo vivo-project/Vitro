@@ -17,4 +17,5 @@ public @interface Property {
 	String uri();
 	int minOccurs() default 0;
 	int maxOccurs() default Integer.MAX_VALUE;
+	boolean asString() default false;
 }
