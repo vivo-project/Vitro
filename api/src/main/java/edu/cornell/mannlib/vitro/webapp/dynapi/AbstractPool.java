@@ -197,6 +197,10 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         	C component = entry.getValue();
 			K key = component.getKey();
 			if (component.isValid()) {
+                if (components.containsKey(key)){
+                    String oldUri = components.getUri(key);
+                    log.info(format("Replaced %s component, uri:'%s' with uri:'%s', as they have the same key:'%s'.", getType().getSimpleName(),oldUri, uri , key));
+                }
                 components.put(key, component);
                 components.putUriMapping(uri, key);
                 log.info(format("Loaded %s component, uri:'%s', key:'%s'.", getType().getSimpleName(), uri , key));
