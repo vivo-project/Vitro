@@ -1,6 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -83,6 +85,25 @@ public class OperationalStep implements Step {
     @Override
     public Parameters getOutputParams() {
         return operation.getOutputParams();
+    }
+
+    @Override
+    public Map<String, ProcedureDescriptor> getDependencies() {
+        Map<String, ProcedureDescriptor> next = nextStep.getDependencies();
+        Map<String, ProcedureDescriptor> current = operation.getDependencies();
+        if (next.isEmpty() && current.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        if (!next.isEmpty() && current.isEmpty()) {
+            return next;
+        }
+        if (next.isEmpty() && !current.isEmpty()) {
+            return current;
+        }
+        Map<String, ProcedureDescriptor> unionDependencies = new HashMap<>();
+        unionDependencies.putAll(current);
+        unionDependencies.putAll(next);
+        return unionDependencies;
     }
 
 }

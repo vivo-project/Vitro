@@ -1,11 +1,14 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Step;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -15,8 +18,8 @@ public class ConditionalStep implements Step {
 
     private HashSet<Condition> conditions = new HashSet<Condition>();
 
-    private boolean allConditionsRequired = true;  
-    
+    private boolean allConditionsRequired = true;
+
     Step nextIfNotSatisfied = NullStep.getInstance();
     Step nextIfSatisfied = NullStep.getInstance();
 
@@ -35,13 +38,13 @@ public class ConditionalStep implements Step {
         if (allConditionsRequired) {
             return areAllSatisfied(data);
         } else {
-            return isAtLeastOneSatisfied(data);     
+            return isAtLeastOneSatisfied(data);
         }
     }
 
     private boolean isAtLeastOneSatisfied(DataStore data) {
         for (Condition condition : conditions) {
-            if (condition.isSatisfied(data)){
+            if (condition.isSatisfied(data)) {
                 return true;
             }
         }
@@ -50,7 +53,7 @@ public class ConditionalStep implements Step {
 
     private boolean areAllSatisfied(DataStore data) {
         for (Condition condition : conditions) {
-            if (!condition.isSatisfied(data)){
+            if (!condition.isSatisfied(data)) {
                 return false;
             }
         }
@@ -76,7 +79,7 @@ public class ConditionalStep implements Step {
     public void setAllConditionsRequired(boolean allConditionsRequired) {
         this.allConditionsRequired = allConditionsRequired;
     }
-    
+
     @Override
     public Set<StepInfo> getNextNodes() {
         HashSet<StepInfo> nextNodes = new HashSet<StepInfo>();
@@ -99,11 +102,11 @@ public class ConditionalStep implements Step {
     public Parameters getOutputParams() {
         return new Parameters();
     }
-    
+
     @Override
     public Parameters getInputParams() {
         Parameters inputParams = new Parameters();
-        for (Condition condition: conditions) {
+        for (Condition condition : conditions) {
             inputParams.addAll(condition.getInputParams());
         }
         return inputParams;
@@ -112,5 +115,15 @@ public class ConditionalStep implements Step {
     @Override
     public void dereference() {}
 
-}
+    @Override
+    public Map<String,ProcedureDescriptor> getDependencies() {
+        Map<String, ProcedureDescriptor> current = new HashMap<>();
+        current.putAll(nextIfSatisfied.getDependencies());
+        current.putAll(nextIfNotSatisfied.getDependencies());
+        for (Condition condition : conditions) {
+            current.putAll(condition.getDependencies());
+        }
+        return current;
+    }
 
+}
