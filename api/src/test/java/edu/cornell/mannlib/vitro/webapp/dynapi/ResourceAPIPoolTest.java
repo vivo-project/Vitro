@@ -29,15 +29,15 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         resourceAPIPool.init(servletContext);
         resourceAPIPool.reload();
 
-        ActionPool actionPool = ActionPool.getInstance();
-        actionPool.init(servletContext);
-        actionPool.reload();
+        RPCPool rpcPool = RPCPool.getInstance();
+        rpcPool.init(servletContext);
+        rpcPool.reload();
 
         assertEquals(0, resourceAPIPool.count());
         assertEquals(0, resourceAPIPool.obsoleteCount());
 
-        assertEquals(0, actionPool.count());
-        assertEquals(0, actionPool.obsoleteCount());
+        assertEquals(0, rpcPool.count());
+        assertEquals(0, rpcPool.obsoleteCount());
     }
 
     @Test
@@ -521,8 +521,8 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
         resourceAPIPool.init(servletContext);
 
-        ActionPool actionPool = ActionPool.getInstance();
-        actionPool.init(servletContext);
+        RPCPool rpcPool = RPCPool.getInstance();
+        rpcPool.init(servletContext);
 
         return resourceAPIPool;
     }

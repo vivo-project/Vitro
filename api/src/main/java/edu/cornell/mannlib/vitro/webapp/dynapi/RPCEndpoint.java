@@ -23,7 +23,7 @@ public class RPCEndpoint extends VitroHttpServlet {
 
     private static final Log log = LogFactory.getLog(RPCEndpoint.class);
 
-    private ActionPool actionPool = ActionPool.getInstance();
+    private RPCPool rpcPool = RPCPool.getInstance();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -35,9 +35,9 @@ public class RPCEndpoint extends VitroHttpServlet {
         ApiRequestPath requestPath = ApiRequestPath.from(request);
         if (requestPath.isValid()) {
             if (log.isDebugEnabled()) {
-                actionPool.printKeys();
+                rpcPool.printKeys();
             }
-            Action action = actionPool.get(requestPath.getActionName());
+            Action action = rpcPool.get(requestPath.getActionName());
 			UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
 	        if (!action.hasPermissions(user)) {
 	        	OperationResult.notAuthorized().prepareResponse(response);
