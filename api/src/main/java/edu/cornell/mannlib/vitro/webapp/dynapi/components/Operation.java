@@ -1,12 +1,15 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
-public abstract class Operation implements RunnableComponent, ParameterInfo {
+public abstract class Operation implements RunnableComponent, ParameterInfo, DependencyInfo {
 
     private static final Log log = LogFactory.getLog(Operation.class);
 
@@ -39,5 +42,8 @@ public abstract class Operation implements RunnableComponent, ParameterInfo {
 
         return true;
     }
-
+    
+    public Map<String, ProcedureDescriptor> getDependencies(){
+        return Collections.emptyMap();
+    }
 }
