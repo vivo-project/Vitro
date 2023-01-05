@@ -56,7 +56,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
     
     private RPCEndpoint rpcEndpoint;
 
-    private ActionPool actionPool;
+    private RPCPool rpcPool;
 
     @Mock
     private HttpServletRequest request;
@@ -103,14 +103,14 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
     
     @Before
     public void beforeEach() throws Exception {
-        actionPool = ActionPool.getInstance();
+        rpcPool = RPCPool.getInstance();
 
         rpcEndpoint = new RPCEndpoint();
 
         loadDefaultModel();
 
-        actionPool.init(servletContext);
-        actionPool.reload();
+        rpcPool.init(servletContext);
+        rpcPool.reload();
 
         MockitoAnnotations.openMocks(this);
         

@@ -26,16 +26,16 @@ public class Initializer implements ServletContextListener {
         resourceAPIPool.init(ctx);
     }
 
-    private void initializeActionPool(ServletContext ctx) {
-        ActionPool actionPool = ActionPool.getInstance();
-        actionPool.init(ctx);
+    private void initializeRPCPool(ServletContext ctx) {
+        RPCPool rpcPool = RPCPool.getInstance();
+        rpcPool.init(ctx);
     }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext ctx = sce.getServletContext();
         initializeStorage(ctx);
-        initializeActionPool(ctx);
+        initializeRPCPool(ctx);
         initializeResourcePool(ctx);
         initializeDynamicAPIDocumentation(ctx);
         initializeDynamicAPIModelFactory(ctx);

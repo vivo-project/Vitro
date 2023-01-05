@@ -64,7 +64,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private RESTEndpoint restEndpoint;
 
-    private ActionPool actionPool;
+    private RPCPool rpcPool;
 
     private ResourceAPIPool resourceAPIPool;
 
@@ -118,7 +118,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     
     @Before
     public void beforeEach() throws IOException {
-        actionPool = ActionPool.getInstance();
+        rpcPool = RPCPool.getInstance();
         resourceAPIPool = ResourceAPIPool.getInstance();
 
         restEndpoint = new RESTEndpoint();
@@ -126,8 +126,8 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         loadDefaultModel();
         loadTestModel();
 
-        actionPool.init(servletContext);
-        actionPool.reload();
+        rpcPool.init(servletContext);
+        rpcPool.reload();
 
         resourceAPIPool.init(servletContext);
         resourceAPIPool.reload();
