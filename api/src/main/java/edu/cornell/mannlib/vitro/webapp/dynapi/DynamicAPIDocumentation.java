@@ -192,7 +192,7 @@ public class DynamicAPIDocumentation {
 
         if (requestPath.getActionName() == null) {
 
-            Map<String, Action> actions = RPCPool.getInstance().getComponents();
+            Map<String, Action> actions = ActionPool.getInstance().getComponents();
 
             Tag tag = tag();
             openApi.addTagsItem(tag);
@@ -210,7 +210,7 @@ public class DynamicAPIDocumentation {
 
             String actionName = requestPath.getActionName();
 
-            Action action = RPCPool.getInstance().get(actionName);
+            Action action = ActionPool.getInstance().get(actionName);
 
             if (!(action instanceof NullAction)) {
                 Tag tag = tag(action);
@@ -293,18 +293,18 @@ public class DynamicAPIDocumentation {
     }
 
     private PathItem collectionPathItem(ResourceAPI resourceAPI, Tag tag) {
-        RPCPool rpcPool = RPCPool.getInstance();
+        ActionPool actionPool = ActionPool.getInstance();
         PathItem pathItem = new PathItem();
 
         RPC collectionGetRPC = resourceAPI.getRpcOnGetAll();
         if (collectionGetRPC != null) {
-            Action action = rpcPool.get(collectionGetRPC.getName());
+            Action action = actionPool.get(collectionGetRPC.getName());
             pathItem.setGet(collectionGetOperation(action, tag));
         }
 
         RPC collectionPostRPC = resourceAPI.getRpcOnPost();
         if (collectionPostRPC != null) {
-            Action action = rpcPool.get(collectionPostRPC.getName());
+            Action action = actionPool.get(collectionPostRPC.getName());
             pathItem.setPost(collectionPostOperation(action, tag));
         }
 
@@ -312,7 +312,7 @@ public class DynamicAPIDocumentation {
     }
 
     private PathItem individualPathItem(ResourceAPI resourceAPI, Tag tag) {
-        RPCPool rpcPool = RPCPool.getInstance();
+        ActionPool actionPool = ActionPool.getInstance();
 
         PathItem pathItem = new PathItem();
 
@@ -320,25 +320,25 @@ public class DynamicAPIDocumentation {
 
         RPC individualGetRPC = resourceAPI.getRpcOnGet();
         if (individualGetRPC != null) {
-            Action action = rpcPool.get(individualGetRPC.getName());
+            Action action = actionPool.get(individualGetRPC.getName());
             pathItem.setGet(individualGetOperation(action, tag));
         }
 
         RPC individualPutAction = resourceAPI.getRpcOnPut();
         if (individualPutAction != null) {
-            Action action = rpcPool.get(individualPutAction.getName());
+            Action action = actionPool.get(individualPutAction.getName());
             pathItem.setPut(individualPutOperation(action, tag));
         }
 
         RPC individualPatchAction = resourceAPI.getRpcOnPatch();
         if (individualPatchAction != null) {
-            Action action = rpcPool.get(individualPatchAction.getName());
+            Action action = actionPool.get(individualPatchAction.getName());
             pathItem.setPatch(individualPatchOperation(action, tag));
         }
 
         RPC individualDeleteAction = resourceAPI.getRpcOnDelete();
         if (individualDeleteAction != null) {
-            Action action = rpcPool.get(individualDeleteAction.getName());
+            Action action = actionPool.get(individualDeleteAction.getName());
             pathItem.setDelete(individualDeleteOperation(action, tag));
         }
 
@@ -346,13 +346,13 @@ public class DynamicAPIDocumentation {
     }
 
     private PathItem customRESTActionPathItem(CustomRESTAction customRESTAction, Tag tag) {
-        RPCPool rpcPool = RPCPool.getInstance();
+        ActionPool actionPool = ActionPool.getInstance();
 
         PathItem pathItem = new PathItem();
 
         RPC targetRPC = customRESTAction.getTargetRPC();
         if (targetRPC != null) {
-            Action action = rpcPool.get(targetRPC.getName());
+            Action action = actionPool.get(targetRPC.getName());
             HTTPMethod httpMethod = targetRPC.getHttpMethod();
 
             if (httpMethod != null) {
