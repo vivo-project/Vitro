@@ -1,7 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.Set;
 
 import org.apache.http.entity.ContentType;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.LangTag;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 
 public class DataStore {
 
@@ -18,6 +17,7 @@ public class DataStore {
 	private ContentType responseType = ContentType.APPLICATION_JSON;
 	private List<String> acceptLangs = new LinkedList<>();
 	private String resourceId = "";
+	private Map<String, Action> dependencyComponents = new HashMap<>();
 
 	public DataStore() {
 	}
@@ -66,4 +66,23 @@ public class DataStore {
 	protected Set<String> keySet() {
 		return dataMap.keySet();
 	}
+	
+    public void putDependency(String uri, Action dependency) {
+        dependencyComponents.put(uri, dependency);
+    }
+
+    public void putDependencies(Map<String, Action> dependencies) {
+        dependencyComponents.putAll(dependencies);
+    }
+
+    public Action getDependency(String uri) {
+        return dependencyComponents.get(uri);
+    }
+
+    public void removeDependencies() {
+        for (Action dependencyComponent : dependencyComponents.values()) {
+            dependencyComponents.remove(dependencyComponent.getKey());
+            dependencyComponent.removeClient();
+        }
+    }
 }

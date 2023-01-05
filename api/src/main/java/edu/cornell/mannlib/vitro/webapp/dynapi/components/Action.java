@@ -205,5 +205,10 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 	private boolean isPublicAccessible() {
 		return false;
 	}
+	
+	@Override
+	public Map<String, ProcedureDescriptor> getDependencies() {
+	    return firstStep.getDependencies();
+	}
 
 }

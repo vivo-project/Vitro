@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
@@ -48,6 +49,11 @@ public class NullStep implements Step {
     @Override
     public Parameters getOutputParams() {
         return new Parameters();
+    }
+
+    @Override
+    public Map<String, ProcedureDescriptor> getDependencies() {
+        return Collections.emptyMap();
     }
 
 }
