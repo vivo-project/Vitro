@@ -3,16 +3,16 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullAction;
 
-public class ActionPool extends AbstractPool<String, Action, ActionPool> {
+public class RPCPool extends AbstractPool<String, Action, RPCPool> {
 
-    private static ActionPool INSTANCE = new ActionPool();
+    private static RPCPool INSTANCE = new RPCPool();
 
-    public static ActionPool getInstance() {
+    public static RPCPool getInstance() {
         return INSTANCE;
     }
 
     @Override
-    public ActionPool getPool() {
+    public RPCPool getPool() {
         return getInstance();
     }
 
