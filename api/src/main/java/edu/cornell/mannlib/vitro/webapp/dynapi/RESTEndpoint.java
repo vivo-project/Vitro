@@ -33,7 +33,7 @@ public class RESTEndpoint extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(RESTEndpoint.class);
 
     private ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
-    private RPCPool rpcPool = RPCPool.getInstance();
+    private ActionPool actionPool = ActionPool.getInstance();
 
     public final static String RESOURCE_ID = "resource_id";
 
@@ -139,9 +139,9 @@ public class RESTEndpoint extends VitroHttpServlet {
         String actionName = rpc.getName();
 
         if (log.isDebugEnabled()) {
-            rpcPool.printKeys();
+            actionPool.printKeys();
         }
-        Action action = rpcPool.get(actionName);
+        Action action = actionPool.get(actionName);
 		UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
         if (!action.hasPermissions(user)) {
         	OperationResult.notAuthorized().prepareResponse(response);

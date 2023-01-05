@@ -57,7 +57,7 @@ public class RESTEndpointTest {
 
     private MockedStatic<ResourceAPIPool> resourceAPIPoolStatic;
 
-    private MockedStatic<RPCPool> rpcPoolStatic;
+    private MockedStatic<ActionPool> actionPoolStatic;
 
     private ByteArrayOutputStream baos;
 
@@ -68,7 +68,7 @@ public class RESTEndpointTest {
     private ResourceAPIPool resourceAPIPool;
 
     @Mock
-    private RPCPool rpcPool;
+    private ActionPool actionPool;
 
     @Mock
     private ResourceAPI resourceAPI;
@@ -119,13 +119,13 @@ public class RESTEndpointTest {
         baos = new ByteArrayOutputStream();
         MockitoAnnotations.openMocks(this);
         resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
-        rpcPoolStatic = mockStatic(RPCPool.class);
+        actionPoolStatic = mockStatic(ActionPool.class);
 
         when(ResourceAPIPool.getInstance()).thenReturn(resourceAPIPool);
         when(resourceAPIPool.get(any(ResourceAPIKey.class))).thenReturn(resourceAPI);
 
-        when(RPCPool.getInstance()).thenReturn(rpcPool);
-        when(rpcPool.get(any(String.class))).thenReturn(action);
+        when(ActionPool.getInstance()).thenReturn(actionPool);
+        when(actionPool.get(any(String.class))).thenReturn(action);
 
         when(request.getParameterMap()).thenReturn(params);
         when(request.getServletContext()).thenReturn(context);
@@ -140,7 +140,7 @@ public class RESTEndpointTest {
     @After
     public void afterEach() {
         resourceAPIPoolStatic.close();
-        rpcPoolStatic.close();
+        actionPoolStatic.close();
         try {
             baos.close();
         } catch (IOException e) {

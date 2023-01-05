@@ -64,7 +64,7 @@ public abstract class ServletContextTest {
 
     public void silenceLoggers() {
         Logger.getLogger(ResourceAPIPool.class).setLevel(Level.ERROR);
-        Logger.getLogger(RPCPool.class).setLevel(Level.ERROR);
+        Logger.getLogger(ActionPool.class).setLevel(Level.ERROR);
     }
     
     protected void loadTestModel() throws IOException {

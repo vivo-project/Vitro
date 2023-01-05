@@ -42,7 +42,7 @@ public class RPCEndpointTest {
     
     private ByteArrayOutputStream baos;
 
-    private MockedStatic<RPCPool> rpcPoolStatic;
+    private MockedStatic<ActionPool> actionPoolStatic;
 
     private RPCEndpoint rpcEndpoint;
 
@@ -53,7 +53,7 @@ public class RPCEndpointTest {
     private UserAccount user;
     
     @Mock
-    private RPCPool rpcPool;
+    private ActionPool actionPool;
 
     @Spy
     private Action action;
@@ -67,9 +67,9 @@ public class RPCEndpointTest {
     @Before
     public void beforeEach() {
         baos = new ByteArrayOutputStream();
-        rpcPoolStatic = mockStatic(RPCPool.class);
-        when(RPCPool.getInstance()).thenReturn(rpcPool);
-        when(rpcPool.get(any(String.class))).thenReturn(action);
+        actionPoolStatic = mockStatic(ActionPool.class);
+        when(ActionPool.getInstance()).thenReturn(actionPool);
+        when(actionPool.get(any(String.class))).thenReturn(action);
 
         when(request.getParameterMap()).thenReturn(params);
         when(request.getSession(false)).thenReturn(session);
@@ -82,7 +82,7 @@ public class RPCEndpointTest {
 
     @After
     public void afterEach() {
-        rpcPoolStatic.close();
+        actionPoolStatic.close();
         try {
             baos.close();
         } catch (IOException e) {
