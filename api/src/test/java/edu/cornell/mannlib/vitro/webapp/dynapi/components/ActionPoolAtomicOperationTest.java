@@ -59,13 +59,24 @@ public class ActionPoolAtomicOperationTest extends ServletContextTest{
     public void componentReloadTest() throws InitializationException {
         ActionPoolAtomicOperation apao = new ActionPoolAtomicOperation();
         DataStore dataStore = new DataStore();
-        Action action1 = actionPool.getByUri(TEST_ACTION_URI);
-        apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
-        addStringParam(dataStore, apao);
-        OperationResult result = apao.run(dataStore);
-        assertEquals(OperationResult.ok().toString(),result.toString());
-        Action action2 = actionPool.getByUri(TEST_ACTION_URI);
-        assertNotEquals(action1, action2);
+        Action action1 = null;
+        Action action2 = null;
+        try {
+            action1 = actionPool.getByUri(TEST_ACTION_URI);
+            apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
+            addStringParam(dataStore, apao);
+            OperationResult result = apao.run(dataStore);
+            assertEquals(OperationResult.ok().toString(),result.toString());
+            action2 = actionPool.getByUri(TEST_ACTION_URI);
+            assertNotEquals(action1, action2);
+        } finally {
+            if (action1 != null) {
+                action1.removeClient();    
+            }
+            if (action2 != null) {
+                action2.removeClient();    
+            }
+        }
     }
     
     @Test
