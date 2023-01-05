@@ -65,11 +65,11 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
 
         loadModels("n3", TEST_PREFIX + "dynamic-api-individuals-api.n3");
 
-        ActionPool actionPool = ActionPool.getInstance();
+        RPCPool rpcPool = RPCPool.getInstance();
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
 
-        actionPool.init(servletContext);
-        actionPool.reload();
+        rpcPool.init(servletContext);
+        rpcPool.reload();
 
         resourceAPIPool.init(servletContext);
         resourceAPIPool.reload();
