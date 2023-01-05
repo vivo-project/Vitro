@@ -51,15 +51,26 @@ public class ResourceAPIPoolBulkOperationTest extends ServletContextTest{
     @Test
     public void componentReloadTest() throws InitializationException {
         assertEquals(1, resourcePool.count());
-        ResourceAPI resource1 = resourcePool.getByUri(TEST_RESOURCE_URI);
+        ResourceAPI resource1 = null;
+        ResourceAPI resource2 = null;
+        try {
+        resource1 = resourcePool.getByUri(TEST_RESOURCE_URI);
         ResourceAPIPoolBulkOperation apao = new ResourceAPIPoolBulkOperation();
         apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
         DataStore dataStore = new DataStore();
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
         assertEquals(1, resourcePool.count());
-        ResourceAPI resource2 = resourcePool.getByUri(TEST_RESOURCE_URI);
+        resource2 = resourcePool.getByUri(TEST_RESOURCE_URI);
         assertNotEquals(resource1, resource2);
+        } finally {
+            if (resource1 != null) {
+                resource1.removeClient();    
+            }
+            if (resource2 != null) {
+                resource2.removeClient();    
+            }
+        }
     }
 
     

@@ -51,15 +51,26 @@ public class ActionPoolBulkOperationTest extends ServletContextTest{
     @Test
     public void componentReloadTest() throws InitializationException {
         assertEquals(1, actionPool.count());
-        Action action1 = actionPool.getByUri(TEST_ACTION_URI);
+        Action action1 = null;
+        Action action2 = null;
+        try {
+        action1 = actionPool.getByUri(TEST_ACTION_URI);
         ActionPoolBulkOperation apao = new ActionPoolBulkOperation();
         apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
         DataStore dataStore = new DataStore();
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
         assertEquals(1, actionPool.count());
-        Action action2 = actionPool.getByUri(TEST_ACTION_URI);
+        action2 = actionPool.getByUri(TEST_ACTION_URI);
         assertNotEquals(action1, action2);
+        } finally {
+            if (action1 != null) {
+                action1.removeClient();    
+            }
+            if (action2 != null) {
+                action2.removeClient();    
+            }
+        }
     }
 
     
