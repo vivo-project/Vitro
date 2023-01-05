@@ -59,10 +59,10 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
 
         loadModels("n3", TEST_PREFIX + "dynamic-api-individuals-api.n3");
 
-        RPCPool rpcPool = RPCPool.getInstance();
+        ActionPool actionPool = ActionPool.getInstance();
 
-        rpcPool.init(servletContext);
-        rpcPool.reload();
+        actionPool.init(servletContext);
+        actionPool.reload();
 
         DynamicAPIDocumentation dynamicAPIDocumentation = DynamicAPIDocumentation.getInstance();
 
