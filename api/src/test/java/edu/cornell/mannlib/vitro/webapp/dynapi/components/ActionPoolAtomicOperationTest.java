@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.RPCPool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ActionPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -19,55 +19,55 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 
-public class RPCPoolAtomicOperationTest extends ServletContextTest{
+public class ActionPoolAtomicOperationTest extends ServletContextTest{
 
     private static final String JSON_OBJECT_PARAM = "jsonContainerParam";
     private static final String STRING_PARAM_NAME = "stringParam";
     private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1";
-    private RPCPool rpcPool;
+    private ActionPool actionPool;
     
     @Before
     public void preparePool() {
-       rpcPool = initWithDefaultModel();
+       actionPool = initWithDefaultModel();
     }
     
     @After
     public void reset() {
         setup();
-        rpcPool = initWithDefaultModel();
+        actionPool = initWithDefaultModel();
     }
     
     @Test
     public void componentLoadUnloadTest() throws InitializationException {
-        RPCPoolAtomicOperation apao = new RPCPoolAtomicOperation();
+        ActionPoolAtomicOperation apao = new ActionPoolAtomicOperation();
         DataStore dataStore = new DataStore();
-        long counter = rpcPool.count();
+        long counter = actionPool.count();
         apao.setOperationType(PoolOperation.OperationType.UNLOAD.toString());
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
-        assertEquals(counter - 1, rpcPool.count());
+        assertEquals(counter - 1, actionPool.count());
         
         apao.setOperationType(PoolOperation.OperationType.LOAD.toString());
         addStringParam(dataStore, apao);
         result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
-        assertEquals(counter, rpcPool.count());
+        assertEquals(counter, actionPool.count());
     }
     
     @Test
     public void componentReloadTest() throws InitializationException {
-        RPCPoolAtomicOperation apao = new RPCPoolAtomicOperation();
+        ActionPoolAtomicOperation apao = new ActionPoolAtomicOperation();
         DataStore dataStore = new DataStore();
         Action action1 = null;
         Action action2 = null;
         try {
-            action1 = rpcPool.getByUri(TEST_ACTION_URI);
+            action1 = actionPool.getByUri(TEST_ACTION_URI);
             apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
             addStringParam(dataStore, apao);
             OperationResult result = apao.run(dataStore);
             assertEquals(OperationResult.ok().toString(),result.toString());
-            action2 = rpcPool.getByUri(TEST_ACTION_URI);
+            action2 = actionPool.getByUri(TEST_ACTION_URI);
             assertNotEquals(action1, action2);
         } finally {
             if (action1 != null) {
@@ -81,7 +81,7 @@ public class RPCPoolAtomicOperationTest extends ServletContextTest{
     
     @Test
     public void componentStatusTest() throws InitializationException {
-        RPCPoolAtomicOperation apao = new RPCPoolAtomicOperation();
+        ActionPoolAtomicOperation apao = new ActionPoolAtomicOperation();
         DataStore dataStore = new DataStore();
         addJsonArrayParam(dataStore, apao);
         apao.setOperationType(PoolOperation.OperationType.STATUS.toString());
@@ -94,7 +94,7 @@ public class RPCPoolAtomicOperationTest extends ServletContextTest{
         assertEquals(expectedValue, data.getSerializedValue());
     }
 
-    private void addStringParam(DataStore dataStore, RPCPoolAtomicOperation apao) {
+    private void addStringParam(DataStore dataStore, ActionPoolAtomicOperation apao) {
         Parameter plainStringParam = new StringParam(STRING_PARAM_NAME);
         apao.addInputParameter(plainStringParam);
         Data plainStringData = new Data(plainStringParam);
@@ -102,20 +102,20 @@ public class RPCPoolAtomicOperationTest extends ServletContextTest{
         dataStore.addData(STRING_PARAM_NAME, plainStringData);
     }
     
-    private void addJsonArrayParam(DataStore dataStore, RPCPoolAtomicOperation apao) {
+    private void addJsonArrayParam(DataStore dataStore, ActionPoolAtomicOperation apao) {
         Parameter jsonObjectParam = new JsonContainerObjectParam(JSON_OBJECT_PARAM);
         apao.addOutputParameter(jsonObjectParam);
     }
     
-    private RPCPool initWithDefaultModel() {
+    private ActionPool initWithDefaultModel() {
         try {
             loadDefaultModel();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        RPCPool rpcPool = RPCPool.getInstance();
-        rpcPool.init(servletContext);
-        return rpcPool;
+        ActionPool actionPool = ActionPool.getInstance();
+        actionPool.init(servletContext);
+        return actionPool;
     }
 }
