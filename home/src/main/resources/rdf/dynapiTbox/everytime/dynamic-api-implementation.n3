@@ -82,7 +82,7 @@ dynapi:ActionPoolAtomicOperation rdfs:subClassOf dynapi_java:ActionPoolAtomicOpe
 
 dynapi:ResourceAPIPoolAtomicOperation rdfs:subClassOf dynapi_java:ResourceAPIPoolAtomicOperation .
 
-dynapi:FunctionDescriptor rdfs:subClassOf dynapi_java:FunctionDescriptor .
+dynapi:ProcedureDescriptor rdfs:subClassOf dynapi_java:ProcedureDescriptor .
 
 dynapi:Validator rdfs:subClassOf dynapi_java:validators.Validator .
 
