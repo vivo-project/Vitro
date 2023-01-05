@@ -1,0 +1,87 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:action>
+        a                                   dynapi:Action ;
+        rdfs:label                          "action"@en-US ;
+        dynapi:hasFirstStep                 <test:step1_test_action> ;
+        dynapi:hasAssignedRPC               <test:rpc_test_action> .
+
+<test:rpc_test_action>
+        a                                   dynapi:Rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "test_action" .
+
+<test:step1_test_action>
+        a                                   dynapi:OperationalStep ;
+        rdfs:label                          "step 1"@en-US ;
+        dynapi:hasOperation                 <test:loopOperation> .
+
+<test:loopOperation> 
+        a                                   dynapi:LoopOperation ;
+        rdfs:label                          "Test Loop operation component"@en-US ;
+        dynapi:inputDescriptor                <test:inputConversionProcedureDescriptor> ;
+        dynapi:conditionDescriptor            <test:conditionProcedureDescriptor> ;
+        dynapi:executableDescriptor           <test:executableInLoopProcedureDescriptor> .
+
+<test:string_param_1>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "string param"@en-US ;
+        dynapi:name                         "string" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+        
+<test:int_param_1>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "int param"@en-US ;
+        dynapi:name                         "iteration" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
+        
+<test:conditionProcedureDescriptor>
+        a                                   dynapi:ProcedureDescriptor ;
+        dynapi:call                         <test:condition_action> .        
+
+<test:inputConversionProcedureDescriptor>
+        a                                   dynapi:ProcedureDescriptor ;
+        dynapi:providesParameter            <test:int_param_1> ;
+        dynapi:requiresParameter            <test:int_param_1> ;
+        dynapi:call                         <test:inputConversionAction> .
+        
+<test:executableInLoopProcedureDescriptor>
+        a                                   dynapi:ProcedureDescriptor ;
+        dynapi:call                         <test:action_run_in_loop> .
+        
+<test:inputConversionAction>
+        a                                   dynapi:Action ;
+        rdfs:label                          "inputConversionAction"@en-US ;
+        dynapi:hasAssignedRPC               <test:rpc_input_conversion_action> .
+        
+<test:rpc_input_conversion_action>
+        a                                   dynapi:Rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "input_conversion_action" .
+        
+<test:condition_action>
+        a                                   dynapi:Action ;
+        rdfs:label                          "action_run_in_loop"@en-US ;
+        dynapi:hasAssignedRPC               <test:rpc_condition_action> .
+        
+<test:rpc_condition_action>
+        a                                   dynapi:Rpc ;
+        rdfs:label                          "Test rpc condition_action"@en-US ;
+        dynapi:name                         "condition_action" . 
+        
+<test:action_run_in_loop>
+        a                                   dynapi:Action ;
+        rdfs:label                          "action_run_in_loop"@en-US ;
+        dynapi:hasAssignedRPC               <test:rpc_action_run_in_loop> .
+        
+<test:rpc_action_run_in_loop>
+        a                                   dynapi:Rpc ;
+        rdfs:label                          "Test rpc create individual"@en-US ;
+        dynapi:name                         "action_run_in_loop" .        
+        
+        
