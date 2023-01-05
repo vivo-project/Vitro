@@ -688,8 +688,8 @@
             rdfs:subClassOf :Operation ; 
             rdfs:label "Loop operation"@en-US .
             
-###  https://vivoweb.org/ontology/vitro-dynamic-api#FunctionDescriptor
-:FunctionDescriptor rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ProcedureDescriptor
+:ProcedureDescriptor rdf:type owl:Class ;
             rdfs:label "Function description"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#NumericRangeValidator
