@@ -9,59 +9,59 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.ActionPool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.RPCPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 
-public class ActionPoolBulkOperationTest extends ServletContextTest{
+public class RPCPoolBulkOperationTest extends ServletContextTest{
 
     private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1";
-    private ActionPool actionPool;
+    private RPCPool rpcPool;
     
     @Before
     public void preparePool() {
-       actionPool = initWithDefaultModel();
+       rpcPool = initWithDefaultModel();
     }
     
     @After
     public void reset() {
         setup();
-        actionPool = initWithDefaultModel();
-        assertEquals(1, actionPool.count());
+        rpcPool = initWithDefaultModel();
+        assertEquals(1, rpcPool.count());
     }
     
     @Test
     public void componentLoadUnloadTest() throws InitializationException {
-        assertEquals(1, actionPool.count());
-        PoolBulkOperation apao = new ActionPoolBulkOperation();
+        assertEquals(1, rpcPool.count());
+        PoolBulkOperation apao = new RPCPoolBulkOperation();
         DataStore dataStore = new DataStore();
 
         apao.setOperationType(PoolOperation.OperationType.UNLOAD.toString());
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
-        assertEquals(0, actionPool.count());
+        assertEquals(0, rpcPool.count());
         
         apao.setOperationType(PoolOperation.OperationType.LOAD.toString());
          result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
-        assertEquals(1, actionPool.count());
+        assertEquals(1, rpcPool.count());
     }
     
     @Test
     public void componentReloadTest() throws InitializationException {
-        assertEquals(1, actionPool.count());
+        assertEquals(1, rpcPool.count());
         Action action1 = null;
         Action action2 = null;
         try {
-        action1 = actionPool.getByUri(TEST_ACTION_URI);
-        ActionPoolBulkOperation apao = new ActionPoolBulkOperation();
+        action1 = rpcPool.getByUri(TEST_ACTION_URI);
+        RPCPoolBulkOperation apao = new RPCPoolBulkOperation();
         apao.setOperationType(PoolOperation.OperationType.RELOAD.toString());
         DataStore dataStore = new DataStore();
         OperationResult result = apao.run(dataStore);
         assertEquals(OperationResult.ok().toString(),result.toString());
-        assertEquals(1, actionPool.count());
-        action2 = actionPool.getByUri(TEST_ACTION_URI);
+        assertEquals(1, rpcPool.count());
+        action2 = rpcPool.getByUri(TEST_ACTION_URI);
         assertNotEquals(action1, action2);
         } finally {
             if (action1 != null) {
@@ -74,15 +74,15 @@ public class ActionPoolBulkOperationTest extends ServletContextTest{
     }
 
     
-    private ActionPool initWithDefaultModel() {
+    private RPCPool initWithDefaultModel() {
         try {
             loadDefaultModel();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        ActionPool actionPool = ActionPool.getInstance();
-        actionPool.init(servletContext);
-        return actionPool;
+        RPCPool rpcPool = RPCPool.getInstance();
+        rpcPool.init(servletContext);
+        return rpcPool;
     }
 }
