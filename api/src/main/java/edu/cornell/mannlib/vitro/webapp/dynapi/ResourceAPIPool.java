@@ -7,6 +7,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 public class ResourceAPIPool extends VersionableAbstractPool<ResourceAPIKey, ResourceAPI, ResourceAPIPool> {
 
     private static ResourceAPIPool INSTANCE = new ResourceAPIPool();
+    private static ResourceAPI defaultInstance = new DefaultResourceAPI();
+
 
     public static ResourceAPIPool getInstance() {
         return INSTANCE;
@@ -19,7 +21,7 @@ public class ResourceAPIPool extends VersionableAbstractPool<ResourceAPIKey, Res
 
     @Override
     public ResourceAPI getDefault() {
-        return new DefaultResourceAPI();
+        return defaultInstance;
     }
 
     @Override

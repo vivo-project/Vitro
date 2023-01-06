@@ -4,6 +4,7 @@ import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RES
 import static java.lang.String.format;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,12 +20,14 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
@@ -145,16 +148,37 @@ public class RESTEndpoint extends VitroHttpServlet {
 		UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
         if (!action.hasPermissions(user)) {
         	OperationResult.notAuthorized().prepareResponse(response);
+            action.removeClient();
         	return;
         } 
         DataStore dataStore = new DataStore();
         if (requestPath.isResourceRequest()) {
             dataStore.setResourceID(requestPath.getResourceId());
         }
+        try {
+            Map<String, ProcedureDescriptor> dependencies = action.getDependencies();
+            Action defaultInstance = actionPool.getDefault();
+            for (String uri : dependencies.keySet()) {
+                Action dependency = actionPool.getByUri(uri);
+                if (defaultInstance.equals(dependency)) {
+                    throw new InitializationException(
+                            Action.class.getSimpleName() + " dependency with uri:'" + uri + "' not found in pool.");
+                }
+                dataStore.putDependency(uri, dependency);
+            }
+        } catch (InitializationException e) {
+            log.error(e, e);
+            dataStore.removeDependencies();
+            action.removeClient();
+            response.setStatus(500);
+            return;
+        }
 		try {
 			Converter.convert(request, action, dataStore);
 		} catch (ConversionException e) {
 			log.error(e,e);
+            action.removeClient();
+			dataStore.removeDependencies();
 			response.setStatus(500);
 			return;
 		}
@@ -167,6 +191,7 @@ public class RESTEndpoint extends VitroHttpServlet {
         	response.setStatus(500);
         	return;
         } finally {
+            dataStore.removeDependencies();
             action.removeClient();
         }
     }
