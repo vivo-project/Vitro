@@ -7,6 +7,7 @@ public class ProcedureDescriptor implements ParameterInfo{
     private String uri;
     private Parameters inputParams = new Parameters();
     private Parameters outputParams = new Parameters();
+    private Parameters expectedParams = new Parameters();
     
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
     public void addInputParameter(Parameter param) {
@@ -17,6 +18,15 @@ public class ProcedureDescriptor implements ParameterInfo{
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
     public void addOutputParameter(Parameter param) {
         outputParams.add(param);
+    }
+    
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#expectedParameter")
+    public void addExpectedParameter(Parameter param) {
+        expectedParams.add(param);
+    }
+    
+    public Parameters getExpectedParams() {
+        return expectedParams;
     }
     
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#call", minOccurs = 1, maxOccurs = 1, asString = true)
