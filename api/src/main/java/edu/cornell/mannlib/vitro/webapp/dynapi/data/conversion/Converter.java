@@ -48,14 +48,13 @@ public class Converter {
 			String message = inputContentTypeExceptionMessage(contentType);
 			throw new ConversionException(message);
 		}
-		convertInternalParams(action, dataStore);
+		convertInternalParams(action.getInternalParams(), dataStore);
 	}
 
-	public static void convertInternalParams(Action action, DataStore dataStore) throws ConversionException {
-		Parameters params = action.getInternalParams();
+	public static void convertInternalParams(Parameters params, DataStore dataStore) throws ConversionException {
 		for (String name : params.getNames()) {
 			Data data = new Data(params.get(name));
-			data.earlyInitialization();
+			data.initializeDefault();
 			dataStore.addData(name, data);
 		}
 	}

@@ -74,6 +74,10 @@ public class DataStore {
     public void putDependencies(Map<String, Action> dependencies) {
         dependencyComponents.putAll(dependencies);
     }
+    
+    public Map<String, Action> getDependencies() {
+        return dependencyComponents;
+    }
 
     public Action getDependency(String uri) {
         return dependencyComponents.get(uri);
@@ -84,5 +88,18 @@ public class DataStore {
             dependencyComponents.remove(dependencyComponent.getKey());
             dependencyComponent.removeClient();
         }
+    }
+
+    public boolean containsData(DataStore expectedData) {
+        Set<String> expectedNames = expectedData.dataMap.keySet();
+        if (!dataMap.keySet().containsAll(expectedNames)) {
+            return false;
+        }
+        for (String name : expectedData.dataMap.keySet()) {
+            if (!getData(name).equals(expectedData.getData(name))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
