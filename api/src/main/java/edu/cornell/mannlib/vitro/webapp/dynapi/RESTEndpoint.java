@@ -4,7 +4,6 @@ import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RES
 import static java.lang.String.format;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,29 +13,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
-public class RESTEndpoint extends VitroHttpServlet {
+public class RESTEndpoint extends Endpoint{
 
     private static final Log log = LogFactory.getLog(RESTEndpoint.class);
 
     private ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
-    private ActionPool actionPool = ActionPool.getInstance();
 
     public final static String RESOURCE_ID = "resource_id";
 
@@ -140,60 +130,7 @@ public class RESTEndpoint extends VitroHttpServlet {
         }
 
         String actionName = rpc.getName();
-
-        if (log.isDebugEnabled()) {
-            actionPool.printKeys();
-        }
-        Action action = actionPool.get(actionName);
-		UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
-        if (!action.hasPermissions(user)) {
-        	OperationResult.notAuthorized().prepareResponse(response);
-            action.removeClient();
-        	return;
-        } 
-        DataStore dataStore = new DataStore();
-        if (requestPath.isResourceRequest()) {
-            dataStore.setResourceID(requestPath.getResourceId());
-        }
-        try {
-            Map<String, ProcedureDescriptor> dependencies = action.getDependencies();
-            Action defaultInstance = actionPool.getDefault();
-            for (String uri : dependencies.keySet()) {
-                Action dependency = actionPool.getByUri(uri);
-                if (defaultInstance.equals(dependency)) {
-                    throw new InitializationException(
-                            Action.class.getSimpleName() + " dependency with uri:'" + uri + "' not found in pool.");
-                }
-                dataStore.putDependency(uri, dependency);
-            }
-        } catch (InitializationException e) {
-            log.error(e, e);
-            dataStore.removeDependencies();
-            action.removeClient();
-            response.setStatus(500);
-            return;
-        }
-		try {
-			Converter.convert(request, action, dataStore);
-		} catch (ConversionException e) {
-			log.error(e,e);
-            action.removeClient();
-			dataStore.removeDependencies();
-			response.setStatus(500);
-			return;
-		}
-
-        try {
-            OperationResult result = action.run(dataStore);
-            Converter.convert(response, action, result, dataStore);
-        } catch (ConversionException e) {
-        	log.error(e,e);
-        	response.setStatus(500);
-        	return;
-        } finally {
-            dataStore.removeDependencies();
-            action.removeClient();
-        }
+        processActionRequest(request, response, requestPath, actionName);
     }
 
 }
