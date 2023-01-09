@@ -3,12 +3,16 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import java.util.LinkedList;
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class LoopOperation extends Operation{
     
+    private static final Log log = LogFactory.getLog(LoopOperation.class.getName());
     private Parameters outputParams = new Parameters();
     private Parameters inputParams = new Parameters();
     private boolean inputCalculated = false;
@@ -48,6 +52,11 @@ public class LoopOperation extends Operation{
     public void addOutputParameter(Parameter param) {
         outputParams.add(param);
     }
+    
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#internalParameter")
+    public void addInternalParameter(Parameter param) {
+        internalParams.add(param);
+    }
 
     @Override
     public Parameters getOutputParams() {
@@ -66,6 +75,10 @@ public class LoopOperation extends Operation{
         return conditionDescriptors;
     }
     
+    public Parameters getInternalParams() {
+        return internalParams;
+    }
+    
     public ProcedureDescriptor getExecutableDescriptor() {
         return executableDescriptor;
     }
@@ -75,38 +88,15 @@ public class LoopOperation extends Operation{
         if (!isValid(dataStore)) {
             return OperationResult.internalServerError();
         }
-        DataStore localStore = new DataStore();
-        initializeInternalData(localStore);
-        copyDataToLocalStore(dataStore, localStore);
-        LoopOperationExecution execution = new LoopOperationExecution(localStore, this);
-        OperationResult result = execution.execute();
-        if (result.equals(OperationResult.ok())) {
-            copyDataFromLocalStore(dataStore, localStore);
+        OperationResult result = OperationResult.ok();
+        try {
+            LoopOperationExecution execution = new LoopOperationExecution(dataStore, this);
+            result = execution.executeLoop();
+        } catch (ConversionException e) {
+            log.error(e,e);
+            return OperationResult.internalServerError();
         }
         return result;
-    }
-    
-    private void initializeInternalData(DataStore localStore) {
-        for (String name : internalParams.getNames()) {
-            Parameter param = internalParams.get(name);
-            Data data = new Data(param);
-            data.initializeDefault();
-            localStore.addData(name, data);
-        }        
-    }
-
-    private void copyDataFromLocalStore(DataStore dataStore, DataStore localStore) {
-        for (String name : outputParams.getNames()) {
-            Data data = localStore.getData(name);
-            dataStore.addData(name, data);
-        }
-    }
-    
-    private void copyDataToLocalStore(DataStore dataStore, DataStore localStore) {
-        for (String name : inputParams.getNames()) {
-            Data data = dataStore.getData(name);
-            localStore.addData(name, data);
-        }
     }
 
     @Override
