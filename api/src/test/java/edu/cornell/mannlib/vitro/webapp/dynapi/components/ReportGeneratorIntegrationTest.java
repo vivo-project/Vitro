@@ -68,7 +68,7 @@ public class ReportGeneratorIntegrationTest extends ServletContextTest {
 		Data queryModelData = new Data(paramQueryModel);
 		TestView.setObject(queryModelData, storeModel);
 		store.addData(QUERY_MODEL, queryModelData);
-		Converter.convertInternalParams(action, store);
+		Converter.convertInternalParams(action.getInternalParams(), store);
 		OperationResult opResult = action.run(store);
 		assertFalse(opResult.hasError());
 		assertTrue(store.contains(REPORT));
