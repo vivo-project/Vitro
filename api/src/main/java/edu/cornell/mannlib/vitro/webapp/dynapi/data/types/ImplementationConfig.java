@@ -1,10 +1,13 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class ImplementationConfig {
 
+public class ImplementationConfig {
 	private Class<?> classObject;
 	private String methodName;
 	private String methodArguments;
@@ -63,4 +66,33 @@ public class ImplementationConfig {
 		this.conversionMethod = conversionMethod;
 	}
 	
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof ImplementationConfig)) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        ImplementationConfig compared = (ImplementationConfig) object;
+
+        return new EqualsBuilder()
+                .append(classObject, compared.classObject)
+                .append(methodName, compared.methodName)
+                .append(methodArguments, compared.methodArguments)
+                .append(conversionMethod, compared.conversionMethod)
+                .append(staticMethod, compared.staticMethod)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(59, 103)
+                .append(classObject)
+                .append(methodName)
+                .append(methodArguments)
+                .append(conversionMethod)
+                .append(staticMethod)
+                .toHashCode();
+    }
 }

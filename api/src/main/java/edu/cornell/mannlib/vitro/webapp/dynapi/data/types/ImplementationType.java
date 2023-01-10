@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -88,4 +90,30 @@ public class ImplementationType {
 	public String getDefaultValue() {
 		return defaultValue;
 	}
+	
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof ImplementationType)) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        ImplementationType compared = (ImplementationType) object;
+
+        return new EqualsBuilder()
+                .append(className, compared.className)
+                .append(serializationConfig, compared.serializationConfig)
+                .append(deserializationConfig, compared.deserializationConfig)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(59, 103)
+                .append(className)
+                .append(serializationConfig)
+                .append(deserializationConfig)
+                .toHashCode();
+    }
 }
