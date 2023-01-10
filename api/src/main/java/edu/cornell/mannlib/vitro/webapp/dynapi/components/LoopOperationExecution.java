@@ -37,7 +37,7 @@ public class LoopOperationExecution {
         loopInputParams = loopOperation.getInputParams();
         for ( ProcedureDescriptor pd : conditionDescriptors) {
             DataStore expectedData = new DataStore();
-            Converter.convertInternalParams(pd.getExpectedParams(), expectedData);
+            Converter.convertInternalParams(pd.getOutputParams(), expectedData);
             conditions.put(pd, expectedData);
         }
         this.dataStore = dataStore;

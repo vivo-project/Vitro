@@ -37,51 +37,55 @@
 <test:int_param_1>
         a                                   dynapi:Parameter ;
         rdfs:label                          "int param"@en-US ;
-        dynapi:name                         "iteration" ;
+        dynapi:name                         "iteration_param" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
+        
+<test:expected_param>
+        a                                   dynapi:Parameter ;
+        rdfs:label                          "expected param"@en-US ;
+        dynapi:name                         "expected" ;
+        dynapi:defaultValue                 "1" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
         
 <test:conditionProcedureDescriptor>
         a                                   dynapi:ProcedureDescriptor ;
+        dynapi:expectedParameter            <test:expected_param> ;
         dynapi:call                         <test:condition_action> .        
 
 <test:inputConversionProcedureDescriptor>
         a                                   dynapi:ProcedureDescriptor ;
         dynapi:providesParameter            <test:int_param_1> ;
         dynapi:requiresParameter            <test:int_param_1> ;
-        dynapi:call                         <test:inputConversionAction> .
+        dynapi:call                         <test:input_action> .
         
 <test:executableInLoopProcedureDescriptor>
         a                                   dynapi:ProcedureDescriptor ;
-        dynapi:call                         <test:action_run_in_loop> .
+        dynapi:call                         <test:execution_action> .
         
-<test:inputConversionAction>
+<test:input_action>
         a                                   dynapi:Action ;
-        rdfs:label                          "inputConversionAction"@en-US ;
-        dynapi:hasAssignedRPC               <test:rpc_input_conversion_action> .
+        dynapi:providesParameter            <test:int_param_1> ;
+        dynapi:requiresParameter            <test:int_param_1> ;
+        dynapi:hasAssignedRPC               <test:rpc_input_action> .
         
-<test:rpc_input_conversion_action>
+<test:rpc_input_action>
         a                                   dynapi:Rpc ;
-        rdfs:label                          "Test rpc create individual"@en-US ;
         dynapi:name                         "input_conversion_action" .
         
 <test:condition_action>
         a                                   dynapi:Action ;
-        rdfs:label                          "action_run_in_loop"@en-US ;
         dynapi:hasAssignedRPC               <test:rpc_condition_action> .
         
 <test:rpc_condition_action>
         a                                   dynapi:Rpc ;
-        rdfs:label                          "Test rpc condition_action"@en-US ;
         dynapi:name                         "condition_action" . 
         
-<test:action_run_in_loop>
+<test:execution_action>
         a                                   dynapi:Action ;
-        rdfs:label                          "action_run_in_loop"@en-US ;
-        dynapi:hasAssignedRPC               <test:rpc_action_run_in_loop> .
+        dynapi:hasAssignedRPC               <test:rpc_execution_action> .
         
-<test:rpc_action_run_in_loop>
+<test:rpc_execution_action>
         a                                   dynapi:Rpc ;
-        rdfs:label                          "Test rpc create individual"@en-US ;
-        dynapi:name                         "action_run_in_loop" .        
+        dynapi:name                         "execution_action" .        
         
         
