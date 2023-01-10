@@ -25,15 +25,22 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     private static final Log log = LogFactory.getLog(Action.class);
 
     private Step firstStep = NullStep.getInstance();
+    private String uri;
     private RPC rpc;
-
     private Set<Long> clients = ConcurrentHashMap.newKeySet();
-
     private Parameters outputParams = new Parameters();
     private Parameters inputParams = new Parameters();
     private Parameters internalParams = new Parameters();
     private List<AccessWhitelist> accessWhitelists = new LinkedList<AccessWhitelist>();
 
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+    
     @Override
     public void dereference() {
     }
