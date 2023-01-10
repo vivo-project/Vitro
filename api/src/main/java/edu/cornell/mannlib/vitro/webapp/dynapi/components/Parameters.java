@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class Parameters implements Removable {
 
 	private Map<String, Parameter> params;
@@ -54,4 +57,33 @@ public class Parameters implements Removable {
 		params = null;
 	}
 
+    public boolean contains(Parameter param) {
+         if (!params.containsKey(param.getName())) {
+             return false;
+         }
+         Parameter storedParam = params.get(param.getName());
+         return storedParam.equals(param);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Parameters)) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        Parameters compared = (Parameters) object;
+
+        return new EqualsBuilder()
+                .append(params, compared.params)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(59, 103)
+                .append(params)
+                .toHashCode();
+    }
 }

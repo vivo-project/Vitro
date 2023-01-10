@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
@@ -108,4 +111,29 @@ public class Parameter implements Removable {
         }
         return type.getImplementationType().getDefaultValue();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Parameter)) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        Parameter compared = (Parameter) object;
+
+        return new EqualsBuilder()
+                .append(getName(), compared.getName())
+                .append(getType(), compared.getType())
+                .isEquals();
+    }
+    
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(43, 205)
+                .append(getName())
+                .append(getType())
+                .toHashCode();
+    }
+
 }
