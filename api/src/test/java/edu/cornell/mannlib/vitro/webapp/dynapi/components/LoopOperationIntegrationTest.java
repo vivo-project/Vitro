@@ -54,7 +54,6 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
     @After
     public void reset() {
         setup();
-
         ActionPool rpcPool = ActionPool.getInstance();
         rpcPool.init(servletContext);
         rpcPool.reload();
@@ -75,12 +74,10 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         loadModel(ontModel, TEST_ACTION);
         ActionPool rpcPool = initWithDefaultModel();
         Action action = null;
-
         try { 
-            action = rpcPool.getByUri("test:action");
+            action = rpcPool.getByUri("test:loop_action");
             assertFalse(action instanceof NullAction);
             assertTrue(action.isValid());
-            Parameters inputParameters = action.getInputParams();
             DataStore store = new DataStore();
             Endpoint.getDependencies(action, store, rpcPool);
             assertTrue(OperationResult.ok().equals(action.run(store))) ;
