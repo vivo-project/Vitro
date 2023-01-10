@@ -18,7 +18,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.HttpHeaders;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
@@ -113,17 +112,10 @@ public class Converter {
 		return mostAppropriateType;
 	}
 
-	public static void convert(HttpServletResponse response, Action action, OperationResult operationResult,
-			DataStore dataStore) throws ConversionException {
-		if (!operationResult.hasSuccess()) {
-			operationResult.prepareResponse(response);
-			return;
-		}
+	public static void convert(HttpServletResponse response, Action action, DataStore dataStore) throws ConversionException {
 		if (!action.isOutputValid(dataStore)) {
-			response.setStatus(500);
-			return;
+		    throw new ConversionException(String.format("Action uri %s output is invalid", action.getUri()));
 		}
-		operationResult.prepareResponse(response);
 		// TODO: test accepted content types and prepare response according to it
 		ContentType responseType = dataStore.getResponseType();
 		if (isJson(responseType)) {
