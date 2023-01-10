@@ -30,25 +30,25 @@ public class LoopOperation extends Operation {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#inputDescriptor")
     public void addInputMapping(ProcedureDescriptor pd) {
         inputDescriptors.add(pd);
-        dependencies.put(pd.getUri(),pd);
+        dependencies.put(pd.getUri(), pd);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#outputDescriptor")
     public void addOutputMapping(ProcedureDescriptor pd) {
         outputDescriptors.add(pd);
-        dependencies.put(pd.getUri(),pd);
+        dependencies.put(pd.getUri(), pd);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#conditionDescriptor", minOccurs = 1)
     public void addCondition(ProcedureDescriptor pd) {
         conditionDescriptors.add(pd);
-        dependencies.put(pd.getUri(),pd);
+        dependencies.put(pd.getUri(), pd);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#executableDescriptor", minOccurs = 1, maxOccurs = 1)
     public void setExecutable(ProcedureDescriptor pd) {
         executableDescriptor = pd;
-        dependencies.put(pd.getUri(),pd);
+        dependencies.put(pd.getUri(), pd);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
@@ -65,7 +65,7 @@ public class LoopOperation extends Operation {
     public Map<String, ProcedureDescriptor> getDependencies() {
         return dependencies;
     }
-    
+
     @Override
     public Parameters getOutputParams() {
         return outputParams;
@@ -187,7 +187,6 @@ public class LoopOperation extends Operation {
         }
         return true;
     }
-
 
     private boolean areDescriptorsValid(DataStore dataStore) {
         for (ProcedureDescriptor descriptor : dependencies.values()) {
