@@ -81,6 +81,10 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
             DataStore store = new DataStore();
             Endpoint.getDependencies(action, store, rpcPool);
             assertTrue(OperationResult.ok().equals(action.run(store))) ;
+            //TODO: 
+            //implement required components
+            //finish implementation
+            
         } finally {
             if (action != null) {
                 action.removeClient();    
