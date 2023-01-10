@@ -15,6 +15,7 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
     private String name;
     private String versionMin;
     private String versionMax;
+    private String uri;
     private RPC rpcOnGet;
     private RPC rpcOnGetAll;
     private RPC rpcOnPost;
@@ -205,6 +206,16 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
             }
         }
         return rpc;
+    }
+
+    @Override
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    @Override
+    public String getUri() {
+        return uri;
     }
 
 }
