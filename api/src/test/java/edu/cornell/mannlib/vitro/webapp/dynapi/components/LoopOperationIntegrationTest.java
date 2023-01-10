@@ -22,10 +22,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ActionPool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
 @RunWith(Parameterized.class)
@@ -44,6 +46,8 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
 
 	@Before
 	public void beforeEach() {
+        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.INFO);
+        Logger.getLogger(ActionPool.class).setLevel(Level.INFO);
 		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
 	}
 	
@@ -55,6 +59,8 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         rpcPool.init(servletContext);
         rpcPool.reload();
         assertEquals(0, rpcPool.count());
+        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.FATAL);
+        Logger.getLogger(ActionPool.class).setLevel(Level.FATAL);
     }
 
     private ActionPool initWithDefaultModel() throws IOException {
@@ -65,18 +71,19 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
     }
     
     @Test
-    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException {
-        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.INFO);
-        Logger.getLogger(ActionPool.class).setLevel(Level.INFO);
+    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException, InitializationException {
         loadModel(ontModel, TEST_ACTION);
         ActionPool rpcPool = initWithDefaultModel();
         Action action = null;
+
         try { 
             action = rpcPool.getByUri("test:action");
             assertFalse(action instanceof NullAction);
             assertTrue(action.isValid());
             Parameters inputParameters = action.getInputParams();
             DataStore store = new DataStore();
+            Endpoint.getDependencies(action, store, rpcPool);
+            assertTrue(OperationResult.ok().equals(action.run(store))) ;
         } finally {
             if (action != null) {
                 action.removeClient();    
