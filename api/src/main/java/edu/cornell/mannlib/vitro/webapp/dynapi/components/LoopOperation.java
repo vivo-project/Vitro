@@ -1,7 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import static java.lang.String.format;
+
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,8 +14,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class LoopOperation extends Operation{
-    
+public class LoopOperation extends Operation {
+
     private static final Log log = LogFactory.getLog(LoopOperation.class.getName());
     private Parameters outputParams = new Parameters();
     private Parameters inputParams = new Parameters();
@@ -20,44 +24,48 @@ public class LoopOperation extends Operation{
     private List<ProcedureDescriptor> inputDescriptors = new LinkedList<>();
     private List<ProcedureDescriptor> outputDescriptors = new LinkedList<>();
     private List<ProcedureDescriptor> conditionDescriptors = new LinkedList<>();
-    private List<ProcedureDescriptor> dependencies = new LinkedList<>();
+    private Map<String, ProcedureDescriptor> dependencies = new HashMap<>();
     private ProcedureDescriptor executableDescriptor;
-
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#inputDescriptor")
     public void addInputMapping(ProcedureDescriptor pd) {
         inputDescriptors.add(pd);
-        dependencies.add(pd);
+        dependencies.put(pd.getUri(),pd);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#outputDescriptor")
     public void addOutputMapping(ProcedureDescriptor pd) {
         outputDescriptors.add(pd);
-        dependencies.add(pd);
+        dependencies.put(pd.getUri(),pd);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#conditionDescriptor", minOccurs = 1)
     public void addCondition(ProcedureDescriptor pd) {
         conditionDescriptors.add(pd);
-        dependencies.add(pd);
+        dependencies.put(pd.getUri(),pd);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#executableDescriptor", minOccurs = 1, maxOccurs = 1)
     public void setExecutable(ProcedureDescriptor pd) {
         executableDescriptor = pd;
-        dependencies.add(pd);
+        dependencies.put(pd.getUri(),pd);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
     public void addOutputParameter(Parameter param) {
         outputParams.add(param);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#internalParameter")
     public void addInternalParameter(Parameter param) {
         internalParams.add(param);
     }
 
+    @Override
+    public Map<String, ProcedureDescriptor> getDependencies() {
+        return dependencies;
+    }
+    
     @Override
     public Parameters getOutputParams() {
         return outputParams;
@@ -70,19 +78,19 @@ public class LoopOperation extends Operation{
     public List<ProcedureDescriptor> getOutputDescriptors() {
         return outputDescriptors;
     }
-    
+
     public List<ProcedureDescriptor> getConditionDescriptors() {
         return conditionDescriptors;
     }
-    
+
     public Parameters getInternalParams() {
         return internalParams;
     }
-    
+
     public ProcedureDescriptor getExecutableDescriptor() {
         return executableDescriptor;
     }
-    
+
     @Override
     public OperationResult run(DataStore dataStore) {
         if (!isValid(dataStore)) {
@@ -93,19 +101,20 @@ public class LoopOperation extends Operation{
             LoopOperationExecution execution = new LoopOperationExecution(dataStore, this);
             result = execution.executeLoop();
         } catch (ConversionException e) {
-            log.error(e,e);
+            log.error(e, e);
             return OperationResult.internalServerError();
         }
         return result;
     }
 
     @Override
-    public void dereference() {}
+    public void dereference() {
+    }
 
     @Override
     public Parameters getInputParams() {
         if (!inputCalculated) {
-            calculateInputParams();    
+            calculateInputParams();
         }
         return inputParams;
     }
@@ -128,32 +137,32 @@ public class LoopOperation extends Operation{
     }
 
     private Parameters getConditionsRequired() {
-        Parameters conditionsRequired = new Parameters(); 
-        for (ProcedureDescriptor condition: conditionDescriptors) {
+        Parameters conditionsRequired = new Parameters();
+        for (ProcedureDescriptor condition : conditionDescriptors) {
             conditionsRequired.addAll(condition.getInputParams());
         }
-        return conditionsRequired;     
+        return conditionsRequired;
     }
 
     private Parameters getOutputConvertersRequired() {
-        Parameters outputConvertersRequired = new Parameters(); 
-        for (ProcedureDescriptor outputConverter: outputDescriptors) {
+        Parameters outputConvertersRequired = new Parameters();
+        for (ProcedureDescriptor outputConverter : outputDescriptors) {
             outputConvertersRequired.addAll(outputConverter.getInputParams());
         }
         return outputConvertersRequired;
     }
-    
+
     private Parameters getInputConvertersRequired() {
-        Parameters inputConvertersRequired = new Parameters(); 
-        for (ProcedureDescriptor inputConverter: inputDescriptors) {
+        Parameters inputConvertersRequired = new Parameters();
+        for (ProcedureDescriptor inputConverter : inputDescriptors) {
             inputConvertersRequired.addAll(inputConverter.getInputParams());
         }
         return inputConvertersRequired;
     }
-    
+
     private Parameters getInputConvertersProvided() {
-        Parameters inputConvertersProvided = new Parameters(); 
-        for (ProcedureDescriptor inputConverter: inputDescriptors) {
+        Parameters inputConvertersProvided = new Parameters();
+        for (ProcedureDescriptor inputConverter : inputDescriptors) {
             inputConvertersProvided.addAll(inputConverter.getOutputParams());
         }
         return inputConvertersProvided;
@@ -163,12 +172,13 @@ public class LoopOperation extends Operation{
         if (!isValid()) {
             return false;
         }
-        //TODO: implement checks
+        if (!areDescriptorsValid(dataStore)) {
+            return false;
+        }
         return true;
     }
 
     public boolean isValid() {
-        //TODO:implement checks
         if (conditionDescriptors.isEmpty()) {
             return false;
         }
@@ -178,5 +188,39 @@ public class LoopOperation extends Operation{
         return true;
     }
 
+
+    private boolean areDescriptorsValid(DataStore dataStore) {
+        for (ProcedureDescriptor descriptor : dependencies.values()) {
+            if (!isValidDescriptor(descriptor, dataStore)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isValidDescriptor(ProcedureDescriptor descriptor, DataStore dataStore) {
+        String uri = descriptor.getUri();
+        if (uri == null) {
+            log.error("Uri not provided. Loop descriptor validation failed.");
+            return false;
+        }
+        Map<String, Action> map = dataStore.getDependencies();
+        if (!map.containsKey(uri)) {
+            log.error(format("Dependency with uri: '%s' expected, but not provided. Loop validation failed.", uri));
+            return false;
+        }
+        Action dependency = map.get(uri);
+        if (dependency == null) {
+            log.error(format("Dependency with uri: '%s' expected, but null provided. Loop validation failed.", uri));
+            return false;
+        }
+        if (NullAction.getInstance().equals(dependency)) {
+            log.error(format(
+                    "Dependency with uri: '%s' expected, but default null object provided. Loop validation failed.",
+                    uri));
+            return false;
+        }
+        return true;
+    }
 
 }
