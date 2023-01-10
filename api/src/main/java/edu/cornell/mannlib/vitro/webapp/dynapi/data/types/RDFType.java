@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.datatypes.xsd.impl.RDFLangString;
@@ -35,6 +37,10 @@ public class RDFType implements Removable {
     public void setName(String name) {
         this.name = name;
     }
+    
+    private String getName() {
+        return name;
+    }
 
 	public boolean isLiteral() {
 		RDFDatatype type = getRDFDataType();
@@ -49,8 +55,27 @@ public class RDFType implements Removable {
 	}
 	
     @Override
-    public void dereference() {
-        // TODO Auto-generated method stub
-    }
+    public void dereference() {}
     
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof RDFType)) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        RDFType compared = (RDFType) object;
+
+        return new EqualsBuilder()
+                .append(getName(), compared.getName())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(47, 201)
+                .append(getName())
+                .toHashCode();
+    }
 }

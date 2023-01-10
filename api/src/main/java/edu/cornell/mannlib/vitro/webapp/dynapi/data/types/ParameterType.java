@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
@@ -13,7 +16,7 @@ public class ParameterType implements Removable {
 	private SerializationType serializationType;
 	private RDFType rdftype;
 	private ImplementationType implementationType;
-	protected ParameterType valuesType = this;
+	protected ParameterType valuesType = NullParameterType.getInstance();
 	private boolean isInternal = false;
 
 	public String getName() {
@@ -126,4 +129,34 @@ public class ParameterType implements Removable {
 		}
 
 	}
+	
+	@Override
+    public boolean equals(Object object) {
+        if (!(object instanceof ParameterType)) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        ParameterType compared = (ParameterType) object;
+
+        return new EqualsBuilder()
+                .append(getName(), compared.getName())
+                .append(getSerializationType(), compared.getSerializationType())
+                .append(getImplementationType(), compared.getImplementationType())
+                .append(getRdfType(), compared.getRdfType())
+                .append(getValuesType(), compared.getValuesType())
+                .isEquals();
+    }
+    
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(43, 205)
+                .append(getName())
+                .append(getSerializationType())
+                .append(getImplementationType())
+                .append(getRdfType())
+                .append(getValuesType())
+                .toHashCode();
+    }
 }
