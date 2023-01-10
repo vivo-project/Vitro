@@ -82,6 +82,10 @@ public class DataStore {
     public Action getDependency(String uri) {
         return dependencyComponents.get(uri);
     }
+    
+    public boolean containsDependency(String uri) {
+        return dependencyComponents.containsKey(uri);
+    }
 
     public void removeDependencies() {
         for (Action dependencyComponent : dependencyComponents.values()) {
