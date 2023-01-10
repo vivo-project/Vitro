@@ -67,6 +67,10 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         component.addClient();
         return component;
     }
+    
+    public String getUri(K key) {
+        return components.getUri(key);
+    }
 
     public void printKeys() {
         for (Map.Entry<K, C> entry : components.entrySet()) {
@@ -201,6 +205,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
                     String oldUri = components.getUri(key);
                     log.info(format("Replaced %s component, uri:'%s' with uri:'%s', as they have the same key:'%s'.", getType().getSimpleName(),oldUri, uri , key));
                 }
+                component.setUri(uri);
                 components.put(key, component);
                 components.putUriMapping(uri, key);
                 log.info(format("Loaded %s component, uri:'%s', key:'%s'.", getType().getSimpleName(), uri , key));
