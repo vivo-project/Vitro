@@ -87,3 +87,9 @@ dynapi:ProcedureDescriptor rdfs:subClassOf dynapi_java:ProcedureDescriptor .
 dynapi:Validator rdfs:subClassOf dynapi_java:validators.Validator .
 
 dynapi:LoopOperation rdfs:subClassOf dynapi_java:LoopOperation .
+
+dynapi:LoopOperation rdfs:subClassOf dynapi_java:LoopOperation .
+
+dynapi:ContainerLoader rdfs:subClassOf dynapi_java:ContainerLoader .
+
+dynapi:ContainerQuery rdfs:subClassOf dynapi_java:ContainerQuery .

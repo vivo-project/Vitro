@@ -135,4 +135,9 @@ public class JsonContainerView {
         return row;
     }
 
+    public static JsonContainer getJsonContainer(DataStore store, Parameter param) {
+        Data data = store.getData(param.getName());
+        JsonContainer container = (JsonContainer) data.getObject();
+        return container;
+    }
 }

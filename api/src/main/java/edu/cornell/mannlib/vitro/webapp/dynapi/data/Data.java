@@ -40,12 +40,22 @@ public class Data {
     public void earlyInitialization() {
         initialization();
     }
+    
+    public boolean isInitialized() {
+        return object != null;
+    }
 
     public void initialization() {
         if (param.isInternal()) {
             initializeDefault();
             return;
         }
+        final ParameterType type = param.getType();
+        final ImplementationType implementationType = type.getImplementationType();
+        object = implementationType.deserialize(type, string);
+    }
+    
+    public void initializeFromString() {
         final ParameterType type = param.getType();
         final ImplementationType implementationType = type.getImplementationType();
         object = implementationType.deserialize(type, string);
