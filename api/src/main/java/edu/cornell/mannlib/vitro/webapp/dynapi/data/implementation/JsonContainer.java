@@ -11,6 +11,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
@@ -20,8 +21,10 @@ import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
 
 public class JsonContainer {
@@ -84,6 +87,32 @@ public class JsonContainer {
 			init(EMPTY_OBJECT);
 		}
 	}
+	
+	public Data getItem(String key, Parameter parameter) {
+	    JsonNode result = NullNode.getInstance();
+        if (isRootObject()) {
+            result = ctx.read("$." + key);
+        } else if (isRootArray()) {
+            result = ctx.read(String.format("$.[%s]", key));
+        }
+        if (!result.isNull() && result.isValueNode()) {
+            String localKey = result.asText();
+            if (dataMap.containsKey(localKey)) {
+                return dataMap.get(localKey);
+            }
+            Data data = new Data(parameter);
+            data.setRawString(result.asText());
+            data.initializeFromString();
+            return data;
+        }
+        if (result.isContainerNode()) {
+            Data data = new Data(parameter);
+            data.setRawString(result.asText());
+            data.initializeFromString();
+            return data;
+        }
+        return new Data(parameter);
+	}
 
 	public List<String> getDataAsStringList() {
 	    List<String> result = new LinkedList<>();
@@ -94,7 +123,11 @@ public class JsonContainer {
 	}
 	
 	private String getRandomKey() {
-		return UUID.randomUUID().toString();
+		String id = UUID.randomUUID().toString();
+		while (dataMap.containsKey(id)){
+		    id = UUID.randomUUID().toString(); 
+		}
+        return id;
 	}
 
 	public static String serialize(JsonContainer object) {
@@ -108,6 +141,16 @@ public class JsonContainer {
 		replaceKeys(deepCopy);
 		return deepCopy;
 	}
+	
+	public boolean isRootArray() {
+	    JsonNode node = ctx.json();
+	    return node.isArray();
+	}
+	
+	public boolean isRootObject() {
+        JsonNode node = ctx.json();
+        return node.isObject();
+    }
 
 	private void replaceKeys(JsonNode node) {
 		if (node.isObject()) {
@@ -166,9 +209,6 @@ public class JsonContainer {
 
 	public void addKeyValue(String var, Data data) {
 		String id = getRandomKey();
-		if (dataMap.containsKey(id)) {
-			throw new RuntimeException();
-		}
 		if (rootType.equals(Type.OBJECT)) {
 		    ctx.put(PATH_ROOT_PREFIX, var, id);    
 		} else {
@@ -181,9 +221,6 @@ public class JsonContainer {
 	
     public void addValue(Data data) {
         String id = getRandomKey();
-        if (dataMap.containsKey(id)) {
-            throw new RuntimeException();
-        }
         if (rootType.equals(Type.ARRAY)) {
             ctx.add(PATH_ROOT_PREFIX, id);
         } else {
