@@ -888,4 +888,17 @@
 :ResourceAPIPoolBulkOperation rdf:type owl:Class ;
             rdfs:subClassOf :PoolBulkOperation ; 
             rdfs:label "Resource API pool bulk operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ContainerLoader
+:ContainerLoader rdf:type owl:Class ;
+            rdfs:subClassOf :PoolOperation,
+                            :ParameterReceiver  ;
+            rdfs:label "Load data into container operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ContainerQuery
+:ContainerQuery rdf:type owl:Class ;
+            rdfs:subClassOf :PoolOperation,
+            		    :ParameterProvider,
+                            :ParameterReceiver  ;
+            rdfs:label "Operation to query data from a container"@en-US .
 
