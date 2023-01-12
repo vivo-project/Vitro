@@ -176,9 +176,15 @@ public class GroupedPropertyList extends BaseTemplateModel {
         List<FauxObjectPropertyWrapper> filteredAdditions = new ArrayList<FauxObjectPropertyWrapper>();
         for (FauxObjectPropertyWrapper prop : populatedFauxOPs) {
             List<String> allowedTypes = populatedObjTypes.get(prop.getURI());
-            if(allowedTypes != null && (allowedTypes.contains(prop.getRangeVClassURI())
-                    || allowedTypes.contains(prop.getRangeEntityURI()) ) ) {
+            if (allowedTypes == null) {
+            	continue;
+            }
+            String rangeVClassURI = prop.getRangeVClassURI();
+            String rangeEntityURI = prop.getRangeEntityURI();
+            if(allowedTypes.contains(rangeVClassURI) ) {
                 filteredAdditions.add(prop);
+            } else if (allowedTypes.contains(rangeEntityURI)) {
+            	filteredAdditions.add(prop);
             }
         }
         return filteredAdditions;
