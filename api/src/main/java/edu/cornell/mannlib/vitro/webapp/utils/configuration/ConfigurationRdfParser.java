@@ -57,7 +57,8 @@ public class ConfigurationRdfParser {
 		Selector s = new SimpleSelector(createResource(uri), null,
 				(RDFNode) null);
 		try (LockedModel m = locking.read()) {
-			if (m.listStatements(s).toList().isEmpty()) {
+			final List<Statement> subjectStatements = m.listStatements(s).toList();
+            if (subjectStatements.isEmpty()) {
 				throw individualDoesNotAppearInModel(uri);
 			}
 		}
@@ -117,9 +118,10 @@ public class ConfigurationRdfParser {
 		Set<Class<? extends T>> concreteClasses = new HashSet<>();
 
 		try (LockedModel m = locking.read()) {
-			for (RDFNode node : m
+			final Set<RDFNode> objectsWithProperty = m
 					.listObjectsOfProperty(createResource(uri), RDF.type)
-					.toSet()) {
+					.toSet();
+            for (RDFNode node : objectsWithProperty) {
 				if (node.isAnon()) {
 					continue;
 				}
