@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 import stubs.javax.servlet.ServletContextStub;
 
 @RunWith(Parameterized.class)
-public class ConditionTest extends ServletContextTest{
+public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest{
 
     private static final String MODEL_PARAM = "FULL_UNION";
 	private static final String INPUT_PARAM = "input_param";
@@ -96,6 +96,7 @@ public class ConditionTest extends ServletContextTest{
     
     public void loadOntology(OntModel ontModel) throws IOException {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
+        loadModel(ontModel, ONTOLOGY_FILE_PATH);
         loadModel(ontModel, getFileList(ABOX_PREFIX));
     }
 
