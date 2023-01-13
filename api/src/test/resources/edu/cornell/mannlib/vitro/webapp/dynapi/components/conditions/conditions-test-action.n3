@@ -13,25 +13,21 @@
         dynapi:hasAssignedRPC               <test:rpc1> .
 
 <test:step1>
-        a                                   dynapi:Step, dynapi:ConditionalStep ;
-        rdfs:label                          "step 1"@en-US ;
+        a                                   dynapi:ConditionalStep ;
         dynapi:nextIfSatisfied              <test:step2> ;
         dynapi:nextIfNotSatisfied           <test:step3> ;
         dynapi:hasCondition                 <test:condition1> .
 
 <test:condition1> 
-        a                                   dynapi:Condition, dynapi:ConditionIsNotEmpty ;
-        rdfs:label                          "condition 1"@en-US ;
+        a                                   dynapi:ConditionIsNotEmpty ;
         dynapi:requiresParameter            <test:input_param> .
 
 <test:step2>
-        a                                   dynapi:Step, dynapi:OperationalStep ;
-        rdfs:label                          "step 2"@en-US ;
+        a                                   dynapi:OperationalStep ;
         dynapi:hasOperation                 <test:query2> .
 
 <test:step3>
-        a                                   dynapi:Step, dynapi:OperationalStep ;
-        rdfs:label                          "step 3"@en-US ;
+        a                                   dynapi:OperationalStep ;
         dynapi:hasOperation                 <test:query3> .
 
 <test:rpc1>
@@ -41,32 +37,28 @@
 
 <test:input_param>
         a                                   dynapi:Parameter ;
-        rdfs:label                          "input param"@en-US ;
         dynapi:name                         "input_param" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 
 <test:model_param>
-        a                                   dynapi:Parameter, dynapi:Model ;
-        rdfs:label                          "model param"@en-US ;
+        a                                   dynapi:Model ;
         dynapi:name                         "model" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
 
 <test:result_param>
         a                                   dynapi:Parameter ;
-        rdfs:label                          "result param"@en-US ;
         dynapi:name                         "label" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> .
 
 <test:query2>
-        a                                   dynapi:Operation, dynapi:SparqlSelectQuery ;
-        rdfs:label                          "sparql query 2"@en-US ;
-		dynapi:hasModel        			    <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+        a                                   dynapi:SparqlSelectQuery ;
+	dynapi:hasModel        		    <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:providesParameter            <test:result_param> ;
-        dynapi:sparqlQueryText              "SELECT ?label WHERE { <test:uri2> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }" . 
+        dynapi:sparqlQueryText              """SELECT ?label WHERE { <test:uri2> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }""" . 
 
 <test:query3>
-        a                                   dynapi:Operation, dynapi:SparqlSelectQuery ;
+        a                                   dynapi:SparqlSelectQuery ;
         rdfs:label                          "sparql query 3"@en-US ;
-		dynapi:hasModel        			    <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
+	dynapi:hasModel        	            <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union> ;
         dynapi:providesParameter            <test:result_param> ;
-        dynapi:sparqlQueryText              "SELECT ?label WHERE { <test:uri3> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }" . 
+        dynapi:sparqlQueryText              """SELECT ?label WHERE { <test:uri3> <http://www.w3.org/2000/01/rdf-schema#label> ?label . }""" . 
