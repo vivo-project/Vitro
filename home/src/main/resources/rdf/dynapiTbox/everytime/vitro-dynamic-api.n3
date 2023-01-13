@@ -901,4 +901,11 @@
             		    :ParameterProvider,
                             :ParameterReceiver  ;
             rdfs:label "Operation to query data from a container"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#SumOperation
+:SumOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolOperation,
+            		    :ParameterProvider,
+                            :ParameterReceiver  ;
+            rdfs:label "Sum operation"@en-US .
 
