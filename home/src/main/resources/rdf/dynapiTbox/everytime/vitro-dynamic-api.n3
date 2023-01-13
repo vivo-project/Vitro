@@ -32,7 +32,7 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasCondition
 :hasCondition rdf:type owl:ObjectProperty ;
               rdfs:subPropertyOf owl:topObjectProperty ;
-              rdfs:domain :Parameter ;
+              rdfs:domain :ConditionalStep ;
               rdfs:range :Condition ;
               rdfs:label "has validator"@en-US .
 
@@ -814,7 +814,6 @@
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#Step
 :Step rdf:type owl:Class ;
-      rdfs:subClassOf owl:Thing ;
       rdfs:label "Step"@en-US .
 
 
