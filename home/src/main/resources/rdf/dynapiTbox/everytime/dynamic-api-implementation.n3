@@ -93,3 +93,5 @@ dynapi:LoopOperation rdfs:subClassOf dynapi_java:LoopOperation .
 dynapi:ContainerLoader rdfs:subClassOf dynapi_java:ContainerLoader .
 
 dynapi:ContainerQuery rdfs:subClassOf dynapi_java:ContainerQuery .
+
+dynapi:SumOperation rdfs:subClassOf dynapi_java:SumOperation .
