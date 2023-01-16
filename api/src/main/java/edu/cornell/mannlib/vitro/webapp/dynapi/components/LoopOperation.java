@@ -120,7 +120,6 @@ public class LoopOperation extends Operation {
     }
 
     protected void calculateInputParams() {
-        Parameters inputParams = new Parameters();
         Parameters inConvertersRequired = getInputConvertersRequired();
         Parameters inConvertersProvided = getInputConvertersProvided();
         Parameters outConvertersRequired = getOutputConvertersRequired();
