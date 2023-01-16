@@ -62,6 +62,8 @@ dynapi:Condition rdfs:subClassOf dynapi_java:conditions.Condition .
 
 dynapi:ConditionIsNotEmpty rdfs:subClassOf dynapi_java:conditions.ConditionIsNotEmpty .
 
+dynapi:ConditionContainerContains rdfs:subClassOf dynapi_java:conditions.ConditionContainerContains .
+
 dynapi:UserGroup rdfs:subClassOf dynapi_access:UserGroup .
 
 dynapi:AccessWhitelist rdfs:subClassOf dynapi_access:AccessWhitelist .
