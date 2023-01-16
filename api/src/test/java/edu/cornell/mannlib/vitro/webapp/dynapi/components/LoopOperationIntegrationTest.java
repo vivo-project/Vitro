@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -25,29 +26,37 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.ActionPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.IntegerParam;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
 @RunWith(Parameterized.class)
 public class LoopOperationIntegrationTest extends ServletContextTest {
 
-	private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
+	private static final String OUTPUT_CONTAINER = "output_container";
+    private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
 	private static final String TEST_ACTION = RESOURCES_PATH + "loop-operation-test-action.n3";
 
 	Model storeModel;
 
 	@org.junit.runners.Parameterized.Parameter(0)
-	public String uri;
-
+	public List<Integer> inputValues;
+	
 	@org.junit.runners.Parameterized.Parameter(1)
-	public String value;
+	public String expectedValues;
+
 
 	@Before
 	public void beforeEach() {
-        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.INFO);
-        Logger.getLogger(ActionPool.class).setLevel(Level.INFO);
+        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.OFF);
+        Logger.getLogger(ActionPool.class).setLevel(Level.OFF);
 		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
 	}
 	
@@ -58,8 +67,8 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         rpcPool.init(servletContext);
         rpcPool.reload();
         assertEquals(0, rpcPool.count());
-        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.FATAL);
-        Logger.getLogger(ActionPool.class).setLevel(Level.FATAL);
+        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.OFF);
+        Logger.getLogger(ActionPool.class).setLevel(Level.OFF);
     }
 
     private ActionPool initWithDefaultModel() throws IOException {
@@ -79,12 +88,13 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
             assertFalse(action instanceof NullAction);
             assertTrue(action.isValid());
             DataStore store = new DataStore();
+            addInputContainer(store);
+            
             Endpoint.getDependencies(action, store, rpcPool);
             assertTrue(OperationResult.ok().equals(action.run(store))) ;
-            //TODO: 
-            //implement required components
-            //finish implementation
-            
+            assertTrue(store.contains(OUTPUT_CONTAINER));
+            Data output = store.getData(OUTPUT_CONTAINER);
+            assertEquals(expectedValues,output.getSerializedValue());
         } finally {
             if (action != null) {
                 action.removeClient();    
@@ -92,16 +102,41 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         }
     }
 
+    private void addInputContainer(DataStore store) {
+        String containerParamName = "input_container";
+        Parameter container = new JsonContainerObjectParam(containerParamName);
+        Data containerData = createContainer(container);
+        store.addData(containerParamName, containerData);
+    }
+    
+    private Data createContainer(Parameter containerParam) {
+        Data containerData = new Data(containerParam);
+        JsonContainer container = new JsonContainer(Type.ARRAY);
+        String expectedOutputParamName = "item";
+        Parameter expectedOutputParam = new IntegerParam(expectedOutputParamName);
+        for (Integer value : inputValues) {
+            addValue(container, expectedOutputParam, value);
+        }
+        TestView.setObject(containerData, container);
+        return containerData;
+    }
+
+    private void addValue(JsonContainer container, Parameter expectedOutputParam, Integer value) {
+        Data data = new Data(expectedOutputParam);
+        TestView.setObject(data, value);
+        container.addValue(data);
+    }
+
 	@Parameterized.Parameters
 	public static Collection<Object[]> requests() {
 		return Arrays.asList(new Object[][] {
-		    {"test", "test"}
+		    {Arrays.asList(20,30,40,50,60), "[\"30\",\"40\",\"50\",\"60\",\"70\"]"},
+		    {Arrays.asList(-100,-90,-80,-70,-60), "[\"-90\",\"-80\",\"-70\",\"-60\",\"-50\"]"},
 		});
 	}
 
 	protected void loadModel(Model model, String... files) throws IOException {
 		for (String file : files) {
-		    System.out.println(file);
 			String rdf = readFile(file);
 			model.read(new StringReader(rdf), null, "n3");
 		}

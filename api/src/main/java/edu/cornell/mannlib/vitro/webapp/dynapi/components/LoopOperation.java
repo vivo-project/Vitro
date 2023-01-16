@@ -100,7 +100,7 @@ public class LoopOperation extends Operation {
         try {
             LoopOperationExecution execution = new LoopOperationExecution(dataStore, this);
             result = execution.executeLoop();
-        } catch (ConversionException e) {
+        } catch (Exception e) {
             log.error(e, e);
             return OperationResult.internalServerError();
         }
@@ -190,6 +190,12 @@ public class LoopOperation extends Operation {
     private boolean areDescriptorsValid(DataStore dataStore) {
         for (ProcedureDescriptor descriptor : dependencies.values()) {
             if (!isValidDescriptor(descriptor, dataStore)) {
+                return false;
+            }
+        }
+        for (String name : inputParams.getNames()) {
+            if (!dataStore.contains(name)) {
+                log.error(String.format("Input parameter '%s' is not provided in data store", name));
                 return false;
             }
         }

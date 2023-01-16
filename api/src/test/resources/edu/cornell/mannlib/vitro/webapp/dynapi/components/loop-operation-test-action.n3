@@ -8,6 +8,7 @@
 <test:loop_action>
         a                                   dynapi:Action ;
         dynapi:hasFirstStep                 <test:step1_test_action> ;
+        dynapi:providesParameter            <test:output_container_param> ;
         dynapi:hasAssignedRPC               <test:rpc_test_action> .
 
 <test:rpc_test_action>
@@ -20,48 +21,96 @@
 
 <test:loopOperation> 
         a                                   dynapi:LoopOperation ;
+        
         dynapi:inputDescriptor              <test:inputDescriptor> ;
 	dynapi:outputDescriptor             <test:outputDescriptor> ;
         dynapi:conditionDescriptor          <test:conditionDescriptor> ;
-        dynapi:executableDescriptor         <test:executableDescriptor> .
-
+        dynapi:executableDescriptor         <test:executableDescriptor> ;
+        
+        dynapi:internalParameter            <test:output_container_param> ;
+        dynapi:internalParameter            <test:iteration_int_param> ;
+        
+        dynapi:providesParameter            <test:output_container_param> .
+        
 <test:string_param_1>
         a                                   dynapi:Parameter ;
         dynapi:name                         "string" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
         
-<test:int_param_1>
+<test:iteration_int_param>
         a                                   dynapi:Parameter ;
         dynapi:name                         "iteration_param" ;
+        dynapi:defaultValue                 "0" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
         
-<test:expected_param>
+<test:container_item_int_param>
         a                                   dynapi:Parameter ;
-        dynapi:name                         "expected" ;
+        dynapi:name                         "item" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
+        
+<test:input_container_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "input_container" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
+        
+<test:output_container_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "output_container" ;
+	dynapi:defaultValue                 "[]" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
+        
+<test:condition_expected_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "condition_result" ;
         dynapi:defaultValue                 "1" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
+        
+<test:condition_evaluated_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "condition_result" ;
+        dynapi:defaultValue                 "0" ;
+        dynapi:isInternal                   "true"^^xsd:boolean ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
+        
+<test:add_int_1_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "int_1" ;
+        dynapi:defaultValue                 "1" ;
+        dynapi:isInternal                   "true"^^xsd:boolean ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
+        
+<test:add_int_10_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "int_10" ;
+        dynapi:defaultValue                 "10" ;
+        dynapi:isInternal                   "true"^^xsd:boolean ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/integer> .
         
 <test:conditionDescriptor>
         a                                   dynapi:ProcedureDescriptor ;
-        dynapi:providesParameter            <test:expected_param> ;
+        dynapi:providesParameter            <test:condition_expected_param> ;
+	dynapi:requiresParameter            <test:input_container_param> ;
+	dynapi:requiresParameter            <test:iteration_int_param> ;
         dynapi:call                         <test:condition_action> .        
 
 <test:inputDescriptor>
         a                                   dynapi:ProcedureDescriptor ;
-        dynapi:providesParameter            <test:int_param_1> ;
-        dynapi:requiresParameter            <test:int_param_1> ;
+        dynapi:requiresParameter            <test:iteration_int_param> ;
+        dynapi:requiresParameter            <test:input_container_param> ;
+        dynapi:providesParameter            <test:container_item_int_param> ;
         dynapi:call                         <test:input_action> .
 
-<test:outputDescriptor>
-        a                                   dynapi:ProcedureDescriptor ;
-        dynapi:providesParameter            <test:int_param_1> ;
-        dynapi:requiresParameter            <test:int_param_1> ;
-        dynapi:call                         <test:output_action> .
+
         
 <test:executableDescriptor>
         a                                   dynapi:ProcedureDescriptor ;
+        dynapi:requiresParameter            <test:container_item_int_param> ;
+        dynapi:providesParameter            <test:container_item_int_param> ;
         dynapi:call                         <test:execution_action> .
-        
+
+##########################################################################################
+#RPC TODO: clean after endpoints modification
+
 <test:rpc_condition_action>
         a                                   dynapi:Rpc ;
         dynapi:name                         "condition_action" . 
@@ -81,27 +130,109 @@
 <test:rpc_condition_action>
         a                                   dynapi:Rpc ;
         dynapi:name                         "condition_action" . 
- ###################################################################       
         
+##########################################################################################       
+#Condition action
 <test:condition_action>
         a                                   dynapi:Action ;
-        dynapi:providesParameter            <test:expected_param> ;
+        dynapi:providesParameter            <test:condition_evaluated_param> ;
+        dynapi:hasFirstStep                 <test:condition_action_conditional_step> ;
         dynapi:hasAssignedRPC               <test:rpc_condition_action> .
         
-<test:execution_action>
-        a                                   dynapi:Action ;
-        dynapi:hasAssignedRPC               <test:rpc_execution_action> .
+<test:condition_action_conditional_step>
+        a                                   dynapi:ConditionalStep ;
+        dynapi:nextIfSatisfied              <test:condition_satisfied_step> ;
+        dynapi:hasCondition                 <test:condition_container_contains> .
         
+<test:condition_satisfied_step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <test:addOperation> .
+        
+<test:addOperation>
+	a                                   dynapi:SumOperation ;
+	dynapi:requiresParameter            <test:add_int_1_param> ;
+	dynapi:requiresParameter            <test:condition_evaluated_param> ;
+	dynapi:providesParameter            <test:condition_evaluated_param> .
+
+<test:condition_container_contains> 
+        a                                   dynapi:ConditionContainerContains ;
+        dynapi:targetContainer              <test:input_container_param> ;
+        dynapi:requiresParameter            <test:iteration_int_param> .
+        
+##########################################################################################
+#Input action   
+
 <test:input_action>
         a                                   dynapi:Action ;
-        dynapi:providesParameter            <test:int_param_1> ;
-        dynapi:requiresParameter            <test:int_param_1> ;
+        dynapi:providesParameter            <test:container_item_int_param> ;
+        dynapi:hasFirstStep                 <test:input_action_step> ;
         dynapi:hasAssignedRPC               <test:rpc_input_action> .
+
+<test:input_action_step> 
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <test:getItemFromContainer> .
         
+ <test:getItemFromContainer>
+ 	a                                   dynapi:ContainerQuery ;
+ 	dynapi:providesParameter            <test:container_item_int_param> ;
+ 	dynapi:targetContainer              <test:input_container_param> ;
+ 	dynapi:requiresParameter            <test:iteration_int_param> .
+ 	
+##########################################################################################
+#Execution action 
+
+<test:execution_action>
+        a                                   dynapi:Action ;
+        dynapi:hasFirstStep                 <test:execution_action_step> ;
+        dynapi:providesParameter            <test:container_item_int_param> ;
+        dynapi:hasAssignedRPC               <test:rpc_execution_action> .
+        
+<test:execution_action_step> 
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <test:execution_addOperation> .
+
+<test:execution_addOperation>
+	a                                   dynapi:SumOperation ;
+	dynapi:requiresParameter            <test:add_int_10_param> ;
+	dynapi:requiresParameter            <test:container_item_int_param> ;
+	dynapi:providesParameter            <test:container_item_int_param> .
+##########################################################################################
+#Output action 
+
 <test:output_action>
         a                                   dynapi:Action ;
-        dynapi:providesParameter            <test:int_param_1> ;
-        dynapi:requiresParameter            <test:int_param_1> ;
+        dynapi:providesParameter            <test:iteration_int_param> ;
+        dynapi:providesParameter            <test:output_container_param> ;
+        dynapi:hasFirstStep                 <test:output_action_put_step> ;
         dynapi:hasAssignedRPC               <test:rpc_output_action> .   
         
+<test:output_action_put_step> 
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <test:output_action_increment_iterator_step> ;
+        dynapi:hasOperation                 <test:putItemIntoContainer> .
+        
+<test:putItemIntoContainer>
+ 	a                                   dynapi:ContainerLoader ;
+ 	dynapi:targetContainer              <test:output_container_param> ;
+ 	dynapi:requiresParameter            <test:container_item_int_param> .
+
+<test:output_action_increment_iterator_step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <test:output_action_increment_iterator> .
+
+<test:output_action_increment_iterator>
+	a                                   dynapi:SumOperation ;
+	dynapi:requiresParameter            <test:add_int_1_param> ;
+	dynapi:requiresParameter            <test:iteration_int_param> ;
+	dynapi:providesParameter            <test:iteration_int_param> .
+
+<test:outputDescriptor>
+        a                                   dynapi:ProcedureDescriptor ;
+        dynapi:providesParameter            <test:output_container_param> ;
+        dynapi:providesParameter            <test:iteration_int_param> ;
+        dynapi:requiresParameter            <test:output_container_param> ;
+        dynapi:requiresParameter            <test:iteration_int_param> ;
+        dynapi:requiresParameter            <test:container_item_int_param> ; 
+        dynapi:call                         <test:output_action> .
+
         
