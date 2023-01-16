@@ -59,12 +59,13 @@ public class SumOperation extends Operation {
         BigDecimal result = new BigDecimal(0);
         for (String name : inputParams.getNames()) {
             Parameter param = inputParams.get(name);
+            Data data = dataStore.getData(name);
             if (IntegerView.isInteger(param)) {
-                int value = IntegerView.getInteger(dataStore.getData(name));
+                int value = IntegerView.getInteger(data);
                 result = result.add(new BigDecimal(value));
             }
             if (BigIntegerView.isBigInteger(param)) {
-                BigInteger value = BigIntegerView.getBigInteger(dataStore.getData(name));
+                BigInteger value = BigIntegerView.getBigInteger(data);
                 result = result.add(new BigDecimal(value));
             }
             dataStore.getData(name);
