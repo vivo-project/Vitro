@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -20,6 +21,7 @@ public class IntegerParam extends Parameter {
 			type.setName(TYPE_NAME);
 			ImplementationType implType = new ImplementationType();
 			type.setImplementationType(implType);
+			type.setSerializationType(createSerializationType());
 			implType.setSerializationConfig(getSerializationConfig());
 			implType.setDeserializationConfig(getDeserializationConfig());	
 			implType.setClassName(Integer.class.getCanonicalName());
@@ -29,6 +31,12 @@ public class IntegerParam extends Parameter {
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
 	}
+
+    private PrimitiveSerializationType createSerializationType() {
+        PrimitiveSerializationType stype = new PrimitiveSerializationType();
+        stype.setName("integer");
+        return stype;
+    }
 	
 	private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
