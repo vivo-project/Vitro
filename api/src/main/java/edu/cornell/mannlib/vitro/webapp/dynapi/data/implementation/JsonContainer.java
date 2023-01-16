@@ -93,9 +93,11 @@ public class JsonContainer {
 	public Data getItem(String key, Parameter parameter) {
 	    JsonNode result = NullNode.getInstance();
         if (isRootObject()) {
-            result = ctx.read("$." + key);
+            String jsonPath = String.format("$['%s']", escapeKey(key));
+            result = ctx.read(jsonPath);
         } else if (isRootArray()) {
-            result = ctx.read(String.format("$.[%s]", key));
+            String jsonPath = String.format("$[%s]", escapeKey(key));
+            result = ctx.read(jsonPath);
         }
         if (!result.isNull() && result.isValueNode()) {
             String localKey = result.asText();
