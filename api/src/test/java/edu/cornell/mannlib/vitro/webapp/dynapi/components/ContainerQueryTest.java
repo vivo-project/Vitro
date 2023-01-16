@@ -31,6 +31,8 @@ public class ContainerQueryTest {
     
     @org.junit.runners.Parameterized.Parameter(2)
     public String value;
+    
+    
 
     private String outputName;
     
@@ -82,6 +84,13 @@ public class ContainerQueryTest {
             {"0", Type.OBJECT, "0"},
             {"key", Type.OBJECT, "test value"},
             {"key", Type.OBJECT, ""},
+            {"key$", Type.OBJECT, "test value"},
+            {"key\\ value", Type.OBJECT, "test value"},
+            {"key'", Type.OBJECT, "test value"},
+            {"key.", Type.OBJECT, "test value"},
+            {"key\n", Type.OBJECT, "test value"},
+            {"key\t", Type.OBJECT, "test value"},
+
         });
     }
 }
