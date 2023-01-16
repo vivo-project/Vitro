@@ -6,12 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import java.util.UUID;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
@@ -24,11 +26,11 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
 
 public class JsonContainer {
 
+    private static final Log log = LogFactory.getLog(JsonContainer.class);
 	public static final String PATH_ROOT_PREFIX = "$";
 	public static final String EMPTY_OBJECT = "{}";
 	public static final String EMPTY_ARRAY = "[]";
@@ -113,8 +115,34 @@ public class JsonContainer {
         }
         return new Data(parameter);
 	}
+	
+	public boolean contains(String key) {
+	    JsonNode result = NullNode.getInstance();
+	    try {
+    	    if (isRootObject()) {
+                String jsonPathQuery = String.format("$['%s']", escapeKey(key));
+                result = ctx.read(jsonPathQuery);
+            } else if (isRootArray()) {
+                String jsonPathQuery = String.format("$[%s]", escapeKey(key));
+                result = ctx.read(jsonPathQuery);
+            }
+	    } catch (Exception e) {
+	        log.error(e, e);
+	        return false;
+	    }
+	    if (result == null || result.isNull()) {
+	        return false;
+	    }
+	    return true;
+	}
+	
+	public String escapeKey(String key) {
+	    return key
+	            .replace("\\", "\\\\")
+	            .replace("'", "\\'");
+	}
 
-	public List<String> getDataAsStringList() {
+    public List<String> getDataAsStringList() {
 	    List<String> result = new LinkedList<>();
 	    for (Data data : dataMap.values()) {
 	        result.add(data.getSerializedValue());
