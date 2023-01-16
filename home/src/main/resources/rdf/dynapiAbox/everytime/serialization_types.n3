@@ -203,8 +203,8 @@
         rdfs:label              "Boolean serialization config"@en-US ;
 		dynapi:className 		"java.lang.Boolean" ;
 		dynapi:methodName 		"toString";
-		dynapi:methodArguments	"input";
-		dynapi:isStaticMethod	"true"^^xsd:boolean ;
+		dynapi:methodArguments	"";
+		dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
         
 #-------------------------------------------------------------------------------
