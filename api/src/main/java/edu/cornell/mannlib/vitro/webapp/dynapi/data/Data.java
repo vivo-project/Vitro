@@ -89,7 +89,7 @@ public class Data {
         
         return new EqualsBuilder()
                 .append(param, d.param)
-                .append(object, d.object)
+                .append(this.object, d.object)
                 .isEquals();
     }
 
