@@ -94,13 +94,15 @@ public class DataStore {
         }
     }
 
-    public boolean containsData(DataStore expectedData) {
-        Set<String> expectedNames = expectedData.dataMap.keySet();
-        if (!dataMap.keySet().containsAll(expectedNames)) {
+    public boolean containsData(DataStore expectedDatas) {
+        Set<String> expectedDataNames = expectedDatas.dataMap.keySet();
+        if (!dataMap.keySet().containsAll(expectedDataNames)) {
             return false;
         }
-        for (String name : expectedData.dataMap.keySet()) {
-            if (!getData(name).equals(expectedData.getData(name))) {
+        for (String name : expectedDataNames) {
+            Data actualData = getData(name);
+            Data expectedData = expectedDatas.getData(name);
+            if (!actualData.equals(expectedData)) {
                 return false;
             }
         }
