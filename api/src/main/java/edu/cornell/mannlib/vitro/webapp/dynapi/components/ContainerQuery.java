@@ -54,11 +54,12 @@ public class ContainerQuery extends Operation{
             log.error("returned result is null");
             return OperationResult.internalServerError();
         }
-        if (!outputParam.equals(item.getParam())){
+        Parameter itemParam = item.getParam();
+        if (!outputParam.equals(itemParam)){
             log.error("returned result has different parameter");
             return OperationResult.internalServerError();    
         }
-        dataStore.addData(item.getParam().getName(), item);
+        dataStore.addData(itemParam.getName(), item);
         return OperationResult.ok();
     }
 
