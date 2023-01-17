@@ -83,11 +83,12 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         loadModel(ontModel, TEST_ACTION);
         ActionPool rpcPool = initWithDefaultModel();
         Action action = null;
+        DataStore store = null;
         try { 
             action = rpcPool.getByUri("test:loop_action");
             assertFalse(action instanceof NullAction);
             assertTrue(action.isValid());
-            DataStore store = new DataStore();
+            store = new DataStore();
             addInputContainer(store);
             
             Endpoint.getDependencies(action, store, rpcPool);
@@ -98,6 +99,9 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         } finally {
             if (action != null) {
                 action.removeClient();    
+            }
+            if (store != null) {
+                store.removeDependencies();    
             }
         }
     }
