@@ -6,7 +6,7 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
-dynapi:Action rdfs:subClassOf dynapi_java:Action .
+dynapi:Procedure rdfs:subClassOf dynapi_java:Procedure .
 
 dynapi:OperationalStep rdfs:subClassOf dynapi_java:OperationalStep .
 
@@ -14,7 +14,7 @@ dynapi:ConditionalStep rdfs:subClassOf dynapi_java:conditions.ConditionalStep .
 
 dynapi:Step rdfs:subClassOf dynapi_java:Step .
 
-dynapi:Operation rdfs:subClassOf dynapi_java:Operation .
+dynapi:Operation rdfs:subClassOf dynapi_java:AbstractOperation .
 
 dynapi:N3Template rdfs:subClassOf dynapi_java:N3Template .
 
@@ -76,13 +76,17 @@ dynapi:PoolAtomicOperation rdfs:subClassOf dynapi_java:PoolAtomicOperation .
 
 dynapi:PoolBulkOperation rdfs:subClassOf dynapi_java:PoolBulkOperation .
 
-dynapi:ActionPoolBulkOperation rdfs:subClassOf dynapi_java:ActionPoolBulkOperation .
+dynapi:ProcedurePoolBulkOperation rdfs:subClassOf dynapi_java:ProcedurePoolBulkOperation .
 
 dynapi:ResourceAPIPoolBulkOperation rdfs:subClassOf dynapi_java:ResourceAPIPoolBulkOperation .
 
-dynapi:ActionPoolAtomicOperation rdfs:subClassOf dynapi_java:ActionPoolAtomicOperation .
+dynapi:ProcedurePoolAtomicOperation rdfs:subClassOf dynapi_java:ProcedurePoolAtomicOperation .
 
 dynapi:ResourceAPIPoolAtomicOperation rdfs:subClassOf dynapi_java:ResourceAPIPoolAtomicOperation .
+
+dynapi:RPCPoolAtomicOperation rdfs:subClassOf dynapi_java:RPCPoolAtomicOperation .
+
+dynapi:RPCPoolAtomicOperation rdfs:subClassOf dynapi_java:RPCPoolAtomicOperation .
 
 dynapi:ProcedureDescriptor rdfs:subClassOf dynapi_java:ProcedureDescriptor .
 

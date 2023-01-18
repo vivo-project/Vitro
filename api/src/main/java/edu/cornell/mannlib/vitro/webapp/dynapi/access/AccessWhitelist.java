@@ -6,6 +6,6 @@ public interface AccessWhitelist {
 
 	public boolean isAuthorized(UserAccount user);
 
-	public void setActionName(String name);
+	public void setProcedureName(String name);
 
 }

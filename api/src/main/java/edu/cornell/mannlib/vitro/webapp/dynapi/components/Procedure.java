@@ -1,13 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,27 +17,16 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Action extends Operation implements Poolable<String>, StepInfo {
+public class Procedure extends AbstractPoolComponent implements Operation, Poolable<String>, StepInfo {
     
-    private static final Log log = LogFactory.getLog(Action.class);
+    private static final Log log = LogFactory.getLog(Procedure.class);
 
     private Step firstStep = NullStep.getInstance();
-    private String uri;
-    private RPC rpc;
-    private Set<Long> clients = ConcurrentHashMap.newKeySet();
     private Parameters outputParams = new Parameters();
     private Parameters inputParams = new Parameters();
     private Parameters internalParams = new Parameters();
     private List<AccessWhitelist> accessWhitelists = new LinkedList<AccessWhitelist>();
 
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-    
     @Override
     public void dereference() {
     }
@@ -53,17 +39,12 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#accessWhiteList")
     public void addAccessFilter(AccessWhitelist whiteList) {
         accessWhitelists.add(whiteList);
-        whiteList.setActionName(rpc.getName());
+        whiteList.setProcedureName(getUri());
     }
     
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", maxOccurs = 1)
     public void setStep(Step step) {
         this.firstStep = step;
-    }
-
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC", minOccurs = 1, maxOccurs = 1)
-    public void setRPC(RPC rpc) {
-        this.rpc = rpc;
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
@@ -73,7 +54,7 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Override
     public String getKey() {
-        return rpc.getName();
+        return getUri();
     }
 
     @Override
@@ -88,37 +69,6 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
         return result;
     }
 
-    @Override
-    public void addClient() {
-        clients.add(Thread.currentThread().getId());
-    }
-
-    @Override
-    public void removeClient() {
-        clients.remove(Thread.currentThread().getId());
-    }
-
-    @Override
-    public void removeDeadClients() {
-        Set<Long> currentClients = new HashSet<Long>();
-        currentClients.addAll(clients);
-        Map<Long, Boolean> currentThreadIds = Thread.getAllStackTraces()
-                .keySet()
-                .stream()
-                .collect(Collectors.toMap(Thread::getId, Thread::isAlive));
-        for (Long client : currentClients) {
-            if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
-                log.error("Removed left client thread with id " + client);
-                clients.remove(client);
-            }
-        }
-    }
-
-    @Override
-    public boolean hasClients() {
-        return !clients.isEmpty();
-    }
-    
     public Parameters getInternalParams() {
         return internalParams;
     }
@@ -135,8 +85,14 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 
     @Override
     public boolean isOutputValid(DataStore dataStore) {
-        if (!(super.isOutputValid(dataStore))) {
-            return false;
+        Parameters providedParams = getOutputParams();
+        if (providedParams != null) {
+            for (String name : providedParams.getNames()) {
+                if (!dataStore.contains(name)) {
+                    log.error("Parameter " + name + " not found");
+                    return false;
+                }
+            }
         }
         if (inputParams != null) {
             for (String name : inputParams.getNames()) {
@@ -217,5 +173,20 @@ public class Action extends Operation implements Poolable<String>, StepInfo {
 	public Map<String, ProcedureDescriptor> getDependencies() {
 	    return firstStep.getDependencies();
 	}
-
+	
+	public boolean isInputValid(DataStore dataStore) {
+        Parameters inputParams = getInputParams();
+        for (String name : inputParams.getNames()) {
+            if (!dataStore.contains(name)) {
+                log.error("Parameter " + name + " not found");
+                return false;
+            }
+            Parameter param = inputParams.get(name);
+            Data data = dataStore.getData(name);
+            if (!param.isValid(name, data)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

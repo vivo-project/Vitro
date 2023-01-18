@@ -34,7 +34,7 @@ import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.RESTEndpoint;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -56,35 +56,35 @@ public class JSONConverter {
 	//private static final String DEFAULT_OUTPUT_JSON = "{ \"result\" : [ {} ] }";
 	private static final String DEFAULT_OUTPUT_JSON = "{}";
 
-	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
+	public static void convert(HttpServletRequest request, Procedure procedure, DataStore dataStore)
 			throws ConversionException {
-		JsonSchema schema = getInputSchema(action, dataStore.getResourceId());
+		JsonSchema schema = getInputSchema(procedure, dataStore.getResourceId());
 		String jsonString = readRequest(request);
-		JsonNode jsonRequest = injectResourceId(jsonString, dataStore, action);
+		JsonNode jsonRequest = injectResourceId(jsonString, dataStore, procedure);
 		Set<ValidationMessage> messages = schema.validate(jsonRequest);
 		if (!messages.isEmpty()) {
 			validationFailed(jsonRequest, messages);
 		}
-		Parameters required = action.getInputParams();
+		Parameters required = procedure.getInputParams();
 		ReadContext ctx = JsonPath.using(jsonPathConfig).parse(jsonRequest.toString());
 		for (String name : required.getNames()) {
 			Parameter param = required.get(name);
-			readParam(dataStore, ctx, name, param, action);
+			readParam(dataStore, ctx, name, param, procedure);
 		}
 	}
 
-	public static void convert(HttpServletResponse response, Action action,
+	public static void convert(HttpServletResponse response, Procedure procedure,
 			DataStore dataStore) throws ConversionException {
 		response.setContentType(dataStore.getResponseType().toString());
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
 		// TODO: Validate output
-		// JsonSchema schema = getOutputSchema(action);
+		// JsonSchema schema = getOutputSchema(procedure);
 		// Set<ValidationMessage> result = schema.validate(jsonResponse);
 
 		try (PrintWriter writer = response.getWriter()) {
 			//ObjectData resultData = operationData.getRootData().filter(params.getNames());
-			String resultBody = createOutputJson(dataStore, action);
+			String resultBody = createOutputJson(dataStore, procedure);
 			//resultBody = IOJsonMessageConverter.getInstance().exportDataToResponseBody(resultData);
 			writer.print(resultBody);
 			writer.flush();
@@ -100,12 +100,12 @@ public class JSONConverter {
 		}
 	}
 
-	private static String createOutputJson(DataStore dataStore, Action action) throws ConversionException {
-		Parameters params = action.getOutputParams();
-		DocumentContext ctx = getOutputTemplate(action);
+	private static String createOutputJson(DataStore dataStore, Procedure procedure) throws ConversionException {
+		Parameters params = procedure.getOutputParams();
+		DocumentContext ctx = getOutputTemplate(procedure);
 		for (String name : params.getNames()) {
 			final Parameter param = params.get(name);
-			String path = getOutputPathPrefix(param, action);
+			String path = getOutputPathPrefix(param, procedure);
 			Data data = dataStore.getData(name);
 			ctx.put(path, name, convertDataValue(data));
 		}
@@ -134,8 +134,8 @@ public class JSONConverter {
         return mapper.convertValue(serializedValue, TextNode.class);
     }
 
-	private static DocumentContext getOutputTemplate(Action action) {
-		String template = action.getOutputTemplate();
+	private static DocumentContext getOutputTemplate(Procedure procedure) {
+		String template = procedure.getOutputTemplate();
 		DocumentContext ctx = null;
 		if (StringUtils.isBlank(template)) {
 			template = DEFAULT_OUTPUT_JSON;
@@ -148,8 +148,8 @@ public class JSONConverter {
 		return ctx;
 	}
 
-	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param, Action action) throws ConversionException {
-		String paramPath = getReadPath(name, param, action);
+	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param, Procedure procedure) throws ConversionException {
+		String paramPath = getReadPath(name, param, procedure);
 		JsonNode node = ctx.read(paramPath, JsonNode.class);
 		Data data = new Data(param);
 		data.setRawString(node.toString());
@@ -157,7 +157,7 @@ public class JSONConverter {
 		dataStore.addData(name, data);
 	}
 
-	private static JsonNode injectResourceId(String jsonString, DataStore dataStore, Action action)
+	private static JsonNode injectResourceId(String jsonString, DataStore dataStore, Procedure procedure)
 			throws ConversionException {
 		final String resourceId = dataStore.getResourceId();
 
@@ -165,14 +165,14 @@ public class JSONConverter {
 			return readJson(jsonString);
 		}
 
-		Parameters params = action.getInputParams();
+		Parameters params = procedure.getInputParams();
 		Parameter param = params.get(RESTEndpoint.RESOURCE_ID);
 
 		if (param == null) {
 			return readJson(jsonString);
 		}
 
-		String path = getInputPathPrefix(param, action);
+		String path = getInputPathPrefix(param, procedure);
 		DocumentContext ctx = JsonPath.using(jsonPathConfig).parse(jsonString).put(path, RESTEndpoint.RESOURCE_ID,
 				resourceId);
 		return readJson(ctx.jsonString());
@@ -192,14 +192,14 @@ public class JSONConverter {
 		return node;
 	}
 
-	private static String getReadPath(String name, Parameter param, Action action) {
-		return getInputPathPrefix(param, action) + "." + name;
+	private static String getReadPath(String name, Parameter param, Procedure procedure) {
+		return getInputPathPrefix(param, procedure) + "." + name;
 	}
 
-	private static String getInputPathPrefix(Parameter param, Action action) {
+	private static String getInputPathPrefix(Parameter param, Procedure procedure) {
 		String paramPath = param.getInputPath();
 		if (StringUtils.isBlank(paramPath)) {
-			paramPath = action.getInputPath();
+			paramPath = procedure.getInputPath();
 			if (StringUtils.isBlank(paramPath)) {
 				paramPath = JSON_ROOT;
 			}
@@ -207,10 +207,10 @@ public class JSONConverter {
 		return paramPath;
 	}
 
-	private static String getOutputPathPrefix(Parameter param, Action action) {
+	private static String getOutputPathPrefix(Parameter param, Procedure procedure) {
 		String paramPath = param.getOutputPath();
 		if (StringUtils.isBlank(paramPath)) {
-			paramPath = action.getOutputPath();
+			paramPath = procedure.getOutputPath();
 			if (StringUtils.isBlank(paramPath)) {
 				paramPath = JSON_ROOT ; //+ ".result[0]";
 			}
@@ -236,9 +236,9 @@ public class JSONConverter {
 		return jsonString;
 	}
 
-	private static JsonSchema getInputSchema(Action action, String resourceId) throws ConversionException {
-		String serializedSchema = action.getInputSerializedSchema();
-		Parameters params = action.getInputParams();
+	private static JsonSchema getInputSchema(Procedure procedure, String resourceId) throws ConversionException {
+		String serializedSchema = procedure.getInputSerializedSchema();
+		Parameters params = procedure.getInputParams();
 		JsonNode nativeSchema = deserializeSchema(serializedSchema);
 		if (nativeSchema != null) {
 			JsonSchema jsonSchema = factory.getSchema(nativeSchema);

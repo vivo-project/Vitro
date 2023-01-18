@@ -1,18 +1,29 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+
+import org.apache.commons.lang3.StringUtils;
+
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class RPC implements Removable {
+public class RPC extends AbstractPoolComponent implements Removable, Poolable<String> {
 
     private String name;
     private String minVersion;
     private String maxVersion;
+    private String procedureUri;
     private HTTPMethod httpMethod;
 
-    @Override
-    public void dereference() {
-        // TODO Auto-generated method stub
+    public String getProcedureUri() {
+        return procedureUri;
     }
+
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#procedure", minOccurs = 1, maxOccurs = 1, asString = true)
+    public void setProcedureUri(String procedureUri) {
+        this.procedureUri = procedureUri;
+    }
+
+    @Override
+    public void dereference() {}
 
     public String getName() {
         return name;
@@ -41,6 +52,19 @@ public class RPC implements Removable {
         return maxVersion;
     }
 
+    @Override
+    public String getKey() {
+        return name;
+    }
+
+    @Override
+    public boolean isValid() {
+        if (StringUtils.isBlank(procedureUri)) {
+            return false;
+        }
+        return true;
+    }
+    
     public HTTPMethod getHttpMethod() {
         return httpMethod;
     }
@@ -49,5 +73,5 @@ public class RPC implements Removable {
     public void setHttpMethod(HTTPMethod httpMethod) {
         this.httpMethod = httpMethod;
     }
-
+    
 }

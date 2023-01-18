@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetracti
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class ModelWriter extends Operation{
+public class ModelWriter extends AbstractOperation{
 
 	
 	private static final String ERROR_MESSAGE = "ModelWriter accept only model parameters";
