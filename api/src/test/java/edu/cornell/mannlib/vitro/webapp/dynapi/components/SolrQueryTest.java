@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -61,12 +62,14 @@ public class SolrQueryTest extends ServletContextTest {
 
     @BeforeClass
     public static void setupStaticObjects() {
+        offLogs();
         applicationUtils = mockStatic(ApplicationUtils.class);
     }
 
     @AfterClass
     public static void after() {
         applicationUtils.close();
+        restoreLogs();
     }
 
     @Before
@@ -77,6 +80,10 @@ public class SolrQueryTest extends ServletContextTest {
         this.solrQuery = new SolrQuery();
         dataStore = new DataStore();
         parameter1 = createStringParameter("testParameter");
+    }
+    
+    @After
+    public void reset() {
     }
 
     @Test

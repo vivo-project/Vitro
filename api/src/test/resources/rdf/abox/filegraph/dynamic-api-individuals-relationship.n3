@@ -7,10 +7,9 @@
 
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1>
-        a                                   dynapi:Action ;
+        a                                   dynapi:Procedure ;
         rdfs:label                          "Test relationship action 1"@en-US ;
         dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
-        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRelationshipRPC1> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testRelationshipStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testRelationshipStep1>
@@ -22,6 +21,7 @@
         a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc create relationship 1"@en-US ;
         dynapi:name                         "test_relationship" ;
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:minAPIVersion                "1.0.0" .
 
@@ -29,6 +29,7 @@
         a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get relationship 1"@en-US ;
         dynapi:name                         "test_relationship" ;
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
@@ -36,6 +37,7 @@
         a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc get all relationship 1"@en-US ;
         dynapi:name                         "test_relationship" ;
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
         dynapi:minAPIVersion                "1.0.0" .
 
@@ -43,6 +45,7 @@
         a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc update relationship 1"@en-US ;
         dynapi:name                         "test_relationship" ;
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
         dynapi:minAPIVersion                "1.0.0" .
 
@@ -50,6 +53,7 @@
         a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc patch relationship 1"@en-US ;
         dynapi:name                         "test_relationship" ;
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
         dynapi:minAPIVersion                "1.0.0" .
 
@@ -57,6 +61,7 @@
         a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc delete relationship 1"@en-US ;
         dynapi:name                         "test_relationship" ;
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
         dynapi:minAPIVersion                "1.0.0" .
 
@@ -65,17 +70,17 @@
         rdfs:label                          "Test relationship custom action 1"@en-US ;
         dynapi:name                         "test_relationship_custom_action_name" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
-        dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateRelationshipRPC1> .
+        dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testRelationshipResource1>
         a                                   dynapi:ResourceAPI ;
         rdfs:label                          "Test relationship resourceAPI 1"@en-US ;
         dynapi:name                         "test_relationship_resource" ;
         dynapi:minAPIVersion                "1.0.0" ;
-        dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateRelationshipRPC1> ;
-        dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetRelationshipRPC1> ;
-        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllRelationshipRPC1> ;
-        dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateRelationshipRPC1> ;
-        dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchRelationshipRPC1> ;
-        dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteRelationshipRPC1> ;
+        dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
+        dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
+        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
+        dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
+        dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
+        dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/action/testRelationshipAction1> ;
         dynapi:hasCustomRESTAction          <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_relationship_custom_action1> .

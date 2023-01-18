@@ -16,7 +16,7 @@ public class OperationalStep implements Step {
 
     private static final Log log = LogFactory.getLog(OperationalStep.class);
 
-    private Operation operation;
+    private AbstractOperation operation;
     private boolean optional;
     private Step nextStep = NullStep.getInstance();
 
@@ -39,7 +39,7 @@ public class OperationalStep implements Step {
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasOperation", maxOccurs = 1)
-    public void setOperation(Operation operation) {
+    public void setOperation(AbstractOperation operation) {
         this.operation = operation;
     }
 

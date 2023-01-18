@@ -5,7 +5,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class CustomRESTAction implements Removable {
 
     private String name;
-    private RPC targetRPC;
+    private String targetProcedureUri;
 
     @Override
     public void dereference() {
@@ -21,13 +21,13 @@ public class CustomRESTAction implements Removable {
         this.name = name;
     }
 
-    public RPC getTargetRPC() {
-        return targetRPC;
+    public String getTargetProcedureUri() {
+        return targetProcedureUri;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo", minOccurs = 1, maxOccurs = 1)
-    public void setTargetRPC(RPC rpc) {
-        this.targetRPC = rpc;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo", minOccurs = 1, maxOccurs = 1, asString = true)
+    public void setTargetProcedureUri(String procedureUri) {
+        this.targetProcedureUri = procedureUri;
     }
 
 }

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SparqlSelectQuery;
@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 public class AutoConfigurationTest {
     @Test
     public void testActionRequirements1() throws InitializationException {
-        Action action = new Action();
+        Procedure action = new Procedure();
         OperationalStep step1 = new OperationalStep();
         OperationalStep step2 = new OperationalStep();
         OperationalStep step3 = new OperationalStep();
@@ -44,7 +44,7 @@ public class AutoConfigurationTest {
 
     @Test
     public void testActionRequirements2() throws InitializationException {
-        Action action = new Action();
+        Procedure action = new Procedure();
         OperationalStep step1 = new OperationalStep();
         OperationalStep step2 = new OperationalStep();
 
@@ -61,7 +61,7 @@ public class AutoConfigurationTest {
     
     @Test
     public void testConditionalInActionRequirements() throws InitializationException {
-        Action action = new Action();
+        Procedure action = new Procedure();
         ConditionalStep step1 = new ConditionalStep();
         OperationalStep step2 = new OperationalStep();
         OperationalStep step3 = new OperationalStep();
@@ -83,7 +83,7 @@ public class AutoConfigurationTest {
     
     @Test
     public void testConditionalWithNullStepInActionRequirements() throws InitializationException {
-        Action action = new Action();
+        Procedure action = new Procedure();
         action.addProvidedParameter(param("A"));
         ConditionalStep step1 = new ConditionalStep();
         OperationalStep step2 = new OperationalStep();

@@ -5,32 +5,32 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions>
-        a                                   dynapi:Action ;
-        rdfs:label                          "list actions"@en-US ;
-        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/step1> ;
-        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions/parameter/actions> ;
-        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/rpc1> .
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures>
+        a                                   dynapi:Procedure ;
+        rdfs:label                          "list procedures"@en-US ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/step1> ;
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/operation/list_procedures/parameter/procedures> .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/rpc1>
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/rpc1>
 	a                                   dynapi:Rpc ;
-	rdfs:label                          "list action rpc endpoint"@en-US ;
-	dynapi:name                         "list_actions" .
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures> ;
+	rdfs:label                          "list procedure rpc endpoint"@en-US ;
+	dynapi:name                         "list_procedures" .
 	
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/step1>
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/step1>
         a                                   dynapi:OperationalStep ;
         rdfs:label                          "Step 1"@en-US ;
-        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions> .
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/operation/list_procedures> .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions> 
-        a                                   dynapi:ActionPoolBulkOperation ;
-        rdfs:label                          "list actions operation"@en-US ;
-        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions/parameter/actions> ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/operation/list_procedures> 
+        a                                   dynapi:ProcedurePoolBulkOperation ;
+        rdfs:label                          "list procedures operation"@en-US ;
+        dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/operation/list_procedures/parameter/procedures> ;
         dynapi:poolOperationType            "status" .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/list_actions/operation/list_actions/parameter/actions>
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/list_procedures/operation/list_procedures/parameter/procedures>
         a                                   dynapi:Parameter ;
-        rdfs:label                          "Actions list"@en-US ;
-        dynapi:name                         "actions" ;
+        rdfs:label                          "Procedure list"@en-US ;
+        dynapi:name                         "procedures" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
 

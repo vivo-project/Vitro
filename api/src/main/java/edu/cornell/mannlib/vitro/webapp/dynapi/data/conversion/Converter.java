@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.HttpHeaders;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
@@ -32,7 +32,7 @@ public class Converter {
 			ContentType.MULTIPART_FORM_DATA.getMimeType().toString(), 
 			ContentType.WILDCARD.getMimeType().toString()));
 
-	public static void convert(HttpServletRequest request, Action action, DataStore dataStore)
+	public static void convert(HttpServletRequest request, Procedure procedure, DataStore dataStore)
 			throws ConversionException {
 		ContentType contentType = getContentType(request.getContentType());
 		ContentType responseType = getResponseType(request.getHeader(HttpHeaders.ACCEPT), contentType);
@@ -40,14 +40,14 @@ public class Converter {
 		List<String> acceptLangs = getAcceptLanguages(request.getHeader(HttpHeaders.ACCEPT_LANGUAGE));
 		dataStore.setAcceptLangs(acceptLangs);
 		if (isJson(contentType)) {
-			JSONConverter.convert(request, action, dataStore);
+			JSONConverter.convert(request, procedure, dataStore);
 		} else if (isForm(contentType)) {
-			FormDataConverter.convert(request, action, dataStore);
+			FormDataConverter.convert(request, procedure, dataStore);
 		} else {
 			String message = inputContentTypeExceptionMessage(contentType);
 			throw new ConversionException(message);
 		}
-		convertInternalParams(action.getInternalParams(), dataStore);
+		convertInternalParams(procedure.getInternalParams(), dataStore);
 	}
 
 	public static void convertInternalParams(Parameters params, DataStore dataStore) throws ConversionException {
@@ -112,16 +112,16 @@ public class Converter {
 		return mostAppropriateType;
 	}
 
-	public static void convert(HttpServletResponse response, Action action, DataStore dataStore) throws ConversionException {
-		if (!action.isOutputValid(dataStore)) {
-		    throw new ConversionException(String.format("Action uri %s output is invalid", action.getUri()));
+	public static void convert(HttpServletResponse response, Procedure procedure, DataStore dataStore) throws ConversionException {
+		if (!procedure.isOutputValid(dataStore)) {
+		    throw new ConversionException(String.format("Action uri %s output is invalid", procedure.getUri()));
 		}
 		// TODO: test accepted content types and prepare response according to it
 		ContentType responseType = dataStore.getResponseType();
 		if (isJson(responseType)) {
-			JSONConverter.convert(response, action, dataStore);
+			JSONConverter.convert(response, procedure, dataStore);
 		} else if (isForm(responseType)) {
-			FormDataConverter.convert(response, action, dataStore);
+			FormDataConverter.convert(response, procedure, dataStore);
 		} else {
 			String message = String.format("No suitable converter found for output content type %s", responseType);
 			throw new ConversionException(message);

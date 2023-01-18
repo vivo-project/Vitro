@@ -38,7 +38,7 @@ public class RequestPathTest {
         assertTrue(requestPath.isValid());
         assertFalse(requestPath.isCustomRestAction());
         assertEquals(RequestType.RPC, requestPath.getType());
-        assertEquals("create", requestPath.getActionName());
+        assertEquals("create", requestPath.getRpcKey());
         assertEquals(null, requestPath.getResourceVersion());
         assertEquals(null, requestPath.getResourceName());
         assertEquals(null, requestPath.getResourceId());
@@ -77,7 +77,7 @@ public class RequestPathTest {
         assertEquals("1", requestPath.getResourceVersion());
         assertEquals("persons", requestPath.getResourceName());
         assertEquals(null, requestPath.getResourceId());
-        assertEquals(null, requestPath.getActionName());
+        assertEquals(null, requestPath.getRpcKey());
 
         when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/");
@@ -113,7 +113,7 @@ public class RequestPathTest {
         assertEquals("1", requestPath.getResourceVersion());
         assertEquals("persons", requestPath.getResourceName());
         assertEquals(null, requestPath.getResourceId());
-        assertEquals("dedupe", requestPath.getActionName());
+        assertEquals("dedupe", requestPath.getCustomRestActionName());
     }
 
     @Test
@@ -129,7 +129,7 @@ public class RequestPathTest {
         assertEquals("1", requestPath.getResourceVersion());
         assertEquals("persons", requestPath.getResourceName());
         assertEquals(resourceId, requestPath.getResourceId());
-        assertEquals(null, requestPath.getActionName());
+        assertEquals(null, requestPath.getRpcKey());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class RequestPathTest {
         assertEquals("1", requestPath.getResourceVersion());
         assertEquals("persons", requestPath.getResourceName());
         assertEquals(resourceId, requestPath.getResourceId());
-        assertEquals("patch", requestPath.getActionName());
+        assertEquals("patch", requestPath.getCustomRestActionName());
     }
 
     @Test

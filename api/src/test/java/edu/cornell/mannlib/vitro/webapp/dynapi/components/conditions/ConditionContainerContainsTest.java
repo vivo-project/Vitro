@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -41,7 +40,7 @@ public class ConditionContainerContainsTest {
     public String testedKey;
     
     @Before
-    public void init() {
+    public void before() {
         Logger.getLogger(JsonContainer.class).setLevel(Level.OFF);
     }
     

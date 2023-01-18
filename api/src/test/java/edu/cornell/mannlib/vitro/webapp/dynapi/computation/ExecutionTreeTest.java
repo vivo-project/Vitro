@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
@@ -17,7 +17,7 @@ public class ExecutionTreeTest {
     
    @Test
    public void testOperationGraphActionEmpty() {
-       Action action = new Action();
+       Procedure action = new Procedure();
        ExecutionTree graph = new ExecutionTree(action);
        
        assertEquals(1, graph.getNextOf(action).size());
@@ -28,7 +28,7 @@ public class ExecutionTreeTest {
    
    @Test
    public void testOperationGraphOneStep() {
-       Action action = new Action();
+       Procedure action = new Procedure();
        OperationalStep step = new OperationalStep();
        action.setStep(step);
        ExecutionTree graph = new ExecutionTree(action);
@@ -41,7 +41,7 @@ public class ExecutionTreeTest {
 
    @Test
    public void testOperationGraphTwoSteps() {
-       Action action = new Action();
+       Procedure action = new Procedure();
        OperationalStep step1 = new OperationalStep();
        action.setStep(step1);
        OperationalStep step2 = addNextStep(step1);
@@ -53,7 +53,7 @@ public class ExecutionTreeTest {
     
    @Test
    public void testOperationGraphConditional() {
-       Action action = new Action();
+       Procedure action = new Procedure();
        ConditionalStep conditionalStep = new ConditionalStep();
        action.setStep(conditionalStep);
 
@@ -77,7 +77,7 @@ public class ExecutionTreeTest {
    
    @Test
    public void testOperationGraphOneStepLoop() {
-       Action action = new Action();
+       Procedure action = new Procedure();
        OperationalStep step = new OperationalStep();
        action.setStep(step);
        step.setNextStep(step);

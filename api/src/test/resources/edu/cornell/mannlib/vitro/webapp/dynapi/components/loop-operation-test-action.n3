@@ -6,7 +6,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <test:loop_action>
-        a                                   dynapi:Action ;
+        a                                   dynapi:Procedure ;
         dynapi:hasFirstStep                 <test:step1_test_action> ;
         dynapi:providesParameter            <test:output_container_param> ;
         dynapi:hasAssignedRPC               <test:rpc_test_action> .
@@ -134,7 +134,7 @@
 ##########################################################################################       
 #Condition action
 <test:condition_action>
-        a                                   dynapi:Action ;
+        a                                   dynapi:Procedure ;
         dynapi:providesParameter            <test:condition_evaluated_param> ;
         dynapi:hasFirstStep                 <test:condition_action_conditional_step> ;
         dynapi:hasAssignedRPC               <test:rpc_condition_action> .
@@ -163,7 +163,7 @@
 #Input action   
 
 <test:input_action>
-        a                                   dynapi:Action ;
+        a                                   dynapi:Procedure ;
         dynapi:providesParameter            <test:container_item_int_param> ;
         dynapi:hasFirstStep                 <test:input_action_step> ;
         dynapi:hasAssignedRPC               <test:rpc_input_action> .
@@ -182,7 +182,7 @@
 #Execution action 
 
 <test:execution_action>
-        a                                   dynapi:Action ;
+        a                                   dynapi:Procedure ;
         dynapi:hasFirstStep                 <test:execution_action_step> ;
         dynapi:providesParameter            <test:container_item_int_param> ;
         dynapi:hasAssignedRPC               <test:rpc_execution_action> .
@@ -200,7 +200,7 @@
 #Output action 
 
 <test:output_action>
-        a                                   dynapi:Action ;
+        a                                   dynapi:Procedure ;
         dynapi:providesParameter            <test:iteration_int_param> ;
         dynapi:providesParameter            <test:output_container_param> ;
         dynapi:hasFirstStep                 <test:output_action_put_step> ;

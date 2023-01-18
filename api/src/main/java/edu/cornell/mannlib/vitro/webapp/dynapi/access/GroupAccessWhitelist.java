@@ -14,7 +14,7 @@ public class GroupAccessWhitelist implements AccessWhitelist {
 
     private static final Log log = LogFactory.getLog(GroupAccessWhitelist.class);
 	private Map<String, UserGroup> groups = new HashMap<String, UserGroup>();
-	private String actionName = "action name not provided";
+	private String procedureName = "procedure name not provided";
 	
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#userGroup")
     public void addAccessFilter(UserGroup userGroup) {
@@ -27,18 +27,18 @@ public class GroupAccessWhitelist implements AccessWhitelist {
 		for (String uri : uris) {
 			UserGroup userGroup = groups.get(uri);
 			if (groups.containsKey(uri)) {
-				log.debug("Group '" + userGroup.getLabel() + "' membership allows '" + user.getEmailAddress() + "' to access action '" + actionName + "'");
+				log.debug("Group '" + userGroup.getLabel() + "' membership allows '" + user.getEmailAddress() + "' to access procedure '" + procedureName + "'");
 				return true;
 			}
-			log.debug("Group '" + userGroup.getLabel() + "' membership doesn't allow '" + user.getEmailAddress() + "' to access action '" + actionName + "'");
+			log.debug("Group '" + userGroup.getLabel() + "' membership doesn't allow '" + user.getEmailAddress() + "' to access procedure '" + procedureName + "'");
 		}
-		log.debug("Whitelist is doesn't allow user '" + user.getEmailAddress() + "' to access action '" + actionName + "'");
+		log.debug("Whitelist is doesn't allow user '" + user.getEmailAddress() + "' to access procedure '" + procedureName + "'");
 		return false;
 	}
 
 	@Override
-	public void setActionName(String name) {
-		this.actionName  = name;
+	public void setProcedureName(String name) {
+		this.procedureName  = name;
 	}
 
 }

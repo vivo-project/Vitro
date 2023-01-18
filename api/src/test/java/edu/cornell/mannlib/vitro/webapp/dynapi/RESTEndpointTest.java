@@ -40,7 +40,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
@@ -57,7 +57,7 @@ public class RESTEndpointTest {
 
     private MockedStatic<ResourceAPIPool> resourceAPIPoolStatic;
 
-    private MockedStatic<ActionPool> actionPoolStatic;
+    private MockedStatic<ProcedurePool> procedurePoolStatic;
 
     private ByteArrayOutputStream baos;
 
@@ -68,7 +68,7 @@ public class RESTEndpointTest {
     private ResourceAPIPool resourceAPIPool;
 
     @Mock
-    private ActionPool actionPool;
+    private ProcedurePool procedurePool;
 
     @Mock
     private ResourceAPI resourceAPI;
@@ -80,7 +80,7 @@ public class RESTEndpointTest {
     private HTTPMethod httpMethod;
 
     @Spy
-    private Action action;
+    private Procedure procedure;
 
     @Mock
     private HttpSession session;
@@ -119,13 +119,13 @@ public class RESTEndpointTest {
         baos = new ByteArrayOutputStream();
         MockitoAnnotations.openMocks(this);
         resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
-        actionPoolStatic = mockStatic(ActionPool.class);
+        procedurePoolStatic = mockStatic(ProcedurePool.class);
 
         when(ResourceAPIPool.getInstance()).thenReturn(resourceAPIPool);
         when(resourceAPIPool.get(any(ResourceAPIKey.class))).thenReturn(resourceAPI);
 
-        when(ActionPool.getInstance()).thenReturn(actionPool);
-        when(actionPool.get(any(String.class))).thenReturn(action);
+        when(ProcedurePool.getInstance()).thenReturn(procedurePool);
+        when(procedurePool.get(any(String.class))).thenReturn(procedure);
 
         when(request.getParameterMap()).thenReturn(params);
         when(request.getServletContext()).thenReturn(context);
@@ -140,7 +140,7 @@ public class RESTEndpointTest {
     @After
     public void afterEach() {
         resourceAPIPoolStatic.close();
-        actionPoolStatic.close();
+        procedurePoolStatic.close();
         try {
             baos.close();
         } catch (IOException e) {
@@ -157,7 +157,7 @@ public class RESTEndpointTest {
 
         PrintWriter writer = new PrintWriter(baos, true);
         when(response.getWriter()).thenReturn(writer);
-        when(action.run(any(DataStore.class)))
+        when(procedure.run(any(DataStore.class)))
             .thenReturn(new OperationResult(testExpectedStatus));
 
         when(httpMethod.getName()).thenReturn(testMethod);
@@ -165,17 +165,18 @@ public class RESTEndpointTest {
         when(rpc.getName()).thenReturn(testActionName);
         when(rpc.getHttpMethod()).thenReturn(httpMethod);
 
-        when(resourceAPI.getRestRPC(testMethod, false)).thenReturn(rpc);
-        when(resourceAPI.getCustomRestActionRPC(testActionName)).thenReturn(rpc);
+        String procedureUri = "resource_uri";
+        when(resourceAPI.getProcedureUri(testMethod, false)).thenReturn(procedureUri);
+        when(resourceAPI.getProcedureUriByActionName(testActionName)).thenReturn(procedureUri);
         doNothing().when(resourceAPI).removeClient();
 
         run(testMethod);
 
-        verify(resourceAPI, times(testExpectedCounts[0])).getRestRPC(any(), anyBoolean());
-        verify(resourceAPI, times(testExpectedCounts[1])).getCustomRestActionRPC(any());
+        verify(resourceAPI, times(testExpectedCounts[0])).getProcedureUri(any(), anyBoolean());
+        verify(resourceAPI, times(testExpectedCounts[1])).getProcedureUriByActionName(any());
         verify(resourceAPI, times(testExpectedCounts[2])).removeClient();
-        verify(action, times(testExpectedCounts[3])).run(any());
-        verify(action, times(testExpectedCounts[4])).removeClient();
+        verify(procedure, times(testExpectedCounts[3])).run(any());
+        verify(procedure, times(testExpectedCounts[4])).removeClient();
         verify(response, times(testExpectedCounts[5])).setStatus(testExpectedStatus);
     }
 
@@ -217,8 +218,8 @@ public class RESTEndpointTest {
             { "PATCH",  PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot patch on resource collection" },
             { "DELETE", PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot delete on resource collection" },
 
-            { "POST",   customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_OK,                 "Resource found with supported method" },
-            { "GET",    customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with unsupported method" },
+            { "POST",   customRestActionPathInfo, actionName, new int[] { 0, 0, 1, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
+            { "GET",    customRestActionPathInfo, actionName, new int[] { 0, 0, 1, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with unsupported method" },
             { "PUT",    customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
             { "PATCH",  customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
             { "DELETE", customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" }

@@ -14,7 +14,10 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,7 +36,7 @@ public class ModelWriterIntegrationTest extends ServletContextTest {
 	private static final String ADDITIONS_NAME = "addition";
 	private static final String RETRACTIONS_NAME = "retraction";
 	private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-    private static final String TEST_ACTION = RESOURCES_PATH + "modelwriter-test-action.n3";
+    private static final String TEST_PROCEDURE = RESOURCES_PATH + "modelwriter-test-action.n3";
     private static final String TEST_STORE = RESOURCES_PATH + "modelwriter-test-store.n3";
 
     
@@ -53,15 +56,28 @@ public class ModelWriterIntegrationTest extends ServletContextTest {
         storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
     }
     
+    @After
+    public void reset() {
+    }
+    
+    @AfterClass
+    public static void after() {
+        restoreLogs();
+    }
+    
+    @BeforeClass
+    public static void before() {
+        offLogs();
+    }
+    
     @Test
     public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException {
         loadOntology(ontModel);
-        loadModel(ontModel, TEST_ACTION);
+        loadModel(ontModel, TEST_PROCEDURE);
         loadModel(storeModel, TEST_STORE);
-       // servletContext = new ServletContextStub();
-        Action action = loader.loadInstance("test:action", Action.class);
-        assertTrue(action.isValid());
-        Parameters parameters = action.getInputParams();
+        Procedure procedure = loader.loadInstance("test:procedure", Procedure.class);
+        assertTrue(procedure.isValid());
+        Parameters parameters = procedure.getInputParams();
 
         DataStore store = new DataStore();
 
@@ -91,7 +107,7 @@ public class ModelWriterIntegrationTest extends ServletContextTest {
         
         //data.add("input_param", new StringData(input));
         assertTrue(storeModel.size() == 1);
-        OperationResult opResult = action.run(store);
+        OperationResult opResult = procedure.run(store);
         assertFalse(opResult.hasError());
         assertEquals(Integer.parseInt(size), storeModel.size());
     }

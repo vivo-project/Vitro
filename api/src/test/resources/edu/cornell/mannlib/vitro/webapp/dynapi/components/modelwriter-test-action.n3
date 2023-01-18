@@ -5,11 +5,9 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<test:action>
-        a                                   dynapi:Action ;
-        rdfs:label                          "action"@en-US ;
-        dynapi:hasFirstStep                 <test:step1> ;
-        dynapi:hasAssignedRPC               <test:rpc1> .
+<test:procedure>
+        a                                   dynapi:Procedure ;
+        dynapi:hasFirstStep                 <test:step1> .
 
 <test:step1>
         a                                   dynapi:Step, dynapi:OperationalStep ;
@@ -22,12 +20,6 @@
         dynapi:retractionModel              <test:retraction_model> ;
         dynapi:additionModel                <test:addition_model> ;
         dynapi:targetModel                  <test:target_model> .
-
-<test:rpc1>
-        a                                   dynapi:Rpc ;
-        rdfs:label                          "Test rpc create individual"@en-US ;
-        dynapi:name                         "test_action" .
-
 
 <test:retraction_model>
         a                                   dynapi:Parameter, dynapi:Model ;

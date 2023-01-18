@@ -71,7 +71,7 @@ public class LoopOperationExecution {
     private boolean isConditionSatisfied(ProcedureDescriptor conditionDescriptor) throws ConversionException {
         DataStore localStore = new DataStore();
         String uri = conditionDescriptor.getUri();
-        Action conditionCheck = loopStore.getDependency(uri);
+        Procedure conditionCheck = loopStore.getDependency(uri);
         initilaizeLocalStore(loopStore, localStore, conditionDescriptor.getInputParams(), conditionCheck.getInternalParams());
         conditionCheck.run(localStore);
         DataStore expectedData = conditions.get(conditionDescriptor);
@@ -84,7 +84,7 @@ public class LoopOperationExecution {
     private void execute(ProcedureDescriptor procedureDescriptor) throws ConversionException {
         DataStore localStore = new DataStore();
         String uri = procedureDescriptor.getUri();
-        Action procedure = loopStore.getDependency(uri);
+        Procedure procedure = loopStore.getDependency(uri);
         initilaizeLocalStore(loopStore, localStore, procedureDescriptor.getInputParams(), procedure.getInternalParams());
         OperationResult result = procedure.run(localStore);
         if (result.hasError()) {

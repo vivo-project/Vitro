@@ -6,8 +6,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <test:action>
-        a                                   dynapi:Action ;
-        rdfs:label                          "action"@en-US ;
+        a                                   dynapi:Procedure ;
         dynapi:providesParameter            <test:result_param> ;
         dynapi:hasFirstStep                 <test:step1> ;
         dynapi:hasAssignedRPC               <test:rpc1> .

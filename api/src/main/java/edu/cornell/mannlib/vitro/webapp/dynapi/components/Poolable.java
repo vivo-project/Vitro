@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import java.util.List;
+
 public interface Poolable<K> extends Removable {
 
     public K getKey();
@@ -17,5 +19,7 @@ public interface Poolable<K> extends Removable {
     public void setUri(String uri);
     
     public String getUri();
+
+    public List<String> getClients();
 
 }

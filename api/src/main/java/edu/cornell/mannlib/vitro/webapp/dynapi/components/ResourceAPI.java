@@ -1,30 +1,21 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class ResourceAPI implements Versionable<ResourceAPIKey> {
+public class ResourceAPI extends AbstractPoolComponent implements Versionable<ResourceAPIKey> {
 
     private String name;
     private String versionMin;
     private String versionMax;
-    private String uri;
-    private RPC rpcOnGet;
-    private RPC rpcOnGetAll;
-    private RPC rpcOnPost;
-    private RPC rpcOnDelete;
-    private RPC rpcOnPut;
-    private RPC rpcOnPatch;
+    private String procedureUriOnGet;
+    private String procedureUriOnGetAll;
+    private String procedureUriOnPost;
+    private String procedureUriOnDelete;
+    private String procedureUriOnPut;
+    private String procedureUriOnPatch;
     private List<CustomRESTAction> customRESTActions = new LinkedList<CustomRESTAction>();
-
-    private Set<Long> clients = ConcurrentHashMap.newKeySet();
 
     @Override
     public void dereference() {
@@ -70,58 +61,58 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
         return true;
     }
 
-    public RPC getRpcOnGet() {
-        return rpcOnGet;
+    public String getProcedureUriOnGet() {
+        return procedureUriOnGet;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", minOccurs = 0, maxOccurs = 1)
-    public void setRpcOnGet(RPC rpcOnGet) {
-        this.rpcOnGet = rpcOnGet;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", minOccurs = 0, maxOccurs = 1, asString = true)
+    public void setProcedureUrionGet(String procedureOnGet) {
+        this.procedureUriOnGet = procedureOnGet;
     }
     
-    public RPC getRpcOnGetAll() {
-        return rpcOnGetAll;
+    public String getProcedureUriOnGetAll() {
+        return procedureUriOnGetAll;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll", minOccurs = 0, maxOccurs = 1)
-    public void setRpcOnGetAll(RPC rpcOnGetAll) {
-        this.rpcOnGetAll = rpcOnGetAll;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll", minOccurs = 0, maxOccurs = 1, asString = true)
+    public void setProcedureUriOnGetAll(String procedureOnGetAll) {
+        this.procedureUriOnGetAll = procedureOnGetAll;
     }
 
-    public RPC getRpcOnPost() {
-        return rpcOnPost;
+    public String getProcedureUriOnPost() {
+        return procedureUriOnPost;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", minOccurs = 0, maxOccurs = 1)
-    public void setRpcOnPost(RPC rpcOnPost) {
-        this.rpcOnPost = rpcOnPost;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", minOccurs = 0, maxOccurs = 1, asString = true)
+    public void setProcedureUriOnPost(String procedureOnPost) {
+        this.procedureUriOnPost = procedureOnPost;
     }
 
-    public RPC getRpcOnDelete() {
-        return rpcOnDelete;
+    public String getProcedureUriOnDelete() {
+        return procedureUriOnDelete;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", minOccurs = 0, maxOccurs = 1)
-    public void setRpcOnDelete(RPC rpcOnDelete) {
-        this.rpcOnDelete = rpcOnDelete;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", minOccurs = 0, maxOccurs = 1, asString = true)
+    public void setProcedureUriOnDelete(String procedureOnDelete) {
+        this.procedureUriOnDelete = procedureOnDelete;
     }
 
-    public RPC getRpcOnPut() {
-        return rpcOnPut;
+    public String getProcedureUriOnPut() {
+        return procedureUriOnPut;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", minOccurs = 0, maxOccurs = 1)
-    public void setRpcOnPut(RPC rpcOnPut) {
-        this.rpcOnPut = rpcOnPut;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", minOccurs = 0, maxOccurs = 1, asString = true)
+    public void setProcedureUriOnPut(String procedureOnPut) {
+        this.procedureUriOnPut = procedureOnPut;
     }
 
-    public RPC getRpcOnPatch() {
-        return rpcOnPatch;
+    public String getProcedureUriOnPatch() {
+        return procedureUriOnPatch;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", minOccurs = 0, maxOccurs = 1)
-    public void setRpcOnPatch(RPC rpcOnPatch) {
-        this.rpcOnPatch = rpcOnPatch;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", minOccurs = 0, maxOccurs = 1, asString = true)
+    public void setProcedureUriOnPatch(String procedureOnPatch) {
+        this.procedureUriOnPatch = procedureOnPatch;
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasCustomRESTAction")
@@ -133,88 +124,47 @@ public class ResourceAPI implements Versionable<ResourceAPIKey> {
         return customRESTActions;
     }
 
-    @Override
-    public void addClient() {
-        clients.add(Thread.currentThread().getId());
-    }
-
-    @Override
-    public void removeClient() {
-        clients.remove(Thread.currentThread().getId());
-    }
-
-    @Override
-    public void removeDeadClients() {
-        Set<Long> currentClients = new HashSet<Long>();
-        currentClients.addAll(clients);
-        Map<Long, Boolean> currentThreadIds = Thread
-                .getAllStackTraces()
-                .keySet()
-                .stream()
-                .collect(Collectors.toMap(Thread::getId, Thread::isAlive));
-        for (Long client : currentClients) {
-            if (!currentThreadIds.containsKey(client) || currentThreadIds.get(client) == false) {
-                clients.remove(client);
-            }
-        }
-    }
-
-    @Override
-    public boolean hasClients() {
-        return !clients.isEmpty();
-    }
-
-    public RPC getRestRPC(String method, boolean isResourceRequest) {
-        RPC rpc = getRestRpcByMethod(method, isResourceRequest);
-        if (rpc != null) {
-            return rpc;
+    public String getProcedureUri(String method, boolean isResourceRequest) {
+        String procedureUri = getProcedureUriByMethod(method, isResourceRequest);
+        if (procedureUri != null) {
+            return procedureUri;
         }
         throw new UnsupportedOperationException("Unsupported method");
     }
 
-    private RPC getRestRpcByMethod(String method, boolean isResourceRequest) {
+    private String getProcedureUriByMethod(String method, boolean isResourceRequest) {
         switch (method.toUpperCase()) {
             case "POST":
-                return rpcOnPost;
+                return procedureUriOnPost;
             case "GET":
-                return isResourceRequest ? rpcOnGet : rpcOnGetAll;
+                return isResourceRequest ? procedureUriOnGet : procedureUriOnGetAll;
             case "DELETE":
-                return rpcOnDelete;
+                return procedureUriOnDelete;
             case "PUT":
-                return rpcOnPut;
+                return procedureUriOnPut;
             case "PATCH":
-                return rpcOnPatch;
+                return procedureUriOnPatch;
             default:
                 return null;
         }
     }
 
-    public RPC getCustomRestActionRPC(String name) {
-        RPC rpc = getCustomRestActionRpcByName(name);
-        if (rpc != null) {
-            return rpc;
+    public String getProcedureUriByActionName(String name) {
+        String uri = getProcedureUriByCustomActionName(name);
+        if (uri != null) {
+            return uri;
         }
         throw new UnsupportedOperationException("Unsupported custom action");
     }
 
-    private RPC getCustomRestActionRpcByName(String name) {
-        RPC rpc = null;
+    private String getProcedureUriByCustomActionName(String name) {
+        String uri = null;
         for (CustomRESTAction customRestAction : customRESTActions) {
             if (customRestAction.getName().equals(name)) {
-                rpc = customRestAction.getTargetRPC();
+                uri = customRestAction.getTargetProcedureUri();
                 break;
             }
         }
-        return rpc;
-    }
-
-    @Override
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    @Override
-    public String getUri() {
         return uri;
     }
 
