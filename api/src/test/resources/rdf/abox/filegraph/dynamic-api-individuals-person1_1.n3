@@ -6,10 +6,10 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1>
-        a                                   dynapi:Action ;
+        a                                   dynapi:Procedure ;
         rdfs:label                          "Test person action 1.1"@en-US ;
         dynapi:providesParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/resultParam1> ;
-        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC1_1> ;
+        #dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC1_1> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testPersonStep1_1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testPersonStep1_1>
@@ -21,6 +21,7 @@
         a                                   dynapi:Rpc ;
         rdfs:label                          "Test rpc create person 1.1"@en-US ;
         dynapi:name                         "test_person" ;
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:minAPIVersion                "1.1.0" .
 
@@ -64,19 +65,19 @@
         rdfs:label                          "Test person custom action 1.1"@en-US ;
         dynapi:name                         "test_person_custom_action_name" ;
         dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
-        dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC1_1> .
+        dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testPersonResource1_1>
         a                                   dynapi:ResourceAPI ;
         rdfs:label                          "Test person resourceAPI 1.1"@en-US ;
         dynapi:name                         "test_person_resource" ;
         dynapi:minAPIVersion                "1.1.0" ;
-        dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC1_1> ;
-        dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetPersonRPC1_1> ;
-        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetAllPersonRPC1_1> ;
-        dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdatePersonRPC1_1> ;
-        dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchPersonRPC1_1> ;
-        dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeletePersonRPC1_1> ;
+        dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> ;
+        dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> ;
+        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> ;
+        dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> ;
+        dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> ;
+        dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1> ;
         dynapi:hasCustomRESTAction          <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_person_custom_action1_1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreatePersonRPC1>

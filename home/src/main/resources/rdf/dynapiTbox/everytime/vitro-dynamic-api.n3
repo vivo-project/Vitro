@@ -17,16 +17,15 @@
             rdfs:subPropertyOf owl:topObjectProperty ;
             rdf:type owl:FunctionalProperty ;
             rdfs:domain :CustomRESTAction ;
-            rdfs:range :Rpc ;
+            rdfs:range :Procedure ;
             rdfs:label "forward to RPC"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC
-:hasAssignedRPC rdf:type owl:ObjectProperty ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#procedure
+:procedure rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf owl:topObjectProperty ;
-                rdfs:domain :Action ;
-                rdfs:range :Rpc ;
-                rdfs:label "assigned rpc"@en-US .
+                rdfs:range :Procedure ;
+                rdfs:label ""@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasCondition
@@ -68,7 +67,7 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep
 :hasFirstStep rdf:type owl:ObjectProperty ;
               rdfs:subPropertyOf owl:topObjectProperty ;
-              rdfs:domain :Action ;
+              rdfs:domain :Procedure ;
               rdfs:range :Step ;
               rdfs:label "first step"@en-US .
 
@@ -181,7 +180,7 @@
 :onDelete rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
           rdfs:domain :ResourceAPI ;
-          rdfs:range :Rpc ;
+          rdfs:range :Procedure ;
           rdfs:label "on DELETE"@en-US .
 
 
@@ -189,7 +188,7 @@
 :onGet rdf:type owl:ObjectProperty ;
        rdfs:subPropertyOf owl:topObjectProperty ;
        rdfs:domain :ResourceAPI ;
-       rdfs:range :Rpc ;
+       rdfs:range :Procedure ;
        rdfs:label "on GET"@en-US .
 
 
@@ -197,7 +196,7 @@
 :onGetAll rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
           rdfs:domain :ResourceAPI ;
-          rdfs:range :Rpc ;
+          rdfs:range :Procedure ;
           rdfs:label "on GET"@en-US .
 
 
@@ -205,7 +204,7 @@
 :onPatch rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
          rdfs:domain :ResourceAPI ;
-         rdfs:range :Rpc ;
+         rdfs:range :Procedure ;
          rdfs:label "on PATCH"@en-US .
 
 
@@ -213,7 +212,7 @@
 :onPost rdf:type owl:ObjectProperty ;
         rdfs:subPropertyOf owl:topObjectProperty ;
         rdfs:domain :ResourceAPI ;
-        rdfs:range :Rpc ;
+        rdfs:range :Procedure ;
         rdfs:label "on POST"@en-US .
 
 
@@ -221,7 +220,7 @@
 :onPut rdf:type owl:ObjectProperty ;
        rdfs:subPropertyOf owl:topObjectProperty ;
        rdfs:domain :ResourceAPI ;
-       rdfs:range :Rpc ;
+       rdfs:range :Procedure ;
        rdfs:label "on PUT"@en-US .
 
 
@@ -236,7 +235,7 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#requiresAccess
 :requiresAccess rdf:type owl:ObjectProperty ;
                 rdfs:subPropertyOf owl:topObjectProperty ;
-                rdfs:domain :Action ;
+                rdfs:domain :Procedure ;
                 rdfs:range :Role ;
                 rdfs:label "requires access"@en-US .
 
@@ -293,7 +292,7 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#accessWhiteList
 :accessWhiteList rdf:type owl:ObjectProperty ;
                    rdfs:subPropertyOf owl:topObjectProperty ;
-                   rdfs:domain :Action ;
+                   rdfs:domain :Procedure ;
                    rdfs:range :AccessWhiteList ;
                    rdfs:label "access white list"@en-US .
 
@@ -409,7 +408,7 @@
           rdfs:label "validator max value"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion
+####  https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion
 :minAPIVersion rdf:type owl:DatatypeProperty ,
                         owl:FunctionalProperty ;
                rdfs:domain [ rdf:type owl:Class ;
@@ -437,7 +436,7 @@
           rdfs:label "validator min value"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#name
+####  https://vivoweb.org/ontology/vitro-dynamic-api#name
 :name rdf:type owl:DatatypeProperty ,
                owl:FunctionalProperty ;
       rdfs:domain [ rdf:type owl:Class ;
@@ -447,9 +446,9 @@
                                   :Model
                                   :Parameter
                                   :SerializationType
-								  :ParameterType
+                                  :ParameterType
                                   :ResourceAPI
-								  :RDFType
+                                  :RDFType
                                   :Rpc
                                 )
                   ] ;
@@ -595,7 +594,7 @@
                   owl:FunctionalProperty ;
          rdfs:domain :Api ,
                      [ rdf:type owl:Class ;
-                       owl:unionOf ( :Action
+                       owl:unionOf ( :Procedure
                                      :Api
                                      :ResourceAPI
                                    )
@@ -614,11 +613,11 @@
 #    Classes
 #################################################################
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#Action
-:Action rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#Procedure
+:Procedure rdf:type owl:Class ;
         rdfs:subClassOf :Operation ,
                         :ParameterProvider ;
-        rdfs:label "Action"@en-US .
+        rdfs:label "Procedure"@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#Api
@@ -868,20 +867,30 @@
                             :ParameterReceiver  ; 
             rdfs:label "Pool bulk operation"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ActionPoolAtomicOperation
-:ActionPoolAtomicOperation rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ProcedurePoolAtomicOperation
+:ProcedurePoolAtomicOperation rdf:type owl:Class ;
             rdfs:subClassOf :PoolAtomicOperation ; 
-            rdfs:label "Action pool atomic operation"@en-US .
+            rdfs:label "Procedure pool atomic operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#RpcPoolAtomicOperation
+:RPCPoolAtomicOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolAtomicOperation ; 
+            rdfs:label "RPC pool atomic operation"@en-US .
             
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ResourceAPIPoolAtomicOperation
 :ResourceAPIPoolAtomicOperation rdf:type owl:Class ;
             rdfs:subClassOf :PoolAtomicOperation ; 
             rdfs:label "Resource API pool atomic operation"@en-US .
             
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ActionPoolBulkOperation
-:ActionPoolBulkOperation rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ProcedurePoolBulkOperation
+:ProcedurePoolBulkOperation rdf:type owl:Class ;
             rdfs:subClassOf :PoolBulkOperation ; 
-            rdfs:label "Action pool bulk operation"@en-US .
+            rdfs:label "Procedure pool bulk operation"@en-US .
+            
+###  https://vivoweb.org/ontology/vitro-dynamic-api#RpcPoolBulkOperation
+:RPCPoolBulkOperation rdf:type owl:Class ;
+            rdfs:subClassOf :PoolBulkOperation ; 
+            rdfs:label "RPC pool bulk operation"@en-US .
             
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ResourceAPIPoolBulkOperation
 :ResourceAPIPoolBulkOperation rdf:type owl:Class ;

@@ -5,12 +5,10 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<test:action>
-        a                                   dynapi:Action ;
-        rdfs:label                          "action"@en-US ;
+<test:procedure>
+        a                                   dynapi:Procedure ;
         dynapi:hasFirstStep                 <test:step1> ;
-        dynapi:providesParameter            <test:output_model> ;
-        dynapi:hasAssignedRPC               <test:rpc1> .
+        dynapi:providesParameter            <test:output_model> .
 
 <test:step1>
         a                                   dynapi:Step, dynapi:OperationalStep ;
@@ -30,11 +28,6 @@
         rdfs:label                          "output model param"@en-US ;
         dynapi:name                         "uri" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
-
-<test:rpc1>
-        a                                   dynapi:Rpc ;
-        rdfs:label                          "Test rpc create individual"@en-US ;
-        dynapi:name                         "test_action" .
 
 <test:output_model>
         a                                   dynapi:Parameter, dynapi:Model ;

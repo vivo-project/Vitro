@@ -7,7 +7,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 
@@ -15,12 +15,12 @@ public class AutoConfiguration {
 
     private static final Log log = LogFactory.getLog(AutoConfiguration.class);
 
-    public static void computeParams(Action action) {
-        Parameters required = action.getInputParams();
-        Parameters provided = action.getOutputParams();
-        Parameters internal = action.getInternalParams();
+    public static void computeParams(Procedure procedure) {
+        Parameters required = procedure.getInputParams();
+        Parameters provided = procedure.getOutputParams();
+        Parameters internal = procedure.getInternalParams();
 
-        ExecutionTree tree = new ExecutionTree(action);
+        ExecutionTree tree = new ExecutionTree(procedure);
         List<StepInfo> exits = tree.getLeafs();
         List<List<StepInfo>> paths = new LinkedList<List<StepInfo>>();
         for (StepInfo exit : exits) {
@@ -29,11 +29,11 @@ public class AutoConfiguration {
             findAllPaths(tree, exit, path, paths);
         }
         for (List<StepInfo> path: paths) {
-            Parameters computed = computeActionRequirements(path, provided);
+            Parameters computed = computeRequirements(path, provided);
             mergeParameters(required, internal, computed);
         }
         if( log.isDebugEnabled()) {
-            Set<String> names = action.getInputParams().getNames();
+            Set<String> names = procedure.getInputParams().getNames();
             String toLog = String.join(", ", names);
             log.debug("Required params: " + toLog);    
         }
@@ -51,7 +51,7 @@ public class AutoConfiguration {
         }
     }
 
-    private static Parameters computeActionRequirements(List<StepInfo> list, Parameters provided) {
+    private static Parameters computeRequirements(List<StepInfo> list, Parameters provided) {
         Parameters requirements = new Parameters();
         requirements.addAll(provided);
         int position = list.size();

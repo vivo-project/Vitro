@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFa
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -64,7 +65,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     private RESTEndpoint restEndpoint;
 
-    private ActionPool actionPool;
+    private ProcedurePool actionPool;
 
     private ResourceAPIPool resourceAPIPool;
 
@@ -108,17 +109,19 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @BeforeClass
     public static void setupStaticObjects() {
+        offLogs();
     	dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
     
     @AfterClass
     public static void after() {
     	dynapiModelFactory.close();
+        restoreLogs();
     }
     
     @Before
     public void beforeEach() throws IOException {
-        actionPool = ActionPool.getInstance();
+        actionPool = ProcedurePool.getInstance();
         resourceAPIPool = ResourceAPIPool.getInstance();
 
         restEndpoint = new RESTEndpoint();
@@ -136,6 +139,10 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(ontModel);
         mockStatus(response);
+    }
+    
+    @After
+    public void reset() {
     }
 
     @Test

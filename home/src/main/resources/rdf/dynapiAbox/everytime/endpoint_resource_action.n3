@@ -5,10 +5,10 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/resource/action>
+<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/resource/procedure>
         a                                   dynapi:ResourceAPI ;
-        rdfs:label                          "Action resourceAPI 1"@en-US ;
-        dynapi:name                         "action" ;
+        rdfs:label                          "Procedure resourceAPI 1"@en-US ;
+        dynapi:name                         "procedure" ;
         dynapi:minAPIVersion                "0.1.0" ;
-        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/action/load_action/rpc1> .
+        dynapi:onGetAll                     <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/load_procedure> .
 

@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class SolrQuery extends Operation {
+public class SolrQuery extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(SolrQuery.class);
 
