@@ -11,8 +11,7 @@
         dynapi:providesParameter            <test:output_model> .
 
 <test:step1>
-        a                                   dynapi:Step, dynapi:OperationalStep ;
-        rdfs:label                          "step 1"@en-US ;
+        a                                   dynapi:OperationalStep ;
         dynapi:hasOperation                 <test:constructQuery> .
 
 <test:constructQuery> 
@@ -25,18 +24,15 @@
 
 <test:uri_param>
         a                                   dynapi:Parameter;
-        rdfs:label                          "output model param"@en-US ;
         dynapi:name                         "uri" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
 
 <test:output_model>
         a                                   dynapi:Parameter, dynapi:Model ;
-        rdfs:label                          "output model param"@en-US ;
         dynapi:name                         "output" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
 
 <test:query_model>
         a                                   dynapi:Parameter, dynapi:Model ;
-        rdfs:label                          "query model param"@en-US ;
         dynapi:name                         "query" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
