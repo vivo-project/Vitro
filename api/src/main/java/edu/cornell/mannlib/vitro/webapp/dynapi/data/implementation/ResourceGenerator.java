@@ -36,6 +36,10 @@ public class ResourceGenerator {
 	public String serialize(Resource input) {
 		return input.toString();
 	}
+	
+	public static Resource generateResourceFromFormat(String input) throws InitializationException {
+	    return getInstance().getUriFromFormat(input);
+	}
 
 	/**
 	 * Creates a resource from input comma separated list of keys.
