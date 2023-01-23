@@ -199,8 +199,7 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 
 	@Override
 	public String checkURI(String uriStr) {
-		throw new RuntimeException(
-				"WebappDaoFactory.checkURI() not implemented.");
+		return null;
 	}
 
 	@Override
