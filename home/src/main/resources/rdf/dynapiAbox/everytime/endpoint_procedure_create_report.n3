@@ -1,0 +1,124 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report_generator>
+        a                                   dynapi:Procedure ;
+        rdfs:label                          "Create report procedure"@en-US ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_construct_query_templates/step> .
+      
+####################################################################################################################################################################################
+#Loop to fill out construct queries
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_construct_query_templates/step>
+        a                                   dynapi:OperationalStep ;
+        rdfs:label                          "Fill out provided construct queries"@en-US ;
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_construct_query_templates/loop> ;
+        dynapi:hasNextStep                  <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_select_query_templates/step> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_construct_query_templates/loop>
+        a                                   dynapi:LoopOperation ;
+        dynapi:inputDescriptor              <INPUT_PROCEDURE_SHOULD_BE_HERE> ;
+	dynapi:outputDescriptor             <test:outputDescriptor> ;
+        dynapi:conditionDescriptor          <test:conditionDescriptor> ;
+        dynapi:executableDescriptor         <test:executableDescriptor> ;
+        
+        dynapi:internalParameter            <test:output_container_param> ;
+        dynapi:internalParameter            <test:iteration_int_param> ;
+        
+        dynapi:providesParameter            <test:output_container_param> .
+        
+        
+####################################################################################################################################################################################
+#Loop to fill out select queries
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_select_query_templates/step>
+        a                                   dynapi:OperationalStep ;
+        rdfs:label                          "Fill out provided select queries"@en-US ;
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_select_query_templates/loop> ;
+        dynapi:hasNextStep                  <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generation_component/step> .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_select_query_templates/loop>
+        a                                   dynapi:LoopOperation ;
+        dynapi:inputDescriptor              <INPUT_PROCEDURE_SHOULD_BE_HERE> ;
+	dynapi:outputDescriptor             <test:outputDescriptor> ;
+        dynapi:conditionDescriptor          <test:conditionDescriptor> ;
+        dynapi:executableDescriptor         <test:executableDescriptor> ;
+        
+        dynapi:internalParameter            <test:output_container_param> ;
+        dynapi:internalParameter            <test:iteration_int_param> ;
+        
+        dynapi:providesParameter            <test:output_container_param> .
+      
+      
+####################################################################################################################################################################################
+#Fill out report generation component
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generation_component/step>
+        a                                   dynapi:OperationalStep ;
+        rdfs:label                          "Fill report generation component"@en-US ;
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generation_component_sources/n3template> ;
+        dynapi:hasNextStep                  <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generator_sources/step> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generation_component_sources/n3template>
+        a                                   dynapi:N3Template ;
+        dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/parameter/report_generation_configuration_graph> ;
+        
+        #Provide  ?report_generation_step_uri, ?template_base64
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/parameter/template_base64> ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/parameter/report_generation_step_uri> ;
+        
+        #Provide autogenerated ?report_generator_operation_uri, ?template_param_uri, ?report_param_uri
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/parameter/report_generator_operation_uri> ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/parameter/template_param_uri> ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/parameter/report_param_uri> ;
+        dynapi:N3TextAdditions              
+        """
+        #Report generation strep 
+	# parameterType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/generated-uri> .
+	
+        ?report_generation_step_uri
+                a                                   dynapi:OperationalStep ;
+                dynapi:hasOperation                 ?report_generator_operation_uri .
+
+        ?report_generator_operation_uri 
+                a                                   dynapi:ReportGenerator ;
+                dynapi:template                     ?template_param_uri ;
+                dynapi:report                       ?report_param_uri .
+	?template_param_uri
+		a                                   dynapi:Parameter ;
+		dynapi:isInternal                   "true"^^xsd:boolean ;
+		dynapi:name                         "template" ;
+		dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> ;
+		dynapi:defaultValue                 ?template_base64 .
+		
+	?report_param_uri
+		a                                   dynapi:Parameter ;
+		dynapi:name                         "report" ;
+		dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> .
+        """ .
+
+####################################################################################################################################################################################
+#Loop to fill out report generation data sources
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generator_sources/step>
+        a                                   dynapi:OperationalStep ;
+        rdfs:label                          "Fill out report generation data sources"@en-US ;
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generator_sources/loop> .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report/fill_out_report_generator_sources/loop>
+        a                                   dynapi:LoopOperation ;
+        dynapi:inputDescriptor              <INPUT_PROCEDURE_SHOULD_BE_HERE> ;
+	dynapi:outputDescriptor             <test:outputDescriptor> ;
+        dynapi:conditionDescriptor          <test:conditionDescriptor> ;
+        dynapi:executableDescriptor         <test:executableDescriptor> ;
+        
+        dynapi:internalParameter            <test:output_container_param> ;
+        dynapi:internalParameter            <test:iteration_int_param> ;
+        
+        dynapi:providesParameter            <test:output_container_param> .
+        
+######################################################################## ?report_generator_operation_uri dynapi:dataSource ?data_source_param_uri .
