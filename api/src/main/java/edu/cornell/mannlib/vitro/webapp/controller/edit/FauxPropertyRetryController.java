@@ -90,6 +90,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 	}
 
 	private static class EpoPopulator {
+		private static final String LITERAL = "http://www.w3.org/2000/01/rdf-schema#Literal";
 		private final VitroRequest req;
 		private final ServletContext ctx;
 		private final WebappDaoFactory wadf;
@@ -325,7 +326,13 @@ public class FauxPropertyRetryController extends BaseEditController {
 			if (rangeUri == null) {
 				Option option = new Option();
 				option.setValue("");
-				option.setBody("untyped (rdfs:Literal)");
+				option.setBody("Untyped");
+				option.setSelected(true);
+				list.add(option);
+			} else if (rangeUri.equals(LITERAL)) {
+				Option option = new Option();
+				option.setValue(rangeUri);
+				option.setBody("Literal");
 				option.setSelected(true);
 				list.add(option);
 			} else {
