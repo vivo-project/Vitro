@@ -372,7 +372,7 @@ public class FauxObjectPropertyWrapper extends ObjectProperty implements FauxPro
 
 	@Override
 	public int getDomainDisplayTier() {
-		return innerOP.getDomainDisplayTier();
+		return faux.getDisplayTier();
 	}
 
 	@Override
