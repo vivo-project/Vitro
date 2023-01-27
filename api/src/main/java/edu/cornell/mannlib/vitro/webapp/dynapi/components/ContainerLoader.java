@@ -7,6 +7,7 @@ import org.apache.solr.common.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
@@ -19,6 +20,7 @@ public class ContainerLoader extends AbstractOperation {
     private Parameter containerParam;
     private Parameter paramToLoad;
     private String key;
+    private Parameter keyParameter;
     
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter", minOccurs = 1, maxOccurs = 1)
     public void addInputParameter(Parameter param){
@@ -40,6 +42,12 @@ public class ContainerLoader extends AbstractOperation {
         this.key = key;
     }
     
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#keyParameter", maxOccurs = 1)
+    public void setKeyParameter(Parameter keyParameter) {
+        inputParams.add(keyParameter);
+        this.keyParameter = keyParameter;
+    }
+    
     @Override
     public OperationResult run(DataStore dataStore) {
         if (!isValid(dataStore)) {
@@ -47,12 +55,22 @@ public class ContainerLoader extends AbstractOperation {
         }
         JsonContainer container = JsonContainerView.getJsonContainer(dataStore, containerParam);
         Data input = dataStore.getData(getLoadParamName());
-        if (StringUtils.isEmpty(key)) {
+        if (StringUtils.isEmpty(key) && keyParameter == null ) {
             container.addValue(input);            
         } else {
-            container.addKeyValue(key, input);            
+            addKeyValue(container, input, dataStore);            
         }
         return OperationResult.ok();
+    }
+
+    private void addKeyValue(JsonContainer container, Data input, DataStore dataStore) {
+        if (!StringUtils.isEmpty(key)) {
+            container.addKeyValue(key, input);    
+        } else {
+            Data keyData = dataStore.getData(keyParameter.getName());
+            String tmpKey = SimpleDataView.getStringRepresentation(keyData);
+            container.addKeyValue(tmpKey, input);    
+        }
     }
 
     private String getLoadParamName() {
