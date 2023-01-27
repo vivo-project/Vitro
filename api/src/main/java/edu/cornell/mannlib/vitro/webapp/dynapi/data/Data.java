@@ -101,4 +101,8 @@ public class Data {
                 .toHashCode();
     }
 
+    public void copyObject(Data assignableData) {
+        this.object = assignableData.getObject();
+    }
+
 }
