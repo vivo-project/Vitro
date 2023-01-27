@@ -21,7 +21,6 @@
 
 <test:loopOperation> 
         a                                   dynapi:LoopOperation ;
-        
         dynapi:inputDescriptor              <test:inputDescriptor> ;
 	dynapi:outputDescriptor             <test:outputDescriptor> ;
         dynapi:conditionDescriptor          <test:conditionDescriptor> ;
@@ -108,31 +107,6 @@
         dynapi:providesParameter            <test:container_item_int_param> ;
         dynapi:call                         <test:execution_action> .
 
-##########################################################################################
-#RPC TODO: clean after endpoints modification
-
-<test:rpc_condition_action>
-        a                                   dynapi:Rpc ;
-        dynapi:name                         "condition_action" . 
-        
-<test:rpc_input_action>
-        a                                   dynapi:Rpc ;
-        dynapi:name                         "input_action" .
-        
-<test:rpc_output_action>
-        a                                   dynapi:Rpc ;
-        dynapi:name                         "output_action" .
-        
-<test:rpc_execution_action>
-        a                                   dynapi:Rpc ;
-        dynapi:name                         "execution_action" .  
-        
-<test:rpc_condition_action>
-        a                                   dynapi:Rpc ;
-        dynapi:name                         "condition_action" . 
-        
-##########################################################################################       
-#Condition action
 <test:condition_action>
         a                                   dynapi:Procedure ;
         dynapi:providesParameter            <test:condition_evaluated_param> ;
