@@ -54,6 +54,16 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/uri-resource>
+        a                       dynapi:ImplementationConfig ;
+        rdfs:label              "Uri resource deserialization config"@en-US ;
+        dynapi:className        "org.apache.jena.rdf.model.impl.ResourceImpl" ;
+        dynapi:methodName       "";
+        dynapi:methodArguments  "input";
+        dynapi:isStaticMethod   "true"^^xsd:boolean ;
+        vitro:mostSpecificType  dynapi:ImplementationConfig .
+
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/generated-uri-resource> 
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Uri resource deserialization config"@en-US ;
