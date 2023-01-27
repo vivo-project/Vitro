@@ -111,7 +111,7 @@ public class JsonContainer {
         }
         if (result.isContainerNode()) {
             Data data = new Data(parameter);
-            data.setRawString(result.asText());
+            data.setRawString(result.toString());
             data.initializeFromString();
             return data;
         }
