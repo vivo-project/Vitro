@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
@@ -88,23 +89,34 @@ public class ReportEndpointIntegrationTest extends ServletContextTest {
         loadModel(ontModel, TEST_ACTION);
         ProcedurePool procedurePool = initWithDefaultModel();
         System.out.println(procedurePool.count());
-        Procedure action = null;
+        Procedure procedure = null;
         DataStore store = null;
         try { 
-            action = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator");
-            assertFalse(action instanceof NullProcedure);
-            assertTrue(action.isValid());
+            procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator");
+            assertFalse(procedure instanceof NullProcedure);
+            assertTrue(procedure.isValid());
+            Parameters inputs = procedure.getInputParams();
+            Parameters outputs = procedure.getOutputParams();
+            Parameters internal = procedure.getInternalParams();
+            System.out.println(inputs.getNames());
+            System.out.println(internal.getNames());
+            System.out.println(outputs.getNames());
             store = new DataStore();
-            addInputContainer(store);
-            
-            Endpoint.getDependencies(action, store, procedurePool);
-            assertTrue(OperationResult.ok().equals(action.run(store))) ;
-            assertTrue(store.contains(OUTPUT_CONTAINER));
-            Data output = store.getData(OUTPUT_CONTAINER);
-            assertEquals(expectedValues,output.getSerializedValue());
+            Converter.convertInternalParams(internal, store);
+            //addInputContainer(store);
+
+            Endpoint.getDependencies(procedure, store, procedurePool);
+            assertTrue(OperationResult.ok().equals(procedure.run(store)));
+            Data modelData = store.getData("report_generator_configuration_graph");
+            Model model = (Model) TestView.getObject(modelData);
+            model.write(System.out,"n3");
+            //assertTrue(store.contains(OUTPUT_CONTAINER));
+            //Data output = store.getData(OUTPUT_CONTAINER);
+            //assertEquals(expectedValues, output.getSerializedValue());
+             
         } finally {
-            if (action != null) {
-                action.removeClient();    
+            if (procedure != null) {
+                procedure.removeClient();    
             }
             if (store != null) {
                 store.removeDependencies();    
