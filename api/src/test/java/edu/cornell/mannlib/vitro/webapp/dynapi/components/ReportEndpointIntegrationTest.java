@@ -1,30 +1,19 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.Base64;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
-import org.apache.poi.openxml4j.opc.internal.ContentTypeManager;
-import org.apache.solr.common.StringUtils;
-import org.docx4j.Docx4jProperties;
-import org.docx4j.TraversalUtil;
-import org.docx4j.XmlUtils;
-import org.docx4j.openpackaging.io.SaveToZipFile;
-import org.docx4j.utils.ResourceUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -33,103 +22,125 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.IntegerParam;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
 @RunWith(Parameterized.class)
 public class ReportEndpointIntegrationTest extends ServletContextTest {
-	private static final String REPORT = "report";
-	private static final String QUERY_MODEL = "querymodel";
-	private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/ReportGenerator/";
+
+	private static final String OUTPUT_CONTAINER = "output_container";
+    private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
+	private static final String TEST_ACTION = RESOURCES_PATH + "loop-operation-test-action.n3";
+	private static final String REPORT_ENDPOINT_FILE_NAME = "endpoint_procedure_create_report.n3"; 
 
 	Model storeModel;
 
 	@org.junit.runners.Parameterized.Parameter(0)
-	public String actionPath;
-
-	@org.junit.runners.Parameterized.Parameter(1)
-	public String storePath;
-
-	@org.junit.runners.Parameterized.Parameter(2)
-	public String extension;
-
-	@BeforeClass
-	public static void before() {
-	    offLogs();
-        offLog(Docx4jProperties.class);
-        offLog(ResourceUtils.class);
-        offLog(XmlUtils.class);
-        offLog(TraversalUtil.class);
-        offLog(SaveToZipFile.class);
-        offLog(ContentTypeManager.class);
-	}
+	public List<Integer> inputValues;
 	
+	@org.junit.runners.Parameterized.Parameter(1)
+	public String expectedValues;
+
+    @AfterClass
+    public static void after() {
+        //restoreLogs();
+    }
+    
+    @BeforeClass
+    public static void before() {
+        //offLogs();
+    }
+
 	@Before
 	public void beforeEach() {
 		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
 	}
 	
-	@AfterClass
-	public static void after() {
-	    restoreLogs();
-        restoreLog(Docx4jProperties.class);
-        restoreLog(ResourceUtils.class);
-        restoreLog(XmlUtils.class);
-        restoreLog(TraversalUtil.class);
-        restoreLog(SaveToZipFile.class);
-        restoreLog(ContentTypeManager.class);
-	}
-	
-	@After
-	public void reset() {
-	   
-	}
-	@Test
-	public void testNull() {
-	    
-	}
-	
-	public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException {
-		loadOntology(ontModel);
-		loadModel(ontModel, ABOX_PREFIX + actionPath);
-		loadModel(storeModel, RESOURCES_PATH + storePath);
-		DataStore store = new DataStore();
-		Procedure procedure = loader.loadInstance("https://vivoweb.org/ontology/vitro-dynamic-api/procedure/create_report_generator", Procedure.class);
-		assertTrue(procedure.isValid());
-		Parameters inputParameters = procedure.getInputParams();
-		Parameter paramQueryModel = inputParameters.get(QUERY_MODEL);
-		assertNotNull(paramQueryModel);
-		Data queryModelData = new Data(paramQueryModel);
-		TestView.setObject(queryModelData, storeModel);
-		store.addData(QUERY_MODEL, queryModelData);
-		Converter.convertInternalParams(procedure.getInternalParams(), store);
-		OperationResult opResult = procedure.run(store);
-		assertFalse(opResult.hasError());
-		assertTrue(store.contains(REPORT));
-		final Data data = store.getData(REPORT);
-		assertTrue(TestView.getObject(data) != null);
-		final String base64EncodedReport = data.getSerializedValue();
-		assertTrue(!StringUtils.isEmpty(base64EncodedReport));
+    @After
+    public void reset() {
+        setup();
+        ProcedurePool procedurePool = ProcedurePool.getInstance();
+        procedurePool.init(servletContext);
+        procedurePool.reload();
+        assertEquals(0, procedurePool.count());
+    }
 
-		boolean manualDebugging = false;
-		if (manualDebugging) {
-			byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport);
-			File file = new File(RESOURCES_PATH + "integration-test-report" + extension);
-			try (OutputStream os = new FileOutputStream(file)) {
-				os.write(reportBytes);
-			}	
-		}
-	}
+    private ProcedurePool initWithDefaultModel() throws IOException {
+        loadOntology(ontModel);
+        ProcedurePool rpcPool = ProcedurePool.getInstance();
+        rpcPool.init(servletContext);
+        return rpcPool;
+    }
+    
+    @Test
+    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException, InitializationException {
+        loadModel(ontModel, TEST_ACTION);
+        ProcedurePool procedurePool = initWithDefaultModel();
+        System.out.println(procedurePool.count());
+        Procedure action = null;
+        DataStore store = null;
+        try { 
+            action = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator");
+            assertFalse(action instanceof NullProcedure);
+            assertTrue(action.isValid());
+            store = new DataStore();
+            addInputContainer(store);
+            
+            Endpoint.getDependencies(action, store, procedurePool);
+            assertTrue(OperationResult.ok().equals(action.run(store))) ;
+            assertTrue(store.contains(OUTPUT_CONTAINER));
+            Data output = store.getData(OUTPUT_CONTAINER);
+            assertEquals(expectedValues,output.getSerializedValue());
+        } finally {
+            if (action != null) {
+                action.removeClient();    
+            }
+            if (store != null) {
+                store.removeDependencies();    
+            }
+        }
+    }
+
+    private void addInputContainer(DataStore store) {
+        String containerParamName = "input_container";
+        Parameter container = new JsonContainerObjectParam(containerParamName);
+        Data containerData = createContainer(container);
+        store.addData(containerParamName, containerData);
+    }
+    
+    private Data createContainer(Parameter containerParam) {
+        Data containerData = new Data(containerParam);
+        JsonContainer container = new JsonContainer(Type.ARRAY);
+        String expectedOutputParamName = "item";
+        Parameter expectedOutputParam = new IntegerParam(expectedOutputParamName);
+        for (Integer value : inputValues) {
+            addValue(container, expectedOutputParam, value);
+        }
+        TestView.setObject(containerData, container);
+        return containerData;
+    }
+
+    private void addValue(JsonContainer container, Parameter expectedOutputParam, Integer value) {
+        Data data = new Data(expectedOutputParam);
+        TestView.setObject(data, value);
+        container.addValue(data);
+    }
 
 	@Parameterized.Parameters
 	public static Collection<Object[]> requests() {
-		return Arrays.asList(new Object[][] { 
-			{ "endpoint_procedure_create_report.n3", "report-generator-store.n3", ".xlsx" },
+		return Arrays.asList(new Object[][] {
+		    {Arrays.asList(20,30,40,50,60), "[\"30\",\"40\",\"50\",\"60\",\"70\"]"},
 		});
 	}
 
@@ -140,9 +151,10 @@ public class ReportEndpointIntegrationTest extends ServletContextTest {
 		}
 	}
 
-    public void loadOntology(OntModel ontModel) throws IOException {
+	public void loadOntology(OntModel ontModel) throws IOException {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
         loadModel(ontModel, ONTOLOGY_FILE_PATH);
         loadModel(ontModel, getFileList(ABOX_PREFIX));
-    }
+        loadModel(ontModel, ABOX_PREFIX + REPORT_ENDPOINT_FILE_NAME);
+	}
 }
