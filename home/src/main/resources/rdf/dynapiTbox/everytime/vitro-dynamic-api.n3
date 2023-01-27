@@ -916,4 +916,7 @@
             		    :ParameterProvider,
                             :ParameterReceiver  ;
             rdfs:label "Sum operation"@en-US .
-
+            
+:AssignOperation rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ;
+            rdfs:label "Assign operation"@en-US .
