@@ -51,7 +51,7 @@ public class ContainerQuery extends AbstractOperation{
         String key = SimpleDataView.getStringRepresentation(firstKeyData(dataStore));
         Data item = container.getItem(key, outputParam);
         if (!item.isInitialized()) {
-            log.error("returned result is null");
+            log.error(String.format("Key '%s' not found in container %s",key,container.serialize(container)));
             return OperationResult.internalServerError();
         }
         Parameter itemParam = item.getParam();
