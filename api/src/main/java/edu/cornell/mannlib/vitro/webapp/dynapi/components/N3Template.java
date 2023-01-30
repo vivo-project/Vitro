@@ -155,13 +155,17 @@ public class N3Template extends AbstractOperation implements Template {
 		//endregion
 
 		//Check if any n3 variables are left without inserted value
-		String[] leftoverVariables = Arrays.stream(n3WithParameters.get(0).split(" "))
-				.filter(token -> token.startsWith("?")).toArray(String[]::new);
-		if(leftoverVariables.length>0){
-			throw new InputMismatchException("N3 template variables:'" + Arrays.toString(leftoverVariables) +
-					"' dont have corresponding input parameters with values that should be inserted in their place.");
-		}
-		return n3WithParameters.get(0);
+        /*
+         * String[] leftoverVariables =
+         * Arrays.stream(n3WithParameters.get(0).split(" ")) .filter(token ->
+         * token.startsWith("?")).toArray(String[]::new);
+         * if(leftoverVariables.length>0){ throw new
+         * InputMismatchException("N3 template variables:'" +
+         * Arrays.toString(leftoverVariables) +
+         * "' dont have corresponding input parameters with values that should be inserted in their place."
+         * ); }
+         */
+		return n3WithParameters.get(0); 
 	}
 
 
