@@ -7,21 +7,18 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 
-public class LoopOperationExecution {
+public class LoopOperationExecution extends ProcedureExecution {
 
     private static final Log log = LogFactory.getLog(LoopOperationExecution.class.getName());
     private List<ProcedureDescriptor> conditionDescriptors;
     private List<ProcedureDescriptor> inputDescriptors;
     private List<ProcedureDescriptor> outputDescriptors;
     Map<ProcedureDescriptor, DataStore> conditions = new HashMap<>();
-
     private ProcedureDescriptor executableDescriptor;
-    private DataStore loopStore = new DataStore();
     private DataStore dataStore;
     private Parameters loopInternalParams;
     private Parameters loopInputParams;
@@ -35,32 +32,33 @@ public class LoopOperationExecution {
         loopInternalParams = loopOperation.getInternalParams();
         loopOutputParams = loopOperation.getOutputParams();
         loopInputParams = loopOperation.getInputParams();
-        for ( ProcedureDescriptor pd : conditionDescriptors) {
+        for (ProcedureDescriptor pd : conditionDescriptors) {
             DataStore expectedData = new DataStore();
             Converter.convertInternalParams(pd.getOutputParams(), expectedData);
             conditions.put(pd, expectedData);
         }
         this.dataStore = dataStore;
     }
-    
+
     public OperationResult executeLoop() throws ConversionException {
+        DataStore loopStore = new DataStore();
         initilaizeLocalStore(dataStore, loopStore, loopInputParams, loopInternalParams);
-        while (allConditionsSatisfied()) {
-            for( ProcedureDescriptor inputDescriptor : inputDescriptors) {
-                execute(inputDescriptor);
+        while (allConditionsSatisfied(loopStore)) {
+            for (ProcedureDescriptor inputDescriptor : inputDescriptors) {
+                execute(inputDescriptor, loopStore);
             }
-            execute(executableDescriptor);
-            for( ProcedureDescriptor outputDescriptor : outputDescriptors) {
-                execute(outputDescriptor);
-            }    
+            execute(executableDescriptor, loopStore);
+            for (ProcedureDescriptor outputDescriptor : outputDescriptors) {
+                execute(outputDescriptor, loopStore);
+            }
         }
         copyDataToStore(loopStore, dataStore, loopOutputParams);
         return OperationResult.ok();
     }
 
-    private boolean allConditionsSatisfied() throws ConversionException {
-        for( ProcedureDescriptor conditionDescriptor : conditionDescriptors) {
-            if (!isConditionSatisfied(conditionDescriptor)) {
+    private boolean allConditionsSatisfied(DataStore loopStore) throws ConversionException {
+        for (ProcedureDescriptor conditionDescriptor : conditionDescriptors) {
+            if (!isConditionSatisfied(conditionDescriptor, loopStore)) {
                 log.debug("Condition uri:'" + conditionDescriptor.getUri() + "' is not satisfied.");
                 return false;
             }
@@ -68,46 +66,22 @@ public class LoopOperationExecution {
         return true;
     }
 
-    private boolean isConditionSatisfied(ProcedureDescriptor conditionDescriptor) throws ConversionException {
+    private boolean isConditionSatisfied(ProcedureDescriptor conditionDescriptor, DataStore loopStore) throws ConversionException {
         DataStore localStore = new DataStore();
         String uri = conditionDescriptor.getUri();
         Procedure conditionCheck = loopStore.getDependency(uri);
-        initilaizeLocalStore(loopStore, localStore, conditionDescriptor.getInputParams(), conditionCheck.getInternalParams());
-        conditionCheck.run(localStore);
+        initilaizeLocalStore(loopStore, localStore, conditionDescriptor.getInputParams(),
+                conditionCheck.getInternalParams());
+        OperationResult result = conditionCheck.run(localStore);
+        if (result.hasError()) {
+            throw new RuntimeException(formatErrorMessage(conditionDescriptor, uri));
+        }
         DataStore expectedData = conditions.get(conditionDescriptor);
         if (localStore.containsData(expectedData)) {
-           return true;
+            return true;
         }
         return false;
     }
 
-    private void execute(ProcedureDescriptor procedureDescriptor) throws ConversionException {
-        DataStore localStore = new DataStore();
-        String uri = procedureDescriptor.getUri();
-        Procedure procedure = loopStore.getDependency(uri);
-        initilaizeLocalStore(loopStore, localStore, procedureDescriptor.getInputParams(), procedure.getInternalParams());
-        OperationResult result = procedure.run(localStore);
-        if (result.hasError()) {
-            throw new RuntimeException(String.format("Procedure %s returned error", uri));
-        }
-        copyDataToStore(localStore, loopStore, procedureDescriptor.getOutputParams());
-    }
-    
-    private void initilaizeLocalStore(DataStore externalStore, DataStore localStore, Parameters paramsToCopy,
-            Parameters localParams) throws ConversionException {
-        copyDataToStore(externalStore, localStore, paramsToCopy);
-        localStore.putDependencies(externalStore.getDependencies());
-        Converter.convertInternalParams(localParams, localStore);
-    }
-
-    private void copyDataToStore(DataStore fromStore, DataStore toStore, Parameters params) {
-        for (String name : params.getNames()) {
-            Data data = fromStore.getData(name);
-            if (data == null) {
-                throw new RuntimeException(String.format("Data '%s' not provided", name));
-            }
-            toStore.addData(name, data);
-        }
-    }
 
 }
