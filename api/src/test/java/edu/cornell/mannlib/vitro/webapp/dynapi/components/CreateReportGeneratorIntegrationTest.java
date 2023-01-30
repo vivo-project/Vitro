@@ -3,16 +3,22 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.Base64;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,12 +41,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
 
     private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-	private static final String REPORT_ENDPOINT_FILE_NAME = "endpoint_procedure_create_report_generator.n3"; 
-	private static final String REPORT_ENDPOINT_INPUT_FILE_NAME = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input.n3";
+	private static final String REPORT_ENDPOINT_FILE = "endpoint_procedure_create_report_generator.n3"; 
+	private static final String REPORT_ENDPOINT_INPUT_FILE = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
+	private static final String REPORT_ENDPOINT_DATA_FILE = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
 
 	private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
-	Model storeModel;
+	OntModel storeModel = ModelFactory.createOntologyModel();
 
     @AfterClass
     public static void after() {
@@ -50,7 +57,7 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
     
     @BeforeClass
     public static void before() {
-        offLogs();
+        //offLogs();
         dynapiModelFactory = mockStatic(DynapiModelFactory.class);
 
     }
@@ -58,7 +65,9 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
 	@Before
 	public void beforeEach() {
 		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
-        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(ontModel);
+        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("http://vitro.mannlib.cornell.edu/default/dynamic-api-abox"))).thenReturn(ontModel);
+        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("vitro:jenaOntModel"))).thenReturn(storeModel);
+
 	}
 	
     @After
@@ -82,6 +91,9 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         ProcedurePool procedurePool = initWithDefaultModel();
         Procedure procedure = null;
         DataStore store = null;
+        
+        boolean manualDebugging = true;
+        
         try { 
             procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator");
             assertFalse(procedure instanceof NullProcedure);
@@ -95,12 +107,33 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             assertTrue(OperationResult.ok().equals(procedure.run(store)));
             assertTrue(ontModel.size() > initialModelSize);
             assertTrue(procedurePool.count() > initialProcedureCount);
-            /*
-             * Data modelData =
-             * store.getData("report_generator_configuration_graph"); Model
-             * model = (Model) TestView.getObject(modelData);
-             * model.write(System.out,"n3");
-             */
+            
+            if (manualDebugging) {
+                Data modelData = store.getData("report_generator_configuration_graph");
+                Model model = (Model) TestView.getObject(modelData);
+                File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report-generator.n3");
+                FileWriter fw = new FileWriter(file);
+                model.write(fw, "n3");
+            }
+            
+            Data uriData = store.getData("report_generator_uri");
+            String reportGeneratorUri = uriData.getSerializedValue();
+            try(Procedure reportGenerator = procedurePool.getByUri(reportGeneratorUri);){
+                Parameters reportInternalParams = reportGenerator.getInternalParams();
+                DataStore reportStore = new DataStore() ;
+                Converter.convertInternalParams(reportInternalParams, reportStore);
+                assertTrue(OperationResult.ok().equals(reportGenerator.run(reportStore)));
+                Data reportData = reportStore.getData("report");
+                String base64EncodedReport = reportData.getSerializedValue();
+                if (manualDebugging) {
+                    byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport);
+                    File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report.xslx");
+                    try (OutputStream os = new FileOutputStream(file)) {
+                        os.write(reportBytes);
+                    }   
+                }
+            }
+
         } finally {
             if (procedure != null) {
                 procedure.removeClient();    
@@ -122,8 +155,8 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
         loadModel(ontModel, ONTOLOGY_FILE_PATH);
         loadModel(ontModel, getFileList(ABOX_PREFIX));
-        loadModel(ontModel, ABOX_PREFIX + REPORT_ENDPOINT_FILE_NAME);
-        loadModel(ontModel, REPORT_ENDPOINT_INPUT_FILE_NAME);
-
+        loadModel(ontModel, ABOX_PREFIX + REPORT_ENDPOINT_FILE);
+        loadModel(ontModel, REPORT_ENDPOINT_INPUT_FILE);
+        loadModel(storeModel, REPORT_ENDPOINT_DATA_FILE);
 	}
 }

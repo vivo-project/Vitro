@@ -5,6 +5,9 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+<https://vivoweb.org/procedure/create_report_generator>
+        dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_configuration_graph_internal> .
+
 <https://vivoweb.org/procedure/create_report/parameter/report_generator_description>
         dynapi:isInternal                   "true"^^xsd:boolean ;
         dynapi:defaultValue                 "Dummy report generator description"  .

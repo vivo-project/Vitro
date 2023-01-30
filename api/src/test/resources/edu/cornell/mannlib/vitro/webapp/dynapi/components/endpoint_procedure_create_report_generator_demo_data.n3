@@ -1,0 +1,1091 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix vivo: <http://vivoweb.org/ontology/core#> .
+@prefix event: <http://purl.org/NET/c4dm/event.owl#> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+
+<https://vivo.tib.eu/demo/individual/3mproj1> a vivo:Grant ;
+	rdfs:label "Ergonomic regional forecast" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI1> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS1> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-02-15"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI1> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS1> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE1> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-03-22"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI1> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE1> .
+
+<https://vivo.tib.eu/demo/individual/3mproj1> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI1> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder5> ;
+	vivo:totalAwardAmount "998054"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder5> a foaf:Organization ;
+	rdfs:label "Europäische Wissenschaftsförderer" .
+
+<https://vivo.tib.eu/demo/individual/3mproj2> a vivo:Grant ;
+	rdfs:label "Public-key directional info-mediaries" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI2> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS2> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-03-13"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI2> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS2> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE2> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-07-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI2> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE2> .
+
+<https://vivo.tib.eu/demo/individual/3mproj2> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI2> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder2> ;
+	vivo:totalAwardAmount "780759"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder2> a foaf:Organization ;
+	rdfs:label "German Society for Scholarship" .
+
+<https://vivo.tib.eu/demo/individual/3mproj3> a vivo:Grant ;
+	rdfs:label "Innovative 24/7 alliance" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI3> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS3> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-02-14"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI3> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS3> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE3> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-02-17"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI3> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE3> .
+
+<https://vivo.tib.eu/demo/individual/3mproj3> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI3> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder7> ;
+	vivo:totalAwardAmount "439577"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder7> a foaf:Organization ;
+	rdfs:label "Bundesministerium für Digitales Denken" .
+
+<https://vivo.tib.eu/demo/individual/3mproj4> a vivo:Grant ;
+	rdfs:label "Synergized client-driven local area network" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI4> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS4> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-09-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI4> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS4> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE4> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-07-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI4> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE4> .
+
+<https://vivo.tib.eu/demo/individual/3mproj4> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI4> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder3> ;
+	vivo:totalAwardAmount "70869"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder3> a foaf:Organization ;
+	rdfs:label "International Society on Support of PhD and Postdocs" .
+
+<https://vivo.tib.eu/demo/individual/3mproj5> a vivo:Grant ;
+	rdfs:label "Optimized bottom-line groupware" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI5> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS5> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-12-22"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI5> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS5> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE5> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-12-27"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI5> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE5> .
+
+<https://vivo.tib.eu/demo/individual/3mproj5> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI5> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder9> ;
+	vivo:totalAwardAmount "317828"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder9> a foaf:Organization ;
+	rdfs:label "Bundesministerium für Innovative Ideen" .
+
+<https://vivo.tib.eu/demo/individual/3mproj6> a vivo:Grant ;
+	rdfs:label "Reduced dedicated Graphical User Interface" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI6> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS6> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-03-22"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI6> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS6> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE6> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-09-12"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI6> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE6> .
+
+<https://vivo.tib.eu/demo/individual/3mproj6> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI6> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder8> ;
+	vivo:totalAwardAmount "1017684"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder8> a foaf:Organization ;
+	rdfs:label "European Committee of Clever Business" .
+
+<https://vivo.tib.eu/demo/individual/3mproj7> a vivo:Grant ;
+	rdfs:label "Managed discrete architecture" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI7> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS7> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-03-15"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI7> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS7> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE7> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-08-03"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI7> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE7> .
+
+<https://vivo.tib.eu/demo/individual/3mproj7> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI7> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder8> ;
+	vivo:totalAwardAmount "267350"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj8> a vivo:Grant ;
+	rdfs:label "Down-sized interactive projection" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI8> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS8> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-04-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI8> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS8> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE8> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-09-23"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI8> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE8> .
+
+<https://vivo.tib.eu/demo/individual/3mproj8> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI8> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder6> ;
+	vivo:totalAwardAmount "604225"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder6> a foaf:Organization ;
+	rdfs:label "Society of Fiction in Science" .
+
+<https://vivo.tib.eu/demo/individual/3mproj9> a vivo:Grant ;
+	rdfs:label "Visionary attitude-oriented moratorium" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI9> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS9> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-11-04"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI9> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS9> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE9> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-11-13"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI9> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE9> .
+
+<https://vivo.tib.eu/demo/individual/3mproj9> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI9> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder4> ;
+	vivo:totalAwardAmount "1108134"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder4> a foaf:Organization ;
+	rdfs:label "Association for Sustainable Industry and Science" .
+
+<https://vivo.tib.eu/demo/individual/3mproj10> a vivo:Grant ;
+	rdfs:label "Phased composite throughput" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI10> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS10> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2014-12-09"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI10> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS10> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE10> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-05-07"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI10> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE10> .
+
+<https://vivo.tib.eu/demo/individual/3mproj10> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI10> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder2> ;
+	vivo:totalAwardAmount "1170341"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj11> a vivo:Grant ;
+	rdfs:label "Grass-roots non-volatile adapter" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI11> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS11> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-10-26"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI11> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS11> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE11> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-09-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI11> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE11> .
+
+<https://vivo.tib.eu/demo/individual/3mproj11> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI11> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder6> ;
+	vivo:totalAwardAmount "470023"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj12> a vivo:Grant ;
+	rdfs:label "Implemented multi-state hub" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI12> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS12> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-06-01"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI12> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS12> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE12> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-01-09"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI12> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE12> .
+
+<https://vivo.tib.eu/demo/individual/3mproj12> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI12> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder4> ;
+	vivo:totalAwardAmount "1039801"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj13> a vivo:Grant ;
+	rdfs:label "Multi-channelled eco-centric conglomeration" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI13> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS13> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-06-23"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI13> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS13> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE13> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-07-15"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI13> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE13> .
+
+<https://vivo.tib.eu/demo/individual/3mproj13> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI13> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder7> ;
+	vivo:totalAwardAmount "269887"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj14> a vivo:Grant ;
+	rdfs:label "Future-proofed composite Graphical User Interface" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI14> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS14> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-12-03"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI14> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS14> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE14> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-07-07"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI14> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE14> .
+
+<https://vivo.tib.eu/demo/individual/3mproj14> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI14> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder1> ;
+	vivo:totalAwardAmount "681097"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder1> a foaf:Organization ;
+	rdfs:label "National Stiftung Industrie und Natur" .
+
+<https://vivo.tib.eu/demo/individual/3mproj15> a vivo:Grant ;
+	rdfs:label "Versatile mobile orchestration" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI15> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS15> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-09-06"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI15> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS15> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE15> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-02-15"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI15> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE15> .
+
+<https://vivo.tib.eu/demo/individual/3mproj15> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI15> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder3> ;
+	vivo:totalAwardAmount "746285"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj16> a vivo:Grant ;
+	rdfs:label "Virtual radical conglomeration" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI16> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS16> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-04-27"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI16> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS16> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE16> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-04-25"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI16> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE16> .
+
+<https://vivo.tib.eu/demo/individual/3mproj16> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI16> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder1> ;
+	vivo:totalAwardAmount "576488"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj17> a vivo:Grant ;
+	rdfs:label "Decentralized maximized algorithm" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI17> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS17> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2014-09-29"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI17> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS17> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE17> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-08-27"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI17> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE17> .
+
+<https://vivo.tib.eu/demo/individual/3mproj17> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI17> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder1> ;
+	vivo:totalAwardAmount "274615"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj18> a vivo:Grant ;
+	rdfs:label "Enhanced scalable encryption" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI18> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS18> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-02-05"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI18> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS18> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE18> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-01-27"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI18> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE18> .
+
+<https://vivo.tib.eu/demo/individual/3mproj18> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI18> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder1> ;
+	vivo:totalAwardAmount "583259"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj19> a vivo:Grant ;
+	rdfs:label "Ergonomic zero tolerance algorithm" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI19> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS19> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-06-08"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI19> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS19> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE19> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-12-07"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI19> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE19> .
+
+<https://vivo.tib.eu/demo/individual/3mproj19> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI19> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder8> ;
+	vivo:totalAwardAmount "624622"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj20> a vivo:Grant ;
+	rdfs:label "Intuitive coherent process improvement" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI20> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS20> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-01-31"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI20> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS20> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE20> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-06-23"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI20> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE20> .
+
+<https://vivo.tib.eu/demo/individual/3mproj20> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI20> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder3> ;
+	vivo:totalAwardAmount "816719"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj21> a vivo:Grant ;
+	rdfs:label "Visionary analyzing challenge" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI21> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS21> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-08-26"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI21> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS21> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE21> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-04-06"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI21> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE21> .
+
+<https://vivo.tib.eu/demo/individual/3mproj21> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI21> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder4> ;
+	vivo:totalAwardAmount "377384"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj22> a vivo:Grant ;
+	rdfs:label "Compatible background intranet" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI22> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS22> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-03-16"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI22> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS22> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE22> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-07-16"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI22> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE22> .
+
+<https://vivo.tib.eu/demo/individual/3mproj22> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI22> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder4> ;
+	vivo:totalAwardAmount "823074"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj23> a vivo:Grant ;
+	rdfs:label "Function-based incremental budgetary management" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI23> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS23> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-07-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI23> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS23> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE23> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-07-20"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI23> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE23> .
+
+<https://vivo.tib.eu/demo/individual/3mproj23> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI23> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder6> ;
+	vivo:totalAwardAmount "660734"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj24> a vivo:Grant ;
+	rdfs:label "Secured directional productivity" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI24> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS24> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-09-16"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI24> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS24> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE24> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-06-28"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI24> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE24> .
+
+<https://vivo.tib.eu/demo/individual/3mproj24> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI24> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder9> ;
+	vivo:totalAwardAmount "741374"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj25> a vivo:Grant ;
+	rdfs:label "Public-key discrete interface" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI25> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS25> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-04-26"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI25> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS25> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE25> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-02-14"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI25> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE25> .
+
+<https://vivo.tib.eu/demo/individual/3mproj25> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI25> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder2> ;
+	vivo:totalAwardAmount "1030201"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj26> a vivo:Grant ;
+	rdfs:label "Switchable secondary standardization" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI26> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS26> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-11-05"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI26> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS26> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE26> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-08-31"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI26> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE26> .
+
+<https://vivo.tib.eu/demo/individual/3mproj26> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI26> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder10> ;
+	vivo:totalAwardAmount "192282"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/funder10> a foaf:Organization ;
+	rdfs:label "Academie of Non-fake Science" .
+
+<https://vivo.tib.eu/demo/individual/3mproj27> a vivo:Grant ;
+	rdfs:label "Profound systematic emulation" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI27> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS27> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-05-17"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI27> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS27> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE27> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-02-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI27> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE27> .
+
+<https://vivo.tib.eu/demo/individual/3mproj27> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI27> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder6> ;
+	vivo:totalAwardAmount "56436"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj28> a vivo:Grant ;
+	rdfs:label "Distributed tertiary standardization" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI28> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS28> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-07-05"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI28> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS28> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE28> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-12-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI28> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE28> .
+
+<https://vivo.tib.eu/demo/individual/3mproj28> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI28> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder6> ;
+	vivo:totalAwardAmount "38581"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj29> a vivo:Grant ;
+	rdfs:label "Multi-layered directional database" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI29> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS29> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-08-06"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI29> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS29> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE29> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-10-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI29> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE29> .
+
+<https://vivo.tib.eu/demo/individual/3mproj29> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI29> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder9> ;
+	vivo:totalAwardAmount "881807"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj30> a vivo:Grant ;
+	rdfs:label "Open-architected real-time instruction set" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI30> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS30> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-11-04"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI30> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS30> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE30> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-06-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI30> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE30> .
+
+<https://vivo.tib.eu/demo/individual/3mproj30> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI30> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder1> ;
+	vivo:totalAwardAmount "761892"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj31> a vivo:Grant ;
+	rdfs:label "Vision-oriented optimal encoding" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI31> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS31> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-05-27"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI31> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS31> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE31> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-06-17"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI31> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE31> .
+
+<https://vivo.tib.eu/demo/individual/3mproj31> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI31> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder10> ;
+	vivo:totalAwardAmount "889504"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj32> a vivo:Grant ;
+	rdfs:label "Ameliorated composite utilisation" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI32> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS32> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-08-28"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI32> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS32> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE32> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-06-13"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI32> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE32> .
+
+<https://vivo.tib.eu/demo/individual/3mproj32> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI32> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder2> ;
+	vivo:totalAwardAmount "54356"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj33> a vivo:Grant ;
+	rdfs:label "Pre-emptive attitude-oriented artificial intelligence" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI33> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS33> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-04-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI33> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS33> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE33> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-05-08"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI33> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE33> .
+
+<https://vivo.tib.eu/demo/individual/3mproj33> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI33> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder3> ;
+	vivo:totalAwardAmount "309300"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj34> a vivo:Grant ;
+	rdfs:label "Diverse mobile utilisation" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI34> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS34> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-01-18"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI34> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS34> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE34> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-11-12"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI34> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE34> .
+
+<https://vivo.tib.eu/demo/individual/3mproj34> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI34> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder5> ;
+	vivo:totalAwardAmount "921148"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj35> a vivo:Grant ;
+	rdfs:label "Persistent tertiary toolset" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI35> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS35> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-12-16"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI35> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS35> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE35> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-04-13"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI35> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE35> .
+
+<https://vivo.tib.eu/demo/individual/3mproj35> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI35> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder7> ;
+	vivo:totalAwardAmount "209398"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj36> a vivo:Grant ;
+	rdfs:label "Multi-layered global success" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI36> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS36> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-06-06"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI36> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS36> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE36> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-01-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI36> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE36> .
+
+<https://vivo.tib.eu/demo/individual/3mproj36> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI36> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder5> ;
+	vivo:totalAwardAmount "569327"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj37> a vivo:Grant ;
+	rdfs:label "Virtual zero tolerance framework" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI37> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS37> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2014-11-16"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI37> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS37> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE37> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-08-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI37> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE37> .
+
+<https://vivo.tib.eu/demo/individual/3mproj37> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI37> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder7> ;
+	vivo:totalAwardAmount "321446"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj38> a vivo:Grant ;
+	rdfs:label "Phased 4th generation interface" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI38> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS38> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-01-14"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI38> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS38> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE38> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-02-28"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI38> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE38> .
+
+<https://vivo.tib.eu/demo/individual/3mproj38> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI38> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder10> ;
+	vivo:totalAwardAmount "173176"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj39> a vivo:Grant ;
+	rdfs:label "Secured regional infrastructure" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI39> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS39> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-07-16"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI39> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS39> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE39> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-09-30"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI39> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE39> .
+
+<https://vivo.tib.eu/demo/individual/3mproj39> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI39> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder5> ;
+	vivo:totalAwardAmount "630983"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj40> a vivo:Grant ;
+	rdfs:label "Fundamental exuding function" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI40> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS40> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-02-13"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI40> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS40> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE40> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-10-09"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI40> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE40> .
+
+<https://vivo.tib.eu/demo/individual/3mproj40> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI40> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder8> ;
+	vivo:totalAwardAmount "951010"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj41> a vivo:Grant ;
+	rdfs:label "Ergonomic logistical solution" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI41> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS41> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-07-04"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI41> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS41> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE41> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-11-09"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI41> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE41> .
+
+<https://vivo.tib.eu/demo/individual/3mproj41> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI41> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder9> ;
+	vivo:totalAwardAmount "1192612"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj42> a vivo:Grant ;
+	rdfs:label "Streamlined coherent concept" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI42> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS42> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-06-15"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI42> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS42> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE42> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-07-16"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI42> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE42> .
+
+<https://vivo.tib.eu/demo/individual/3mproj42> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI42> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder1> ;
+	vivo:totalAwardAmount "87508"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj43> a vivo:Grant ;
+	rdfs:label "Reverse-engineered analyzing software" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI43> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS43> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-07-24"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI43> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS43> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE43> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-02-11"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI43> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE43> .
+
+<https://vivo.tib.eu/demo/individual/3mproj43> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI43> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder3> ;
+	vivo:totalAwardAmount "878069"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj44> a vivo:Grant ;
+	rdfs:label "Function-based 4th generation matrices" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI44> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS44> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-05-05"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI44> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS44> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE44> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-05-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI44> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE44> .
+
+<https://vivo.tib.eu/demo/individual/3mproj44> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI44> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder6> ;
+	vivo:totalAwardAmount "711298"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj45> a vivo:Grant ;
+	rdfs:label "Robust dedicated task-force" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI45> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS45> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2018-02-13"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI45> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS45> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE45> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2020-11-10"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI45> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE45> .
+
+<https://vivo.tib.eu/demo/individual/3mproj45> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI45> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder9> ;
+	vivo:totalAwardAmount "213768"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj46> a vivo:Grant ;
+	rdfs:label "Digitized background support" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI46> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS46> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-10-24"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI46> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS46> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE46> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-01-07"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI46> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE46> .
+
+<https://vivo.tib.eu/demo/individual/3mproj46> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI46> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder5> ;
+	vivo:totalAwardAmount "731403"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj47> a vivo:Grant ;
+	rdfs:label "Universal grid-enabled utilisation" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI47> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS47> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-01-20"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI47> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS47> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE47> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-11-19"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI47> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE47> .
+
+<https://vivo.tib.eu/demo/individual/3mproj47> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI47> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder10> ;
+	vivo:totalAwardAmount "757055"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj48> a vivo:Grant ;
+	rdfs:label "Fundamental reciprocal pricing structure" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI48> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS48> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2016-01-09"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI48> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS48> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE48> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2019-09-23"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI48> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE48> .
+
+<https://vivo.tib.eu/demo/individual/3mproj48> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI48> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder3> ;
+	vivo:totalAwardAmount "537538"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj49> a vivo:Grant ;
+	rdfs:label "Adaptive heuristic local area network" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI49> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS49> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2017-09-23"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI49> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS49> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE49> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2022-03-29"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI49> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE49> .
+
+<https://vivo.tib.eu/demo/individual/3mproj49> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI49> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder1> ;
+	vivo:totalAwardAmount "955140"^^xsd:int .
+
+<https://vivo.tib.eu/demo/individual/3mproj50> a vivo:Grant ;
+	rdfs:label "Realigned grid-enabled circuit" .
+
+<https://vivo.tib.eu/demo/individual/3projDTI50> a vivo:DateTimeInterval .
+
+<https://vivo.tib.eu/demo/individual/3projDTVS50> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2015-07-15"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI50> vivo:start <https://vivo.tib.eu/demo/individual/3projDTVS50> .
+
+<https://vivo.tib.eu/demo/individual/3projDTVE50> a vivo:DateTimeValue ;
+	vivo:dateTimePrecision vivo:yearMonthDayPrecision ;
+	vivo:dateTime "2021-03-26"^^xsd:date .
+
+<https://vivo.tib.eu/demo/individual/3projDTI50> vivo:end <https://vivo.tib.eu/demo/individual/3projDTVE50> .
+
+<https://vivo.tib.eu/demo/individual/3mproj50> vivo:dateTimeInterval <https://vivo.tib.eu/demo/individual/3projDTI50> ;
+	vivo:assignedBy <https://vivo.tib.eu/demo/individual/funder3> ;
+	vivo:totalAwardAmount "361288"^^xsd:int .
