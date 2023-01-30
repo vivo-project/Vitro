@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 
 public class DataStore {
@@ -80,6 +82,9 @@ public class DataStore {
     }
 
     public Procedure getDependency(String uri) {
+        if (StringUtils.isEmpty(uri)) {
+            return NullProcedure.getInstance();
+        }
         return dependencyComponents.get(uri);
     }
     
