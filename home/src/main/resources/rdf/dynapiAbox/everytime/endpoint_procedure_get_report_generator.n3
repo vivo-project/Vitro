@@ -1,0 +1,40 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/procedure/get_report_generator>
+        a                                   dynapi:Procedure ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/step> .
+
+####################################################################################################################################################################################
+
+ <https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/step>
+         a                                   dynapi:OperationalStep ;
+         dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/get_report_generator_status/step> ;
+         dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/operation> .       
+
+<https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/operation>
+         a                                   dynapi:SparqlSelectQuery ;
+         dynapi:sparqlQueryText              "SELECT QUERY SHOULD BE HERE " ;
+         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/get_report_generator/get_report_generator_status/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/get_report_generator_status/operation> .
+
+<https://vivoweb.org/procedure/get_report_generator/get_report_generator_status/operation>
+        a                                   dynapi:ProcedurePoolAtomicOperation ;
+        dynapi:poolOperationType            "status" ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/report_generator_uri> .
+
+####################################################################################################################################################################################
+        
+<https://vivoweb.org/procedure/get_report_generator/parameter/report_generator_uri>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "report_generator_uri" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
