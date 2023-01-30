@@ -6,63 +6,63 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_assertions>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "TBOX_ASSERTIONS" ;
-        dynapi:defaultValue        "TBOX_ASSERTIONS" ;
+        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/asserted-tbox" ;
         rdfs:label              "tbox assertions model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "ABOX_ASSERTIONS" ;
-        dynapi:defaultValue        "ABOX_ASSERTIONS" ;
+        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-2ABOX_ASSERTIONS" ;
         rdfs:label              "abox assertions model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_union>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "ABOX_UNION" ;
-        dynapi:defaultValue        "ABOX_UNION" ;
+        dynapi:defaultValue     "vitro:aboxOntModel" ;
         rdfs:label              "abox union model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_union>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "TBOX_UNION" ;
-        dynapi:defaultValue        "TBOX_UNION" ;
+        dynapi:defaultValue     "vitro:tboxOntModel" ;
         rdfs:label              "tbox union model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "FULL_UNION" ;
-        dynapi:defaultValue        "FULL_UNION" ;
+        dynapi:defaultValue     "vitro:jenaOntModel" ;
         rdfs:label              "full union model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/application_metadata>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "APPLICATION_METADATA" ;
-        dynapi:defaultValue        "APPLICATION_METADATA" ;
+        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata" ;
         rdfs:label              "application metadata model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/user_accounts>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "USER_ACCOUNTS" ;
-        dynapi:defaultValue        "USER_ACCOUNTS" ;
+        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts" ;
         rdfs:label              "user accounts model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
         
 <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions>
-        a                       dynapi:Parameter, dynapi:Model ;
+        a                       dynapi:Model ;
         dynapi:name             "dynamic_api_abox_graph" ;
         dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox" ;
         rdfs:label              "dynamic api abox assertions model"@en-US ;
