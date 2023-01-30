@@ -9,7 +9,7 @@
         a                                   dynapi:Procedure ;
         rdfs:label                          "Create report procedure"@en-US ;
         dynapi:hasFirstStep                 <https://vivoweb.org/procedure/create_report/fill_in_report_generation_procedure/step> ;
-        dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_configuration_graph_internal> ;
+#        dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_configuration_graph_internal> ;
         dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_uri>  .
         
 ####################################################################################################################################################################################
@@ -31,6 +31,7 @@
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_param_uri> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_name> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_description> ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri_internal> ;
         dynapi:N3TextAdditions              
         """
         @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
@@ -44,7 +45,10 @@
 	?report_param_uri
 		a                                   dynapi:Parameter ;
 		dynapi:name                         "report" ;
-		dynapi:hasType                      <https://vivoweb.org/parameter/type/binary-file> .
+		dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> .
+		
+	?report_generator_operation_uri
+                a                                   dynapi:ReportGenerator ;
         """ .
         
 ####################################################################################################################################################################################
@@ -306,6 +310,7 @@
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/container/data_sources> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/get_select_from_container/parameter/container_select_item> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/container/query_graph_names> ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri> ;
         dynapi:call                         <https://vivoweb.org/procedure/add_report_generator_select_query> .   
 
 <https://vivoweb.org/procedure/create_report/fill_in_select_query_templates/output_descriptor>
@@ -391,6 +396,7 @@
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/query_text> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/data_source_parameter_uri> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/graph_parameter_uri> ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri> ;
         dynapi:N3TextAdditions              
         """
         @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
@@ -413,6 +419,8 @@
 		dynapi:name                 ?query_name ;
 		dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/json> .
         
+        ?report_generator_operation_uri dynapi:dataSource ?data_source_parameter_uri .
+        
         """ .
 
 <https://vivoweb.org/procedure/report_generator_select_query_fill_in/add_data_source_uri_to_map/step>
@@ -423,7 +431,6 @@
 <https://vivoweb.org/procedure/report_generator_select_query_fill_in/add_data_source_uri_to_map/operation>
  	a                                   dynapi:ContainerLoader ;
  	dynapi:targetContainer              <https://vivoweb.org/procedure/create_report/parameter/container/data_sources> ;
-# 	dynapi:keyParameter                 <https://vivoweb.org/procedure/create_report/parameter/query_name> ;
  	dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/data_source_parameter_uri> .
  	
 <https://vivoweb.org/procedure/report_generator_select_query_fill_in/assign_next_step_to_current/step>
@@ -489,7 +496,7 @@
 <https://vivoweb.org/procedure/create_report/fill_in_report_generation_component/step>
         a                                   dynapi:OperationalStep ;
         rdfs:label                          "Fill report generation component"@en-US ;
-#        dynapi:hasNextStep                  <https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/step> ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/create_report/add_to_dynamic_api_model/step> ;
         dynapi:hasOperation                 <https://vivoweb.org/procedure/create_report/fill_in_report_generation_component_sources/n3template> .
 
 
@@ -498,7 +505,7 @@
         dynapi:hasModel                     <https://vivoweb.org/procedure/create_report/parameter/report_generator_configuration_graph> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/template_base64> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/current_step_uri> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri> ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri_internal> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/template_param_uri> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_param_uri> ;
         dynapi:N3TextAdditions              
@@ -510,7 +517,6 @@
                 dynapi:hasOperation                 ?report_generator_operation_uri .
 
         ?report_generator_operation_uri 
-                a                                   dynapi:ReportGenerator ;
                 dynapi:template                     ?template_param_uri ;
                 dynapi:report                       ?report_param_uri .
 	
@@ -518,115 +524,64 @@
 		a                                   dynapi:Parameter ;
 		dynapi:isInternal                   "true"^^xsd:boolean ;
 		dynapi:name                         "template" ;
-		dynapi:hasType                      <https://vivoweb.org/parameter/type/binary-file> ;
+		dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> ;
 		dynapi:defaultValue                 ?template .
 		
         """ .
 
 ####################################################################################################################################################################################
 ####################################################################################################################################################################################
-#Loop to fill in report generation data sources
 
-<https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/step>
+<https://vivoweb.org/procedure/create_report/add_to_dynamic_api_model/step>
         a                                   dynapi:OperationalStep ;
-        rdfs:label                          "Fill in report generation data sources"@en-US ;
-        dynapi:hasOperation                 <https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/loop> .
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/create_report/load_procedure_into_procedure_pool/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/create_report/add_to_dynamic_api_model/operation> .
 
-<https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/loop>
-        a                                   dynapi:LoopOperation ;
-        dynapi:inputDescriptor              <https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/input_descriptor> ;
-        dynapi:conditionDescriptor          <https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/condition_descriptor> ;
-        dynapi:outputDescriptor             <https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/output_descriptor> ;
-        dynapi:executableDescriptor         <https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/executable_descriptor> ;
-        
-        dynapi:internalParameter            <https://vivoweb.org/procedure/create_report/parameter/iteration_int_param> ;
-        dynapi:internalParameter            <https://vivoweb.org/procedure/create_report/parameter/container/data_sources> ;
-        dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/container/data_sources> .
-
-#Get data source from array
-<https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/input_descriptor>
-        a                                   dynapi:ProcedureDescriptor ;
-        dynapi:providesParameter            <https://vivoweb.org/procedure/get_select_from_container/parameter/container_select_item> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/iteration_int_param> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/container/select_queries> ;
-        dynapi:call                         <https://vivoweb.org/procedure/get_select_from_container> .
-
-#If data source is in array
-<https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/condition_descriptor>
-        a                                   dynapi:ProcedureDescriptor ;
-        dynapi:providesParameter            <https://vivoweb.org/parameter/expected_int_result_1> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/iteration_int_param> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/container/select_queries> ;
-        dynapi:call                         <https://vivoweb.org/procedure/contains_select_item> .
-
-#n3 template to add data source        
-<https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/executable_descriptor>
-        a                                   dynapi:ProcedureDescriptor ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_configuration_graph> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/current_step_uri> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/container/data_sources> ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/get_select_from_container/parameter/container_select_item> ;
-        dynapi:call                         <https://vivoweb.org/procedure/add_report_generator_select_query> .   
-
-#increment iterator
-<https://vivoweb.org/procedure/create_report/fill_in_report_generator_sources/output_descriptor>
-        a                                   dynapi:ProcedureDescriptor ;
-        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/iteration_int_param> ;
-        dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/iteration_int_param> ;
-        dynapi:call                         <https://vivoweb.org/procedure/increment_integer> . 
-        
-######################################################################## ?report_generator_operation_uri dynapi:dataSource ?data_source_param_uri .
-
+<https://vivoweb.org/procedure/create_report/add_to_dynamic_api_model/operation>
+        a                                   dynapi:ModelWriter ;
+        dynapi:additionModel                <https://vivoweb.org/procedure/create_report/parameter/report_generator_configuration_graph_internal> ;
+        dynapi:targetModel                  <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
 
 ####################################################################################################################################################################################
+####################################################################################################################################################################################
 
+<https://vivoweb.org/procedure/create_report/load_procedure_into_procedure_pool/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/create_report/load_procedure_into_procedure_pool/operation> .
 
+<https://vivoweb.org/procedure/create_report/load_procedure_into_procedure_pool/operation>
+        a                                   dynapi:ProcedurePoolAtomicOperation ;
+        dynapi:poolOperationType            "load" ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_uri> .
+ 
+####################################################################################################################################################################################
+####################################################################################################################################################################################
 
-#INPUT
+#Parameters
 
 <https://vivoweb.org/procedure/create_report/parameter/report_generator_description>
         a                                   dynapi:Parameter ;
         dynapi:name                         "report_generator_description" ;
-        ##For tests only
-        dynapi:isInternal                   "true"^^xsd:boolean ;
-        dynapi:defaultValue                 "Dummy report generator description" ;
-        ##
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> .
         
 <https://vivoweb.org/procedure/create_report/parameter/report_generator_name>
         a                                   dynapi:Parameter ;
         dynapi:name                         "report_generator_name" ;
-        ##For tests only
-        dynapi:isInternal                   "true"^^xsd:boolean ;
-        dynapi:defaultValue                 "Dummy report generator name" ;
-        ##
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> .
 
 <https://vivoweb.org/procedure/create_report/parameter/container/construct_queries>
         a                                   dynapi:Parameter ;
         dynapi:name                         "construct_queries" ;
-        ##For tests only
-        dynapi:isInternal                   "true"^^xsd:boolean ;
-        dynapi:defaultValue                 """[{"name": "constructQuery1", "description": "dummy description 1", "constructQuery": "CONSTRUCT Query text 1" }, {"name": "constructQuery2", "description": "dummy description 2", "constructQuery": "CONSTRUCT Query text 2" } ]""" ;
-        ##
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
         
 <https://vivoweb.org/procedure/create_report/parameter/container/select_queries>
         a                                   dynapi:Parameter ;
         dynapi:name                         "select_queries" ;
-         ##For tests only
-        dynapi:isInternal                   "true"^^xsd:boolean ;
-        dynapi:defaultValue                 """[{"name": "data source 1 (select query)", "description": "dummy description select query 1", "selectQuery": "Select query text 1", "graph": "constructQuery1" }, {"name": "data source 2 (select query)", "description": "dummy description 2", "selectQuery": "Select query text 2" , "graph": "constructQuery2"} ]""" ;
-        ##
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
         
 
 <https://vivoweb.org/procedure/create_report/parameter/template_base64>
         a                                   dynapi:Parameter ;
-         ##For tests only
-        dynapi:isInternal                   "true"^^xsd:boolean ;
-        dynapi:defaultValue                 "TEMPLATE_BASE64_ENCODED_STRING_SHOULD_BE_HERE" ;
-        ##
         dynapi:name                         "template" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> .
 
@@ -721,7 +676,7 @@
 <https://vivoweb.org/procedure/create_report/parameter/graph_parameter_uri>
         a                                   dynapi:Parameter ;
         dynapi:name                         "graph_parameter_uri" ;
-        dynapi:defaultValue                 "https://vivoweb.org/procedure/report_generator/operation/,java_uuid_number" ;
+        dynapi:defaultValue                 "https://vivoweb.org/procedure/report_generator/graph_parameter/,java_uuid_number" ;
         dynapi:isInternal                   "true"^^xsd:boolean ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/generated-uri> .
 
@@ -739,13 +694,18 @@
         dynapi:isInternal                   "true"^^xsd:boolean ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/generated-uri> .
         
-<https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri>
+<https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri_internal>
         a                                   dynapi:Parameter ;
         dynapi:name                         "report_generator_operation_uri" ;
         dynapi:isInternal                   "true"^^xsd:boolean ;
-        dynapi:defaultValue                 "https://vivoweb.org/procedure/report_generator/operation/,java_uuid_number" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/generated-uri> .        
+        dynapi:defaultValue                 "https://vivoweb.org/procedure/report_generator/report_generator_operation/,java_uuid_number" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/generated-uri> . 
         
+<https://vivoweb.org/procedure/create_report/parameter/report_generator_operation_uri>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "report_generator_operation_uri" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/generated-uri> .  
+ 
 <https://vivoweb.org/procedure/create_report/parameter/current_step_uri>
         a                                   dynapi:Parameter ;
         dynapi:name                         "current_step_uri" ;
