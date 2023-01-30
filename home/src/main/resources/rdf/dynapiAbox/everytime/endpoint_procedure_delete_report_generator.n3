@@ -1,0 +1,62 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/procedure/delete_report_generator>
+        a                                   dynapi:Procedure ;
+#        dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph_internal> ;
+#        dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_uri>  ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/procedure/delete_report_generator/get_report_from_dynamic_api_graph/step> .
+
+
+####################################################################################################################################################################################
+
+ <https://vivoweb.org/procedure/delete_report_generator/get_report_from_dynamic_api_graph/step>
+         a                                   dynapi:OperationalStep ;
+         dynapi:hasNextStep                  <https://vivoweb.org/procedure/delete_report_generator/remove_from_dynamic_api_model/step> ;
+         dynapi:hasOperation                 <https://vivoweb.org/procedure/delete_report_generator/get_report_from_dynamic_api_graph/operation> .       
+
+<https://vivoweb.org/procedure/delete_report_generator/get_report_from_dynamic_api_graph/operation>
+         a                                   dynapi:SparqlConstructQuery ;
+         dynapi:sparqlQueryText              "CONSTRUCT { <test:uri> <test:property> ?o . } WHERE { ?uri <test:property> ?o . } " ;
+         dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph> ;
+         dynapi:requiresParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_uri> ;
+         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/delete_report_generator/remove_from_dynamic_api_model/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/delete_report_generator/unload_procedure_from_procedure_pool/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/delete_report_generator/remove_from_dynamic_api_model/operation> .
+
+<https://vivoweb.org/procedure/delete_report_generator/remove_from_dynamic_api_model/operation>
+        a                                   dynapi:ModelWriter ;
+        dynapi:retractionModel              <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph> ;
+        dynapi:targetModel                  <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/delete_report_generator/unload_procedure_from_procedure_pool/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/delete_report_generator/unload_procedure_from_procedure_pool/operation> .
+
+<https://vivoweb.org/procedure/delete_report_generator/unload_procedure_from_procedure_pool/operation>
+        a                                   dynapi:ProcedurePoolAtomicOperation ;
+        dynapi:poolOperationType            "unload" ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_uri> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph>
+        a                                   dynapi:Model ;
+        dynapi:name                         "report_generator_configuration_graph" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
+
+<https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_uri>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "report_generator_uri" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
