@@ -90,6 +90,11 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         }
         K key = component.getKey();
         log.info(format("Adding component %s with URI %s", key, uri));
+        if (!component.isValid()) {
+            throw new RuntimeException(format("%s %s with URI %s is not valid. Not adding to pool.",
+                    getType().getName(), key, uri));
+        }
+        
         if (isInModel(uri)) {
             synchronized (mutex) {
                 K oldKey = components.putUriMapping(uri, key);
