@@ -60,3 +60,11 @@
         rdfs:label              "user accounts model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
+        
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions>
+        a                       dynapi:Parameter, dynapi:Model ;
+        dynapi:name             "dynamic_api_abox_graph" ;
+        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox" ;
+        rdfs:label              "dynamic api abox assertions model"@en-US ;
+        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        vitro:mostSpecificType  dynapi:Model .
