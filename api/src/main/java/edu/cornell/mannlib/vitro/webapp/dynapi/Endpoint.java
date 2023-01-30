@@ -81,6 +81,9 @@ public abstract class Endpoint extends VitroHttpServlet {
                 continue;
             }
             ProcedureDescriptor descriptor = dependencies.get(uri);
+            if (descriptor.getUriParam() != null) {
+                continue;
+            }
             Procedure dependency = procedurePool.getByUri(uri);
             if (NullProcedure.getInstance().equals(dependency)) {
                 throw new InitializationException(String.format("%s dependency with uri:'%s' not found in pool.",

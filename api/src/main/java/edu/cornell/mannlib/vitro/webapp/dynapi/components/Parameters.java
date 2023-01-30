@@ -18,6 +18,10 @@ public class Parameters implements Removable {
 	public void add(Parameter param) {
 		params.put(param.getName(), param);
 	}
+	
+    public void remove(Parameter param) {
+        params.remove(param.getName());
+    }
 
 	public void addAll(Parameters newParams) {
 		Set<String> names = newParams.getNames();
