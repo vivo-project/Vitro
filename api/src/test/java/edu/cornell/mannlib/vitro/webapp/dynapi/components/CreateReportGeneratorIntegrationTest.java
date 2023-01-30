@@ -23,7 +23,9 @@ import org.mockito.MockedStatic;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
@@ -93,7 +95,12 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             assertTrue(OperationResult.ok().equals(procedure.run(store)));
             assertTrue(ontModel.size() > initialModelSize);
             assertTrue(procedurePool.count() > initialProcedureCount);
-             
+            /*
+             * Data modelData =
+             * store.getData("report_generator_configuration_graph"); Model
+             * model = (Model) TestView.getObject(modelData);
+             * model.write(System.out,"n3");
+             */
         } finally {
             if (procedure != null) {
                 procedure.removeClient();    
