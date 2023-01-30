@@ -57,7 +57,7 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
     
     @BeforeClass
     public static void before() {
-        //offLogs();
+        offLogs();
         dynapiModelFactory = mockStatic(DynapiModelFactory.class);
 
     }
@@ -92,7 +92,7 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         Procedure procedure = null;
         DataStore store = null;
         
-        boolean manualDebugging = true;
+        boolean manualDebugging = false;
         
         try { 
             procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator");
