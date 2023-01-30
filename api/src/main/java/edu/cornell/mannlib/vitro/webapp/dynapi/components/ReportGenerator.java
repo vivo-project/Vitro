@@ -64,7 +64,7 @@ public class ReportGenerator extends AbstractOperation {
 		inputParams.add(templateParam);
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#dataSource", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#dataSource", minOccurs = 1)
 	public void addDataSource(Parameter dataSource) throws InitializationException {
 		if (!JsonView.isJsonNode(dataSource)) {
 			throw new InitializationException("Only json data sources accepted on addDataSource");
