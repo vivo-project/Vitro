@@ -15,9 +15,9 @@
         dynapi:hasOperation                 <test:constructQuery> .
 
 <test:constructQuery> 
-        a                                   dynapi:SparqlConstructQuery, dynapi:Operation ;
+        a                                   dynapi:SparqlConstructQuery ;
         rdfs:label                          "Test SparqlConstructQuery component"@en-US ;
-		dynapi:sparqlQueryText              "CONSTRUCT { <test:uri> <test:property> ?o . } WHERE { ?uri <test:property> ?o . } " ;
+	dynapi:sparqlQueryText              "CONSTRUCT { <test:uri> <test:property> ?o . } WHERE { ?uri <test:property> ?o . } " ;
         dynapi:providesParameter            <test:output_model> ;
         dynapi:requiresParameter            <test:uri_param> ;
         dynapi:hasModel                     <test:query_model> .
@@ -28,11 +28,11 @@
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
 
 <test:output_model>
-        a                                   dynapi:Parameter, dynapi:Model ;
+        a                                   dynapi:Model ;
         dynapi:name                         "output" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
 
 <test:query_model>
-        a                                   dynapi:Parameter, dynapi:Model ;
+        a                                   dynapi:Model ;
         dynapi:name                         "query" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
