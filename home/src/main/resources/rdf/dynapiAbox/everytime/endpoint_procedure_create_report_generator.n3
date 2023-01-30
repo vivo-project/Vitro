@@ -9,7 +9,6 @@
         a                                   dynapi:Procedure ;
         rdfs:label                          "Create report procedure"@en-US ;
         dynapi:hasFirstStep                 <https://vivoweb.org/procedure/create_report/fill_in_report_generation_procedure/step> ;
-#        dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_configuration_graph_internal> ;
         dynapi:providesParameter            <https://vivoweb.org/procedure/create_report/parameter/report_generator_uri>  .
         
 ####################################################################################################################################################################################
