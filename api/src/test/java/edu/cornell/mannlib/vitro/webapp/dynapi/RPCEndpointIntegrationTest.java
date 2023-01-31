@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -140,7 +141,8 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         when(request.getParameterMap()).thenReturn(parameterMap);
         when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
-        when(response.getWriter()).thenReturn(new PrintWriter(System.out));
+        final StringWriter out = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(out));
         mockParameterIntoMap("limit", testLimit);
         mockParameterIntoMap("email", testEmail);
         mockStatus(response);
