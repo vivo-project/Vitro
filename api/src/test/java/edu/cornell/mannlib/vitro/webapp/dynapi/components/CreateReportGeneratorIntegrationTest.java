@@ -92,7 +92,7 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         ProcedurePool procedurePool = initWithDefaultModel();
         DataStore store = null;
         
-        boolean manualDebugging = true;
+        boolean manualDebugging = false;
         
         try(Procedure procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator")) { 
             assertFalse(procedure instanceof NullProcedure);
