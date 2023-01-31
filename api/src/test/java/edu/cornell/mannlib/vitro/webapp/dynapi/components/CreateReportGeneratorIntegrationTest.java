@@ -142,11 +142,17 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
                 Model removeModel = (Model) TestView.getObject(removeData);
                 final Model notRemoved = generatorConfiguration.difference(removeModel);
                 final Model excessivelyRemoved = removeModel.difference(generatorConfiguration);
-                //excessivelyRemoved.write(System.out,"n3");
-                //System.out.println(notRemoved.size() + " " + excessivelyRemoved.size());
+                if (manualDebugging) {
+                    System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + excessivelyRemoved.size());
+                    excessivelyRemoved.write(System.out,"n3");
+                    System.out.println("------------------------------------------------------------" + notRemoved.size());
+                    notRemoved.write(System.out,"n3");
+                    
+                }
                 assertTrue(notRemoved.isEmpty());
-                //assertTrue(excessivelyRemoved.isEmpty());
-
+                assertTrue(excessivelyRemoved.isEmpty());
+                assertTrue(ontModel.size() == initialModelSize);
+                assertTrue(procedurePool.count() == initialProcedureCount);
             }
 
         } finally {
