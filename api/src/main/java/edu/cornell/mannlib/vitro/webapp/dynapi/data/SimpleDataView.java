@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -42,9 +43,20 @@ public class SimpleDataView {
 			SparqlSelectQuery.log.debug(var + " : " + solution.get(var));
 			if (simpleData.contains(var) && solution.contains(var)) {
 				RDFNode solVar = solution.get(var);
-				Data data = new Data(outputParams.get(var));
+				Parameter param = outputParams.get(var);
+                Data data = new Data(param);
 				//TODO: new data should be created based on it's RDF type and parameter type
-				data.setRawString(solVar.toString());
+                if (param.getType().isRdfType()) {
+                    data.setRawString(solVar.toString());    
+                } else {
+                    if (solVar.isLiteral()) {
+                        Literal literal = (Literal) solVar;
+                        data.setRawString(literal.getLexicalForm());    
+                    } else {
+                        data.setRawString(solVar.toString());    
+                    }
+                }
+				
 				data.earlyInitialization();
 				dataStore.addData(var, data);
 				simpleData.remove(var);
