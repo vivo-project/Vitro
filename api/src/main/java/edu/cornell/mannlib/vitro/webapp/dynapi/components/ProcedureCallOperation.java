@@ -60,16 +60,16 @@ public class ProcedureCallOperation extends AbstractOperation {
         if (!isValid(dataStore)) {
             return OperationResult.internalServerError();
         }
-        OperationResult result = OperationResult.ok();
+        DataStore localStore = new DataStore();
         try {
-            DataStore localStore = new DataStore();
-            ProcedureExecution.initilaizeLocalStore(dataStore, localStore, inputParams, internalParams);
-            ProcedureExecution.execute(callableDescriptor, localStore);
+            ProcedureDescriptorCall.initilaizeLocalStore(dataStore, localStore, inputParams, internalParams);
+            ProcedureDescriptorCall.execute(callableDescriptor, localStore);
         } catch (Exception e) {
             log.error(e, e);
             return OperationResult.internalServerError();
         }
-        return result;
+        ProcedureDescriptorCall.copyData(localStore, dataStore, outputParams);
+        return OperationResult.ok();
     }
 
     @Override
