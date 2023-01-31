@@ -64,6 +64,8 @@ dynapi:ConditionIsNotEmpty rdfs:subClassOf dynapi_java:conditions.ConditionIsNot
 
 dynapi:ConditionContainerContains rdfs:subClassOf dynapi_java:conditions.ConditionContainerContains .
 
+dynapi:ConditionIsParameter rdfs:subClassOf dynapi_java:conditions.ConditionIsParameter .
+
 dynapi:UserGroup rdfs:subClassOf dynapi_access:UserGroup .
 
 dynapi:AccessWhitelist rdfs:subClassOf dynapi_access:AccessWhitelist .
@@ -103,3 +105,5 @@ dynapi:ContainerQuery rdfs:subClassOf dynapi_java:ContainerQuery .
 dynapi:SumOperation rdfs:subClassOf dynapi_java:SumOperation .
 
 dynapi:AssignOperation rdfs:subClassOf dynapi_java:AssignOperation .
+
+dynapi:ProcedureCallOperation rdfs:subClassOf dynapi_java:ProcedureCallOperation .
