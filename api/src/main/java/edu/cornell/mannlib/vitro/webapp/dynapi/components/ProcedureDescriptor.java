@@ -18,7 +18,7 @@ public class ProcedureDescriptor implements ParameterInfo {
         return uriParam;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#uriParameter", maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#callParameter", maxOccurs = 1)
     public void setUriParam(Parameter uriParam) {
         this.uriParam = uriParam;
         inputParams.add(uriParam);
