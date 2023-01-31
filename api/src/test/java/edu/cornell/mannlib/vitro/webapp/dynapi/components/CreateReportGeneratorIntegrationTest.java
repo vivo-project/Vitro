@@ -42,9 +42,10 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
 
     private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
 	private static final String CREATE_REPORT_ENDPOINT = "endpoint_procedure_create_report_generator.n3";
-	private static final String EXECUTE_REPORT_ENDPOINT = "endpoint_procedure_execute_report_generator.n3"; 
-	private static final String REPORT_ENDPOINT_INPUT_FILE = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
-	private static final String REPORT_ENDPOINT_DATA_FILE = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
+	private static final String EXECUTE_REPORT_ENDPOINT = "endpoint_procedure_execute_report_generator.n3";
+    private static final String DELETE_REPORT_ENDPOINT = "endpoint_procedure_delete_report_generator.n3"; 
+	private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
+	private static final String REPORT_ENDPOINT_DATA = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
 
 	private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
@@ -107,12 +108,13 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             assertTrue(ontModel.size() > initialModelSize);
             assertTrue(procedurePool.count() > initialProcedureCount);
             
+            Data modelData = store.getData("report_generator_configuration_graph");
+            Model generatorConfiguration = (Model) TestView.getObject(modelData);
+            assertFalse(generatorConfiguration.isEmpty());
             if (manualDebugging) {
-                Data modelData = store.getData("report_generator_configuration_graph");
-                Model model = (Model) TestView.getObject(modelData);
                 File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report-generator.n3");
                 FileWriter fw = new FileWriter(file);
-                model.write(fw, "n3");
+                generatorConfiguration.write(fw, "n3");
             }
             DataStore reportStore = new DataStore() ;
             Data uriData = store.getData("report_generator_uri");
@@ -131,6 +133,20 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
                         os.write(reportBytes);
                     }   
                 }
+            }
+            try(Procedure deleteReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/delete_report_generator");){
+                Parameters internalParams = deleteReportGenerator.getInternalParams();
+                Converter.convertInternalParams(internalParams, reportStore);
+                assertTrue(OperationResult.ok().equals(deleteReportGenerator.run(reportStore)));
+                Data removeData = reportStore.getData("report_generator_configuration_graph");
+                Model removeModel = (Model) TestView.getObject(removeData);
+                final Model notRemoved = generatorConfiguration.difference(removeModel);
+                final Model excessivelyRemoved = removeModel.difference(generatorConfiguration);
+                //excessivelyRemoved.write(System.out,"n3");
+                //System.out.println(notRemoved.size() + " " + excessivelyRemoved.size());
+                assertTrue(notRemoved.isEmpty());
+                //assertTrue(excessivelyRemoved.isEmpty());
+
             }
 
         } finally {
@@ -153,7 +169,8 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         loadModel(ontModel, getFileList(ABOX_PREFIX));
         loadModel(ontModel, ABOX_PREFIX + CREATE_REPORT_ENDPOINT);
         loadModel(ontModel, ABOX_PREFIX + EXECUTE_REPORT_ENDPOINT);
-        loadModel(ontModel, REPORT_ENDPOINT_INPUT_FILE);
-        loadModel(storeModel, REPORT_ENDPOINT_DATA_FILE);
+        loadModel(ontModel, ABOX_PREFIX + DELETE_REPORT_ENDPOINT);
+        loadModel(ontModel, REPORT_ENDPOINT_INPUT);
+        loadModel(storeModel, REPORT_ENDPOINT_DATA);
 	}
 }

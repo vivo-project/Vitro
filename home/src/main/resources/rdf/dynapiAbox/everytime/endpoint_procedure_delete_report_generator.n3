@@ -7,7 +7,7 @@
 
 <https://vivoweb.org/procedure/delete_report_generator>
         a                                   dynapi:Procedure ;
-#        dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph_internal> ;
+        dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph> ;
 #        dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_uri>  ;
         dynapi:hasFirstStep                 <https://vivoweb.org/procedure/delete_report_generator/get_report_from_dynamic_api_graph/step> .
 
@@ -21,7 +21,58 @@
 
 <https://vivoweb.org/procedure/delete_report_generator/get_report_from_dynamic_api_graph/operation>
          a                                   dynapi:SparqlConstructQuery ;
-         dynapi:sparqlQueryText              "CONSTRUCT { <test:uri> <test:property> ?o . } WHERE { ?uri <test:property> ?o . } " ;
+         dynapi:sparqlQueryText              """
+         prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
+         prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+         prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+         CONSTRUCT { 
+                 ?report_generator_uri rdf:type ?gen_type ;
+                 dynapi:description ?gen_description ;
+                 dynapi:name ?gen_name ;
+                 dynapi:hasFirstStep ?firstStep ;
+                 dynapi:providesParameter ?report_param .
+                 
+                 ?provided_param ?provided_param_p ?provided_param_o .
+                 
+                 ?report_param ?report_p ?report_o .
+                 
+                 ?step rdf:type ?step_class .
+                 ?step dynapi:hasOperation ?operation .
+                 ?step dynapi:hasNextStep ?nextStep .
+                 
+                 ?operation dynapi:template ?template_parm .
+                 ?template_parm ?template_parm_p ?template_parm_o .
+                 
+                 ?operation ?operation_p ?operation_o .
+         } WHERE { 
+                 ?report_generator_uri rdf:type ?gen_type ;
+                 dynapi:description ?gen_description ;
+                 dynapi:name ?gen_name ;
+                 dynapi:hasFirstStep ?firstStep ;
+                 dynapi:providesParameter ?report_param .
+                 
+                 ?report_param ?report_p ?report_o .
+                 
+                 ?report_generator_uri (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
+                 
+                 ?step rdf:type ?step_class .
+                 ?step dynapi:hasOperation ?operation .
+                 
+                 ?operation ?operation_p ?operation_o .
+                 OPTIONAL{
+                         ?operation dynapi:template ?template_parm .
+                         ?requiredParam dynapi:name "template" .
+                         ?template_parm ?template_parm_p ?template_parm_o .
+                 }
+                 OPTIONAL {
+                        ?step dynapi:hasNextStep ?nextStep .
+                 }
+                 OPTIONAL {
+                        ?operation dynapi:providesParameter ?provided_param .
+                        ?provided_param ?provided_param_p ?provided_param_o .
+                 }
+         } 
+         """ ;
          dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph> ;
          dynapi:requiresParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_uri> ;
          dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
