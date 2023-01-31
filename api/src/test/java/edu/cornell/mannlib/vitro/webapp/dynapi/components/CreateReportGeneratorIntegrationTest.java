@@ -123,9 +123,9 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
                 assertTrue(OperationResult.ok().equals(reportGenerator.run(reportStore)));
                 Data reportData = reportStore.getData("report");
                 String base64EncodedReport = reportData.getSerializedValue();
+                assertFalse(base64EncodedReport.isEmpty());
                 if (manualDebugging) {
                     byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport);
-                    assertFalse(base64EncodedReport.isEmpty());
                     File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report.xlsx");
                     try (OutputStream os = new FileOutputStream(file)) {
                         os.write(reportBytes);
