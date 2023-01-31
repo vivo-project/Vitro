@@ -19,7 +19,13 @@
 
 <https://vivoweb.org/procedure/execute_report_generator/is_requested_uri_report_generator_uri/operation>
          a                                   dynapi:SparqlSelectQuery ;
-         dynapi:sparqlQueryText              "SELECT QUERY SHOULD BE HERE " ;
+         dynapi:sparqlQueryText              """
+         prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
+         prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+         SELECT ?is_report_generator WHERE { 
+         bind( if(exists{?report_generator_uri rdf:type dynapi:Procedure . },true,false) as ?is_report_generator ) 
+         }
+         """ ;
          dynapi:providesParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/is_report_generator> ;
          dynapi:requiresParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/report_generator_uri> ;
          dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
@@ -33,7 +39,7 @@
 
 <https://vivoweb.org/procedure/execute_report_generator/condition_is_report_generator/condition>
          a                                   dynapi:ConditionIsParameter ;
-         dynapi:requiresParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/report_generator_uri> .
+         dynapi:requiresParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/is_report_generator> .
 
 ####################################################################################################################################################################################
 
@@ -44,6 +50,7 @@
 <https://vivoweb.org/procedure/execute_report_generator/call_report_generator/operation>
         a                                   dynapi:ProcedureCallOperation ;
         dynapi:callableDescriptor           <https://vivoweb.org/procedure/execute_report_generator/call_report_generator/callableDescriptor> ;
+        dynapi:providesParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/report_param> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/report_generator_uri> .
 
 ####################################################################################################################################################################################
