@@ -48,8 +48,7 @@ public class SparqlSelectQuery extends SparqlQuery {
 				SimpleDataView.addFromSolution(dataStore, vars, solution, outputParams);
 			}
 		} catch (Exception e) {
-			log.error(e.getLocalizedMessage());
-			e.printStackTrace();
+			log.error(e,e);
 			result = OperationResult.internalServerError();
 		}
 
