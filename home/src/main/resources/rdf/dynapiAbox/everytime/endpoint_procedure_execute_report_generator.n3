@@ -23,7 +23,13 @@
          prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
          prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
          SELECT ?is_report_generator WHERE { 
-         bind( if(exists{?report_generator_uri rdf:type dynapi:Procedure . },true,false) as ?is_report_generator ) 
+         bind( if(exists{
+                ?report_generator_uri rdf:type dynapi:Procedure . 
+                ?report_generator_uri dynapi:providesParameter ?parameter . 
+                ?parameter rdf:type dynapi:Parameter ;
+		dynapi:name "report" ;
+		dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> .  
+                },true,false) as ?is_report_generator ) 
          }
          """ ;
          dynapi:providesParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/is_report_generator> ;
