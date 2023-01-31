@@ -41,7 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
 
     private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-	private static final String REPORT_ENDPOINT_FILE = "endpoint_procedure_create_report_generator.n3"; 
+	private static final String CREATE_REPORT_ENDPOINT = "endpoint_procedure_create_report_generator.n3";
+	private static final String EXECUTE_REPORT_ENDPOINT = "endpoint_procedure_execute_report_generator.n3"; 
 	private static final String REPORT_ENDPOINT_INPUT_FILE = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
 	private static final String REPORT_ENDPOINT_DATA_FILE = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
 
@@ -89,13 +90,11 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
     @Test
     public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException, InitializationException {
         ProcedurePool procedurePool = initWithDefaultModel();
-        Procedure procedure = null;
         DataStore store = null;
         
-        boolean manualDebugging = false;
+        boolean manualDebugging = true;
         
-        try { 
-            procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator");
+        try(Procedure procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator")) { 
             assertFalse(procedure instanceof NullProcedure);
             assertTrue(procedure.isValid());
             long initialModelSize = ontModel.size();
@@ -115,19 +114,19 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
                 FileWriter fw = new FileWriter(file);
                 model.write(fw, "n3");
             }
-            
+            DataStore reportStore = new DataStore() ;
             Data uriData = store.getData("report_generator_uri");
-            String reportGeneratorUri = uriData.getSerializedValue();
-            try(Procedure reportGenerator = procedurePool.getByUri(reportGeneratorUri);){
+            reportStore.addData(uriData.getParam().getName(), uriData);
+            try(Procedure reportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/execute_report_generator");){
                 Parameters reportInternalParams = reportGenerator.getInternalParams();
-                DataStore reportStore = new DataStore() ;
                 Converter.convertInternalParams(reportInternalParams, reportStore);
                 assertTrue(OperationResult.ok().equals(reportGenerator.run(reportStore)));
                 Data reportData = reportStore.getData("report");
                 String base64EncodedReport = reportData.getSerializedValue();
                 if (manualDebugging) {
                     byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport);
-                    File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report.xslx");
+                    assertFalse(base64EncodedReport.isEmpty());
+                    File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report.xlsx");
                     try (OutputStream os = new FileOutputStream(file)) {
                         os.write(reportBytes);
                     }   
@@ -135,9 +134,6 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             }
 
         } finally {
-            if (procedure != null) {
-                procedure.removeClient();    
-            }
             if (store != null) {
                 store.removeDependencies();    
             }
@@ -155,7 +151,8 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
         loadModel(ontModel, ONTOLOGY_FILE_PATH);
         loadModel(ontModel, getFileList(ABOX_PREFIX));
-        loadModel(ontModel, ABOX_PREFIX + REPORT_ENDPOINT_FILE);
+        loadModel(ontModel, ABOX_PREFIX + CREATE_REPORT_ENDPOINT);
+        loadModel(ontModel, ABOX_PREFIX + EXECUTE_REPORT_ENDPOINT);
         loadModel(ontModel, REPORT_ENDPOINT_INPUT_FILE);
         loadModel(storeModel, REPORT_ENDPOINT_DATA_FILE);
 	}
