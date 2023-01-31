@@ -25,44 +25,124 @@
          prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
          prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
          prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+         prefix xsd: <http://www.w3.org/2001/XMLSchema#>
          CONSTRUCT { 
-                 ?report_generator_uri rdf:type ?gen_type ;
+                 ?report_generator_uri 
+                 rdf:type dynapi:Procedure ;
                  dynapi:description ?gen_description ;
                  dynapi:name ?gen_name ;
                  dynapi:hasFirstStep ?firstStep ;
                  dynapi:providesParameter ?report_param .
                  
-                 ?provided_param ?provided_param_p ?provided_param_o .
+                 #?provided_param ?provided_param_p ?provided_param_o .
                  
-                 ?report_param ?report_p ?report_o .
+                 ?report_param a dynapi:Parameter ;
+		 dynapi:name "report" ;
+		 dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> .
                  
-                 ?step rdf:type ?step_class .
+                 ?template_parm
+                 a                                   dynapi:Parameter ;
+                 dynapi:isInternal                   "true"^^xsd:boolean ;
+                 dynapi:name                         "template" ;
+                 dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> ;
+                 dynapi:defaultValue                 ?template_file .
+                 
+                 ?data_source_parameter_uri
+		 a                           dynapi:Parameter ;
+		 dynapi:name                 ?data_source_parameter_name ;
+		 dynapi:hasType              <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/json> .
+                 
+                 ?step rdf:type dynapi:OperationalStep .
                  ?step dynapi:hasOperation ?operation .
                  ?step dynapi:hasNextStep ?nextStep .
                  
                  ?operation dynapi:template ?template_parm .
-                 ?template_parm ?template_parm_p ?template_parm_o .
                  
-                 ?operation ?operation_p ?operation_o .
+                 ?selectOperation 
+                 a <https://vivoweb.org/ontology/vitro-dynamic-api#SparqlSelectQuery>;
+                 rdfs:label ?select_query_label ;
+                 dynapi:description ?select_query_description ;
+                 dynapi:hasModel ?select_query_model ;
+                 dynapi:providesParameter ?provided_json ;
+                 dynapi:sparqlQueryText ?select_query_text .
+                 
+                 ?constructOperation 
+                 a <https://vivoweb.org/ontology/vitro-dynamic-api#SparqlConstructQuery>;
+                 rdfs:label ?construct_query_label ;
+                 dynapi:description ?construct_query_description ;
+                 dynapi:hasModel ?construct_query_model ;
+                 dynapi:providesParameter ?provided_graph ;
+                 dynapi:sparqlQueryText ?construct_query_text .
+                 
+                 ?provided_graph 
+                 a <https://vivoweb.org/ontology/vitro-dynamic-api#Model>;
+                 dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> ;
+                 dynapi:name ?construct_query_model_name .
+                 
+                 ?reportGeneratorOperation 
+                 a <https://vivoweb.org/ontology/vitro-dynamic-api#ReportGenerator>;
+                 dynapi:dataSource ?data_source ;
+                 dynapi:report ?report_param .
+                 
          } WHERE { 
-                 ?report_generator_uri rdf:type ?gen_type ;
+                 ?report_generator_uri
                  dynapi:description ?gen_description ;
                  dynapi:name ?gen_name ;
                  dynapi:hasFirstStep ?firstStep ;
                  dynapi:providesParameter ?report_param .
-                 
-                 ?report_param ?report_p ?report_o .
-                 
+                               
                  ?report_generator_uri (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
                  
-                 ?step rdf:type ?step_class .
                  ?step dynapi:hasOperation ?operation .
                  
                  ?operation ?operation_p ?operation_o .
-                 OPTIONAL{
+                 
+                 OPTIONAL {
+                        ?operation 
+                        a dynapi:SparqlConstructQuery ;
+                        rdfs:label ?construct_query_label ;
+                        dynapi:description ?construct_query_description ;
+                        dynapi:hasModel ?construct_query_model ;
+                        dynapi:providesParameter ?provided_graph ;
+                        dynapi:sparqlQueryText ?construct_query_text .
+                        
+                        ?provided_graph 
+                        a <https://vivoweb.org/ontology/vitro-dynamic-api#Model>;
+                        dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> ;
+                        dynapi:name ?construct_query_model_name .
+                        
+                        BIND(?operation as ?constructOperation)
+                 }
+                 OPTIONAL {
+                        ?operation 
+                        a dynapi:SparqlSelectQuery ;
+                        rdfs:label ?select_query_label ;
+                        dynapi:description ?select_query_description ;
+                        dynapi:hasModel ?select_query_model ;
+                        dynapi:providesParameter ?provided_json ;
+                        dynapi:sparqlQueryText ?select_query_text .
+                        BIND(?operation as ?selectOperation)
+                 }
+                 
+                 OPTIONAL {
+                        ?operation 
+                        a dynapi:ReportGenerator;
+                        dynapi:dataSource ?data_source ;
+                        dynapi:report ?report_param .
+                        BIND(?operation as ?reportGeneratorOperation)
+                 }
+                 
+                 OPTIONAL {
                          ?operation dynapi:template ?template_parm .
-                         ?requiredParam dynapi:name "template" .
-                         ?template_parm ?template_parm_p ?template_parm_o .
+                         ?template_parm dynapi:name "template" ;
+                         dynapi:defaultValue ?template_file ;
+                 }
+                 OPTIONAL {
+                         ?operation dynapi:providesParameter ?data_source_parameter_uri .
+                         ?data_source_parameter_uri dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/json> .
+                         OPTIONAL {
+                               ?data_source_parameter_uri dynapi:name ?data_source_parameter_name .
+                         }
                  }
                  OPTIONAL {
                         ?step dynapi:hasNextStep ?nextStep .
