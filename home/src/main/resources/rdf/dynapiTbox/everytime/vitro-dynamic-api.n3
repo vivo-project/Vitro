@@ -642,6 +642,10 @@
                      rdfs:subClassOf :Condition ;
                      rdfs:label "Condition interface"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionIsParameter
+:ConditionIsParameter rdf:type owl:Class ;
+                     rdfs:subClassOf :Condition ;
+                     rdfs:label "Condition is all parameter are set to true"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep
 :ConditionalStep rdf:type owl:Class ;
@@ -920,3 +924,7 @@
 :AssignOperation rdf:type owl:Class ;
             rdfs:subClassOf :Operation ;
             rdfs:label "Assign operation"@en-US .
+            
+:ProcedureCallOperation rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ;
+            rdfs:label "Procedure call operation"@en-US .
