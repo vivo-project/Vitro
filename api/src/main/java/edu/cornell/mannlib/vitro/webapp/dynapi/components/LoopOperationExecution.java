@@ -10,8 +10,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 
-public class LoopOperationExecution extends ProcedureExecution {
+public class LoopOperationExecution extends ProcedureDescriptorCall {
 
     private static final Log log = LogFactory.getLog(LoopOperationExecution.class.getName());
     private List<ProcedureDescriptor> conditionDescriptors;
@@ -40,7 +41,7 @@ public class LoopOperationExecution extends ProcedureExecution {
         this.dataStore = dataStore;
     }
 
-    public OperationResult executeLoop() throws ConversionException {
+    public OperationResult executeLoop() throws ConversionException, InitializationException {
         DataStore loopStore = new DataStore();
         initilaizeLocalStore(dataStore, loopStore, loopInputParams, loopInternalParams);
         while (allConditionsSatisfied(loopStore)) {
@@ -52,7 +53,7 @@ public class LoopOperationExecution extends ProcedureExecution {
                 execute(outputDescriptor, loopStore);
             }
         }
-        copyDataToStore(loopStore, dataStore, loopOutputParams);
+        copyData(loopStore, dataStore, loopOutputParams);
         return OperationResult.ok();
     }
 
