@@ -21,7 +21,7 @@ public class ProcedureCallOperation extends AbstractOperation {
     private Map<String, ProcedureDescriptor> dependencies = new HashMap<>();
     private ProcedureDescriptor callableDescriptor;
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#executableDescriptor", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#callableDescriptor", minOccurs = 1, maxOccurs = 1)
     public void setExecutable(ProcedureDescriptor pd) {
         callableDescriptor = pd;
         dependencies.put(pd.getUri(), pd);
