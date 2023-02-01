@@ -112,6 +112,14 @@
         dynapi:name             "json array" ;
         rdfs:label              "Array type"@en-US ;
         dynapi:implementationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/json-container-array> ;
+        dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/json-container> ;
+        vitro:mostSpecificType  dynapi:ParameterType .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArrayTest>
+        a                       dynapi:ParameterType ;
+        dynapi:name             "json array" ;
+        rdfs:label              "Array type"@en-US ;
+        dynapi:implementationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/json-container-array> ;
         dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultArrayType> ;
         vitro:mostSpecificType  dynapi:ParameterType .
 
