@@ -7,8 +7,6 @@
 
 <https://vivoweb.org/procedure/delete_report_generator>
         a                                   dynapi:Procedure ;
-        dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_configuration_graph> ;
-#        dynapi:providesParameter            <https://vivoweb.org/procedure/delete_report_generator/parameter/report_generator_uri>  ;
         dynapi:hasFirstStep                 <https://vivoweb.org/procedure/delete_report_generator/get_report_from_dynamic_api_graph/step> .
 
 
