@@ -45,7 +45,9 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
 	private static final String EXECUTE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_execute_report_generator.n3";
     private static final String DELETE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_delete_report_generator.n3";
     private static final String LIST_REPORT_GENERATORS_PROCEDURE = "endpoint_procedure_list_report_generators.n3";
-    private static final String GET_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_get_report_generator.n3"; 
+    private static final String GET_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_get_report_generator.n3";
+    private static final String EXPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_export_report_generator.n3"; 
+
 
 	private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
 	private static final String REPORT_ENDPOINT_DATA = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
@@ -174,6 +176,27 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             assertTrue(report.contains("template"));
         }
         
+        DataStore exportReportStore = new DataStore() ;
+        Data exportedData;
+        exportReportStore.addData(uriData.getParam().getName(), uriData);
+        try(Procedure exportReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/export_report_generator");){
+            Parameters internalParams = exportReportGenerator.getInternalParams();
+            Converter.convertInternalParams(internalParams, exportReportStore);
+            assertTrue(OperationResult.ok().equals(exportReportGenerator.run(exportReportStore)));
+            exportedData = exportReportStore.getData("report_generator_configuration_graph");
+            Model exportedModel = (Model) TestView.getObject(exportedData);
+            Model notAddedData = generatorConfiguration.difference(exportedModel);
+            Model excessivelyAddedData = exportedModel.difference(generatorConfiguration);
+            if (manualDebugging) {
+                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + excessivelyAddedData.size());
+                excessivelyAddedData.write(System.out,"n3");
+                System.out.println("------------------------------------------------------------" + notAddedData.size());
+                notAddedData.write(System.out,"n3");
+            }
+            assertTrue(notAddedData.isEmpty());
+            assertTrue(excessivelyAddedData.isEmpty());
+        }
+        
         DataStore deleteReportStore = new DataStore() ;
         deleteReportStore.addData(uriData.getParam().getName(), uriData);
         try(Procedure deleteReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/delete_report_generator");){
@@ -195,6 +218,8 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             assertTrue(ontModel.size() == initialModelSize);
             assertTrue(procedurePool.count() == initialProcedureCount);
         }
+        
+
     }
 
 	protected void loadModel(Model model, String... files) throws IOException {
@@ -213,6 +238,7 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         loadModel(ontModel, ABOX_PREFIX + DELETE_REPORT_GENERATOR_PROCEDURE);
         loadModel(ontModel, ABOX_PREFIX + LIST_REPORT_GENERATORS_PROCEDURE);
         loadModel(ontModel, ABOX_PREFIX + GET_REPORT_GENERATOR_PROCEDURE);
+        loadModel(ontModel, ABOX_PREFIX + EXPORT_REPORT_GENERATOR_PROCEDURE);
 
         loadModel(ontModel, REPORT_ENDPOINT_INPUT);
         loadModel(storeModel, REPORT_ENDPOINT_DATA);
