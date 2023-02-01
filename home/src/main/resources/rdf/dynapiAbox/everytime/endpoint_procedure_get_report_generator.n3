@@ -7,20 +7,189 @@
 
 <https://vivoweb.org/procedure/get_report_generator>
         a                                   dynapi:Procedure ;
+        dynapi:providesParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/step> .
 
 ####################################################################################################################################################################################
 
- <https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/step>
+<https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/step>
          a                                   dynapi:OperationalStep ;
-         dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/get_report_generator_status/step> ;
+         dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/get_report_constructs_from_dynamic_api_graph/step> ;
          dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/operation> .       
 
 <https://vivoweb.org/procedure/get_report_generator/get_report_from_dynamic_api_graph/operation>
          a                                   dynapi:SparqlSelectQuery ;
-         dynapi:sparqlQueryText              "SELECT QUERY SHOULD BE HERE " ;
+         dynapi:sparqlQueryText              """
+         prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
+         prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+         prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+         prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+         SELECT ?name ?description ?template WHERE {
+                ?report_generator_uri 
+                rdf:type dynapi:Procedure ;
+                dynapi:description ?description ;
+                dynapi:name ?name ;
+                dynapi:hasFirstStep ?firstStep ;
+                dynapi:providesParameter ?report_param .
+                
+                ?report_generator_uri (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
+                ?step dynapi:hasOperation ?operation .
+                
+                ?operation
+                a dynapi:ReportGenerator;
+                dynapi:template ?template_parm .
+                ?template_parm dynapi:name "template" ;
+                dynapi:defaultValue ?template .
+         }
+         """ ;
+         dynapi:providesParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/name> ;
+         dynapi:providesParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/description> ;
+         dynapi:providesParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/template> ;
+         dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/report_generator_uri> ;
          dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+         
+####################################################################################################################################################################################
 
+<https://vivoweb.org/procedure/get_report_generator/get_report_constructs_from_dynamic_api_graph/step>
+         a                                   dynapi:OperationalStep ;
+         dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/get_report_selects_from_dynamic_api_graph/step> ;
+         dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/get_report_constructs_from_dynamic_api_graph/operation> .       
+
+<https://vivoweb.org/procedure/get_report_generator/get_report_constructs_from_dynamic_api_graph/operation>
+         a                                   dynapi:SparqlSelectQuery ;
+         dynapi:sparqlQueryText              """
+         prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
+         prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+         prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+         prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+         SELECT ?name ?description ?constructQuery WHERE {
+                ?report_generator_uri 
+                rdf:type dynapi:Procedure  .
+                
+                ?report_generator_uri (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
+                ?step dynapi:hasOperation ?operation .
+                
+                ?operation 
+                a dynapi:SparqlConstructQuery ;
+                dynapi:description ?description ;
+                dynapi:providesParameter ?provided_graph ;
+                dynapi:sparqlQueryText ?constructQuery .
+                
+                ?provided_graph 
+                a <https://vivoweb.org/ontology/vitro-dynamic-api#Model>;
+                dynapi:name ?name .
+         }
+         """ ;
+         dynapi:providesParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/constructs> ;
+         dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/report_generator_uri> ;
+         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+         
+####################################################################################################################################################################################
+
+ <https://vivoweb.org/procedure/get_report_generator/get_report_selects_from_dynamic_api_graph/step>
+         a                                   dynapi:OperationalStep ;
+         dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/addNameToResult/step> ;
+         dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/get_report_selects_from_dynamic_api_graph/operation> .       
+
+<https://vivoweb.org/procedure/get_report_generator/get_report_selects_from_dynamic_api_graph/operation>
+         a                                   dynapi:SparqlSelectQuery ;
+         dynapi:sparqlQueryText              """
+         prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
+         prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+         prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+         prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+         SELECT ?name ?description ?selectQuery ?graph WHERE {
+                ?report_generator_uri 
+                rdf:type dynapi:Procedure .
+                
+                ?report_generator_uri (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
+                ?step dynapi:hasOperation ?operation .
+                
+                ?operation 
+                a dynapi:SparqlSelectQuery ;
+                dynapi:description ?description ;
+                dynapi:hasModel ?select_query_graph ;
+                dynapi:providesParameter ?provided_json ;
+                dynapi:sparqlQueryText ?selectQuery .
+                
+                ?select_query_graph 
+                a <https://vivoweb.org/ontology/vitro-dynamic-api#Model>;
+                dynapi:name ?graph .
+                
+                ?provided_json 
+                dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/json> ;
+                dynapi:name ?name .
+         }
+         """ ;
+         dynapi:providesParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/selects> ;
+         dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/report_generator_uri> ;
+         dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+         
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/get_report_generator/addNameToResult/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/addDescriptionToResult/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/addNameToResult/operation> .
+
+<https://vivoweb.org/procedure/get_report_generator/addNameToResult/operation>
+ 	a                                   dynapi:ContainerLoader ;
+ 	dynapi:targetContainer              <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
+ 	dynapi:key                          "name" ;
+ 	dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/name> .
+ 
+ ####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/get_report_generator/addDescriptionToResult/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/addTemplateToResult/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/addDescriptionToResult/operation> .
+
+<https://vivoweb.org/procedure/get_report_generator/addDescriptionToResult/operation>
+ 	a                                   dynapi:ContainerLoader ;
+ 	dynapi:targetContainer              <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
+ 	dynapi:key                          "description" ;
+ 	dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/description> .
+
+ ####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/get_report_generator/addTemplateToResult/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/addConstructsToResult/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/addTemplateToResult/operation> .
+
+<https://vivoweb.org/procedure/get_report_generator/addTemplateToResult/operation>
+ 	a                                   dynapi:ContainerLoader ;
+ 	dynapi:targetContainer              <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
+ 	dynapi:key                          "template" ;
+ 	dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/template> .
+
+ ####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/get_report_generator/addConstructsToResult/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/addSelectsToResult/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/addConstructsToResult/operation> .
+
+<https://vivoweb.org/procedure/get_report_generator/addConstructsToResult/operation>
+ 	a                                   dynapi:ContainerLoader ;
+ 	dynapi:targetContainer              <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
+ 	dynapi:key                          "construct_queries" ;
+ 	dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/constructs> .
+ 	
+ ####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/get_report_generator/addSelectsToResult/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/addSelectsToResult/operation> .
+
+<https://vivoweb.org/procedure/get_report_generator/addSelectsToResult/operation>
+ 	a                                   dynapi:ContainerLoader ;
+ 	dynapi:targetContainer              <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
+ 	dynapi:key                          "select_queries" ;
+ 	dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/selects> .
+
+#TODO: Return info about report generator status
 ####################################################################################################################################################################################
 
 <https://vivoweb.org/procedure/get_report_generator/get_report_generator_status/step>
@@ -38,3 +207,34 @@
         a                                   dynapi:Parameter ;
         dynapi:name                         "report_generator_uri" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
+        
+<https://vivoweb.org/procedure/get_report_generator/parameter/constructs>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "constructs" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArray> .
+        
+<https://vivoweb.org/procedure/get_report_generator/parameter/selects>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "selects" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArray> .
+        
+<https://vivoweb.org/procedure/get_report_generator/parameter/result>
+        a                                   dynapi:Parameter ;
+        dynapi:isInternal                   "true"^^xsd:boolean ;
+        dynapi:name                         "result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
+        
+<https://vivoweb.org/procedure/get_report_generator/parameter/name>        
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "name" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> .
+                
+<https://vivoweb.org/procedure/get_report_generator/parameter/description>        
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "description" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> .
+                
+<https://vivoweb.org/procedure/get_report_generator/parameter/template>        
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "template" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> .  
