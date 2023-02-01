@@ -181,6 +181,7 @@
 
 <https://vivoweb.org/procedure/get_report_generator/addSelectsToResult/step>
         a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/get_report_generator/addUriToResult/step> ;
         dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/addSelectsToResult/operation> .
 
 <https://vivoweb.org/procedure/get_report_generator/addSelectsToResult/operation>
@@ -188,6 +189,17 @@
  	dynapi:targetContainer              <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
  	dynapi:key                          "select_queries" ;
  	dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/selects> .
+
+####################################################################################################################################################################################
+<https://vivoweb.org/procedure/get_report_generator/addUriToResult/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/get_report_generator/addUriToResult/operation> .
+
+<https://vivoweb.org/procedure/get_report_generator/addUriToResult/operation>
+ 	a                                   dynapi:ContainerLoader ;
+ 	dynapi:targetContainer              <https://vivoweb.org/procedure/get_report_generator/parameter/result> ;
+ 	dynapi:key                          "uri" ;
+ 	dynapi:requiresParameter            <https://vivoweb.org/procedure/get_report_generator/parameter/report_generator_uri> .
 
 #TODO: Return info about report generator status
 ####################################################################################################################################################################################
