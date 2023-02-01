@@ -39,8 +39,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/json-node> 
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Fasterxml Json node deserialization config"@en-US ;
-        dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode" ;
-        dynapi:methodName 		"deserialize";
+        dynapi:className 	"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode" ;
+        dynapi:methodName 	"deserialize";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
@@ -53,7 +53,7 @@
         dynapi:methodArguments	"";
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
-
+        
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/uri-resource>
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Uri resource deserialization config"@en-US ;
@@ -63,6 +63,23 @@
         dynapi:isStaticMethod   "true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/string-literal>
+        a                       dynapi:ImplementationConfig ;
+        rdfs:label              "String literal serialization config"@en-US ;
+        dynapi:className 	"org.apache.jena.rdf.model.impl.LiteralImpl" ;
+        dynapi:methodName 	"toString";
+        dynapi:methodArguments	"";
+        dynapi:isStaticMethod	"false"^^xsd:boolean ;
+        vitro:mostSpecificType  dynapi:ImplementationConfig .
+
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/string-literal>
+        a                       dynapi:ImplementationConfig ;
+        rdfs:label              "String literal deserialization config"@en-US ;
+        dynapi:className 	"org.apache.jena.rdf.model.ResourceFactory" ;
+        dynapi:methodName 	"createStringLiteral";
+        dynapi:methodArguments	"input";
+        dynapi:isStaticMethod	"true"^^xsd:boolean ;
+        vitro:mostSpecificType  dynapi:ImplementationConfig .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/generated-uri-resource> 
         a                       dynapi:ImplementationConfig ;
