@@ -1,0 +1,66 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://vivoweb.org/procedure/import_report_generator>
+        a                                   dynapi:Procedure ;
+        dynapi:providesParameter            <https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_uri> ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/procedure/import_report_generator/get_report_generator_uri/step> .
+
+#TODO: Shape validation!
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/import_report_generator/get_report_generator_uri/step> 
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/import_report_generator/add_to_dynamic_api_model/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/import_report_generator/get_report_generator_uri/operation> .
+
+<https://vivoweb.org/procedure/import_report_generator/get_report_generator_uri/operation>
+        a                                   dynapi:SparqlSelectQuery ;
+        dynapi:providesParameter            <https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_uri> ;
+        dynapi:sparqlQueryText              """
+        prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
+        prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        SELECT ?report_generator_uri WHERE { 
+               ?report_generator_uri a dynapi:Procedure . 
+         }
+         """ ;
+        dynapi:hasModel                     <https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_configuration_graph> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/import_report_generator/add_to_dynamic_api_model/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasNextStep                  <https://vivoweb.org/procedure/import_report_generator/load_procedure_into_procedure_pool/step> ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/import_report_generator/add_to_dynamic_api_model/operation> .
+
+<https://vivoweb.org/procedure/import_report_generator/add_to_dynamic_api_model/operation>
+        a                                   dynapi:ModelWriter ;
+        dynapi:additionModel                <https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_configuration_graph> ;
+        dynapi:targetModel                  <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/import_report_generator/load_procedure_into_procedure_pool/step>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <https://vivoweb.org/procedure/import_report_generator/load_procedure_into_procedure_pool/operation> .
+
+<https://vivoweb.org/procedure/import_report_generator/load_procedure_into_procedure_pool/operation>
+        a                                   dynapi:ProcedurePoolAtomicOperation ;
+        dynapi:poolOperationType            "load" ;
+        dynapi:requiresParameter            <https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_uri> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_configuration_graph>
+        a                                   dynapi:Model ;
+        dynapi:name                         "report_generator_configuration_graph" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model> .
+
+<https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_uri>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "report_generator_uri" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
