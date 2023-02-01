@@ -78,8 +78,8 @@
         dynapi:name             "string" ;
         rdfs:label              "String literal type"@en-US ;
         dynapi:serializationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/string> ;
-        dynapi:rdfType			 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/string> ;
-        dynapi:implementationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/string> ;
+        dynapi:rdfType		<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/string> ;
+        dynapi:implementationType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/string-literal> ;
         vitro:mostSpecificType  dynapi:ParameterType .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/model>

@@ -32,6 +32,15 @@
         dynapi:defaultValue		"";
         vitro:mostSpecificType  dynapi:ImplementationType .
 
+<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/string-literal>
+        a                       dynapi:ImplementationType ;
+        dynapi:serializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/string-literal> ;
+        dynapi:deserializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/string-literal> ;
+        dynapi:className        "org.apache.jena.rdf.model.Literal" ;
+        rdfs:label              "String literal implementation type"@en-US ;
+        dynapi:defaultValue	"";
+        vitro:mostSpecificType  dynapi:ImplementationType .
+
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/implementation-type/integer>
         a                       dynapi:ImplementationType ;
         dynapi:serializationConfig <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/integer> ;
