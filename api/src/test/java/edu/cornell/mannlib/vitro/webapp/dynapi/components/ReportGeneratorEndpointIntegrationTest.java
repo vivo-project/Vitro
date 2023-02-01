@@ -38,7 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
-public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
+public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
 
     private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
 	private static final String CREATE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_create_report_generator.n3";
@@ -47,6 +47,8 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
     private static final String LIST_REPORT_GENERATORS_PROCEDURE = "endpoint_procedure_list_report_generators.n3";
     private static final String GET_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_get_report_generator.n3";
     private static final String EXPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_export_report_generator.n3"; 
+    private static final String IMPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_import_report_generator.n3"; 
+
 
 
 	private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
@@ -103,18 +105,22 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         
         boolean manualDebugging = false;
         
+        long modelSizeWithReportGenerator;
+        long procedureCountWithReportGenerator;
         try(Procedure procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator")) { 
             assertFalse(procedure instanceof NullProcedure);
             assertTrue(procedure.isValid());
             initialModelSize = ontModel.size();
-            initialProcedureCount = procedurePool.count();
+            initialProcedureCount = procedurePool.count();;
             Parameters internal = procedure.getInternalParams();
             store = new DataStore();
             Converter.convertInternalParams(internal, store);
             Endpoint.getDependencies(procedure, store, procedurePool);
             assertTrue(OperationResult.ok().equals(procedure.run(store)));
-            assertTrue(ontModel.size() > initialModelSize);
-            assertTrue(procedurePool.count() > initialProcedureCount);
+            modelSizeWithReportGenerator = ontModel.size();
+            procedureCountWithReportGenerator = procedurePool.count();
+            assertTrue(modelSizeWithReportGenerator > initialModelSize);
+            assertTrue(procedureCountWithReportGenerator > initialProcedureCount);
             
             Data modelData = store.getData("report_generator_configuration_graph");
             generatorConfiguration = (Model) TestView.getObject(modelData);
@@ -219,7 +225,17 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             assertTrue(procedurePool.count() == initialProcedureCount);
         }
         
-
+        DataStore importReportStore = new DataStore() ;
+        importReportStore.addData(exportedData.getParam().getName(), exportedData);
+        try(Procedure importReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/import_report_generator");){
+            Parameters internalParams = importReportGenerator.getInternalParams();
+            Converter.convertInternalParams(internalParams, importReportStore);
+            assertTrue(OperationResult.ok().equals(importReportGenerator.run(importReportStore)));
+            Data importedUriData = importReportStore.getData("report_generator_uri");
+            assertTrue(uriData.getSerializedValue().equals(importedUriData.getSerializedValue()));
+            assertTrue(ontModel.size() == modelSizeWithReportGenerator);
+            assertTrue(procedurePool.count() == procedureCountWithReportGenerator);
+        }
     }
 
 	protected void loadModel(Model model, String... files) throws IOException {
@@ -239,6 +255,7 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         loadModel(ontModel, ABOX_PREFIX + LIST_REPORT_GENERATORS_PROCEDURE);
         loadModel(ontModel, ABOX_PREFIX + GET_REPORT_GENERATOR_PROCEDURE);
         loadModel(ontModel, ABOX_PREFIX + EXPORT_REPORT_GENERATOR_PROCEDURE);
+        loadModel(ontModel, ABOX_PREFIX + IMPORT_REPORT_GENERATOR_PROCEDURE);
 
         loadModel(ontModel, REPORT_ENDPOINT_INPUT);
         loadModel(storeModel, REPORT_ENDPOINT_DATA);
