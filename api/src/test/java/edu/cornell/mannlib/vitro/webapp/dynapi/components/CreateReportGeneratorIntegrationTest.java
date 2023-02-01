@@ -41,9 +41,11 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
 
     private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-	private static final String CREATE_REPORT_ENDPOINT = "endpoint_procedure_create_report_generator.n3";
-	private static final String EXECUTE_REPORT_ENDPOINT = "endpoint_procedure_execute_report_generator.n3";
-    private static final String DELETE_REPORT_ENDPOINT = "endpoint_procedure_delete_report_generator.n3"; 
+	private static final String CREATE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_create_report_generator.n3";
+	private static final String EXECUTE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_execute_report_generator.n3";
+    private static final String DELETE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_delete_report_generator.n3";
+    private static final String LIST_REPORT_GENERATORS_PROCEDURE = "endpoint_procedure_list_report_generators.n3"; 
+
 	private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
 	private static final String REPORT_ENDPOINT_DATA = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
 
@@ -92,14 +94,17 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
     public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException, InitializationException {
         ProcedurePool procedurePool = initWithDefaultModel();
         DataStore store = null;
+        long initialModelSize ;
+        long initialProcedureCount ;
+        Model generatorConfiguration ;
         
         boolean manualDebugging = false;
         
         try(Procedure procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator")) { 
             assertFalse(procedure instanceof NullProcedure);
             assertTrue(procedure.isValid());
-            long initialModelSize = ontModel.size();
-            long initialProcedureCount = procedurePool.count();
+            initialModelSize = ontModel.size();
+            initialProcedureCount = procedurePool.count();
             Parameters internal = procedure.getInternalParams();
             store = new DataStore();
             Converter.convertInternalParams(internal, store);
@@ -109,56 +114,70 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
             assertTrue(procedurePool.count() > initialProcedureCount);
             
             Data modelData = store.getData("report_generator_configuration_graph");
-            Model generatorConfiguration = (Model) TestView.getObject(modelData);
+            generatorConfiguration = (Model) TestView.getObject(modelData);
             assertFalse(generatorConfiguration.isEmpty());
             if (manualDebugging) {
                 File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report-generator.n3");
                 FileWriter fw = new FileWriter(file);
                 generatorConfiguration.write(fw, "n3");
             }
-            DataStore reportStore = new DataStore() ;
-            Data uriData = store.getData("report_generator_uri");
-            reportStore.addData(uriData.getParam().getName(), uriData);
-            try(Procedure reportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/execute_report_generator");){
-                Parameters reportInternalParams = reportGenerator.getInternalParams();
-                Converter.convertInternalParams(reportInternalParams, reportStore);
-                assertTrue(OperationResult.ok().equals(reportGenerator.run(reportStore)));
-                Data reportData = reportStore.getData("report");
-                String base64EncodedReport = reportData.getSerializedValue();
-                assertFalse(base64EncodedReport.isEmpty());
-                if (manualDebugging) {
-                    byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport);
-                    File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report.xlsx");
-                    try (OutputStream os = new FileOutputStream(file)) {
-                        os.write(reportBytes);
-                    }   
-                }
-            }
-            try(Procedure deleteReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/delete_report_generator");){
-                Parameters internalParams = deleteReportGenerator.getInternalParams();
-                Converter.convertInternalParams(internalParams, reportStore);
-                assertTrue(OperationResult.ok().equals(deleteReportGenerator.run(reportStore)));
-                Data removeData = reportStore.getData("report_generator_configuration_graph");
-                Model removeModel = (Model) TestView.getObject(removeData);
-                final Model notRemoved = generatorConfiguration.difference(removeModel);
-                final Model excessivelyRemoved = removeModel.difference(generatorConfiguration);
-                if (manualDebugging) {
-                    System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + excessivelyRemoved.size());
-                    excessivelyRemoved.write(System.out,"n3");
-                    System.out.println("------------------------------------------------------------" + notRemoved.size());
-                    notRemoved.write(System.out,"n3");
-                    
-                }
-                assertTrue(notRemoved.isEmpty());
-                assertTrue(excessivelyRemoved.isEmpty());
-                assertTrue(ontModel.size() == initialModelSize);
-                assertTrue(procedurePool.count() == initialProcedureCount);
-            }
-
         } finally {
             if (store != null) {
                 store.removeDependencies();    
             }
+        }
+        
+        DataStore reportStore = new DataStore() ;
+        Data uriData = store.getData("report_generator_uri");
+        assertTrue(uriData != null);
+        reportStore.addData(uriData.getParam().getName(), uriData);
+        try(Procedure reportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/execute_report_generator");){
+            Parameters reportInternalParams = reportGenerator.getInternalParams();
+            Converter.convertInternalParams(reportInternalParams, reportStore);
+            assertTrue(OperationResult.ok().equals(reportGenerator.run(reportStore)));
+            Data reportData = reportStore.getData("report");
+            String base64EncodedReport = reportData.getSerializedValue();
+            assertFalse(base64EncodedReport.isEmpty());
+            if (manualDebugging) {
+                byte[] reportBytes = Base64.getDecoder().decode(base64EncodedReport);
+                File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report.xlsx");
+                try (OutputStream os = new FileOutputStream(file)) {
+                    os.write(reportBytes);
+                }   
+            }
+        }
+        DataStore listReportStore = new DataStore() ;
+        listReportStore.addData(uriData.getParam().getName(), uriData);
+
+        try(Procedure listReportGenerators = procedurePool.getByUri("https://vivoweb.org/procedure/list_report_generators");){
+            Parameters internalParams = listReportGenerators.getInternalParams();
+            Converter.convertInternalParams(internalParams, listReportStore);
+            assertTrue(OperationResult.ok().equals(listReportGenerators.run(listReportStore)));
+            Data reportsData = listReportStore.getData("reports");
+            String reports = reportsData.getSerializedValue();
+            assertTrue(reports.contains(uriData.getSerializedValue()));
+        }
+        
+        DataStore deleteReportStore = new DataStore() ;
+        deleteReportStore.addData(uriData.getParam().getName(), uriData);
+        try(Procedure deleteReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/delete_report_generator");){
+            Parameters internalParams = deleteReportGenerator.getInternalParams();
+            Converter.convertInternalParams(internalParams, deleteReportStore);
+            assertTrue(OperationResult.ok().equals(deleteReportGenerator.run(deleteReportStore)));
+            Data removeData = deleteReportStore.getData("report_generator_configuration_graph");
+            Model removeModel = (Model) TestView.getObject(removeData);
+            final Model notRemoved = generatorConfiguration.difference(removeModel);
+            final Model excessivelyRemoved = removeModel.difference(generatorConfiguration);
+            if (manualDebugging) {
+                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + excessivelyRemoved.size());
+                excessivelyRemoved.write(System.out,"n3");
+                System.out.println("------------------------------------------------------------" + notRemoved.size());
+                notRemoved.write(System.out,"n3");
+            }
+            assertTrue(notRemoved.isEmpty());
+            assertTrue(excessivelyRemoved.isEmpty());
+            assertTrue(ontModel.size() == initialModelSize);
+            assertTrue(procedurePool.count() == initialProcedureCount);
         }
     }
 
@@ -173,9 +192,10 @@ public class CreateReportGeneratorIntegrationTest extends ServletContextTest {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
         loadModel(ontModel, ONTOLOGY_FILE_PATH);
         loadModel(ontModel, getFileList(ABOX_PREFIX));
-        loadModel(ontModel, ABOX_PREFIX + CREATE_REPORT_ENDPOINT);
-        loadModel(ontModel, ABOX_PREFIX + EXECUTE_REPORT_ENDPOINT);
-        loadModel(ontModel, ABOX_PREFIX + DELETE_REPORT_ENDPOINT);
+        loadModel(ontModel, ABOX_PREFIX + CREATE_REPORT_GENERATOR_PROCEDURE);
+        loadModel(ontModel, ABOX_PREFIX + EXECUTE_REPORT_GENERATOR_PROCEDURE);
+        loadModel(ontModel, ABOX_PREFIX + DELETE_REPORT_GENERATOR_PROCEDURE);
+        loadModel(ontModel, ABOX_PREFIX + LIST_REPORT_GENERATORS_PROCEDURE);
         loadModel(ontModel, REPORT_ENDPOINT_INPUT);
         loadModel(storeModel, REPORT_ENDPOINT_DATA);
 	}

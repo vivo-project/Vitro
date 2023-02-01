@@ -7,19 +7,44 @@
 
 <https://vivoweb.org/procedure/list_report_generators>
         a                                   dynapi:Procedure ;
+        dynapi:providesParameter            <https://vivoweb.org/procedure/list_report_generators/parameter/reports> ;
         dynapi:hasFirstStep                 <https://vivoweb.org/procedure/list_report_generators/get_reports_from_dynamic_api_graph/step> .
 
 ####################################################################################################################################################################################
 
  <https://vivoweb.org/procedure/list_report_generators/get_reports_from_dynamic_api_graph/step>
          a                                   dynapi:OperationalStep ;
-         dynapi:hasNextStep                  <https://vivoweb.org/procedure/list_report_generators/get_reports_from_procedure_pool/step> ;
+         #dynapi:hasNextStep                 <https://vivoweb.org/procedure/list_report_generators/get_reports_from_procedure_pool/step> ;
          dynapi:hasOperation                 <https://vivoweb.org/procedure/list_report_generators/get_reports_from_dynamic_api_graph/operation> .       
 
 <https://vivoweb.org/procedure/list_report_generators/get_reports_from_dynamic_api_graph/operation>
          a                                   dynapi:SparqlSelectQuery ;
-         dynapi:sparqlQueryText              "SELECT QUERY SHOULD BE HERE " ;
+         dynapi:sparqlQueryText              """
+         prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
+         prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+         prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+         prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+         SELECT ?report_generator_uri ?name ?description WHERE {
+                ?report_generator_uri 
+                 rdf:type dynapi:Procedure ;
+                 dynapi:description ?description ;
+                 dynapi:name ?name ;
+                 dynapi:hasFirstStep ?firstStep ;
+                 dynapi:providesParameter ?report_param .
+                 
+                 ?report_generator_uri (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
+                 ?step dynapi:hasOperation ?operation .
+                 
+                 ?operation
+                 a dynapi:ReportGenerator;
+                 dynapi:template ?template_parm .
+                 ?template_parm dynapi:name "template" ;
+                 dynapi:defaultValue ?template .
+         }
+         """ ;
+         dynapi:providesParameter            <https://vivoweb.org/procedure/list_report_generators/parameter/reports> ;
          dynapi:hasModel                     <https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions> .
+         
 
 #TODO: In loop get status about each procedure presented in dynamic api assertions
 ####################################################################################################################################################################################
@@ -34,6 +59,11 @@
         dynapi:requiresParameter            <https://vivoweb.org/procedure/list_report_generators/parameter/report_generator_uri> .
 
 ####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/list_report_generators/parameter/reports>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "reports" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArray> .
 
 <https://vivoweb.org/procedure/list_report_generators/parameter/report_generator_uri>
         a                                   dynapi:Parameter ;

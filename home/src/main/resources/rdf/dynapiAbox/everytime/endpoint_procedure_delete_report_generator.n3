@@ -34,8 +34,6 @@
                  dynapi:hasFirstStep ?firstStep ;
                  dynapi:providesParameter ?report_param .
                  
-                 #?provided_param ?provided_param_p ?provided_param_o .
-                 
                  ?report_param a dynapi:Parameter ;
 		 dynapi:name "report" ;
 		 dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> .
@@ -95,8 +93,6 @@
                  
                  ?step dynapi:hasOperation ?operation .
                  
-                 ?operation ?operation_p ?operation_o .
-                 
                  OPTIONAL {
                         ?operation 
                         a dynapi:SparqlConstructQuery ;
@@ -146,10 +142,6 @@
                  }
                  OPTIONAL {
                         ?step dynapi:hasNextStep ?nextStep .
-                 }
-                 OPTIONAL {
-                        ?operation dynapi:providesParameter ?provided_param .
-                        ?provided_param ?provided_param_p ?provided_param_o .
                  }
          } 
          """ ;
