@@ -351,7 +351,7 @@ prop-data:sparql_query_description_1.Vitro
 prop-data:acct_created_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nПоздравляем!\n\nМы создали новую учётную запись VIVO на ${siteName}, связанную с адресом\n${userAccount.emailAddress}.\n\nСпасибо!"@ru-RU ;
+        rdfs:label       "${userAccount.firstName} ${userAccount.lastName}\n\nПоздравляем!\n\nМы создали новую учётную запись VIVO на ${siteName}, связанную с адресом\n${userAccount.emailAddress}.\n\n Если вы не запрашивали новый аккаунт, то можете смело игнорировать это письмо. \n Срок действия этого запроса истечет, если не предпринять никаких действий в течение 30 дней.\n Вставьте ссылку ниже в адресную строку вашего браузера для создания пароля к вашему аккаунту.\n\n ${passwordLink}\n\nСпасибо!"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_email_plain_text" ;
         prop:hasPackage  "Vitro-languages" .
@@ -2139,7 +2139,7 @@ prop-data:to_manage_content.Vitro
 prop-data:acct_created_email_html_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;
-        rdfs:label       "<p>${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p><strong>Поздравляем!</strong></p>\n\n <p>Мы создали новую учётную запись на сайте ${siteName}, связанную с адресом ${userAccount.emailAddress}.</p>\n\n <p>Спасибо!</p>"@ru-RU ;
+        rdfs:label       "<p>${userAccount.firstName} ${userAccount.lastName}</p>\n\n <p><strong>Поздравляем!</strong></p>\n\n <p>Мы создали новую учётную запись на сайте ${siteName}, связанную с адресом ${userAccount.emailAddress}.</p>\n\n <p>\n Если вы не запрашивали новый аккаунт, то можете смело игнорировать это письмо. \n Срок действия этого запроса истечет, если не предпринять никаких действий в течение 30 дней.\n </p>\n\n <p>\n Нажмите на ссылку ниже, чтобы создать пароль для вашей новой учетной записи.\n </p>\n\n <p>\n <a href=\"${passwordLink}\" title=\"создание пароля для учётной записи\">${passwordLink}</a>\n </p>\n\n <p>\n Если ссылка выше не работает, вы можете скопировать и вставить ссылку прямо в адресную строку вашего браузера.\n </p>\n\n <p>Спасибо!</p>"@ru-RU ;
         prop:hasApp      "Vitro" ;
         prop:hasKey      "acct_created_email_html_text" ;
         prop:hasPackage  "Vitro-languages" .
