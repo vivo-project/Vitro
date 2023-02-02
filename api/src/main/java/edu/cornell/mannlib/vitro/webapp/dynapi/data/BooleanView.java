@@ -16,4 +16,7 @@ public class BooleanView {
         return data.getParam().getType().isBoolean();
     }
 
+    public static boolean isBoolean(Parameter param) {
+        return param.getType().isBoolean();
+    }
 }
