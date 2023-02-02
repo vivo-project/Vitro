@@ -226,6 +226,10 @@ public class FauxObjectPropertyWrapper extends ObjectProperty implements FauxPro
 
 	@Override
 	public String getRangeEntityURI() {
+		String uri = faux.getRootRangeUri();
+		if (uri != null) {
+			return uri;
+		}
 		return innerOP.getRangeEntityURI();
 	}
 

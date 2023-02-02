@@ -163,7 +163,12 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 			String domainUri = domainUris.isEmpty() ? null : domainUris
 					.iterator().next();
 
+			Collection<String> rootRangeUris = getPropertyResourceURIValues(context, QUALIFIED_BY_ROOT);
+			
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
+			if (!rootRangeUris.isEmpty()) {
+				fp.setRootRangeUri(rootRangeUris.iterator().next());
+			}
 			fp.setContextUri(contextUri);
 			populateInstance(fp);
 			log.debug("Loaded FauxProperty: " + fp);

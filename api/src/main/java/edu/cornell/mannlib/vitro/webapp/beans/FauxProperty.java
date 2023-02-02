@@ -23,6 +23,8 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 
 	// Must not be null on insert or update. Partial identifier on delete.
 	private String rangeURI = "";
+	
+	private String rootRangeURI;
 	// May be null. Partial identifier on delete.
 	private String domainURI;
 
@@ -259,5 +261,13 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	@Override
 	public String getRangeVClassURI() {
 		return getRangeURI();
+	}
+
+	public void setRootRangeUri(String rootRangeUri) {
+		this.rootRangeURI = rootRangeUri;
+	}
+	
+	public String getRootRangeUri() {
+		return rootRangeURI;
 	}
 }
