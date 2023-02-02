@@ -107,3 +107,5 @@ dynapi:SumOperation rdfs:subClassOf dynapi_java:SumOperation .
 dynapi:AssignOperation rdfs:subClassOf dynapi_java:AssignOperation .
 
 dynapi:ProcedureCallOperation rdfs:subClassOf dynapi_java:ProcedureCallOperation .
+
+dynapi:ShapeValidation rdfs:subClassOf dynapi_java:ShapeValidation .

@@ -39,6 +39,8 @@ public class ModelNames {
 	public static final String DYNAMIC_API_ABOX_FIRSTTIME_BACKUP = DYNAMIC_API_ABOX + "FirsttimeBackup";
 	public static final String DYNAMIC_API_TBOX = "http://vitro.mannlib.cornell.edu/default/dynamic-api-tbox";
 	public static final String DYNAMIC_API_TBOX_FIRSTTIME_BACKUP = DYNAMIC_API_TBOX + "FirsttimeBackup";
+	public static final String SHAPES = "http://vitro.mannlib.cornell.edu/default/shapes";
+	public static final String SHAPES_FIRSTTIME_BACKUP = SHAPES + "FirsttimeBackup";
 	
 	/**
 	 * A map of the URIS, keyed by their short names, intended only for display
@@ -73,7 +75,8 @@ public class ModelNames {
 		map.put("DYNAMIC_API_ABOX_FIRSTTIME_BACKUP", DYNAMIC_API_ABOX_FIRSTTIME_BACKUP);
 		map.put("DYNAMIC_API_TBOX", DYNAMIC_API_TBOX);
 		map.put("DYNAMIC_API_TBOX_FIRSTTIME_BACKUP", DYNAMIC_API_TBOX_FIRSTTIME_BACKUP);
-
+        map.put("SHAPES", SHAPES);
+        map.put("SHAPES_FIRSTTIME_BACKUP", SHAPES_FIRSTTIME_BACKUP);
 		return Collections.unmodifiableMap(map);
 	}
 
