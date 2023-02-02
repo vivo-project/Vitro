@@ -68,3 +68,11 @@
         rdfs:label              "dynamic api abox assertions model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
+                
+<https://vivoweb.org/ontology/vitro-dynamic-api/model/shapes>
+        a                       dynapi:Model ;
+        dynapi:name             "http://vitro.mannlib.cornell.edu/default/shapes" ;
+        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/shapes" ;
+        rdfs:label              "SHACL shapes model"@en-US ;
+        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        vitro:mostSpecificType  dynapi:Model .

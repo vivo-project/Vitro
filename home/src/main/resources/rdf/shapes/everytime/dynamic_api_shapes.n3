@@ -1,0 +1,730 @@
+@prefix :      <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+:methodArguments-shape
+        a                    sh:NodeShape ;
+        sh:class             :ImplementationConfig ;
+        sh:targetSubjectsOf  :methodArguments .
+
+:Action-requiresAccess
+        a         sh:PropertyShape ;
+        sh:class  :Role ;
+        sh:path   :requiresAccess .
+
+:ImplementationConfig-methodName
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :methodName .
+
+:providesParameter-shape
+        a                    sh:NodeShape ;
+        sh:class             :ParameterProvider ;
+        sh:targetSubjectsOf  :providesParameter .
+
+:CustomRESTAction  a  sh:NodeShape , rdfs:Class ;
+        sh:property  :CustomRESTAction-hasDefaultMethod , :CustomRESTAction-forwardsTo , :CustomRESTAction-name .
+
+:SparqlQuery-hasModel
+        a         sh:PropertyShape ;
+        sh:class  :Model ;
+        sh:path   :hasModel .
+
+:ResourceAPI  a      sh:NodeShape , rdfs:Class ;
+        sh:property  :ResourceAPI-onGet , :ResourceAPI-version , :ResourceAPI-minAPIVersion , :ResourceAPI-onPatch , :ResourceAPI-name , :ResourceAPI-onPost , :ResourceAPI-onPut , :ResourceAPI-onDelete , :ResourceAPI-maxAPIVersion , :ResourceAPI-onGetAll , :ResourceAPI-hasCustomRESTAction .
+
+:maxLength-shape  a          sh:NodeShape ;
+        sh:class             :StringLengthRangeValidator ;
+        sh:targetSubjectsOf  :maxLength .
+
+:OperationalStep-isOptional
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:boolean ;
+        sh:maxCount  1 ;
+        sh:path      :isOptional .
+
+:ParameterProvider-providesParameter
+        a         sh:PropertyShape ;
+        sh:class  :Parameter ;
+        sh:path   :providesParameter .
+
+:SparqlQuery  a      rdfs:Class , sh:NodeShape ;
+        sh:property  :SparqlQuery-hasModel , :SparqlQuery-sparqlQueryText .
+
+:SolrQuery  a        sh:NodeShape , rdfs:Class ;
+        sh:property  :SolrQuery-solrOffset , :SolrQuery-solrSort , :SolrQuery-solrField , :SolrQuery-solrFilter , :SolrQuery-solrQueryText , :SolrQuery-solrFacet , :SolrQuery-solrLimit .
+
+:onPatch-shape  a            sh:NodeShape ;
+        sh:class             :ResourceAPI ;
+        sh:targetSubjectsOf  :onPatch .
+
+:retractionModel-shape
+        a                    sh:NodeShape ;
+        sh:class             :ModelWriter ;
+        sh:targetSubjectsOf  :retractionModel .
+
+:ModelWriter-retractionModel
+        a         sh:PropertyShape ;
+        sh:class  :Model ;
+        sh:path   :retractionModel .
+
+:methodName-shape  a         sh:NodeShape ;
+        sh:class             :ImplementationConfig ;
+        sh:targetSubjectsOf  :methodName .
+
+:N3Template  a       sh:NodeShape , rdfs:Class ;
+        sh:property  :N3Template-N3TextAdditions , :N3Template-N3TextRetractions .
+
+:requiresParameter-shape
+        a                    sh:NodeShape ;
+        sh:class             :ParameterReceiver ;
+        sh:targetSubjectsOf  :requiresParameter .
+
+:ConditionalStep-allConditionsRequired
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:boolean ;
+        sh:maxCount  1 ;
+        sh:path      :allConditionsRequired .
+
+:ModelWriter  a      sh:NodeShape , rdfs:Class ;
+        sh:property  :ModelWriter-retractionModel , :ModelWriter-additionModel , :ModelWriter-targetModel .
+
+:SerializationType-name
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:SolrQuery-solrQueryText
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :solrQueryText .
+
+:question-shape  a           sh:NodeShape ;
+        sh:class             :ConditionalStep ;
+        sh:targetSubjectsOf  :question .
+
+:RegularExpressionValidator
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  :RegularExpressionValidator-regularExpression .
+
+:ConditionalStep-question
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      :question .
+
+:additionModel-shape  a      sh:NodeShape ;
+        sh:class             :ModelWriter ;
+        sh:targetSubjectsOf  :additionModel .
+
+:Action-hasAssignedRPC
+        a         sh:PropertyShape ;
+        sh:class  :Rpc ;
+        sh:path   :hasAssignedRPC .
+
+:Parameter-serializationType
+        a            sh:PropertyShape ;
+        sh:class     :ParameterType , :SerializationType ;
+        sh:maxCount  1 ;
+        sh:path      :serializationType .
+
+:ParameterType  a    sh:NodeShape , rdfs:Class ;
+        sh:property  :ParameterType-serializationType , :ParameterType-implementationType , :ParameterType-rdfType , :ParameterType-isInternal , :ParameterType-name .
+
+:Parameter  a        sh:NodeShape , rdfs:Class ;
+        sh:property  :Parameter-hasCondition , :Parameter-description , :Parameter-name , :Parameter-hasValidator , :Parameter-serializationType .
+
+:ArrayParameterType  a  sh:NodeShape , rdfs:Class ;
+        sh:property  :ArrayParameterType-containsType .
+
+:nextIfNotSatisfied-shape
+        a                    sh:NodeShape ;
+        sh:class             :ConditionalStep ;
+        sh:targetSubjectsOf  :nextIfNotSatisfied .
+
+:ParameterType-name  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:Rpc-hasDefaultMethod
+        a         sh:PropertyShape ;
+        sh:class  :HttpMethod ;
+        sh:path   :hasDefaultMethod .
+
+:onDelete-shape  a           sh:NodeShape ;
+        sh:class             :ResourceAPI ;
+        sh:targetSubjectsOf  :onDelete .
+
+:ParameterReceiver-requiresParameter
+        a         sh:PropertyShape ;
+        sh:class  :Parameter ;
+        sh:path   :requiresParameter .
+
+:Parameter-hasValidator
+        a         sh:PropertyShape ;
+        sh:class  :Validator ;
+        sh:path   :hasValidator .
+
+:Api-description  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :description .
+
+:maxValue-shape  a           sh:NodeShape ;
+        sh:class             :NumericRangeValidator ;
+        sh:targetSubjectsOf  :maxValue .
+
+:CustomRESTAction-forwardsTo
+        a            sh:PropertyShape ;
+        sh:class     :Rpc ;
+        sh:maxCount  1 ;
+        sh:path      :forwardsTo .
+
+:CustomRESTAction-hasDefaultMethod
+        a         sh:PropertyShape ;
+        sh:class  :HttpMethod ;
+        sh:path   :hasDefaultMethod .
+
+:OperationalStep-hasOperation
+        a            sh:PropertyShape ;
+        sh:class     :Operation ;
+        sh:maxCount  1 ;
+        sh:path      :hasOperation .
+
+:ImplementationConfig-methodArguments
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :methodArguments .
+
+:Parameter-description
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :description .
+
+:RDFType  a          rdfs:Class , sh:NodeShape ;
+        sh:property  :RDFType-name .
+
+:hasValidator-shape  a       sh:NodeShape ;
+        sh:class             :Parameter ;
+        sh:targetSubjectsOf  :hasValidator .
+
+:hasNextStep-shape  a        sh:NodeShape ;
+        sh:class             :OperationalStep ;
+        sh:targetSubjectsOf  :hasNextStep .
+
+:allConditionsRequired-shape
+        a                    sh:NodeShape ;
+        sh:class             :ConditionalStep ;
+        sh:targetSubjectsOf  :allConditionsRequired .
+
+:requiresAccess-shape
+        a                    sh:NodeShape ;
+        sh:class             :Action ;
+        sh:targetSubjectsOf  :requiresAccess .
+
+:solrField-shape  a          sh:NodeShape ;
+        sh:class             :SolrQuery ;
+        sh:targetSubjectsOf  :solrField .
+
+:nextIfSatisfied-shape
+        a                    sh:NodeShape ;
+        sh:class             :ConditionalStep ;
+        sh:targetSubjectsOf  :nextIfSatisfied .
+
+:ModelWriter-targetModel
+        a         sh:PropertyShape ;
+        sh:class  :Model ;
+        sh:path   :targetModel .
+
+:ParameterType-implementationType
+        a            sh:PropertyShape ;
+        sh:class     :ImplementationType ;
+        sh:maxCount  1 ;
+        sh:path      :implementationType .
+
+:version-shape  a            sh:NodeShape ;
+        sh:class             :Api ;
+        sh:targetSubjectsOf  :version .
+
+:ParameterType-isInternal
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:boolean ;
+        sh:maxCount  1 ;
+        sh:path      :isInternal .
+
+:OperationalStep-hasNextStep
+        a         sh:PropertyShape ;
+        sh:class  :Step ;
+        sh:path   :hasNextStep .
+
+#:hasInternalElement-shape
+#        a                    sh:NodeShape ;
+#        sh:class             :JsonObjectSerializationType ;
+#        sh:targetSubjectsOf  :hasInternalElement .
+
+:Parameter-name  a   sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:Api-version  a      sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :version .
+
+:isOptional-shape  a         sh:NodeShape ;
+        sh:class             :OperationalStep ;
+        sh:targetSubjectsOf  :isOptional .
+
+:ImplementationConfig-className
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :className .
+
+:ParameterType-serializationType
+        a            sh:PropertyShape ;
+        sh:class     :SerializationType ;
+        sh:maxCount  1 ;
+        sh:path      :serializationType .
+
+:solrQueryText-shape  a      sh:NodeShape ;
+        sh:class             :SolrQuery ;
+        sh:targetSubjectsOf  :solrQueryText .
+
+:ImplementationType-className
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :className .
+
+:SolrQuery-solrSort  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      :solrSort .
+
+:hasElementsOfType-shape
+        a                    sh:NodeShape ;
+        sh:class             :ArraySerializationType ;
+        sh:targetSubjectsOf  :hasElementsOfType .
+
+:ResourceAPI-onPatch  a  sh:PropertyShape ;
+        sh:class  :Rpc ;
+        sh:path   :onPatch .
+
+:Template  a         rdfs:Class , sh:NodeShape ;
+        sh:property  :Template-hasModel .
+
+:isStaticMethod-shape
+        a                    sh:NodeShape ;
+        sh:class             :ImplementationConfig ;
+        sh:targetSubjectsOf  :isStaticMethod .
+
+:ParameterProvider  a  sh:NodeShape , rdfs:Class ;
+        sh:property  :ParameterProvider-providesParameter .
+
+:ResourceAPI-hasCustomRESTAction
+        a         sh:PropertyShape ;
+        sh:class  :CustomRESTAction ;
+        sh:path   :hasCustomRESTAction .
+
+:ConditionalStep  a  sh:NodeShape , rdfs:Class ;
+        sh:property  :ConditionalStep-question , :ConditionalStep-nextIfSatisfied , :ConditionalStep-allConditionsRequired , :ConditionalStep-nextIfNotSatisfied .
+
+:ArraySerializationType-hasElementsOfType
+        a            sh:PropertyShape ;
+        sh:class     :SerializationType ;
+        sh:maxCount  1 ;
+        sh:path      :hasElementsOfType .
+
+:onGetAll-shape  a           sh:NodeShape ;
+        sh:class             :ResourceAPI ;
+        sh:targetSubjectsOf  :onGetAll .
+
+:Model  a            rdfs:Class , sh:NodeShape ;
+        sh:property  :Model-name .
+
+:OperationalStep  a  rdfs:Class , sh:NodeShape ;
+        sh:property  :OperationalStep-hasOperation , :OperationalStep-hasNextStep , :OperationalStep-isOptional .
+
+:solrFilter-shape  a         sh:NodeShape ;
+        sh:class             :SolrQuery ;
+        sh:targetSubjectsOf  :solrFilter .
+
+:implementationType-shape
+        a                    sh:NodeShape ;
+        sh:class             :ParameterType ;
+        sh:targetSubjectsOf  :implementationType .
+
+:Action-hasFirstStep  a  sh:PropertyShape ;
+        sh:class  :Step ;
+        sh:path   :hasFirstStep .
+
+:SolrQuery-solrFacet  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      :solrFacet .
+
+:SerializationType  a  sh:NodeShape , rdfs:Class ;
+        sh:property  :SerializationType-name .
+
+:minLength-shape  a          sh:NodeShape ;
+        sh:class             :StringLengthRangeValidator ;
+        sh:targetSubjectsOf  :minLength .
+
+:onPost-shape  a             sh:NodeShape ;
+        sh:class             :ResourceAPI ;
+        sh:targetSubjectsOf  :onPost .
+
+:ParameterType-rdfType
+        a            sh:PropertyShape ;
+        sh:class     :RDFType ;
+        sh:maxCount  1 ;
+        sh:path      :rdfType .
+
+:ConditionalStep-nextIfSatisfied
+        a         sh:PropertyShape ;
+        sh:class  :Step ;
+        sh:path   :nextIfSatisfied .
+
+:sparqlQueryText-shape
+        a                    sh:NodeShape ;
+        sh:class             :SparqlQuery ;
+        sh:targetSubjectsOf  :sparqlQueryText .
+
+#:serializationType-shape
+#        a                    sh:NodeShape ;
+#        sh:class             :ParameterType , :Parameter ;
+#        sh:targetSubjectsOf  :serializationType .
+
+:ParameterReceiver  a  sh:NodeShape , rdfs:Class ;
+        sh:property  :ParameterReceiver-requiresParameter .
+
+:solrLimit-shape  a          sh:NodeShape ;
+        sh:class             :SolrQuery ;
+        sh:targetSubjectsOf  :solrLimit .
+
+:regularExpression-shape
+        a                    sh:NodeShape ;
+        sh:class             :RegularExpressionValidator ;
+        sh:targetSubjectsOf  :regularExpression .
+
+:ResourceAPI-maxAPIVersion
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :maxAPIVersion .
+
+:HttpMethod  a       rdfs:Class , sh:NodeShape ;
+        sh:property  :HttpMethod-name .
+
+:solrSort-shape  a           sh:NodeShape ;
+        sh:class             :SolrQuery ;
+        sh:targetSubjectsOf  :solrSort .
+
+:Rpc-description  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :description .
+
+:NumericRangeValidator-maxValue
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:float ;
+        sh:maxCount  1 ;
+        sh:path      :maxValue .
+
+:ImplementationType  a  rdfs:Class , sh:NodeShape ;
+        sh:property  :ImplementationType-className .
+
+:ArrayParameterType-containsType
+        a            sh:PropertyShape ;
+        sh:class     :ParameterType ;
+        sh:maxCount  1 ;
+        sh:path      :containsType .
+
+:N3Template-N3TextRetractions
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      :N3TextRetractions .
+
+:solrOffset-shape  a         sh:NodeShape ;
+        sh:class             :SolrQuery ;
+        sh:targetSubjectsOf  :solrOffset .
+
+:ResourceAPI-onGetAll
+        a         sh:PropertyShape ;
+        sh:class  :Rpc ;
+        sh:path   :onGetAll .
+
+:ResourceAPI-minAPIVersion
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :minAPIVersion .
+
+:SolrQuery-solrOffset
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :solrOffset .
+
+:ResourceAPI-onPost  a  sh:PropertyShape ;
+        sh:class  :Rpc ;
+        sh:path   :onPost .
+
+:SolrQuery-solrLimit  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :solrLimit .
+
+:ImplementationConfig-isStaticMethod
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:boolean ;
+        sh:maxCount  1 ;
+        sh:path      :isStaticMethod .
+
+:N3TextAdditions-shape
+        a                    sh:NodeShape ;
+        sh:class             :N3Template ;
+        sh:targetSubjectsOf  :N3TextAdditions .
+
+:RegularExpressionValidator-regularExpression
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :regularExpression .
+
+:ModelWriter-additionModel
+        a         sh:PropertyShape ;
+        sh:class  :Model ;
+        sh:path   :additionModel .
+
+:Template-hasModel  a  sh:PropertyShape ;
+        sh:class  :Model ;
+        sh:path   :hasModel .
+
+:Api-title  a        sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :title .
+
+:SparqlQuery-sparqlQueryText
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :sparqlQueryText .
+
+:N3Template-N3TextAdditions
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      :N3TextAdditions .
+
+:rdfType-shape  a            sh:NodeShape ;
+        sh:class             :ParameterType ;
+        sh:targetSubjectsOf  :rdfType .
+
+:SolrQuery-solrFilter
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      :solrFilter .
+
+:forwardsTo-shape  a         sh:NodeShape ;
+        sh:class             :CustomRESTAction ;
+        sh:targetSubjectsOf  :forwardsTo .
+
+:CustomRESTAction-name
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:ArraySerializationType
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  :ArraySerializationType-hasElementsOfType .
+
+:Rpc-name  a         sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:pattern   "^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$" ;
+        sh:path      :name .
+
+:onPut-shape  a              sh:NodeShape ;
+        sh:class             :ResourceAPI ;
+        sh:targetSubjectsOf  :onPut .
+
+:hasAssignedRPC-shape
+        a                    sh:NodeShape ;
+        sh:class             :Action ;
+        sh:targetSubjectsOf  :hasAssignedRPC .
+
+:Parameter-hasCondition
+        a         sh:PropertyShape ;
+        sh:class  :Condition ;
+        sh:path   :hasCondition .
+
+:targetModel-shape  a        sh:NodeShape ;
+        sh:class             :ModelWriter ;
+        sh:targetSubjectsOf  :targetModel .
+
+:StringLengthRangeValidator
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  :StringLengthRangeValidator-minLength , :StringLengthRangeValidator-maxLength .
+
+:HttpMethod-name  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:onGet-shape  a              sh:NodeShape ;
+        sh:class             :ResourceAPI ;
+        sh:targetSubjectsOf  :onGet .
+
+:Action-version  a   sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :version .
+
+:ResourceAPI-name  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:JsonObjectSerializationType-hasInternalElement
+        a         sh:PropertyShape ;
+        sh:class  :Parameter ;
+        sh:path   :hasInternalElement .
+
+:ResourceAPI-onGet  a  sh:PropertyShape ;
+        sh:class  :Rpc ;
+        sh:path   :onGet .
+
+:solrFacet-shape  a          sh:NodeShape ;
+        sh:class             :SolrQuery ;
+        sh:targetSubjectsOf  :solrFacet .
+
+:SolrQuery-solrField  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:path      :solrField .
+
+:Model-name  a       sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:Api    a            sh:NodeShape , rdfs:Class ;
+        sh:property  :Api-description , :Api-version , :Api-title .
+
+:hasCustomRESTAction-shape
+        a                    sh:NodeShape ;
+        sh:class             :ResourceAPI ;
+        sh:targetSubjectsOf  :hasCustomRESTAction .
+
+:Rpc-maxAPIVersion  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :maxAPIVersion .
+
+:StringLengthRangeValidator-maxLength
+        a            sh:PropertyShape ;
+        sh:class     xsd:int ;
+        sh:maxCount  1 ;
+        sh:path      :maxLength .
+
+:containsType-shape  a       sh:NodeShape ;
+        sh:class             :ArrayParameterType ;
+        sh:targetSubjectsOf  :containsType .
+
+:minValue-shape  a           sh:NodeShape ;
+        sh:class             :NumericRangeValidator ;
+        sh:targetSubjectsOf  :minValue .
+
+:NumericRangeValidator
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  :NumericRangeValidator-maxValue , :NumericRangeValidator-minValue .
+
+:isInternal-shape  a         sh:NodeShape ;
+        sh:class             :ParameterType ;
+        sh:targetSubjectsOf  :isInternal .
+
+:ResourceAPI-onPut  a  sh:PropertyShape ;
+        sh:class  :Rpc ;
+        sh:path   :onPut .
+
+:Rpc-minAPIVersion  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :minAPIVersion .
+
+:title-shape  a              sh:NodeShape ;
+        sh:class             :Api ;
+        sh:targetSubjectsOf  :title .
+
+:Rpc    a            sh:NodeShape , rdfs:Class ;
+        sh:property  :Rpc-description , :Rpc-maxAPIVersion , :Rpc-name , :Rpc-minAPIVersion , :Rpc-hasDefaultMethod .
+
+:Action  a           rdfs:Class , sh:NodeShape ;
+        sh:property  :Action-version , :Action-requiresAccess , :Action-hasFirstStep , :Action-hasAssignedRPC .
+
+:ImplementationConfig
+        a            sh:NodeShape , rdfs:Class ;
+        sh:property  :ImplementationConfig-methodName , :ImplementationConfig-isStaticMethod , :ImplementationConfig-methodArguments , :ImplementationConfig-className .
+
+:StringLengthRangeValidator-minLength
+        a            sh:PropertyShape ;
+        sh:class     xsd:int ;
+        sh:maxCount  1 ;
+        sh:path      :minLength .
+
+:hasFirstStep-shape  a       sh:NodeShape ;
+        sh:class             :Action ;
+        sh:targetSubjectsOf  :hasFirstStep .
+
+:JsonObjectSerializationType
+        a            rdfs:Class , sh:NodeShape ;
+        sh:property  :JsonObjectSerializationType-hasInternalElement .
+
+:N3TextRetractions-shape
+        a                    sh:NodeShape ;
+        sh:class             :N3Template ;
+        sh:targetSubjectsOf  :N3TextRetractions .
+
+:hasCondition-shape  a       sh:NodeShape ;
+        sh:class             :Parameter ;
+        sh:targetSubjectsOf  :hasCondition .
+
+:NumericRangeValidator-minValue
+        a            sh:PropertyShape ;
+        sh:datatype  xsd:float ;
+        sh:maxCount  1 ;
+        sh:path      :minValue .
+
+:ResourceAPI-onDelete
+        a         sh:PropertyShape ;
+        sh:class  :Rpc ;
+        sh:path   :onDelete .
+
+:hasOperation-shape  a       sh:NodeShape ;
+        sh:class             :OperationalStep ;
+        sh:targetSubjectsOf  :hasOperation .
+
+:RDFType-name  a     sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :name .
+
+:ResourceAPI-version  a  sh:PropertyShape ;
+        sh:datatype  xsd:string ;
+        sh:maxCount  1 ;
+        sh:path      :version .
+
+:ConditionalStep-nextIfNotSatisfied
+        a         sh:PropertyShape ;
+        sh:class  :Step ;
+        sh:path   :nextIfNotSatisfied .

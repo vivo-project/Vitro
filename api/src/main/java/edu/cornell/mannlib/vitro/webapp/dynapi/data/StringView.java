@@ -25,4 +25,8 @@ public class StringView {
     	return data.getObject().toString();
     }
 
+    public static boolean isPlainString(Parameter param) {
+        return param.getType().isPlainString();
+    }
+
 }
