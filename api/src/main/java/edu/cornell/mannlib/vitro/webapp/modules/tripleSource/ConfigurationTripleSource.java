@@ -32,6 +32,8 @@ public abstract class ConfigurationTripleSource implements TripleSource {
 			DYNAMIC_API_ABOX_FIRSTTIME_BACKUP,
 			DYNAMIC_API_TBOX,
 			DYNAMIC_API_TBOX_FIRSTTIME_BACKUP,
+	        SHAPES,
+	        SHAPES_FIRSTTIME_BACKUP,
 			};
 
 	/**

@@ -46,4 +46,6 @@ public abstract class AbstractOperation implements Operation {
     public Map<String, ProcedureDescriptor> getDependencies(){
         return Collections.emptyMap();
     }
+    
+    public void dereference() {}
 }
