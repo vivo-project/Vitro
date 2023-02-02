@@ -340,8 +340,14 @@ var customForm = {
             },
             select: function(event, ui) {
                 customForm.showAutocompleteSelection(ui.item.label, ui.item.uri, $(selectedObj));
-                if ( $(selectedObj).attr('acGroupName') == customForm.typeSelector.attr('acGroupName') ) {
-                    customForm.typeSelector.val(ui.item.msType);
+                let currAttr = $(selectedObj).attr('acgroupname');
+                if (currAttr) {
+                    for (const customTypeSelector of customForm.typeSelector ) {
+                        let customTypeAttr = $(customTypeSelector).attr('acgroupname');
+                        if (customTypeAttr && currAttr === customTypeAttr) {
+                            $(customTypeSelector).val(ui.item.msType);
+                        }
+                    }
                 }
             }
         });
@@ -570,7 +576,15 @@ var customForm = {
         }
         else {
             $acSelectionObj = $(selectedObj);
-            customForm.typeSelector.val('');
+            let currAttr = $(selectedObj).attr('acgroupname');
+            if (currAttr) {
+                for (const customTypeSelector of customForm.typeSelector ) {
+                    let customTypeAttr = $(customTypeSelector).attr('acgroupname');
+                    if (customTypeAttr && currAttr === customTypeAttr) {
+                        $(customTypeSelector).val('');
+                    }
+                }
+            }
         }
 
         $acSelector = this.getAcSelector($acSelectionObj);
