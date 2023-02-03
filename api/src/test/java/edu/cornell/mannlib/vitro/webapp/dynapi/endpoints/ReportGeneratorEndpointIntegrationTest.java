@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi.components;
+package edu.cornell.mannlib.vitro.webapp.dynapi.endpoints;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,7 +12,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collection;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -24,11 +26,17 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
@@ -38,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
+@RunWith(Parameterized.class)
 public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
 
     private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
@@ -48,16 +57,21 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
     private static final String GET_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_get_report_generator.n3";
     private static final String EXPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_export_report_generator.n3"; 
     private static final String IMPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_import_report_generator.n3"; 
+	private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input1.n3";
+    private static final String REPORT_ENDPOINT_INPUT2 = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input2.n3";
 
-
-
-	private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input_new.n3";
 	private static final String REPORT_ENDPOINT_DATA = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
 
 	private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
 	OntModel storeModel = ModelFactory.createOntologyModel();
 
+    @org.junit.runners.Parameterized.Parameter(0)
+    public String inputFileName;
+    
+    @org.junit.runners.Parameterized.Parameter(1)
+    public String dataFileName;
+	
     @AfterClass
     public static void after() {
         restoreLogs();
@@ -68,7 +82,6 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
     public static void before() {
         offLogs();
         dynapiModelFactory = mockStatic(DynapiModelFactory.class);
-
     }
 
 	@Before
@@ -165,6 +178,9 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             Data reportsData = listReportStore.getData("reports");
             String reports = reportsData.getSerializedValue();
             assertTrue(reports.contains(uriData.getSerializedValue()));
+            if (manualDebugging) {
+                System.out.println(reports);
+            }
         }
         
         DataStore getReportStore = new DataStore() ;
@@ -180,6 +196,9 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             assertTrue(report.contains("selectQuery"));
             assertTrue(report.contains("constructQuery"));
             assertTrue(report.contains("template"));
+            if (manualDebugging) {
+                System.out.println(report);
+            }
         }
         
         DataStore exportReportStore = new DataStore() ;
@@ -257,7 +276,15 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
         loadModel(ontModel, ABOX_PREFIX + EXPORT_REPORT_GENERATOR_PROCEDURE);
         loadModel(ontModel, ABOX_PREFIX + IMPORT_REPORT_GENERATOR_PROCEDURE);
 
-        loadModel(ontModel, REPORT_ENDPOINT_INPUT);
-        loadModel(storeModel, REPORT_ENDPOINT_DATA);
+        loadModel(ontModel, inputFileName);
+        loadModel(storeModel, dataFileName);
 	}
+	
+	@Parameterized.Parameters
+    public static Collection<Object[]> requests() {
+        return Arrays.asList(new Object[][] {
+            {REPORT_ENDPOINT_INPUT, REPORT_ENDPOINT_DATA},
+            {REPORT_ENDPOINT_INPUT2, REPORT_ENDPOINT_DATA},
+        });
+    }
 }
