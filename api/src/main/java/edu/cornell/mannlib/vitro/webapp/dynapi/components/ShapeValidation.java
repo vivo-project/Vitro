@@ -243,7 +243,7 @@ public class ShapeValidation extends AbstractOperation {
                 return ModelView.getModel(dataStore, model);    
             }
         }
-        throw new RuntimeException(String.format("Model '%s' not provided"));
+        throw new RuntimeException("Model '%s' not provided");
     }
 
     protected void calculateInputParams() {
