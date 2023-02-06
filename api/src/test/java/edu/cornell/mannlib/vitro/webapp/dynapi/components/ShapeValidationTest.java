@@ -37,14 +37,6 @@ public class ShapeValidationTest extends ServletContextTest {
     public static final String SHAPES_PREFIX = "../home/src/main/resources/rdf/shapes/everytime/";
     private static final String SHAPES_MODEL_FILE = SHAPES_PREFIX + "dynamic_api_shapes.n3";
     
-    private static final String CREATE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_create_report_generator.n3";
-    private static final String EXECUTE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_execute_report_generator.n3";
-    private static final String DELETE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_delete_report_generator.n3";
-    private static final String LIST_REPORT_GENERATORS_PROCEDURE = "endpoint_procedure_list_report_generators.n3";
-    private static final String GET_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_get_report_generator.n3";
-    private static final String EXPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_export_report_generator.n3"; 
-    private static final String IMPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_import_report_generator.n3"; 
-
     private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
     OntModel shapesModel = ModelFactory.createOntologyModel();
     
