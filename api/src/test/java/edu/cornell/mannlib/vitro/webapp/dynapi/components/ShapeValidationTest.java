@@ -20,6 +20,7 @@ import org.mockito.MockedStatic;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
@@ -31,10 +32,13 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.ModelPa
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 
 public class ShapeValidationTest extends ServletContextTest {
-
+    
+    private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
     private static final String DYNAPI_ABOX_URI = "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox";
     private static final String SHAPES_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/shapes";
     public static final String SHAPES_PREFIX = "../home/src/main/resources/rdf/shapes/everytime/";
+    private static final String PROCEDURE_FILE_NAME = RESOURCES_PATH + "shape-validation-empty-procedure.n3";
+
     private static final String SHAPES_MODEL_FILE = SHAPES_PREFIX + "dynamic_api_shapes.n3";
     
     private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
@@ -66,12 +70,10 @@ public class ShapeValidationTest extends ServletContextTest {
     }
     
     @Test
-    public void validationTest() throws InitializationException, ConversionException, IOException {
+    public void validationWithProvidedShapes() throws InitializationException, ConversionException, IOException {
         
         boolean manualDebugging = false;
-        loadOntology(ontModel);
-
-        //ProcedurePool pool = initWithDefaultModel();
+        ProcedurePool pool = initWithDefaultModel();
         
         ShapeValidation sv = new ShapeValidation();
         Parameter dataModelParam = new ModelParam(DYNAPI_ABOX_URI, true, true);
@@ -94,6 +96,47 @@ public class ShapeValidationTest extends ServletContextTest {
             String report = (String) TestView.getObject(dataStore.getData("report"));
             System.out.println(report);
         }
+        ShapesGraphPool.getInstance().clear();
+    }
+    
+    @Test
+    public void validationWithProcedureInvocation() throws InitializationException, ConversionException, IOException {
+        
+        boolean manualDebugging = false;
+        ProcedurePool pool = initWithDefaultModel();
+        ShapeValidation sv = new ShapeValidation();
+        Parameter dataModelParam = new ModelParam(DYNAPI_ABOX_URI, true, true);
+        Parameter shapesModelParam = new ModelParam(SHAPES_MODEL_URI, true, true);
+        
+        ProcedureDescriptor pd = new ProcedureDescriptor();
+        pd.addOutputParameter(shapesModelParam);
+        pd.setCallUri("test:procedure-provides-shapes");
+        sv.setShapesProcedureDescriptor(pd);
+        
+        Parameter reportParam = new StringParam("report");
+        Parameter resultParam = new BooleanParam("result");
+        sv.setDataModel(dataModelParam);
+        sv.addOutputParam(reportParam);
+        sv.addOutputParam(resultParam);
+        sv.setDetails(true);
+        sv.setCache(true);
+        sv.setValidateShapes(false);
+        DataStore dataStore = new DataStore();
+        Converter.convertInternalParams(sv.getInputParams(), dataStore);
+        try (Procedure shapesProcedure = pool.get("test:procedure-provides-shapes")){
+            dataStore.putDependency("test:procedure-provides-shapes", shapesProcedure);
+            assertTrue(OperationResult.ok().equals(sv.run(dataStore)));    
+        }finally {
+            dataStore.removeDependencies();
+        }
+        
+        assertTrue(dataStore.contains("report"));
+        assertTrue(dataStore.contains("result"));
+        if (manualDebugging) {
+            String report = (String) TestView.getObject(dataStore.getData("report"));
+            System.out.println(report);
+        }
+        ShapesGraphPool.getInstance().clear();
     }
     
     protected void loadModel(Model model, String... files) throws IOException {
@@ -109,5 +152,6 @@ public class ShapeValidationTest extends ServletContextTest {
         loadModel(ontModel, getFileList(ABOX_PREFIX));
         loadModel(ontModel, getFileList(TBOX_PREFIX));
         loadModel(shapesModel, SHAPES_MODEL_FILE);
+        loadModel(ontModel, PROCEDURE_FILE_NAME);
     }
 }
