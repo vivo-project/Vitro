@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 
@@ -19,6 +20,7 @@ public class DataStore {
 	private ContentType responseType = ContentType.APPLICATION_JSON;
 	private List<String> acceptLangs = new LinkedList<>();
 	private String resourceId = "";
+	private UserAccount user;
 	private Map<String, Procedure> dependencyComponents = new HashMap<>();
 
 	public DataStore() {
@@ -112,5 +114,20 @@ public class DataStore {
             }
         }
         return true;
+    }
+    
+    public void setUser(UserAccount user) {
+        this.user = user;
+    }
+    
+    public UserAccount getUser() {
+        return user;
+    }
+
+    public String getUserUri() {
+        if (user != null) {
+            return user.getUri();
+        }
+        return "";
     }
 }

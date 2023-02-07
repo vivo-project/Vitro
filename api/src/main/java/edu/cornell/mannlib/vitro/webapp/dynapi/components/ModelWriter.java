@@ -61,7 +61,7 @@ public class ModelWriter extends AbstractOperation{
 		Model target = ModelView.getModel(dataStore, targetModelParam);
 		AdditionsAndRetractions changes = new AdditionsAndRetractions(additions, retractions);
 		//TODO: set editor uri instead of ""
-		ProcessRdfForm.applyChangesToWriteModel(changes, null, target, "");
+		ProcessRdfForm.applyChangesToWriteModel(changes, null, target, dataStore.getUserUri());
 		
 		return OperationResult.ok();
 	}
