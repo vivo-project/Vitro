@@ -154,6 +154,7 @@ public class ShapeValidationTest extends ServletContextTest {
         DataStore dataStore = new DataStore();
         Converter.convertInternalParams(sv.getInputParams(), dataStore);
         Procedure shapesProcedure = new Procedure();
+        shapesProcedure.setPublicAccess(true);
         shapesProcedure.setUri(PROCEDURE_PROVIDES_SHAPES_URI);
         shapesProcedure.addProvidedParameter(shapesModelParam);
         assertTrue(shapesProcedure.isValid());

@@ -47,6 +47,9 @@ public class ProcedureDescriptorCall {
         DataStore localStore = new DataStore();
         Parameters internalParams = procedure.getInternalParams();
         initilaizeLocalStore(dataStore, localStore, inputParams, internalParams);
+        if (!procedure.hasPermissions(localStore.getUser())) {
+            throw new RuntimeException(formatNotAuthorizedErrorMessage(procedureDescriptor, uri));
+        }
         OperationResult result = procedure.run(localStore);
         if (result.hasError()) {
             throw new RuntimeException(formatErrorMessage(procedureDescriptor, uri));
@@ -54,6 +57,11 @@ public class ProcedureDescriptorCall {
         copyData(localStore, dataStore, procedureDescriptor.getOutputParams());
     }
 
+    protected static String formatNotAuthorizedErrorMessage(ProcedureDescriptor procedureDescriptor, String uri) {
+        return String.format("User not authorized to access procedure %s, defined by descriptor %s",
+                uri, procedureDescriptor.toString());
+    }
+    
     protected static String formatErrorMessage(ProcedureDescriptor procedureDescriptor, String uri) {
         return String.format("Procedure '%s' described by descriptor '%s' returned error",
                 uri, procedureDescriptor.toString());
@@ -63,6 +71,7 @@ public class ProcedureDescriptorCall {
             Parameters localParams) throws ConversionException {
         copyData(externalStore, localStore, paramsToCopy);
         localStore.putDependencies(externalStore.getDependencies());
+        localStore.setUser(externalStore.getUser());
         Converter.convertInternalParams(localParams, localStore);
     }
 
