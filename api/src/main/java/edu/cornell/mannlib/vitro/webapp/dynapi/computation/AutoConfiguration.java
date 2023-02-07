@@ -20,6 +20,7 @@ public class AutoConfiguration {
         Parameters provided = procedure.getOutputParams();
         Parameters internal = procedure.getInternalParams();
 
+        copyInternalProvidedParamsToInternal(provided, internal);
         ExecutionTree tree = new ExecutionTree(procedure);
         List<StepInfo> exits = tree.getLeafs();
         List<List<StepInfo>> paths = new LinkedList<List<StepInfo>>();
@@ -37,6 +38,15 @@ public class AutoConfiguration {
             String toLog = String.join(", ", names);
             log.debug("Required params: " + toLog);    
         }
+    }
+
+    private static void copyInternalProvidedParamsToInternal(Parameters provided, Parameters internal) {
+        for (String name : provided.getNames()) {
+            Parameter param = provided.get(name);
+            if (param.isInternal()) {
+                internal.add(param);
+            } 
+        }        
     }
 
     private static void mergeParameters(Parameters required, Parameters internal, Parameters computed) {
