@@ -53,4 +53,8 @@ public class ShapesGraphPool {
             components.clear();
         }
     }
+    
+    public int count() {
+        return components.size();
+    }
 }
