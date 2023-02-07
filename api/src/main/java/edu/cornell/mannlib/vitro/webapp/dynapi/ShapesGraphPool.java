@@ -39,13 +39,18 @@ public class ShapesGraphPool {
                 log.info(format("Updated ShapesGraph with name %s", name));
             }
         }
-        
     }
 
     public void remove(String name) {
         log.info(format("Removing ShapesGraph with name %s", name));
         synchronized (mutex) {
             components.remove(name);
+        }
+    }
+    
+    public void clear() {
+        synchronized (mutex) {
+            components.clear();
         }
     }
 }
