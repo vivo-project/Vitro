@@ -131,7 +131,7 @@ public abstract class ServletContextTest {
         };
     }
 
-    protected String[] getFileList(String path) {
+    protected static String[] getFileList(String path) {
         File dir = new File(path);
         File[] files = dir.listFiles();
         List<String> paths = new LinkedList<String>();
