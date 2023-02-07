@@ -227,9 +227,9 @@ public class ShapeValidation extends AbstractOperation {
 
     private Model getShapesModel(DataStore dataStore) throws ConversionException, InitializationException {
         DataStore localStore = new DataStore();
-        ProcedureDescriptorCall.initilaizeLocalStore(dataStore, localStore, inputParams, internalParams);
+        ProcedureDescriptorCall.initilaizeLocalStore(dataStore, localStore, shapesProcedureDescriptor.getInputParams(), internalParams);
         ProcedureDescriptorCall.execute(shapesProcedureDescriptor, localStore);
-        return getModel(localStore, outputParams);
+        return getModel(localStore, shapesProcedureDescriptor.getOutputParams());
     }
 
     protected Model getModel(DataStore dataStore, Parameters params) {
@@ -243,7 +243,7 @@ public class ShapeValidation extends AbstractOperation {
                 return ModelView.getModel(dataStore, model);    
             }
         }
-        throw new RuntimeException("Model '%s' not provided");
+        throw new RuntimeException("Model is not returned");
     }
 
     protected void calculateInputParams() {
