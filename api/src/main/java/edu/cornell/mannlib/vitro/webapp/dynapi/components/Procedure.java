@@ -25,6 +25,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
     private Parameters outputParams = new Parameters();
     private Parameters inputParams = new Parameters();
     private Parameters internalParams = new Parameters();
+    private boolean publicAcess = false;
     private List<AccessWhitelist> accessWhitelists = new LinkedList<AccessWhitelist>();
 
     @Override
@@ -52,6 +53,11 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
         outputParams.add(param);
     }
 
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#publicAccess")
+    public void setPublicAccess(boolean access) {
+        publicAcess = access;
+    }
+    
     @Override
     public String getKey() {
         return getUri();
@@ -166,7 +172,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
 	}
 
 	private boolean isPublicAccessible() {
-		return false;
+		return publicAcess;
 	}
 	
 	@Override
@@ -189,4 +195,5 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
         }
         return true;
     }
+
 }

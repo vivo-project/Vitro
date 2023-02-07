@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
@@ -93,6 +94,9 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
             assertFalse(action instanceof NullProcedure);
             assertTrue(action.isValid());
             store = new DataStore();
+            UserAccount user = new UserAccount();
+            user.setRootUser(true);
+            store.setUser(user);
             addInputContainer(store);
             
             Endpoint.getDependencies(action, store, procedurePool);
