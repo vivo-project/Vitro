@@ -40,6 +40,7 @@ public abstract class Endpoint extends VitroHttpServlet {
             return;
         }
         DataStore dataStore = new DataStore();
+        dataStore.setUser(user);
         try {
             getDependencies(procedure, dataStore, procedurePool);
             Converter.convert(request, procedure, dataStore);

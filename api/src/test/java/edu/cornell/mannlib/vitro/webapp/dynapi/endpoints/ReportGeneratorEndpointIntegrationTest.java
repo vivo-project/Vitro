@@ -30,6 +30,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
@@ -115,7 +116,8 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
         long initialModelSize ;
         long initialProcedureCount ;
         Model generatorConfiguration ;
-        
+        UserAccount user = new UserAccount();
+        user.setRootUser(true);
         boolean manualDebugging = false;
         
         long modelSizeWithReportGenerator;
@@ -127,6 +129,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             initialProcedureCount = procedurePool.count();;
             Parameters internal = procedure.getInternalParams();
             store = new DataStore();
+            store.setUser(user);
             Converter.convertInternalParams(internal, store);
             Endpoint.getDependencies(procedure, store, procedurePool);
             assertTrue(OperationResult.ok().equals(procedure.run(store)));
@@ -149,7 +152,8 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             }
         }
         
-        DataStore reportStore = new DataStore() ;
+        DataStore reportStore = new DataStore();
+        reportStore.setUser(user);
         Data uriData = store.getData("report_generator_uri");
         assertTrue(uriData != null);
         reportStore.addData(uriData.getParam().getName(), uriData);
@@ -168,7 +172,8 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
                 }   
             }
         }
-        DataStore listReportStore = new DataStore() ;
+        DataStore listReportStore = new DataStore();
+        listReportStore.setUser(user);
         listReportStore.addData(uriData.getParam().getName(), uriData);
 
         try(Procedure listReportGenerators = procedurePool.getByUri("https://vivoweb.org/procedure/list_report_generators");){
@@ -183,7 +188,8 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             }
         }
         
-        DataStore getReportStore = new DataStore() ;
+        DataStore getReportStore = new DataStore();
+        getReportStore.setUser(user);
         getReportStore.addData(uriData.getParam().getName(), uriData);
 
         try(Procedure getReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/get_report_generator");){
@@ -202,6 +208,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
         }
         
         DataStore exportReportStore = new DataStore() ;
+        exportReportStore.setUser(user);
         Data exportedData;
         exportReportStore.addData(uriData.getParam().getName(), uriData);
         try(Procedure exportReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/export_report_generator");){
@@ -222,7 +229,8 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             assertTrue(excessivelyAddedData.isEmpty());
         }
         
-        DataStore deleteReportStore = new DataStore() ;
+        DataStore deleteReportStore = new DataStore();
+        deleteReportStore.setUser(user);
         deleteReportStore.addData(uriData.getParam().getName(), uriData);
         try(Procedure deleteReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/delete_report_generator");){
             Parameters internalParams = deleteReportGenerator.getInternalParams();
