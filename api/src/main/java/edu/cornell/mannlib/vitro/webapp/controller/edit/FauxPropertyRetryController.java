@@ -91,6 +91,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 	private static class EpoPopulator {
 		private static final String LITERAL = "http://www.w3.org/2000/01/rdf-schema#Literal";
+		private static final String XML_LITERAL = "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
 		private final VitroRequest req;
 		private final ServletContext ctx;
 		private final WebappDaoFactory wadf;
@@ -335,11 +336,22 @@ public class FauxPropertyRetryController extends BaseEditController {
 				option.setBody("Literal");
 				option.setSelected(true);
 				list.add(option);
+			} else if (rangeUri.equals(XML_LITERAL)) {
+				Option option = new Option();
+				option.setValue(rangeUri);
+				option.setBody("XML Literal");
+				option.setSelected(true);
+				list.add(option);
 			} else {
 				Datatype dataType = wadf.getDatatypeDao().getDatatypeByURI(rangeUri);
 				Option option = new Option();
-				option.setValue(dataType.getUri());
-				option.setBody(dataType.getName());
+				if (dataType != null) {
+					option.setValue(dataType.getUri());
+					option.setBody(dataType.getName());
+				} else {
+					option.setValue(rangeUri);
+					option.setBody(rangeUri);
+				}
 				option.setSelected(true);
 				list.add(option);
 			}
