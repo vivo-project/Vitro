@@ -109,3 +109,5 @@ dynapi:AssignOperation rdfs:subClassOf dynapi_java:AssignOperation .
 dynapi:ProcedureCallOperation rdfs:subClassOf dynapi_java:ProcedureCallOperation .
 
 dynapi:ShapeValidation rdfs:subClassOf dynapi_java:ShapeValidation .
+
+dynapi:ErrorStep rdfs:subClassOf dynapi_java:ErrorStep .
