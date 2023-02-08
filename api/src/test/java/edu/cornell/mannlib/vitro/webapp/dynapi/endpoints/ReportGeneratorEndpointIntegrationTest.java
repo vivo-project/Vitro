@@ -252,6 +252,17 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             assertTrue(procedurePool.count() == initialProcedureCount);
         }
         
+        reportStore = new DataStore();
+        reportStore.setUser(user);
+        assertTrue(uriData != null);
+        reportStore.addData(uriData.getParam().getName(), uriData);
+        try(Procedure reportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/execute_report_generator");){
+            Parameters reportInternalParams = reportGenerator.getInternalParams();
+            Converter.convertInternalParams(reportInternalParams, reportStore);
+            OperationResult result = reportGenerator.run(reportStore);
+            assertTrue((new OperationResult(404)).equals(result));
+        }
+        
         DataStore importReportStore = new DataStore() ;
         importReportStore.addData(exportedData.getParam().getName(), exportedData);
         try(Procedure importReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/import_report_generator");){

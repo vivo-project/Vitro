@@ -41,6 +41,7 @@
  <https://vivoweb.org/procedure/execute_report_generator/condition_is_report_generator/step>
          a                                   dynapi:ConditionalStep ;
          dynapi:nextIfSatisfied              <https://vivoweb.org/procedure/execute_report_generator/call_report_generator/step> ;
+         dynapi:nextIfNotSatisfied              <https://vivoweb.org/procedure/execute_report_generator/provided_uri_is_not_report_generator/step> ;
          dynapi:hasCondition                 <https://vivoweb.org/procedure/execute_report_generator/condition_is_report_generator/condition> .       
 
 <https://vivoweb.org/procedure/execute_report_generator/condition_is_report_generator/condition>
@@ -58,6 +59,12 @@
         dynapi:callableDescriptor           <https://vivoweb.org/procedure/execute_report_generator/call_report_generator/callableDescriptor> ;
         dynapi:providesParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/report_param> ;
         dynapi:requiresParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/report_generator_uri> .
+
+####################################################################################################################################################################################
+
+<https://vivoweb.org/procedure/execute_report_generator/provided_uri_is_not_report_generator/step>
+        a                                   dynapi:ErrorStep ;
+        dynapi:errorCode                    "404"^^xsd:int .
 
 ####################################################################################################################################################################################
 
