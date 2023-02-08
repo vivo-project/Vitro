@@ -21,6 +21,13 @@ public class OperationResult {
         this.responseCode = responseCode;
     }
 
+    public static boolean hasError(int code) {
+        if (errors.contains(code)) {
+            return true;
+        }
+        return false;
+    }
+    
     public boolean hasError() {
         if (errors.contains(responseCode)) {
             return true;
