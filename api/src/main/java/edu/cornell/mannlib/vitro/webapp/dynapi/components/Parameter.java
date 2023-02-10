@@ -17,6 +17,8 @@ public class Parameter implements Removable {
 	private ParameterType type;
 	private String defaultValue;
 	private Boolean internal;
+	private boolean optional;
+
 
     public String getName() {
 		return name;
@@ -39,7 +41,17 @@ public class Parameter implements Removable {
 	
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#isInternal", minOccurs = 0, maxOccurs = 1)
 	public void setInternal(boolean internal) {
-	    this.internal = internal;
+        if (!optional) {
+            this.internal = internal;    
+        }
+    }
+    
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#isOptional", minOccurs = 0, maxOccurs = 1)
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+        if (optional) {
+            this.internal = true;    
+        }
     }
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
@@ -98,7 +110,7 @@ public class Parameter implements Removable {
 	}
 
 	public boolean isOptional() {
-		return false;
+		return optional;
 	}
 
 	public boolean isJsonContainer() {

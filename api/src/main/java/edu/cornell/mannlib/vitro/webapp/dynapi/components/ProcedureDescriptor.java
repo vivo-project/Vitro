@@ -12,6 +12,7 @@ public class ProcedureDescriptor implements ParameterInfo {
     private String uri;
     private Parameters inputParams = new Parameters();
     private Parameters outputParams = new Parameters();
+    private Parameters optionalParams = new Parameters();
     private Parameter uriParam;
 
     public Parameter getUriParam() {
@@ -27,6 +28,11 @@ public class ProcedureDescriptor implements ParameterInfo {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
     public void addInputParameter(Parameter param) {
         inputParams.add(param);
+    }
+    
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#optionalParameter")
+    public void addOptionalParameter(Parameter param) {
+        optionalParams.add(param);
     }
 
     // TODO:SHACL validate that it has at least one parameter if used in context
@@ -49,6 +55,10 @@ public class ProcedureDescriptor implements ParameterInfo {
     @Override
     public Parameters getOutputParams() {
         return outputParams;
+    }
+    
+    public Parameters getOptionalParams() {
+        return optionalParams;
     }
 
     public String getUri() {

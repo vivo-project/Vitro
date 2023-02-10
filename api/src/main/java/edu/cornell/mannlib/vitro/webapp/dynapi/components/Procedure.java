@@ -79,6 +79,17 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
         return internalParams;
     }
     
+    public Parameters getOptionalParams() {
+        Parameters optionalParams = new Parameters();
+        for (String name : internalParams.getNames()) {
+            Parameter param = internalParams.get(name);
+            if (param.isOptional()) {
+                optionalParams.add(param);
+            }
+        }
+        return optionalParams;
+    }
+    
     @Override
     public Parameters getInputParams() {
         return inputParams;
