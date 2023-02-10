@@ -52,6 +52,9 @@ public class Converter {
 
 	public static void convertInternalParams(Parameters params, DataStore dataStore) throws ConversionException {
 		for (String name : params.getNames()) {
+		    if (dataStore.contains(name)) {
+		        continue;
+		    }
 			Data data = new Data(params.get(name));
 			data.initializeDefault();
 			dataStore.addData(name, data);

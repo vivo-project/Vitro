@@ -46,13 +46,19 @@ public class Data {
     }
 
     public void initialization() {
-        if (param.isInternal()) {
+        if(isOnlyInternalParameter() || isOptionalWithoutValue()) {
             initializeDefault();
             return;
         }
-        final ParameterType type = param.getType();
-        final ImplementationType implementationType = type.getImplementationType();
-        object = implementationType.deserialize(type, string);
+        initializeFromString();
+    }
+
+    private boolean isOnlyInternalParameter() {
+        return param.isInternal() && !param.isOptional();
+    }
+
+    private boolean isOptionalWithoutValue() {
+        return param.isOptional() && string == null;
     }
     
     public void initializeFromString() {

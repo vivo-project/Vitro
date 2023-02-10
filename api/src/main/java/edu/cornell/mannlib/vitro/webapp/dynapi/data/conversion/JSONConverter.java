@@ -71,6 +71,11 @@ public class JSONConverter {
 			Parameter param = required.get(name);
 			readParam(dataStore, ctx, name, param, procedure);
 		}
+		Parameters optional = procedure.getOptionalParams();
+		for (String name : optional.getNames()) {
+            Parameter param = optional.get(name);
+            readOptionalParam(dataStore, ctx, name, param, procedure);
+        }
 	}
 
 	public static void convert(HttpServletResponse response, Procedure procedure,
@@ -156,6 +161,22 @@ public class JSONConverter {
 		data.earlyInitialization();
 		dataStore.addData(name, data);
 	}
+	
+    public static void readOptionalParam(DataStore dataStore, ReadContext ctx, String name, Parameter param,
+            Procedure procedure) throws ConversionException {
+        String paramPath = getReadPath(name, param, procedure);
+        try {
+            JsonNode node = ctx.read(paramPath, JsonNode.class);
+            if (node != null && !node.isMissingNode() && !node.isNull()) {
+                Data data = new Data(param);
+                data.setRawString(node.toString());
+                data.earlyInitialization();
+                dataStore.addData(name, data);    
+            }
+        } catch (Exception e) {
+            log.debug(e,e);
+        }
+    }
 
 	private static JsonNode injectResourceId(String jsonString, DataStore dataStore, Procedure procedure)
 			throws ConversionException {
