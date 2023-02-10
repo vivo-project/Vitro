@@ -14,6 +14,8 @@ public class AssignOperation extends AbstractOperation {
     private static final Log log = LogFactory.getLog(AssignOperation.class);
 
     private Parameters inputParams = new Parameters();
+    private Parameters outputParams = new Parameters();
+
     private Parameter targetParam;
     private Parameter assignableParam;
     private String key;
@@ -25,8 +27,8 @@ public class AssignOperation extends AbstractOperation {
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#targetParameter", minOccurs = 1, maxOccurs = 1)
-    public void setContainer(Parameter param) throws InitializationException {
-        inputParams.add(param);
+    public void addOutputParameter(Parameter param) {
+        outputParams.add(param);
         targetParam = param;
     }
 
@@ -35,9 +37,17 @@ public class AssignOperation extends AbstractOperation {
         if (!isValid(dataStore)) {
             return OperationResult.internalServerError();
         }
-        Data targetData = dataStore.getData(targetParam.getName());
+        Data targetData;
+        if (dataStore.contains(targetParam.getName())) {
+            targetData = dataStore.getData(targetParam.getName());    
+        } else {
+            targetData = new Data(targetParam);
+        }
         Data assignableData = dataStore.getData(assignableParam.getName());
         targetData.copyObject(assignableData);
+        if (!dataStore.contains(targetParam.getName())){
+            dataStore.addData(targetParam.getName(), targetData);
+        }
         return OperationResult.ok();
     }
 
@@ -56,7 +66,7 @@ public class AssignOperation extends AbstractOperation {
 
     @Override
     public Parameters getOutputParams() {
-        return new Parameters();
+        return outputParams;
     }
 
     public boolean isValid() {
@@ -87,15 +97,7 @@ public class AssignOperation extends AbstractOperation {
             log.error("data store is null");
             return false;
         }
-        Data targetData = dataStore.getData(targetParam.getName());
-        if (targetData == null) {
-            log.error("target data is not provided in data store");
-            return false;
-        }
-        if (targetData.getParam() == null) {
-            log.error("target data param is null");
-            return false;
-        }
+        
 
         Data assignableData = dataStore.getData(getAssignableParamName());
         if (assignableData == null) {
