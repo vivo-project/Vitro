@@ -25,7 +25,34 @@ public class FormDataConverter {
 	public static void convert(HttpServletRequest request, Procedure procedure, DataStore dataStore) throws ConversionException {
 		Parameters required = procedure.getInputParams();
 		Map<String, String[]> received = request.getParameterMap();
-		for (String name : required.getNames()) {
+		convertRequiredParams(dataStore, required, received);
+		convertOptionalParams(dataStore, procedure.getOptionalParams(), received);
+	}
+
+	private static void convertOptionalParams(DataStore dataStore, Parameters optional, Map<String, String[]> received) {
+        for (String name : optional.getNames()) {
+            String[] values = received.get(name);
+            if (values == null || values.length == 0) {
+                String message = String.format("Optional parameter %s not found", name);
+                log.debug(message);
+                continue;
+            }
+            try {
+                Parameter param = optional.get(name);
+                if (param.isArray()) {
+                    readArray(dataStore, name, values, param);
+                } else {
+                    readParam(dataStore, name, values, param);
+                }
+            } catch(Exception e) {
+                log.debug(e,e);
+            }
+        }
+    }
+	
+    private static void convertRequiredParams(DataStore dataStore, Parameters required, Map<String, String[]> received)
+            throws ConversionException {
+        for (String name : required.getNames()) {
 			String[] values = received.get(name);
 			if (values == null || values.length == 0) {
 				String message = String.format("Parameter %s not found", name);
@@ -39,7 +66,7 @@ public class FormDataConverter {
 				readParam(dataStore, name, values, param);
 			}
 		}
-	}
+    }
 
 	private static void readParam(DataStore dataStore, String name, String[] values, Parameter param) throws ConversionException {
 		Data data = new Data(param);
