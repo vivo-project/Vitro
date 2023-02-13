@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -176,6 +177,11 @@ public class DatapropEditController extends BaseEditController {
                 assertionsDpDao.getEquivalentPropertyURIs(dp.getURI()), assertionsDpDao);
         sortForPickList(eqProps, vreq);
         request.setAttribute("equivalentProperties", eqProps);
+	
+        List<FauxProperty> fauxProps = vreq.getUnfilteredAssertionsWebappDaoFactory().getFauxPropertyDao().
+        		getFauxPropertiesForBaseUri(dp.getURI());
+        sortForPickList(fauxProps, vreq);
+        request.setAttribute("fauxproperties", fauxProps);	
 
         ApplicationBean appBean = vreq.getAppBean();
 

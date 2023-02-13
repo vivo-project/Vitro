@@ -33,7 +33,7 @@ public class LanguageFilteringUtils {
      * (as in RDF language specifiers).
      */
     public static String localeToLanguage(Locale locale) {
-        return locale.toString().replace(UNDERSCORE, HYPHEN);
+        return locale.toLanguageTag().replace(UNDERSCORE, HYPHEN);
     }
 	
     /**
@@ -69,9 +69,9 @@ public class LanguageFilteringUtils {
 		List<String> langs = new ArrayList<>();
 		while (locales.hasMoreElements()) {
 			Locale locale = (Locale) locales.nextElement();
-			langs.add(locale.toString().replace(UNDERSCORE, HYPHEN));
+			langs.add(locale.toLanguageTag().replace(UNDERSCORE, HYPHEN));
 		}
-		if (langs.isEmpty()) {
+		if (!langs.contains(DEFAULT_LANG_STRING)) {
 			langs.add(DEFAULT_LANG_STRING);
 		}
 

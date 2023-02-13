@@ -38,11 +38,6 @@ public class ChildVClassesWithParent implements FieldOptions {
         return this;
     }
 
-/*
- * UQAM-Linguistic-Management
- * This method is polymorphism of getOptions(EditConfigurationVTwo editConfig,String fieldName, WebappDaoFactory wDaoFact)
- * for the internationalization of word "other" in the scroling list of personHasAdvisorRelationship.ftl
- */
     public Map<String, String> getOptions(
             EditConfigurationVTwo editConfig,
             String fieldName,
@@ -53,16 +48,17 @@ public class ChildVClassesWithParent implements FieldOptions {
         if ( ! StringUtils.isEmpty( defaultOptionLabel ) ){
             optionsMap.put(LEFT_BLANK, defaultOptionLabel);
         }
-        String other_i18n = i18n.text("other");
-        // first character in capital
-        optionsMap.put(classUri, other_i18n.substring(0, 1).toUpperCase() + other_i18n.substring(1));
         VClassDao vclassDao = wDaoFact.getVClassDao();
+        VClass rdfClass = vclassDao.getVClassByURI(classUri);
+        if (rdfClass != null && !OWL.Nothing.getURI().equals(classUri)) {
+        	optionsMap.put(classUri, rdfClass.getName().trim());
+        }
         List<String> subClassList = vclassDao.getAllSubClassURIs(classUri);
         if (subClassList != null && subClassList.size() > 0) {
             for (String subClassUri : subClassList) {
-                VClass subClass = vclassDao.getVClassByURI(subClassUri);
-                if (subClass != null && !OWL.Nothing.getURI().equals(subClassUri)) {
-                    optionsMap.put(subClassUri, subClass.getName().trim());
+                rdfClass = vclassDao.getVClassByURI(subClassUri);
+                if (rdfClass != null && !OWL.Nothing.getURI().equals(subClassUri)) {
+                    optionsMap.put(subClassUri, rdfClass.getName().trim());
                 }
             }
         }
@@ -72,5 +68,5 @@ public class ChildVClassesWithParent implements FieldOptions {
     public Comparator<String[]> getCustomComparator() {
     	return null;
     }
-
+ 
 }

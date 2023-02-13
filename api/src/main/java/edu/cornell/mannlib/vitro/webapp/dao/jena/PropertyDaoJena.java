@@ -813,7 +813,9 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         List<ObjectProperty> stragglers = getAdditionalFauxSubpropertiesForVClasses(
                 vclasses, propInsts);
         for (ObjectProperty op : stragglers) {
-            propInsts.add(makePropInst(op));
+        	if (op != null) {
+        		propInsts.add(makePropInst(op));	
+        	}
         }
 
         return propInsts;

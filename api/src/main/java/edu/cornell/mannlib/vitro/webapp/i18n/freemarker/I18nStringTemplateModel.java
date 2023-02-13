@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.i18n.freemarker;
 import java.text.MessageFormat;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.i18n.TranslationProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,13 +38,10 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	private static final Log log = LogFactory
 			.getLog(I18nStringTemplateModel.class);
 
-	private final String bundleName;
 	private final String key;
 	private final String textString;
 
-	public I18nStringTemplateModel(String bundleName, String key,
-			String textString) {
-		this.bundleName = bundleName;
+	public I18nStringTemplateModel( String key,	String textString) {
 		this.key = key;
 		this.textString = textString;
 	}
@@ -56,8 +54,7 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Object exec(List args) throws TemplateModelException {
-		log.debug("Formatting string '" + key + "' from bundle '" + bundleName
-				+ "' with these arguments: " + args);
+		log.debug("Formatting string '" + key + "' with these arguments: " + args);
 
 		if (args.isEmpty()) {
 			return textString;
@@ -71,11 +68,10 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 				if(isOnlineTranslationsEnabled()) {
 					return getOnlineTranslationsFormattedMessage(textString, unwrappedArgs);
 				} else {
-					return MessageFormat.format(textString, unwrappedArgs);	
+					return MessageFormat.format(TranslationProvider.preprocessForFormating(textString), unwrappedArgs);
 				}
 			} catch (Exception e) {
-				String message = "Can't format '" + key + "' from bundle '"
-						+ bundleName + "', wrong argument types: " + args
+				String message = "Can't format '" + key + "', wrong argument types: " + args
 						+ " for message format'" + textString + "'";
 				log.warn(message);
 				return message;
@@ -88,13 +84,13 @@ public class I18nStringTemplateModel implements TemplateMethodModelEx,
 	 * and combines preProcessed string back to be used with online translations.
 	 * Substitutes arguments in message which is a part of preProcessed string  
 	 * @param preProcessed String "startSep + key + intSep + textString + intSep + message + endSep"
-	 * @param arguments that should be listed before message and substituted in the message itself 
+	 * @param args that should be listed before message and substituted in the message itself
 	 * @return
 	 */
 	private String getOnlineTranslationsFormattedMessage(String preProcessed, Object[] args) {
 		String[] parts = preProcessed.split(I18nBundle.INT_SEP);
 		final int messageIndex = parts.length -1;
-		String message = MessageFormat.format(parts[messageIndex], args);
+		String message = MessageFormat.format(TranslationProvider.preprocessForFormating(parts[messageIndex]), args);
 		String[] arguments = convertToArrayOfStrings(args);
 		parts[messageIndex] = "";
 		String result = String.join(I18nBundle.INT_SEP, parts) + 

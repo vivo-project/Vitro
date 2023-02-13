@@ -88,7 +88,7 @@ public class LocaleSelectionController extends HttpServlet {
 		if (!selectables.contains(locale)) {
 			log.warn("User selected a locale '" + locale
 					+ "' that was not in the list: " + selectables);
-		} else if (!LocaleUtils.isAvailableLocale(locale)) {
+		} else if (!LocaleUtils.isAvailableLocale(locale.stripExtensions())) {
 			log.warn("User selected an unrecognized locale: '" + locale + "'");
 		}
 

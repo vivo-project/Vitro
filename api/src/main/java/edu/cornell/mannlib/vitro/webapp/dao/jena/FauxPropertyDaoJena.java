@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.ontology.ObjectProperty;
@@ -152,20 +153,22 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 			Collection<String> rangeUris = getPropertyResourceURIValues(
 					context, QUALIFIED_BY_RANGE);
-			if (rangeUris.isEmpty()) {
-				log.debug("'" + contextUri + "' has no value for '"
-						+ QUALIFIED_BY_RANGE + "'");
-				return null;
+			String rangeUri = null;
+			if (!rangeUris.isEmpty()) {
+				rangeUri = rangeUris.iterator().next();
 			}
-			String rangeUri = rangeUris.iterator().next();
-
 			// domainURI is optional.
 			Collection<String> domainUris = getPropertyResourceURIValues(
 					context, QUALIFIED_BY_DOMAIN);
 			String domainUri = domainUris.isEmpty() ? null : domainUris
 					.iterator().next();
 
+			Collection<String> rootRangeUris = getPropertyResourceURIValues(context, QUALIFIED_BY_ROOT);
+			
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
+			if (!rootRangeUris.isEmpty()) {
+				fp.setRootRangeUri(rootRangeUris.iterator().next());
+			}
 			fp.setContextUri(contextUri);
 			populateInstance(fp);
 			log.debug("Loaded FauxProperty: " + fp);
@@ -214,7 +217,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 			addPropertyResourceValue(context, RDF.type, CONFIG_CONTEXT);
 			addPropertyResourceURIValue(context, CONFIG_CONTEXT_FOR,
 					fp.getBaseURI());
-			addPropertyResourceURIValue(context, QUALIFIED_BY_RANGE,
+			addPropertyResourceURINotEmpty(context, QUALIFIED_BY_RANGE,
 					fp.getRangeURI());
 			addPropertyResourceURINotEmpty(context, QUALIFIED_BY_DOMAIN,
 					fp.getDomainURI());
@@ -493,31 +496,22 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 	// ConfigContext
 	// ----------------------------------------------------------------------
 
-	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_DOMAIN = "" //
-			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
-			+ "\n" //
-			+ "SELECT DISTINCT ?context ?config \n" //
-			+ "WHERE { \n" //
-			+ "    ?context a :ConfigContext ; \n" //
-			+ "        :configContextFor ?baseUri ; \n" //
-			+ "        :qualifiedByDomain ?domainUri ; \n" //
-			+ "        :qualifiedBy ?rangeUri ; \n" //
-			+ "        :hasConfiguration ?config . \n" //
-			+ "} \n"; //
+	private static String queryLocateConfigContext(boolean hasDomain, boolean hasRange) {
+		return  "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" 
+				+ "SELECT DISTINCT ?context ?config \n" 
+				+ "WHERE { \n" 
+				+ "    ?context a :ConfigContext . \n" 
+				+ "    ?context :configContextFor ?baseUri . \n"
+				+ ( hasDomain ? "" : " FILTER NOT EXISTS { \n " ) 
+				+ "    ?context :qualifiedByDomain ?domainUri . \n"
+				+ ( hasDomain ? "" : "} \n" )
+				+ ( hasRange ? "" : " FILTER NOT EXISTS { \n " ) 
+				+ "    ?context :qualifiedBy ?rangeUri . \n"
+				+ ( hasRange ? "" : "} \n" )
+				+ "    ?context :hasConfiguration ?config . \n" 
+				+ "} \n"; 
 
-	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN = "" //
-			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
-			+ "\n" //
-			+ "SELECT DISTINCT ?context ?config \n" //
-			+ "WHERE { \n" //
-			+ "    ?context a :ConfigContext ; \n" //
-			+ "        :configContextFor ?baseUri ; \n" //
-			+ "        :qualifiedBy ?rangeUri ; \n" //
-			+ "        :hasConfiguration ?config . \n" //
-			+ "     FILTER NOT EXISTS { \n" //
-			+ "        ?context :qualifiedByDomain ?domainUri \n" //
-			+ "     } \n" //
-			+ "} \n"; //
+	}
 
 	private static class ParserLocateConfigContext extends
 			ResultSetParser<Set<ConfigContext>> {
@@ -556,22 +550,16 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 	private static class ConfigContext {
 		public static Set<ConfigContext> findByQualifiers(
-				LockableOntModel lockableDisplayModel, String domainUri,
-				String baseUri, String rangeUri) {
+				LockableOntModel lockableDisplayModel, String domainUri, String baseUri, String rangeUri) {
 			try (LockedOntModel displayModel = lockableDisplayModel.read()) {
-				QueryHolder qHolder;
-				if (domainUri == null || domainUri.trim().isEmpty()
-						|| domainUri.equals(OWL.Thing.getURI())) {
-					qHolder = queryHolder(
-							QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN)
-							.bindToUri("baseUri", baseUri).bindToUri(
-									"rangeUri", rangeUri);
-				} else {
-					qHolder = queryHolder(
-							QUERY_LOCATE_CONFIG_CONTEXT_WITH_DOMAIN)
-							.bindToUri("baseUri", baseUri)
-							.bindToUri("rangeUri", rangeUri)
-							.bindToUri("domainUri", domainUri);
+				boolean hasDomain = !StringUtils.isEmpty(domainUri) && !domainUri.equals(OWL.Thing.getURI());
+				boolean hasRange = !StringUtils.isEmpty(rangeUri);
+				QueryHolder qHolder = queryHolder(queryLocateConfigContext(hasDomain, hasRange)).bindToUri("baseUri", baseUri);
+				if (hasDomain) {
+					qHolder = qHolder.bindToUri("domainUri", domainUri);
+				}
+				if (hasRange) {
+					qHolder = qHolder.bindToUri("rangeUri", rangeUri);
 				}
 				if (log.isDebugEnabled()) {
 					log.debug("domainUri=" + domainUri + ", baseUri=" + baseUri

@@ -24,24 +24,19 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective;
 import freemarker.template.Configuration;
+import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
  * A framework that makes it simpler to send email messages with a body built
  * from a Freemarker template.
  *
- * The template must call the @email directive, which may provide the subject
- * line, the HTML content, and the plain text content. If these values are not
- * provided by the directive, they default to empty strings, or to values that
- * were set by the controller.
- *
- * @see EmailDirective
  */
 public class FreemarkerEmailMessage {
 	private static final Log log = LogFactory
@@ -56,7 +51,6 @@ public class FreemarkerEmailMessage {
 
 	private InternetAddress fromAddress = null;
 	private String subject = "";
-	private String templateName = "";
 	private String htmlContent = "";
 	private String textContent = "";
 	private Map<String, Object> bodyMap = Collections.emptyMap();
@@ -124,10 +118,6 @@ public class FreemarkerEmailMessage {
 		this.textContent = nonNull(textContent, "");
 	}
 
-	public void setTemplate(String templateName) {
-		this.templateName = nonNull(templateName, "");
-	}
-
 	public void setBodyMap(Map<String, Object> body) {
 		if (body == null) {
 			this.bodyMap = Collections.emptyMap();
@@ -137,15 +127,51 @@ public class FreemarkerEmailMessage {
 	}
 
 	public void processTemplate() {
-		bodyMap.put("email", new EmailDirective(this));
-
 		try {
-			config.getTemplate(templateName).process(bodyMap,
-					new StringWriter());
+			addDefaultBodyMapValues();
+			StringWriter writer = new StringWriter();
+			new Template(null, getInlineVariable("subject"), config).process(bodyMap, writer);
+			subject = writer.toString();
+			writer.getBuffer().setLength(0);
+			new Template(null, getEmailTemplate(), config).process(bodyMap, writer);
+			htmlContent = writer.toString();
+			writer.getBuffer().setLength(0);
+			new Template(null, getInlineVariable("textMessage"), config).process(bodyMap, writer);
+			textContent = writer.toString();
 		} catch (TemplateException | IOException e) {
 			log.error(e, e);
 		}
     }
+
+	private void addDefaultBodyMapValues() {
+		if (!bodyMap.containsKey("subject")) {
+			if (StringUtils.isBlank(subject)) {
+				bodyMap.put("subject", "No subject defined");	
+			}
+			bodyMap.put("subject", subject);	
+		}
+		if (!bodyMap.containsKey("textMessage")) {
+			bodyMap.put("textMessage", "No text message defined");
+		}
+		if (!bodyMap.containsKey("htmlMessage")) {
+			bodyMap.put("htmlMessage", "No html message defined");
+		}
+	}
+
+	private String getInlineVariable(String name) {
+		return "<@" + name + "?interpret />";
+	}
+	
+	private String getEmailTemplate() {
+		return "<html>\n"
+		+ "    <head>\n"
+		+ "        <title><@subject?interpret /></title>\n"
+		+ "    </head>\n"
+		+ "    <body>\n"
+		+ "		<@htmlMessage?interpret />\n"
+		+ "    </body>\n"
+		+ "</html>";
+	}
 
 	public boolean send() {
 		try {
@@ -182,13 +208,25 @@ public class FreemarkerEmailMessage {
 			}
 
 			msg.setSentDate(new Date());
-
-			Transport.send(msg);
+			sendMessage(msg);
 			return true;
 		} catch (MessagingException e) {
 			log.error("Failed to send message.", e);
 			return false;
 		}
+	}
+
+	private void sendMessage(MimeMessage msg) {
+		Thread thread = new Thread() {
+			public void run() {
+				try {
+					Transport.send(msg);
+				} catch (MessagingException e) {
+					log.error(e, e);
+				}
+			}
+		  };
+		  thread.start();
 	}
 
 	private void addBodyPart(MimeMultipart content, String textBody, String type)

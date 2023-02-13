@@ -644,7 +644,8 @@ var customForm = {
         if ( this.templateDefinedAcTypes && !this.defaultAcType.length ) {
             this.defaultAcType = this.acTypes[acTypeKey];
         }
-        if (selectedType.val().length) {
+        var selectedTypeLength = selectedType.val().length;
+        if ( selectedTypeLength !== 'undefined') {
             this.acTypes[acTypeKey] = selectedType.val();
             this.typeName = selectedType.html();
             if ( this.editMode == 'edit' ) {
@@ -709,10 +710,10 @@ var customForm = {
         // ac fields there are cases where we also have to check if the help text is already there
         if (!$(selectedObj).val() || $(selectedObj).hasClass(this.acHelpTextClass) || $(selectedObj).val().substring(0, 18) == customForm.selectAnExisting ) {
         	typeText = this.getTypeNameForLabels($(selectedObj));
-        	var helpText = customForm.selectAnExisting + " " + typeText + " " + customForm.orCreateNewOne ;
+        	var helpText = customForm.selectAnExistingOrCreateNewOne ;
         	//Different for object property autocomplete
         	if ( this.acSelectOnly ) {
-        		helpText = customForm.selectAnExisting + " " + typeText;
+        		helpText = customForm.selectAnExisting;
         	}
     		$(selectedObj).val(helpText)
     	               .addClass(this.acHelpTextClass);
@@ -758,5 +759,9 @@ var customForm = {
 };
 
 $(document).ready(function() {
-    customForm.onLoad();
+	try{
+	    customForm.onLoad();
+	} catch(error){
+		console.log(error.message);
+	}
 });

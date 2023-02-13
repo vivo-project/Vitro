@@ -149,7 +149,7 @@ name will be used as the label. -->
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
         <img class="add-individual" data-domain="${domainUri}" data-range="${rangeUri}" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
-        <a class="add-${propertyLocalName}" href="${url}" title="${i18n().add_new} ${label?lower_case} ${i18n().entry}">
+        <a class="add-${propertyLocalName}" href="${url}" title="${i18n().add_new_entry_for} ${label?lower_case}">
         <img class="add-individual" data-domain="${domainUri}" data-range="${rangeUri}" src="${urls.images}/individual/addIcon.gif" alt="${i18n().add}" /></a>
     </#if>
 </#macro>
@@ -353,5 +353,5 @@ name will be used as the label. -->
 </#function>
 
 <#function capitalizeGroupName propertyGroupName>
-    <#return propertyGroupName?capitalize>
+    <#return propertyGroupName?cap_first>
 </#function>

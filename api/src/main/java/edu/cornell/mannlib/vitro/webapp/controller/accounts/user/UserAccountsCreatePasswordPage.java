@@ -26,8 +26,6 @@ public class UserAccountsCreatePasswordPage extends
 			.getLog(UserAccountsCreatePasswordPage.class);
 
 	private static final String TEMPLATE_NAME = "userAccounts-createPassword.ftl";
-	private static final String EMAIL_TEMPLATE = "userAccounts-passwordCreatedEmail.ftl";
-
 	public UserAccountsCreatePasswordPage(VitroRequest vreq) {
 		super(vreq);
 	}
@@ -73,8 +71,11 @@ public class UserAccountsCreatePasswordPage extends
 		FreemarkerEmailMessage email = FreemarkerEmailFactory
 				.createNewMessage(vreq);
 		email.addRecipient(TO, userAccount.getEmailAddress());
-		email.setSubject(i18n.text("password_created_subject", getSiteName()));
-		email.setTemplate(EMAIL_TEMPLATE);
+		final String subject = i18n.text("password_created_subject", getSiteName());
+		email.setSubject(subject);
+		body.put("subject", subject);
+		body.put("textMessage", i18n.text("password_created_email_plain_text"));
+		body.put("htmlMessage", i18n.text("password_created_email_html_text"));
 		email.setBodyMap(body);
 		email.processTemplate();
 		email.send();

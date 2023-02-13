@@ -1,0 +1,12 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663600>
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        rdfs:label  "value from n3 file"@en-US ;
+        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+                "VIVO" ;
+        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+                "property_to_overwrite" .

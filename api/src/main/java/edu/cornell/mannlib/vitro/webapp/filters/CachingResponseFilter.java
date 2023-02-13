@@ -284,7 +284,7 @@ public class CachingResponseFilter implements Filter {
 
 		StringBuilder buffer = new StringBuilder("\"").append(rawEtag);
 		for (Locale locale : locales) {
-			buffer.append(locale.toString());
+			buffer.append(locale.toLanguageTag());
 		}
 		buffer.append("\"");
 

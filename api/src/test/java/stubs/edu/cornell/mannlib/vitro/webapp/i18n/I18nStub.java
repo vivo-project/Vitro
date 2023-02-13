@@ -51,14 +51,11 @@ public class I18nStub extends I18n {
 	}
 
 	@Override
-	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
-		return new I18nBundleStub(bundleName);
+	protected I18nBundle getBundle( HttpServletRequest req) {
+		return new I18nBundleStub();
 	}
 
-	private class I18nBundleStub extends I18nBundle {
-		public I18nBundleStub(String bundleName) {
-			super(bundleName, new DummyResourceBundle(), null);
-		}
+	private class I18nBundleStub implements I18nBundle {
 
 		@Override
 		public String text(String key, Object... parameters) {

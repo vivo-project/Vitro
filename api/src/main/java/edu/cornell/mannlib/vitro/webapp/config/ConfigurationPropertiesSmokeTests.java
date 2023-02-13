@@ -160,7 +160,7 @@ public class ConfigurationPropertiesSmokeTests implements
 				String vivoBundle = VIVO_BUNDLE_PREFIX + language + ".properties";
 				String vitroBundle = VITRO_BUNDLE_PREFIX + language + ".properties";
 				if (!i18nNames.contains(vivoBundle) && !i18nNames.contains(vitroBundle)) {
-					ss.warning(this, language + " was found in the value for "
+					ss.info(this, language + " was found in the value for "
 						+ PROPERTY_LANGUAGE_SELECTABLE + " but no corresponding "
 							+ "language file was found.");
 				}
