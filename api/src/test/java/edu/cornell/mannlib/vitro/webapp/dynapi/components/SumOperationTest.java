@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SumOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.BigIntegerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;

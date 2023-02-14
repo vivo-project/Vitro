@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.SparqlSelectQuery;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SparqlSelectQuery;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.ConditionalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;

@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ModelWriter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;

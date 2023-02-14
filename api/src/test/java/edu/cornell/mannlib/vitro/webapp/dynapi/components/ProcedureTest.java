@@ -12,6 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.access.GroupAccessWhitelist;
 import edu.cornell.mannlib.vitro.webapp.dynapi.access.UserAccessWhitelist;
 import edu.cornell.mannlib.vitro.webapp.dynapi.access.UserGroup;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.AssignOperation;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;

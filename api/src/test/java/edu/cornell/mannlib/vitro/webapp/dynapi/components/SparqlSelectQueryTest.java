@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SparqlSelectQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
@@ -46,7 +47,7 @@ public class SparqlSelectQueryTest {
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
 		sparql.setQueryText(QUERY_NO_VARS);
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
-		sparql.rdfService = new RDFServiceModel(model);
+		sparql.setRdfService(new RDFServiceModel(model));
 		Parameter strParam = ParameterUtils.createStringLiteralParameter(STR_VAR);
 		sparql.addOutputParameter(strParam);
 
