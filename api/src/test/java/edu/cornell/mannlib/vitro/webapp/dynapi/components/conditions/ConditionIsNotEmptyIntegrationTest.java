@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockitoAnnotations;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
@@ -50,14 +51,9 @@ public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest{
     @org.junit.runners.Parameterized.Parameter(1)
     public String result;
     
-    @AfterClass
-    public static void after() {
-        restoreLogs();
-    }
-    
     @BeforeClass
     public static void before() {
-        offLogs();
+        LoggingControl.offLogs();
     }
     
     @Before
@@ -68,6 +64,7 @@ public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest{
     
     @After
     public void reset() {
+        LoggingControl.restoreLogs();
     }
     
     @Test

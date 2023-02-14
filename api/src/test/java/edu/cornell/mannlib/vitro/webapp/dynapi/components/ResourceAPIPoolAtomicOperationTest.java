@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolOperation;
@@ -28,7 +29,8 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
     
     @Before
     public void preparePool() {
-       resourcePool = initWithDefaultModel();
+        LoggingControl.offLogs();
+        resourcePool = initWithDefaultModel();
     }
     
     @After
@@ -36,16 +38,7 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
         setup();
         resourcePool = initWithDefaultModel();
         assertEquals(0, resourcePool.count());
-    }
-    
-    @AfterClass
-    public static void after() {
-        restoreLogs();
-    }
-    
-    @BeforeClass
-    public static void before() {
-        offLogs();
+        LoggingControl.restoreLogs();
     }
     
     @Test

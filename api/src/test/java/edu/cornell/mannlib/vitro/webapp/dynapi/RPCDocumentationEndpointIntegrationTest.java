@@ -54,6 +54,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
 
     @Before
     public void beforeEach() throws IOException {
+        LoggingControl.offLogs();
         rpcEndpoint = new RPCDocumentationEndpoint();
 
         loadDefaultModel();
@@ -78,16 +79,11 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
         MockitoAnnotations.openMocks(this);
     }
 
-    @AfterClass
-    public static void after() {
-        restoreLogs();
+    @After
+    public void after() {
+        LoggingControl.restoreLogs();
     }
     
-    @BeforeClass
-    public static void before() {
-        offLogs();
-    }
-
     @Test
     public void doTest() throws IOException {
         String pathInfo = "";
