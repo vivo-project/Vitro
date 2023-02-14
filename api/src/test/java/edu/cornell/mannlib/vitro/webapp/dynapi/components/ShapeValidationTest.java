@@ -27,6 +27,7 @@ import org.mockito.MockedStatic;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphPool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ShapeValidation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;

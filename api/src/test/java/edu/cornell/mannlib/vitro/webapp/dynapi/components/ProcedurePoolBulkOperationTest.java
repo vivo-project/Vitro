@@ -13,6 +13,9 @@ import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolBulkOperation;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolOperation;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ProcedurePoolBulkOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 

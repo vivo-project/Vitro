@@ -1,113 +1,113 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
-@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
-@prefix dynapi_access: <java:edu.cornell.mannlib.vitro.webapp.dynapi.access#> .
+@prefix components: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix operations: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components.operations#> .
+@prefix steps: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components.steps#> .
+@prefix access: <java:edu.cornell.mannlib.vitro.webapp.dynapi.access#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
-@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
+@prefix types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
 
-dynapi:Procedure rdfs:subClassOf dynapi_java:Procedure .
+dynapi:Procedure rdfs:subClassOf components:Procedure .
 
-dynapi:OperationalStep rdfs:subClassOf dynapi_java:OperationalStep .
+dynapi:OperationalStep rdfs:subClassOf steps:OperationalStep .
 
-dynapi:ConditionalStep rdfs:subClassOf dynapi_java:conditions.ConditionalStep .
+dynapi:ConditionalStep rdfs:subClassOf steps:ConditionalStep .
 
-dynapi:Step rdfs:subClassOf dynapi_java:Step .
+dynapi:Step rdfs:subClassOf steps:Step .
 
-dynapi:Operation rdfs:subClassOf dynapi_java:AbstractOperation .
+dynapi:Operation rdfs:subClassOf operations:AbstractOperation .
 
-dynapi:N3Template rdfs:subClassOf dynapi_java:N3Template .
+dynapi:N3Template rdfs:subClassOf operations:N3Template .
 
-dynapi:SparqlSelectQuery rdfs:subClassOf dynapi_java:SparqlSelectQuery .
+dynapi:SparqlSelectQuery rdfs:subClassOf operations:SparqlSelectQuery .
 
-dynapi:SparqlConstructQuery rdfs:subClassOf dynapi_java:SparqlConstructQuery .
+dynapi:SparqlConstructQuery rdfs:subClassOf operations:SparqlConstructQuery .
 
-dynapi:SolrQuery rdfs:subClassOf dynapi_java:SolrQuery .
+dynapi:SolrQuery rdfs:subClassOf operations:SolrQuery .
 
-dynapi:ReportGenerator rdfs:subClassOf dynapi_java:ReportGenerator .
+dynapi:ReportGenerator rdfs:subClassOf operations:ReportGenerator .
 
-dynapi:Model rdfs:subClassOf dynapi_java:Parameter .
+dynapi:Model rdfs:subClassOf components:Parameter .
 
-dynapi:ModelWriter rdfs:subClassOf dynapi_java:ModelWriter .
+dynapi:ModelWriter rdfs:subClassOf operations:ModelWriter .
 
-dynapi:Parameter rdfs:subClassOf dynapi_java:Parameter .
+dynapi:Parameter rdfs:subClassOf components:Parameter .
 
-dynapi:ParameterType rdfs:subClassOf dynapi_types:ParameterType .
+dynapi:ParameterType rdfs:subClassOf types:ParameterType .
 
-dynapi:ArrayParameterType rdfs:subClassOf dynapi_types:ParameterType, dynapi_types:ArrayParameterType .
+dynapi:ArrayParameterType rdfs:subClassOf types:ParameterType, types:ArrayParameterType .
 
-dynapi:RDFType rdfs:subClassOf dynapi_types:RDFType .
+dynapi:RDFType rdfs:subClassOf types:RDFType .
 
-dynapi:ImplementationType rdfs:subClassOf dynapi_types:ImplementationType .
+dynapi:ImplementationType rdfs:subClassOf types:ImplementationType .
 
-dynapi:ImplementationConfig rdfs:subClassOf dynapi_types:ImplementationConfig .
+dynapi:ImplementationConfig rdfs:subClassOf types:ImplementationConfig .
 
-dynapi:PrimitiveSerializationType rdfs:subClassOf dynapi_java:serialization.PrimitiveSerializationType, dynapi_java:serialization.SerializationType .
+dynapi:PrimitiveSerializationType rdfs:subClassOf components:serialization.PrimitiveSerializationType, components:serialization.SerializationType .
 
-dynapi:ArraySerializationType rdfs:subClassOf dynapi_java:serialization.ArraySerializationType, dynapi_java:serialization.SerializationType .
+dynapi:ArraySerializationType rdfs:subClassOf components:serialization.ArraySerializationType, components:serialization.SerializationType .
 
-dynapi:JsonContainerSerializationType rdfs:subClassOf dynapi_java:serialization.JsonContainerSerializationType, dynapi_java:serialization.SerializationType .
+dynapi:JsonContainerSerializationType rdfs:subClassOf components:serialization.JsonContainerSerializationType, components:serialization.SerializationType .
 
-dynapi:ResourceAPI rdfs:subClassOf dynapi_java:ResourceAPI .
+dynapi:ResourceAPI rdfs:subClassOf components:ResourceAPI .
 
-dynapi:Rpc rdfs:subClassOf dynapi_java:RPC .
+dynapi:Rpc rdfs:subClassOf components:RPC .
 
-dynapi:HttpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
+dynapi:HttpMethod rdfs:subClassOf components:HTTPMethod .
 
-dynapi:CustomRESTAction rdfs:subClassOf dynapi_java:CustomRESTAction .
+dynapi:CustomRESTAction rdfs:subClassOf components:CustomRESTAction .
 
-dynapi:Api rdfs:subClassOf dynapi_java:APIInformation .
+dynapi:Api rdfs:subClassOf components:APIInformation .
 
-dynapi:Condition rdfs:subClassOf dynapi_java:conditions.Condition .
+dynapi:Condition rdfs:subClassOf components:conditions.Condition .
 
-dynapi:ConditionIsNotEmpty rdfs:subClassOf dynapi_java:conditions.ConditionIsNotEmpty .
+dynapi:ConditionIsNotEmpty rdfs:subClassOf components:conditions.ConditionIsNotEmpty .
 
-dynapi:ConditionContainerContains rdfs:subClassOf dynapi_java:conditions.ConditionContainerContains .
+dynapi:ConditionContainerContains rdfs:subClassOf components:conditions.ConditionContainerContains .
 
-dynapi:ConditionIsParameter rdfs:subClassOf dynapi_java:conditions.ConditionIsParameter .
+dynapi:ConditionIsParameter rdfs:subClassOf components:conditions.ConditionIsParameter .
 
-dynapi:UserGroup rdfs:subClassOf dynapi_access:UserGroup .
+dynapi:UserGroup rdfs:subClassOf access:UserGroup .
 
-dynapi:AccessWhitelist rdfs:subClassOf dynapi_access:AccessWhitelist .
+dynapi:AccessWhitelist rdfs:subClassOf access:AccessWhitelist .
 
-dynapi:GroupAccessWhitelist rdfs:subClassOf dynapi_access:GroupAccessWhitelist .
+dynapi:GroupAccessWhitelist rdfs:subClassOf access:GroupAccessWhitelist .
 
-dynapi:PoolOperation rdfs:subClassOf dynapi_java:PoolOperation .
+dynapi:PoolOperation rdfs:subClassOf operations:PoolOperation .
 
-dynapi:PoolAtomicOperation rdfs:subClassOf dynapi_java:PoolAtomicOperation .
+dynapi:PoolAtomicOperation rdfs:subClassOf operations:PoolAtomicOperation .
 
-dynapi:PoolBulkOperation rdfs:subClassOf dynapi_java:PoolBulkOperation .
+dynapi:PoolBulkOperation rdfs:subClassOf operations:PoolBulkOperation .
 
-dynapi:ProcedurePoolBulkOperation rdfs:subClassOf dynapi_java:ProcedurePoolBulkOperation .
+dynapi:ProcedurePoolBulkOperation rdfs:subClassOf operations:ProcedurePoolBulkOperation .
 
-dynapi:ResourceAPIPoolBulkOperation rdfs:subClassOf dynapi_java:ResourceAPIPoolBulkOperation .
+dynapi:ResourceAPIPoolBulkOperation rdfs:subClassOf operations:ResourceAPIPoolBulkOperation .
 
-dynapi:ProcedurePoolAtomicOperation rdfs:subClassOf dynapi_java:ProcedurePoolAtomicOperation .
+dynapi:ProcedurePoolAtomicOperation rdfs:subClassOf operations:ProcedurePoolAtomicOperation .
 
-dynapi:ResourceAPIPoolAtomicOperation rdfs:subClassOf dynapi_java:ResourceAPIPoolAtomicOperation .
+dynapi:ResourceAPIPoolAtomicOperation rdfs:subClassOf operations:ResourceAPIPoolAtomicOperation .
 
-dynapi:RPCPoolAtomicOperation rdfs:subClassOf dynapi_java:RPCPoolAtomicOperation .
+dynapi:RPCPoolAtomicOperation rdfs:subClassOf operations:RPCPoolAtomicOperation .
 
-dynapi:RPCPoolAtomicOperation rdfs:subClassOf dynapi_java:RPCPoolAtomicOperation .
+dynapi:RPCPoolAtomicOperation rdfs:subClassOf operations:RPCPoolAtomicOperation .
 
-dynapi:ProcedureDescriptor rdfs:subClassOf dynapi_java:ProcedureDescriptor .
+dynapi:ProcedureDescriptor rdfs:subClassOf components:ProcedureDescriptor .
 
-dynapi:Validator rdfs:subClassOf dynapi_java:validators.Validator .
+dynapi:Validator rdfs:subClassOf components:validators.Validator .
 
-dynapi:LoopOperation rdfs:subClassOf dynapi_java:LoopOperation .
+dynapi:LoopOperation rdfs:subClassOf operations:LoopOperation .
 
-dynapi:LoopOperation rdfs:subClassOf dynapi_java:LoopOperation .
+dynapi:ContainerLoader rdfs:subClassOf operations:ContainerLoader .
 
-dynapi:ContainerLoader rdfs:subClassOf dynapi_java:ContainerLoader .
+dynapi:ContainerQuery rdfs:subClassOf operations:ContainerQuery .
 
-dynapi:ContainerQuery rdfs:subClassOf dynapi_java:ContainerQuery .
+dynapi:SumOperation rdfs:subClassOf operations:SumOperation .
 
-dynapi:SumOperation rdfs:subClassOf dynapi_java:SumOperation .
+dynapi:AssignOperation rdfs:subClassOf operations:AssignOperation .
 
-dynapi:AssignOperation rdfs:subClassOf dynapi_java:AssignOperation .
+dynapi:ProcedureCallOperation rdfs:subClassOf operations:ProcedureCallOperation .
 
-dynapi:ProcedureCallOperation rdfs:subClassOf dynapi_java:ProcedureCallOperation .
+dynapi:ShapeValidation rdfs:subClassOf operations:ShapeValidation .
 
-dynapi:ShapeValidation rdfs:subClassOf dynapi_java:ShapeValidation .
-
-dynapi:ErrorStep rdfs:subClassOf dynapi_java:ErrorStep .
+dynapi:ErrorStep rdfs:subClassOf steps:ErrorStep .

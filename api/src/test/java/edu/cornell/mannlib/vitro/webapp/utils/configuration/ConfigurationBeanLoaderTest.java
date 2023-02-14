@@ -25,7 +25,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationRdfParser.InvalidConfigurationRdfException;
