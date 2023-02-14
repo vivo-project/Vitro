@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.NullStep;
 
 public class ExecutionTree {
     private Map<StepInfo, List<StepInfo>> forwardMap;

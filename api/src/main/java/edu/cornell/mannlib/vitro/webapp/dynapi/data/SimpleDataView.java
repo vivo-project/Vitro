@@ -9,7 +9,7 @@ import org.apache.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.SparqlSelectQuery;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SparqlSelectQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class SimpleDataView {

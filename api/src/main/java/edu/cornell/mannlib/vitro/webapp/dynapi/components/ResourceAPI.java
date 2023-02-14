@@ -2,6 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ResourceAPI extends AbstractPoolComponent implements Versionable<ResourceAPIKey> {

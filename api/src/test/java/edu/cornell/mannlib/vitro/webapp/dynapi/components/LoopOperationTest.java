@@ -3,6 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.LoopOperation;
+
 public class LoopOperationTest {
 
     @Test
