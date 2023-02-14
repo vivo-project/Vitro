@@ -16,8 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class LoopOperation extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(LoopOperation.class.getName());
-    private Parameters outputParams = new Parameters();
-    private Parameters inputParams = new Parameters();
     private boolean inputCalculated = false;
     private Parameters internalParams = new Parameters();
     private List<ProcedureDescriptor> inputDescriptors = new LinkedList<>();
@@ -65,11 +63,6 @@ public class LoopOperation extends AbstractOperation {
         return dependencies;
     }
 
-    @Override
-    public Parameters getOutputParams() {
-        return outputParams;
-    }
-
     public List<ProcedureDescriptor> getInputDescriptors() {
         return inputDescriptors;
     }
@@ -91,10 +84,7 @@ public class LoopOperation extends AbstractOperation {
     }
 
     @Override
-    public OperationResult run(DataStore dataStore) {
-        if (!isValid(dataStore)) {
-            return OperationResult.internalServerError();
-        }
+    public OperationResult runOperation(DataStore dataStore) {
         OperationResult result = OperationResult.ok();
         try {
             LoopOperationExecution execution = new LoopOperationExecution(dataStore, this);
@@ -104,10 +94,6 @@ public class LoopOperation extends AbstractOperation {
             return OperationResult.internalServerError();
         }
         return result;
-    }
-
-    @Override
-    public void dereference() {
     }
 
     @Override
@@ -166,8 +152,8 @@ public class LoopOperation extends AbstractOperation {
         return inputConvertersProvided;
     }
 
-    protected boolean isValid(DataStore dataStore) {
-        if (!isValid()) {
+    public boolean isInputValid(DataStore dataStore) {
+        if (!super.isInputValid(dataStore)) {
             return false;
         }
         if (!areDescriptorsValid(dataStore)) {

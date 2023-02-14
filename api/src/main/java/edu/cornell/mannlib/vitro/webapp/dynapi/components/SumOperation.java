@@ -13,14 +13,9 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.IntegerView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class SumOperation extends AbstractOperation {
-
     private static final Log log = LogFactory.getLog(SumOperation.class);
-
-    private Parameters inputParams = new Parameters();
-    private Parameters outputParams = new Parameters();
     private Parameter outputParam;
 
-    
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter", minOccurs = 1, maxOccurs = 1)
     public void addOutputParameter(Parameter param){
         outputParams.add(param);
@@ -33,10 +28,7 @@ public class SumOperation extends AbstractOperation {
     }
     
     @Override
-    public OperationResult run(DataStore dataStore) {
-        if (!isValid(dataStore)) {
-            return OperationResult.internalServerError();
-        }
+    public OperationResult runOperation(DataStore dataStore) {
         BigDecimal result = compute(dataStore);
         createOutput(result,dataStore);
         return OperationResult.ok();
@@ -73,10 +65,6 @@ public class SumOperation extends AbstractOperation {
         return result;
     }
 
-    @Override
-    public void dereference() {}
-
-
     public boolean isValid() {
         if (outputParam == null) {
             log.error("output parameter is not set");
@@ -96,32 +84,4 @@ public class SumOperation extends AbstractOperation {
         }
         return true;
     }
-    
-    public boolean isValid(DataStore dataStore) {
-        if (!isValid()) {
-            return false;
-        }
-        if (dataStore == null) {
-            log.error("data store is null");
-            return false;
-        }
-        for (String name : inputParams.getNames()) {
-            if (!dataStore.contains(name)) {
-                log.error(String.format("Input parameter '%s' is not provided in data store", name));
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    @Override
-    public Parameters getInputParams() {
-        return inputParams;
-    }
-    
-    @Override
-    public Parameters getOutputParams() {
-        return outputParams;
-    }
-
 }

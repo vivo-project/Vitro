@@ -21,8 +21,6 @@ public abstract class PoolOperation extends AbstractOperation {
 		LOAD, UNLOAD, RELOAD, STATUS
 	};
 
-	protected Parameters inputParams = new Parameters();
-	protected Parameters outputParams = new Parameters();
 	protected AbstractPool pool;
 	protected OperationType operationType;
 
@@ -44,10 +42,7 @@ public abstract class PoolOperation extends AbstractOperation {
 	}
 
 	@Override
-	public OperationResult run(DataStore dataStore) {
-		if (!isValid(dataStore)) {
-			return OperationResult.internalServerError();
-		}
+	public OperationResult runOperation(DataStore dataStore) {
 		if (OperationType.LOAD.equals(operationType)) {
 			return loadComponents(dataStore);
 		} else if (OperationType.RELOAD.equals(operationType)) {
@@ -68,29 +63,13 @@ public abstract class PoolOperation extends AbstractOperation {
 	protected abstract OperationResult reloadComponents(DataStore dataStore);
 
 	protected abstract OperationResult loadComponents(DataStore dataStore);
-
-	@Override
-	public void dereference() {}
-
-	@Override
-	public Parameters getInputParams() {
-		return inputParams;
-	}
-
-	@Override
-	public Parameters getOutputParams() {
-		return outputParams;
-	}
 	
-    protected boolean isValid(DataStore dataStore) {
-        for (String paramName : inputParams.getNames()) {
-            if (!dataStore.contains(paramName)) {
-                log.debug("Parameter '" + paramName + "' wasn't provided");
-                return false;
-            }
+    public boolean isValid() {
+        if (operationType == null) {
+            return false;
         }
         return true;
-    };
+    }
 
     protected List<JsonContainer> getOutputJsonObjects(DataStore dataStore) {
         return JsonContainerView.getOutputJsonObjectList(outputParams, dataStore);

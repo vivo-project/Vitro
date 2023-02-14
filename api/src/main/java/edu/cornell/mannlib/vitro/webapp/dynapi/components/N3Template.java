@@ -9,7 +9,6 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Literal;
@@ -18,10 +17,7 @@ import org.apache.jena.rdf.model.Model;
 import java.util.*;
 
 public class N3Template extends AbstractOperation implements Template {
-
 	private static final Log log = LogFactory.getLog(N3Template.class);
-
-	private Parameters inputParams = new Parameters();
 	private String n3TextAdditions = "";
 	private String n3TextRetractions = "";
 	private Parameter modelParam;
@@ -51,31 +47,12 @@ public class N3Template extends AbstractOperation implements Template {
 		this.n3TextRetractions = n3TextRetractions;
 	}
 
-	// endregion
-
-	// region Getters
-
-	@Override
-	public Parameters getInputParams() {
-		return inputParams;
-	}
-
-	@Override
-	public Parameters getOutputParams() {
-		return new Parameters();
-	}
-
 	public String getN3TextAdditions() { return this.n3TextAdditions; }
 
 	public String getN3TextRetractions() { return this.n3TextRetractions; }
 
-	//endregion
-
 	@Override
-	public OperationResult run(DataStore dataStore) {
-		if (!isValid(dataStore)) {
-			return OperationResult.internalServerError();
-		}		
+	public OperationResult runOperation(DataStore dataStore) {
 		String substitutedN3AdditionsTemplate;
 		String substitutedN3RetractionsTemplate;
 		try {
@@ -118,15 +95,7 @@ public class N3Template extends AbstractOperation implements Template {
 		return OperationResult.ok();
 	}
 
-	private boolean isValid(DataStore dataStore) {
-		boolean result = isValid();
-		if (!isInputValid(dataStore)) {
-			result = false;
-		}
-		return result;
-	}
-	
-	private boolean isValid() {
+	public boolean isValid() {
 		boolean result = true;
 		if (modelParam == null) {
 			log.error("Model param is not provided in configuration");
@@ -167,9 +136,5 @@ public class N3Template extends AbstractOperation implements Template {
          */
 		return n3WithParameters.get(0); 
 	}
-
-
-	@Override
-	public void dereference() {}
 
 }
