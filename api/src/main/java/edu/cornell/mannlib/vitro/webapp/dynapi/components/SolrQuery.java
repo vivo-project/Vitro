@@ -18,12 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class SolrQuery extends AbstractOperation {
-
     private static final Log log = LogFactory.getLog(SolrQuery.class);
-
-    private Parameters inputParams = new Parameters();
-    private Parameters outputParams = new Parameters();
-
     private String queryText;
     private String offset;
     private String limit;
@@ -83,16 +78,6 @@ public class SolrQuery extends AbstractOperation {
 
     // region Getters
 
-    @Override
-    public Parameters getInputParams() {
-        return inputParams;
-    }
-
-    @Override
-    public Parameters getOutputParams() {
-        return outputParams;
-    }
-
     public String getQueryText() {
         return queryText;
     }
@@ -124,11 +109,7 @@ public class SolrQuery extends AbstractOperation {
     // endregion
 
     @Override
-    public OperationResult run(DataStore input) {
-        if (!isInputValid(input)) {
-            return OperationResult.badRequest();
-        }
-
+    public OperationResult runOperation(DataStore input) {
         SearchQuery searchQuery;
         try {
             searchQuery = createSearchQuery(input);
@@ -149,6 +130,10 @@ public class SolrQuery extends AbstractOperation {
         }
 
         return OperationResult.ok();
+    }
+    
+    public boolean isValid() {
+        return true;
     }
 
     private SearchQuery createSearchQuery(DataStore dataStore)
@@ -197,10 +182,5 @@ public class SolrQuery extends AbstractOperation {
         }
 
         return property;
-    }
-
-    @Override
-    public void dereference() {
-
     }
 }

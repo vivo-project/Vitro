@@ -16,7 +16,6 @@ public class ContainerLoader extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(ContainerLoader.class);
     
-    private Parameters inputParams = new Parameters();
     private Parameter containerParam;
     private Parameter paramToLoad;
     private String key;
@@ -49,10 +48,7 @@ public class ContainerLoader extends AbstractOperation {
     }
     
     @Override
-    public OperationResult run(DataStore dataStore) {
-        if (!isValid(dataStore)) {
-            return OperationResult.internalServerError();
-        }
+    public OperationResult runOperation(DataStore dataStore) {
         JsonContainer container = JsonContainerView.getJsonContainer(dataStore, containerParam);
         Data input = dataStore.getData(getLoadParamName());
         if (StringUtils.isEmpty(key) && keyParameter == null ) {
@@ -77,19 +73,6 @@ public class ContainerLoader extends AbstractOperation {
         return paramToLoad.getName();
     }
 
-    @Override
-    public void dereference() {}
-
-    @Override
-    public Parameters getInputParams() {
-        return inputParams;
-    }
-
-    @Override
-    public Parameters getOutputParams() {
-        return new Parameters();
-    }
-    
     public boolean isValid() {
         if (paramToLoad == null) {
             log.error("parameter to load into container is not set");
@@ -106,12 +89,8 @@ public class ContainerLoader extends AbstractOperation {
         return true;
     }
     
-    public boolean isValid(DataStore dataStore) {
-        if (!isValid()) {
-            return false;
-        }
-        if (dataStore == null) {
-            log.error("data store is null");
+    public boolean isInputValid(DataStore dataStore) {
+        if (!super.isInputValid(dataStore)) {
             return false;
         }
         Data container = dataStore.getData(containerParam.getName());
