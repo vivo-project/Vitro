@@ -24,7 +24,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.AbstractOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SolrQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -63,18 +65,20 @@ public class SolrQueryTest extends ServletContextTest {
 
     @BeforeClass
     public static void setupStaticObjects() {
-        offLogs();
         applicationUtils = mockStatic(ApplicationUtils.class);
     }
 
     @AfterClass
     public static void after() {
         applicationUtils.close();
-        restoreLogs();
+
     }
 
     @Before
     public void setupQuery() throws Exception{
+        LoggingControl.offLogs();
+        LoggingControl.offLog(AbstractOperation.class);
+        LoggingControl.offLog(SolrQuery.class);
         when(ApplicationUtils.instance()).thenReturn(application);
         when(application.getSearchEngine()).thenReturn(searchEngine);
         when(searchEngine.createQuery()).thenReturn(searchQuery);
@@ -85,6 +89,9 @@ public class SolrQueryTest extends ServletContextTest {
     
     @After
     public void reset() {
+        LoggingControl.restoreLogs();
+        LoggingControl.restoreLog(AbstractOperation.class);
+        LoggingControl.restoreLog(SolrQuery.class);
     }
 
     @Test
