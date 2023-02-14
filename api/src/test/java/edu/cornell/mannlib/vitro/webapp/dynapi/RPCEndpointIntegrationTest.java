@@ -94,18 +94,17 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @BeforeClass
     public static void setupStaticObjects() {
-        offLogs();
     	dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
     
     @AfterClass
     public static void after() {
         dynapiModelFactory.close();   
-        restoreLogs();
     }
     
     @Before
     public void beforeEach() throws Exception {
+        offLogs();
         procedurePool = ProcedurePool.getInstance();
         rpcPool = RPCPool.getInstance();
 
@@ -157,24 +156,25 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        restoreLogs();
     }
     
     public static void offLogs(){
-        ServletContextTest.offLogs();
-        offLog(RPCEndpoint.class);
-        offLog(Endpoint.class);
-        offLog(FormDataConverter.class);
-        offLog(ConversionMethod.class);
-        offLog(ImplementationType.class);
+        LoggingControl.offLogs();
+        LoggingControl.offLog(RPCEndpoint.class);
+        LoggingControl.offLog(Endpoint.class);
+        LoggingControl.offLog(FormDataConverter.class);
+        LoggingControl.offLog(ConversionMethod.class);
+        LoggingControl.offLog(ImplementationType.class);
     }
     
     public static void restoreLogs(){
-        ServletContextTest.restoreLogs();
-        restoreLog(RPCEndpoint.class);
-        restoreLog(Endpoint.class);
-        restoreLog(FormDataConverter.class);
-        restoreLog(ConversionMethod.class);
-        restoreLog(ImplementationType.class);
+        LoggingControl.restoreLogs();
+        LoggingControl.restoreLog(RPCEndpoint.class);
+        LoggingControl.restoreLog(Endpoint.class);
+        LoggingControl.restoreLog(FormDataConverter.class);
+        LoggingControl.restoreLog(ConversionMethod.class);
+        LoggingControl.restoreLog(ImplementationType.class);
     }
 
     @Test

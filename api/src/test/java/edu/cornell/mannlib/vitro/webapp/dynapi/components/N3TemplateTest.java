@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.N3Template;
@@ -67,12 +68,16 @@ public class N3TemplateTest extends ServletContextTest {
     @AfterClass
     public static void after() {
     	dynapiModelFactory.close();
-    	restoreLogs();
+    }
+    
+    @After
+    public void reset() {
+        LoggingControl.restoreLogs();
+        LoggingControl.restoreLog(N3Template.class);
     }
     
     @BeforeClass
     public static void setupStaticObjects(){
-        offLogs();
         anyURI = new PrimitiveSerializationType();
         anyURI.setName("anyURI");
         stringType = new PrimitiveSerializationType();
@@ -84,6 +89,8 @@ public class N3TemplateTest extends ServletContextTest {
     
     @Before
     public void setupTemplate(){
+        LoggingControl.offLogs();
+        LoggingControl.offLog(N3Template.class);
         writeModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(writeModel);
         this.n3Template = new N3Template();

@@ -17,6 +17,7 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -25,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ShapeValidation;
@@ -82,20 +84,24 @@ public class ShapeValidationTest extends ServletContextTest {
     private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
     OntModel shapesModel = ModelFactory.createOntologyModel();
 
+    @After
+    public void reset() {
+        LoggingControl.restoreLogs();
+    }
+    
     @AfterClass
     public static void after() {
-        restoreLogs();
         dynapiModelFactory.close();
     }
 
     @BeforeClass
     public static void before() {
-        offLogs();
         dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
 
     @Before
     public void beforeEach() {
+        LoggingControl.offLogs();
         shapesModel = new OntModelImpl(OntModelSpec.OWL_MEM);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq(DYNAPI_ABOX_URI))).thenReturn(ontModel);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq(SHAPES_MODEL_URI))).thenReturn(shapesModel);

@@ -13,9 +13,8 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -56,6 +55,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
 
     @Before
     public void beforeEach() throws IOException {
+        LoggingControl.offLogs();
         restEndpoint = new RESTDocumentationEndpoint();
 
         loadDefaultModel();
@@ -82,16 +82,11 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
         MockitoAnnotations.openMocks(this);
     }
 
-    @AfterClass
-    public static void after() {
-        restoreLogs();
+    @After
+    public void reset() {
+        LoggingControl.restoreLogs();
     }
     
-    @BeforeClass
-    public static void before() {
-        offLogs();
-    }
-
     @Test
     public void doTest() throws IOException {
         String pathInfo = "/" + testVersion;

@@ -109,18 +109,17 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @BeforeClass
     public static void setupStaticObjects() {
-        offLogs();
     	dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
     
     @AfterClass
     public static void after() {
     	dynapiModelFactory.close();
-        restoreLogs();
     }
     
     @Before
     public void beforeEach() throws IOException {
+        LoggingControl.offLogs();
         actionPool = ProcedurePool.getInstance();
         resourceAPIPool = ResourceAPIPool.getInstance();
 
@@ -143,6 +142,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     
     @After
     public void reset() {
+        LoggingControl.restoreLogs();
     }
 
     @Test

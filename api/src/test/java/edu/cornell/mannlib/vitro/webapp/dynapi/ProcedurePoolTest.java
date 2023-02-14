@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -32,16 +33,12 @@ public class ProcedurePoolTest extends ServletContextTest {
 
         assertEquals(0, procedurePool.count());
         assertEquals(0, procedurePool.obsoleteCount());
+        LoggingControl.restoreLogs();
     }
     
-    @AfterClass
-    public static void after() {
-        restoreLogs();
-    }
-    
-    @BeforeClass 
-    public static void before() {
-        offLogs();
+    @Before 
+    public void before() {
+        LoggingControl.offLogs();
     }
 
     @Test
