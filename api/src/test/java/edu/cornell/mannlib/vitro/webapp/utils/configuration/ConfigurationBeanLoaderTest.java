@@ -22,10 +22,14 @@ import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationRdfParser.InvalidConfigurationRdfException;
@@ -36,6 +40,17 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.Reso
 public class ConfigurationBeanLoaderTest extends
 		ConfigurationBeanLoaderTestBase {
 
+    @After
+    public void after() {
+        LoggingControl.restoreLogs();
+    }
+    
+    @Before
+    public void before() {
+        LoggingControl.offLogs();
+    }
+
+    
 	// ----------------------------------------------------------------------
 	// Constructor tests
 	// ----------------------------------------------------------------------

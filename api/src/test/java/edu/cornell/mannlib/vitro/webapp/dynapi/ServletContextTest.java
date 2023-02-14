@@ -8,16 +8,12 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
@@ -48,7 +44,6 @@ public abstract class ServletContextTest {
     protected OntModel ontModel;
 
     protected ConfigurationBeanLoader loader;
-    private static Map<Class,Level> logLevels = new HashMap<>();
 
     @Before
     public void setup() {
@@ -65,35 +60,6 @@ public abstract class ServletContextTest {
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
-    public static void offLog(Class clazz) {
-        if (!logLevels.containsKey(clazz)) {
-            final Logger logger = Logger.getLogger(clazz);
-            Level level = logger.getLevel();
-            logLevels.put(clazz, level);
-            logger.setLevel(Level.OFF);
-        }
-    }
-    
-    public static void restoreLog(Class clazz) {
-        if (logLevels.containsKey(clazz)) {
-            Level level = logLevels.get(clazz);
-            Logger.getLogger(clazz).setLevel(level);
-            logLevels.remove(clazz);
-        }
-    }
-    
-    public static void offLogs() {
-        offLog(ResourceAPIPool.class);
-        offLog(RPCPool.class);
-        offLog(ProcedurePool.class);
-    }
-    
-    public static void restoreLogs() {
-        restoreLog(ResourceAPIPool.class);
-        restoreLog(RPCPool.class);
-        restoreLog(ProcedurePool.class);
-    }
-    
     protected void loadTestModel() throws IOException {
         // all actions reuse testSparqlQuery1 from testing action
         loadModel(

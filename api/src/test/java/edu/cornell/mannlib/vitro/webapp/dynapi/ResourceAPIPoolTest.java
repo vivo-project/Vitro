@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullResourceAPI;
@@ -29,18 +27,9 @@ public class ResourceAPIPoolTest extends ServletContextTest {
     protected final static String TEST_PERSON_PROCEDURE_URI_4 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction4";
     protected final static String TEST_PERSON_PROCEDURE_URI_5 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction5";
 
-    @BeforeClass
-    public static void before() {
-        offLogs();
-    }
-    
-    @AfterClass
-    public static void after() {
-        restoreLogs();
-    }
-    
     @Before
     public void beforeEach() {
+        LoggingControl.offLogs();
         setup();
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
         resourceAPIPool.init(servletContext);
@@ -74,6 +63,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         assertEquals(0, procedurePool.count());
         assertEquals(0, procedurePool.obsoleteCount());
+        LoggingControl.restoreLogs();
     }
     
 

@@ -24,15 +24,18 @@ import org.docx4j.Docx4jProperties;
 import org.docx4j.TraversalUtil;
 import org.docx4j.XmlUtils;
 import org.docx4j.openpackaging.io.SaveToZipFile;
+import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.utils.ResourceUtils;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.haulmont.yarg.formatters.impl.XlsxFormatter;
+
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -58,36 +61,33 @@ public class ReportGeneratorIntegrationTest extends ServletContextTest {
 	@org.junit.runners.Parameterized.Parameter(2)
 	public String extension;
 
-	@BeforeClass
-	public static void before() {
-	    offLogs();
-        offLog(Docx4jProperties.class);
-        offLog(ResourceUtils.class);
-        offLog(XmlUtils.class);
-        offLog(TraversalUtil.class);
-        offLog(SaveToZipFile.class);
-        offLog(ContentTypeManager.class);
-	}
-	
 	@Before
 	public void beforeEach() {
 		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
-	}
-	
-	@AfterClass
-	public static void after() {
-	    restoreLogs();
-        restoreLog(Docx4jProperties.class);
-        restoreLog(ResourceUtils.class);
-        restoreLog(XmlUtils.class);
-        restoreLog(TraversalUtil.class);
-        restoreLog(SaveToZipFile.class);
-        restoreLog(ContentTypeManager.class);
-	}
+        LoggingControl.offLogs();
+        LoggingControl.offLog(Docx4jProperties.class);
+        LoggingControl.offLog(ResourceUtils.class);
+        LoggingControl.offLog(XmlUtils.class);
+        LoggingControl.offLog(TraversalUtil.class);
+        LoggingControl.offLog(SaveToZipFile.class);
+        LoggingControl.offLog(ContentTypeManager.class);
+        LoggingControl.offLog(XlsxFormatter.class);
+        LoggingControl.offLog(SpreadsheetMLPackage.class);
+        LoggingControl.offLog(DocPropsCustomPart.class);
+    }
 	
 	@After
 	public void reset() {
-	   
+	    LoggingControl.restoreLogs();
+        LoggingControl.restoreLog(Docx4jProperties.class);
+        LoggingControl.restoreLog(ResourceUtils.class);
+        LoggingControl.restoreLog(XmlUtils.class);
+        LoggingControl.restoreLog(TraversalUtil.class);
+        LoggingControl.restoreLog(SaveToZipFile.class);
+        LoggingControl.restoreLog(ContentTypeManager.class);
+        LoggingControl.restoreLog(XlsxFormatter.class);
+        LoggingControl.restoreLog(SpreadsheetMLPackage.class);
+        LoggingControl.restoreLog(DocPropsCustomPart.class);
 	}
 
 	@Test
