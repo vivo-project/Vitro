@@ -30,10 +30,7 @@ public class SparqlConstructQuery extends SparqlQuery {
 	}
 
 	@Override
-	public OperationResult run(DataStore dataStore) {
-		if (!isValid(dataStore)) {
-			return OperationResult.internalServerError();
-		}
+	public OperationResult runOperation(DataStore dataStore) {
 		OperationResult result = OperationResult.ok();
 		final String preparedQueryString = prepareQuery(dataStore);
 		RDFService localRdfService = getRDFService(dataStore);
@@ -59,16 +56,6 @@ public class SparqlConstructQuery extends SparqlQuery {
 			return OperationResult.internalServerError();
 		}
 		return result;
-	}
-
-	protected boolean isValid(DataStore dataStore) {
-		if (!isValid()) {
-			return false;
-		}
-		if (!super.isValid(dataStore)) {
-			return false;
-		}
-		return true;
 	}
 
 	public boolean isValid() {

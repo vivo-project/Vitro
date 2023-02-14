@@ -45,10 +45,7 @@ public class ShapeValidation extends AbstractOperation {
     private boolean details = false;
     private boolean cache = false;
     private int maximumViolationsBeforeAbort = -1;
-    
-    private Parameters inputParams = new Parameters();
     private Parameters internalParams = new Parameters();
-    private Parameters outputParams = new Parameters();
     private Map<String, ProcedureDescriptor> dependencies = new HashMap<>();
     private ProcedureDescriptor shapesProcedureDescriptor;
 
@@ -98,7 +95,7 @@ public class ShapeValidation extends AbstractOperation {
     }
 
     @Override
-    public OperationResult run(DataStore dataStore) {
+    public OperationResult runOperation(DataStore dataStore) {
         if (!isValid(dataStore)) {
             return OperationResult.internalServerError();
         }
@@ -365,18 +362,7 @@ public class ShapeValidation extends AbstractOperation {
     }
 
     @Override
-    public Parameters getOutputParams() {
-        return outputParams;
-    }
-    
-    @Override
     public Map<String, ProcedureDescriptor> getDependencies() {
         return dependencies;
     }
-    
-    @Override
-    public void dereference() {
-        
-    }
-    
 }

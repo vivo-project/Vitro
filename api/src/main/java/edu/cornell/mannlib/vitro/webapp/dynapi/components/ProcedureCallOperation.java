@@ -14,8 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class ProcedureCallOperation extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(ProcedureCallOperation.class.getName());
-    private Parameters outputParams = new Parameters();
-    private Parameters inputParams = new Parameters();
     private boolean inputCalculated = false;
     private Parameters internalParams = new Parameters();
     private Map<String, ProcedureDescriptor> dependencies = new HashMap<>();
@@ -42,24 +40,12 @@ public class ProcedureCallOperation extends AbstractOperation {
         return dependencies;
     }
 
-    @Override
-    public Parameters getOutputParams() {
-        return outputParams;
-    }
-
-    public Parameters getInternalParams() {
-        return internalParams;
-    }
-
     public ProcedureDescriptor getExecutableDescriptor() {
         return callableDescriptor;
     }
 
     @Override
-    public OperationResult run(DataStore dataStore) {
-        if (!isValid(dataStore)) {
-            return OperationResult.internalServerError();
-        }
+    public OperationResult runOperation(DataStore dataStore) {
         DataStore localStore = new DataStore();
         try {
             ProcedureDescriptorCall.initilaizeLocalStore(dataStore, localStore, inputParams, internalParams);
@@ -70,10 +56,6 @@ public class ProcedureCallOperation extends AbstractOperation {
         }
         ProcedureDescriptorCall.copyData(localStore, dataStore, outputParams);
         return OperationResult.ok();
-    }
-
-    @Override
-    public void dereference() {
     }
 
     @Override
@@ -90,9 +72,8 @@ public class ProcedureCallOperation extends AbstractOperation {
         inputCalculated = true;
     }
 
-
-    protected boolean isValid(DataStore dataStore) {
-        if (!isValid()) {
+    public boolean isInputValid(DataStore dataStore) {
+        if (!super.isInputValid(dataStore)) {
             return false;
         }
         if (!areDescriptorsValid(dataStore)) {

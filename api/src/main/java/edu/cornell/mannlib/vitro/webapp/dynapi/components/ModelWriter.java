@@ -12,12 +12,9 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ModelWriter extends AbstractOperation{
-
-	
 	private static final String ERROR_MESSAGE = "ModelWriter accept only model parameters";
 	Parameters additionModelParams = new Parameters();
 	Parameters retractionModelParams = new Parameters();
-	Parameters inputParams = new Parameters();
 	private Parameter targetModelParam;
 	
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#additionModel")
@@ -48,36 +45,19 @@ public class ModelWriter extends AbstractOperation{
 	}
 	
 	@Override
-	public OperationResult run(DataStore dataStore) {
-		if (targetModelParam == null) {
-			return OperationResult.internalServerError();
-		}
-		if (!isInputValid(dataStore)) {
-			return OperationResult.internalServerError();
-		}
-		
+	public OperationResult runOperation(DataStore dataStore) {
 		List<Model> additions = ModelView.getExistingModels(additionModelParams, dataStore);
 		List<Model> retractions = ModelView.getExistingModels(retractionModelParams, dataStore);
 		Model target = ModelView.getModel(dataStore, targetModelParam);
 		AdditionsAndRetractions changes = new AdditionsAndRetractions(additions, retractions);
-		//TODO: set editor uri instead of ""
 		ProcessRdfForm.applyChangesToWriteModel(changes, null, target, dataStore.getUserUri());
-		
 		return OperationResult.ok();
 	}
 
-	@Override
-	public void dereference() {
-	}
-
-	@Override
-	public Parameters getInputParams() {
-		return inputParams;
-	}
-
-	@Override
-	public Parameters getOutputParams() {
-		return new Parameters();
-	}
-
+    public boolean isValid() {
+        if (targetModelParam == null) {
+			return false;
+		}
+        return true;
+    }
 }

@@ -22,20 +22,9 @@ public abstract class SparqlQuery extends AbstractOperation implements ContextMo
 
 	private static final Log log = LogFactory.getLog(SparqlQuery.class);
 	protected String queryText;
-	protected Parameters inputParams = new Parameters();
-	protected Parameters outputParams = new Parameters();
 	protected Parameter queryModelParam;
 	protected boolean langFiltering = false;
 	protected RDFService rdfService;
-
-	@Override
-	public Parameters getOutputParams() {
-		return outputParams;
-	}
-
-	@Override
-	public void dereference() {
-	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
 	public void addInputParameter(Parameter param) {
@@ -61,11 +50,6 @@ public abstract class SparqlQuery extends AbstractOperation implements ContextMo
 		inputParams.add(model);
 	}
 
-	@Override
-	public Parameters getInputParams() {
-		return inputParams;
-	}
-
 	protected void setUris(DataStore dataStore, ParameterizedSparqlString pss) {
 		for (String paramName : RdfView.getUriNames(inputParams)) {
 			pss.setIri(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore));
@@ -86,17 +70,6 @@ public abstract class SparqlQuery extends AbstractOperation implements ContextMo
 		setUris(dataStore, pss);
 		final String preparedQueryString = pss.toString();
 		return preparedQueryString;
-	}
-
-	protected boolean isValid(DataStore dataStore) {
-		if (!isValid()) {
-			return false;
-		}
-		if (!isInputValid(dataStore)) {
-			log.error("Input data is invalid");
-			return false;
-		}
-		return true;
 	}
 
 	public boolean isValid() {
@@ -129,5 +102,4 @@ public abstract class SparqlQuery extends AbstractOperation implements ContextMo
 		}
 		return localRdfService;
 	}
-
 }
