@@ -25,6 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SolrQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;

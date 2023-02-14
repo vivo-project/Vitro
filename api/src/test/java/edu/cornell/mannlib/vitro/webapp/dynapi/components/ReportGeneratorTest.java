@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ReportGenerator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.BinaryView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;

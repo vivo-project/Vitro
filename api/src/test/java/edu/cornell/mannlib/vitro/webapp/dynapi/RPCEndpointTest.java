@@ -29,9 +29,9 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 
 @RunWith(MockitoJUnitRunner.class)

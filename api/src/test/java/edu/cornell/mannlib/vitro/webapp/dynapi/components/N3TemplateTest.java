@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.N3Template;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;

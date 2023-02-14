@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolOperation;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ResourceAPIPoolAtomicOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
