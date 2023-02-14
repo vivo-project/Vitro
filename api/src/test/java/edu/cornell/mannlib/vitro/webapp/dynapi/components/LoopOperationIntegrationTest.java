@@ -15,9 +15,7 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -25,6 +23,7 @@ import org.junit.runners.Parameterized;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -52,18 +51,9 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
 	@org.junit.runners.Parameterized.Parameter(1)
 	public String expectedValues;
 
-    @AfterClass
-    public static void after() {
-        restoreLogs();
-    }
-    
-    @BeforeClass
-    public static void before() {
-        offLogs();
-    }
-
 	@Before
 	public void beforeEach() {
+        LoggingControl.offLogs();
 		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
 	}
 	
@@ -74,6 +64,7 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         procedurePool.init(servletContext);
         procedurePool.reload();
         assertEquals(0, procedurePool.count());
+        LoggingControl.restoreLogs();
     }
 
     private ProcedurePool initWithDefaultModel() throws IOException {

@@ -5,9 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.model;
 
 import org.apache.jena.rdf.model.Model;
+import org.junit.After;
 import org.junit.Before;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ModelAccessFactory;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.ServletContextStub;
@@ -41,6 +43,7 @@ public class ConfigurationBeanLoaderTestBase extends AbstractTestClass {
 
 	@Before
 	public void setup() {
+        LoggingControl.offLogs();
 		ctx = new ServletContextStub();
 
 		session = new HttpSessionStub();
@@ -57,6 +60,12 @@ public class ConfigurationBeanLoaderTestBase extends AbstractTestClass {
 		loader = new ConfigurationBeanLoader(model, req);
 		noRequestLoader = new ConfigurationBeanLoader(model, ctx);
 		noContextLoader = new ConfigurationBeanLoader(model);
+	}
+	
+	@After
+	public void reset() {
+        LoggingControl.restoreLogs();
+
 	}
 
 	// ----------------------------------------------------------------------

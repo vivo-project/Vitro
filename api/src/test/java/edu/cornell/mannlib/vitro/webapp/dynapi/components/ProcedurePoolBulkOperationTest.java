@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolBulkOperation;
@@ -26,7 +27,8 @@ public class ProcedurePoolBulkOperationTest extends ServletContextTest{
     
     @Before
     public void preparePool() {
-       procedurePool = initWithDefaultModel();
+        LoggingControl.offLogs();
+        procedurePool = initWithDefaultModel();
     }
     
     @After
@@ -34,16 +36,7 @@ public class ProcedurePoolBulkOperationTest extends ServletContextTest{
         setup();
         procedurePool = initWithDefaultModel();
         assertEquals(1, procedurePool.count());
-    }
-    
-    @AfterClass
-    public static void after() {
-        restoreLogs();
-    }
-    
-    @BeforeClass
-    public static void before() {
-        offLogs();
+        LoggingControl.restoreLogs();
     }
     
     @Test

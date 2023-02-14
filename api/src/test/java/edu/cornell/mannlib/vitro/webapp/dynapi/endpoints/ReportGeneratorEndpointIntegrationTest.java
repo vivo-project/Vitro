@@ -21,6 +21,9 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.docx4j.openpackaging.io.SaveToZipFile;
+import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,8 +33,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
+import com.haulmont.yarg.formatters.impl.XlsxFormatter;
+import com.haulmont.yarg.reporting.Reporting;
+
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
@@ -75,18 +82,22 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
 	
     @AfterClass
     public static void after() {
-        restoreLogs();
         dynapiModelFactory.close();
     }
     
     @BeforeClass
     public static void before() {
-        offLogs();
         dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
 
 	@Before
 	public void beforeEach() {
+        LoggingControl.offLog(Reporting.class);
+        LoggingControl.offLog(XlsxFormatter.class);
+        LoggingControl.offLog(SpreadsheetMLPackage.class);
+        LoggingControl.offLog(DocPropsCustomPart.class);
+        LoggingControl.offLog(SaveToZipFile.class);
+        LoggingControl.offLogs();
 		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("http://vitro.mannlib.cornell.edu/default/dynamic-api-abox"))).thenReturn(ontModel);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("vitro:jenaOntModel"))).thenReturn(storeModel);
@@ -100,6 +111,12 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
         procedurePool.init(servletContext);
         procedurePool.reload();
         assertEquals(0, procedurePool.count());
+        LoggingControl.restoreLogs();
+        LoggingControl.restoreLog(Reporting.class);
+        LoggingControl.restoreLog(XlsxFormatter.class);
+        LoggingControl.restoreLog(SpreadsheetMLPackage.class);
+        LoggingControl.restoreLog(DocPropsCustomPart.class);
+        LoggingControl.restoreLog(SaveToZipFile.class);
     }
 
     private ProcedurePool initWithDefaultModel() throws IOException {

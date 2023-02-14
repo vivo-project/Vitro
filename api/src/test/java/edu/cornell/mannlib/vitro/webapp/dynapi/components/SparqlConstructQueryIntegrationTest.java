@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -48,23 +49,15 @@ public class SparqlConstructQueryIntegrationTest extends ServletContextTest {
     @org.junit.runners.Parameterized.Parameter(1)
     public String size;
     
-    @AfterClass
-    public static void after() {
-        restoreLogs();
-    }
-    
-    @BeforeClass
-    public static void before() {
-        offLogs();
-    }
-    
     @Before
     public void beforeEach() {
+        LoggingControl.offLogs();
         storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
     }
     
     @After
     public void reset() {
+        LoggingControl.restoreLogs();
     }
     
     @Test

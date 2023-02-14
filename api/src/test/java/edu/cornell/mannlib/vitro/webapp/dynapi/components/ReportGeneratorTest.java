@@ -9,9 +9,11 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ReportGenerator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.BinaryView;
@@ -32,12 +34,19 @@ public class ReportGeneratorTest {
 	private static final String testJsonString = "{\"head\":{\"vars\":[\"o\"]},\"results\":{\"bindings\":[{\"o\":{\"type\":\"literal\",\"value\":\"alice\"}}]}}";
 	ReportGenerator generator;
 	DataStore dataStore;
+    private boolean manualDebugging = false;
 
 	@Before
 	public void init() throws Exception {
+	    LoggingControl.offLogs();
 		generator = new ReportGenerator();
 		dataStore = new DataStore();
 	}
+	
+    @After
+    public void rest() throws Exception {
+        LoggingControl.restoreLogs();
+    }
 
 	@Test
 	public void testDocX() throws Exception {
@@ -52,7 +61,6 @@ public class ReportGeneratorTest {
 	public void testReport(String templatePath) throws Exception {
 		Path p = new File(RESOURCES_PATH + templatePath).toPath();
 		byte[] templateByteArray = Files.readAllBytes(p);
-		System.out.println(templateByteArray.length);
 
 		Parameter reportParam = ParameterUtils.createByteArrayParameter(REPORT);
 		generator.addReport(reportParam);
@@ -76,7 +84,6 @@ public class ReportGeneratorTest {
 		byte[] reportBytes = BinaryView.getByteArray(dataStore, reportParam);
 		assertTrue(reportBytes.length > templateByteArray.length);
 		
-		boolean manualDebugging = false;
 		if (manualDebugging) {
 			File file = new File(RESOURCES_PATH + "result-" + templatePath);
 			try (OutputStream os = new FileOutputStream(file)) {

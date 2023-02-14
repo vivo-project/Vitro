@@ -11,8 +11,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.Set;
 
 import org.apache.jena.rdf.model.Statement;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.InstanceWrapper.InstanceWrapperException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.CardinalityException;
 
