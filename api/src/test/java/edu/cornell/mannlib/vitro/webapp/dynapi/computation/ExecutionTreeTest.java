@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullStep;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationalStep;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions.ConditionalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.ConditionalStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.NullStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
 
 
 public class ExecutionTreeTest {

@@ -11,6 +11,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.access.AccessWhitelist;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.Operation;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.NullStep;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.Step;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.AutoConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;

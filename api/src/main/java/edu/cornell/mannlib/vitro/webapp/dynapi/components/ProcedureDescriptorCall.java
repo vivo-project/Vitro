@@ -74,7 +74,7 @@ public class ProcedureDescriptorCall {
         Converter.convertInternalParams(localParams, localStore);
     }
 
-    protected static void copyData(DataStore sourceStore, DataStore destinationStore, Parameters params) {
+    public static void copyData(DataStore sourceStore, DataStore destinationStore, Parameters params) {
         for (String name : params.getNames()) {
             Data data = sourceStore.getData(name);
             if (data == null) {

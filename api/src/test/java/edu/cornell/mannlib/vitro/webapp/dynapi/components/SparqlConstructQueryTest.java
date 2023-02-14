@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SparqlConstructQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
@@ -42,7 +43,7 @@ public class SparqlConstructQueryTest {
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
 		sparql.setQueryText(QUERY_NO_VARS);
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
-		sparql.rdfService = new RDFServiceModel(model);
+		sparql.setRdfService(new RDFServiceModel(model));
 		assertEquals(OperationResult.internalServerError(), sparql.run(dataStore));
 		Parameter output = ParameterUtils.createModelParameter(OUT_MODEL);
 		sparql.addOutputParameter(output);
@@ -126,7 +127,7 @@ public class SparqlConstructQueryTest {
     @Test
     public void languageFiltering() throws Exception {
         sparql.setQueryText(QUERY_LABEL);
-        sparql.rdfService = new RDFServiceModel(model);
+        sparql.setRdfService(new RDFServiceModel(model));
         ParameterUtils.addStatement(model, "test:uri", "http://www.w3.org/2000/01/rdf-schema#label", "Alicia@es");
         ParameterUtils.addStatement(model, "test:uri", "http://www.w3.org/2000/01/rdf-schema#label", "Alice@en-US");
         ParameterUtils.addStatement(model, "test:uri", "http://www.w3.org/2000/01/rdf-schema#label", "Алиса@ru-RU");
