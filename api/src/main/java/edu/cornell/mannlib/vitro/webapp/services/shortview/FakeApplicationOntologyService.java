@@ -456,17 +456,15 @@ public class FakeApplicationOntologyService {
 		/*
 		 * UQAM-Optimization New query including Linguistic context
 		 */
-		private static String QUERY_STRING_LANG(String lang) {
-			return ""
+		private static String QUERY_STRING_LANG = ""
 				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
 				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
 				+ "SELECT ?pt  \n" + "WHERE {  \n"
 				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
 				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
 				+ "    ?vTitle vcard:title ?pt . \n"
-				+ "    FILTER (langMatches(lang(?pt), '" + lang + "'))  \n"
+				+ "    FILTER (langMatches(lang(?pt), '?langCtx'))  \n"
 				+ " } LIMIT 1";
-		}
 
 		private static final String FAKE_VIVO_PEOPLE_DATA_GETTER_URI = "http://FakeVivoPeopleDataGetter";
 
@@ -482,7 +480,7 @@ public class FakeApplicationOntologyService {
 			Property saveToVarProperty = m
 					.getProperty(DisplayVocabulary.SAVE_TO_VAR);
 
-			m.add(dataGetter, queryProperty, QUERY_STRING_LANG("en-US")); //UQAM-Optimization Using query with linguistic context
+			m.add(dataGetter, queryProperty, QUERY_STRING_LANG); //UQAM-Optimization Using query with linguistic context
 			m.add(dataGetter, saveToVarProperty, "extra");
 			return m;
 		}
