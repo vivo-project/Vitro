@@ -15,8 +15,6 @@ public class ContainerQuery extends AbstractOperation{
 
     private static final Log log = LogFactory.getLog(ContainerQuery.class);
 
-    private Parameters outputParams = new Parameters();
-    private Parameters inputParams = new Parameters();
     private Parameters keys = new Parameters();
     private Parameter containerParam;
     private Parameter outputParam;
@@ -43,15 +41,12 @@ public class ContainerQuery extends AbstractOperation{
     }
     
     @Override
-    public OperationResult run(DataStore dataStore) {
-        if (!isValid(dataStore)) {
-            return OperationResult.internalServerError();
-        }
+    public OperationResult runOperation(DataStore dataStore) {
         JsonContainer container = JsonContainerView.getJsonContainer(dataStore, containerParam);
         String key = SimpleDataView.getStringRepresentation(firstKeyData(dataStore));
         Data item = container.getItem(key, outputParam);
         if (!item.isInitialized()) {
-            log.error(String.format("Key '%s' not found in container %s",key,container.serialize(container)));
+            log.error(String.format("Key '%s' not found in container %s",key,JsonContainer.serialize(container)));
             return OperationResult.internalServerError();
         }
         Parameter itemParam = item.getParam();
@@ -69,19 +64,6 @@ public class ContainerQuery extends AbstractOperation{
 
     private String firstKeyName() {
         return keys.getNames().iterator().next();
-    }
-
-    @Override
-    public void dereference() {}
-
-    @Override
-    public Parameters getInputParams() {
-        return inputParams;
-    }
-
-    @Override
-    public Parameters getOutputParams() {
-        return outputParams;
     }
 
     public boolean isValid() {
@@ -104,12 +86,8 @@ public class ContainerQuery extends AbstractOperation{
         return true;
     }
     
-    public boolean isValid(DataStore dataStore) {
-        if (!isValid()) {
-            return false;
-        }
-        if (dataStore == null) {
-            log.error("data store is null");
+    public boolean isInputValid(DataStore dataStore) {
+        if (!super.isInputValid(dataStore)) {
             return false;
         }
         Data container = dataStore.getData(containerParam.getName());

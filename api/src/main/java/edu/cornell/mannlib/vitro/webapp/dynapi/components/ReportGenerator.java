@@ -49,8 +49,6 @@ public class ReportGenerator extends AbstractOperation {
 		outputTypes.put(MIME_XLSX, ReportOutputType.xlsx);
 		outputTypes.put(MIME_DOCX, ReportOutputType.docx);
 	}
-	protected Parameters inputParams = new Parameters();
-	protected Parameters outputParams = new Parameters();
 	protected Parameters dataSources = new Parameters();
 	private Parameter templateParam;
 	private Parameter reportParam;
@@ -83,12 +81,7 @@ public class ReportGenerator extends AbstractOperation {
 	}
 
 	@Override
-	public OperationResult run(DataStore dataStore) {
-		if (!isValid(dataStore)) {
-			return OperationResult.internalServerError();
-		}
-		OperationResult result = OperationResult.ok();
-
+	public OperationResult runOperation(DataStore dataStore) {
 		// get from dataStore
 		byte[] template = BinaryView.getByteArray(dataStore, templateParam);
 		String type = detectType(template);
@@ -120,7 +113,7 @@ public class ReportGenerator extends AbstractOperation {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		reporting.runReport(runParams, baos);
 		BinaryView.setByteArray(dataStore, reportParam, baos);
-		return result;
+		return OperationResult.ok();
 	}
 
 	private String detectType(byte[] template) {
@@ -159,15 +152,9 @@ public class ReportGenerator extends AbstractOperation {
 		builder.band(band.build());
 	}
 
-	private boolean isValid(DataStore dataStore) {
-		boolean result = isValid();
-		if (!isInputValid(dataStore)) {
-			result = false;
-		}
-		return result;
-	}
 
-	private boolean isValid() {
+
+	public boolean isValid() {
 		boolean result = true;
 		if (templateParam == null) {
 			log.error("Template file param is not provided in the configuration");
@@ -182,19 +169,5 @@ public class ReportGenerator extends AbstractOperation {
 			result = false;
 		}
 		return result;
-	}
-
-	@Override
-	public Parameters getInputParams() {
-		return inputParams;
-	}
-
-	@Override
-	public Parameters getOutputParams() {
-		return outputParams;
-	}
-
-	@Override
-	public void dereference() {
 	}
 }

@@ -5,17 +5,11 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class AssignOperation extends AbstractOperation {
-
     private static final Log log = LogFactory.getLog(AssignOperation.class);
-
-    private Parameters inputParams = new Parameters();
-    private Parameters outputParams = new Parameters();
-
     private Parameter targetParam;
     private Parameter assignableParam;
     private String key;
@@ -33,10 +27,7 @@ public class AssignOperation extends AbstractOperation {
     }
 
     @Override
-    public OperationResult run(DataStore dataStore) {
-        if (!isValid(dataStore)) {
-            return OperationResult.internalServerError();
-        }
+    public OperationResult runOperation(DataStore dataStore) {
         Data targetData;
         if (dataStore.contains(targetParam.getName())) {
             targetData = dataStore.getData(targetParam.getName());    
@@ -55,20 +46,6 @@ public class AssignOperation extends AbstractOperation {
         return assignableParam.getName();
     }
 
-    @Override
-    public void dereference() {
-    }
-
-    @Override
-    public Parameters getInputParams() {
-        return inputParams;
-    }
-
-    @Override
-    public Parameters getOutputParams() {
-        return outputParams;
-    }
-
     public boolean isValid() {
         if (assignableParam == null) {
             log.error("assignable parameter is not set");
@@ -85,20 +62,13 @@ public class AssignOperation extends AbstractOperation {
                     assignableParam.getName(), targetParam.getName()));
             return false;
         }
-
         return true;
     }
 
-    public boolean isValid(DataStore dataStore) {
-        if (!isValid()) {
+    public boolean isInputValid(DataStore dataStore) {
+        if (!super.isInputValid(dataStore)) {
             return false;
         }
-        if (dataStore == null) {
-            log.error("data store is null");
-            return false;
-        }
-        
-
         Data assignableData = dataStore.getData(getAssignableParamName());
         if (assignableData == null) {
             log.error("assignable data is not provided in data store");
