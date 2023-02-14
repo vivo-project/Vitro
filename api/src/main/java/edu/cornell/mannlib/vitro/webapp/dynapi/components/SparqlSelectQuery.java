@@ -26,10 +26,7 @@ public class SparqlSelectQuery extends SparqlQuery {
 	}
 
 	@Override
-	public OperationResult run(DataStore dataStore) {
-		if (!isValid(dataStore)) {
-			return OperationResult.internalServerError();
-		}
+	public OperationResult runOperation(DataStore dataStore) {
 		OperationResult result = OperationResult.ok();
 		RDFService localRdfService = getRDFService(dataStore);
 		final String preparedQueryString = prepareQuery(dataStore);

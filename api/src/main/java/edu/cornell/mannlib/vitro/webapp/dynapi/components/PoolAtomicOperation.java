@@ -92,8 +92,8 @@ public abstract class PoolAtomicOperation extends PoolOperation {
         return RdfView.getUris(dataStore, inputParams);
     }
     
-    protected boolean isValid(DataStore dataStore) {
-        if (!super.isValid(dataStore)) {
+    public boolean isInputValid(DataStore dataStore) {
+        if (!super.isInputValid(dataStore)) {
             return false;
         }
         List<String> uris = getComponentUris(dataStore);
