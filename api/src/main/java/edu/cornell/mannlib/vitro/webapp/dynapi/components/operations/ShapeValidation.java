@@ -65,7 +65,7 @@ public class ShapeValidation extends AbstractOperation {
         inputParams.add(model);
     }
     
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#dataModel", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter", minOccurs = 1, maxOccurs = 1)
     public void addOutputParam(Parameter param) throws InitializationException {
         outputParams.add(param);
     }
@@ -103,18 +103,11 @@ public class ShapeValidation extends AbstractOperation {
 
     @Override
     public OperationResult runOperation(DataStore dataStore) {
-        if (!isValid(dataStore)) {
-            return OperationResult.internalServerError();
-        }
         try {
             ValidationEngine engine = configureEngine(dataStore);
             executeValidation(dataStore, engine);
         } catch (Exception e) {
             log.error(e, e);
-            return OperationResult.internalServerError();
-        }
-        if (!isOutputValid(dataStore)) {
-            log.error("Operation produced invalid output");
             return OperationResult.internalServerError();
         }
         return OperationResult.ok();
