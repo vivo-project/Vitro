@@ -463,8 +463,9 @@ public class FakeApplicationOntologyService {
 				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
 				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
 				+ "    ?vTitle vcard:title ?pt . \n"
-				+ "    FILTER (lang(?pt) = '?langCtx' )  \n"
+				+ "    FILTER (langMatches(lang(?pt), '?langCtx'))  \n"
 				+ " } LIMIT 1";
+
 		private static final String FAKE_VIVO_PEOPLE_DATA_GETTER_URI = "http://FakeVivoPeopleDataGetter";
 
 		private static OntModel fakeDisplayModel = initializeFakeDisplayModel();
