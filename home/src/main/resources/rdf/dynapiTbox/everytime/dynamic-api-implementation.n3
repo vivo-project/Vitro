@@ -111,3 +111,5 @@ dynapi:ProcedureCallOperation rdfs:subClassOf operations:ProcedureCallOperation 
 dynapi:ShapeValidation rdfs:subClassOf operations:ShapeValidation .
 
 dynapi:ErrorStep rdfs:subClassOf steps:ErrorStep .
+
+dynapi:XMLTransformation rdfs:subClassOf operations:XMLTransformation .

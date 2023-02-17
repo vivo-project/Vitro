@@ -928,3 +928,7 @@
 :ProcedureCallOperation rdf:type owl:Class ;
             rdfs:subClassOf :Operation ;
             rdfs:label "Procedure call operation"@en-US .
+            
+:XMLTransformation rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ;
+            rdfs:label "XMLTransformation operation"@en-US .
