@@ -1,0 +1,36 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:xml-transformation-procedure>
+        a                                   dynapi:Procedure ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:providesParameter            <test:output_xml_param> .
+
+<test:step1>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <test:XMLTransformation> .
+
+<test:XMLTransformation> 
+        a                                   dynapi:XMLTransformation ;
+	dynapi:xslt                         <test:xml_transformation_rules_param> ;
+        dynapi:inputXml                     <test:input_xml_param> ;
+        dynapi:outputXml                    <test:output_xml_param> .
+
+<test:input_xml_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "input" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
+<test:output_xml_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "output" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
+<test:xml_transformation_rules_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "xslt" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
