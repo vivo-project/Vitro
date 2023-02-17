@@ -34,7 +34,7 @@ public abstract class AbstractOperation implements Operation {
         }
         try {
             result = runOperation(dataStore);    
-        } catch(Throwable t) {
+        } catch(Exception t) {
             log.error(t,t);
             return OperationResult.internalServerError();
         }
@@ -44,7 +44,7 @@ public abstract class AbstractOperation implements Operation {
         return result;
     }
 
-    protected abstract OperationResult runOperation(DataStore dataStore);
+    protected abstract OperationResult runOperation(DataStore dataStore) throws Exception;
 
     public boolean isInputValid(DataStore dataStore) {
         if (!isValid()) {
