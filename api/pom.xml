@@ -7,13 +7,13 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-api</artifactId>
-    <version>1.13.1-SNAPSHOT</version>
+    <version>1.14.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
         <artifactId>vitro-project</artifactId>
-        <version>1.13.1-SNAPSHOT</version>
+        <version>1.14.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -21,6 +21,32 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <echo>###################################################################</echo>
+                                <echo>Displaying value of 'VIVO build' property</echo>
+                                <echo>###################################################################</echo>
+                                <echo>[vitro-version] ${vitro-version}</echo>
+                                <echo>[vivo-version] ${vivo-version}</echo>
+                                <echo>[vivo-dir] ${vivo-dir}</echo>
+                                <echo>[project.version] ${project.version}</echo>
+                                <echo>###################################################################</echo>
+                                <echo>###################################################################</echo>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>       
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -73,7 +99,7 @@
         <dependency>
             <groupId>org.vivoweb</groupId>
             <artifactId>vitro-dependencies</artifactId>
-            <version>1.13.1-SNAPSHOT</version>
+            <version>1.14.1-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
         <dependency>
