@@ -45,6 +45,7 @@
                                 <echo message="[java.vendor.version]        ${java.vendor.version}" />
                                 <echo message="[java.version]               ${java.version}" />
                                 <echo message="[java.specification.version] ${java.specification.version}" />
+                                <echo message="[maven.compiler.release]     ${maven.compiler.release}" />
                                 <echo message="###################################################################" />
                                 <echo message="###################################################################" />
                             </target>
