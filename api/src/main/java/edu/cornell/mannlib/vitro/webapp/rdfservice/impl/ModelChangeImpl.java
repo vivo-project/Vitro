@@ -17,9 +17,11 @@ public class ModelChangeImpl implements ModelChange {
 	private RDFService.ModelSerializationFormat serializationFormat;
 	private Operation operation;
 	private String graphURI;
+	private String userId;
 
 	public ModelChangeImpl() {}
 
+	@Deprecated
 	public ModelChangeImpl(InputStream serializedModel,
                            RDFService.ModelSerializationFormat serializationFormat,
                            Operation operation,
@@ -29,6 +31,19 @@ public class ModelChangeImpl implements ModelChange {
 		this.serializationFormat = serializationFormat;
 		this.operation = operation;
 		this.graphURI = graphURI;
+	}
+	
+	public ModelChangeImpl(InputStream serializedModel,
+            RDFService.ModelSerializationFormat serializationFormat,
+            Operation operation,
+            String graphURI, 
+            String userId) {
+
+		this.serializedModel = serializedModel;
+		this.serializationFormat = serializationFormat;
+		this.operation = operation;
+		this.graphURI = graphURI;
+		this.userId = userId;
 	}
 
 	@Override
@@ -91,5 +106,15 @@ public class ModelChangeImpl implements ModelChange {
 		} catch (IOException e) {
 			return "Failed to read input stream: " + e;
 		}
+	}
+
+	@Override
+	public String getUserId() {
+		return userId;
+	}
+
+	@Override
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

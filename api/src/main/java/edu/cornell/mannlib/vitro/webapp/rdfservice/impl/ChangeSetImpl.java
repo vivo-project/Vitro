@@ -48,14 +48,26 @@ public class ChangeSetImpl implements ChangeSet {
 	    	return modelChanges;
 	}
 
+	@Deprecated
 	@Override
 	public void addAddition(InputStream model, RDFService.ModelSerializationFormat format, String graphURI) {
 		modelChanges.add(manufactureModelChange(model,format, ModelChange.Operation.ADD, graphURI));
 	}
 
 	@Override
+	public void addAddition(InputStream model, RDFService.ModelSerializationFormat format, String graphURI, String userId) {
+		modelChanges.add(manufactureModelChange(model,format, ModelChange.Operation.ADD, graphURI, userId));
+	}
+
+	@Deprecated
+	@Override
 	public void addRemoval(InputStream model, RDFService.ModelSerializationFormat format, String graphURI) {
 		modelChanges.add(manufactureModelChange(model, format, ModelChange.Operation.REMOVE, graphURI));
+	}
+	
+	@Override
+	public void addRemoval(InputStream model, RDFService.ModelSerializationFormat format, String graphURI, String userId) {
+		modelChanges.add(manufactureModelChange(model, format, ModelChange.Operation.REMOVE, graphURI, userId));
 	}
 
 	@Override
@@ -63,12 +75,22 @@ public class ChangeSetImpl implements ChangeSet {
 		return new ModelChangeImpl();
 	}
 
+	@Deprecated
 	@Override
 	public ModelChange manufactureModelChange(InputStream serializedModel,
                                               RDFService.ModelSerializationFormat serializationFormat,
                                               Operation operation,
                                               String graphURI) {
 		return new ModelChangeImpl(serializedModel, serializationFormat, operation, graphURI);
+	}
+	
+	@Override
+	public ModelChange manufactureModelChange(InputStream serializedModel,
+                                              RDFService.ModelSerializationFormat serializationFormat,
+                                              Operation operation,
+                                              String graphURI, 
+                                              String userId) {
+		return new ModelChangeImpl(serializedModel, serializationFormat, operation, graphURI, userId);
 	}
 
 	@Override
@@ -98,5 +120,4 @@ public class ChangeSetImpl implements ChangeSet {
 				+ ", preChangeEvents=" + preChangeEvents
 				+ ", postChangeEvents=" + postChangeEvents + "]";
 	}
-
 }

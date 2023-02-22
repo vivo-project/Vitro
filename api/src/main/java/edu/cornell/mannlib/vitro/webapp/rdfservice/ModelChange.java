@@ -18,6 +18,16 @@ public interface ModelChange {
 	}
 
 	/**
+	 * @return String - user identifier
+	 */
+	public String getUserId();
+
+	/**
+	 * @param String - user identifier
+	 */
+	public void setUserId(String userId);
+	
+	/**
 	 * @return InputStream - the serialized model (collection of RDF triples) representing a change to make
 	 */
 	public InputStream getSerializedModel();

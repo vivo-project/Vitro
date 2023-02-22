@@ -5,6 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice;
 import java.io.InputStream;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange.Operation;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+
 /**
  * Input parameter to changeSetUpdate() method in RDFService.
  * Represents a precondition query and an ordered list of model changes.
@@ -43,6 +46,7 @@ public interface ChangeSet {
 	 * @param serializationFormat - format of the serialized RDF model
 	 * @param graphURI - URI of the graph to which the RDF model should be added
 	 */
+	@Deprecated
 	public void addAddition(InputStream model,
 			                RDFService.ModelSerializationFormat serializationFormat,
 			                String graphURI);
@@ -54,10 +58,37 @@ public interface ChangeSet {
 	 * @param serializationFormat - format of the serialized RDF model
 	 * @param graphURI - URI of the graph from which the RDF model should be removed
 	 */
+	@Deprecated
 	public void addRemoval(InputStream model,
 			               RDFService.ModelSerializationFormat serializationFormat,
 			               String graphURI);
 
+	/**
+	 * Adds one model change representing an addition to the list of model changes
+	 *
+	 * @param model - a serialized RDF model (collection of triples)
+	 * @param serializationFormat - format of the serialized RDF model
+	 * @param graphURI - URI of the graph to which the RDF model should be added
+ 	 * @param userId String - identifier of user requested model changes
+	 */
+	public void addAddition(InputStream model,
+			                RDFService.ModelSerializationFormat serializationFormat,
+			                String graphURI, 
+			                String userId);
+
+	/**
+	 * Adds one model change representing a deletion to the list of model changes
+	 *
+	 * @param model - a serialized RDF model (collection of triples)
+	 * @param serializationFormat - format of the serialized RDF model
+	 * @param graphURI - URI of the graph from which the RDF model should be removed
+	 * @param userId String - identifier of user requested model changes
+	 */
+	public void addRemoval(InputStream model,
+			               RDFService.ModelSerializationFormat serializationFormat,
+			               String graphURI, 
+			               String userId);
+	
 	/**
 	 * Creates an instance of the ModelChange class
 	 *
@@ -76,11 +107,27 @@ public interface ChangeSet {
 	 * @return ModelChange - a ModelChange instance initialized with the input
 	 *                       model, model format, operation and graphURI
 	 */
+	@Deprecated
 	public ModelChange manufactureModelChange(InputStream serializedModel,
                                               RDFService.ModelSerializationFormat serializationFormat,
                                               ModelChange.Operation operation,
                                               String graphURI);
 
+	/**
+	 * Creates an instance of the ModelChange class
+	 *
+	 * @param serializedModel - a serialized RDF model (collection of triples)
+	 * @param serializationFormat - format of the serialized RDF model
+	 * @param operation - the type of operation to be performed with the serialized RDF model
+	 * @param graphURI - URI of the graph on which to apply the model change operation
+	 * @param userId - URI of the user requested model changes
+	 *
+	 * @return ModelChange - a ModelChange instance initialized with the input
+	 *                       model, model format, operation and graphURI
+	 */
+	public ModelChange manufactureModelChange(InputStream serializedModel, ModelSerializationFormat serializationFormat,
+			Operation operation, String graphURI, String userId);
+	
 	/**
 	 * Adds an event that will be be passed to any change listeners in advance of
 	 * the change set additions and retractions being performed. The event
@@ -111,5 +158,7 @@ public interface ChangeSet {
      * the change set additions and retractions are performed.
      */
     public List<Object> getPostChangeEvents();
+
+
 
 }
