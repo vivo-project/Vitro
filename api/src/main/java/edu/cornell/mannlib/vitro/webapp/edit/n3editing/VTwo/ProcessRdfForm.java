@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
-import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -23,16 +25,18 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.shared.Lock;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.XSD;
-import org.apache.commons.lang3.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 /**
  * The goal of this class is to provide processing from
@@ -283,23 +287,27 @@ public class ProcessRdfForm {
             AdditionsAndRetractions changes,
             Model queryModel, Model writeModel, String editorUri) {
         //side effect: modify the write model with the changes
-        Lock lock = null;
-        try{
-            lock =  writeModel.getLock();
-            lock.enterCriticalSection(Lock.WRITE);
-            if( writeModel instanceof OntModel){
-                ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri,true));
-            }
-            writeModel.add( changes.getAdditions() );
-            writeModel.remove( changes.getRetractions() );
-        }catch(Throwable t){
-            log.error("error adding edit change n3required model to in memory model \n"+ t.getMessage() );
-        }finally{
-            if( writeModel instanceof OntModel){
-                ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri,false));
-            }
-            lock.leaveCriticalSection();
-        }
+        RDFService rdfService = new RDFServiceModel(writeModel);
+        ChangeSet cs = rdfService.manufactureChangeSet();
+		cs.addPreChangeEvent(new BulkUpdateEvent(null, true));
+		cs.addPostChangeEvent(new BulkUpdateEvent(null, false));
+		
+		ByteArrayOutputStream additionsStream = new ByteArrayOutputStream();
+		changes.getAdditions().write(additionsStream, "N3");
+		InputStream additionsInputStream = new ByteArrayInputStream(additionsStream.toByteArray());
+		
+		ByteArrayOutputStream retractionsStream = new ByteArrayOutputStream();
+		changes.getRetractions().write(retractionsStream, "N3");
+		InputStream retractionsInputStream = new ByteArrayInputStream(additionsStream.toByteArray());
+		
+		cs.addAddition(additionsInputStream, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), null, editorUri);
+		cs.addRemoval(retractionsInputStream, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), null, editorUri);
+
+        try {
+			rdfService.changeSetUpdate(cs);
+		} catch (RDFServiceException e) {
+			log.error(e, e);
+		}
     }
 
     protected AdditionsAndRetractions parseN3ToChange(
