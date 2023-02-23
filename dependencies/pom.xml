@@ -1,5 +1,4 @@
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
@@ -18,50 +17,34 @@
     </parent>
 
     <name>Vitro Dependencies</name>
+    <properties>
+        <jena.version>3.16.0</jena.version>
+        <owl-api.version>5.1.1</owl-api.version>
+
+    </properties>
 
     <dependencies>
         <!-- Added for runtime, or just EasyMock -->
-        <!-- dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>3.1</version>
-        </dependency -->
+        <!-- dependency> <groupId>asm</groupId> <artifactId>asm</artifactId> 
+            <version>3.1</version> </dependency -->
         <!-- Added for runtime, was 1.6 - was used by Pellet, still needed? -->
-        <!-- dependency>
-            <groupId>com.github.ansell.aterms</groupId>
-            <artifactId>aterm-java</artifactId>
-            <version>1.8.2</version>
-        </dependency -->
+        <!-- dependency> <groupId>com.github.ansell.aterms</groupId> <artifactId>aterm-java</artifactId> 
+            <version>1.8.2</version> </dependency -->
         <!-- Added for runtime, used by Jackson databind, was used by EasyMock -->
-        <!-- dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>2.2</version>
-        </dependency -->
-            <!-- Added for runtime -->
-        <!-- dependency>
-            <groupId>com.servlets</groupId>
-            <artifactId>cos</artifactId>
-            <version>05Nov2002</version>
-        </dependency -->
-            <!-- Added for runtime -->
-        <!-- dependency>
-            <groupId>org.apache.cxf.xjc-utils</groupId>
-            <artifactId>cxf-xjc-runtime</artifactId>
-            <version>2.6.2</version>
-        </dependency -->
-            <!-- Added for runtime -->
-        <!-- dependency>
-            <groupId>org.apache.cxf.xjcplugins</groupId>
-            <artifactId>cxf-xjc-ts</artifactId>
-            <version>2.6.2</version>
-        </dependency -->
+        <!-- dependency> <groupId>cglib</groupId> <artifactId>cglib</artifactId> 
+            <version>2.2</version> </dependency -->
         <!-- Added for runtime -->
-        <!-- dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-        </dependency -->
+        <!-- dependency> <groupId>com.servlets</groupId> <artifactId>cos</artifactId> 
+            <version>05Nov2002</version> </dependency -->
+        <!-- Added for runtime -->
+        <!-- dependency> <groupId>org.apache.cxf.xjc-utils</groupId> <artifactId>cxf-xjc-runtime</artifactId> 
+            <version>2.6.2</version> </dependency -->
+        <!-- Added for runtime -->
+        <!-- dependency> <groupId>org.apache.cxf.xjcplugins</groupId> <artifactId>cxf-xjc-ts</artifactId> 
+            <version>2.6.2</version> </dependency -->
+        <!-- Added for runtime -->
+        <!-- dependency> <groupId>dom4j</groupId> <artifactId>dom4j</artifactId> 
+            <version>1.6.1</version> </dependency -->
 
 
 
@@ -149,12 +132,12 @@
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-api</artifactId>
-            <version>5.1.1</version>
+            <version>${owl-api.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-apibinding</artifactId>
-            <version>5.1.1</version>
+            <version>${owl-api.version}</version>
             <!-- Exclude rio binding as we don't use Sesame -->
             <exclusions>
                 <exclusion>
@@ -176,7 +159,7 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
-            <version>3.16.0</version>
+            <version>${jena.version}</version>
             <exclusions>
                 <!-- Exclude OSGi bundles from jsonld-java -->
                 <exclusion>
@@ -192,7 +175,7 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
-            <version>3.16.0</version>
+            <version>${jena.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
@@ -202,7 +185,7 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb</artifactId>
-            <version>3.16.0</version>
+            <version>${jena.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
@@ -241,11 +224,8 @@
         </dependency>
 
         <!-- Used for JSP runtime -->
-        <!-- dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency -->
+        <!-- dependency> <groupId>jstl</groupId> <artifactId>jstl</artifactId> 
+            <version>1.2</version> </dependency -->
         <dependency>
             <groupId>org.apache.taglibs</groupId>
             <artifactId>taglibs-standard-spec</artifactId>

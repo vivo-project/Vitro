@@ -42,7 +42,7 @@
                                 <echo message="[java.version]               ${java.version}" />
                                 <echo message="[java.specification.version] ${java.specification.version}" />
                                 <echo message="[maven.compiler.release]     ${maven.compiler.release}" />
-                                <echo message="[skip-samples-install]        ${skip-samples-install}" />
+                                <echo message="[skip-samples-install]       ${skip-samples-install}" />
                                 <echo message="###################################################################" />
                                 <echo message="###################################################################" />
                             </target>
