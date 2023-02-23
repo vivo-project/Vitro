@@ -30,4 +30,9 @@ public class IdModelSelector implements ModelSelector {
 		return mSource.getModel(name);
 	}
 
+	@Override
+	public String getDefaultGraphUri() {
+		return name;
+	}
+
 }

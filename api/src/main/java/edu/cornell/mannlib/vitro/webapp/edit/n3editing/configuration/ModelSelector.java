@@ -18,4 +18,6 @@ import org.apache.jena.rdf.model.Model;
  */
 public interface ModelSelector {
     public Model getModel(HttpServletRequest request, ServletContext context);
+    
+    public String getDefaultGraphUri();
 }

@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmis
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.LimitRemovalsToLanguage;
 
 /**
@@ -50,8 +51,6 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocesso
 public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
     private Log log = LogFactory.getLog(ProcessRdfFormController.class);
-
-
 
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
@@ -78,8 +77,8 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
         // get the models to work with in case the write model and query model are not the defaults
 		Model queryModel = configuration.getQueryModelSelector().getModel(vreq, getServletContext());
-	    Model writeModel = configuration.getWriteModelSelector().getModel(vreq,getServletContext());
-
+	    ModelSelector writeModelSelector = configuration.getWriteModelSelector();
+		Model writeModel = writeModelSelector.getModel(vreq,getServletContext());
 	    //If data property check for back button confusion
 	    boolean isBackButton = checkForBackButtonConfusion(configuration, vreq, queryModel);
 	    if(isBackButton) {
@@ -108,7 +107,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		configuration.addModelChangePreprocessor(new LimitRemovalsToLanguage(vreq.getLocale()));
 		N3EditUtils.preprocessModels(changes, configuration, vreq);
 		
-		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, N3EditUtils.getEditorUri(vreq) );
+		ProcessRdfForm.applyChangesToWriteModel(changes, vreq.getRDFService(), writeModelSelector.getDefaultGraphUri(), N3EditUtils.getEditorUri(vreq));
 
 		//Here we are trying to get the entity to return to URL,
 		//More involved processing for data property apparently

@@ -24,4 +24,9 @@ public class StandardModelSelector implements ModelSelector {
 
     public static final ModelSelector selector = new StandardModelSelector();
 
+	@Override
+	public String getDefaultGraphUri() {
+		return ABOX_UNION;
+	}
+
 }
