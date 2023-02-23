@@ -298,7 +298,7 @@ public class ProcessRdfForm {
 		
 		ByteArrayOutputStream retractionsStream = new ByteArrayOutputStream();
 		changes.getRetractions().write(retractionsStream, "N3");
-		InputStream retractionsInputStream = new ByteArrayInputStream(additionsStream.toByteArray());
+		InputStream retractionsInputStream = new ByteArrayInputStream(retractionsStream.toByteArray());
 		
 		cs.addAddition(additionsInputStream, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), null, editorUri);
 		cs.addRemoval(retractionsInputStream, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), null, editorUri);
