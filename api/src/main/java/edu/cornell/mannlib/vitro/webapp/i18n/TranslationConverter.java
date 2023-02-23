@@ -123,7 +123,7 @@ public class TranslationConverter {
 		ByteArrayOutputStream removeOS = new ByteArrayOutputStream();
 		storedModel.write(removeOS, "N3");
 		InputStream removeIS = new ByteArrayInputStream(removeOS.toByteArray());
-		cs.addRemoval(removeIS, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.INTERFACE_I18N);
+		cs.addRemoval(removeIS, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.INTERFACE_I18N, getClassUri());
 		try {
 			rdfService.changeSetUpdate(cs);
 		} catch (RDFServiceException e) {
@@ -136,7 +136,7 @@ public class TranslationConverter {
 		ByteArrayOutputStream addOS = new ByteArrayOutputStream();
 		memModel.write(addOS, "N3");
 		InputStream addIS = new ByteArrayInputStream(addOS.toByteArray());
-		cs.addAddition(addIS, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.INTERFACE_I18N);
+		cs.addAddition(addIS, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.INTERFACE_I18N, getClassUri());
 		try {
 			rdfService.changeSetUpdate(cs);
 		} catch (RDFServiceException e) {
@@ -325,6 +325,10 @@ public class TranslationConverter {
 		cs.addPreChangeEvent(new BulkUpdateEvent(null, BEGIN));
 		cs.addPostChangeEvent(new BulkUpdateEvent(null, END));
 		return cs;
+	}
+	
+	private String getClassUri() {
+		return "java:" + this.getClass().getCanonicalName();
 	}
 	
 }

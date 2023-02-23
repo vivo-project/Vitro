@@ -70,6 +70,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -659,7 +660,7 @@ public class JenaIngestController extends BaseEditController {
                   vreq.setAttribute("title","Rename Resource");
                   return RENAME_RESOURCE;
               } else {
-                  String result = doRename(oldNamespace, newNamespace);
+                  String result = doRename(oldNamespace, newNamespace, vreq);
                   vreq.setAttribute("result",result);
                   vreq.setAttribute("title","Rename Resources");
                   return RENAME_RESULT;
@@ -1072,7 +1073,7 @@ public class JenaIngestController extends BaseEditController {
                         vreq)).run(jenaOntModel.getIndividual(workflowStepURI));
     }
 
-    private String doRename(String oldNamespace,String newNamespace){
+    private String doRename(String oldNamespace,String newNamespace, VitroRequest vreq){
         String uri = null;
         String result = null;
         Integer counter = 0;
@@ -1141,14 +1142,15 @@ public class JenaIngestController extends BaseEditController {
                         "   ?s ?r <" + newURIStr + "> \n" + whereClause;
                 try {
                     ChangeSet cs = rdfService.manufactureChangeSet();
+                    String editorUri = N3EditUtils.getEditorUri(vreq);
                     cs.addAddition(rdfService.sparqlConstructQuery(
-                            addQuery, RDFService.ModelSerializationFormat.N3),
+					addQuery, RDFService.ModelSerializationFormat.N3),
                                     RDFService.ModelSerializationFormat.N3,
-                                            ABOX_ASSERTIONS);
+                                            ABOX_ASSERTIONS, editorUri);
                     cs.addRemoval(rdfService.sparqlConstructQuery(
                             removeQuery, RDFService.ModelSerializationFormat.N3),
                                     RDFService.ModelSerializationFormat.N3,
-                                            ABOX_ASSERTIONS);
+                                            ABOX_ASSERTIONS, editorUri);
                     rdfService.changeSetUpdate(cs);
                 } catch (RDFServiceException e) {
                     throw new RuntimeException(e);

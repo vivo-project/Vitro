@@ -42,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -120,6 +121,7 @@ public class RDFUploadController extends JenaIngestController {
 
         /* ********************* GET RDF by URL ********************** */
         String RDFUrlStr =  request.getParameter("rdfUrl");
+        String editorUri = N3EditUtils.getEditorUri(request);
         if (RDFUrlStr != null && RDFUrlStr.length() > 0) {
             try {
                 uploadModel.enterCriticalSection(Lock.WRITE);
@@ -147,7 +149,7 @@ public class RDFUploadController extends JenaIngestController {
                 try {
                     if (directRead) {
                         addUsingRDFService(rdfStream.getInputStream(), languageStr,
-                                request.getRDFService());
+                                request.getRDFService(), editorUri);
                     } else {
                         uploadModel.enterCriticalSection(Lock.WRITE);
                         try {
@@ -200,7 +202,7 @@ public class RDFUploadController extends JenaIngestController {
                 // aggressively seek all statements that are part of the TBox
                 tboxstmtCount = operateOnModel(request.getUnfilteredWebappDaoFactory(),
                         tboxModel, tboxChangeModel, ontModelSelector,
-                                remove, makeClassgroups, loginBean.getUserURI());
+                                remove, makeClassgroups, loginBean.getUserURI(), editorUri);
             }
             if (aboxModel != null) {
                 aboxChangeModel = uploadModel.remove(tboxChangeModel);
@@ -210,10 +212,10 @@ public class RDFUploadController extends JenaIngestController {
                 ByteArrayInputStream in = new ByteArrayInputStream(os.toByteArray());
                 if(!remove) {
                     readIntoModel(in, "N3", request.getRDFService(),
-                            ModelNames.ABOX_ASSERTIONS);
+                            ModelNames.ABOX_ASSERTIONS, editorUri);
                 } else {
                     removeFromModel(in, "N3", request.getRDFService(),
-                            ModelNames.ABOX_ASSERTIONS);
+                            ModelNames.ABOX_ASSERTIONS, editorUri);
                 }
 //                operateOnModel(request.getUnfilteredWebappDaoFactory(),
 //                        aboxModel, aboxChangeModel, ontModelSelector,
@@ -245,7 +247,7 @@ public class RDFUploadController extends JenaIngestController {
     }
 
     private void addUsingRDFService(InputStream in, String languageStr,
-            RDFService rdfService) {
+            RDFService rdfService, String userId) {
         ChangeSet changeSet = makeChangeSet(rdfService);
         RDFService.ModelSerializationFormat format =
                 ("RDF/XML".equals(languageStr)
@@ -253,7 +255,7 @@ public class RDFUploadController extends JenaIngestController {
                                 ? RDFService.ModelSerializationFormat.RDFXML
                                 : RDFService.ModelSerializationFormat.N3;
         changeSet.addAddition(in, format,
-                ABOX_ASSERTIONS);
+                ABOX_ASSERTIONS, userId);
         try {
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException rdfse) {
@@ -280,7 +282,7 @@ public class RDFUploadController extends JenaIngestController {
         } else {
             RDFService rdfService = getRDFService(request, maker, modelName);
             try {
-                doLoadRDFData(modelName, docLoc, filePath, languageStr, rdfService, remove);
+                doLoadRDFData(modelName, docLoc, filePath, languageStr, rdfService, remove, N3EditUtils.getEditorUri(request));
             } finally {
                 rdfService.close();
             }
@@ -315,7 +317,7 @@ public class RDFUploadController extends JenaIngestController {
                                 OntModelSelector ontModelSelector,
                                 boolean remove,
                                 boolean makeClassgroups,
-                                String userURI) {
+                                String userURI, String userId) {
 
         EditEvent startEvent = null, endEvent = null;
 
@@ -353,7 +355,7 @@ public class RDFUploadController extends JenaIngestController {
                     changesModel.write(out, "N-TRIPLE");
                     ChangeSet cs = makeChangeSet(rdfService);
                     ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-                    cs.addRemoval(in, RDFService.ModelSerializationFormat.NTRIPLE, null);
+                    cs.addRemoval(in, RDFService.ModelSerializationFormat.NTRIPLE, null, userId);
                     try {
                         rdfService.changeSetUpdate(cs);
                     } catch (RDFServiceException e) {
@@ -380,17 +382,19 @@ public class RDFUploadController extends JenaIngestController {
                                String filePath,
                                String language,
                                RDFService rdfService,
-                               boolean remove) {
+                               boolean remove,
+                               String userId
+    							) {
         try {
             if ( (docLoc != null) && (docLoc.length()>0) ) {
                 URL docLocURL = new URL(docLoc);
                 InputStream in = docLocURL.openStream();
                 if(!remove) {
                     readIntoModel(in, language, rdfService,
-                            modelName);
+                            modelName, userId);
                 } else {
                     removeFromModel(in, language, rdfService,
-                            modelName);
+                            modelName, userId);
                 }
             } else if ( (filePath != null) && (filePath.length()>0) ) {
                 File file = new File(filePath);
@@ -406,10 +410,10 @@ public class RDFUploadController extends JenaIngestController {
                     try {
                         if(!remove) {
                             readIntoModel(fileStream.getInputStream(), language, rdfService,
-                                    modelName);
+                                    modelName, userId);
                         } else {
                             removeFromModel(fileStream.getInputStream(), language, rdfService,
-                                    modelName);
+                                    modelName, userId);
                         }
                         fileStream.delete();
                     } catch (IOException ioe) {
@@ -426,10 +430,10 @@ public class RDFUploadController extends JenaIngestController {
     }
 
     private void readIntoModel(InputStream in, String language,
-            RDFService rdfService, String modelName) {
+            RDFService rdfService, String modelName, String userId) {
         ChangeSet cs = makeChangeSet(rdfService);
         cs.addAddition(in, RDFServiceUtils.getSerializationFormatFromJenaString(
-                        language), modelName);
+                        language), modelName, userId);
         try {
             rdfService.changeSetUpdate(cs);
         } catch (RDFServiceException e) {
@@ -438,10 +442,10 @@ public class RDFUploadController extends JenaIngestController {
     }
 
     private void removeFromModel(InputStream in, String language,
-            RDFService rdfService, String modelName) {
+            RDFService rdfService, String modelName, String userId) {
         ChangeSet cs = makeChangeSet(rdfService);
         cs.addRemoval(in, RDFServiceUtils.getSerializationFormatFromJenaString(
-                        language), modelName);
+                        language), modelName, userId);
         try {
             rdfService.changeSetUpdate(cs);
         } catch (RDFServiceException e) {
