@@ -11,7 +11,8 @@ Vitro CodeStyle Requirements
   4. Maximum line length is 100 characters (except for long URLs, packages or imports)
   5. No trailing spaces allowed (except in comments)
   6. Tokens should be surrounded by whitespace (see http://checkstyle.sourceforge.net/config_whitespace.html#WhitespaceAround)
-  7. Each source file must include our license header (validated separately by license-maven-plugin, see pom.xml)
+  7. Each line of code can only include one statement. This also means each variable declaration must be on its own line
+  8. Each source file must include our license header (validated separately by license-maven-plugin, see pom.xml)
 
 For more information on CheckStyle configurations below, see: http://checkstyle.sourceforge.net/checks.html
 -->
@@ -104,7 +105,5 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <module name="MultipleVariableDeclarations"/>
         <!-- Each line of code can only include one statement -->
         <module name="OneStatementPerLine"/>
-        <!-- Require that "catch" statements are not empty (must at least contain a comment) -->
-        <module name="EmptyCatchBlock"/>
     </module>
 </module>
