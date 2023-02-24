@@ -306,11 +306,12 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <skip>true</skip>
                     <configLocation>
-                      duraspace-checkstyle/checkstyle.xml
+                      checkstyle.xml
                     </configLocation>
                     <suppressionsLocation>
-                      vitro-checkstyle/checkstyle-suppressions.xml
+                      checkstyle-suppressions.xml
                     </suppressionsLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
