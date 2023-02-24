@@ -53,8 +53,7 @@ var browseByVClass = {
         // if the user navigates with the back button
         this.browseVClasses.children('li').each( function() {
            $(this).find('a').click(function () {
-                // the extra space is needed to prevent odd scrolling behavior
-                location.hash = $(this).attr('data-uri') + ' ';
+                location.hash = $(this).attr('data-uri');
            });
         });
 
