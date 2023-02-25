@@ -91,7 +91,7 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
-Return                                     <artifactItems>
+                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>
                                             <artifactId>${project.artifactId}</artifactId>
