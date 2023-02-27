@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.config;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,8 +14,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.ibm.icu.text.SimpleDateFormat;
 
 /**
  * Information about the provenance of this application: release, revision

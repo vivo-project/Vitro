@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.text.Collator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -17,7 +18,6 @@ import org.apache.jena.shared.CannotCreateException;
 import org.apache.jena.shared.DoesNotExistException;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
-import com.ibm.icu.text.Collator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;

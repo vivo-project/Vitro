@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.config.RevisionInfoSetup.DATE_FOR
 import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -19,8 +20,6 @@ import org.junit.Test;
 
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpSessionStub;
-
-import com.ibm.icu.text.SimpleDateFormat;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
