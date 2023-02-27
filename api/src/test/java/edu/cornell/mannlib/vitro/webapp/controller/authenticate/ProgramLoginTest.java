@@ -14,6 +14,7 @@ import java.util.Collections;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -156,7 +157,7 @@ public class ProgramLoginTest extends AbstractTestClass {
 
 	@Test
 	public void newPasswordTooLong() {
-		executeRequest(NEW_USER_NAME, NEW_USER_PASSWORD, "reallyLongPassword");
+		executeRequest(NEW_USER_NAME, NEW_USER_PASSWORD, RandomStringUtils.randomAlphanumeric(UserAccount.MAX_PASSWORD_LENGTH + 1));
 		assert403();
 	}
 
