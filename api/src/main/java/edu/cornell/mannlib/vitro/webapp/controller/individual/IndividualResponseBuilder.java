@@ -94,6 +94,7 @@ class IndividualResponseBuilder {
 		body.put("relatedSubject", getRelatedSubject());
 		body.put("namespaces", namespaces);
 		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
+        body.put("mapOfScienceVisualizationEnabled", getMapOfScienceVisualizationFlag());
 		body.put("profilePageTypesEnabled", getprofilePageTypesFlag());
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
 
@@ -194,6 +195,12 @@ class IndividualResponseBuilder {
 				"visualization.temporal");
 		return "enabled".equals(property);
 	}
+
+    private boolean getMapOfScienceVisualizationFlag() {
+        String property = ConfigurationProperties.getBean(vreq).getProperty(
+                "visualization.mapOfScience");
+        return "enabled".equals(property);
+    }
 
 	private boolean getprofilePageTypesFlag() {
 		String property = ConfigurationProperties.getBean(vreq).getProperty(
