@@ -306,7 +306,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <skip>true</skip>
                     <configLocation>
                       checkstyle.xml
                     </configLocation>
