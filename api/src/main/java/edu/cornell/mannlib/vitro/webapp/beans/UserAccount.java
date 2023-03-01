@@ -15,7 +15,7 @@ import org.apache.commons.lang3.RandomStringUtils;
  */
 public class UserAccount {
 	public static final int MIN_PASSWORD_LENGTH = 6;
-	public static final int MAX_PASSWORD_LENGTH = 12;
+	public static final int MAX_PASSWORD_LENGTH = 64;
 
 	public enum Status {
 		ACTIVE, INACTIVE;
