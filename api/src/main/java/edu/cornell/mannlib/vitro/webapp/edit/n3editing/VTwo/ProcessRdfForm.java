@@ -283,40 +283,39 @@ public class ProcessRdfForm {
         return changes;
     }
 
-    public static void applyChangesToWriteModel(AdditionsAndRetractions changes, RDFService rdfService,
-    		String defaultGraphUri, String editorUri) {
-		appyChangesToWriteModel(changes, editorUri, rdfService, defaultGraphUri);
+    @Deprecated
+    public static void applyChangesToWriteModel(AdditionsAndRetractions changes, Model writeModel,
+            String editorUri) {
+        RDFService rdfService = new RDFServiceModel(writeModel);
+        applyChangesToWriteModel(changes, rdfService, null, editorUri);
     }
-    
-	@Deprecated
-	public static void applyChangesToWriteModel(AdditionsAndRetractions changes, Model writeModel, String editorUri) {
-		RDFService rdfService = new RDFServiceModel(writeModel);
-		appyChangesToWriteModel(changes, editorUri, rdfService, null);
-	}
 
-	private static void appyChangesToWriteModel(AdditionsAndRetractions changes, String editorUri,
-			RDFService rdfService, String graphUri) {
-		ChangeSet cs = rdfService.manufactureChangeSet();
-		cs.addPreChangeEvent(new BulkUpdateEvent(null, true));
-		cs.addPostChangeEvent(new BulkUpdateEvent(null, false));
-		
-		ByteArrayOutputStream additionsStream = new ByteArrayOutputStream();
-		changes.getAdditions().write(additionsStream, "N3");
-		InputStream additionsInputStream = new ByteArrayInputStream(additionsStream.toByteArray());
-		
-		ByteArrayOutputStream retractionsStream = new ByteArrayOutputStream();
-		changes.getRetractions().write(retractionsStream, "N3");
-		InputStream retractionsInputStream = new ByteArrayInputStream(retractionsStream.toByteArray());
-		
-		cs.addAddition(additionsInputStream, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), graphUri, editorUri);
-		cs.addRemoval(retractionsInputStream, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), graphUri, editorUri);
+    public static void applyChangesToWriteModel(AdditionsAndRetractions changes,
+            RDFService rdfService, String graphUri, String editorUri) {
+        ChangeSet cs = rdfService.manufactureChangeSet();
+        cs.addPreChangeEvent(new BulkUpdateEvent(null, true));
+        cs.addPostChangeEvent(new BulkUpdateEvent(null, false));
+
+        ByteArrayOutputStream additionsStream = new ByteArrayOutputStream();
+        changes.getAdditions().write(additionsStream, "N3");
+        InputStream additionsInputStream = new ByteArrayInputStream(additionsStream.toByteArray());
+
+        ByteArrayOutputStream retractionsStream = new ByteArrayOutputStream();
+        changes.getRetractions().write(retractionsStream, "N3");
+        InputStream retractionsInputStream = new ByteArrayInputStream(
+                retractionsStream.toByteArray());
+
+        cs.addAddition(additionsInputStream,
+                RDFServiceUtils.getSerializationFormatFromJenaString("N3"), graphUri, editorUri);
+        cs.addRemoval(retractionsInputStream,
+                RDFServiceUtils.getSerializationFormatFromJenaString("N3"), graphUri, editorUri);
 
         try {
-			rdfService.changeSetUpdate(cs);
-		} catch (RDFServiceException e) {
-			log.error(e, e);
-		}
-	}
+            rdfService.changeSetUpdate(cs);
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+    }
 
     protected AdditionsAndRetractions parseN3ToChange(
             List<String> requiredAdds, List<String> optionalAdds,

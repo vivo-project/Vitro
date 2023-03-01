@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
-public class RDFServiceNotifictaionTest {
+public class RDFServiceNotificationTest {
 
 	private String TEST_TRIPLE = "<test:uri1> <test:pred1> \"test value\" .";
 	private List<ModelChange> modelChanges = null;

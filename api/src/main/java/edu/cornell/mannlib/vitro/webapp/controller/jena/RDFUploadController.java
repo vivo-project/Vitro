@@ -317,7 +317,8 @@ public class RDFUploadController extends JenaIngestController {
                                 OntModelSelector ontModelSelector,
                                 boolean remove,
                                 boolean makeClassgroups,
-                                String userURI, String userId) {
+                                String userURI, 
+                                String userId) {
 
         EditEvent startEvent = null, endEvent = null;
 
