@@ -384,8 +384,7 @@ public class RDFUploadController extends JenaIngestController {
                                String language,
                                RDFService rdfService,
                                boolean remove,
-                               String userId
-    							) {
+                               String userId) {
         try {
             if ( (docLoc != null) && (docLoc.length()>0) ) {
                 URL docLocURL = new URL(docLoc);
