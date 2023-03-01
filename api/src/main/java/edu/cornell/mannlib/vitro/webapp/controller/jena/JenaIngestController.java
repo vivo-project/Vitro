@@ -660,7 +660,7 @@ public class JenaIngestController extends BaseEditController {
                   vreq.setAttribute("title","Rename Resource");
                   return RENAME_RESOURCE;
               } else {
-                  String result = doRename(oldNamespace, newNamespace, vreq);
+                  String result = doRename(oldNamespace, newNamespace, N3EditUtils.getEditorUri(vreq));
                   vreq.setAttribute("result",result);
                   vreq.setAttribute("title","Rename Resources");
                   return RENAME_RESULT;
@@ -1073,7 +1073,7 @@ public class JenaIngestController extends BaseEditController {
                         vreq)).run(jenaOntModel.getIndividual(workflowStepURI));
     }
 
-    private String doRename(String oldNamespace,String newNamespace, VitroRequest vreq){
+    private String doRename(String oldNamespace,String newNamespace, String editorUri){
         String uri = null;
         String result = null;
         Integer counter = 0;
@@ -1142,7 +1142,6 @@ public class JenaIngestController extends BaseEditController {
                         "   ?s ?r <" + newURIStr + "> \n" + whereClause;
                 try {
                     ChangeSet cs = rdfService.manufactureChangeSet();
-                    String editorUri = N3EditUtils.getEditorUri(vreq);
                     cs.addAddition(rdfService.sparqlConstructQuery(
 					addQuery, RDFService.ModelSerializationFormat.N3),
                                     RDFService.ModelSerializationFormat.N3,
