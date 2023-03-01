@@ -283,13 +283,6 @@ public class ProcessRdfForm {
         return changes;
     }
 
-    @Deprecated
-    public static void applyChangesToWriteModel(AdditionsAndRetractions changes, Model writeModel,
-            String editorUri) {
-        RDFService rdfService = new RDFServiceModel(writeModel);
-        applyChangesToWriteModel(changes, rdfService, null, editorUri);
-    }
-
     public static void applyChangesToWriteModel(AdditionsAndRetractions changes,
             RDFService rdfService, String graphUri, String editorUri) {
         ChangeSet cs = rdfService.manufactureChangeSet();
