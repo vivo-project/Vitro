@@ -1,6 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.dynapi;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
+package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 public class NullRPC extends RPC {
 
