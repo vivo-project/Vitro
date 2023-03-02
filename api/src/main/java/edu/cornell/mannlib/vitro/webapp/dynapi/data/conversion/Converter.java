@@ -32,7 +32,7 @@ public class Converter {
 			ContentType.MULTIPART_FORM_DATA.getMimeType().toString(), 
 			ContentType.WILDCARD.getMimeType().toString()));
 
-	public static void convert(HttpServletRequest request, Procedure procedure, DataStore dataStore)
+	public static void convertFromRequest(HttpServletRequest request, Procedure procedure, DataStore dataStore)
 			throws ConversionException {
 		ContentType contentType = getContentType(request.getContentType());
 		ContentType responseType = getResponseType(request.getHeader(HttpHeaders.ACCEPT), contentType);
@@ -115,7 +115,7 @@ public class Converter {
 		return mostAppropriateType;
 	}
 
-	public static void convert(HttpServletResponse response, Procedure procedure, DataStore dataStore) throws ConversionException {
+	public static void convertToResponse(HttpServletResponse response, Procedure procedure, DataStore dataStore) throws ConversionException {
 		if (!procedure.isOutputValid(dataStore)) {
 		    throw new ConversionException(String.format("Action uri %s output is invalid", procedure.getUri()));
 		}
