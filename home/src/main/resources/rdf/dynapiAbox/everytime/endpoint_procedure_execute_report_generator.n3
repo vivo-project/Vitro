@@ -45,7 +45,7 @@
          dynapi:hasCondition                 <https://vivoweb.org/procedure/execute_report_generator/condition_is_report_generator/condition> .       
 
 <https://vivoweb.org/procedure/execute_report_generator/condition_is_report_generator/condition>
-         a                                   dynapi:ConditionIsParameter ;
+         a                                   dynapi:ConditionHasTrueValue ;
          dynapi:requiresParameter            <https://vivoweb.org/procedure/execute_report_generator/parameter/is_report_generator> .
 
 ####################################################################################################################################################################################

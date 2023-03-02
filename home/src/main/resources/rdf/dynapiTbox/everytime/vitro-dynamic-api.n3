@@ -642,8 +642,8 @@
                      rdfs:subClassOf :Condition ;
                      rdfs:label "Condition interface"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionIsParameter
-:ConditionIsParameter rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionHasTrueValue
+:ConditionHasTrueValue rdf:type owl:Class ;
                      rdfs:subClassOf :Condition ;
                      rdfs:label "Condition is all parameter are set to true"@en-US .
 
