@@ -43,7 +43,6 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#accessWhiteList")
     public void addAccessFilter(AccessWhitelist whiteList) {
         accessWhitelists.add(whiteList);
-        whiteList.setProcedureName(getUri());
     }
     
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", maxOccurs = 1)
@@ -178,7 +177,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
 			return true;
 		}
 		for (AccessWhitelist filter : accessWhitelists) {
-			if (filter.isAuthorized(user)) {
+			if (filter.isAuthorized(user, getUri())) {
 				return true;
 			}
 		}
