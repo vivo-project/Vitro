@@ -34,7 +34,7 @@ public class ProcedureDescriptorCall {
         inputParams.remove(procedureDescriptor.getUriParam());
         ProcedurePool procedurePool = ProcedurePool.getInstance();
         try(Procedure procedure = procedurePool.getByUri(uri);){
-            Endpoint.getDependencies(procedure, dataStore, procedurePool);
+            Endpoint.collectDependencies(procedure, dataStore, procedurePool);
             execute(procedureDescriptor, dataStore, uri, procedure, inputParams);    
         } finally {
             dataStore.removeDependencies();
