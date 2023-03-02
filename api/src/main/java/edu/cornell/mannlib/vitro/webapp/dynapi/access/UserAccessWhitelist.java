@@ -13,7 +13,6 @@ public class UserAccessWhitelist implements AccessWhitelist {
 
     private static final Log log = LogFactory.getLog(UserAccessWhitelist.class);
     private Set<String> users = new HashSet<String>();
-    private String procedureName = "action name not provided";
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#userEmail")
     public void addUserEmail(String email) {
@@ -21,7 +20,7 @@ public class UserAccessWhitelist implements AccessWhitelist {
     }
 
     @Override
-    public boolean isAuthorized(UserAccount user) {
+    public boolean isAuthorized(UserAccount user, String procedureName) {
         String email = user.getEmailAddress();
         if (users.contains(email)) {
             log.debug("User '" + user.getEmailAddress() + "' allowed to access procedure '" + procedureName + "'");
@@ -31,10 +30,4 @@ public class UserAccessWhitelist implements AccessWhitelist {
                 + procedureName + "'");
         return false;
     }
-
-    @Override
-    public void setProcedureName(String name) {
-        this.procedureName = name;
-    }
-
 }
