@@ -42,7 +42,7 @@ public abstract class Endpoint extends VitroHttpServlet {
         DataStore dataStore = new DataStore();
         dataStore.setUser(user);
         try {
-            getDependencies(procedure, dataStore, procedurePool);
+            collectDependencies(procedure, dataStore, procedurePool);
             Converter.convert(request, procedure, dataStore);
         } catch (Exception e) {
             log.error(e, e);
@@ -75,7 +75,7 @@ public abstract class Endpoint extends VitroHttpServlet {
         return;
     }
 
-    public static void getDependencies(Procedure procedure, DataStore dataStore, ProcedurePool procedurePool) throws InitializationException {
+    public static void collectDependencies(Procedure procedure, DataStore dataStore, ProcedurePool procedurePool) throws InitializationException {
         Map<String, ProcedureDescriptor> dependencies = procedure.getDependencies();
         for (String uri : dependencies.keySet()) {
             if (dataStore.containsDependency(uri)) {
@@ -92,7 +92,7 @@ public abstract class Endpoint extends VitroHttpServlet {
             }
             validateDependency(descriptor, dependency);
             dataStore.putDependency(uri, dependency);
-            getDependencies(dependency, dataStore, procedurePool);
+            collectDependencies(dependency, dataStore, procedurePool);
         }
     }
 
