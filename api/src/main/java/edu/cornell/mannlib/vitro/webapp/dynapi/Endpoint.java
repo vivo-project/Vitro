@@ -97,38 +97,36 @@ public abstract class Endpoint extends VitroHttpServlet {
     }
 
     private static void validateDependency(ProcedureDescriptor descriptor, Procedure procedure) throws InitializationException {
-        checkInputParameters(descriptor, procedure);
-        checkOutputParameters(descriptor, procedure);
+        validateInputParameters(descriptor, procedure);
+        validateOutputParameters(descriptor, procedure);
     }
 
-    private static void checkInputParameters(ProcedureDescriptor descriptor, Procedure procedure)
+    private static void validateInputParameters(ProcedureDescriptor descriptor, Procedure procedure)
             throws InitializationException {
         Parameters providedInput = descriptor.getInputParams();
         Parameters requiredInput = procedure.getInputParams();
-        for (String paramName : requiredInput.getNames()) {
-            Parameter param = requiredInput.get(paramName);
-            if (!providedInput.contains(param)) {
-                throw new InitializationException(String.format(
-                        "Input parameter with name %s required by procedure with uri:'%s' is not provided by descriptor.",
-                        paramName, procedure.getUri()));
-            }
-            
-        }
+        String errorMessage = "Input parameter with name %s required by procedure with uri:'" + procedure.getUri() + "' is not provided by descriptor.";
+
+        validateParameters(providedInput, requiredInput, errorMessage);
     }
 
-    private static void checkOutputParameters(ProcedureDescriptor descriptor, Procedure procedure)
+    private static void validateOutputParameters(ProcedureDescriptor descriptor, Procedure procedure)
             throws InitializationException {
         Parameters providedOutput = procedure.getOutputParams();
         Parameters requiredOutput = descriptor.getOutputParams();
-        for (String paramName : requiredOutput.getNames()) {
-            Parameter param = requiredOutput.get(paramName);
-            //TODO:contains parameter with the same name, same parameter type, rdf type, impl type, serial/deserial types.
-            if (!providedOutput.contains(param)) {
-                throw new InitializationException(String.format(
-                        "Output parameter with name '%s' required by descriptor is not provided by procedure with uri:'%s'.",
-                        paramName, procedure.getUri()));
+        String errorMessage = "Output parameter with name '%s' required by descriptor is not provided by procedure with uri:'" + procedure.getUri() + "'.";
+
+        validateParameters(providedOutput, requiredOutput, errorMessage);
+    }
+
+    private static void validateParameters(Parameters provided, Parameters required, String errorMessage)
+            throws InitializationException {
+        for (String paramName : required.getNames()) {
+            Parameter param = required.get(paramName);
+            if (!provided.contains(param)) {
+                throw new InitializationException(String.format(errorMessage, paramName));
             }
-            
         }
     }
+    
 }
