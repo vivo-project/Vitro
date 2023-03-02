@@ -14,7 +14,6 @@ public class GroupAccessWhitelist implements AccessWhitelist {
 
     private static final Log log = LogFactory.getLog(GroupAccessWhitelist.class);
 	private Map<String, UserGroup> groups = new HashMap<String, UserGroup>();
-	private String procedureName = "procedure name not provided";
 	
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#userGroup")
     public void addAccessFilter(UserGroup userGroup) {
@@ -22,7 +21,7 @@ public class GroupAccessWhitelist implements AccessWhitelist {
     }
 	
 	@Override
-	public boolean isAuthorized(UserAccount user) {
+	public boolean isAuthorized(UserAccount user, String procedureName) {
 		Set<String> uris = user.getPermissionSetUris();
 		for (String uri : uris) {
 			UserGroup userGroup = groups.get(uri);
@@ -34,11 +33,5 @@ public class GroupAccessWhitelist implements AccessWhitelist {
 		}
 		log.debug("Whitelist is doesn't allow user '" + user.getEmailAddress() + "' to access procedure '" + procedureName + "'");
 		return false;
-	}
-
-	@Override
-	public void setProcedureName(String name) {
-		this.procedureName  = name;
-	}
-
+    }
 }
