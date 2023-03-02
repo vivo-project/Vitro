@@ -73,10 +73,6 @@ public class ConditionContainerContains implements Condition {
             log.error("container param is not set");
             return false;
         }
-        if (!containerParam.isJsonContainer()) {
-            log.error("container param is not JsonContainer");
-            return false;
-        }
         if (keys.getNames().isEmpty()) {
             log.error("target param key not set");
             return false;
