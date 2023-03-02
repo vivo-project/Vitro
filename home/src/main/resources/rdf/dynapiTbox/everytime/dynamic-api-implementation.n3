@@ -66,7 +66,7 @@ dynapi:ConditionIsNotEmpty rdfs:subClassOf components:conditions.ConditionIsNotE
 
 dynapi:ConditionContainerContains rdfs:subClassOf components:conditions.ConditionContainerContains .
 
-dynapi:ConditionIsParameter rdfs:subClassOf components:conditions.ConditionIsParameter .
+dynapi:ConditionHasTrueValue rdfs:subClassOf components:conditions.ConditionHasValueTrue .
 
 dynapi:UserGroup rdfs:subClassOf access:UserGroup .
 
