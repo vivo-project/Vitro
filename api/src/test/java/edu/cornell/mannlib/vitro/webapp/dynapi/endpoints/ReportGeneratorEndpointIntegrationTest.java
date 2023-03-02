@@ -148,7 +148,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             store = new DataStore();
             store.setUser(user);
             Converter.convertInternalParams(internal, store);
-            Endpoint.getDependencies(procedure, store, procedurePool);
+            Endpoint.collectDependencies(procedure, store, procedurePool);
             assertTrue(OperationResult.ok().equals(procedure.run(store)));
             modelSizeWithReportGenerator = ontModel.size();
             procedureCountWithReportGenerator = procedurePool.count();
