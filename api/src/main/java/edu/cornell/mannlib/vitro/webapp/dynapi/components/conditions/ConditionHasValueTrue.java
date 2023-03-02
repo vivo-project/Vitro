@@ -10,16 +10,16 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class ConditionIsParameter implements Condition {
+public class ConditionHasValueTrue implements Condition {
 
+    private static final String TRUE_STRING_REPRESENTATION = "true";
     private Parameters inputParams = new Parameters();
     
     @Override
     public boolean isSatisfied(DataStore data) {
         for (String name : SimpleDataView.getNames(inputParams)) {
-            //RawData values = data.getData(name);
         	String value = SimpleDataView.getStringRepresentation(name, data);
-			if (!String.valueOf(true).equals(value)) {
+			if (!TRUE_STRING_REPRESENTATION.equals(value)) {
 				return false;
 			}
         }
