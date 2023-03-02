@@ -23,38 +23,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>echo-properties</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                            <target>
-                                <echo message="###################################################################" />
-                                <echo message="Displaying value of '${project.artifactId}' properties" />
-                                <echo message="###################################################################" />
-                                <echo message="[vitro-version]              ${vitro-version}" />
-                                <echo message="[vivo-version]               ${vivo-version}" />
-                                <echo message="[vivo-dir]                   ${vivo-dir}" />
-                                <echo message="[project.version]            ${project.version}" />
-                                <echo message="[java.vendor.version]        ${java.vendor.version}" />
-                                <echo message="[java.version]               ${java.version}" />
-                                <echo message="[java.specification.version] ${java.specification.version}" />
-                                <echo message="[maven.compiler.release]     ${maven.compiler.release}" />
-                                <echo message="###################################################################" />
-                                <echo message="###################################################################" />
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <runOrder>alphabetical</runOrder>
