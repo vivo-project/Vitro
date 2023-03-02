@@ -11,7 +11,7 @@ public class OperationResult {
     private static final OperationResult OK = new OperationResult(HttpServletResponse.SC_OK);
 	private static final OperationResult INTERNAL_SERVER_ERROR = new OperationResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	private static final OperationResult METHOD_NOT_ALLOWED = new OperationResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-	private static final OperationResult NOT_AUTHORIZED = new OperationResult(HttpServletResponse.SC_UNAUTHORIZED);
+	private static final OperationResult UNAUTHORIZED = new OperationResult(HttpServletResponse.SC_UNAUTHORIZED);
 	private static final OperationResult NOT_FOUND = new OperationResult(HttpServletResponse.SC_NOT_FOUND);
 	private static final OperationResult BAD_REQUEST = new OperationResult(HttpServletResponse.SC_BAD_REQUEST);
 	private int responseCode;
@@ -60,7 +60,7 @@ public class OperationResult {
     }
     
     public static OperationResult notAuthorized() {
-        return NOT_AUTHORIZED;
+        return UNAUTHORIZED;
     }
     
     public static OperationResult ok() {
