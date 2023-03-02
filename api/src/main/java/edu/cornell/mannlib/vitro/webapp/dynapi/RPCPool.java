@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullRPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 
 public class RPCPool extends AbstractPool<String, RPC, RPCPool> {
