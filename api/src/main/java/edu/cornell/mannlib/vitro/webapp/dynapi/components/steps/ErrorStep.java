@@ -21,7 +21,7 @@ public class ErrorStep implements Step{
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#errorCode", minOccurs = 1, maxOccurs = 1)
-    public void setMaxLength(int input) throws InitializationException {
+    public void setErrorCode(int input) throws InitializationException {
         if (!OperationResult.hasError(input)) {
             throw new InitializationException(String.format("Code '%s' is not an error. Error range is between 400 and 599", input));
         }
