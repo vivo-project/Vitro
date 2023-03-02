@@ -90,7 +90,7 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
             store.setUser(user);
             addInputContainer(store);
             
-            Endpoint.getDependencies(action, store, procedurePool);
+            Endpoint.collectDependencies(action, store, procedurePool);
             assertTrue(OperationResult.ok().equals(action.run(store))) ;
             assertTrue(store.contains(OUTPUT_CONTAINER));
             Data output = store.getData(OUTPUT_CONTAINER);
