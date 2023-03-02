@@ -43,7 +43,7 @@ public abstract class Endpoint extends VitroHttpServlet {
         dataStore.setUser(user);
         try {
             collectDependencies(procedure, dataStore, procedurePool);
-            Converter.convert(request, procedure, dataStore);
+            Converter.convertFromRequest(request, procedure, dataStore);
         } catch (Exception e) {
             log.error(e, e);
             dataStore.removeDependencies();
@@ -62,7 +62,7 @@ public abstract class Endpoint extends VitroHttpServlet {
             return;
         }
         try {
-            Converter.convert(response, procedure, dataStore);
+            Converter.convertToResponse(response, procedure, dataStore);
         } catch (ConversionException e) {
             log.error(e, e);
             OperationResult.internalServerError().prepareResponse(response);
