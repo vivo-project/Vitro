@@ -20,7 +20,7 @@ public class MultiAccessComponents<K, C> extends ConcurrentSkipListMap<K, C> {
         return this.get(key);
 	}
 	
-    public String getUri(Object key) {
+    public String getUri(K key) {
         return keyToUriMap.get(key);
     }
 
