@@ -95,7 +95,7 @@ public class VitroHomeDirectory {
 	 * 
 	 * Checksum digest can be manually created with the following command.
 	 * 
-	 * `find /vivo/home -type f | cut -c3- | grep -E '^bin/|^config/|^rdf/' | xargs md5sum > /vivo/home/digest.md5`
+	 * `find /vivo/home -type f | grep -E "^/vivo/home/bin/|^/vivo/home/config/|^/vivo/home/rdf/" | xargs md5sum > /vivo/home/digest.md5`
 	 * 
 	 * @param destination VIVO home directory
 	 * @return digest of each files checksum
