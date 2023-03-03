@@ -188,7 +188,7 @@ public class ContextModelAccessImpl implements ContextModelAccess {
 	@Override
 	public OntModel getOntModel(String name) {
 		OntModel ontModel = ontModelCache.getOntModel(name);
-		log.debug("getOntModel: " + name);	
+		log.debug("getOntModel: " + name);
 		return ontModel;
 	}
 
