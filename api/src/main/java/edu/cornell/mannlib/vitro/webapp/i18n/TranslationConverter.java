@@ -152,9 +152,11 @@ public class TranslationConverter {
 		log.debug("prefixesRegex " + prefixesRegex);
 		for (String dir : i18nDirs) {
 			File realDir = new File(ctx.getRealPath(dir));
-			Collection<File> files = FileUtils.listFiles(realDir, new RegexFileFilter(prefixesRegex + ".*\\.properties"), DirectoryFileFilter.DIRECTORY);
-			for (File file : files) {
-				convert(file);
+			if (realDir.isDirectory()) {
+				Collection<File> files = FileUtils.listFiles(realDir, new RegexFileFilter(prefixesRegex + ".*\\.properties"), DirectoryFileFilter.DIRECTORY);
+				for (File file : files) {
+					convert(file);
+				}	
 			}
 		}
 	}
