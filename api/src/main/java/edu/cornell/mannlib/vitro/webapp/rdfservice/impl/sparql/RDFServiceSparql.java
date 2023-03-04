@@ -119,7 +119,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
     protected void testConnection() {
         try {
             this.sparqlSelectQuery(
-                    "SELECT ?s WHERE { ?s a " + "<http://vitro.mannlib.cornell.edu/ns/vitro/nonsense/> }",
+                    "SELECT ?s WHERE { ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>" + "<http://vitro.mannlib.cornell.edu/ns/vitro/nonsense/> }",
                     RDFService.ResultFormat.JSON);
         } catch (Exception e) {
             throw new RuntimeException("Unable to connect to endpoint at " + readEndpointURI, e);
@@ -568,45 +568,45 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }
     }
 
-//	protected void addTriple(Triple t, String graphURI) throws RDFServiceException {
-//		try {
-//			StringBuffer updateString = new StringBuffer();
-//			updateString.append("INSERT DATA { ");
-//			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
-//			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
-//			updateString.append(" ");
-//			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
-//			updateString.append(" ");
-//			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
-//			updateString.append(" }");
-//			updateString.append((graphURI != null) ? " } " : "");
+//  protected void addTriple(Triple t, String graphURI) throws RDFServiceException {
+//      try {
+//          StringBuffer updateString = new StringBuffer();
+//          updateString.append("INSERT DATA { ");
+//          updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
+//          updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+//          updateString.append(" ");
+//          updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+//          updateString.append(" ");
+//          updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+//          updateString.append(" }");
+//          updateString.append((graphURI != null) ? " } " : "");
 //
-//			executeUpdate(updateString.toString());
-//			notifyListeners(t, ModelChange.Operation.ADD, graphURI);
-//		} finally {
-//			rebuildGraphURICache = true;
-//		}
-//	}
+//          executeUpdate(updateString.toString());
+//          notifyListeners(t, ModelChange.Operation.ADD, graphURI);
+//      } finally {
+//          rebuildGraphURICache = true;
+//      }
+//  }
 //
-//	protected void removeTriple(Triple t, String graphURI) throws RDFServiceException {
-//		try {
-//			StringBuffer updateString = new StringBuffer();
-//			updateString.append("DELETE DATA { ");
-//			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
-//			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
-//			updateString.append(" ");
-//			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
-//			updateString.append(" ");
-//			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
-//			updateString.append(" }");
-//			updateString.append((graphURI != null) ? " } " : "");
+//  protected void removeTriple(Triple t, String graphURI) throws RDFServiceException {
+//      try {
+//          StringBuffer updateString = new StringBuffer();
+//          updateString.append("DELETE DATA { ");
+//          updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
+//          updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+//          updateString.append(" ");
+//          updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+//          updateString.append(" ");
+//          updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+//          updateString.append(" }");
+//          updateString.append((graphURI != null) ? " } " : "");
 //
-//			executeUpdate(updateString.toString());
-//			notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
-//		} finally {
-//			rebuildGraphURICache = true;
-//		}
-//	}
+//          executeUpdate(updateString.toString());
+//          notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
+//      } finally {
+//          rebuildGraphURICache = true;
+//      }
+//  }
 
     @Override
     protected boolean isPreconditionSatisfied(String query, RDFService.SPARQLQueryType queryType)
