@@ -5,6 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.controller.json;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -65,8 +68,12 @@ public class GetRenderedSearchIndividualsByVClass extends GetSearchIndividualsBy
     /**
      * Look through the return object. For each individual, render the short view
      * and insert the resulting HTML into the object.
+     * ORIGINAL CODE 
+     * This code segment is never called. 
+     * It is kept for the time being for performance comparison tests. 
+     * It should be deleted when PR is accepted.
      */
-    private void addShortViewRenderings(ObjectNode rObj) {
+    private void addShortViewRenderings_ORIG(ObjectNode rObj) {
         ArrayNode individuals = (ArrayNode) rObj.get("individuals");
         String vclassName = rObj.get("vclass").get("name").asText();
         for (int i = 0; i < individuals.size(); i++) {
@@ -75,6 +82,50 @@ public class GetRenderedSearchIndividualsByVClass extends GetSearchIndividualsBy
         }
     }
 
+    /**
+     * Look through the return object. For each individual, render the short view
+     * and insert the resulting HTML into the object.
+     * The use of multi treading allows to submit the requests and the processing in 
+     * parallel of the necessary elements to the html objects of the page. 
+     * Parallel processing allows to use the network bandwidth to the maximum
+     */
+    private void addShortViewRenderings(ObjectNode rObj) {
+
+        ArrayNode individuals = (ArrayNode) rObj.get("individuals");
+        String vclassName = rObj.get("vclass").get("name").asText();
+        int indvSize = individuals.size();
+        ExecutorService es = Executors.newFixedThreadPool(indvSize);
+        for (int i = 0; i < indvSize; i++) {
+            ObjectNode individual = (ObjectNode) individuals.get(i);
+               ProcessIndividual pi = new ProcessIndividual();
+               pi.setIndividual(individual);
+               pi.setVclassName(vclassName);
+               es.execute(pi);
+        }
+        es.shutdown();
+        try {
+            while(!es.awaitTermination(250, TimeUnit.MILLISECONDS)){
+            }
+        } catch (InterruptedException e1) {
+        }
+    }
+    private class ProcessIndividual implements Runnable {
+        private ObjectNode individual = null;
+        private String vclassName;
+        public String getVclassName() {
+            return vclassName;
+        }
+        public void setVclassName(String vclassName) {
+            this.vclassName = vclassName;
+        }
+        // Method
+        public void run() {
+            individual.put("shortViewHtml", renderShortView(individual.get("URI").asText(), vclassName));
+        }
+        public void setIndividual(ObjectNode individual) {
+            this.individual = individual;
+        }
+    }
     private String renderShortView(String individualUri, String vclassName) {
         IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();
         Individual individual = iDao.getIndividualByURI(individualUri);
