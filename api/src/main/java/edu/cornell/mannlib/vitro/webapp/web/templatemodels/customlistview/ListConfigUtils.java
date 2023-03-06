@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceSDB;
 import org.apache.commons.lang3.StringUtils;
 
 public final class ListConfigUtils {

@@ -33,9 +33,9 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
         PropertyInstanceDao {
 
     public PropertyInstanceDaoJena(RDFService rdfService,
-                                   DatasetWrapperFactory dwf,
+                                   DatasetWrapper dw,
                                    WebappDaoFactoryJena wadf) {
-        super(rdfService, dwf, wadf);
+        super(rdfService, dw, wadf);
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI) {

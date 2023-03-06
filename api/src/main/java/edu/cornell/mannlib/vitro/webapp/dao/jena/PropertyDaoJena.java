@@ -73,14 +73,14 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     }
 
     protected RDFService rdfService;
-    protected DatasetWrapperFactory dwf;
+    protected DatasetWrapper dw;
 
     public PropertyDaoJena(RDFService rdfService,
-                           DatasetWrapperFactory dwf,
+                           DatasetWrapper dw,
                            WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.dw = dw;
         this.rdfService = rdfService;
-        this.dwf = dwf;
     }
 
     @Override

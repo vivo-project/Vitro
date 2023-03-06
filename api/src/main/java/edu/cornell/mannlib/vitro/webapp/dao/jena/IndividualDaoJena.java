@@ -52,7 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 	//For random number generation, creating it everytime the method is called lead to nextInt being about the same
 	//if calls were made close together in time
-	private Random random = new Random(System.currentTimeMillis());
+    protected Random random = new Random(System.currentTimeMillis());
     public IndividualDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
@@ -131,49 +131,44 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     }
 
     public List<Individual> getIndividualsByVClassURI(String vclassURI, int offset, int quantity ) {
-
-    	if (vclassURI==null) {
+        if (vclassURI == null) {
             return null;
         }
 
-        List<Individual> ents = new ArrayList<Individual>();
+        List<Individual> ents = new ArrayList<>();
 
         Resource theClass = (vclassURI.indexOf(PSEUDO_BNODE_NS) == 0)
             ? getOntModel().createResource(new AnonId(vclassURI.split("#")[1]))
             : ResourceFactory.createResource(vclassURI);
 
-
-
         if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
-        	UnionClass u = theClass.as(UnionClass.class);
-        	for (OntClass operand : u.listOperands().toList()) {
-        		VClass vc = new VClassJena(operand, getWebappDaoFactory());
-        		ents.addAll(getIndividualsByVClass(vc));
-        	}
+            UnionClass u = theClass.as(UnionClass.class);
+            for (OntClass operand : u.listOperands().toList()) {
+                VClass vc = new VClassJena(operand, getWebappDaoFactory());
+                ents.addAll(getIndividualsByVClass(vc));
+            }
         } else {
-        	OntModel ontModel = getOntModelSelector().getABoxModel();
-        	try {
-        		ontModel.enterCriticalSection(Lock.READ);
-	            StmtIterator stmtIt = ontModel.listStatements((Resource) null, RDF.type, theClass);
-	            try {
-	                while (stmtIt.hasNext()) {
-	                    Statement stmt = stmtIt.nextStatement();
-	                    OntResource ind = stmt.getSubject().as(OntResource.class);
-	                    ents.add(new IndividualJena(ind, getWebappDaoFactory()));
-	                }
-	            } finally {
-	                stmtIt.close();
-	            }
-        	} finally {
-        		ontModel.leaveCriticalSection();
-        	}
+            OntModel ontModel = getOntModelSelector().getABoxModel();
+            try {
+                ontModel.enterCriticalSection(Lock.READ);
+                StmtIterator stmtIt = ontModel.listStatements((Resource) null, RDF.type, theClass);
+                try {
+                    while (stmtIt.hasNext()) {
+                        Statement stmt = stmtIt.nextStatement();
+                        OntResource ind = stmt.getSubject().as(OntResource.class);
+                        ents.add(new IndividualJena(ind, getWebappDaoFactory()));
+                    }
+                } finally {
+                    stmtIt.close();
+                }
+            } finally {
+                ontModel.leaveCriticalSection();
+            }
         }
-
 
         java.util.Collections.sort(ents);
 
         return ents;
-
     }
 
     public int getCountOfIndividualsInVClass(String vclassURI ) {
@@ -711,8 +706,8 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     // This method returns an EditLiteral rather than a Jena Literal, since IndividualDao
     // should not reference Jena objects. (However, the problem isn't really solved
     // because EditLiteral currently references the Jena API.)
-    public EditLiteral getLabelEditLiteral(String individualUri) {
-        Literal literal = getLabelLiteral(individualUri);
+    public EditLiteral getLabelEditLiteral(String individualURI) {
+        Literal literal = getLabelLiteral(individualURI);
         if (literal == null) {
             return null;
         }

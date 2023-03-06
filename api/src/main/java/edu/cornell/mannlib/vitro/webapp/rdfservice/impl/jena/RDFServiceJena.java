@@ -38,7 +38,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.sdb.SDB;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.Quad;
 
@@ -574,30 +573,26 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 	}
 
 	private void serialize(OutputStream outputStream, String query) throws RDFServiceException {
-		DatasetWrapper dw = getDatasetWrapper();
-		try {
-			Dataset d = dw.getDataset();
-			Query q = createQuery(query);
-			QueryExecution qe = createQueryExecution(query, q, d);
-			// These properties only help for SDB, but shouldn't hurt for TDB.
-			qe.getContext().set(SDB.jdbcFetchSize, Integer.MIN_VALUE);
-			qe.getContext().set(SDB.jdbcStream, true);
-			qe.getContext().set(SDB.streamGraphAPI, true);
-			try {
-				ResultSet resultSet = qe.execSelect();
-				if (resultSet.getResultVars().contains("g")) {
-					Iterator<Quad> quads = new ResultSetQuadsIterator(resultSet);
-					RDFDataMgr.writeQuads(outputStream, quads);
-				} else {
-					Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
-					RDFDataMgr.writeTriples(outputStream, triples);
-				}
-			} finally {
-				qe.close();
-			}
-		} finally {
-			dw.close();
-		}
+        DatasetWrapper dw = getDatasetWrapper();
+        try {
+            Dataset d = dw.getDataset();
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
+            try {
+                ResultSet resultSet = qe.execSelect();
+                if (resultSet.getResultVars().contains("g")) {
+                    Iterator<Quad> quads = new ResultSetQuadsIterator(resultSet);
+                    RDFDataMgr.writeQuads(outputStream, quads);
+                } else {
+                    Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
+                    RDFDataMgr.writeTriples(outputStream, triples);
+                }
+            } finally {
+                qe.close();
+            }
+        } finally {
+            dw.close();
+        }
 	}
 
 	/**

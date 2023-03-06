@@ -147,7 +147,7 @@ public class FileGraphSetup implements ServletContextListener {
 
 	/*
      * Reads the graphs stored as files in sub-directories of
-     *   1. updates the SDB store to reflect the current contents of the graph.
+     *   1. updates the data store to reflect the current contents of the graph.
      *   2. adds the graph as an in-memory submodel of the base in-memory graph
      *
      * Note: no connection needs to be maintained between the in-memory copy of the
@@ -160,7 +160,7 @@ public class FileGraphSetup implements ServletContextListener {
         boolean modelChanged = false;
 
         // For each file graph in the target directory update or add that graph to
-        // the Jena SDB, and attach the graph as a submodel of the base model
+        // the Jena data store, and attach the graph as a submodel of the base model
         for ( Path p : pathSet ) {
 
             count++; // note this will count the empty files too
@@ -251,7 +251,7 @@ public class FileGraphSetup implements ServletContextListener {
      *                           graphs (of the given type) in the file
      *                           system.
      * @param type (input)     - abox or tbox.
-     * @param kbStore (output) - the SDB store for the application
+     * @param kbStore (output) - the data store for the application
      */
     public void cleanupDB(Dataset dataset, Set<String> uriSet, String type) {
 
@@ -288,7 +288,7 @@ public class FileGraphSetup implements ServletContextListener {
 	}
 
     /*
-     * Takes a path for a file graph and returns the corresponding SDB URI
+     * Takes a path for a file graph and returns the corresponding URI
      * for the graph. The correspondence is by defined convention.
      */
     private String pathToURI(Path path, String type) {

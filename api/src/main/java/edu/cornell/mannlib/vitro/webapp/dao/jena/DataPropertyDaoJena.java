@@ -73,9 +73,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
 
     public DataPropertyDaoJena(RDFService rdfService,
-                               DatasetWrapperFactory dwf,
+                               DatasetWrapper dw,
                                WebappDaoFactoryJena wadf) {
-        super(rdfService, dwf, wadf);
+        super(rdfService, dw, wadf);
     }
 
     public void deleteDataProperty(DataProperty dtp) {
