@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResults;
+import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
@@ -41,7 +42,11 @@ public class IndividualListController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(IndividualListController.class.getName());
 
-    private static final int INDIVIDUALS_PER_PAGE = 30;
+    /*
+     * The call to the attribution in JsonServlet ensures the uniformity of the assigned INDIVIDUALS_PER_PAGE value
+     */
+    private static final int INDIVIDUALS_PER_PAGE = JsonServlet.getIndividualsPerPage();
+
     private static final int MAX_PAGES = 40;  // must be even
 
     private static final String TEMPLATE_DEFAULT = "individualList.ftl";

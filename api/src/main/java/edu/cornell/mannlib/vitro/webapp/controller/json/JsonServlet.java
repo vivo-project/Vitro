@@ -36,7 +36,21 @@ import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
 public class JsonServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(JsonServlet.class);
-    private static final int INDIVIDUALS_PER_PAGE = 30;
+    
+    /*
+     * Approximately 50 SPARQL queries are required to process each individual. 
+     * The value of this variable has a major impact on the refresh 
+     * performance of the front pages of each tab, especially on person and organization
+     *
+     * I suggest to put the assignment of this variable in runtime.properties
+     * 
+     */
+    private static final int INDIVIDUALS_PER_PAGE = 15;
+    public static int getIndividualsPerPage() {
+        return INDIVIDUALS_PER_PAGE;
+    }
+
+
     public static final int REPLY_SIZE = 256;
 
     @Override
