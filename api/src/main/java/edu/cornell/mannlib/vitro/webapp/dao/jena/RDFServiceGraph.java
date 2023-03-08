@@ -515,6 +515,15 @@ public class RDFServiceGraph implements GraphWithPerform {
         public boolean transactionsSupported() {
             return true;
         }
+
+        @Override
+        public void executeAlways(Runnable action) {
+        }
+
+        @Override
+        public <T> T calculateAlways(Supplier<T> action) {
+            return null;
+        }
     };
 
     private void execSelect(String queryStr, ResultSetConsumer consumer) {

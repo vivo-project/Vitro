@@ -9,7 +9,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingUtils;
+import org.apache.jena.sparql.engine.binding.BindingLib;
 
 public class FilteredResultSet implements ResultSet {
 
@@ -54,13 +54,18 @@ public class FilteredResultSet implements ResultSet {
 
     @Override
     public Binding nextBinding() {
-        return BindingUtils.asBinding(nextSolution());
+        return BindingLib.asBinding(nextSolution());
     }
 
     @Override
     public QuerySolution nextSolution() {
         rowNum++;
         return solutIt.next();
+    }
+
+    @Override
+    public void close() {
+        originalResultSet.close();
     }
 
 }
