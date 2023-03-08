@@ -16,15 +16,15 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractGraphDecorat
  * A graph decorator that filters find() results according to a list of 
  * preferred language strings
  */
-public class LanguageFilteringGraph extends AbstractGraphDecorator 
-        implements Graph {
+public class LanguageFilteringGraph extends AbstractGraphDecorator {
 
     private List<String> langs;
     private LanguageFilterModel filterModel = new LanguageFilterModel();
-    
+
     /**
      * Return a graph wrapped in a decorator that will filter find() results
-     * according to the supplied list of acceptable languages  
+     * according to the supplied list of acceptable languages
+     *
      * @param g the graph to wrap with language awareness. May not be null.
      * @param preferredLanguages a list of preferred language strings. May not 
      * be null.
@@ -34,25 +34,22 @@ public class LanguageFilteringGraph extends AbstractGraphDecorator
         this.langs = preferredLanguages;
     }
 
-    @Override
     public ExtendedIterator<Triple> find(Triple arg0) {
         return filter(super.find(arg0));
-        
     }
 
-    @Override
     public ExtendedIterator<Triple> find(Node arg0, Node arg1, Node arg2) {
         return filter(super.find(arg0, arg1, arg2));
     }
-    
+
     private ExtendedIterator<Triple> filter(ExtendedIterator<Triple> triples) {
         Graph tmp = new GraphMem();
-        while(triples.hasNext()) {
+        while (triples.hasNext()) {
             Triple t = triples.next();
             tmp.add(t);
         }
         Model filteredModel = filterModel.filterModel(
-                ModelFactory.createModelForGraph(tmp), langs);
+            ModelFactory.createModelForGraph(tmp), langs);
         return filteredModel.getGraph().find();
     }
 

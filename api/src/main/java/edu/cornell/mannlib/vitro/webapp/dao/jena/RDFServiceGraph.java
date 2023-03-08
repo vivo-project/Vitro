@@ -2,6 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,8 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.graph.Capabilities;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.GraphEventManager;
-import org.apache.jena.graph.GraphListener;
-import org.apache.jena.graph.GraphStatisticsHandler;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.TransactionHandler;
 import org.apache.jena.graph.Triple;
@@ -27,21 +33,12 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.AddDeniedException;
-import org.apache.jena.shared.Command;
 import org.apache.jena.shared.DeleteDeniedException;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.SingletonIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
-
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class RDFServiceGraph implements GraphWithPerform {
 
@@ -215,9 +212,9 @@ public class RDFServiceGraph implements GraphWithPerform {
 
     @Override
     public boolean contains(Node subject, Node predicate, Node object) {
-		if ((subject != null && subject.isBlank())
-				|| (predicate != null && predicate.isBlank())
-				|| (object != null && object.isBlank())) {
+        if ((subject != null && subject.isBlank())
+                || (predicate != null && predicate.isBlank())
+                || (object != null && object.isBlank())) {
             return false;
         }
         StringBuilder containsQuery = new StringBuilder("SELECT * WHERE { \n");
@@ -265,11 +262,11 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
 
     @Override
-	public void remove(Node subject, Node predicate, Node object) {
-		for (Triple t : find(subject, predicate, object).toList()) {
-			delete(t);
-		}
-	}
+    public void remove(Node subject, Node predicate, Node object) {
+        for (Triple t : find(subject, predicate, object).toList()) {
+            delete(t);
+        }
+    }
 
     @Override
     public boolean dependsOn(Graph arg0) {
@@ -430,11 +427,6 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
 
     @Override
-    public GraphStatisticsHandler getStatisticsHandler() {
-        return null;
-    }
-
-    @Override
     public TransactionHandler getTransactionHandler() {
         return transactionHandler;
     }
@@ -453,7 +445,7 @@ public class RDFServiceGraph implements GraphWithPerform {
     @Override
     public boolean isIsomorphicWith(Graph arg0) {
         throw new UnsupportedOperationException("isIsomorphicWith() not supported " +
-        		"by SPARQL graphs");
+                "by SPARQL graphs");
     }
 
     @Override
@@ -463,25 +455,15 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
 
     @Override
-	public void clear() {
-    	removeAll();
-	}
+    public void clear() {
+        removeAll();
+    }
 
-	private final static Capabilities capabilities = new Capabilities() {
+    private final static Capabilities capabilities = new Capabilities() {
 
         @Override
-		public boolean addAllowed() {
+        public boolean addAllowed() {
             return false;
-        }
-
-        @Override
-        public boolean addAllowed(boolean everyTriple) {
-            return false;
-        }
-
-        @Override
-        public boolean canBeEmpty() {
-            return true;
         }
 
         @Override
@@ -490,38 +472,23 @@ public class RDFServiceGraph implements GraphWithPerform {
         }
 
         @Override
-        public boolean deleteAllowed(boolean everyTriple) {
-            return false;
-        }
-
-        @Override
-        public boolean findContractSafe() {
-            return true;
-        }
-
-        @Override
         public boolean handlesLiteralTyping() {
             return true;
-        }
-
-        @Override
-        public boolean iteratorRemoveAllowed() {
-            return false;
         }
 
         @Override
         public boolean sizeAccurate() {
             return true;
         }
-	};
+    };
 
-	private final TransactionHandler transactionHandler = new TransactionHandler() {
-	    @Override
-	    public synchronized void abort() {
-	        inTransaction = false;
-	        removalsGraph.clear();
-	        additionsGraph.clear();
-	    }
+    private final TransactionHandler transactionHandler = new TransactionHandler() {
+        @Override
+        public synchronized void abort() {
+            inTransaction = false;
+            removalsGraph.clear();
+            additionsGraph.clear();
+        }
 
         @Override
         public synchronized void begin() {
@@ -532,12 +499,6 @@ public class RDFServiceGraph implements GraphWithPerform {
         public synchronized void commit() {
             flush();
             inTransaction = false;
-        }
-
-        @Override
-        public Object executeInTransaction(Command arg0) {
-            // TODO Auto-generated method stub
-            return null;
         }
 
         @Override
@@ -608,10 +569,10 @@ public class RDFServiceGraph implements GraphWithPerform {
         return VitroModelFactory.createModelForGraph(g);
     }
 
-	@Override
-	public String toString() {
-		return "RDFServiceGraph[" + ToString.hashHex(this) + ", " + rdfService
-				+ ", graphURI=" + ToString.modelName(graphURI) + "]";
-	}
+    @Override
+    public String toString() {
+        return "RDFServiceGraph[" + ToString.hashHex(this) + ", " + rdfService
+                + ", graphURI=" + ToString.modelName(graphURI) + "]";
+    }
 
 }

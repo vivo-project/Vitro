@@ -6,10 +6,18 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.apache.jena.riot.web.HttpNames.paramUsingGraphURI;
+import static org.apache.jena.riot.web.HttpNames.paramUsingNamedGraphURI;
+
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,26 +26,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.apache.jena.riot.web.HttpNames.paramUsingGraphURI;
-import static org.apache.jena.riot.web.HttpNames.paramUsingNamedGraphURI;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.update.GraphStore;
-import org.apache.jena.update.GraphStoreFactory;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.modify.UsingList;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.sparql.modify.UsingList;
-
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 
 /**
  * Process SPARQL Updates, as an API.
@@ -128,7 +126,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		VitroRequest vreq = new VitroRequest(req);
 		SearchIndexer indexer = ApplicationUtils.instance().getSearchIndexer();
 		Dataset ds = new RDFServiceDataset(vreq.getUnfilteredRDFService());
-		GraphStore graphStore = GraphStoreFactory.create(ds);
+        DatasetGraph dg = DatasetGraphFactory.createTxnMem();
 	    try {
 	        if(indexer != null) {
 	            indexer.pause();
@@ -136,7 +134,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	        if(ds.supportsTransactions()) {
 			    ds.begin(ReadWrite.WRITE);
 	        }
-			UpdateAction.execute(parsed, graphStore);
+            UpdateAction.execute(parsed, dg);
 		} finally {
 		    if(ds.supportsTransactions()) {
                 ds.commit();

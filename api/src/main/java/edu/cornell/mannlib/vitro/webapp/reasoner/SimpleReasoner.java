@@ -139,7 +139,7 @@ public class SimpleReasoner extends StatementListener
 		this.inferenceModel = inferenceModel;
 		this.fullModel = VitroModelFactory.createUnion(aboxModel,
 				VitroModelFactory.createOntologyModel(inferenceModel));
-    Dataset ds = DatasetFactory.createMem();
+    Dataset ds = DatasetFactory.createTxnMem();
 		ds.addNamedModel(ModelNames.ABOX_ASSERTIONS, aboxModel);
 		ds.addNamedModel(ModelNames.ABOX_INFERENCES, inferenceModel);
 		ds.addNamedModel(ModelNames.TBOX_ASSERTIONS, tboxModel);

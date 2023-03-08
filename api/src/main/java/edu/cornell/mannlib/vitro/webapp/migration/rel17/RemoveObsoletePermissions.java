@@ -5,25 +5,24 @@ package edu.cornell.mannlib.vitro.webapp.migration.rel17;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.update.GraphStore;
-import org.apache.jena.update.GraphStoreFactory;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
-
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * A handful of Permissions were removed between release 1.6 and 1.7. Remove
@@ -102,8 +101,8 @@ public class RemoveObsoletePermissions implements ServletContextListener {
 			log.debug(updateString);
 			UpdateRequest parsed = UpdateFactory.create(updateString);
 			Dataset ds = new RDFServiceDataset(rdfService);
-			GraphStore graphStore = GraphStoreFactory.create(ds);
-			UpdateAction.execute(parsed, graphStore);
+			DatasetGraph dg = DatasetGraphFactory.createTxnMem();
+			UpdateAction.execute(parsed, dg);
 		}
 
 		public long statementsRemoved() {

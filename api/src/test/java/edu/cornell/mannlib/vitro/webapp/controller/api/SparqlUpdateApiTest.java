@@ -2,27 +2,26 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 import java.io.StringReader;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.update.GraphStore;
-import org.apache.jena.update.GraphStoreFactory;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
-
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test that the SparqlQueryApiExecutor can handle all query types and all
@@ -54,7 +53,7 @@ public class SparqlUpdateApiTest extends AbstractTestClass {
     @Before
     public void setup() {
         model = ModelFactory.createDefaultModel();
-        Dataset ds = DatasetFactory.createMem();
+        Dataset ds = DatasetFactory.createTxnMem();
         ds.addNamedModel(GRAPH_URI, model);
         rdfService = new RDFServiceModel(ds);
     }
@@ -69,12 +68,12 @@ public class SparqlUpdateApiTest extends AbstractTestClass {
         Model desiredResults = ModelFactory.createDefaultModel();
         desiredResults.read(new StringReader(result1), null, "N3");
         Dataset ds = new RDFServiceDataset(rdfService);
-        GraphStore graphStore = GraphStoreFactory.create(ds);
+        DatasetGraph dg = DatasetGraphFactory.createTxnMem();
         try {
             if(ds.supportsTransactions()) {
                 ds.begin(ReadWrite.WRITE);
             }
-            UpdateAction.execute(UpdateFactory.create(updateStr1), graphStore);
+            UpdateAction.execute(UpdateFactory.create(updateStr1), dg);
         } finally {
             if(ds.supportsTransactions()) {
                 ds.commit();

@@ -156,7 +156,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     public static Dataset makeInMemoryDataset(Model assertions,
                                               Model inferences) {
-        Dataset dataset = DatasetFactory.createMem();
+        Dataset dataset = DatasetFactory.createTxnMem();
         OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         if (assertions != null) {
             dataset.addNamedModel(

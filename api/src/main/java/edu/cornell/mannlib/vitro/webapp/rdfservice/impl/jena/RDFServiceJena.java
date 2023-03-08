@@ -219,7 +219,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                 QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
                 try {
                     Model tree = qee.execDescribe();
-                    Dataset ds = DatasetFactory.createMem();
+                    Dataset ds = DatasetFactory.createTxnMem();
                     if (graphURI == null) {
                         ds.setDefaultModel(dataset.getDefaultModel());
                     } else {
@@ -302,7 +302,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         Query construct = QueryFactory.create(queryBuff.toString());
         // make a plain dataset to force the query to be run in a way that
         // won't overwhelm MySQL with too many joins
-        Dataset ds = DatasetFactory.createMem();
+        Dataset ds = DatasetFactory.createTxnMem();
         if (graphURI == null) {
             ds.setDefaultModel(dataset.getDefaultModel());
         } else {
