@@ -9,7 +9,6 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.exception.IndividualNotFoundException;
 
 /**
  * Created by IntelliJ IDEA.
