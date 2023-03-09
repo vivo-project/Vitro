@@ -52,7 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 	//For random number generation, creating it everytime the method is called lead to nextInt being about the same
 	//if calls were made close together in time
-    protected Random random = new Random(System.currentTimeMillis());
+    private Random random = new Random(System.currentTimeMillis());
     public IndividualDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
