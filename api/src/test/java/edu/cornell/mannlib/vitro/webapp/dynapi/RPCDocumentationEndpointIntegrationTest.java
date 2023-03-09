@@ -125,7 +125,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
         final String organization = "test_organization";
         final String organizationUri = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testOrganizationAction1";
         final String person = "test_person";
-        final String personUri = "thttps://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1";
+        final String personUri = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1";
         final String process = "test_process";
         final String processUri = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testProcessAction1";
         final String relationship = "test_relationship";
