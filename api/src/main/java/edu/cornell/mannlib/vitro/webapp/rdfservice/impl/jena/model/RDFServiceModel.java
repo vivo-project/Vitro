@@ -50,7 +50,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
       if (dataset != null)  {
           d = dataset;
       } else {
-          d = DatasetFactory.createTxnMem();
+          d = DatasetFactory.createGeneral();
           if (modelName == null) {
               d.setDefaultModel(this.model);
           } else {

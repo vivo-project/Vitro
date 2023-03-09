@@ -126,7 +126,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		VitroRequest vreq = new VitroRequest(req);
 		SearchIndexer indexer = ApplicationUtils.instance().getSearchIndexer();
 		Dataset ds = new RDFServiceDataset(vreq.getUnfilteredRDFService());
-        DatasetGraph dg = DatasetGraphFactory.createTxnMem();
+        DatasetGraph dg = DatasetGraphFactory.createGeneral();
 	    try {
 	        if(indexer != null) {
 	            indexer.pause();

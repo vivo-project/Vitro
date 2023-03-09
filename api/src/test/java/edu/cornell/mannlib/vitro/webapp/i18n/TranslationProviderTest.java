@@ -31,7 +31,7 @@ public class TranslationProviderTest {
 	public void init(String i18nFile, String themeName, String appName) throws FileNotFoundException {
 		i18nModel = ModelFactory.createDefaultModel();
 		i18nModel.read(new FileReader(new File(i18nFile)), null, "n3");
-		Dataset ds = DatasetFactory.createTxnMem();
+        Dataset ds = DatasetFactory.createGeneral();
 		ds.addNamedModel("http://vitro.mannlib.cornell.edu/default/interface-i18n", i18nModel);
 		rdfService = new RDFServiceModel(ds);
 		tp = TranslationProvider.getInstance();

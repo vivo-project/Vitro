@@ -101,7 +101,7 @@ public class RemoveObsoletePermissions implements ServletContextListener {
 			log.debug(updateString);
 			UpdateRequest parsed = UpdateFactory.create(updateString);
 			Dataset ds = new RDFServiceDataset(rdfService);
-			DatasetGraph dg = DatasetGraphFactory.createTxnMem();
+        DatasetGraph dg = DatasetGraphFactory.createGeneral();
 			UpdateAction.execute(parsed, dg);
 		}
 

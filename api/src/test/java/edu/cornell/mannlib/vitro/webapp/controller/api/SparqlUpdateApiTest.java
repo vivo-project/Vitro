@@ -53,7 +53,7 @@ public class SparqlUpdateApiTest extends AbstractTestClass {
     @Before
     public void setup() {
         model = ModelFactory.createDefaultModel();
-        Dataset ds = DatasetFactory.createTxnMem();
+        Dataset ds = DatasetFactory.createGeneral();
         ds.addNamedModel(GRAPH_URI, model);
         rdfService = new RDFServiceModel(ds);
     }
@@ -68,7 +68,7 @@ public class SparqlUpdateApiTest extends AbstractTestClass {
         Model desiredResults = ModelFactory.createDefaultModel();
         desiredResults.read(new StringReader(result1), null, "N3");
         Dataset ds = new RDFServiceDataset(rdfService);
-        DatasetGraph dg = DatasetGraphFactory.createTxnMem();
+        DatasetGraph dg = DatasetGraphFactory.createGeneral();
         try {
             if(ds.supportsTransactions()) {
                 ds.begin(ReadWrite.WRITE);
