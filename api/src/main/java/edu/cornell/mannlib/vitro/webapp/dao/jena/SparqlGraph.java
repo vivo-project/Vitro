@@ -20,7 +20,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.jena.graph.Capabilities;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.GraphEventManager;
-import org.apache.jena.graph.GraphStatisticsHandler;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.TransactionHandler;
 import org.apache.jena.graph.Triple;
@@ -169,9 +168,9 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public boolean contains(Node subject, Node predicate, Node object) {
-		if ((subject != null && subject.isBlank())
-				|| (predicate != null && predicate.isBlank())
-				|| (object != null && object.isBlank())) {
+        if ((subject != null && subject.isBlank())
+                || (predicate != null && predicate.isBlank())
+                || (object != null && object.isBlank())) {
             return false;
         }
         StringBuilder containsQuery = new StringBuilder("ASK { \n");
@@ -203,16 +202,16 @@ public class SparqlGraph implements GraphWithPerform {
     }
 
     @Override
-	public void clear() {
-		removeAll();
-	}
+    public void clear() {
+        removeAll();
+    }
 
-	@Override
-	public void remove(Node subject, Node predicate, Node object) {
-		for (Triple t: find(subject, predicate, object).toList()) {
-			delete(t);
-		}
-	}
+    @Override
+    public void remove(Node subject, Node predicate, Node object) {
+        for (Triple t: find(subject, predicate, object).toList()) {
+            delete(t);
+        }
+    }
 
     @Override
     public boolean dependsOn(Graph arg0) {
@@ -319,7 +318,7 @@ public class SparqlGraph implements GraphWithPerform {
     @Override
     public GraphEventManager getEventManager() {
         if (eventManager == null) {
-            eventManager = new SimpleEventManager(this);
+            eventManager = new SimpleEventManager();
         }
         return eventManager;
     }
@@ -327,11 +326,6 @@ public class SparqlGraph implements GraphWithPerform {
     @Override
     public PrefixMapping getPrefixMapping() {
         return prefixMapping;
-    }
-
-    @Override
-    public GraphStatisticsHandler getStatisticsHandler() {
-        return null;
     }
 
     @Override
@@ -355,7 +349,7 @@ public class SparqlGraph implements GraphWithPerform {
     public boolean isIsomorphicWith(Graph arg0) {
         log.info("Hey dummy!");
         throw new UnsupportedOperationException("isIsomorphicWith() not supported " +
-        		"by SPARQL graphs");
+                "by SPARQL graphs");
     }
 
     @Override
@@ -367,18 +361,8 @@ public class SparqlGraph implements GraphWithPerform {
     private final static Capabilities capabilities = new Capabilities() {
 
         @Override
-		public boolean addAllowed() {
+        public boolean addAllowed() {
             return false;
-        }
-
-        @Override
-        public boolean addAllowed(boolean everyTriple) {
-            return false;
-        }
-
-        @Override
-        public boolean canBeEmpty() {
-            return true;
         }
 
         @Override
@@ -387,23 +371,8 @@ public class SparqlGraph implements GraphWithPerform {
         }
 
         @Override
-        public boolean deleteAllowed(boolean everyTriple) {
-            return false;
-        }
-
-        @Override
-        public boolean findContractSafe() {
-            return true;
-        }
-
-        @Override
         public boolean handlesLiteralTyping() {
             return true;
-        }
-
-        @Override
-        public boolean iteratorRemoveAllowed() {
-            return false;
         }
 
         @Override
@@ -485,10 +454,10 @@ public class SparqlGraph implements GraphWithPerform {
         }
     }
 
-	@Override
-	public String toString() {
-		return "SparqlGraph[" + ToString.hashHex(this) + ", endpoint="
-				+ endpointURI + ", name=" + ToString.modelName(graphURI) + "]";
-	}
+    @Override
+    public String toString() {
+        return "SparqlGraph[" + ToString.hashHex(this) + ", endpoint="
+                + endpointURI + ", name=" + ToString.modelName(graphURI) + "]";
+    }
 
 }

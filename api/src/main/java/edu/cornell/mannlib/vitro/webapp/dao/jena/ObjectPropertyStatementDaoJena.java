@@ -55,15 +55,15 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
 
-    protected DatasetWrapperFactory dwf;
+    protected DatasetWrapper dw;
     protected RDFService rdfService;
 
     public ObjectPropertyStatementDaoJena(RDFService rdfService,
-                                          DatasetWrapperFactory dwf,
+                                          DatasetWrapper dw,
                                           WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.dw = dw;
         this.rdfService = rdfService;
-        this.dwf = dwf;
     }
 
     @Override
@@ -435,13 +435,11 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                         return constructedModel;
                     }
 
-                    DatasetWrapper w = dwf.getDatasetWrapper();
-                    Dataset dataset = w.getDataset();
+                    Dataset dataset = dw.getDataset();
                     dataset.getLock().enterCriticalSection(Lock.READ);
                     QueryExecution qe = null;
                     try {
-                        qe = QueryExecutionFactory.create(
-                                query, dataset);
+                        qe = QueryExecutionFactory.create(query, dataset);
                         qe.execConstruct(constructedModel);
                     } catch (Exception e) {
                         log.error("Error getting constructed model for subject "
@@ -451,7 +449,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                             qe.close();
                         }
                         dataset.getLock().leaveCriticalSection();
-                        w.close();
+                        dw.close();
                     }
             	} else {
             	    rdfService.sparqlConstructQuery(queryString, constructedModel);
@@ -507,8 +505,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
         Map<String, String> result = new LinkedHashMap<String, String>();
         Map<String, List<Literal>> types = new LinkedHashMap<String, List<Literal>>();
-        DatasetWrapper w = dwf.getDatasetWrapper();
-        Dataset dataset = w.getDataset();
+        Dataset dataset = dw.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         QueryExecution qexec = null;
         try {
@@ -552,7 +549,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             if (qexec != null) {
                 qexec.close();
             }
-            w.close();
+            dw.close();
         }
 
     }

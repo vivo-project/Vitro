@@ -16,6 +16,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
+import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.shared.LockMRSW;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -345,5 +346,11 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 		return "RDFServiceDatasetGraph[" + ToString.hashHex(this)
 				+ ", " + rdfService + "]";
 	}
+
+    @Override
+    public PrefixMap prefixes() {
+        // TODO Auto-generated method stub, see PrefixesDboeFactory.newPrefixMap().
+        return null;
+    }
 
 }

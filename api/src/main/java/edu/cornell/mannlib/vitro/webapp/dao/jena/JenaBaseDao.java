@@ -87,7 +87,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	this.NONUSER_NAMESPACES = wadf.getNonuserNamespaces();
     	this.PREFERRED_LANGUAGES = wadf.getPreferredLanguages();
     	this.webappDaoFactory = wadf;
-
     }
 
     /* ******************** accessors ************************** */
@@ -118,19 +117,18 @@ public class JenaBaseDao extends JenaBaseDaoCon {
             try {
                 ClosableIterator<Statement> stateIt = res.getModel().listStatements(res,dataprop,(Literal)null);
                 try {
-                    if (stateIt.hasNext())
+                    if (stateIt.hasNext()) {
                         return ((Literal)stateIt.next().getObject()).getString();
-                    else
-                        return null;
+                    }
                 } finally {
                     stateIt.close();
                 }
             } catch (Exception e) {
-                return null;
+                log.debug(e);
             }
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -148,21 +146,20 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected Boolean getPropertyBooleanValue(OntResource res, Property dataprop) {
         if (dataprop != null) {
             try {
-                ClosableIterator stateIt = getOntModel().listStatements(res,dataprop,(Literal)null);
+                StmtIterator stateIt = getOntModel().listStatements(res,dataprop,(Literal)null);
                 try {
-                    if (stateIt.hasNext())
+                    if (stateIt.hasNext()) {
                         return ((Literal)((Statement)stateIt.next()).getObject()).getBoolean();
-                    else
-                        return null;
+                    }
                 } finally {
                     stateIt.close();
                 }
             } catch (Exception e) {
-                return null;
+                log.debug(e);
             }
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -920,8 +917,8 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         return label;
     }
 
-    protected Literal getLabelLiteral(String individualUri) {
-        OntResource resource = webappDaoFactory.getOntModel().createOntResource(individualUri);
+    protected Literal getLabelLiteral(String individualURI) {
+        OntResource resource = webappDaoFactory.getOntModel().createOntResource(individualURI);
         return getLabelLiteral(resource);
     }
 

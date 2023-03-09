@@ -2,12 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
 import java.util.Set;
 
 import org.apache.jena.graph.Capabilities;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.GraphEventManager;
-import org.apache.jena.graph.GraphStatisticsHandler;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.TransactionHandler;
 import org.apache.jena.graph.Triple;
@@ -17,16 +18,27 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.util.iterator.WrappedIterator;
 
-import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
-
 public class DifferenceGraph implements Graph {
 
     private Graph g;
     private Graph subtract;
 
+    /**
+     * Initialize, setting the passed graphs as the inner graphs.
+     *
+     * @param g The internal graph to be delegated.
+     * @param subtract The graph being subtracted from g.
+     */
     public DifferenceGraph(Graph g, Graph subtract) {
         this.g = g;
         this.subtract = subtract;
+    }
+
+    @Override
+    public String toString() {
+        return "DifferenceGraph[" + ToString.hashHex(this) + ", g="
+            + ToString.graphToString(g) + ", subtract="
+            + ToString.graphToString(subtract) + "]";
     }
 
     @Override
@@ -55,9 +67,9 @@ public class DifferenceGraph implements Graph {
     }
 
     @Override
-	public void remove(Node arg0, Node arg1, Node arg2) {
-		g.remove(arg0, arg1, arg2);
-	}
+    public void remove(Node arg0, Node arg1, Node arg2) {
+        g.remove(arg0, arg1, arg2);
+    }
 
     @Override
     public boolean dependsOn(Graph arg0) {
@@ -84,11 +96,6 @@ public class DifferenceGraph implements Graph {
     @Override
     public PrefixMapping getPrefixMapping() {
         return g.getPrefixMapping();
-    }
-
-    @Override
-    public GraphStatisticsHandler getStatisticsHandler() {
-        return g.getStatisticsHandler();
     }
 
     @Override
@@ -121,16 +128,9 @@ public class DifferenceGraph implements Graph {
         g.add(arg0);
     }
 
-	@Override
-	public void clear() {
-		g.clear();
-	}
-
-	@Override
-	public String toString() {
-		return "DifferenceGraph[" + ToString.hashHex(this) + ", g="
-				+ ToString.graphToString(g) + ", subtract="
-				+ ToString.graphToString(subtract) + "]";
-	}
+    @Override
+    public void clear() {
+        g.clear();
+    }
 
 }

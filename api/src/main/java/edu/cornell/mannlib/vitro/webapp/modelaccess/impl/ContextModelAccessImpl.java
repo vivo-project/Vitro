@@ -36,10 +36,10 @@ import org.apache.jena.rdf.model.ModelMaker;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetMode;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryDB;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
@@ -247,15 +247,17 @@ public class ContextModelAccessImpl implements ContextModelAccess {
 
 		Map<ReasoningOption, WebappDaoFactory> map = new EnumMap<>(
 				ReasoningOption.class);
-		map.put(ASSERTIONS_ONLY, new WebappDaoFactorySDB(rdfService,
-				getOntModelSelector(ASSERTIONS_ONLY), config,
-				SDBDatasetMode.ASSERTIONS_ONLY));
-		map.put(INFERENCES_ONLY, new WebappDaoFactorySDB(rdfService,
-				getOntModelSelector(INFERENCES_ONLY), config,
-				SDBDatasetMode.INFERENCES_ONLY));
-		map.put(ASSERTIONS_AND_INFERENCES, new WebappDaoFactorySDB(rdfService,
-				getOntModelSelector(ASSERTIONS_AND_INFERENCES), config,
-				SDBDatasetMode.ASSERTIONS_AND_INFERENCES));
+
+       map.put(ASSERTIONS_ONLY, new WebappDaoFactoryDB(rdfService,
+                       getOntModelSelector(ASSERTIONS_ONLY), config,
+                       DatasetMode.ASSERTIONS_ONLY));
+       map.put(INFERENCES_ONLY, new WebappDaoFactoryDB(rdfService,
+                       getOntModelSelector(INFERENCES_ONLY), config,
+                       DatasetMode.INFERENCES_ONLY));
+       map.put(ASSERTIONS_AND_INFERENCES, new WebappDaoFactoryDB(rdfService,
+                       getOntModelSelector(ASSERTIONS_AND_INFERENCES), config,
+                       DatasetMode.ASSERTIONS_AND_INFERENCES));
+
 		log.debug("WebappdaoFactoryMap: " + map);
 		return Collections.unmodifiableMap(map);
 	}

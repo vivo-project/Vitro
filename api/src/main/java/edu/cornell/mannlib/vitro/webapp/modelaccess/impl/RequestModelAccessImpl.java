@@ -30,11 +30,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetMode;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryDB;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.filters.ModelSwitcher;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.DatasetOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
@@ -317,25 +318,25 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 		}
 
 		RDFService rdfService = getRDFService(key.rdfServiceKey());
-		OntModelSelector ontModelSelector = getOntModelSelector(key
-				.ontModelSelectorKey());
+        OntModelSelector ontModelSelector = getOntModelSelector(key.ontModelSelectorKey());
 		WebappDaoFactoryConfig config = source.getWebappDaoFactoryConfig();
 
-		switch (key.getReasoningOption()) {
-		case ASSERTIONS_ONLY:
-			return new WebappDaoFactorySDB(rdfService, ontModelSelector,
-					config, SDBDatasetMode.ASSERTIONS_ONLY);
-		case INFERENCES_ONLY:
-			return new WebappDaoFactorySDB(rdfService, ontModelSelector,
-					config, SDBDatasetMode.INFERENCES_ONLY);
-		default: // ASSERTIONS_AND_INFERENCES
-			// TODO Do model switching and replace the WebappDaoFactory with
-			// a different version if requested by parameters
-			WebappDaoFactory unswitched = new WebappDaoFactorySDB(rdfService,
-					ontModelSelector, config);
-			return new ModelSwitcher().checkForModelSwitching(new VitroRequest(
-					req), unswitched);
-		}
+       switch (key.getReasoningOption()) {
+       case ASSERTIONS_ONLY:
+           return new WebappDaoFactoryDB(rdfService, ontModelSelector, config,
+               DatasetMode.ASSERTIONS_ONLY);
+       case INFERENCES_ONLY:
+           return new WebappDaoFactoryDB(rdfService, ontModelSelector, config,
+               DatasetMode.INFERENCES_ONLY);
+       default:
+           // ASSERTIONS_AND_INFERENCES
+           // TODO Do model switching and replace the WebappDaoFactory with
+           // a different version if requested by parameters
+           WebappDaoFactory unswitched =
+               new WebappDaoFactoryDB(rdfService, ontModelSelector, config);
+
+           return new ModelSwitcher().checkForModelSwitching(new VitroRequest(req), unswitched);
+        }
 	}
 
 	private WebappDaoFactory addPolicyAwareness(WebappDaoFactory unaware) {
