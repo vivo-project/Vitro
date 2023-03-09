@@ -78,7 +78,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
 	private Map<String,String> properties = new HashMap<String,String>();
 
-	protected DatasetWrapperFactory dwf;
+    protected DatasetWrapper dw;
 
 	protected RDFService rdfService;
 
@@ -88,7 +88,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         this.ontModelSelector = base.ontModelSelector;
         this.config = base.config;
         this.userURI = userURI;
-        this.dwf = base.dwf;
+        this.dw = base.dw;
     }
 
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector,
@@ -109,7 +109,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
                 : null;
 
         Dataset dataset = makeInMemoryDataset(assertions, inferences);
-        this.dwf = new StaticDatasetFactory(dataset);
+        dw = new DatasetWrapper(dataset);
 
         this.rdfService = new RDFServiceModel(ontModelSelector.getFullModel());
 
@@ -331,13 +331,31 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     		return userAccountsDao = new UserAccountsDaoJena(this);
     }
 
-    DataPropertyStatementDao dataPropertyStatementDao = null;
+    private DataPropertyStatementDao dataPropertyStatementDao = null;
     @Override
 	public DataPropertyStatementDao getDataPropertyStatementDao() {
-        if( dataPropertyStatementDao == null )
-            dataPropertyStatementDao = new DataPropertyStatementDaoJena(
-                    dwf, this);
+        if (!hasDataPropertyStatementDao()) {
+            setDataPropertyStatementDao(new DataPropertyStatementDaoJena(dw, this));
+        }
         return dataPropertyStatementDao;
+    }
+
+    /**
+     * Set the data property statement DAO.
+     *
+     * @param propertyStatement The data property statement DAO.
+     */
+    protected void setDataPropertyStatementDao(DataPropertyStatementDao propertyStatement) {
+        this.dataPropertyStatementDao = propertyStatement;
+    }
+
+    /**
+     * Check if the data property statement DAO is defined.
+     *
+     * @return True if defined, false if null.
+     */
+    protected boolean hasDataPropertyStatementDao() {
+        return dataPropertyStatementDao != null;
     }
 
     DatatypeDao datatypeDao = null;
@@ -352,7 +370,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
 	public DataPropertyDao getDataPropertyDao() {
         if( dataPropertyDao == null )
-            dataPropertyDao = new DataPropertyDaoJena(rdfService, dwf, this);
+            dataPropertyDao = new DataPropertyDaoJena(rdfService, dw, this);
         return dataPropertyDao;
     }
 
@@ -365,11 +383,29 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     ObjectPropertyStatementDao objectPropertyStatementDao = null;
     @Override
-	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
-        if( objectPropertyStatementDao == null )
-            objectPropertyStatementDao = new ObjectPropertyStatementDaoJena(
-                    rdfService, dwf, this);
+    public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
+        if (!hasObjectPropertyStatementDao()) {
+            setObjectPropertyStatementDao(new ObjectPropertyStatementDaoJena(rdfService, dw, this));
+        }
         return objectPropertyStatementDao;
+    }
+
+    /**
+     * Set the object property statement DAO.
+     *
+     * @param propertyStatement The object property statement DAO.
+     */
+    protected void setObjectPropertyStatementDao(ObjectPropertyStatementDao propertyStatement) {
+        this.objectPropertyStatementDao = propertyStatement;
+    }
+
+    /**
+     * Check if the object property statement DAO is defined.
+     *
+     * @return True if defined, false if null.
+     */
+    protected boolean hasObjectPropertyStatementDao() {
+        return objectPropertyStatementDao != null;
     }
 
     private OntologyDao ontologyDao = null;
@@ -385,7 +421,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	public ObjectPropertyDao getObjectPropertyDao() {
         if( objectPropertyDao == null )
             objectPropertyDao = new ObjectPropertyDaoJena(
-                    rdfService, dwf, config.customListViewConfigFileMap, this);
+                rdfService, dw, config.customListViewConfigFileMap, this);
         return objectPropertyDao;
     }
 
@@ -402,7 +438,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
 	public PropertyInstanceDao getPropertyInstanceDao() {
         if( propertyInstanceDao == null )
-            propertyInstanceDao = new PropertyInstanceDaoJena(rdfService, dwf, this);
+            propertyInstanceDao = new PropertyInstanceDaoJena(rdfService, dw, this);
         return propertyInstanceDao;
     }
 
@@ -484,7 +520,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	}
         this.config = base.config;
         this.userURI = base.userURI;
-        this.dwf = base.dwf;
+        this.dw = base.dw;
     }
 
     /**

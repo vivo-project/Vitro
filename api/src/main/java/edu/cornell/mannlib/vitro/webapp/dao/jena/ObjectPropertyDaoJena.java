@@ -58,10 +58,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     private static final Log log = LogFactory.getLog(ObjectPropertyDaoJena.class.getName());
 
     public ObjectPropertyDaoJena(RDFService rdfService,
-                                 DatasetWrapperFactory dwf,
+                                 DatasetWrapper dw,
                                  Map<FullPropertyKey, String> customListViewConfigFileMap,
                                  WebappDaoFactoryJena wadf) {
-        super(rdfService, dwf, wadf);
+        super(rdfService, dw, wadf);
         this.customListViewConfigFileMap = customListViewConfigFileMap;
     }
 

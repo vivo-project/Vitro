@@ -50,15 +50,22 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
 {
     private static final Log log = LogFactory.getLog(DataPropertyStatementDaoJena.class);
 
+    private DatasetWrapper dw;
 
-    private DatasetWrapperFactory dwf;
-
-    public DataPropertyStatementDaoJena(DatasetWrapperFactory dwf,
+    public DataPropertyStatementDaoJena(DatasetWrapper dw,
                                         WebappDaoFactoryJena wadf) {
         super(wadf);
-        this.dwf = dwf;
+        this.dw = dw;
     }
 
+    /**
+     * Get the data wrapper.
+     * 
+     * @return The data wrapper.
+     */
+    public DatasetWrapper getDataWrapper() {
+        return dw;
+    }
 
     public void deleteDataPropertyStatement( DataPropertyStatement dataPropertyStatement )
     {
@@ -366,13 +373,11 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
 
         // Run the SPARQL query to get the properties
         List<Literal> values = new ArrayList<Literal>();
-        DatasetWrapper w = dwf.getDatasetWrapper();
-        Dataset dataset = w.getDataset();
+        Dataset dataset = dw.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         QueryExecution qexec = null;
         try {
-            qexec = QueryExecutionFactory.create(
-                    queryString, dataset);
+            qexec = QueryExecutionFactory.create(queryString, dataset);
             ResultSet results = qexec.execSelect();
 
             while (results.hasNext()) {
@@ -388,7 +393,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
 
         } finally {
             dataset.getLock().leaveCriticalSection();
-            w.close();
+            dw.close();
             if (qexec != null) {
                 qexec.close();
             }
@@ -430,8 +435,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
 
         // Run the SPARQL query to get the properties
         List<Literal> values = new ArrayList<Literal>();
-        DatasetWrapper w = dwf.getDatasetWrapper();
-        Dataset dataset = w.getDataset();
+        Dataset dataset = dw.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         QueryExecution qexec = null;
         try {
@@ -459,7 +463,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
             return Collections.emptyList();
         } finally {
             dataset.getLock().leaveCriticalSection();
-            w.close();
+            dw.close();
             if (qexec != null) {
                 qexec.close();
             }
@@ -497,8 +501,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
             initialBindings.add(
                     "property", ResourceFactory.createResource(propertyUri));
 
-            DatasetWrapper w = dwf.getDatasetWrapper();
-            Dataset dataset = w.getDataset();
+            Dataset dataset = dw.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
             QueryExecution qe = null;
             try {
@@ -512,7 +515,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                     qe.close();
                 }
                 dataset.getLock().leaveCriticalSection();
-                w.close();
+                dw.close();
             }
         }
 

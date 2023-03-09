@@ -67,7 +67,7 @@ import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 
-    protected static final Log log = LogFactory.getLog(VClassDaoJena.class);
+    protected static final Log LOG = LogFactory.getLog(VClassDaoJena.class);
     private final I18nBundle i18n;
     private boolean isUnderlyingStoreReasoned = false;
 
@@ -200,7 +200,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 return getLabelOrId(cls);
             }
         } catch (Exception e) {
-            log.error(e, e);
+            LOG.error(e, e);
             return "???";
         } finally {
             cls.getModel().leaveCriticalSection();
@@ -264,7 +264,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         } catch (ProfileException pe) {
             // Current language profile does not support disjointWith axioms.
             // We'd prefer to return an empty list instead of throwing an exception.
-        	log.error(pe, pe);
+            LOG.error(pe, pe);
         } finally {
             getOntModel().leaveCriticalSection();
         }
@@ -480,7 +480,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             }
                         }
                     } catch (ClassCastException cce) {
-                        log.error(cce, cce);
+                        LOG.error(cce, cce);
                     }
                 }
             } finally {
@@ -532,7 +532,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         rootClassList.add(ontClass.as(OntClass.class));
                     }
                 } catch (ClassCastException cce) {
-                    log.error(cce, cce);
+                    LOG.error(cce, cce);
                 }
             }
         } finally {
@@ -639,7 +639,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 supURIs.add(getClassURIStr(cls));
             }
         } catch (Exception e) {
-            log.debug(e,e);
+            LOG.debug(e,e);
             // we'll try this again using a different method
             // that doesn't try to convert to OntClass
             supURIs.clear();
@@ -857,8 +857,6 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                                         vcw.setEntityCount(count);
                                         classIsInstantiated = (count > 0);
                                     } else if (!includeUninstantiatedClasses) {
-                                        // Note: to support SDB models, may want to do this with
-                                        // SPARQL and LIMIT 1 if SDB can take advantage of it
                                         Model aboxModel = getOntModelSelector().getABoxModel();
                                         aboxModel.enterCriticalSection(Lock.READ);
                                         try {
@@ -880,7 +878,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                                     }
                                 }
                             } catch (ClassCastException cce) {
-                                log.error(cce, cce);
+                                LOG.error(cce, cce);
                             }
                         }
                     } finally {
@@ -909,7 +907,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             ResultSet rs =qe.execSelect();
             count = Integer.parseInt(((Literal) rs.nextSolution().get(".1")).getLexicalForm());
         }catch(Exception ex){
-            log.error(ex,ex);
+            LOG.error(ex,ex);
         } finally {
             ontModel.leaveCriticalSection();
         }
@@ -946,7 +944,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     ontCls.removeAll(RDFS.label);
                 }
             } catch (Exception e) {
-                log.error("error setting label for class "+cls.getURI());
+                LOG.error("error setting label for class "+cls.getURI());
             }
             try {
                 if (cls.getGroupURI() != null && cls.getGroupURI().length()>0) {
@@ -954,11 +952,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     if (badURIErrorStr == null) {
                         ontCls.addProperty(IN_CLASSGROUP, getOntModel().getResource(cls.getGroupURI()));
                     } else {
-                        log.error(badURIErrorStr);
+                        LOG.error(badURIErrorStr);
                     }
                 }
             } catch (Exception e) {
-                log.error("error linking class "+cls.getURI()+" to class group");
+                LOG.error("error linking class "+cls.getURI()+" to class group");
             }
             updatePlainLiteralValue(ontCls, SHORTDEF, cls.getShortDef());
             updatePlainLiteralValue(ontCls, EXAMPLE_ANNOT, cls.getExample());
@@ -971,7 +969,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 try {
                     ontCls.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getHiddenFromDisplayBelowRoleLevel().getURI()));
                 } catch (Exception e) {
-                    log.error("error adding HiddenFromDisplayBelowRoleLevel annotation to class "+cls.getURI());
+                    LOG.error("error adding HiddenFromDisplayBelowRoleLevel annotation to class "+cls.getURI());
                 }
             }
 
@@ -980,7 +978,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 try {
                     ontCls.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getProhibitedFromUpdateBelowRoleLevel().getURI()));
                 } catch (Exception e) {
-                    log.error("error adding ProhibitedFromUpdateBelowRoleLevel annotation to class "+cls.getURI());
+                    LOG.error("error adding ProhibitedFromUpdateBelowRoleLevel annotation to class "+cls.getURI());
                 }
             }
 
@@ -989,7 +987,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 try {
                     ontCls.addProperty(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getHiddenFromPublishBelowRoleLevel().getURI()));
                 } catch (Exception e) {
-                    log.error("error adding HiddenFromPublishBelowRoleLevel annotation to class "+cls.getURI());
+                    LOG.error("error adding HiddenFromPublishBelowRoleLevel annotation to class "+cls.getURI());
                 }
             }
 
@@ -1043,7 +1041,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 updatePropertyStringValue(ontCls,PROPERTY_CUSTOMSHORTVIEWANNOT,cls.getCustomShortView(),ontModel);
                 updatePropertyStringValue(ontCls,PROPERTY_CUSTOMSEARCHVIEWANNOT,cls.getCustomSearchView(),ontModel);
             } else {
-                log.error("error: cannot find jena class "+cls.getURI()+" for updating");
+                LOG.error("error: cannot find jena class "+cls.getURI()+" for updating");
             }
         } finally {
             getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
@@ -1063,13 +1061,13 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             OntResource subclass = getOntClass(ontModel,c2c.getSubclassURI());
             OntResource superclass = getOntClass(ontModel,c2c.getSuperclassURI());
             if(subclass == null || superclass == null) {
-                log.warn("unable to delete " + c2c.getSubclassURI() +
+                LOG.warn("unable to delete " + c2c.getSubclassURI() +
                         " rdfs:subClassOf " + c2c.getSuperclassURI());
                 if (subclass == null) {
-                    log.warn(c2c.getSubclassURI() + " not found in the model.");
+                    LOG.warn(c2c.getSubclassURI() + " not found in the model.");
                 }
                 if (superclass == null) {
-                    log.warn(c2c.getSuperclassURI() + " not found in the model.");
+                    LOG.warn(c2c.getSuperclassURI() + " not found in the model.");
                 }
                 return;
             }

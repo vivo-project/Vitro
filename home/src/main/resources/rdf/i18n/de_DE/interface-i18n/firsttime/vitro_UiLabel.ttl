@@ -1402,14 +1402,6 @@ prop-data:fake_external_auth.Vitro
         prop:hasKey      "fake_external_auth" ;
         prop:hasPackage  "Vitro-languages" .
 
-prop-data:run_sdb_setup.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         prop:PropertyKey ;
-        rdfs:label       "Starte SDB-Setup"@de-DE ;
-        prop:hasApp      "Vitro" ;
-        prop:hasKey      "run_sdb_setup" ;
-        prop:hasPackage  "Vitro-languages" .
-
 prop-data:property_management.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         prop:PropertyKey ;

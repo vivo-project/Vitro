@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model;
 
 import java.io.ByteArrayInputStream;
-import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -58,8 +57,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
               d.addNamedModel(this.modelName, model);
           }
       }
-      DatasetWrapper datasetWrapper = new DatasetWrapper(d);
-      return datasetWrapper;
+      return new DatasetWrapper(d);
     }
 
     @Override
@@ -72,8 +70,6 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
                                 changeSet.getPreconditionQueryType())) {
             return false;
         }
-
-        //Dataset dataset = getDatasetWrapper().getDataset();
 
         try {
             for (Object o : changeSet.getPreChangeEvents()) {
