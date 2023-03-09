@@ -66,6 +66,7 @@ public class VClassDaoDB extends VClassDaoJena {
      *
      * @deprecated
      */
+    @Override
     @Deprecated
     public void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses, boolean getIndividualCount) {
 
@@ -154,6 +155,7 @@ public class VClassDaoDB extends VClassDaoJena {
      *
      * @return The total number of VClass group instances.
      */
+    @Override
     int getClassGroupInstanceCount(VClassGroup vcg){
         int count = 0;
 

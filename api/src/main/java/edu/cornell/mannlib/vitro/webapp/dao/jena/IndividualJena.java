@@ -59,6 +59,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         setupURIParts(this.ind);
     }
 
+    @Override
     public String getName() {
         if (this.name != null) {
             return name;
@@ -75,10 +76,12 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
+    @Override
     public String getLabel() {
         return getRdfsLabel();
     }
 
+    @Override
     public String getRdfsLabel() {
         if (this.rdfsLabel != null) {
             return rdfsLabel;
@@ -96,6 +99,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
+    @Override
     public String getVClassURI() {
         if (this.vClassURI != null) {
             return vClassURI;
@@ -123,6 +127,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return this.vClassURI;
     }
 
+    @Override
     public VClass getVClass() {
         if (this.vClass != null) {
             return this.vClass;
@@ -151,6 +156,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
+    @Override
     public Timestamp getModTime() {
         if (modTime != null) {
             return modTime;
@@ -168,6 +174,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
+    @Override
     public Float getSearchBoost() {
         ind.getOntModel().enterCriticalSection(Lock.READ);
         try {
@@ -182,6 +189,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return searchBoost;
     }
 
+    @Override
     public String getMainImageUri() {
         if (this.mainImageUri != NOT_INITIALIZED) {
             return mainImageUri;
@@ -196,6 +204,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return null;
     }
 
+    @Override
     public String getImageUrl() {
         if (this.imageInfo == null) {
             this.imageInfo = ImageInfo.instanceFromEntityUri(wadf, this);
@@ -208,6 +217,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return this.imageInfo.getMainImage().getBytestreamAliasUrl();
     }
 
+    @Override
     public String getThumbUrl() {
         if (this.imageInfo == null) {
             this.imageInfo = ImageInfo.instanceFromEntityUri(wadf, this);
@@ -220,6 +230,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return this.imageInfo.getThumbnail().getBytestreamAliasUrl();
     }
 
+    @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements() {
         if (this.objectPropertyStatements != null) {
             return this.objectPropertyStatements;
@@ -305,6 +316,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
+    @Override
     public List<ObjectProperty> getObjectPropertyList() {
         if (this.propertyList != null) {
             return this.propertyList;
@@ -344,6 +356,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return map;
     }
 
+    @Override
     public List<DataPropertyStatement> getDataPropertyStatements() {
         if (this.dataPropertyStatements != null) {
             return this.dataPropertyStatements;
@@ -357,6 +370,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return this.dataPropertyStatements;
     }
 
+    @Override
     public List getDataPropertyList() {
         if (this.datatypePropertyList != null) {
             return this.datatypePropertyList;
@@ -396,6 +410,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
         return map;
     }
 
+    @Override
     public List<DataPropertyStatement> getExternalIds() {
         // BJL 2007-11-11: need to decide whether we want to use Collections or Lists in our interfaces - we seem to be leaning toward Lists
         if (this.externalIds != null) {

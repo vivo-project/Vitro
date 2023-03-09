@@ -34,10 +34,12 @@ public class LanguageFilteringGraph extends AbstractGraphDecorator {
         this.langs = preferredLanguages;
     }
 
+    @Override
     public ExtendedIterator<Triple> find(Triple arg0) {
         return filter(super.find(arg0));
     }
 
+    @Override
     public ExtendedIterator<Triple> find(Node arg0, Node arg1, Node arg2) {
         return filter(super.find(arg0, arg1, arg2));
     }

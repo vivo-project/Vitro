@@ -581,6 +581,7 @@ public abstract class AbstractOntModelDecorator implements OntModel {
         return inner.getProfile();
     }
 
+    @Override
     @Deprecated
     public ModelMaker getModelMaker() {
         return inner.getModelMaker();
@@ -596,6 +597,7 @@ public abstract class AbstractOntModelDecorator implements OntModel {
         return inner.getSubGraphs();
     }
 
+    @Override
     @Deprecated
     public ExtendedIterator<OntModel> listImportedModels() {
         return inner.listImportedModels();
@@ -1229,6 +1231,7 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 
     // ==== These methods are directly on ModelCon.class. ====
 
+    @Override
     @Deprecated
     public Resource getResource(String uri, org.apache.jena.rdf.model.ResourceF f) {
         return inner.getResource(uri, f);
@@ -1294,11 +1297,13 @@ public abstract class AbstractOntModelDecorator implements OntModel {
         return inner.createResource(uri, type);
     }
 
+    @Override
     @Deprecated
     public Resource createResource(org.apache.jena.rdf.model.ResourceF f) {
         return inner.createResource(f);
     }
 
+    @Override
     @Deprecated
     public Resource createResource(String uri, org.apache.jena.rdf.model.ResourceF f) {
         return inner.createResource(uri, f);
@@ -1486,6 +1491,7 @@ public abstract class AbstractOntModelDecorator implements OntModel {
         return inner.addLiteral(s, p, o);
     }
 
+    @Override
     @Deprecated
     public Model addLiteral(Resource s, Property p, Object o) {
         return inner.addLiteral(s, p, o);
