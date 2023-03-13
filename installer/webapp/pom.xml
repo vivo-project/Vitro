@@ -7,13 +7,13 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-installer-webapp</artifactId>
-    <version>1.13.1-SNAPSHOT</version>
+    <version>1.14.0</version>
     <packaging>war</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
         <artifactId>vitro-installer</artifactId>
-        <version>1.13.1-SNAPSHOT</version>
+        <version>1.14.0</version>
         <relativePath>..</relativePath>
     </parent>
 
