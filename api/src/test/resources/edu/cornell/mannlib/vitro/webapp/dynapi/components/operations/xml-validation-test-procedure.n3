@@ -1,0 +1,42 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:xml-validation-procedure>
+        a                                   dynapi:Procedure ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:providesParameter            <test:result> .
+
+<test:step1>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <test:XMLValidation> .
+
+<test:XMLValidation> 
+        a                                   dynapi:XMLValidation ;
+	dynapi:xsd                          <test:xml_schemal_rules_param> ;
+        dynapi:inputXml                     <test:input_xml_param> ;
+        dynapi:errorMessage                 <test:error_message> ;
+        dynapi:result                       <test:result> .
+
+<test:input_xml_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "input" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
+<test:result>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/boolean> .
+
+<test:xml_schemal_rules_param>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "xsd" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+        
+<test:error_message>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "error" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .

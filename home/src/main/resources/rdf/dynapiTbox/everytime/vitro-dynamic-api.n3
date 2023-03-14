@@ -932,3 +932,7 @@
 :XMLTransformation rdf:type owl:Class ;
             rdfs:subClassOf :Operation ;
             rdfs:label "XMLTransformation operation"@en-US .
+            
+:XMLValidation rdf:type owl:Class ;
+            rdfs:subClassOf :Operation ;
+            rdfs:label "XML validation operation"@en-US .
