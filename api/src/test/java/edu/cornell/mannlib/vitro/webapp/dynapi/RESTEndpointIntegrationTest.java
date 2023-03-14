@@ -186,7 +186,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
                 if (overwrite) {
                 	overwrite(filePath);	
                 }
-                verify(responsePrintWriter, times(1)).print(expectedReponseBody);
+                verify(responsePrintWriter, times(1)).print(expectedReponseBody.trim());
                 verify(responsePrintWriter, times(1)).flush();
             }
 

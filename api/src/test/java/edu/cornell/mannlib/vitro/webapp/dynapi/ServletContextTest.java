@@ -31,10 +31,10 @@ public abstract class ServletContextTest {
     //public static final String INDIVIDUALS_FILE_PATH = ABOX_PREFIX + "dynamic-api-individuals.n3";
     public static final String IMPLEMENTATION_FILE_PATH = TBOX_PREFIX + "dynamic-api-implementation.n3";
     public static final String ONTOLOGY_FILE_PATH = TBOX_PREFIX + "vitro-dynamic-api.n3";
-	protected final static String TEST_PROCEDURE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1";
+	protected final static String TEST_PROCEDURE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1";
     protected final static ResourceAPIKey TEST_RESOURCE_KEY = ResourceAPIKey.of("test_resource", "0.1.0");
 
-    protected final static String TEST_PERSON_PROCEDURE_URI_1 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1";
+    protected final static String TEST_PERSON_PROCEDURE_URI_1 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";
 
     protected final static ResourceAPIKey TEST_PERSON_RESOURCE_KEY = ResourceAPIKey.of("test_person_resource", "1.0.0");
 
