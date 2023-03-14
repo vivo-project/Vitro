@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 
 public class ProcedurePoolTest extends ServletContextTest {
 
-    protected final static String TEST_PERSON_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1";
+    protected final static String TEST_PERSON_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";
 
     @After
     public void reset() {
@@ -249,7 +249,7 @@ public class ProcedurePoolTest extends ServletContextTest {
         
         assertProcedure(TEST_PROCEDURE_URI, procedurePool.get(TEST_PROCEDURE_URI));
 
-        procedurePool.unload("https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1");
+        procedurePool.unload("https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1");
 
         assertEquals(procedureCount - 1, procedurePool.count());
     }

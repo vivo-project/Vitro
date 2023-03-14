@@ -21,11 +21,11 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 public class ResourceAPIPoolTest extends ServletContextTest {
 
     protected final static String TEST_PERSON_RESOURCE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testPersonResource1";
-    protected final static String TEST_PERSON_PROCEDURE_URI_1_1 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1_1";
-    protected final static String TEST_PERSON_PROCEDURE_URI_2 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction2";
-    protected final static String TEST_PERSON_PROCEDURE_URI_3 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction3";
-    protected final static String TEST_PERSON_PROCEDURE_URI_4 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction4";
-    protected final static String TEST_PERSON_PROCEDURE_URI_5 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction5";
+    protected final static String TEST_PERSON_PROCEDURE_URI_1_1 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1_1";
+    protected final static String TEST_PERSON_PROCEDURE_URI_2 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure2";
+    protected final static String TEST_PERSON_PROCEDURE_URI_3 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure3";
+    protected final static String TEST_PERSON_PROCEDURE_URI_4 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure4";
+    protected final static String TEST_PERSON_PROCEDURE_URI_5 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure5";
 
     @Before
     public void beforeEach() {
@@ -114,7 +114,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         ResourceAPIKey document_v0 = ResourceAPIKey.of("test_document_resource", "0");
         ResourceAPIKey document_v1 = ResourceAPIKey.of("test_document_resource", "1");
 
-        String testDocumentProcedureUri = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testDocumentAction1";
+        String testDocumentProcedureUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testDocumentProcedure1";
 
         ResourceAPIKey person_v0 = ResourceAPIKey.of("test_person_resource", "0");
         ResourceAPIKey person_v1 = ResourceAPIKey.of("test_person_resource", "1");
