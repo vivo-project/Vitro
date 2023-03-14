@@ -33,7 +33,7 @@
         dynapi:hasType           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string-literal> ;
         rdfs:label               "Object for N3 template"@en-US .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/N3TemplateTestAction>
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/N3TemplateTestAction>
         a                        dynapi:Procedure ;
         rdfs:label               "N3 template test action"@en-US ;
         dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/N3TestRPC1> ;
