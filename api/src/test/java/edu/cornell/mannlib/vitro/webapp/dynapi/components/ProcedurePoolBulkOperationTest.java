@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 
 public class ProcedurePoolBulkOperationTest extends ServletContextTest{
 
-    private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1";
+    private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1";
     private ProcedurePool procedurePool;
     
     @Before

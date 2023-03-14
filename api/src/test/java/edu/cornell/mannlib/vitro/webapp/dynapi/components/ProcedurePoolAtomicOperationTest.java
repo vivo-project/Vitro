@@ -28,7 +28,7 @@ public class ProcedurePoolAtomicOperationTest extends ServletContextTest{
 
     private static final String JSON_OBJECT_PARAM = "jsonContainerParam";
     private static final String STRING_PARAM_NAME = "stringParam";
-    private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1";
+    private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1";
     private ProcedurePool procedurePool;
     
     @Before
