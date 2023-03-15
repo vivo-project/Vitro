@@ -1,0 +1,84 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix default: <http://vitro.mannlib.cornell.edu/ns/default/pages#> .
+
+default:dynamic-api-rest-documentation-dg
+    a   <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter> ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#htmlValue>
+        """
+	<link rel="stylesheet" type="text/css" href="./css/swagger/swagger-ui.css">
+	<div id="swagger-ui"></div>
+	<script src="./js/swagger/swagger-ui-standalone-preset.js"></script>
+	<script src="./js/swagger/swagger-ui-bundle.js"></script>
+	<script>
+	    window.onload = function() {
+        	// Build a system
+	        const ui = SwaggerUIBundle({
+        	    url: "./api/docs/rest/1",
+                    validatorUrl: "None",
+	            dom_id: '#swagger-ui',
+        	    deepLinking: true,
+	            presets: [
+        	        SwaggerUIBundle.presets.apis,
+                	SwaggerUIStandalonePreset
+	            ],
+        	    plugins: [
+                	SwaggerUIBundle.plugins.DownloadUrl
+	            ],
+        	    layout: "StandaloneLayout",
+	        })
+        	window.ui = ui
+	    }
+	</script>
+        """@en-US ;
+        <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#saveToVar>
+                "dynamicApiRestDocs" .
+default:dynamic-api-rest-documentation
+    a   <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page> ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasDataGetter>
+        default:dynamic-api-rest-documentation-dg ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#title>
+        "Dynamic API REST Documentation"@en-US ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#urlMapping>
+        "/dynapi-rest-docs" .
+
+default:dynamic-api-rpc-documentation-dg
+    a   <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter> ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#htmlValue>
+        """
+	<link rel="stylesheet" type="text/css" href="./css/swagger/swagger-ui.css">
+        <div id="swagger-ui"></div>
+	<script src="./js/swagger/swagger-ui-standalone-preset.js"></script>
+	<script src="./js/swagger/swagger-ui-bundle.js"></script>
+        <script>
+            window.onload = function() {
+                // Build a system
+                const ui = SwaggerUIBundle({
+                    url: "./api/docs/rpc/",
+                    validatorUrl: "None",
+                    dom_id: '#swagger-ui',
+                    deepLinking: true,
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl
+                    ],
+                    layout: "StandaloneLayout",
+                })
+                window.ui = ui
+            }
+        </script>
+        """@en-US ;
+        <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#saveToVar>
+                "dynamicApiRpcDocs" .
+default:dynamic-api-rpc-documentation
+    a   <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page> ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasDataGetter>
+        default:dynamic-api-rpc-documentation-dg ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#title>
+        "Dynamic API RPC Documentation"@en-US ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#urlMapping>
+        "/dynapi-rpc-docs" .
+
