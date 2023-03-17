@@ -15,8 +15,8 @@ session=$(mktemp -d)
 
 url="$host/$app_name/authenticate"
 
-loginName="email@email.com"
-loginPassword="password"
+loginName="$email"
+loginPassword="$password"
 loginForm="Log in"
 
 # Log in and get session cookies
