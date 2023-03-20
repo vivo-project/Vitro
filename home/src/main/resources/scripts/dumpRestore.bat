@@ -7,8 +7,8 @@ set password=%4%
 
 set host=http://example:port
 set purge=true
-set restoration_files=.
-set dumped_files=.
+set restoration_files_path=.
+set dumped_files_path=%restoration_files_path%
 set app_name=vivo
 
 set session=%TEMP%\%RANDOM%
@@ -26,7 +26,7 @@ curl --cookie-jar "%session%\cookies.txt" --create-dirs -d "loginName=%loginName
 if "%action%" == "dump" (
     echo Starting dump...
     
-    curl --cookie "%session%\cookies.txt" "%host%/%app_name%/dumpRestore/dump/%models%.nq?which=%models%" -o "%dumped_files%\%models%.nq"
+    curl --cookie "%session%\cookies.txt" "%host%/%app_name%/dumpRestore/dump/%models%.nq?which=%models%" -o "%dumped_files_path%\%models%.nq"
     
     echo Completed successfully.
 ) else if "%action%" == "restore" (
@@ -34,7 +34,7 @@ if "%action%" == "dump" (
 
     set url=%host%/%app_name%/dumpRestore/restore
 
-    curl --cookie "%session%\cookies.txt" -X POST -F "sourceFile=@%restoration_files%\%models%.nq" "%url%?which=%models%&purge=%purge%" > nul
+    curl --cookie "%session%\cookies.txt" -X POST -F "sourceFile=@%restoration_files_path%\%models%.nq" "%url%?which=%models%&purge=%purge%" > nul
 
     if %errorlevel% equ 0 (
         echo Restored successfully.
