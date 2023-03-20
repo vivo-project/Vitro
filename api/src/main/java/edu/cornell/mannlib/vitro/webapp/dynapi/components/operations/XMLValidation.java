@@ -35,9 +35,9 @@ public class XMLValidation extends AbstractOperation {
 
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#xsd", minOccurs = 1, maxOccurs = 1)
-    public void setXsltParam(Parameter xsltParam) throws InitializationException {
-        this.schemaParam = xsltParam;
-        inputParams.add(xsltParam);
+    public void setSchemaParam(Parameter schemaParam) throws InitializationException {
+        this.schemaParam = schemaParam;
+        inputParams.add(schemaParam);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#inputXml", minOccurs = 1, maxOccurs = 1)
