@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 
 @RunWith(Parameterized.class)
-public class XMLTransforamationTest {
+public class XMLTransformationTest {
 
     private static final String OUTPUT_XML = "output xml";
     private static final String INPUT_XML = "input xml";
