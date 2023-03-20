@@ -72,7 +72,7 @@ public class XMLValidationTest {
     public void testUnconfiguredOperation() throws Exception {
         xmlt.setInputXmlParam(inputParam);
         assertFalse(xmlt.isValid());
-        xmlt.setXsltParam(xsdParam);
+        xmlt.setSchemaParam(xsdParam);
         assertFalse(xmlt.isValid());
         xmlt.setValidationResult(outputParam);
         xmlt.setErrorMessage(errorMessageParam);
