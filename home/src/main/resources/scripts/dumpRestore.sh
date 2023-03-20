@@ -5,7 +5,7 @@ models="$2"
 email="$3"
 password="$4"
 
-host="http://localhost:8080"              # URL where the VIVO instance is hosted
+host="http://example:port"                # URL where the VIVO instance is hosted
 purge="true"                              # Will the restoration process purge the models before restoring
 restoration_files_path="."                # Directory containing the files used for restoration
 dumped_files_path=$restoration_files_path # Directory containing the backed-up files
