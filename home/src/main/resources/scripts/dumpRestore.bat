@@ -16,12 +16,12 @@ mkdir "%session%"
  
 set url=%host%/%app_name%/authenticate
  
-set loginName=%email%
-set loginPassword=%password%
-set loginForm=Log in
+set login_name=%email%
+set login_password=%password%
+set login_form=Log in
  
 :: Log in and get session cookies
-curl --cookie-jar "%session%\cookies.txt" --create-dirs --data-urlencode "loginName=%loginName%" --data-urlencode "loginPassword=%loginPassword%" -d "loginForm=%loginForm%" %url%
+curl --cookie-jar "%session%\cookies.txt" --create-dirs --data-urlencode "loginName=%login_name%" --data-urlencode "loginPassword=%login_password%" -d "loginForm=%login_form%" %url%
  
 if "%action%" == "dump" (
     echo Starting dump...
