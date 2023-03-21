@@ -20,12 +20,26 @@ loginPassword="$password"
 loginForm="Log in"
 
 # Log in and get session cookies
-curl --cookie-jar "$session/cookies.txt" -d "loginName=$loginName" -d "loginPassword=$loginPassword" -d "loginForm=$loginForm" $url
+curl --cookie-jar "$session/cookies.txt" --data-urlencode "loginName=$loginName" --data-urlencode "loginPassword=$loginPassword" -d "loginForm=$loginForm" $url
 
 if [[ "$action" == "dump" ]]; then
     echo "Starting dump..."
-    curl --cookie "$session/cookies.txt" "$host/$app_name/dumpRestore/dump/$models.nq?which=$models" -o "$dumped_files_path/$models.nq"
-    echo "Completed successfully."
+
+    dump_file_path="$dumped_files_path/$models.nq"
+
+    status_code=$(curl --write-out %{http_code} --cookie "$session/cookies.txt" "$host/$app_name/dumpRestore/dump/$models.nq?which=$models" -o "$dump_file_path")
+    
+    if [[ "$status_code" -ne 200 ]]; then
+        echo "Dump failed, status code is $status_code, check login credentials, parameters and try again."
+    fi
+
+    if [ -s $dump_file_path ]; then
+        echo "Completed successfully."
+    else
+        echo "Dump file is empty, deleting..."
+        rm -r "$dump_file_path"
+    fi
+
 elif [[ "$action" == "restore" ]]; then
     echo "Starting restoration process..."
 
