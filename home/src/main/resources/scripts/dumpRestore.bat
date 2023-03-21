@@ -21,7 +21,7 @@ set loginPassword=%password%
 set loginForm=Log in
  
 :: Log in and get session cookies
-curl --cookie-jar "%session%\cookies.txt" --create-dirs -d "loginName=%loginName%" -d "loginPassword=%loginPassword%" -d "loginForm=%loginForm%" %url%
+curl --cookie-jar "%session%\cookies.txt" --create-dirs --data-urlencode "loginName=%loginName%" --data-urlencode "loginPassword=%loginPassword%" -d "loginForm=%loginForm%" %url%
  
 if "%action%" == "dump" (
     echo Starting dump...
