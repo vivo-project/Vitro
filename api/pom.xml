@@ -7,13 +7,13 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-api</artifactId>
-    <version>1.13.1-SNAPSHOT</version>
+    <version>1.14.0</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.vivoweb</groupId>
         <artifactId>vitro-project</artifactId>
-        <version>1.13.1-SNAPSHOT</version>
+        <version>1.14.0</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.vivoweb</groupId>
             <artifactId>vitro-dependencies</artifactId>
-            <version>1.13.1-SNAPSHOT</version>
+            <version>1.14.0</version>
             <type>pom</type>
         </dependency>
         <dependency>
