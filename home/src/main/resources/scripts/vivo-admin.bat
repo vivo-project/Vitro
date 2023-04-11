@@ -1,15 +1,8 @@
 @echo off
  
+call ./setenv.bat
+
 set action=%1%
-set models=%2%
-set email=%3%
-set password=%4%
- 
-set host=http://example:port
-set purge=true
-set restoration_files_path=.
-set dumped_files_path=%restoration_files_path%
-set app_name=vivo
  
 set session=%TEMP%\%RANDOM%
 mkdir "%session%"
