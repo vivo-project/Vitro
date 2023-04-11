@@ -1,15 +1,8 @@
 #!/bin/bash
 
-action="$1"
-models="$2"
-email="$3"
-password="$4"
+source ./setenv.sh
 
-host="http://example:port"                # URL where the VIVO instance is hosted
-purge="true"                              # Will the restoration process purge the models before restoring
-restoration_files_path="."                # Directory containing the files used for restoration
-dumped_files_path=$restoration_files_path # Directory containing the backed-up files
-app_name="vivo"                           # app-name parameter
+action="$1"
 
 session=$(mktemp -d)
 
