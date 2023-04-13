@@ -21,6 +21,14 @@
         <fileSet>
             <directory>${project.basedir}/src/main/resources</directory>
             <outputDirectory>.</outputDirectory>
+            <excludes>
+		<exclude>scripts/**</exclude>
+		<exclude>scripts</exclude>
+	    </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources/scripts</directory>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
         <!-- fileSet>
             <directory>${project.build.directory}</directory>
