@@ -19,7 +19,6 @@ public class Parameter implements Removable {
 	private Boolean internal;
 	private boolean optional;
 
-
     public String getName() {
 		return name;
 	}

@@ -115,3 +115,5 @@ dynapi:ErrorStep rdfs:subClassOf steps:ErrorStep .
 dynapi:XMLTransformation rdfs:subClassOf operations:XMLTransformation .
 
 dynapi:XMLValidation rdfs:subClassOf operations:XMLValidation .
+
+dynapi:ParameterSubstitution rdfs:subClassOf components:ParameterSubstitution .
