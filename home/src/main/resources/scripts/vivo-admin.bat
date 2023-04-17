@@ -35,7 +35,7 @@ if "%action%" == "dump" (
     )
  
 ) else if "%action%" == "restore" (
-    echo "Starting restoration process..."
+    echo Starting restoration process...
 
     curl --cookie "%session%\cookies.txt" -X POST -F "sourceFile=@%restoration_files_path%\%models%.nq" "%host%/%app_name%/dumpRestore/restore?which=%models%&purge=%purge%" > nul
  
