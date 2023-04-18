@@ -1,0 +1,153 @@
+@prefix ocrer: <http://purl.org/net/OCRe/research.owl#> .
+@prefix pr:    <https://iph.ras.ru/relationships#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix ns:    <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix scires: <http://vivoweb.org/ontology/scientific-research#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix swo:   <http://www.ebi.ac.uk/efo/swo/> .
+@prefix ocresd: <http://purl.org/net/OCRe/study_design.owl#> .
+@prefix cito:  <http://purl.org/spar/cito/> .
+@prefix geo:   <http://aims.fao.org/aos/geopolitical.owl#> .
+@prefix search: <https://vivoweb.org/ontology/vitro-search#> .
+@prefix ocresst: <http://purl.org/net/OCRe/statistics.owl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vivo:  <http://vivoweb.org/ontology/core#> .
+@prefix vann:  <http://purl.org/vocab/vann/> .
+@prefix event: <http://purl.org/NET/c4dm/event.owl#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix c4o:   <http://purl.org/spar/c4o/> .
+@prefix fabio: <http://purl.org/spar/fabio/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix skos2: <http://www.w3.org/2008/05/skos#> .
+@prefix vitro-public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ocresp: <http://purl.org/net/OCRe/study_protocol.owl#> .
+@prefix ecrm:  <http://erlangen-crm.org/170309/> .
+@prefix bibo:  <http://purl.org/ontology/bibo/> .
+@prefix ro:    <http://purl.obolibrary.org/obo/ro.owl#> .
+@prefix obo:   <http://purl.obolibrary.org/obo/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<https://vivoweb.org/ontology/vitro-search>
+        a                          owl:Ontology ;
+        vitro:ontologyPrefixAnnot  "search" .
+
+search:multivalued  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:SearchField ;
+        rdfs:range                    xsd:boolean .
+
+search:isAscending  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Sort ;
+        rdfs:range                    xsd:boolean .
+
+search:RangeFilter  a                 owl:Class ;
+        rdfs:subClassOf               search:Filter , search:Statement .
+
+search:indexField  a                  owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:SearchField ;
+        rdfs:range                    xsd:string .
+
+search:contains  a                    owl:ObjectProperty ;
+        rdfs:domain                   search:FilterGroup ;
+        rdfs:range                    search:Filter .
+
+search:step  a                        owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:RangeFilter ;
+        rdfs:range                    xsd:int .
+
+search:isLanguageSpecific
+        a                             owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:SearchField ;
+        rdfs:range                    xsd:boolean .
+
+search:filterField  a                 owl:ObjectProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    search:SearchField .
+
+search:isUriValues  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    xsd:boolean .
+
+search:SearchField  a                 owl:Class ;
+        rdfs:subClassOf               search:Statement .
+
+search:order  a                       owl:FunctionalProperty , owl:DatatypeProperty ;
+        rdfs:domain                   [ a            owl:Class ;
+                                        owl:unionOf  ( search:FilterValue search:Filter search:FilterGroup )
+                                      ] ;
+        rdfs:range                    xsd:integer .
+
+search:userInput  a                   owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    xsd:boolean .
+
+search:FilterValue  a                 owl:Class .
+
+search:Statement  a                   owl:Class .
+
+search:from  a                        owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:RangeFilter ;
+        rdfs:range                    xsd:string .
+
+search:description  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Statement ;
+        rdfs:range                    xsd:string .
+
+search:FilterGroup  a                 owl:Class .
+
+search:userInputRegex
+        a                             owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    xsd:boolean .
+
+search:Filter  a                      owl:Class ;
+        rdfs:subClassOf               search:Statement .
+
+search:sortField  a                   owl:FunctionalProperty , owl:ObjectProperty ;
+        rdfs:domain                   search:Sort ;
+        rdfs:range                    search:SearchField .
+
+search:id  a                          owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   [ a            owl:Class ;
+                                        owl:unionOf  ( search:Sort search:FilterValue search:Filter search:FilterGroup )
+                                      ] ;
+        rdfs:range                    xsd:string .
+
+search:facetResults  a                owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    xsd:boolean .
+
+search:Sort  a                        owl:Class ;
+        rdfs:subClassOf               search:Statement .
+
+search:to  a                          owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:RangeFilter ;
+        rdfs:range                    xsd:string .
+
+search:hasKnownValue  a                owl:ObjectProperty ;
+        rdfs:domain                    search:Filter ;
+        rdfs:range                     search:FilterValue .
+
+
+search:public  a                      owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   [ a            owl:Class ;
+                                        owl:unionOf  ( search:Filter search:FilterGroup )
+                                      ] ;
+        rdfs:range                    xsd:boolean .
+
+
+search:defaultPublic
+        a                   <http://www.w3.org/2002/07/owl#DatatypeProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> ;
+        rdfs:domain         <https://vivoweb.org/ontology/vitro-search#FilterValue> ;
+        rdfs:range          <http://www.w3.org/2001/XMLSchema#boolean> ;
+        rdfs:subPropertyOf  <http://www.w3.org/2002/07/owl#topDataProperty> .
+
+search:moreLimit
+        a                   <http://www.w3.org/2002/07/owl#DatatypeProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> ;
+        rdfs:domain         <https://vivoweb.org/ontology/vitro-search#Filter> ;
+        rdfs:range          <http://www.w3.org/2001/XMLSchema#int> ;
+        rdfs:subPropertyOf  <http://www.w3.org/2002/07/owl#topDataProperty> .

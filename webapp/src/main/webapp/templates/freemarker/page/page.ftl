@@ -15,7 +15,11 @@
             <#-- Note to UI team: do not change this div without also making the corresponding change in menu.jsp -->
             <div id="navAndSearch" class="block">
                 <#include "menu.ftl">
-                <#include "search.ftl">
+                <#if currentServlet != "extendedsearch">
+                    <#include "search.ftl">
+                <#else>
+                    <#include "remote-search.ftl">
+                </#if>
             </div> <!-- navAndSearch -->
 
             <#include "breadcrumbs.ftl">
