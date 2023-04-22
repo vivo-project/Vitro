@@ -245,7 +245,7 @@ public class CachingResponseFilter implements Filter {
 	 */
 	private String findEtagForIndividual(String individualUri) {
 		SearchEngine search = ApplicationUtils.instance().getSearchEngine();
-		SearchQuery query = search.createQuery("URI:" + individualUri).addFields(
+		SearchQuery query = search.createQuery("URI:\"" + individualUri + "\"").addFields(
 				ETAG_FIELD);
 
 		try {
