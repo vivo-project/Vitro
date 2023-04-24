@@ -187,8 +187,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 			Property base;
 			if (objBase != null) {
 				fp.setSelectFromExisting(objBase.getSelectFromExisting());
-			    fp.setOfferCreateNewOption(objBase.getOfferCreateNewOption());
-			    base = objBase;
+				fp.setOfferCreateNewOption(objBase.getOfferCreateNewOption());
+				base = objBase;
 			} else {
 				base = dpDao.getDataPropertyByURI(baseUri);
 			}
