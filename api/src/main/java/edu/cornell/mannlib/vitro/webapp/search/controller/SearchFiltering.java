@@ -30,15 +30,10 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField.Count;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 public class SearchFiltering {
@@ -496,16 +491,6 @@ public class SearchFiltering {
 		filter.setInputText(getFilterInputText(vreq, resultFilterId));
 		filter.setRangeValues(getFilterRangeText(vreq, resultFilterId));
 
-		// String filterTo = getFilterTo(vreq, resultFilterId);
-		// if (!StringUtils.isBlank(filterTo)) {
-		// filter.setToValue(filterTo);
-		// filter.setSelected(true);
-		// }
-		// String filterFrom = getFilterFrom(vreq, resultFilterId);
-		// if (!StringUtils.isBlank(filterFrom)) {
-		// filter.setFromValue(filterFrom);
-		// filter.setSelected(true);
-		// }
 		return filter;
 	}
 

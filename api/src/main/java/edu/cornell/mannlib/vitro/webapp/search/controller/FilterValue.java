@@ -1,13 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.RDFNode;
 
 public class FilterValue {
 	
-    private static final Log log = LogFactory.getLog(FilterValue.class);
-
 	private String id;
 	private String name = "";
 	private int order;

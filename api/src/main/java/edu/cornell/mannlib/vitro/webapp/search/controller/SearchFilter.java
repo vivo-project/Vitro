@@ -13,8 +13,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.RDFNode;
 
 
@@ -23,8 +21,6 @@ public class SearchFilter {
 
     private static final String FILTER = "Filter";
 	private static final String RANGE_FILTER = "RangeFilter";
-
-	private static final Log log = LogFactory.getLog(SearchFilter.class);
 
 	private String id;
 	private String name = "";
@@ -253,13 +249,6 @@ public class SearchFilter {
 
 	public void setMax(String max) {
 		this.max = max;
-	}
-	
-	private String prettyTime(String timeString) {
-		Instant time = Instant.parse ( timeString );
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault()) ;
-		String formatted = formatter.format(time);
-		return formatted;
 	}
 	
 	private String getYear(String timeString) {

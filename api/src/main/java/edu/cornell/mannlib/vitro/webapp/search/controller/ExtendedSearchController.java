@@ -68,7 +68,6 @@ public class ExtendedSearchController extends FreemarkerHttpServlet {
 
 	private static final String HITS_PER_PAGE_OPTIONS = "hitsPerPageOptions";
 	private static final String FACETS = "facets";
-	private static final long serialVersionUID = 1L;
 	static final Log log = LogFactory.getLog(ExtendedSearchController.class);
 
 	protected static final int DEFAULT_HITS_PER_PAGE = 30;
@@ -733,13 +732,6 @@ public class ExtendedSearchController extends FreemarkerHttpServlet {
 			message = I18n.text(vreq, "search_failed");
 		}
 		body.put("message", message);
-		return new TemplateResponseValues(getTemplate(f, Result.ERROR), body);
-	}
-
-	private TemplateResponseValues doNoHits(String querytext, Format f, VitroRequest vreq) {
-		Map<String, Object> body = new HashMap<String, Object>();
-		body.put("title", I18n.text(vreq, "search_for", querytext));
-		body.put("message", I18n.text(vreq, "no_matching_results"));
 		return new TemplateResponseValues(getTemplate(f, Result.ERROR), body);
 	}
 
