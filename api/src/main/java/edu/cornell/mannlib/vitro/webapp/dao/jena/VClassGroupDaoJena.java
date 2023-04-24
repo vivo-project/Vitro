@@ -5,14 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntModel;
@@ -30,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
@@ -191,9 +190,9 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     	edu.cornell.mannlib.vitro.webapp.beans.Individual groupInd =
     		new IndividualImpl(); // We should make a factory for these
     	groupInd.setURI(vcg.getURI());
-    	groupInd.setNamespace(DEFAULT_NAMESPACE+"vitroClassGroup");
-    	groupInd.setName(vcg.getPublicName());
+    	groupInd.setNamespace(DEFAULT_NAMESPACE + "vitroClassGroup");
     	groupInd.setVClassURI(CLASSGROUP.getURI());
+    	groupInd.setName(vcg.getPublicName());
 
     	String groupURI = null;
 
@@ -204,8 +203,12 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
     	WebappDaoFactory wadfForURIGeneration = null;
     	try {
-    	    wadfForURIGeneration = new WebappDaoFactoryJena(
-    	            unionForURIGeneration);
+    	    // Ensure that the temporary WebappDaoFactory has the same
+    	    // preferred languages as the main one for this DAO.
+    	    WebappDaoFactoryConfig wadfConfig = new WebappDaoFactoryConfig();
+    	    wadfConfig.setPreferredLanguages(getWebappDaoFactory().getPreferredLanguages());
+    	    wadfForURIGeneration = new WebappDaoFactoryJena(new SimpleOntModelSelector(
+                    unionForURIGeneration), wadfConfig, null);
     		groupURI = wadfForURIGeneration
                     .getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
