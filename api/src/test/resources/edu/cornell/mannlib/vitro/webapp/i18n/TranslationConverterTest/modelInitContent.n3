@@ -4,9 +4,9 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663600>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "value from n3 file"@en-US ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "VIVO" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "property_to_overwrite" .

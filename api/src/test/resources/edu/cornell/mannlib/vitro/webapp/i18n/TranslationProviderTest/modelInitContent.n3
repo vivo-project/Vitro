@@ -4,74 +4,74 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663600>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "testkey VIVO no theme en-US"@en-US ;
         rdfs:label  "testkey VIVO no theme de-DE"@de-DE ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "VIVO" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "testkey" .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663601>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "testkey Vitro no theme en-US"@en-US ;
         rdfs:label  "testkey Vitro no theme de-DE"@de-DE ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "Vitro" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "testkey" .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663602>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "testkey VIVO wilma en-US"@en-US ;
         rdfs:label  "testkey VIVO wilma de-DE"@de-DE ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "VIVO" ;
-		 <http://vivoweb.org/ontology/core/properties/vocabulary#hasTheme>
+		 <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasTheme>
                 "wilma" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "testkey" .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663603>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "testkey Vitro wilma en-US"@en-US ;
         rdfs:label  "testkey Vitro wilma de-DE"@de-DE ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "Vitro" ;
-		 <http://vivoweb.org/ontology/core/properties/vocabulary#hasTheme>
+		 <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasTheme>
                 "wilma" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "testkey" .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663604>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "testkey Vitro vitro en-US"@en-US ;
         rdfs:label  "testkey Vitro vitro de-DE"@de-DE ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "Vitro" ;
-		<http://vivoweb.org/ontology/core/properties/vocabulary#hasTheme>
+		<http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasTheme>
                 "vitro" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "testkey" .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663605>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "testkey_app_fallback Vitro wilma en-US"@en-US ;
         rdfs:label  "testkey_app_fallback Vitro wilma de-DE"@de-DE ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "Vitro" ;
-		<http://vivoweb.org/ontology/core/properties/vocabulary#hasTheme>
+		<http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasTheme>
                 "wilma" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "testkey_app_fallback" .
 
 <urn:uuid:8c80dbf5-adda-41d5-a6fe-d5efde663606>
-        a           owl:NamedIndividual , <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> ;
+        a           owl:NamedIndividual , <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> ;
         rdfs:label  "testkey_app_fallback Vitro no theme en-US"@en-US ;
         rdfs:label  "testkey_app_fallback Vitro no theme de-DE"@de-DE ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp>
                 "Vitro" ;
-        <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey>
+        <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey>
                 "testkey_app_fallback" .
 
 
