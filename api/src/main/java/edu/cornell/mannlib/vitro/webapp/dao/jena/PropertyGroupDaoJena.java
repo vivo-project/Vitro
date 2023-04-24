@@ -188,9 +188,9 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	            if (group.getPublicDescription() != null
 	                    && group.getPublicDescription().length()>0) {
 		            try {
-		                updatePlainLiteralValue(groupJenaInd, PUBLIC_DESCRIPTION_ANNOT,
-		                        group.getPublicDescription(), getDefaultLanguage());
-		            } catch (Exception ex) {
+                        updatePlainLiteralValue(groupJenaInd, PUBLIC_DESCRIPTION_ANNOT,
+                                group.getPublicDescription(), getDefaultLanguage());
+                    } catch (Exception ex) {
 		                log.error(
 		                        "error setting public description for "
 		                                + groupInd.getURI());
@@ -228,12 +228,12 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	    try {
 	        Individual groupInd = ontModel.getIndividual(group.getURI());
 	        try {
-	            updateRDFSLabel(groupInd, group.getName(), getDefaultLanguage());
+                updateRDFSLabel(groupInd, group.getName(), getDefaultLanguage());
 	        } catch (Exception e) {
 	            log.error("error updating name for "+groupInd.getURI());
 	        }
 	        try {
-	            updatePlainLiteralValue(groupInd, PUBLIC_DESCRIPTION_ANNOT,
+                updatePlainLiteralValue(groupInd, PUBLIC_DESCRIPTION_ANNOT,
 	                    group.getPublicDescription(), getDefaultLanguage());	            
 	        } catch (Exception e) {
 	            log.error("Error updating public description for "+groupInd.getURI());

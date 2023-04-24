@@ -203,10 +203,10 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
     	WebappDaoFactory wadfForURIGeneration = null;
     	try {
-    	    // Ensure that the temporary WebappDaoFactory has the same
-    	    // preferred languages as the main one for this DAO.
-    	    WebappDaoFactoryConfig wadfConfig = new WebappDaoFactoryConfig();
-    	    wadfConfig.setPreferredLanguages(getWebappDaoFactory().getPreferredLanguages());
+            // Ensure that the temporary WebappDaoFactory has the same
+            // preferred languages as the main one for this DAO.
+            WebappDaoFactoryConfig wadfConfig = new WebappDaoFactoryConfig();
+            wadfConfig.setPreferredLanguages(getWebappDaoFactory().getPreferredLanguages());
     	    wadfForURIGeneration = new WebappDaoFactoryJena(new SimpleOntModelSelector(
                     unionForURIGeneration), wadfConfig, null);
     		groupURI = wadfForURIGeneration
