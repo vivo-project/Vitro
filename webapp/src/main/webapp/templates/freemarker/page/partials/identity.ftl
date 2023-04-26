@@ -26,7 +26,6 @@
             <li role="listitem"><a href="${urls.index}" title="${i18n().view_content_index}">${i18n().index}</a></li>
     </ul>
 </nav>
-<#if currentServlet != "extendedsearch">
     <section id="search" role="region">
       <fieldset>
       <legend>${i18n().search_form}</legend>
@@ -38,6 +37,3 @@
          </form>
        </fieldset>
     </section>
-<#else>
-	<#include "remote-search.ftl">
-</#if>
