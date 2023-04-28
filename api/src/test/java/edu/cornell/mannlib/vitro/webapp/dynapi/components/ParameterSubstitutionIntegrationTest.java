@@ -60,13 +60,13 @@ public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
     
 	@Before
 	public void beforeEach() {
-        LoggingControl.offLogs();
+        //LoggingControl.offLogs();
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("http://vitro.mannlib.cornell.edu/default/dynamic-api-abox"))).thenReturn(ontModel);
     }
 	
 	@After
 	public void reset() {
-	    LoggingControl.restoreLogs();
+	    //LoggingControl.restoreLogs();
         setup();
         ProcedurePool procedurePool = ProcedurePool.getInstance();
         procedurePool.init(servletContext);
@@ -111,8 +111,8 @@ public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
 	public static Collection<Object[]> requests() {
 		return Arrays.asList(new Object[][] { 
 			{ "parameter-substitution-procedure.n3", "test string" },
-	        { "parameter-substitution-procedure-narrowed.n3", "test string" },
 	        { "parameter-substitution-call-exteranal-procedure.n3", "test string" },
+	        { "parameter-substitution-call-exteranal-procedure-mirror-params.n3", "1" },
 		});
 	}
 

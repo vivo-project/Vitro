@@ -13,7 +13,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ParameterSubstitution;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ParameterSubstitution.Direction;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ParameterSubstitutor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.AbstractOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
@@ -102,7 +101,7 @@ public class OperationalStep implements Step {
         if (substitutions.isEmpty()) {
             return params;    
         } else {
-            return ParameterSubstitutor.inverseSubstitution(params, substitutions, Direction.FORWARD);
+            return ParameterSubstitutor.substituteDependencies(params, substitutions);
         }
     }
 
@@ -112,7 +111,7 @@ public class OperationalStep implements Step {
         if (substitutions.isEmpty()) {
             return params;    
         } else {
-            return ParameterSubstitutor.inverseSubstitution(params, substitutions, Direction.BACKWARD);
+            return ParameterSubstitutor.substituteDependencies(params, substitutions);
         }
     }
 
