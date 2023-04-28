@@ -296,7 +296,7 @@ name will be used as the label. -->
 		<#assign useEditLink = true/>
 	</#if>
     <#local label = individual.nameStatement>
-    ${label.value}
+    ${label.value?html}
     <#if useEditLink>
     	<@editingLinks "label" "" label editable ""/>
     <#elseif (editable && (labelCount > 0)) || (languageCount > 1)>
