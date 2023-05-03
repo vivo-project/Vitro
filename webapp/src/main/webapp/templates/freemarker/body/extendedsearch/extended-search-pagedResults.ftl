@@ -65,6 +65,8 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 		    var input=$(this);
 		    if (input.is(".selected-input")) { 
 		        input.prop("checked",false);
+		    } else {
+		        input.prop("checked",true);
 		    }
 	        $('#search-form').submit();
 		});
@@ -322,8 +324,8 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 						</#if>  
 						${getInput(filter, v, getValueID(filter.id, valueNumber), valueNumber)}
 						${getLabel(valueNumber, v, filter, additionalLabels)}
-						<#assign valueNumber = valueNumber + 1>
 					</#if>
+					<#assign valueNumber = valueNumber + 1>
 
 				</#list>
 				<#if additionalLabels >
@@ -413,8 +415,8 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 		<#assign filterName = filterName + "_" + valueNumber >
 	</#if>
 
-	<#return "<input form=\"search-form\" type=\"" + type + "\" id=\"" + valueID + "\"  value=\"" + filter.id + ":" + filterValue.id 
-		+ "\" name=\"filters_" + filterName + "\" style=\"display:none;\" " + checked + "\" class=\"" + class + "\" >" />
+	<#return "<input form=\"search-form\" type=\"" + type + "\" id=\"" + valueID?html + "\"  value=\"" + filter.id + ":" + filterValue.id 
+		+ "\" name=\"filters_" + valueID?html + "\" style=\"display:none;\" " + checked + "\" class=\"" + class + "\" >" />
 </#function>
 
 <#function getValueID id number>
