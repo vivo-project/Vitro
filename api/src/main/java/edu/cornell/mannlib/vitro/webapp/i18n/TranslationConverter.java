@@ -68,13 +68,13 @@ public class TranslationConverter {
 	protected static final String THEMES_PATH = "/themes/";
 	private static final String TEMPLATE_BODY = ""
 			+ "?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .\n"
-			+ "?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core/properties/vocabulary#PropertyKey> .\n"
-			+ "?uri <http://vivoweb.org/ontology/core/properties/vocabulary#hasApp> ?application .\n"
-			+ "?uri <http://vivoweb.org/ontology/core/properties/vocabulary#hasKey> ?key .\n";
+			+ "?uri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#UILabel> .\n"
+			+ "?uri <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp> ?application .\n"
+			+ "?uri <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey> ?key .\n";
 	private static final String TEMPLATE_LABEL = ""
 			+ "?uri <http://www.w3.org/2000/01/rdf-schema#label> ?label .\n";
 	private static final String TEMPLATE_THEME = ""
-			+ "?uri <http://vivoweb.org/ontology/core/properties/vocabulary#hasTheme> ?theme .\n";
+			+ "?uri <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasTheme> ?theme .\n";
 	
 	private static final String queryWithTheme(String langTag) { 
 		return

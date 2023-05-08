@@ -35,7 +35,7 @@ public class TranslationProvider {
 	private static final Log log = LogFactory.getLog(TranslationProvider.class);
 	private static final I18nLogger i18nLogger = new I18nLogger();
 	private static final String QUERY = "" 
-	+ "PREFIX : <http://vivoweb.org/ontology/core/properties/vocabulary#>\n"
+	+ "PREFIX : <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#>\n"
 	+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
 	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
 	+ "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n" 
