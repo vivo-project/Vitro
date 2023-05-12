@@ -37,6 +37,37 @@ public class AuditChangeSet {
     // The statemetns removed from the triple store
     private String userId = AuditVocabulary.RESOURCE_UNKNOWN;
     
+    private String userEmail = "";
+
+    private String userFirstName = "";
+
+    private String userLastName = "";
+
+    
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getUserFirstName() {
+        return userFirstName;
+    }
+
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
+    }
+
+    public String getUserLastName() {
+        return userLastName;
+    }
+
+    public void setUserLastName(String userLastName) {
+        this.userLastName = userLastName;
+    }
+
     public String getUserId() {
         return userId;
     }

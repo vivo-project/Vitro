@@ -248,7 +248,7 @@ public abstract class AuditDAOJena implements AuditDAO {
 
             // SPARQL query to retrieve overall change sets authored by the user, in reverse chronological order, with pagination
             queryString = new StringBuilder();
-            queryString.append("SELECT ?dataset ?userId");
+            queryString.append("SELECT ?dataset");
             queryString.append(" WHERE {");
             queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
             queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
@@ -267,9 +267,30 @@ public abstract class AuditDAOJena implements AuditDAO {
                 while (rs.hasNext()) {
                     QuerySolution qs = rs.next();
                     String uri = qs.getResource("dataset").getURI();
-                    total++;
                     // Read the change set from the audit store
                     datasets.add(getChangeSet(auditStore, uri));
+                }
+            } finally {
+                qexec.close();
+                query.clone();
+            }
+            
+            // SPARQL Query to obtain a count of all change sets for this user
+            queryString = new StringBuilder();
+            queryString.append("SELECT (COUNT(?dataset) AS ?datasetCount) ");
+            queryString.append(" WHERE {");
+            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
+            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
+            queryString.append(" } ");
+
+            query = QueryFactory.create(queryString.toString());
+            qexec = QueryExecutionFactory.create(query, auditStore);
+
+            try {
+                ResultSet rs = qexec.execSelect();
+                while (rs.hasNext()) {
+                    QuerySolution qs = rs.next();
+                    total = qs.getLiteral("datasetCount").getLong();
                 }
             } finally {
                 qexec.close();

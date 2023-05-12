@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.audit.controller;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.audit.AuditChangeSet;
 import edu.cornell.mannlib.vitro.webapp.audit.AuditResults;
 import edu.cornell.mannlib.vitro.webapp.audit.ListAddedStatementsMethod;
 import edu.cornell.mannlib.vitro.webapp.audit.ListRemovedStatementsMethod;
@@ -14,12 +15,16 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WebappDaoFactoryOption;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.annotation.WebServlet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +40,7 @@ public class AuditController extends FreemarkerHttpServlet {
     private static final String PARAM_OFFSET = "offset";
     private static final String PARAM_LIMIT = "limit";
 
+
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
         return SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
@@ -45,7 +51,7 @@ public class AuditController extends FreemarkerHttpServlet {
         if (log.isDebugEnabled()) {
             dumpRequestParameters(vreq);
         }
-
+        UserAccountsDao uad = ModelAccess.on(vreq).getWebappDaoFactory().getUserAccountsDao();
         Map<String, Object> body = new HashMap<>();
 
         // Get the current user
@@ -58,10 +64,9 @@ public class AuditController extends FreemarkerHttpServlet {
 
             // Get the Audit DAO
             AuditDAO auditDAO = AuditDAOFactory.getAuditDAO();
-
             // Find a page of audit entries for the current user
             AuditResults results = auditDAO.find(offset, limit);
-
+            setUserData(results.getDatasets(), uad);
             // Pass the results to Freemarker
             body.put("results", results);
 
@@ -93,6 +98,18 @@ public class AuditController extends FreemarkerHttpServlet {
 
         // Return the default template and parameters
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
+    }
+
+    private void setUserData(List<AuditChangeSet> list, UserAccountsDao uad) {
+        for (AuditChangeSet acs : list) {
+            UserAccount account = uad.getUserAccountByUri(acs.getUserId());
+            if (account == null) {
+                continue;
+            }
+            acs.setUserFirstName(account.getFirstName());
+            acs.setUserLastName(account.getLastName());
+            acs.setUserEmail(account.getEmailAddress());
+        }
     }
 
     /**

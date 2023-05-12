@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <section id="audit" role="region">
-    <h2>Changes made by ${username}</h2>
+    <h2>Tracked changes</h2>
 
     <table class="history">
         <tbody>
@@ -16,7 +16,7 @@
                 <#assign pos = pos + 1>
                 <tr>
                     <td>${pos}</td>
-                    <td>${dataset.userId!}</td>
+                    <td>${dataset.userLastName!} ${dataset.userFirstName!} ${dataset.userEmail}</td>
                     <td>${dataset.requestTime?datetime}</td>
                     <td>
                         <#list dataset.graphUris as graphUri>
