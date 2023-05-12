@@ -2,10 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit.storage;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.audit.AuditChangeSet;
 import edu.cornell.mannlib.vitro.webapp.audit.AuditResults;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -21,8 +19,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,9 +36,6 @@ public abstract class AuditDAOJena implements AuditDAO {
     // The base URI for creating change objects
     private final static String changesBaseURI = "http://vivoweb.org/audit/changes/";
 
-    // The current request
-    private HttpServletRequest request = null;
-
     /**
      * Get a dataset from the Jena store that be written to / read from
      *
@@ -50,22 +43,8 @@ public abstract class AuditDAOJena implements AuditDAO {
      */
     protected abstract Dataset getDataset();
 
-    /**
-     * Create an AuditDAO for the current request
-     * @param req
-     */
-    public AuditDAOJena(ServletRequest req) {
-        if (req instanceof HttpServletRequest) {
-            request = (HttpServletRequest)req;
-        }
-    }
-
     @Override
     public void write(AuditChangeSet changes) {
-        // Only record changes if there is a current request
-        if (request == null) {
-            return;
-        }
 
         // Ensure we have something to write
         if (changes.getAddedDataset().asDatasetGraph().isEmpty() &&
@@ -99,12 +78,7 @@ public abstract class AuditDAOJena implements AuditDAO {
             changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_UUID), changes.getUUID().toString());
 
             // Add the user information
-            UserAccount acc = LoginStatusBean.getCurrentUser(request);
-            if (acc != null) {
-                changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_USER), auditModel.createResource(acc.getUri()));
-            } else {
-                changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_USER), auditModel.createResource(AuditVocabulary.RESOURCE_UNKNOWN));
-            }
+            changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_USER), auditModel.createResource(changes.getUserId()));
 
             // Add the time of the change
             changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_DATE), Long.toString(changes.getRequestTime().getTime(),10));
@@ -254,6 +228,62 @@ public abstract class AuditDAOJena implements AuditDAO {
         return new AuditResults(total, offset, limit, datasets);
     }
 
+    @Override
+    public AuditResults find(long offset, int limit) {
+        long total = 0;
+        List<AuditChangeSet> datasets = new ArrayList<AuditChangeSet>();
+
+        // Get the audit dataset
+        Dataset auditStore = getDataset();
+        if (auditStore == null) {
+            return null;
+        }
+
+        // Indicate that we are reading from the audit store
+        auditStore.begin(ReadWrite.READ);
+        try {
+            StringBuilder queryString;
+            Query query;
+            QueryExecution qexec;
+
+            // SPARQL query to retrieve overall change sets authored by the user, in reverse chronological order, with pagination
+            queryString = new StringBuilder();
+            queryString.append("SELECT ?dataset ?userId");
+            queryString.append(" WHERE {");
+            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
+            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
+            queryString.append(" } ");
+            queryString.append(" ORDER BY DESC(?date) ");
+            queryString.append(" LIMIT ").append(limit);
+            queryString.append(" OFFSET ").append(offset);
+
+            query = QueryFactory.create(queryString.toString());
+            qexec = QueryExecutionFactory.create(query, auditStore);
+
+            try {
+                ResultSet rs = qexec.execSelect();
+
+                // For each result
+                while (rs.hasNext()) {
+                    QuerySolution qs = rs.next();
+                    String uri = qs.getResource("dataset").getURI();
+                    total++;
+                    // Read the change set from the audit store
+                    datasets.add(getChangeSet(auditStore, uri));
+                }
+            } finally {
+                qexec.close();
+                query.clone();
+            }
+
+        } finally {
+            auditStore.end();
+        }
+
+        // Create a new results object
+        return new AuditResults(total, offset, limit, datasets);
+    }
+    
     /**
      * Retrieve a changeset from the audit store
      *
@@ -272,6 +302,7 @@ public abstract class AuditDAOJena implements AuditDAO {
         }
 
         UUID id = null;
+        String userId = null;
         Date time = null;
         List<String> graphUris = new ArrayList<>();
 
@@ -303,6 +334,9 @@ public abstract class AuditDAOJena implements AuditDAO {
                         case AuditVocabulary.PROP_HASGRAPH:
                             graphUris.add(stmt.getObject().asResource().getURI());
                             break;
+                        case AuditVocabulary.PROP_USER:
+                            userId = stmt.getObject().asResource().getURI();
+                            break;
                     }
                     stmt.getObject();
                 }
@@ -313,6 +347,7 @@ public abstract class AuditDAOJena implements AuditDAO {
 
         // Create a changeset object
         AuditChangeSet auditChangeSet = new AuditChangeSet(id, time);
+        auditChangeSet.setUserId(userId);
 
         // Loop through all of the change graphs
         for (String graphUri : graphUris) {

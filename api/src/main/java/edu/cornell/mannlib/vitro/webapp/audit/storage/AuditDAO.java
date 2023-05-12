@@ -25,4 +25,6 @@ public interface AuditDAO {
      * @return
      */
     AuditResults findForUser(String userUri, long offset, int limit);
+
+    AuditResults find(long offset, int limit);
 }

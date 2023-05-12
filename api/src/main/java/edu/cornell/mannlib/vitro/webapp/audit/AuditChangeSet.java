@@ -9,6 +9,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 
+import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary;
+
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashSet;
@@ -31,6 +33,17 @@ public class AuditChangeSet {
 
     // The statemetns removed from the triple store
     private Dataset removedDataset = null;
+
+    // The statemetns removed from the triple store
+    private String userId = AuditVocabulary.RESOURCE_UNKNOWN;
+    
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     /**
      * Initialize a change set

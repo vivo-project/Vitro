@@ -7,6 +7,7 @@
         <tbody>
             <tr>
                 <th>Pos</th>
+                <th>User</th>
                 <th>Date</th>
                 <th>Changes</th>
             </tr>
@@ -15,6 +16,7 @@
                 <#assign pos = pos + 1>
                 <tr>
                     <td>${pos}</td>
+                    <td>${dataset.userId!}</td>
                     <td>${dataset.requestTime?datetime}</td>
                     <td>
                         <#list dataset.graphUris as graphUri>

@@ -19,5 +19,5 @@ public final class AuditVocabulary {
     public final static String PROP_GRAPH_ADDED = "http://vivoweb.org/audit/properties#added";
     public final static String PROP_GRAPH_REMOVED = "http://vivoweb.org/audit/properties#removed";
 
-    public final static String RESOURCE_UNKNOWN= "http://vivoweb.org/audit/resource/unknown";
+    public final static String RESOURCE_UNKNOWN = "http://vivoweb.org/audit/resource/unknown";
 }

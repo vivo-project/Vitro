@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.audit.storage;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.tdb.TDBFactory;
 
-import javax.servlet.ServletRequest;
 import java.io.File;
 
 /**
@@ -14,10 +13,6 @@ import java.io.File;
 public class AuditDAOTDB extends AuditDAOJena {
     // The TDB instance
     private static Dataset dataset = null;
-
-    public AuditDAOTDB(ServletRequest req) {
-        super(req);
-    }
 
     /**
      * Initialize the Jena TFB storage

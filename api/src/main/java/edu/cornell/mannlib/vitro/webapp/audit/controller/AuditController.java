@@ -50,19 +50,17 @@ public class AuditController extends FreemarkerHttpServlet {
 
         // Get the current user
         UserAccount acc = LoginStatusBean.getCurrentUser(vreq);
-        if (acc != null) {
-            // Get the URI of the user
-            String uri = acc.getUri();
+        if (acc != null && acc.isRootUser()) {
 
             // Get the offset / limit parameters (or default if unset)
             int offset = getOffset(vreq);
             int limit  = getLimit(vreq);
 
             // Get the Audit DAO
-            AuditDAO auditDAO = AuditDAOFactory.getAuditDAO(vreq);
+            AuditDAO auditDAO = AuditDAOFactory.getAuditDAO();
 
             // Find a page of audit entries for the current user
-            AuditResults results = auditDAO.findForUser(uri, offset, limit);
+            AuditResults results = auditDAO.find(offset, limit);
 
             // Pass the results to Freemarker
             body.put("results", results);

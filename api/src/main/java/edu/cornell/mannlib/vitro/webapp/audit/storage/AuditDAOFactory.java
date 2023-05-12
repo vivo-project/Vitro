@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit.storage;
 
-import javax.servlet.ServletRequest;
-
 /**
  * Factory for Audit DAOs
  */
@@ -38,17 +36,17 @@ public class AuditDAOFactory {
      * @param req
      * @return
      */
-    public static AuditDAO getAuditDAO(ServletRequest req) {
+    public static AuditDAO getAuditDAO() {
         if (storage == null) {
             throw new IllegalStateException("AduitDAOFactory not initialized");
         }
 
         switch (storage) {
             case AUDIT_FS:
-                return new AuditDAOFS(req);
+                return new AuditDAOFS();
 
             case AUDIT_TDB:
-                return new AuditDAOTDB(req);
+                return new AuditDAOTDB();
         }
 
         throw new UnsupportedOperationException("Unsupported Audit storage");
