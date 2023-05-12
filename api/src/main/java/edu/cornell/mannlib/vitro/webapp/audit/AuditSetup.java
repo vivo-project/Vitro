@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.audit;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
@@ -40,10 +41,17 @@ public class AuditSetup implements ServletContextListener {
      */
     private synchronized void registerChangeListener(ServletContext ctx) {
         // Check that no change listener has already been created
-        RDFService rdfService = ModelAccess.on(ctx).getRDFService();
+        RDFService contentRdfService = ModelAccess.on(ctx).getRDFService(WhichService.CONTENT);
         try {
             // Register the change listener
-            rdfService.registerListener(CHANGE_LISTENER);
+            contentRdfService.registerListener(CHANGE_LISTENER);
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        RDFService configurationRdfService = ModelAccess.on(ctx).getRDFService(WhichService.CONFIGURATION);
+        try {
+            // Register the change listener
+            configurationRdfService.registerListener(CHANGE_LISTENER);
         } catch (RDFServiceException e) {
             log.error(e, e);
         }
