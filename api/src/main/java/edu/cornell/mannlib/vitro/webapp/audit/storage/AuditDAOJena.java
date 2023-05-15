@@ -147,7 +147,7 @@ public abstract class AuditDAOJena implements AuditDAO {
     }
 
     @Override
-    public AuditResults find(long offset, int limit, long startDate, String userUri, String graphUri, boolean order) {
+    public AuditResults find(long offset, int limit, long startDate, long endDate, String userUri, String graphUri, boolean order) {
         long total = 0;
         List<AuditChangeSet> datasets = new ArrayList<AuditChangeSet>();
 
@@ -178,7 +178,10 @@ public abstract class AuditDAOJena implements AuditDAO {
                 queryString.append("   ?graph <").append(AuditVocabulary.PROP_GRAPH).append("> <").append(graphUri).append("> . ");    
             }
             if (startDate > 0) {
-                queryString.append("   FILTER ( ?date <= \"" + Long.toString(startDate)  +  "\"^^<http://www.w3.org/2001/XMLSchema#date> ) ");
+                queryString.append("   FILTER ( ?date >= \"" + Long.toString(startDate)  +  "\" ) ");
+            }
+            if (endDate > 0) {
+                queryString.append("   FILTER ( ?date <= \"" + Long.toString(endDate)  +  "\" ) ");
             }
             queryString.append(" } ");
             if (order ) {
@@ -213,18 +216,19 @@ public abstract class AuditDAOJena implements AuditDAO {
             queryString.append("SELECT (COUNT(?dataset) AS ?datasetCount) ");
             queryString.append(" WHERE {");
             queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            if (startDate > 0) {
-                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
+            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
+            if (!StringUtils.isBlank(userUri)) {
+                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri).append("> . ");    
             }
             if (!StringUtils.isBlank(graphUri)) {
                 queryString.append("   ?dataset <").append(AuditVocabulary.PROP_HASGRAPH).append("> ?graph . ");    
                 queryString.append("   ?graph <").append(AuditVocabulary.PROP_GRAPH).append("> <").append(graphUri).append("> . ");    
             }
-            if (!StringUtils.isBlank(userUri)) {
-                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri).append("> . ");    
-            }
             if (startDate > 0) {
-                queryString.append("   FILTER ( ?date <= \"" + Long.toString(startDate)  +  "\"^^<http://www.w3.org/2001/XMLSchema#date> ) ");
+                queryString.append("   FILTER ( ?date >= \"" + Long.toString(startDate)  +  "\" ) ");
+            }
+            if (endDate > 0) {
+                queryString.append("   FILTER ( ?date <= \"" + Long.toString(endDate)  +  "\" ) ");
             }
             queryString.append(" } ");
 

@@ -29,10 +29,10 @@ public interface AuditDAO {
      * @param order true = ASC, false = DESC
      * @return
      */
-    AuditResults find(long offset, int limit, long startDate, String userUri, String graphUri, boolean order);
-
     List<String> getUsers();
 
     List<String> getGraphs();
+
+    AuditResults find(long offset, int limit, long startDate, long endDate, String userUri, String graphUri, boolean order);
 
 }

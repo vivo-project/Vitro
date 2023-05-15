@@ -3,7 +3,7 @@
 <section id="audit" role="region">
     <h2>Audit history</h2>
     <form>
-      <label for="user">User uri:</label>
+      <label for="user">Editor uri:</label>
       <select name="user" id="user">
         <option value="">Any</option>
         <#list users as curUser>
@@ -29,7 +29,12 @@
           <@printSelectOption curOrder order />
         </#list>
       </select>
-      <input type="submit" value="Update" >
+      <label for="start_date">From:</label>
+      <input type="date" id="start_date" name="start_date" value="${start_date}">
+      <label for="end_date">To:</label>
+      <input type="date" id="end_date" name="end_date" value="${end_date}">
+	  <br>
+      <input type="submit" value="Filter" >
     </form>
 
     <table class="history">

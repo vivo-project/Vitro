@@ -86,7 +86,7 @@ public class AuditDAOFS implements AuditDAO {
     }
 
     @Override
-    public AuditResults find(long offset, int limit, long startDate, String userUri, String graphUri, boolean order) {
+    public AuditResults find(long offset, int limit, long startDate, long endDate, String userUri, String graphUri, boolean order) {
         throw new UnsupportedOperationException();
     }
 

@@ -38,8 +38,8 @@ public class AuditChangeListener extends StatementListener implements ModelChang
         
             String userId = modelChange.getUserId();
             if (StringUtils.isBlank(userId)) {
-                log.error("User id is not provided.");
-                log.error(Thread.currentThread().getStackTrace());
+                Exception e = new Exception();
+                log.error("User id is not provided.", e);
                 userId = AuditVocabulary.RESOURCE_UNKNOWN;
             }
         auditChangeset.setUserId(userId);
