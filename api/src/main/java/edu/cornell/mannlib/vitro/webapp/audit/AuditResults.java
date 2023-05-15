@@ -11,6 +11,7 @@ public class AuditResults {
     private long total;
     private long offset;
     private long limit;
+
     private List<AuditChangeSet> datasets;
 
     public AuditResults(long total, long offset, long limit, List<AuditChangeSet> datasets) {
@@ -20,6 +21,9 @@ public class AuditResults {
         this.datasets = datasets;
     }
     
+    public long getLimit() {
+        return limit;
+    }
 
     public long getTotal() {
         return total;

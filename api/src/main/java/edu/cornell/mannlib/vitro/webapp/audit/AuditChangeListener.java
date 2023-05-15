@@ -3,11 +3,15 @@
 package edu.cornell.mannlib.vitro.webapp.audit;
 
 import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOFactory;
+import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
@@ -16,6 +20,7 @@ import org.apache.jena.rdf.model.ModelChangedListener;
  * Listener for changes in the RDFService
  */
 public class AuditChangeListener extends StatementListener implements ModelChangedListener, ChangeListener {
+    private static final Log log = LogFactory.getLog(AuditChangeListener.class);
 
     @Override
     public void notifyModelChange(ModelChange modelChange) {
@@ -31,7 +36,13 @@ public class AuditChangeListener extends StatementListener implements ModelChang
         AuditChangeSet auditChangeset = new AuditChangeSet();
         Model additions = auditChangeset.getAddedModel(modelChange.getGraphURI());
         
-        auditChangeset.setUserId(modelChange.getUserId());
+            String userId = modelChange.getUserId();
+            if (StringUtils.isBlank(userId)) {
+                log.error("User id is not provided.");
+                log.error(Thread.currentThread().getStackTrace());
+                userId = AuditVocabulary.RESOURCE_UNKNOWN;
+            }
+        auditChangeset.setUserId(userId);
         
         // Is the change adding or removing statements?
         if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {

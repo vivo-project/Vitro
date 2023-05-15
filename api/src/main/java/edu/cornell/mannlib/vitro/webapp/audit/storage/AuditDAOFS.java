@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Audit storage using a plain file system
@@ -85,14 +86,17 @@ public class AuditDAOFS implements AuditDAO {
     }
 
     @Override
-    public AuditResults findForUser(String userUri, long offset, int limit) {
-        // Plain file system audit log is read only at this time
+    public AuditResults find(long offset, int limit, long startDate, String userUri, String graphUri, boolean order) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public AuditResults find(long offset, int limit) {
-        // TODO Auto-generated method stub
+    public List<String> getUsers() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<String> getGraphs() {
         throw new UnsupportedOperationException();
     }
 }

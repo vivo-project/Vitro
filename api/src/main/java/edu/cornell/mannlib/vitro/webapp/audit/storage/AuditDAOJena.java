@@ -14,6 +14,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -21,6 +22,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -145,91 +147,7 @@ public abstract class AuditDAOJena implements AuditDAO {
     }
 
     @Override
-    public AuditResults findForUser(String userUri, long offset, int limit) {
-        long total = 0;
-        List<AuditChangeSet> datasets = new ArrayList<AuditChangeSet>();
-
-        // Must have a user uri
-        if (StringUtils.isEmpty(userUri)) {
-            return null;
-        }
-
-        // Get the audit dataset
-        Dataset auditStore = getDataset();
-        if (auditStore == null) {
-            return null;
-        }
-
-        // Indicate that we are reading from the audit store
-        auditStore.begin(ReadWrite.READ);
-        try {
-            StringBuilder queryString;
-            Query query;
-            QueryExecution qexec;
-
-            // SPARQL query to retrieve overall change sets authored by the user, in reverse chronological order, with pagination
-            queryString = new StringBuilder();
-            queryString.append("SELECT ?dataset ");
-            queryString.append(" WHERE {");
-            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
-            queryString.append(" } ");
-            queryString.append(" ORDER BY DESC(?date) ");
-            queryString.append(" LIMIT ").append(limit);
-            queryString.append(" OFFSET ").append(offset);
-
-            query = QueryFactory.create(queryString.toString());
-            qexec = QueryExecutionFactory.create(query, auditStore);
-
-            try {
-                ResultSet rs = qexec.execSelect();
-
-                // For each result
-                while (rs.hasNext()) {
-                    QuerySolution qs = rs.next();
-                    String uri = qs.getResource("dataset").getURI();
-
-                    // Read the change set from the audit store
-                    datasets.add(getChangeSet(auditStore, uri));
-                }
-            } finally {
-                qexec.close();
-                query.clone();
-            }
-
-            // SPARQL Query to obtain a count of all change sets for this user
-            queryString = new StringBuilder();
-            queryString.append("SELECT (COUNT(?dataset) AS ?datasetCount) ");
-            queryString.append(" WHERE {");
-            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
-            queryString.append(" } ");
-
-            query = QueryFactory.create(queryString.toString());
-            qexec = QueryExecutionFactory.create(query, auditStore);
-
-            try {
-                ResultSet rs = qexec.execSelect();
-                while (rs.hasNext()) {
-                    QuerySolution qs = rs.next();
-                    total = qs.getLiteral("datasetCount").getLong();
-                }
-            } finally {
-                qexec.close();
-                query.clone();
-            }
-        } finally {
-            auditStore.end();
-        }
-
-        // Create a new results object
-        return new AuditResults(total, offset, limit, datasets);
-    }
-
-    @Override
-    public AuditResults find(long offset, int limit) {
+    public AuditResults find(long offset, int limit, long startDate, String userUri, String graphUri, boolean order) {
         long total = 0;
         List<AuditChangeSet> datasets = new ArrayList<AuditChangeSet>();
 
@@ -246,14 +164,29 @@ public abstract class AuditDAOJena implements AuditDAO {
             Query query;
             QueryExecution qexec;
 
-            // SPARQL query to retrieve overall change sets authored by the user, in reverse chronological order, with pagination
+            // SPARQL query to retrieve overall change sets, in reverse chronological order, with pagination
             queryString = new StringBuilder();
             queryString.append("SELECT ?dataset");
             queryString.append(" WHERE {");
             queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
+            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");    
+            if (!StringUtils.isBlank(userUri)) {
+                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri).append("> . ");    
+            }
+            if (!StringUtils.isBlank(graphUri)) {
+                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_HASGRAPH).append("> ?graph . ");    
+                queryString.append("   ?graph <").append(AuditVocabulary.PROP_GRAPH).append("> <").append(graphUri).append("> . ");    
+            }
+            if (startDate > 0) {
+                queryString.append("   FILTER ( ?date <= \"" + Long.toString(startDate)  +  "\"^^<http://www.w3.org/2001/XMLSchema#date> ) ");
+            }
             queryString.append(" } ");
-            queryString.append(" ORDER BY DESC(?date) ");
+            if (order ) {
+                queryString.append(" ORDER BY ASC(?date) ");
+            } else {
+                queryString.append(" ORDER BY DESC(?date) ");    
+            }
+            
             queryString.append(" LIMIT ").append(limit);
             queryString.append(" OFFSET ").append(offset);
 
@@ -275,12 +208,24 @@ public abstract class AuditDAOJena implements AuditDAO {
                 query.clone();
             }
             
-            // SPARQL Query to obtain a count of all change sets for this user
+            // SPARQL Query to obtain a count of all change sets
             queryString = new StringBuilder();
             queryString.append("SELECT (COUNT(?dataset) AS ?datasetCount) ");
             queryString.append(" WHERE {");
             queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
+            if (startDate > 0) {
+                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
+            }
+            if (!StringUtils.isBlank(graphUri)) {
+                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_HASGRAPH).append("> ?graph . ");    
+                queryString.append("   ?graph <").append(AuditVocabulary.PROP_GRAPH).append("> <").append(graphUri).append("> . ");    
+            }
+            if (!StringUtils.isBlank(userUri)) {
+                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri).append("> . ");    
+            }
+            if (startDate > 0) {
+                queryString.append("   FILTER ( ?date <= \"" + Long.toString(startDate)  +  "\"^^<http://www.w3.org/2001/XMLSchema#date> ) ");
+            }
             queryString.append(" } ");
 
             query = QueryFactory.create(queryString.toString());
@@ -304,7 +249,103 @@ public abstract class AuditDAOJena implements AuditDAO {
         // Create a new results object
         return new AuditResults(total, offset, limit, datasets);
     }
+
+    @Override
+    public List<String> getUsers() {
+        List<String> users = new LinkedList<>();
+        // Get the audit dataset
+        Dataset auditStore = getDataset();
+        if (auditStore == null) {
+            return users;
+        }
+
+        // Indicate that we are reading from the audit store
+        auditStore.begin(ReadWrite.READ);
+        try {
+            StringBuilder queryString;
+            Query query;
+            QueryExecution qexec;
+
+            // SPARQL query to retrieve overall change sets, in reverse chronological order, with pagination
+            queryString = new StringBuilder();
+            queryString.append("SELECT DISTINCT ?userUri ");
+            queryString.append(" WHERE {");
+            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
+            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> ?userUri . ");    
+            queryString.append(" } ");
+
+            query = QueryFactory.create(queryString.toString());
+            qexec = QueryExecutionFactory.create(query, auditStore);
+
+            try {
+                ResultSet rs = qexec.execSelect();
+                while (rs.hasNext()) {
+                    QuerySolution qs = rs.next();
+                    RDFNode user = qs.get("userUri");
+                    if (user.isResource()) {
+                        String uri = user.asResource().getURI();
+                        if (uri != null) {
+                            users.add(uri);    
+                        }
+                    }
+                }
+            } finally {
+                qexec.close();
+            }
+
+        } finally {
+            auditStore.end();
+        }
+        return users;
+    }    
     
+    @Override
+    public List<String> getGraphs() {
+        List<String> users = new LinkedList<>();
+        // Get the audit dataset
+        Dataset auditStore = getDataset();
+        if (auditStore == null) {
+            return users;
+        }
+
+        // Indicate that we are reading from the audit store
+        auditStore.begin(ReadWrite.READ);
+        try {
+            StringBuilder queryString;
+            Query query;
+            QueryExecution qexec;
+
+            // SPARQL query to retrieve overall change sets, in reverse chronological order, with pagination
+            queryString = new StringBuilder();
+            queryString.append("SELECT DISTINCT ?graphUri ");
+            queryString.append(" WHERE {");
+            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_GRAPH).append("> ?graphUri . ");    
+            queryString.append(" } ");
+
+            query = QueryFactory.create(queryString.toString());
+            qexec = QueryExecutionFactory.create(query, auditStore);
+
+            try {
+                ResultSet rs = qexec.execSelect();
+                while (rs.hasNext()) {
+                    QuerySolution qs = rs.next();
+                    RDFNode user = qs.get("graphUri");
+                    if (user.isResource()) {
+                        String uri = user.asResource().getURI();
+                        if (uri != null) {
+                            users.add(uri);    
+                        }
+                    }
+                }
+            } finally {
+                qexec.close();
+            }
+
+        } finally {
+            auditStore.end();
+        }
+        return users;
+    }   
     /**
      * Retrieve a changeset from the audit store
      *

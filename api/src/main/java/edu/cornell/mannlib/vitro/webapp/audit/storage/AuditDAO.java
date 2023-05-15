@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit.storage;
 
+import java.util.List;
+
 import edu.cornell.mannlib.vitro.webapp.audit.AuditChangeSet;
 import edu.cornell.mannlib.vitro.webapp.audit.AuditResults;
 
@@ -21,10 +23,16 @@ public interface AuditDAO {
      *
      * @param userUri
      * @param offset
+     * @param startDate 
      * @param limit
+     * @param graphUri 
+     * @param order true = ASC, false = DESC
      * @return
      */
-    AuditResults findForUser(String userUri, long offset, int limit);
+    AuditResults find(long offset, int limit, long startDate, String userUri, String graphUri, boolean order);
 
-    AuditResults find(long offset, int limit);
+    List<String> getUsers();
+
+    List<String> getGraphs();
+
 }
