@@ -63,7 +63,7 @@ public class AuditController extends FreemarkerHttpServlet {
 
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-        return SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION;
+        return SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION;
     }
 
     @Override
