@@ -50,7 +50,7 @@
                 <#assign pos = pos + 1>
                 <tr>
                     <td>${pos}</td>
-                    <td>${dataset.userLastName!} ${dataset.userFirstName!} ${dataset.userEmail}</td>
+                    <td>${dataset.userLastName!} ${dataset.userFirstName!} ${dataset.userEmail!} (${dataset.userId})</td>
                     <td>${dataset.requestTime?datetime}</td>
                     <td>
                         <#list dataset.graphUris as graphUri>
