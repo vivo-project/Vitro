@@ -228,7 +228,7 @@ public class AuditController extends FreemarkerHttpServlet {
         } catch (Exception e) {
             log.error(e, e);
         }
-        return new Date();
+        return DateUtils.addDays(new Date(), 1);
     }
     /**
      * Get user
