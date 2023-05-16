@@ -561,7 +561,15 @@ public class IndividualFiltering implements Individual {
     }
 
 
-	@Override
+	/**
+     * @return the _innerIndividual
+     */
+    public Individual get_innerIndividual() {
+        return _innerIndividual;
+    }
+
+
+    @Override
 	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		_innerIndividual.resolveAsFauxPropertyStatements(list);
 	}

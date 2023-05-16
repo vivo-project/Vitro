@@ -63,13 +63,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     private static final Log log = LogFactory.getLog(
                 IndividualSDB.class.getName());
     private OntResource ind = null;
-    private WebappDaoFactorySDB webappDaoFactory = null;
+    protected WebappDaoFactorySDB webappDaoFactory = null;
     private Float _searchBoostJena = null;
     private boolean retreivedNullRdfsLabel = false;
     private DatasetWrapperFactory dwf = null;
     private SDBDatasetMode datasetMode =
                 SDBDatasetMode.ASSERTIONS_AND_INFERENCES;
-    private String individualURI = null;
+    protected String individualURI = null;
     private Model model = null;
     private Boolean _hasThumb = null;
 

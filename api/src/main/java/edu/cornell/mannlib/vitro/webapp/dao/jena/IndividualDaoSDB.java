@@ -45,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -70,22 +71,24 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 
     protected Individual makeIndividual(String individualURI) {
         try {
-            return new IndividualSDB(individualURI,
-            	                     this.dwf,
-            	                     datasetMode,
-            	                     wadf);
+            Individual anIndividual;
+            if (wadf.config.getIndividualsTreatmentOption() == ModelAccess.BUFFERED_TREATMENT)
+                anIndividual = new IndividualSDBBuffered(individualURI, this.dwf, datasetMode, wadf);
+            else
+                anIndividual = new IndividualSDB(individualURI, this.dwf, datasetMode, wadf);
+            return anIndividual;
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
             return null;
-        } catch(Exception ex) {
-        	//Should some other error occur, please log it here
-        	log.error("An error occurred trying to make an individual ", ex);
-        	if(StringUtils.isNotEmpty(individualURI)) {
-        		log.error("IndividualURI equals " + individualURI);
-        	} else {
-        		log.error("IndividualURI is null or empty");
-        	}
-        	return null;
+        } catch (Exception ex) {
+            // Should some other error occur, please log it here
+            log.error("An error occurred trying to make an individual ", ex);
+            if (StringUtils.isNotEmpty(individualURI)) {
+                log.error("IndividualURI equals " + individualURI);
+            } else {
+                log.error("IndividualURI is null or empty");
+            }
+            return null;
         }
     }
 

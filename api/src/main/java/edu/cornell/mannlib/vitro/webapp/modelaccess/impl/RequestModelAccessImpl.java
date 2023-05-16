@@ -315,12 +315,12 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 		if (key.getPolicyOption() == POLICY_AWARE) {
 			return addPolicyAwareness(getWebappDaoFactory(key.policyNeutral()));
 		}
-
+		
 		RDFService rdfService = getRDFService(key.rdfServiceKey());
 		OntModelSelector ontModelSelector = getOntModelSelector(key
 				.ontModelSelectorKey());
 		WebappDaoFactoryConfig config = source.getWebappDaoFactoryConfig();
-
+		config.setIndividualsTreatmentOption(key.getIndividualsTreatmentOption());
 		switch (key.getReasoningOption()) {
 		case ASSERTIONS_ONLY:
 			return new WebappDaoFactorySDB(rdfService, ontModelSelector,

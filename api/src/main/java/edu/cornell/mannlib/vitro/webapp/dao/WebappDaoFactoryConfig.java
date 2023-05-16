@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.IndividualsTreatmentOption;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 
 public class WebappDaoFactoryConfig {
@@ -20,6 +21,7 @@ public class WebappDaoFactoryConfig {
 	private Set<String> nonUserNamespaces;
 	private boolean isUnderlyingStoreReasoned = false;
 	public Map<FullPropertyKey, String> customListViewConfigFileMap;
+    private IndividualsTreatmentOption individualsTreatmentOption;
 
 	public WebappDaoFactoryConfig() {
 		preferredLanguages = Arrays.asList("en-US", "en", "EN");
@@ -27,6 +29,7 @@ public class WebappDaoFactoryConfig {
 		defaultNamespace = "http://vitro.mannlib.cornell.edu/ns/default#";
 		nonUserNamespaces = new HashSet<String>();
 		nonUserNamespaces.add(VitroVocabulary.vitroURI);
+		individualsTreatmentOption=IndividualsTreatmentOption.REMOTE_TREATMENT;
 	}
 
 	public List<String> getPreferredLanguages() {
@@ -78,4 +81,11 @@ public class WebappDaoFactoryConfig {
         this.customListViewConfigFileMap = map;
     }
 
+    public void setIndividualsTreatmentOption(IndividualsTreatmentOption individualsTreatmentOption) {
+        this.individualsTreatmentOption = individualsTreatmentOption;
+    }
+
+    public IndividualsTreatmentOption getIndividualsTreatmentOption() {
+        return individualsTreatmentOption;
+    }
 }

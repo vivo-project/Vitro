@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -99,7 +100,9 @@ public class RevisionInfoSetup implements ServletContextListener {
 					"Can't find a resource in the webapp at '" + RESOURCE_PATH
 							+ "'.");
 		} else {
-			return new BufferedReader(new InputStreamReader(stream));
+		    BufferedReader br = new BufferedReader(
+                    new InputStreamReader(stream, StandardCharsets.UTF_8));
+			return br;
 		}
 	}
 

@@ -62,7 +62,7 @@ public class ModelAccess {
 	}
 
 	public interface RdfServiceOption extends ModelAccessOption {
-		// Just a marker interface
+		// Just a marker interfaces
 	}
 
 	public interface DatasetOption extends ModelAccessOption {
@@ -76,6 +76,23 @@ public class ModelAccess {
 	public interface WebappDaoFactoryOption extends ModelAccessOption {
 		// Just a marker interface
 	}
+
+
+    @SuppressWarnings("hiding")
+    public enum IndividualsTreatmentOption implements  WebappDaoFactoryOption {
+        /*
+         * The individual's model is loaded in memory and the treatments are performed on this model
+         */
+        BUFFERED_TREATMENT, 
+        /*
+         * Each processing is done by a remote call to the data server
+         */
+        REMOTE_TREATMENT ;
+        public boolean isDefault() {
+            return this == REMOTE_TREATMENT;
+        }
+    }
+
 
 	@SuppressWarnings("hiding")
 	public enum LanguageOption implements RdfServiceOption, DatasetOption,
@@ -131,6 +148,8 @@ public class ModelAccess {
 	public static final PolicyOption POLICY_AWARE = PolicyOption.POLICY_AWARE;
 	public static final WhichService CONTENT = WhichService.CONTENT;
 	public static final WhichService CONFIGURATION = WhichService.CONFIGURATION;
+    public static final IndividualsTreatmentOption BUFFERED_TREATMENT = IndividualsTreatmentOption.BUFFERED_TREATMENT;
+    public static final IndividualsTreatmentOption REMOTE_TREATMENT = IndividualsTreatmentOption.REMOTE_TREATMENT;
 
 	// ----------------------------------------------------------------------
 	// The factory

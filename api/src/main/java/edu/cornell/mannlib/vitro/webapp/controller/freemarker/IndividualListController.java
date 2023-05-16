@@ -41,12 +41,10 @@ public class IndividualListController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(IndividualListController.class.getName());
-
     /*
      * The call to the attribution in JsonServlet ensures the uniformity of the assigned INDIVIDUALS_PER_PAGE value
      */
     private static final int INDIVIDUALS_PER_PAGE = JsonServlet.getIndividualsPerPage();
-
     private static final int MAX_PAGES = 40;  // must be even
 
     private static final String TEMPLATE_DEFAULT = "individualList.ftl";

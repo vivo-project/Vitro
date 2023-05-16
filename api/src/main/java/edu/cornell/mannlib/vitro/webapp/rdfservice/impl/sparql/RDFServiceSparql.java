@@ -115,7 +115,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	protected void testConnection() {
 		try {
 			this.sparqlSelectQuery(
-					"SELECT ?s WHERE { ?s a " +
+					"SELECT ?s WHERE { ?s <http://www.w3.org/2000/01/rdf-schema#type> " +
 							"<http://vitro.mannlib.cornell.edu/ns/vitro/nonsense/> }",
 					RDFService.ResultFormat.JSON);
 		} catch (Exception e) {
@@ -520,7 +520,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		try {
 		    long start = System.currentTimeMillis();
 			verbModel(model, graphURI, "INSERT");
-			log.info((System.currentTimeMillis() - start) + " ms to insert " + model.size() + " triples");
+			log.debug((System.currentTimeMillis() - start) + " ms to insert " + model.size() + " triples");
 		} finally {
 			rebuildGraphURICache = true;
 		}

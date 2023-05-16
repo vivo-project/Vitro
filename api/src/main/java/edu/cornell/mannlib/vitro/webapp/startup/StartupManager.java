@@ -3,12 +3,17 @@
 package edu.cornell.mannlib.vitro.webapp.startup;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -16,6 +21,8 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
  * Instantiate and run the ServletContextListeners for Vitro, while accumulating
@@ -43,6 +50,12 @@ public class StartupManager implements ServletContextListener {
 	private ServletContext ctx;
 	private StartupStatus ss;
 
+    private boolean waitBeforeStart=true;
+    public void contextInitialized(ServletContextEvent sce, boolean waitBeforeStart) {
+        this.waitBeforeStart=waitBeforeStart;
+        contextInitialized(sce);
+    }
+
 	/**
 	 * Build a list of the listeners, and run contextInitialized() on each of
 	 * them, at least until we get a fatal error.
@@ -52,9 +65,15 @@ public class StartupManager implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+        try {
+            if (waitBeforeStart) TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
 		ctx = sce.getServletContext();
 		ss = StartupStatus.getBean(ctx);
-
 		try {
 			findAndInstantiateListeners();
 
@@ -63,6 +82,9 @@ public class StartupManager implements ServletContextListener {
 					ss.listenerNotExecuted(listener);
 				} else {
 					initialize(listener, sce);
+                    log.debug("Called listeners "+listener+"===============START");
+					this.dumpCtxAttrib(ctx);
+                    log.debug("Called listeners "+listener+"===============END");
 				}
 			}
 			log.info("Called 'contextInitialized' on all listeners.");
@@ -224,5 +246,22 @@ public class StartupManager implements ServletContextListener {
 		}
 		log.info("Called 'contextDestroyed' on all listeners.");
 	}
+
+    public static void dumpReqParam(VitroRequest vreq) {
+        Enumeration<String> paramNames = vreq.getParameterNames();
+        for (Iterator iterator =  paramNames.asIterator(); iterator.hasNext();) {
+            String name = (String) iterator.next();
+            log.debug("ctx name= "+ name + ", value= "+vreq.getParameter(name));
+        }
+        
+    }
+    public static void dumpCtxAttrib(ServletContext ctx2) {
+        Enumeration<String> attribNames = ctx2.getAttributeNames();
+        for (Iterator iterator =  attribNames.asIterator(); iterator.hasNext();) {
+            String name = (String) iterator.next();
+            log.debug("ctx name= "+ name + ", value= "+ctx2.getAttribute(name));
+        }
+        
+    }
 
 }

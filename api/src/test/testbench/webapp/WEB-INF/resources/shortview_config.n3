@@ -1,0 +1,13 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+#
+# Short View configuration
+#
+# This file allows a Vitro administrator to configure short view templates and data getters
+# for individuals of particular classes in particular contexts. This is a transitional
+# implementation, and should be replaced when the work on the Application and Display
+# Ontology is complete.
+#
+# Find out how to use this file at
+# https://wiki.lyrasis.org/display/VIVODOC112x/Creating+short+views+of+individuals
+#

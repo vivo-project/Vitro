@@ -1,0 +1,16 @@
+@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:documentModifier_multilingual_sort
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.SelectQueryI18nDocumentModifier> ,
+            <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    rdfs:label "multilingual sort document modifier" ;
+    :hasTargetSuffix "_label_sort" ;
+    :hasSelectQuery """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT ( LCASE(MIN(?label)) AS ?singleLabel ) WHERE {
+        	?uri rdfs:label ?label .
+            BIND (LANG(?label) as ?lang )
+        } GROUP BY ?lang ORDER BY ?lang
+    """ .

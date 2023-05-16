@@ -10,6 +10,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ASSERTION
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.CONTENT;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LANGUAGE_NEUTRAL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NEUTRAL;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.BUFFERED_TREATMENT;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 
 import java.text.Collator;
@@ -41,11 +42,10 @@ public class VitroRequest extends HttpServletRequestWrapper {
     final static Log log = LogFactory.getLog(VitroRequest.class);
 
     //Attribute in case of special model editing such as display model editing
-    public static final String SPECIAL_WRITE_MODEL = "specialWriteModel";
-
-    public  static final String ID_FOR_WRITE_MODEL = "idForWriteModel";
-    public  static final String ID_FOR_TBOX_MODEL = "idForTboxModel";
-    public  static final String ID_FOR_ABOX_MODEL = "idForAboxModel";
+    public static final String SPECIAL_WRITE_MODEL  = "specialWriteModel";
+    public static final String ID_FOR_WRITE_MODEL   = "idForWriteModel";
+    public static final String ID_FOR_TBOX_MODEL    = "idForTboxModel";
+    public static final String ID_FOR_ABOX_MODEL    = "idForAboxModel";
     public static final String ID_FOR_DISPLAY_MODEL = "idForDisplayModel";
 
     private HttpServletRequest _req;
@@ -73,6 +73,10 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return ModelAccess.on(this).getWebappDaoFactory(POLICY_NEUTRAL);
     }
 
+    public WebappDaoFactory getBufferedIndividualWebappDaoFactory() {
+        return ModelAccess.on(this).getWebappDaoFactory(POLICY_NEUTRAL, BUFFERED_TREATMENT);
+    }
+    
     /** gets assertions-only WebappDaoFactory with no policy filtering */
     public WebappDaoFactory getUnfilteredAssertionsWebappDaoFactory() {
     	return ModelAccess.on(this).getWebappDaoFactory(POLICY_NEUTRAL, ASSERTIONS_ONLY);

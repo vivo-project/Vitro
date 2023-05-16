@@ -45,7 +45,7 @@ public class JsonServlet extends VitroHttpServlet {
      * I suggest to put the assignment of this variable in runtime.properties
      * 
      */
-    private static final int INDIVIDUALS_PER_PAGE = 15;
+    private static final int INDIVIDUALS_PER_PAGE = 30;
     public static int getIndividualsPerPage() {
         return INDIVIDUALS_PER_PAGE;
     }
