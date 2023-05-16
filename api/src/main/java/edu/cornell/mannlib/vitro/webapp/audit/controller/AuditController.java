@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import javax.servlet.annotation.WebServlet;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +63,7 @@ public class AuditController extends FreemarkerHttpServlet {
 
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-        return SimplePermission.EDIT_OWN_ACCOUNT.ACTION;
+        return SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION;
     }
 
     @Override
