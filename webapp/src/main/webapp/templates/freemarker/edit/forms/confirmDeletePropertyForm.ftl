@@ -24,7 +24,7 @@
                 <#include deletionTemplateName />
             </#if>
         <#else>
-            ${statement}
+            ${statement?html}
         </#if>
     </p>
 

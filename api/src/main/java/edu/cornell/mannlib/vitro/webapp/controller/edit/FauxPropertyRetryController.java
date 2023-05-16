@@ -183,8 +183,13 @@ public class FauxPropertyRetryController extends BaseEditController {
 			FauxProperty fp = new FauxProperty(null, baseUri, null);
 			ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
 			DataPropertyDao dpDao = wadf.getDataPropertyDao();
-			Property base = opDao.getObjectPropertyByURI(baseUri);
-			if (base == null) {
+			ObjectProperty objBase = opDao.getObjectPropertyByURI(baseUri);
+			Property base;
+			if (objBase != null) {
+				fp.setSelectFromExisting(objBase.getSelectFromExisting());
+				fp.setOfferCreateNewOption(objBase.getOfferCreateNewOption());
+				base = objBase;
+			} else {
 				base = dpDao.getDataPropertyByURI(baseUri);
 			}
 			fp.setGroupURI(base.getGroupURI());
