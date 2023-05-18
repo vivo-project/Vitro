@@ -184,7 +184,7 @@ public class IndividualSDBBufferTest extends AbstractTestClass implements Servle
 //              RDFDataMgr.write(System.out, model, Lang.TURTLE);
              log.info("ANALYSER: The treatment at (" + t2 +") for (" + individual.getURI()+") took "+ ChronoUnit.MILLIS.between(t1, t2)/1000.0 + " seconds");
              
-            } catch (RDFServiceException e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

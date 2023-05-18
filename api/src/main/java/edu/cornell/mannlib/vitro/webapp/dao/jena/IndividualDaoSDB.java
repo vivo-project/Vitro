@@ -73,7 +73,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         try {
             Individual anIndividual;
             if (wadf.config.getIndividualsTreatmentOption() == ModelAccess.BUFFERED_TREATMENT)
-                anIndividual = new IndividualSDBBuffered(individualURI, this.dwf, datasetMode, wadf);
+                anIndividual = new IndividualBufferedSDB(individualURI, this.dwf, datasetMode, wadf);
             else
                 anIndividual = new IndividualSDB(individualURI, this.dwf, datasetMode, wadf);
             return anIndividual;

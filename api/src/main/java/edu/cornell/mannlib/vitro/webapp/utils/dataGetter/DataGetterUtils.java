@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -38,7 +38,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDBBuffered;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.services.shortview.FakeApplicationOntologyService;
+import edu.cornell.mannlib.vitro.webapp.services.shortview.FakeApplicationOntologyService.FakeVivoPeopleDataGetter;
+import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceImpl;
 
 
 public class DataGetterUtils {
@@ -448,7 +452,15 @@ public class DataGetterUtils {
 		templateData.put("associatedPageURI", group.getURI());
     }
 
-
-
+    public static Map<String, Object> getDataFromBufferModel(FakeVivoPeopleDataGetter dg, Map<String, Object> valueMap, IndividualSDBBuffered individualdg) {
+//        Map<String, Object> parms = new HashMap<>();
+//        parms.put("uri",dg.getIndividualUri());
+//        parms.put("langCtx", dg.getLangCtx());
+//        Map<String, String> merged = SparqlQueryDataGetter.mergeParameters(dg.getVreq().getParameterMap(), valueMap);
+//        String queryText = dg.getQueryText();
+//        String boundQueryText = SparqlQueryDataGetter.bindParameters(queryText, merged);
+//        return SparqlQueryDataGetter.doQueryOnModel(boundQueryText, individualdg.getBuffOntModel());
+        return null;
+    }
 
 }

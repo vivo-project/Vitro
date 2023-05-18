@@ -31,12 +31,15 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
      * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#toString()
      */
     public String toString(){
-           String prop = (getProperty()!=null)?getProperty().getDomainPublic():"by propURI"+getPropertyURI();
+           String prop = (getProperty()!=null)?getProperty().getDomainPublic():"by propURI:"+getPropertyURI();
            String ran = (getObject()!= null)?getObject().getName():"objectURI:"+getObjectURI();
            String dom = (getSubject()!= null)?getSubject().getName():"subjectURI:"+getSubjectURI();
            return "Object Property Statements: "+dom+" "+prop+" to "+ran+" ";
     }
 
+    public String toStringByUri(){
+        return "<"+getSubjectURI()+"> <"+getPropertyURI()+"> <"+getObjectURI()+">";
+    }
     /* (non-Javadoc)
      * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#getSubjectURI()
      */

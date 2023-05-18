@@ -55,7 +55,6 @@ public class GetRenderedSearchIndividualsByVClassTest {
     private static HttpSessionStub session;
     private static HttpServletRequestStub hreq;
     private static StartupManager sm;
-
     private static StartupStatus ss;
 
     /**
@@ -92,55 +91,73 @@ public class GetRenderedSearchIndividualsByVClassTest {
     }
 
     @Test
-    public void testMultipleEntries() {
-        List<String> irisList = new ArrayList<>();
-//        irisList.add("http://vivo-demo.uqam.ca/individual/abergel_elisabeth_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/adjiwanou_visseho_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/agbobli_christian_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/ajib_wessam_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/alhaji_ahmad_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/alandry_aymeric_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/alessandra_amandine_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/cadieux_alexandre_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/alexeeva_olga_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/allard_s_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/allen_marie_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/alloing_camille_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/amamou_salem_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/amiot_catherine_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/amireault_valerie_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/ananian_priscilla_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/anaya_arenas_ana_maria_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/ancelovici_marcos_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/angenot_valerie_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/annabi_borhane_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/Charrette_anne_marie_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/belanger_anouk_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/apostolov_vestislav_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/araujo_oliveira_anderson_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/arcand_manon_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/archambault_denis_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/armony_victor_uqam_ca");
-//        irisList.add("http://vivo-demo.uqam.ca/individual/arroyo_pardo_paulina_uqam_ca");
-        irisList.add("http://vivo-demo.uqam.ca/individual/arseneault_paul_uqam_ca");
-        Instant d1 = Instant.now();
-        WebappDaoFactoryOption options;
+    public void testMultipleEntriesWithBufferedWDF() {
+//        WebappDaoFactoryOption options;
         // LogManager.getRootLogger().setLevel(Level.DEBUG);
         WebappDaoFactory daoFact = vreq.getBufferedIndividualWebappDaoFactory();
-        for (Iterator iterator = irisList.iterator(); iterator.hasNext();) {
-            String individualUri = (String) iterator.next();
-            IndividualDao iDao = daoFact.getIndividualDao();
-            Individual individual = iDao.getIndividualByURI(individualUri);
-            evaluate(individual);
-            
-        }
-        Instant d2 = Instant.now();
-        int totalIndv = irisList.size();
-        long totalTime = ChronoUnit.MILLIS.between(d1, d2);
-//      LogManager.getRootLogger().setLevel(Level.INFO);
-      log.info("ANALYSER: total indv:(" + totalIndv + ") "
-              + "total time :(" + totalTime / 1000.0 + ") sec. "
-              + "- avrg time :(" + (totalTime / totalIndv) / 1000.0+") sec.");
+        doTest(daoFact);
+
+    }
+    
+//    @Test
+//    public void testMultipleEntriesWithWDF() {
+////        WebappDaoFactoryOption options;
+//        // LogManager.getRootLogger().setLevel(Level.DEBUG);
+//        WebappDaoFactory daoFact = vreq.getWebappDaoFactory();
+//        doTest(daoFact);
+//    }
+
+private void doTest(WebappDaoFactory daoFact) {
+    List<String> irisList = buildIrisList();
+    Instant d1 = Instant.now();
+    for (Iterator iterator = irisList.iterator(); iterator.hasNext();) {
+        String individualUri = (String) iterator.next();
+        IndividualDao iDao = daoFact.getIndividualDao();
+        Individual individual = iDao.getIndividualByURI(individualUri);
+        LogManager.getRootLogger().setLevel(Level.DEBUG);
+        evaluate(individual);
+    }
+    Instant d2 = Instant.now();
+    int totalIndv = irisList.size();
+    long totalTime = ChronoUnit.MILLIS.between(d1, d2);
+//  LogManager.getRootLogger().setLevel(Level.INFO);
+    log.info("ANALYSER: total indv:(" + totalIndv + ") "
+          + "total time :(" + totalTime / 1000.0 + ") sec. "
+          + "- avrg time :(" + (totalTime / totalIndv) / 1000.0+") sec.");    }
+
+private List<String> buildIrisList() {
+    List<String> irisList = new ArrayList<>();
+//    irisList.add("http://vivo-demo.uqam.ca/individual/abergel_elisabeth_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/adjiwanou_visseho_uqam_ca");
+    irisList.add("http://vivo-demo.uqam.ca/individual/agbobli_christian_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/ajib_wessam_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/alhaji_ahmad_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/alandry_aymeric_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/alessandra_amandine_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/cadieux_alexandre_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/alexeeva_olga_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/allard_s_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/allen_marie_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/alloing_camille_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/amamou_salem_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/amiot_catherine_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/amireault_valerie_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/ananian_priscilla_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/anaya_arenas_ana_maria_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/ancelovici_marcos_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/angenot_valerie_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/annabi_borhane_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/Charrette_anne_marie_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/belanger_anouk_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/apostolov_vestislav_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/araujo_oliveira_anderson_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/arcand_manon_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/archambault_denis_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/armony_victor_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/arroyo_pardo_paulina_uqam_ca");
+//    irisList.add("http://vivo-demo.uqam.ca/individual/arseneault_paul_uqam_ca");
+//    irisList.add("http://localhost:8080/vivo_i18n/individual/n6870");
+    return irisList;
     }
 
 //    @Test
@@ -182,11 +199,11 @@ public class GetRenderedSearchIndividualsByVClassTest {
         modelMap.put("vclass", "Professeur");
         ShortViewService svs = ShortViewServiceSetup.getService(ctx);
 //        LogManager.getRootLogger().setLevel(Level.DEBUG);
-        Instant t1 = Instant.now();
+//        Instant t1 = Instant.now();
         String rsv = svs.renderShortView(anIndividual, ShortViewContext.BROWSE, modelMap, vreq);
-        Instant t2 = Instant.now();
-        log.info("ANALYSER: renderShortView at (" + t2 + ") for (" + anIndividual.getURI() + ") took "
-                + ChronoUnit.MILLIS.between(t1, t2) / 1000.0 + " seconds");
+//        Instant t2 = Instant.now();
+//        log.info("ANALYSER: renderShortView at (" + t2 + ") for (" + anIndividual.getURI() + ") took "
+//                + ChronoUnit.MILLIS.between(t1, t2) / 1000.0 + " seconds");
 //        log.info("toString " + anIndividual);
     }
 }

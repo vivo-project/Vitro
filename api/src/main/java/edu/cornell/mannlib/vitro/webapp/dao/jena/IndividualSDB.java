@@ -66,12 +66,20 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     protected WebappDaoFactorySDB webappDaoFactory = null;
     private Float _searchBoostJena = null;
     private boolean retreivedNullRdfsLabel = false;
-    private DatasetWrapperFactory dwf = null;
-    private SDBDatasetMode datasetMode =
+    protected DatasetWrapperFactory dwf = null;
+    protected SDBDatasetMode datasetMode =
                 SDBDatasetMode.ASSERTIONS_AND_INFERENCES;
     protected String individualURI = null;
     private Model model = null;
     private Boolean _hasThumb = null;
+    protected OntModel _buffOntModel ; //Ontology as a memory buffer model 
+
+    /**
+     * @return the _buffOntModel
+     */
+    public OntModel getBuffOntModel() {
+        return _buffOntModel;
+    }
 
     public IndividualSDB(String individualURI,
                          DatasetWrapperFactory datasetWrapperFactory,
@@ -125,9 +133,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		}
 
     	if (skipInitialization) {
-            OntModel ontModel = ModelFactory.createOntologyModel(
+            _buffOntModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
-            this.ind = ontModel.createOntResource(individualURI);
+            this.ind = _buffOntModel.createOntResource(individualURI);
     	} else {
         	try {
     	    	String getStatements =

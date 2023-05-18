@@ -16,10 +16,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDBBuffered;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateParsingException;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingServiceSetup;
+import edu.cornell.mannlib.vitro.webapp.services.shortview.FakeApplicationOntologyService.FakeVivoPeopleDataGetter;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.FakeApplicationOntologyService.TemplateAndDataGetters;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 
@@ -124,17 +126,21 @@ public class ShortViewServiceImpl implements ShortViewService {
 		return new TemplateAndDataGetters(svContext.getDefaultTemplateName());
 	}
 
-	/** Build a data map from the combined results of all data getters. */
-	private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters,
-			Individual individual) {
-		Map<String, Object> valueMap = new HashMap<String, Object>();
-		valueMap.put("individualUri", individual.getURI());
-		Map<String, Object> gotData = new HashMap<String, Object>();
-		for (DataGetter dg : dataGetters) {
-			gotData.putAll(dg.getData(valueMap));
-		}
-		return gotData;
-	}
+    /** Build a data map from the combined results of all data getters. */
+    private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters, Individual individual) {
+        Map<String, Object> valueMap = new HashMap<String, Object>();
+        valueMap.put("individualUri", individual.getURI());
+        Map<String, Object> gotData = new HashMap<String, Object>();
+        for (DataGetter dg : dataGetters) {
+            Map<String, Object> data;
+            if (individual instanceof IndividualSDBBuffered)
+                data = ((FakeVivoPeopleDataGetter) dg).getData(valueMap, ((IndividualSDBBuffered) individual).getBuffOntModel());
+            else
+               data = dg.getData(valueMap);
+            gotData.putAll(data);
+        }
+        return gotData;
+    }
 
 	private static class TemplateAndSupplementalDataImpl implements
 			TemplateAndSupplementalData {

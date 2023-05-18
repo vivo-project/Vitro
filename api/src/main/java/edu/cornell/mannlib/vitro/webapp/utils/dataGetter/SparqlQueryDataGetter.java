@@ -138,6 +138,22 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     	}
     }
 
+
+    /**
+     * Allows to execute the query on a buffer model
+     * @param pageData
+     * @param ontModel
+     * @return
+     */
+    public Map<String, Object> getData(Map<String, Object> pageData, Model bufferModel) {
+        if (bufferModel == null || bufferModel.isEmpty()) {
+            return getData( pageData);
+        }
+        Map<String, String> merged = mergeParameters(vreq.getParameterMap(), pageData);
+        String boundQueryText = bindParameters(queryText, merged);
+        return doQueryOnModel(boundQueryText, bufferModel);
+    }
+
     /** Merge the pageData with the request parameters. PageData overrides. */
 	private Map<String, String> mergeParameters(
 			Map<String, String[]> parameterMap, Map<String, Object> pageData) {

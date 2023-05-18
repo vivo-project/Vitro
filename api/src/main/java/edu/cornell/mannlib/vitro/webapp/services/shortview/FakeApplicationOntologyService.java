@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -444,7 +445,7 @@ public class FakeApplicationOntologyService {
 	 * A SPARQL query data getter that initializes itself from its own private
 	 * "display model". The query finds a preferred title for the individual.
 	 */
-	private static class FakeVivoPeopleDataGetter extends SparqlQueryDataGetter {
+	public static class FakeVivoPeopleDataGetter extends SparqlQueryDataGetter {
 		//		private static String QUERY_STRING = ""
 		//				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
 		//				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
@@ -509,6 +510,13 @@ public class FakeApplicationOntologyService {
 
 			return super.getData(parms);
 		}
+		
+        public Map<String, Object> getData(Map<String, Object> pageData, Model bufferModel) {
+            Map<String, Object> parms = new HashMap<>();
+            parms.put("uri", individualUri);
+            parms.put("langCtx", langCtx); 
+            return super.getData(parms, bufferModel);
+        }
 
 	}
 

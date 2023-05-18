@@ -21,8 +21,10 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntResource;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
@@ -246,36 +248,41 @@ public class IndividualJena extends IndividualImpl implements Individual {
 
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyURI) {
-    	if (propertyURI == null) {
-    		return null;
-    	}
-    	List<ObjectPropertyStatement> objectPropertyStatements = new ArrayList<ObjectPropertyStatement>();
-    	ind.getOntModel().enterCriticalSection(Lock.READ);
-    	try {
-    		StmtIterator sit = ind.listProperties(ind.getModel().getProperty(propertyURI));
-    		while (sit.hasNext()) {
-    			Statement s = sit.nextStatement();
-    			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
-    			    continue;
-    			}
-    			Individual subj = new IndividualJena(s.getSubject().as(OntResource.class), webappDaoFactory);
-    			Individual obj = new IndividualJena(s.getObject().as(OntResource.class), webappDaoFactory);
-    			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
-    			if (subj != null && obj != null && op != null) {
-    				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
-    				ops.setSubject(subj);
-    				ops.setSubjectURI(subj.getURI());
-    				ops.setObject(obj);
-    				ops.setObjectURI(obj.getURI());
-    				ops.setProperty(op);
-    				ops.setPropertyURI(op.getURI());
-    				objectPropertyStatements.add(ops);
-    			}
-    		}
-     	} finally {
-    		ind.getOntModel().leaveCriticalSection();
-    	}
-     	return objectPropertyStatements;
+        if (propertyURI == null) {
+            return null;
+        }
+        List<ObjectPropertyStatement> objectPropertyStatements = new ArrayList<ObjectPropertyStatement>();
+        ind.getOntModel().enterCriticalSection(Lock.READ);
+        try {
+            StmtIterator sit = ind.listProperties(ind.getModel().getProperty(propertyURI));
+            while (sit.hasNext()) {
+                Statement s = sit.nextStatement();
+                if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
+                    continue;
+                }
+                /*
+                 * Replacement of IndividualImpl instead of IndividualJena
+                 */
+                Individual subj = new IndividualImpl(s.getSubject().getURI());
+                Individual obj = new IndividualImpl(s.getObject().asResource().getURI());
+                ObjectProperty op = new ObjectProperty();
+                op.setURI(s.getPredicate().getURI());
+                if (subj != null && obj != null && op != null) {
+                    ObjectPropertyStatementImpl ops = new ObjectPropertyStatementImpl();
+                    ops.setSubject(subj);
+                    ops.setSubjectURI(subj.getURI());
+                    ops.setObject(obj);
+                    ops.setObjectURI(obj.getURI());
+                    ops.setProperty(op);
+                    ops.setPropertyURI(op.getURI());
+                    log.debug(ops.toStringByUri());
+                    objectPropertyStatements.add(ops);
+                }
+            }
+        } finally {
+            ind.getOntModel().leaveCriticalSection();
+        }
+        return objectPropertyStatements;
     }
 
     @Override
@@ -617,5 +624,20 @@ public class IndividualJena extends IndividualImpl implements Individual {
 	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatements(list);
 	}
+
+    @Override
+    public String toString() {
+        return "IndividualJena [" + (ind != null ? "ind=" + ind + ", " : "")
+                + (name != null ? "name=" + name + ", " : "")
+                + (rdfsLabel != null ? "rdfsLabel=" + rdfsLabel + ", " : "")
+                + (vClassURI != null ? "vClassURI=" + vClassURI + ", " : "")
+                + (vClass != null ? "vClass=" + vClass + ", " : "")
+                + (directVClasses != null ? "directVClasses=" + directVClasses + ", " : "")
+                + (allVClasses != null ? "allVClasses=" + allVClasses + ", " : "")
+                + (mainImageUri != null ? "mainImageUri=" + mainImageUri + ", " : "")
+                + (imageInfo != null ? "imageInfo=" + imageInfo + ", " : "")
+                + (namespace != null ? "namespace=" + namespace + ", " : "")
+                + (localName != null ? "localName=" + localName : "") + "]";
+    }
 
 }

@@ -2,67 +2,38 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
-
-import java.io.OutputStream;
-import java.sql.Timestamp;
-import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Jdk14Logger;
-import org.joda.time.DateTime;
-import org.apache.jena.graph.Node;
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.OntResource;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shared.Lock;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 public class IndividualSDBBuffered extends IndividualSDB {
@@ -93,45 +64,42 @@ public class IndividualSDBBuffered extends IndividualSDB {
             + "PREFIX vitro-public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n"
             + "PREFIX vivo:     <http://vivoweb.org/ontology/core#>\n"
             + "PREFIX scires:   <http://vivoweb.org/ontology/scientific-research#>\n"
-            + "DESCRIBE <__INDIVIDUAL_IRI__> ?i1 \n" + " where {\n" + "  <__INDIVIDUAL_IRI__> ?p1 ?i1 \n"
-            + "  FILTER(regex(str(?i1), \"individual\" )) \n" + "}";
+            + "DESCRIBE <__INDIVIDUAL_IRI__> ?i1 ?i2 \n" 
+            + " where {\n" + "  <__INDIVIDUAL_IRI__> ?p1 ?i1 \n"
+            + "  FILTER(regex(str(?i1), \"individual\" )) \n"
+            + "  ?i1 ?p2 ?i2 .\n"
+            + "  FILTER(regex(str(?i2), \"individual\" )) \n" 
+            + "}";
 
-//    + "  ?i1 ?p2 ?i2 .\n"
-//    + "  FILTER(regex(str(?i2), \"individual\" )) \n" 
 
-    private OntModel _buffOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+//    private OntModel _buffOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     private static final Log log = LogFactory.getLog(IndividualSDBBuffered.class.getName());
     private List<String> _prefLangs;
 
-    private Resource _individualJenaResource;
+//    private Resource _individualJenaResource;
 
     private Property toPredicate(String IRI) {
         return ResourceFactory.createProperty(IRI);
     }
 
     private Property MOST_SPECIFIC_TYPE = toPredicate(VitroVocabulary.MOST_SPECIFIC_TYPE);
+    private Property FS_THUMBNAIL_IMAGE = toPredicate(VitroVocabulary.FS_THUMBNAIL_IMAGE);
+    private Property IND_MAIN_IMAGE = toPredicate(VitroVocabulary.IND_MAIN_IMAGE);
+    private Property IND_IMAGE = toPredicate(VitroVocabulary.IND_IMAGE);
 
-    public IndividualSDBBuffered(String individualURI, DatasetWrapperFactory datasetWrapperFactory,
-            SDBDatasetMode datasetMode, WebappDaoFactorySDB wadf, Model initModel) {
-        super(individualURI, datasetWrapperFactory, datasetMode, wadf, initModel);
-    }
-
-    public IndividualSDBBuffered(String individualURI, DatasetWrapperFactory datasetWrapperFactory,
-            SDBDatasetMode datasetMode, WebappDaoFactorySDB wadf, boolean skipInitialization)
-            throws edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException {
-        super(individualURI, datasetWrapperFactory, datasetMode, wadf, skipInitialization);
-    }
+    private Resource _individualJenaResource;
 
     public IndividualSDBBuffered(String individualURI, DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode, WebappDaoFactorySDB wadf)
             throws edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException {
-        super(individualURI, datasetWrapperFactory, datasetMode, wadf);
+        super(individualURI, datasetWrapperFactory, datasetMode, wadf, true);
     }
 
-    public Model populateIndividualBufferModel(String individualUri) throws RDFServiceException {
+    public Model populateIndividualBufferModel(String individualUri) {
         if (!_buffOntModel.isEmpty())
             return _buffOntModel;
         try {
+            log.info("Loading the buffer model of :" +individualUri);
             _prefLangs = webappDaoFactory.config.getPreferredLanguages();
             _buffOntModel.getLock().enterCriticalSection(Lock.READ);
             _individualJenaResource = ResourceFactory.createResource(individualURI);
@@ -139,7 +107,9 @@ public class IndividualSDBBuffered extends IndividualSDB {
             log.debug(_query);
             webappDaoFactory.getRDFService().sparqlConstructQuery(
                     indvGraphSparqlQuery.replace("__INDIVIDUAL_IRI__", individualUri), _buffOntModel);
-            // RDFDataMgr.write(System.out, _buffOntModel, Lang.TURTLE);
+//            RDFDataMgr.write(System.out, _buffOntModel, Lang.TURTLE);
+        } catch (RDFServiceException e) {
+            e.printStackTrace();
         } finally {
             _buffOntModel.getLock().leaveCriticalSection();
         }
@@ -147,12 +117,7 @@ public class IndividualSDBBuffered extends IndividualSDB {
     }
 
     public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyURI) {
-        try {
-            populateIndividualBufferModel(this.individualURI);
-        } catch (RDFServiceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        populateIndividualBufferModel(this.individualURI);
         List<ObjectPropertyStatement> objectPropertyStatements = new ArrayList<ObjectPropertyStatement>();
         Resource subj = ResourceFactory.createResource(individualURI);
         Property pred = ResourceFactory.createProperty(propertyURI);
@@ -174,17 +139,9 @@ public class IndividualSDBBuffered extends IndividualSDB {
             objectPropertyStatements.add(ops);
         }
         return objectPropertyStatements;
-
     }
-
     public List<String> getMostSpecificTypeURIs() {
-        try {
-            populateIndividualBufferModel(this.individualURI);
-        } catch (RDFServiceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
+        populateIndividualBufferModel(this.individualURI);
         final List<String> typeURIs = new ArrayList<String>();
         if (this.getURI() == null) {
             return typeURIs;
@@ -203,12 +160,13 @@ public class IndividualSDBBuffered extends IndividualSDB {
         }
         return typeURIs;
     }
-
     public String getMainImageUri() {
+        populateIndividualBufferModel(this.individualURI);
         if (this.mainImageUri != NOT_INITIALIZED) {
             return mainImageUri;
         } else {
-            List<ObjectPropertyStatement> mainImgStmts = getObjectPropertyStatements(VitroVocabulary.IND_MAIN_IMAGE);
+            List<ObjectPropertyStatement> mainImgStmts =
+                    getObjectPropertyStatements(VitroVocabulary.IND_MAIN_IMAGE);
             if (mainImgStmts != null && mainImgStmts.size() > 0) {
                 // arbitrarily return the first value in the list
                 mainImageUri = mainImgStmts.get(0).getObjectURI();
@@ -216,6 +174,60 @@ public class IndividualSDBBuffered extends IndividualSDB {
             }
             return null;
         }
+    }
+    public String getThumbUrl() {
+        populateIndividualBufferModel(this.individualURI);
+        WebappDaoFactoryJena webappDaoFactory = new WebappDaoFactoryJena(_buffOntModel);
+        if (this.imageInfo == null) {
+            this.imageInfo = ImageInfo.instanceFromEntityUri(
+                    webappDaoFactory, this);
+            log.trace("figured imageInfo for " + getURI() + ": '"
+                    + this.imageInfo + "'");
+        }
+        if (this.imageInfo == null) {
+            this.imageInfo = ImageInfo.EMPTY_IMAGE_INFO;
+            log.trace("imageInfo for " + getURI() + " is empty.");
+        }
+        return this.imageInfo.getThumbnail().getBytestreamAliasUrl();
+    }
+    public String getImageUrl() {
+        populateIndividualBufferModel(this.individualURI);
+        if (this.imageInfo == null) {
+            this.imageInfo = ImageInfo.instanceFromEntityUri(
+                    webappDaoFactory, this);
+            log.trace("figured imageInfo for " + getURI() + ": '"
+                    + this.imageInfo + "'");
+        }
+        if (this.imageInfo == null) {
+            this.imageInfo = ImageInfo.EMPTY_IMAGE_INFO;
+            log.trace("imageInfo for " + getURI() + " is empty.");
+        }
+        return this.imageInfo.getMainImage().getBytestreamAliasUrl();
+    }
+
+    @Override
+    public Individual getRelatedIndividual(String propertyURI) {
+        if (propertyURI == null) {
+            return null;
+        }
+        populateIndividualBufferModel(this.individualURI);
+        _buffOntModel.getLock().enterCriticalSection(Lock.READ);
+        Property propertyRes = ResourceFactory.createProperty(propertyURI);
+        List<RDFNode> objects = _buffOntModel.listObjectsOfProperty(_individualJenaResource, propertyRes).toList();
+        _buffOntModel.getLock().leaveCriticalSection();
+        for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
+            RDFNode rdfNode = (RDFNode) iterator.next();
+            if (rdfNode != null && rdfNode.canAs(OntResource.class)) {
+                try {
+                    return new IndividualSDBBuffered(
+                            rdfNode.as(OntResource.class).getURI(),
+                                    dwf, datasetMode, webappDaoFactory);
+                } catch (IndividualNotFoundException e) {
+                    return null;
+                }
+            }            
+        }
+        return null;
     }
 
     public String toString() {
@@ -248,5 +260,34 @@ public class IndividualSDBBuffered extends IndividualSDB {
                 + (localNameWithPrefix != null ? "localNameWithPrefix=" + localNameWithPrefix + ", \n" : "")
                 + (pickListName != null ? "pickListName=" + pickListName : "\n") + "]";
     }
+//    @Override
+//    public String getThumbUrl() {
+//        try {
+//            populateIndividualBufferModel(this.individualURI);
+//        } catch (RDFServiceException e) {
+//            e.printStackTrace();
+//        }
+//            List<Statement> stmts = _buffOntModel.listStatements(_individualJenaResource, MOST_SPECIFIC_TYPE, (Resource) null).toList();
+//            for (Iterator<Statement> iterator = stmts.iterator(); iterator.hasNext();) {
+//                RDFNode node = (RDFNode) iterator.next().getObject();
+//                if (node.isURIResource()) {
+//                    typeURIs.add(node.asResource().getURI());
+//                }
+//            }
+//        }
+//
+//    
+//    if (this.imageInfo == null) {
+//            this.imageInfo = ImageInfo.instanceFromEntityUri(
+//                    webappDaoFactory, this);
+//            log.trace("figured imageInfo for " + getURI() + ": '"
+//                    + this.imageInfo + "'");
+//        }
+//        if (this.imageInfo == null) {
+//            this.imageInfo = ImageInfo.EMPTY_IMAGE_INFO;
+//            log.trace("imageInfo for " + getURI() + " is empty.");
+//        }
+//        return this.imageInfo.getThumbnail().getBytestreamAliasUrl();
+//    }
 
 }
