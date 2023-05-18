@@ -113,7 +113,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
 
-    protected void setAddUrl(ObjectProperty property) {
+    protected void setAddUrl(Property property) {
     	// Is the add link suppressed for this property?
     	if (property.isAddLinkSuppressed()) {
     		return;
@@ -123,10 +123,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 		RequestedAction action = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), subjectUri, property, SOME_URI);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
-            return;
-        }
-        
-        if (isNotAllowedToCreateOrSelect(property)) {
             return;
         }
 
@@ -154,10 +150,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);
         }
-    }
-
-    private boolean isNotAllowedToCreateOrSelect(ObjectProperty property) {
-        return !property.getSelectFromExisting() && !property.getOfferCreateNewOption();
     }
 
 		/**
