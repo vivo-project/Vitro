@@ -59,7 +59,6 @@ public abstract class AuditDAOJena implements AuditDAO {
         if (auditStore == null) {
             return;
         }
-
         // Lock the dataset
         auditStore.begin(ReadWrite.WRITE);
         try {
@@ -194,7 +193,7 @@ public abstract class AuditDAOJena implements AuditDAO {
             queryString.append(" OFFSET ").append(offset);
 
             query = QueryFactory.create(queryString.toString());
-            qexec = QueryExecutionFactory.create(query, auditStore);
+            qexec = QueryExecutionFactory.create(query, auditStore.getNamedModel(auditGraph));
 
             try {
                 ResultSet rs = qexec.execSelect();
@@ -233,7 +232,7 @@ public abstract class AuditDAOJena implements AuditDAO {
             queryString.append(" } ");
 
             query = QueryFactory.create(queryString.toString());
-            qexec = QueryExecutionFactory.create(query, auditStore);
+            qexec = QueryExecutionFactory.create(query, auditStore.getNamedModel(auditGraph));
 
             try {
                 ResultSet rs = qexec.execSelect();
@@ -262,7 +261,6 @@ public abstract class AuditDAOJena implements AuditDAO {
         if (auditStore == null) {
             return users;
         }
-
         // Indicate that we are reading from the audit store
         auditStore.begin(ReadWrite.READ);
         try {
@@ -274,12 +272,12 @@ public abstract class AuditDAOJena implements AuditDAO {
             queryString = new StringBuilder();
             queryString.append("SELECT DISTINCT ?userUri ");
             queryString.append(" WHERE {");
-            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
+            //queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
             queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> ?userUri . ");    
             queryString.append(" } ");
 
             query = QueryFactory.create(queryString.toString());
-            qexec = QueryExecutionFactory.create(query, auditStore);
+            qexec = QueryExecutionFactory.create(query, auditStore.getNamedModel(auditGraph));
 
             try {
                 ResultSet rs = qexec.execSelect();
@@ -327,7 +325,7 @@ public abstract class AuditDAOJena implements AuditDAO {
             queryString.append(" } ");
 
             query = QueryFactory.create(queryString.toString());
-            qexec = QueryExecutionFactory.create(query, auditStore);
+            qexec = QueryExecutionFactory.create(query, auditStore.getNamedModel(auditGraph));
 
             try {
                 ResultSet rs = qexec.execSelect();

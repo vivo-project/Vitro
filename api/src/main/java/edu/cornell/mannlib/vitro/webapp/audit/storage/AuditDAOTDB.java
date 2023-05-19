@@ -46,6 +46,7 @@ public class AuditDAOTDB extends AuditDAOJena {
     public static void shutdown() {
         if (dataset != null) {
             dataset.close();
+            dataset = null;
         }
     }
 

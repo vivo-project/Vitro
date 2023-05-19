@@ -6,8 +6,8 @@ package edu.cornell.mannlib.vitro.webapp.audit.storage;
  * Factory for Audit DAOs
  */
 public class AuditDAOFactory {
-    // Available storage engines - plain file syatem, or Jena TDB
-    public enum Storage { AUDIT_FS, AUDIT_TDB };
+    // Available storage engines - Jena TDB
+    public enum Storage { AUDIT_TDB };
 
     // Configured storage engine.
     private static Storage storage;
@@ -28,6 +28,7 @@ public class AuditDAOFactory {
      * Clean up for the factory
      */
     public static void shutdown() {
+        AuditDAOFactory.storage = null;
     }
 
     /**
@@ -42,9 +43,6 @@ public class AuditDAOFactory {
         }
 
         switch (storage) {
-            case AUDIT_FS:
-                return new AuditDAOFS();
-
             case AUDIT_TDB:
                 return new AuditDAOTDB();
         }

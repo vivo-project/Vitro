@@ -31,7 +31,7 @@ public class TDBAuditModule implements AuditModule {
     }
 
     @Override
-    public void startup(Application application, ComponentStartupStatus ss) {
+    public void startup(Application application, ComponentStartupStatus css) {
         // Get the home directory
         Path vitroHome = ApplicationUtils.instance().getHomeDirectory().getPath();
 
@@ -40,7 +40,6 @@ public class TDBAuditModule implements AuditModule {
 
         // Initialize the TDB DAO with the directory
         AuditDAOTDB.initialize(resolvedPath);
-
         // Initialize the DAO factory to use TDB
         AuditDAOFactory.initialize(AuditDAOFactory.Storage.AUDIT_TDB);
     }

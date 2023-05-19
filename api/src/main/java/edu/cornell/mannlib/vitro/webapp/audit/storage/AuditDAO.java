@@ -11,6 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.audit.AuditResults;
  * Interface for storing and retrieving Audit entries
  */
 public interface AuditDAO {
+    
     /**
      * Write the dataset to stroage
      *

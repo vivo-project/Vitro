@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.audit;
 
 import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOFactory;
 import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -24,10 +23,6 @@ public class AuditChangeListener extends StatementListener implements ModelChang
 
     @Override
     public void notifyModelChange(ModelChange modelChange) {
-        // Check this is a change that we want to track
-        if(isABoxInferenceGraph(modelChange.getGraphURI()) || isTBoxGraph(modelChange.getGraphURI())) {
-            return;
-        }
 
         // Convert the serialized statements into a Jena Model
         Model changes = RDFServiceUtils.parseModel(modelChange.getSerializedModel(), modelChange.getSerializationFormat());
@@ -39,7 +34,7 @@ public class AuditChangeListener extends StatementListener implements ModelChang
             String userId = modelChange.getUserId();
             if (StringUtils.isBlank(userId)) {
                 Exception e = new Exception();
-                log.error("User id is not provided.", e);
+                log.debug("User id is not provided.", e);
                 userId = AuditVocabulary.RESOURCE_UNKNOWN;
             }
         auditChangeset.setUserId(userId);
@@ -65,16 +60,4 @@ public class AuditChangeListener extends StatementListener implements ModelChang
     @Override
     public void notifyEvent(String graphURI, Object event) {
     }
-
-    private boolean isABoxInferenceGraph(String graphURI) {
-        return ModelNames.ABOX_INFERENCES.equals(graphURI);
-    }
-
-    private boolean isTBoxGraph(String graphURI) {
-        return ( ModelNames.TBOX_ASSERTIONS.equals(graphURI)
-                || ModelNames.TBOX_INFERENCES.equals(graphURI)
-                || (graphURI != null && graphURI.contains("tbox")) );
-    }
-    
-    
 }

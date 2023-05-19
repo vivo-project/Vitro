@@ -38,10 +38,6 @@ import java.util.Set;
  */
 @WebServlet(name = "AuditViewer", urlPatterns = {"/audit/*"} )
 public class AuditController extends FreemarkerHttpServlet {
-    private static final String DESC_ORDER = "DESC";
-
-    private static final String ASC_ORDER = "ASC";
-
     private static final Log log = LogFactory.getLog(AuditController.class);
 
     // Template for the UI
@@ -53,9 +49,9 @@ public class AuditController extends FreemarkerHttpServlet {
     private static final String PARAM_ORDER = "order";
     private static final String PARAM_START_DATE = "start_date";
     private static final String PARAM_END_DATE = "end_date";
-
-
-    private static final String PARAM_USER = "user";
+    private static final String PARAM_USER_URI = "user";
+    private static final String DESC_ORDER = "DESC";
+    private static final String ASC_ORDER = "ASC";
     private static final String[] limits = { "10", "30", "50", "100", "1000" };
     private static final String[] orders = { ASC_ORDER, DESC_ORDER };
 
@@ -76,59 +72,64 @@ public class AuditController extends FreemarkerHttpServlet {
 
         // Get the current user
         UserAccount acc = LoginStatusBean.getCurrentUser(vreq);
-        if (acc != null && isAdmin(acc)) {
+        if (acc == null || !isAdmin(acc)) {
+            return new TemplateResponseValues("error-standard.ftl", body);
+        }
+        // Get the offset parameter (or default if unset)
+        int offset = getOffset(vreq);
+        body.put("offset", offset);
+        // Get the limit parameter (or default 10 if unset)
+        int limit  = getLimit(vreq);
+        body.put("limit", String.valueOf(limit));
+        body.put("limits", limits);
+        // Get the start_date parameter (or week ago if unset)
+        Date startDate = getStartDate(vreq);
+        body.put("start_date", sdf.format(startDate));
+        // Get the end_date parameter (or tomorrow if unset)
+        Date endDate = getEndDate(vreq);
+        body.put("end_date", sdf.format(endDate));
+        // Get the user parameter (or empty if unset)
+        String userUri = getUserUri(vreq);
+        body.put("userUri", userUri);
+        // Get the graph_uri parameter (or empty if unset)
+        String graphUri = getGraph(vreq);
+        body.put("selectedGraphUri", graphUri);
+        // Get the order parameter (or default DESC if unset)
+        String order = getOrder(vreq);
+        body.put("order", order);
+        body.put("orders", orders);
+        // Get the Audit DAO
+        AuditDAO auditDAO = AuditDAOFactory.getAuditDAO();
+        // Find a page of audit entries for the current user
+        AuditResults results = auditDAO.find(offset, limit, dateToTimeStamp(startDate), dateToTimeStamp(endDate), userUri, graphUri, ASC_ORDER.equals(order));
+        List <String> users = auditDAO.getUsers();
+        body.put("users", users);
+        List <String> graphUris = auditDAO.getGraphs();
+        body.put("graphs", graphUris);
 
-            // Get the offset / limit parameters (or default if unset)
-            int offset = getOffset(vreq);
-            body.put("offset", offset);
-            int limit  = getLimit(vreq);
-            body.put("limit", String.valueOf(limit));
-            body.put("limits", limits);
-            Date startDate = getStartDate(vreq);
-            body.put("start_date", sdf.format(startDate));
-            Date endDate = getEndDate(vreq);
-            body.put("end_date", sdf.format(endDate));
-            String userUri = getUser(vreq);
-            body.put("userUri", userUri);
-            String graphUri = getGraph(vreq);
-            body.put("selectedGraphUri", graphUri);
-            String order = getOrder(vreq);
-            body.put("order", order);
-            body.put("orders", orders);
-            body.put("selectedGraphUri", graphUri);
-            // Get the Audit DAO
-            AuditDAO auditDAO = AuditDAOFactory.getAuditDAO();
-            // Find a page of audit entries for the current user
-            AuditResults results = auditDAO.find(offset, limit, dateToTimeStamp(startDate), dateToTimeStamp(endDate), userUri, graphUri, ASC_ORDER.equals(order));
-            List <String> users = auditDAO.getUsers();
-            body.put("users", users);
-            List <String> graphUris = auditDAO.getGraphs();
-            body.put("graphs", graphUris);
+        setUserData(results.getDatasets(), uad);
+        // Pass the results to Freemarker
+        body.put("results", results);
 
-            setUserData(results.getDatasets(), uad);
-            // Pass the results to Freemarker
-            body.put("results", results);
+        // Create next / previous links
+        if (offset > 0) {
+            body.put("prevPage", getPreviousPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order, userUri, graphUri, vreq.getServletPath()));
+        }
+        if (offset < (results.getTotal() - limit)) {
+            body.put("nextPage", getNextPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order, userUri, graphUri, vreq.getServletPath()));
+        }
 
-            // Create next / previous links
-            if (offset > 0) {
-                body.put("prevPage", getPreviousPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order, userUri, graphUri, vreq.getServletPath()));
-            }
-            if (offset < (results.getTotal() - limit)) {
-                body.put("nextPage", getNextPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order, userUri, graphUri, vreq.getServletPath()));
-            }
-
-            // Pass the user name to Freemarker
-            if (StringUtils.isNotEmpty(acc.getFirstName())) {
-                if (StringUtils.isNoneEmpty(acc.getLastName())) {
-                    body.put("username", acc.getFirstName() + " " + acc.getLastName());
-                } else {
-                    body.put("username", acc.getFirstName());
-                }
-            } else if (StringUtils.isNotEmpty(acc.getEmailAddress())) {
-                body.put("username", acc.getEmailAddress());
+        // Pass the user name to Freemarker
+        if (StringUtils.isNotEmpty(acc.getFirstName())) {
+            if (StringUtils.isNoneEmpty(acc.getLastName())) {
+                body.put("username", acc.getFirstName() + " " + acc.getLastName());
             } else {
-                body.put("username", "");
+                body.put("username", acc.getFirstName());
             }
+        } else if (StringUtils.isNotEmpty(acc.getEmailAddress())) {
+            body.put("username", acc.getEmailAddress());
+        } else {
+            body.put("username", "");
         }
 
         // Pass the helper methods to Freemaker
@@ -236,8 +237,8 @@ public class AuditController extends FreemarkerHttpServlet {
      * @param vreq
      * @return empty string if user wasn't set
      */
-    private String getUser(VitroRequest vreq) {
-        String user = vreq.getParameter(PARAM_USER);
+    private String getUserUri(VitroRequest vreq) {
+        String user = vreq.getParameter(PARAM_USER_URI);
         if ( user == null) {
             return "";
         }
@@ -290,7 +291,7 @@ public class AuditController extends FreemarkerHttpServlet {
         params.put(PARAM_START_DATE, startDate);
         params.put(PARAM_END_DATE, endDate);
         params.put(PARAM_ORDER, order);
-        params.put(PARAM_USER, userUri);
+        params.put(PARAM_USER_URI, userUri);
         params.put(PARAM_GRAPH, graphUri);
         return UrlBuilder.getUrl(baseUrl, params);
     }
@@ -314,7 +315,7 @@ public class AuditController extends FreemarkerHttpServlet {
         params.put(PARAM_START_DATE, String.valueOf(startDate));
         params.put(PARAM_END_DATE, endDate);
         params.put(PARAM_ORDER, order);
-        params.put(PARAM_USER, userUri);
+        params.put(PARAM_USER_URI, userUri);
         params.put(PARAM_GRAPH, graphUri);
         return UrlBuilder.getUrl(baseUrl, params);
     }

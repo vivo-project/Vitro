@@ -30,8 +30,12 @@ public class AuditSetup implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         // Ensure that the audit module has been initialized
         if (isAuditEnabled()) {
-            // Ensure the change listener is registered with the RDFService
-            registerChangeListener(sce.getServletContext());
+            ServletContext ctx = sce.getServletContext();
+            // Register listener with the RDFServices
+            RDFService contentRdfService = ModelAccess.on(ctx).getRDFService(WhichService.CONTENT);
+            registerChangeListener(contentRdfService);
+            RDFService configurationRdfService = ModelAccess.on(ctx).getRDFService(WhichService.CONFIGURATION);
+            registerChangeListener(configurationRdfService);
         }
     }
 
@@ -39,19 +43,9 @@ public class AuditSetup implements ServletContextListener {
      * Register a change listener with the RDFService
      * @param ctx
      */
-    private synchronized void registerChangeListener(ServletContext ctx) {
-        // Check that no change listener has already been created
-        RDFService contentRdfService = ModelAccess.on(ctx).getRDFService(WhichService.CONTENT);
+    protected synchronized void registerChangeListener(RDFService rdfService) {
         try {
-            // Register the change listener
-            contentRdfService.registerListener(CHANGE_LISTENER);
-        } catch (RDFServiceException e) {
-            log.error(e, e);
-        }
-        RDFService configurationRdfService = ModelAccess.on(ctx).getRDFService(WhichService.CONFIGURATION);
-        try {
-            // Register the change listener
-            configurationRdfService.registerListener(CHANGE_LISTENER);
+            rdfService.registerListener(CHANGE_LISTENER);
         } catch (RDFServiceException e) {
             log.error(e, e);
         }
