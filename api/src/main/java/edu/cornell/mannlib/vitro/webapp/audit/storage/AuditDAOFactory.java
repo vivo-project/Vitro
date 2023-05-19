@@ -19,7 +19,7 @@ public class AuditDAOFactory {
      */
     public static void initialize(Storage storage) {
         if (AuditDAOFactory.storage != null) {
-            throw new IllegalStateException("AduitDAOFactory already initialized");
+            throw new IllegalStateException("AuditDAOFactory already initialized");
         }
         AuditDAOFactory.storage = storage;
     }
@@ -39,7 +39,7 @@ public class AuditDAOFactory {
      */
     public static AuditDAO getAuditDAO() {
         if (storage == null) {
-            throw new IllegalStateException("AduitDAOFactory not initialized");
+            throw new IllegalStateException("AuditDAOFactory not initialized");
         }
 
         switch (storage) {

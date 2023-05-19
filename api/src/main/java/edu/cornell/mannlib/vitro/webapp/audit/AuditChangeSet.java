@@ -31,10 +31,10 @@ public class AuditChangeSet {
     // The statements added to the triple store
     private Dataset addedDataset   = null;
 
-    // The statemetns removed from the triple store
+    // The statements removed from the triple store
     private Dataset removedDataset = null;
 
-    // The statemetns removed from the triple store
+    // The statements removed from the triple store
     private String userId = AuditVocabulary.RESOURCE_UNKNOWN;
     
     private String userEmail = "";
