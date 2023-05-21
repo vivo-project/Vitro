@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualBufferedSDB;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDBBuffered;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateParsingException;
@@ -133,8 +134,8 @@ public class ShortViewServiceImpl implements ShortViewService {
         Map<String, Object> gotData = new HashMap<String, Object>();
         for (DataGetter dg : dataGetters) {
             Map<String, Object> data;
-            if (individual instanceof IndividualSDBBuffered)
-                data = ((FakeVivoPeopleDataGetter) dg).getData(valueMap, ((IndividualSDBBuffered) individual).getBuffOntModel());
+            if (individual instanceof IndividualBufferedSDB)
+                data = ((FakeVivoPeopleDataGetter) dg).getData(valueMap, ((IndividualBufferedSDB) individual).getBuffOntModel());
             else
                data = dg.getData(valueMap);
             gotData.putAll(data);

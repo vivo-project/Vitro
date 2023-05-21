@@ -114,4 +114,24 @@ public class IndividualBufferedSDB extends IndividualSDB {
         populateIndividualBufferModel();
         return _individualJena.getMostSpecificTypeURIs();
     }
+    
+    public String getMainImageUri() {
+        populateIndividualBufferModel();
+        return _individualJena.getMainImageUri();
+    }
+
+    public String getImageUrl() {
+        populateIndividualBufferModel();
+        return _individualJena.getImageUrl();
+    }
+    
+    public String getRdfsLabel() {
+        populateIndividualBufferModel();
+        return _individualJena.getRdfsLabel();
+    }    
+    
+    public String getThumbUrl() {
+        populateIndividualBufferModel();
+        return _individualJena.getThumbUrl();
+    }
 }

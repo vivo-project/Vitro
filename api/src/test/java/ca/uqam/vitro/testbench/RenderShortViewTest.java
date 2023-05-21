@@ -46,8 +46,8 @@ import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 
-public class GetRenderedSearchIndividualsByVClassTest {
-    private static final Log log = LogFactory.getLog(GetRenderedSearchIndividualsByVClassTest.class);
+public class RenderShortViewTest {
+    private static final Log log = LogFactory.getLog(RenderShortViewTest.class);
 
     private static ServletContextStub ctx;
     private static ServletContextEvent sce;
