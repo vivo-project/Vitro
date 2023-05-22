@@ -58,11 +58,11 @@
                             <#assign removed = listRemovedStatements(dataset, graphUri)>
 
                             <b>Graph</b>: ${graphUri}<br />
-                            <#if added??>
+                            <#if added?has_content>
                                 <br /><b>Added</b>:<br />
                                 <div><pre style="font-size: 0.8em;">${added?html}</pre></div>
                             </#if>
-                            <#if removed??>
+                            <#if removed?has_content>
                                 <br /><b>Removed</b>:<br />
                                 <div><pre style="font-size: 0.8em;">${removed?html}</pre></div>
                             </#if>
