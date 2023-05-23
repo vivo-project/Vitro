@@ -1,0 +1,75 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<test:parameter-substitution-procedure>
+        a                                   dynapi:Procedure ;
+        dynapi:hasFirstStep                 <test:step1> ;
+        dynapi:providesParameter            <test:result> .
+
+<test:step1>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasParameterSubstitution     <test:input-parameter-substitution> ;
+        dynapi:hasParameterSubstitution     <test:result-parameter-substitution> ;
+        dynapi:hasOperation                 <test:call-reusable-procedure-operation>  .
+
+<test:input-parameter-substitution>
+        a                                   dynapi:ParameterSubstitution ;
+        dynapi:substitutionSource           <test:input> ;
+        dynapi:substitutionTarget           <test:internal-input> .
+
+<test:result-parameter-substitution>
+        a                                   dynapi:ParameterSubstitution ;
+        dynapi:substitutionSource           <test:result> ;
+        dynapi:substitutionTarget           <test:internal-result> .
+
+<test:call-reusable-procedure-operation>
+        a                                   dynapi:ProcedureCallOperation ;
+        dynapi:callableDescriptor           <test:parameter-substitution-reusable-procedure-descriptor> ;
+        dynapi:providesParameter            <test:internal-result> ;
+        dynapi:requiresParameter            <test:internal-input> .
+
+<test:parameter-substitution-reusable-procedure-descriptor>
+        a                                   dynapi:ProcedureDescriptor ;
+        dynapi:providesParameter            <test:internal-result> ;
+        dynapi:requiresParameter            <test:internal-input> ;
+        dynapi:call                         "test:parameter-substitution-reusable-procedure" .
+
+<test:parameter-substitution-reusable-procedure>
+        a                                   dynapi:Procedure ;
+        dynapi:hasFirstStep                 <test:reusable-procedure-step1> ;
+        dynapi:providesParameter            <test:internal-result> .
+
+<test:reusable-procedure-step1>
+        a                                   dynapi:OperationalStep ;
+        dynapi:hasOperation                 <test:assign-operation>  .
+
+<test:assign-operation> 
+        a                                   dynapi:AssignOperation ;
+        dynapi:assignableParameter          <test:internal-input> ;
+        dynapi:targetParameter              <test:internal-result> .
+
+<test:input>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "input" ;
+        dynapi:isInternal                   "true"^^xsd:boolean ;
+        dynapi:defaultValue                 "test string" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+        
+<test:internal-input>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "internal input" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
+<test:result>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
+
+<test:internal-result>
+        a                                   dynapi:Parameter ;
+        dynapi:name                         "internal result" ;
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
