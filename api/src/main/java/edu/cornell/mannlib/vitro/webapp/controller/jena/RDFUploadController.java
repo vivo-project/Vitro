@@ -195,29 +195,29 @@ public class RDFUploadController extends JenaIngestController {
             OntModelSelector ontModelSelector = ModelAccess.on(getServletContext()).getOntModelSelector();
 
             if (tboxModel != null) {
+                // aggressively seek all statements that are part of the TBox
                 boolean AGGRESSIVE = true;
                 tboxChangeModel = xutil.extractTBox(uploadModel, AGGRESSIVE);
-                // aggressively seek all statements that are part of the TBox
-                tboxstmtCount = operateOnModel(request.getUnfilteredWebappDaoFactory(),
-                        tboxModel, tboxChangeModel, ontModelSelector,
-                                remove, makeClassgroups, loginBean.getUserURI());
+                if (makeClassgroups) {
+                    Model[] classgroupModel = JenaModelUtils.makeClassGroupsFromRootClasses(
+                                request.getUnfilteredWebappDaoFactory(), tboxChangeModel);
+                    tboxChangeModel.add(classgroupModel[1]);
+                    OntModel appMetadataModel = ontModelSelector
+                            .getApplicationMetadataModel();
+                    appMetadataModel.enterCriticalSection(Lock.WRITE);
+                    try {
+                        appMetadataModel.add(classgroupModel[0]);
+                    } finally {
+                        appMetadataModel.leaveCriticalSection();
+                    }
+                }               
+                tboxstmtCount = tboxChangeModel.size();
             }
             if (aboxModel != null) {
                 aboxChangeModel = uploadModel.remove(tboxChangeModel);
                 aboxstmtCount = aboxChangeModel.size();
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                aboxChangeModel.write(os, "N3");
-                ByteArrayInputStream in = new ByteArrayInputStream(os.toByteArray());
-                if(!remove) {
-                    readIntoModel(in, "N3", request.getRDFService(),
-                            ModelNames.ABOX_ASSERTIONS);
-                } else {
-                    removeFromModel(in, "N3", request.getRDFService(),
-                            ModelNames.ABOX_ASSERTIONS);
-                }
-//                operateOnModel(request.getUnfilteredWebappDaoFactory(),
-//                        aboxModel, aboxChangeModel, ontModelSelector,
-//                                remove, makeClassgroups, loginBean.getUserURI());
+                writeModelToRDFService(tboxChangeModel, request.getRDFService(),
+                		ModelNames.ABOX_ASSERTIONS, remove);
             }
             request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " +
                     (tboxstmtCount + aboxstmtCount) + "  statements.");
@@ -260,6 +260,18 @@ public class RDFUploadController extends JenaIngestController {
             log.error(rdfse);
             throw new RuntimeException(rdfse);
         }
+    }
+    
+    private void writeModelToRDFService(Model model, RDFService rdfService,
+    		String graphURI, boolean remove) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        model.write(os, "N3");
+        ByteArrayInputStream in = new ByteArrayInputStream(os.toByteArray());
+        if(!remove) {
+            readIntoModel(in, "N3", rdfService, graphURI);
+        } else {
+            removeFromModel(in, "N3", rdfService, graphURI);
+        } 
     }
 
     public void loadRDF(VitroRequest request, HttpServletResponse response)
@@ -307,72 +319,6 @@ public class RDFUploadController extends JenaIngestController {
             Model m = maker.getModel(modelName);
             return new RDFServiceModel(m);
         }
-    }
-
-    private long operateOnModel(WebappDaoFactory webappDaoFactory,
-                                OntModel mainModel,
-                                Model changesModel,
-                                OntModelSelector ontModelSelector,
-                                boolean remove,
-                                boolean makeClassgroups,
-                                String userURI) {
-
-        EditEvent startEvent = null, endEvent = null;
-
-        if (remove) {
-            startEvent = new BulkUpdateEvent(userURI, true);
-            endEvent = new BulkUpdateEvent(userURI, false);
-        } else {
-            startEvent = new EditEvent(userURI, true);
-            endEvent = new EditEvent(userURI, false);
-        }
-
-        Model[] classgroupModel = null;
-
-        if (makeClassgroups) {
-            classgroupModel = JenaModelUtils.makeClassGroupsFromRootClasses(
-                        webappDaoFactory, changesModel);
-            OntModel appMetadataModel = ontModelSelector
-                    .getApplicationMetadataModel();
-            appMetadataModel.enterCriticalSection(Lock.WRITE);
-            try {
-                appMetadataModel.add(classgroupModel[0]);
-            } finally {
-                appMetadataModel.leaveCriticalSection();
-            }
-        }
-
-        mainModel.enterCriticalSection(Lock.WRITE);
-        try {
-
-            mainModel.getBaseModel().notifyEvent(startEvent);
-            try {
-                if (remove) {
-                    RDFService rdfService = new RDFServiceModel(mainModel);
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    changesModel.write(out, "N-TRIPLE");
-                    ChangeSet cs = makeChangeSet(rdfService);
-                    ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-                    cs.addRemoval(in, RDFService.ModelSerializationFormat.NTRIPLE, null);
-                    try {
-                        rdfService.changeSetUpdate(cs);
-                    } catch (RDFServiceException e) {
-                        throw new RuntimeException(e);
-                    }
-                    //mainModel.remove(changesModel);
-                } else {
-                    mainModel.add(changesModel);
-                    if (classgroupModel != null) {
-                        mainModel.add(classgroupModel[1]);
-                    }
-                }
-            } finally {
-                mainModel.getBaseModel().notifyEvent(endEvent);
-            }
-        } finally {
-            mainModel.leaveCriticalSection();
-        }
-        return changesModel.size();
     }
 
     private void doLoadRDFData(String modelName,
