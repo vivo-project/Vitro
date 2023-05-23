@@ -22,7 +22,7 @@
     </section>
 </#if>
 
-<#assign literalValues = "${editConfiguration.dataLiteralValuesAsString}" />
+<#assign literalValues = "${editConfiguration.dataLiteralValuesAsString?html}" />
 <#assign datatype = editConfiguration.dataPredicateProperty.rangeDatatypeURI!"none" />
 
 <form class="editForm" action = "${submitUrl}" method="post">

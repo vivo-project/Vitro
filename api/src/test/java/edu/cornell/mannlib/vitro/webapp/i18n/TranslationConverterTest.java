@@ -22,11 +22,11 @@ import stubs.javax.servlet.ServletContextStub;
 public class TranslationConverterTest {
 
 	private static final String WILMA = "wilma";
-	private static final String HAS_THEME = "http://vivoweb.org/ontology/core/properties/vocabulary#hasTheme";
+	private static final String HAS_THEME = "http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasTheme";
 	private static final String VITRO = "Vitro";
 	private static final String VIVO = "VIVO";
-	private static final String HAS_APP = "http://vivoweb.org/ontology/core/properties/vocabulary#hasApp";
-	private static final String HAS_KEY = "http://vivoweb.org/ontology/core/properties/vocabulary#hasKey";
+	private static final String HAS_APP = "http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasApp";
+	private static final String HAS_KEY = "http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasKey";
 	private static final String ROOT_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/i18n/TranslationConverterTest/root";
 	private static final String INIT_N3_FILE = "src/test/resources/edu/cornell/mannlib/vitro/webapp/i18n/TranslationConverterTest/modelInitContent.n3";
 	ServletContextStub ctx = new ServletContextStub();

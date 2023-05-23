@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 
 public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDao {
 
@@ -142,7 +143,7 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 
     	edu.cornell.mannlib.vitro.webapp.beans.Individual groupInd =
     		new IndividualImpl(); // We should make a factory for these
-    	groupInd.setNamespace(DEFAULT_NAMESPACE+"vitroPropertyGroup");
+    	groupInd.setNamespace(DEFAULT_NAMESPACE + "vitroPropertyGroup");
     	groupInd.setName(group.getName());
     	groupInd.setVClassURI(PROPERTYGROUP.getURI());
     	groupInd.setURI(group.getURI());
@@ -156,8 +157,12 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 
         WebappDaoFactory wadfForURIGeneration = null;
         try {
-            wadfForURIGeneration = new WebappDaoFactoryJena(
-                    unionForURIGeneration);
+            // Ensure that the temporary WebappDaoFactory has the same
+            // preferred languages as the main one for this DAO.
+            WebappDaoFactoryConfig wadfConfig = new WebappDaoFactoryConfig();
+            wadfConfig.setPreferredLanguages(getWebappDaoFactory().getPreferredLanguages());
+            wadfForURIGeneration = new WebappDaoFactoryJena(new SimpleOntModelSelector(
+                    unionForURIGeneration), wadfConfig, null);
             groupURI = wadfForURIGeneration
                     .getIndividualDao().insertNewIndividual(groupInd);
     	} catch (InsertException ie) {
@@ -183,11 +188,9 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	            if (group.getPublicDescription() != null
 	                    && group.getPublicDescription().length()>0) {
 		            try {
-		                groupJenaInd.addProperty(
-		                        PUBLIC_DESCRIPTION_ANNOT,
-		                        group.getPublicDescription(),
-		                        XSDDatatype.XSDstring);
-		            } catch (Exception ex) {
+                        updatePlainLiteralValue(groupJenaInd, PUBLIC_DESCRIPTION_ANNOT,
+                                group.getPublicDescription(), getDefaultLanguage());
+                    } catch (Exception ex) {
 		                log.error(
 		                        "error setting public description for "
 		                                + groupInd.getURI());
@@ -225,15 +228,13 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	    try {
 	        Individual groupInd = ontModel.getIndividual(group.getURI());
 	        try {
-	            groupInd.setLabel(group.getName(), getDefaultLanguage());
+                updateRDFSLabel(groupInd, group.getName(), getDefaultLanguage());
 	        } catch (Exception e) {
 	            log.error("error updating name for "+groupInd.getURI());
 	        }
 	        try {
-	            groupInd.removeAll(PUBLIC_DESCRIPTION_ANNOT);
-	            if (group.getPublicDescription()!=null && group.getPublicDescription().length()>0) {
-	                groupInd.addProperty(PUBLIC_DESCRIPTION_ANNOT, group.getPublicDescription(), XSDDatatype.XSDstring);
-	            }
+                updatePlainLiteralValue(groupInd, PUBLIC_DESCRIPTION_ANNOT,
+	                    group.getPublicDescription(), getDefaultLanguage());	            
 	        } catch (Exception e) {
 	            log.error("Error updating public description for "+groupInd.getURI());
 	        }
