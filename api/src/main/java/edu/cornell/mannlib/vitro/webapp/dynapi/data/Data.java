@@ -9,7 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class Data {
 
-    private String string = null;
+    private String rawString = null;
     private Object object = null;
     private Parameter param = null;
 
@@ -25,16 +25,20 @@ public class Data {
         return object;
     }
 
+    public void setParam(Parameter param) {
+        this.param = param;
+    }
+    
     public Parameter getParam() {
         return param;
     }
 
-    public void setRawString(String raw) {
-        this.string = raw;
+    public void setRawString(String rawString) {
+        this.rawString = rawString;
     }
 
     protected String getRawString() {
-        return string;
+        return rawString;
     }
 
     public void earlyInitialization() {
@@ -58,20 +62,20 @@ public class Data {
     }
 
     private boolean isOptionalWithoutValue() {
-        return param.isOptional() && string == null;
+        return param.isOptional() && rawString == null;
     }
     
     public void initializeFromString() {
         final ParameterType type = param.getType();
         final ImplementationType implementationType = type.getImplementationType();
-        object = implementationType.deserialize(type, string);
+        object = implementationType.deserialize(type, rawString);
     }
 
     public String getSerializedValue() {
         final ParameterType type = param.getType();
         final ImplementationType implementationType = type.getImplementationType();
         if (object == null) {
-            object = implementationType.deserialize(type, string);
+            object = implementationType.deserialize(type, rawString);
         }
         return implementationType.serialize(type, object).toString();
     }

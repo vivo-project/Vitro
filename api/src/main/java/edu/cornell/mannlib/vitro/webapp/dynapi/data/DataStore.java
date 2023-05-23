@@ -130,4 +130,9 @@ public class DataStore {
         }
         return "";
     }
+
+    public void remove(String name) {
+        dataMap.remove(name);
+    }
+
 }
