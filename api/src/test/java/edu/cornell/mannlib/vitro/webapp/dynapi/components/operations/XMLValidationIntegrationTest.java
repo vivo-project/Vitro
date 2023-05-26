@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
@@ -103,7 +104,7 @@ public class XMLValidationIntegrationTest extends ServletContextTest {
             assertTrue(store.contains(OUTPUT));
             Data output = store.getData(OUTPUT);
             boolean expectSuccess = false;
-            if (expectedResult.isBlank()) {
+            if (StringUtils.isBlank(expectedResult)) {
                 expectSuccess = true;
             }
             assertEquals(Boolean.toString(expectSuccess), output.getSerializedValue());
