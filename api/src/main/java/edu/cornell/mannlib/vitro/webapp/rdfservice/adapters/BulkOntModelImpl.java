@@ -21,7 +21,6 @@ public class BulkOntModelImpl extends OntModelImpl {
         if (unwrappedGraph instanceof BulkGraphMem) {
             GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());
         } else {
-            GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());
             super.remove(m);
         }
         return this;
