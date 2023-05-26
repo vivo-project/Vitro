@@ -473,8 +473,8 @@ public class VitroModelFactoryTest extends AbstractTestClass {
     public void testCreateNewBulkOntModel() {
         TestBulkGraphMem spyGraph = new TestBulkGraphMem();
         Model baseModel = new ModelCom(spyGraph);
-        OntModel intermediateOntModel = new OntModelImpl(OWL_MEM, baseModel);
-        OntModel ontModel = VitroModelFactory.createOntologyModel(intermediateOntModel);
+        baseModel = wrap(wrap(wrap(baseModel)));
+        OntModel ontModel = VitroModelFactory.createOntologyModel(baseModel);
         Model inputModel = ModelFactory.createDefaultModel();
         try {
             inputModel.enterCriticalSection(Lock.WRITE);
@@ -491,6 +491,10 @@ public class VitroModelFactoryTest extends AbstractTestClass {
         ontModel.remove(inputModel);
         assertEquals(5, spyGraph.countAddWithoutNotify);
         assertEquals(5, spyGraph.countDeleteWithoutNotify);
+    }
+
+    private OntModelImpl wrap(Model baseModel) {
+        return new OntModelImpl(OWL_MEM, baseModel);
     }
 
     private static class TestBulkGraphMem extends BulkGraphMem {

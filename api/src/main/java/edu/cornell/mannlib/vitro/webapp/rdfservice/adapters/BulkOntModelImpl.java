@@ -21,10 +21,7 @@ public class BulkOntModelImpl extends OntModelImpl {
         if (unwrappedGraph instanceof BulkGraphMem) {
             GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());
         } else {
-            unwrappedGraph = GraphUtils.unwrapUnionGraphs(getBaseGraph());
-            if (unwrappedGraph instanceof BulkGraphMem) {
-                GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());
-            }
+            GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());
             super.remove(m);
         }
         return this;
@@ -36,12 +33,7 @@ public class BulkOntModelImpl extends OntModelImpl {
         if (unwrappedGraph instanceof BulkGraphMem) {
             GraphUtils.addInto((BulkGraphMem) unwrappedGraph, m.getGraph());
         } else {
-            unwrappedGraph = GraphUtils.unwrapUnionGraphs(getBaseGraph());
-            if (unwrappedGraph instanceof BulkGraphMem) {
-                GraphUtils.addInto((BulkGraphMem) unwrappedGraph, m.getGraph());
-            } else {
-                super.add(m);
-            }
+            super.add(m);
         }
         return this;
     }
