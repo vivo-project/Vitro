@@ -13,10 +13,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-
+import org.apache.jena.graph.Triple;
 import org.apache.jena.graph.impl.GraphWithPerform;
 import org.apache.jena.mem.GraphMem;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -27,6 +28,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.ModelCom;
+import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.testing.RecordingProxy;
@@ -65,6 +68,9 @@ import edu.cornell.mannlib.vitro.testing.RecordingProxy.MethodCallRecorder;
  * presumably the bulk updaters will be removed completely.
  */
 public class VitroModelFactoryTest extends AbstractTestClass {
+    
+    private String testData = "src/test/resources/edu/cornell/mannlib/vitro/webapp/rdfservice/adapters/vitro_model_factory_test_data.n3";
+
 	private static final Statement SINGLE_STATEMENT = stmt(
 			resource("http://subject"), property("http://add"),
 			literal("object"));
@@ -463,7 +469,49 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 				.test();
 	}
 
-	// ----------------------------------------------------------------------
+    @Test
+    public void testCreateNewBulkOntModel() {
+        TestBulkGraphMem spyGraph = new TestBulkGraphMem();
+        Model baseModel = new ModelCom(spyGraph);
+        OntModel intermediateOntModel = new OntModelImpl(OWL_MEM, baseModel);
+        OntModel ontModel = VitroModelFactory.createOntologyModel(intermediateOntModel);
+        Model inputModel = ModelFactory.createDefaultModel();
+        try {
+            inputModel.enterCriticalSection(Lock.WRITE);
+            inputModel.read(testData);
+        } finally {
+            inputModel.leaveCriticalSection();
+        }
+        assertEquals(0, spyGraph.countAddWithoutNotify);
+        assertEquals(0, spyGraph.countDeleteWithoutNotify);
+        ontModel.add(inputModel);
+        assertEquals(5, spyGraph.countAddWithoutNotify);
+        assertEquals(0, spyGraph.countDeleteWithoutNotify);
+        
+        ontModel.remove(inputModel);
+        assertEquals(5, spyGraph.countAddWithoutNotify);
+        assertEquals(5, spyGraph.countDeleteWithoutNotify);
+    }
+
+    private static class TestBulkGraphMem extends BulkGraphMem {
+        int countDeleteWithoutNotify = 0;
+        int countAddWithoutNotify = 0;
+        
+        @Override
+        public void addWithoutNotify(Triple t) {
+            checkOpen();
+            performAdd(t);
+            countAddWithoutNotify++;
+        }
+        @Override
+        public final void deleteWithoutNotify(Triple t) {
+            checkOpen();
+            performDelete(t);
+            countDeleteWithoutNotify++;
+        }
+    }
+
+    // ----------------------------------------------------------------------
 	// OntModel of Union of Models
 	//
 	// This shouldn't hold any surprises, should it?

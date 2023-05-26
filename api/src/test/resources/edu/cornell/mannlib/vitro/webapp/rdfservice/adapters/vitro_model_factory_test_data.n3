@@ -1,0 +1,5 @@
+<test:bob> <test:has_publication> <test:bob_publication1> .
+<test:bob> <test:has_publication> <test:bob_publication2> .
+<test:bob> <test:has_publication> <test:bob_publication3> .
+<test:alice> <test:has_publication> <test:alice_publication1> .
+<test:alice> <test:has_publication> <test:alice_publication2> .
