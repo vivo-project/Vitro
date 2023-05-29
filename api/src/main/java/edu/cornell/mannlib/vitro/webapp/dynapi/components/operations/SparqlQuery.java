@@ -7,6 +7,8 @@ import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
@@ -26,11 +28,19 @@ public abstract class SparqlQuery extends AbstractOperation implements ContextMo
 	protected Parameter queryModelParam;
 	protected boolean langFiltering = false;
 	protected RDFService rdfService;
+    protected Parameters substitutionParams = new Parameters();
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addInputParameter(Parameter param) {
-		inputParams.add(param);
-	}
+
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+    public void addInputParameter(Parameter param) {
+        inputParams.add(param);
+    }
+    
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresPlainParameter")
+    public void addInputSubstitutionParameter(Parameter param) {
+        inputParams.add(param);
+        substitutionParams.add(param);
+    }
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#languageFiltering", minOccurs = 0, maxOccurs = 1)
 	public void setLanguageFiltering(boolean langFiltering) {
@@ -51,22 +61,37 @@ public abstract class SparqlQuery extends AbstractOperation implements ContextMo
 		inputParams.add(model);
 	}
 
-	protected void setUris(DataStore dataStore, ParameterizedSparqlString pss) {
-		for (String paramName : RdfView.getUriNames(inputParams)) {
-			pss.setIri(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore));
-		}
-	}
+    protected void setUris(DataStore dataStore, ParameterizedSparqlString pss) {
+        for (String paramName : RdfView.getUriNames(inputParams)) {
+            if (substitutionParams.contains(paramName)) {
+                return;
+            }
+            pss.setIri(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore));
+        }
+    }
 
 	protected void setLiterals(DataStore dataStore, ParameterizedSparqlString pss) {
 		for (String paramName : RdfView.getLiteralNames(inputParams)) {
+		    if (substitutionParams.contains(paramName)) {
+		        return;
+		    }
 			pss.setLiteral(paramName, SimpleDataView.getStringRepresentation(paramName, dataStore),
 					inputParams.get(paramName).getType().getRdfType().getRDFDataType());
 		}
 	}
+	
+    protected String prepareQuery(DataStore dataStore, String preparedQuery) {
+        for (String paramName : substitutionParams.getNames()) {
+            Data data = dataStore.getData(paramName);
+            preparedQuery = preparedQuery.replaceAll("\\?" + paramName + "(?![a-zA-Z0-9_-])", data.getSerializedValue());
+        }
+        return preparedQuery;
+    }
 
 	protected String prepareQuery(DataStore dataStore) {
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
-		pss.setCommandText(queryText);
+		String query = prepareQuery(dataStore, queryText);
+		pss.setCommandText(query);
 		setLiterals(dataStore, pss);
 		setUris(dataStore, pss);
 		final String preparedQueryString = pss.toString();
