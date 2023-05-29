@@ -57,7 +57,7 @@ public class XMLTransformation extends AbstractOperation {
         String styles = SimpleDataView.getStringRepresentation(xsltParam.getName(), dataStore);
         ByteArrayOutputStream output = transform(is, styles);
         Data outputData = new Data(outputXmlParam);
-        outputData.setRawString(output.toString(StandardCharsets.UTF_8));
+        outputData.setRawString(output.toString(StandardCharsets.UTF_8.toString()));
         outputData.initializeFromString();
         dataStore.addData(outputXmlParam.getName(), outputData);
         return OperationResult.ok();

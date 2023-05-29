@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.tika.utils.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,7 +85,7 @@ public class XMLValidationTest {
         Data outputData = ds.getData(OUTPUT_PARAM_NAME);
         String outputString = outputData.getSerializedValue();
         boolean expectSuccess = false;
-        if (expectedResult.isBlank()) {
+        if (StringUtils.isBlank(expectedResult)) {
             expectSuccess = true;
         }
         assertEquals(Boolean.toString(expectSuccess),outputString);
