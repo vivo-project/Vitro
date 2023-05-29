@@ -247,6 +247,17 @@
                    rdfs:range :Parameter ;
                    rdfs:label "requires parameter"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#requiresPlainParameter
+:requiresPlainParameter rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf owl:topObjectProperty ;
+                   rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( :SparqlSelectQuery
+                                      :SparqlConstructQuery
+                                    )
+                      ] ;
+                   rdfs:range :Parameter ;
+                   rdfs:label "requires parameter for plain substitution"@en-US .
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#additionModel
 :additionModel rdf:type owl:ObjectProperty ;
                    rdfs:subPropertyOf owl:topObjectProperty ;
