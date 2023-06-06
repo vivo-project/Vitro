@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAcce
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.WRAP_TYPE;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -63,13 +64,8 @@ public class PolicyHelper {
         if (ar.getPredefinedDecision() != DecisionResult.INCONCLUSIVE){
             return ar.getPredefinedDecision() == DecisionResult.AUTHORIZED;
         }
-        if (ar.isContainer()) {
-            List<AuthorizationRequest> items = ar.getItems();
-            boolean result = false;
-            for (AuthorizationRequest item : items ) {
-                result = result || isAuthorizedForActions(ids, item);
-            }
-            return result;
+        if (ar.getWrapType() != null) {
+            return processUnwrappedAuthorizationRequest(ar, ids);
         }
         return actionRequestIsAuthorized(ids, ar.getAccessObject(), ar.getAccessOperation());
     }
@@ -82,16 +78,27 @@ public class PolicyHelper {
         if (ar.getPredefinedDecision() != DecisionResult.INCONCLUSIVE){
             return ar.getPredefinedDecision() == DecisionResult.AUTHORIZED;
         }
-        if (ar.isContainer()) {
-            List<AuthorizationRequest> items = ar.getItems();
-            boolean result = false;
-            for (AuthorizationRequest item : items ) {
-                result = result || isAuthorizedForActions(req, item);
-            }
-            return result;
-        }
         IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
+        if (ar.getWrapType() != null) {
+            return processUnwrappedAuthorizationRequest(ar, ids);
+        }
         return actionRequestIsAuthorized(ids, ar.getAccessObject(), ar.getAccessOperation());
+    }
+
+    private static boolean processUnwrappedAuthorizationRequest(AuthorizationRequest ar, IdentifierBundle ids) {
+        List<AuthorizationRequest> items = ar.getItems();
+        boolean result = false;
+        if (WRAP_TYPE.OR == ar.getWrapType()) {
+            for (AuthorizationRequest item : items ) {
+                result = result || isAuthorizedForActions(ids, item);
+            }    
+        } else {
+            result = true;
+            for (AuthorizationRequest item : items ) {
+                result = result && isAuthorizedForActions(ids, item);
+            } 
+        }
+        return result;
     }
 
 	private static boolean actionRequestIsAuthorized(IdentifierBundle ids, AccessObject ao, AccessOperation operation) {

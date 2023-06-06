@@ -23,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccess
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -107,7 +106,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		}
 		final DataPropertyStatementAccessObject editDataPropertyStatement = new DataPropertyStatementAccessObject(ontModel, subjectUri, predicateUri, objectUri);
         boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, 
-		        AuthHelper.logicOr(
+		        AuthorizationRequest.or(
 		                new SimpleAuthorizationRequest(editDataPropertyStatement, AccessOperation.EDIT), 
 		                new SimpleAuthorizationRequest(objectPropertyAction, ao)));
 		if (!isAuthorized) {
