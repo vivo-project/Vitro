@@ -18,7 +18,7 @@ public class AndAuthorizationRequest extends AuthorizationRequest {
 	}
 
     @Override
-    public WRAP_TYPE getType() {
+    public WRAP_TYPE getWrapType() {
         return WRAP_TYPE.AND;
     }
 	
