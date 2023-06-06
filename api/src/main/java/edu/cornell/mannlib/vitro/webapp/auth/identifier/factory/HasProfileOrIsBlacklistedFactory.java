@@ -28,17 +28,13 @@ public class HasProfileOrIsBlacklistedFactory extends
 	private static final Log log = LogFactory
 			.getLog(HasProfileOrIsBlacklistedFactory.class);
 
-	public HasProfileOrIsBlacklistedFactory(ServletContext ctx) {
-		super(ctx);
-	}
-
 	@Override
 	public IdentifierBundle getIdentifierBundleForUser(UserAccount user) {
 		ArrayIdentifierBundle ids = new ArrayIdentifierBundle();
 
 		for (Individual ind : getAssociatedIndividuals(user)) {
 			// If they are blacklisted, this factory will return an identifier
-			Identifier id = IsBlacklisted.getInstance(ind, ctx);
+			Identifier id = IsBlacklisted.getInstance(ind);
 			if (id != null) {
 				ids.add(id);
 			} else {
@@ -60,7 +56,7 @@ public class HasProfileOrIsBlacklistedFactory extends
 			return individuals;
 		}
 
-		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(ctx);
+		SelfEditingConfiguration sec = SelfEditingConfiguration.getInstance();
 		individuals.addAll(sec.getAssociatedIndividuals(indDao, user));
 
 		return individuals;

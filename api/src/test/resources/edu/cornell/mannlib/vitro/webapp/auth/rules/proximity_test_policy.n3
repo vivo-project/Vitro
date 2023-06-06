@@ -1,0 +1,30 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:ProximityTestPolicy rdf:type ao:Policy ;
+          ao:rules ai:ProximityRuleSet .
+
+ai:ProximityRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowPersonEditOwnPublication .
+          
+ai:AllowPersonEditOwnPublication rdf:type ao:Rule ;
+          ao:attribute ai:PublicationInProximityAttribute .
+          
+ai:PublicationInProximityAttribute rdf:type ao:Attribute ;
+         ao:test ai:SparqlSelectQueryContains ;
+         ao:type ai:StatementSubjectUri ;
+         ao:value ai:PublicationProximityToPerson .
+
+ai:PublicationProximityToPerson rdf:type ao:TestData ;
+        ao:id """
+        SELECT ?resourceUri WHERE {
+                  ?personUri <test:has_publication> ?resourceUri .
+        }
+        """ .

@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:CuratorDisplayDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:CuratorDisplayDataPropertyRuleSet ;
+          ao:testDatasets ai:CuratorDisplayDataPropertyTestDatasets ;
+          ao:policyKey ai:CuratorDisplayDataPropertyPolicyKey .
+
+ai:CuratorDisplayDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowCuratorDisplayDataPropertyStatementRule;
+          ao:rule ai:AllowCuratorDisplayDataPropertyRule .
+
+ai:CuratorDisplayDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:CuratorDisplayDataPropertyDataset .
+
+ai:CuratorDisplayDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:CuratorDisplayDataPropertyTestData .
+          
+ai:CuratorDisplayDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:DataPropertyAccesObject ;
+          ao:keyComponent auth:CURATOR ;
+          ao:keyComponent ai:DisplayOperationGroup .
+
+ai:AllowCuratorDisplayDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:DisplayOperationAttribute ;
+          ao:attribute ai:DataPropertyTypeAttribute ;
+          ao:attribute ai:CuratorDisplayDataPropertyAttribute .
+
+ai:AllowCuratorDisplayDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:DisplayOperationAttribute ;
+          ao:attribute ai:DataPropertyStatementTypeAttribute ;
+          ao:attribute ai:CuratorDisplayDataPropertyStatementAttribute .
+         
+ai:CuratorDisplayDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:CuratorDisplayDataPropertyTestData .
+
+ai:CuratorDisplayDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:CuratorDisplayDataPropertyTestData .
+         
+ai:CuratorDisplayDataPropertyTestData rdf:type ao:TestData ;
+       .

@@ -7,4 +7,6 @@ public interface FauxPropertyWrapper {
 	public FauxProperty getFauxProperty();
 	
 	public String getContextUri();
+	
+	public String getConfigUri();
 }

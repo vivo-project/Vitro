@@ -2,14 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,7 +14,6 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -32,6 +27,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The "standard" implementation of Authenticator.
@@ -228,17 +229,20 @@ public class BasicAuthenticator extends Authenticator {
 	/**
 	 * Editors and other privileged users get a longer timeout interval.
 	 */
-	private void setSessionTimeoutLimit(UserAccount userAccount,
-			HttpSession session) {
-		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
-		if (role == RoleLevel.EDITOR || role == RoleLevel.CURATOR
-				|| role == RoleLevel.DB_ADMIN) {
-			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
-		} else if (userAccount.isRootUser()) {
-			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
+	private void setSessionTimeoutLimit(UserAccount userAccount, HttpSession session) {
+		int interval = LOGGED_IN_TIMEOUT_INTERVAL;
+		if (userAccount.isRootUser()) {
+			interval = PRIVILEGED_TIMEOUT_INTERVAL;
 		} else {
-			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
+			Set<String> permissions = userAccount.getPermissionSetUris();
+			for (String uri : permissions) {
+				if (!uri.equals(PermissionSets.URI_SELF_EDITOR)) {
+					interval = PRIVILEGED_TIMEOUT_INTERVAL;
+				}
+			}
 		}
+
+		session.setMaxInactiveInterval(interval);
 	}
 
 	/**

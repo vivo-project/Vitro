@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.INCONCLUSIVE;
+import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.INCONCLUSIVE;
 
 import java.util.regex.Pattern;
 
@@ -10,9 +10,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
@@ -33,7 +33,7 @@ public class PolicyDecisionLogger {
 			INCONCLUSIVE, "The decision was null.");
 
 	private final DeveloperSettings settings;
-	private final RequestedAction whatToAuth;
+	private final AccessObject whatToAuth;
 	private final IdentifierBundle whoToAuth;
 
 	private final boolean enabled;
@@ -43,7 +43,7 @@ public class PolicyDecisionLogger {
 	private final boolean includeIdentifiers;
 
 	public PolicyDecisionLogger(IdentifierBundle whoToAuth,
-			RequestedAction whatToAuth) {
+			AccessObject whatToAuth) {
 		this.settings = DeveloperSettings.getInstance();
 		this.whoToAuth = whoToAuth;
 		this.whatToAuth = whatToAuth;
@@ -130,7 +130,7 @@ public class PolicyDecisionLogger {
 	 * If the logger and the policy and the decision all pass the restrictions,
 	 * write to the log. A null decision is treated as inconclusive.
 	 */
-	public void log(PolicyIface policy, PolicyDecision pd) {
+	public void log(Policy policy, PolicyDecision pd) {
 		if (passesRestrictions(String.valueOf(policy), pd)) {
 			if (this.includeIdentifiers) {
 				log.info(String.format(
@@ -161,7 +161,7 @@ public class PolicyDecisionLogger {
 	}
 
 	private boolean isInconclusive(PolicyDecision pd) {
-		return pd == null || pd.getAuthorized() == INCONCLUSIVE;
+		return pd == null || pd.getDecisionResult() == INCONCLUSIVE;
 	}
 
 	public void logNoDecision(PolicyDecision pd) {

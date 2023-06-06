@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:CuratorPublishObjectPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:CuratorPublishObjectPropertyRuleSet ;
+          ao:testDatasets ai:CuratorPublishObjectPropertyTestDatasets ;
+          ao:policyKey ai:CuratorPublishObjectPropertyPolicyKey .
+
+ai:CuratorPublishObjectPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowCuratorPublishObjectPropertyStatementRule ;
+          ao:rule ai:AllowCuratorPublishObjectPropertyRule .
+
+ai:CuratorPublishObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:CuratorPublishObjectPropertyDataset .
+
+ai:CuratorPublishObjectPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:CuratorPublishObjectPropertyTestData .
+          
+ai:CuratorPublishObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:ObjectPropertyAccesObject ;
+          ao:keyComponent auth:CURATOR ;
+          ao:keyComponent ai:PublishOperationGroup .
+
+ai:AllowCuratorPublishObjectPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:ObjectPropertyTypeAttribute ;
+          ao:attribute ai:CuratorPublishObjectPropertyAttribute .
+
+ai:AllowCuratorPublishObjectPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:CuratorPublishObjectPropertyStatementAttribute .
+         
+ai:CuratorPublishObjectPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:CuratorPublishObjectPropertyTestData .
+         
+ai:CuratorPublishObjectPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:CuratorPublishObjectPropertyTestData .
+         
+ai:CuratorPublishObjectPropertyTestData rdf:type ao:TestData ;
+     .

@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
 
@@ -58,7 +57,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		return AUTHORIZED; // No requirements to use this page.
+		return AuthorizationRequest.AUTHORIZED; // No requirements to use this page.
 	}
 
 	@Override

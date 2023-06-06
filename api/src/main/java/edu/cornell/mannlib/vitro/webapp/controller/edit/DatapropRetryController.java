@@ -25,12 +25,12 @@ import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -165,23 +165,6 @@ public class DatapropRetryController extends BaseEditController {
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
 
-        optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(objectForEditing));
-        optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(objectForEditing));
-        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(objectForEditing));
-
-        // Set the value of the editing parameter (as defined in VitroVocabulary.java). 
-        // Use value to control form types as in defaultDataPropertyForm.ftl
-        String editingVal = objectForEditing.getEditing();
-        List<Option> editingOptList = new ArrayList<Option>();
-        editingOptList.add(0,new Option("","plaintext"));
-        editingOptList.add(1,new Option("HTML","rich text"));
-        for (Option val : editingOptList) {
-            if(editingVal != null && editingVal.equals(val.getValue())) {
-                val.setSelected(true);
-            }
-        }
-        optionMap.put("Editing", editingOptList);
-
         foo.setOptionLists(optionMap);
 
         request.setAttribute("functional",objectForEditing.getFunctional());
@@ -199,6 +182,8 @@ public class DatapropRetryController extends BaseEditController {
         request.setAttribute("title","Data Property Editing Form");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","DatatypeProperty");
+
+        addAccessAttributes(request, objectForEditing.getURI(), AccessObjectType.DATA_PROPERTY);
         setRequestAttributes(request,epo);
 
         try {

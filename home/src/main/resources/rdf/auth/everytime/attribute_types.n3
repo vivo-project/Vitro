@@ -1,0 +1,54 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:Subject rdf:type ao:AttributeType ;
+         ao:id "SUBJECT" .
+
+ai:SubjectRole rdf:type ao:AttributeType ;
+         ao:id "SUBJECT_ROLE_URI" .
+         
+ai:SubjectType rdf:type ao:AttributeType ;
+         ao:id "SUBJECT_TYPE" .
+
+ai:ObjectUri rdf:type ao:AttributeType ;
+         ao:id "OBJECT_URI" .
+         
+ai:ObjectType rdf:type ao:AttributeType ;
+         ao:id "OBJECT_TYPE" .
+
+ai:Operation rdf:type ao:AttributeType ;
+         ao:id "OPERATION" .
+         
+ai:SubjectNotMatch rdf:type ao:AttributeType ;
+         ao:id "SUBJECT_NOT_MATCH" .
+         
+ai:ObjectNotMatch rdf:type ao:AttributeType ;
+         ao:id "OBJECT_NOT_MATCH" .
+         
+ai:SubjectNotMatch rdf:type ao:AttributeType ;
+         ao:id "SUBJECT_NOT_MATCH" .
+         
+ai:RelatesToSubjectProfile rdf:type ao:AttributeType ;
+         ao:id "RELATES_TO_SUBJECT_PROFILE" .
+         
+ai:StatementPredicateUri rdf:type ao:AttributeType ;
+         ao:id "STATEMENT_PREDICATE_URI" .
+         
+ai:StatementSubjectUri rdf:type ao:AttributeType ;
+         ao:id "STATEMENT_SUBJECT_URI" .
+
+ai:ObjectPropertyUri rdf:type ao:AttributeType ;
+         ao:id "OBJECT_PROPERTY_URI" .
+         
+ai:DataPropertyUri rdf:type ao:AttributeType ;
+         ao:id "DATA_PROPERTY_URI" .
+      
+ai:StatementObjectUri rdf:type ao:AttributeType ;
+         ao:id "STATEMENT_OBJECT_URI" .

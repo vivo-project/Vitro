@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.UNAUTHORIZED;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.PARAMETER_UPLOADED_FILE;
 
 import java.io.IOException;
@@ -29,10 +28,11 @@ import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -86,19 +86,22 @@ public class FileUploadController extends FreemarkerHttpServlet {
 
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		RequestedAction ra;
+		AccessObject ra;
+		AccessOperation ao;
 		try {
 			Property predicate = new Property(getPredicateUri(vreq));
 			final OntModel jenaOntModel = vreq.getJenaOntModel();
 			final String subject = getSubjectUri(vreq);
 			if (isUpload(vreq)) {
-				ra = new AddObjectPropertyStatement(jenaOntModel, subject, predicate,RequestedAction.SOME_URI);
+				ra = new ObjectPropertyStatementAccessObject(jenaOntModel, subject, predicate,AccessObject.SOME_URI);
+				ao = AccessOperation.ADD;
 			} else { // delete
-				ra = new DropObjectPropertyStatement(jenaOntModel, subject, predicate, getFileUri(vreq));
+				ra = new ObjectPropertyStatementAccessObject(jenaOntModel, subject, predicate, getFileUri(vreq));
+				ao = AccessOperation.DROP;
 			}
-			return ra;
+			return new SimpleAuthorizationRequest(ra, ao);
 		} catch (Exception e) {
-			return UNAUTHORIZED;
+			return AuthorizationRequest.UNAUTHORIZED;
 		}
 	}
 

@@ -1,0 +1,41 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:SelfEditorUpdateClassPolicy rdf:type ao:Policy ;
+          ao:rules ai:SelfEditorUpdateClassRuleSet ;
+          ao:testDatasets ai:SelfEditorUpdateClassTestDatasets ;
+          ao:policyKey ai:SelfEditorUpdateClassPolicyKey .
+
+ai:SelfEditorUpdateClassRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowSelfEditorUpdateClassRule .
+
+ai:SelfEditorUpdateClassTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:SelfEditorUpdateClassDataset .
+
+ai:SelfEditorUpdateClassDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:SelfEditorUpdateClassTestData .
+          
+ai:SelfEditorUpdateClassPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:Class ;
+          ao:keyComponent auth:SELF_EDITOR ;
+          ao:keyComponent ai:UpdateOperationGroup .
+
+ai:AllowSelfEditorUpdateClassRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:ClassTypeAttribute ;
+          ao:attribute ai:SelfEditorUpdateClassAttribute .
+         
+ai:SelfEditorUpdateClassAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:SelfEditorUpdateClassTestData .
+         
+ai:SelfEditorUpdateClassTestData rdf:type ao:TestData ;
+       .

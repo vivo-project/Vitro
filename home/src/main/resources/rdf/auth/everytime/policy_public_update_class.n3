@@ -1,0 +1,41 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:PublicUpdateClassPolicy rdf:type ao:Policy ;
+          ao:rules ai:PublicUpdateClassRuleSet ;
+          ao:testDatasets ai:PublicUpdateClassTestDatasets ;
+          ao:policyKey ai:PublicUpdateClassPolicyKey .
+
+ai:PublicUpdateClassRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowPublicUpdateClassRule .
+
+ai:PublicUpdateClassTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:PublicUpdateClassDataset .
+
+ai:PublicUpdateClassDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:PublicUpdateClassTestData .
+          
+ai:PublicUpdateClassPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:Class ;
+          ao:keyComponent auth:PUBLIC ;
+          ao:keyComponent ai:UpdateOperationGroup .
+
+ai:AllowPublicUpdateClassRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsPublicRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:ClassTypeAttribute ;
+          ao:attribute ai:PublicUpdateClassAttribute .
+         
+ai:PublicUpdateClassAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:PublicUpdateClassTestData .
+         
+ai:PublicUpdateClassTestData rdf:type ao:TestData ;
+       .

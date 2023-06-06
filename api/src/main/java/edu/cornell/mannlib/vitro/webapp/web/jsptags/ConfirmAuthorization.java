@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
@@ -15,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
 /**
@@ -64,18 +61,11 @@ public class ConfirmAuthorization extends BodyTagSupport {
 		getRequest().removeAttribute("requestedActions");
 
 		if (attribute == null) {
-			return AUTHORIZED;
-		} else if (attribute instanceof RequestedAction) {
-			RequestedAction ra = (RequestedAction) attribute;
+			return AuthorizationRequest.AUTHORIZED;
+		} else if (attribute instanceof AuthorizationRequest) {
+		    AuthorizationRequest ra = (AuthorizationRequest) attribute;
 			log.debug("requested action was " + ra.getClass().getSimpleName());
 			return ra;
-		} else if (attribute instanceof RequestedAction[]) {
-			AuthorizationRequest auth = AUTHORIZED;
-			for (RequestedAction ra : (RequestedAction[]) attribute) {
-				auth = auth.and(ra);
-			}
-			log.debug("requested actions were " + auth);
-			return auth;
 		} else {
 			throw new IllegalStateException(
 					"Expected request.getAttribute(\"requestedActions\") "

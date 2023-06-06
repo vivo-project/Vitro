@@ -266,10 +266,8 @@ public abstract class Authenticator {
 	 * Get the IDs that would be created for this userAccount, if this user were
 	 * to log in.
 	 */
-	public static IdentifierBundle getIdsForUserAccount(HttpServletRequest req,
-			UserAccount userAccount) {
-		return ActiveIdentifierBundleFactories.getUserIdentifierBundle(req,
-				userAccount);
+	public static IdentifierBundle getIdsForUserAccount(UserAccount userAccount) {
+		return ActiveIdentifierBundleFactories.getUserIdentifierBundle(userAccount);
 	}
 
 	// ----------------------------------------------------------------------

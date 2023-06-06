@@ -9,19 +9,21 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -190,7 +192,7 @@ public class BaseEditController extends VitroHttpServlet {
    }
 
     protected WebappDaoFactory getWebappDaoFactory() {
-    	return ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY);
+    	return ModelAccess.getInstance().getWebappDaoFactory(ASSERTIONS_ONLY);
     }
 
     protected WebappDaoFactory getWebappDaoFactory(String userURI) {
@@ -201,4 +203,60 @@ public class BaseEditController extends VitroHttpServlet {
     	return(request.getContextPath() + DEFAULT_LANDING_PAGE);
     }
 
+    protected static void addAccessAttributes(HttpServletRequest req, String entityURI, AccessObjectType aot) {
+        // Add the permissionsEntityURI (if we are creating a new property, this will be empty)
+        req.setAttribute("_permissionsEntityURI", entityURI);
+
+        // Get the available permission sets
+        List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
+        List<String> roleUris = new ArrayList<>();
+        for (PermissionSet permissionSet : permissionSets) {
+            roleUris.add(permissionSet.getUri());
+        }  
+        req.setAttribute("roles", permissionSets);
+        // If the namespace is empty (e.e. we are creating a new record)
+        for (OperationGroup og : OperationGroup.values()){
+            String groupName = og.toString().toLowerCase().split("_")[0];
+            final String attributeName = groupName + "Roles";
+            if (StringUtils.isEmpty(entityURI)) {
+                // predefined values
+                req.setAttribute(attributeName, roleUris);
+            } else {
+                // Get the permission sets that are granted permission for this entity
+                req.setAttribute(attributeName, EntityPolicyController.getGrantedRoles(entityURI, og, aot, roleUris));
+            }
+        }
+        
+    }
+
+    /**
+     * Create a list of all known PermissionSets.
+     */
+    protected static List<PermissionSet> buildListOfSelectableRoles(WebappDaoFactory wadf) {
+        List<PermissionSet> permissionSets = new ArrayList<>();
+
+        // Get the non-public PermissionSets.
+        for (PermissionSet ps: wadf.getUserAccountsDao().getAllPermissionSets()) {
+            if (!ps.isForPublic()) {
+                permissionSets.add(ps);
+            }
+        }
+
+        // Sort the non-public PermissionSets
+        permissionSets.sort(new Comparator<PermissionSet>() {
+            @Override
+            public int compare(PermissionSet ps1, PermissionSet ps2) {
+                return ps1.getUri().compareTo(ps2.getUri());
+            }
+        });
+
+        // Add the public PermissionSets.
+        for (PermissionSet ps: wadf.getUserAccountsDao().getAllPermissionSets()) {
+            if (ps.isForPublic()) {
+                permissionSets.add(ps);
+            }
+        }
+        
+        return permissionSets;
+    }
 }

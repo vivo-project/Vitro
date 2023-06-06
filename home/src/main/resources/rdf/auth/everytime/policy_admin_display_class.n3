@@ -1,0 +1,41 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:AdminDisplayClassPolicy rdf:type ao:Policy ;
+          ao:rules ai:AdminDisplayClassRuleSet ;
+          ao:testDatasets ai:AdminDisplayClassTestDatasets ;
+          ao:policyKey ai:AdminDisplayClassPolicyKey .
+
+ai:AdminDisplayClassRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowAdminDisplayClassRule .
+
+ai:AdminDisplayClassTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:AdminDisplayClassDataset .
+
+ai:AdminDisplayClassDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:AdminDisplayClassTestData .
+          
+ai:AdminDisplayClassPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:Class ;
+          ao:keyComponent auth:ADMIN ;
+          ao:keyComponent ai:DisplayOperationGroup .
+
+ai:AllowAdminDisplayClassRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:DisplayOperationAttribute ;
+          ao:attribute ai:ClassTypeAttribute ;
+          ao:attribute ai:AdminDisplayClassAttribute .
+         
+ai:AdminDisplayClassAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:AdminDisplayClassTestData .
+         
+ai:AdminDisplayClassTestData rdf:type ao:TestData ;
+       .

@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,9 +83,8 @@ public class ContextModelAccessImpl implements ContextModelAccess {
 	 * because we may not know the names of all of the models that will be
 	 * requested.
 	 */
-	public ContextModelAccessImpl(ServletContext ctx,
-			CombinedTripleSource factory) {
-		this.props = ConfigurationProperties.getBean(ctx);
+	public ContextModelAccessImpl(CombinedTripleSource factory) {
+		this.props = ConfigurationProperties.getInstance();
 		this.factory = factory;
 
 		this.ontModelCache = factory.getOntModelCache();

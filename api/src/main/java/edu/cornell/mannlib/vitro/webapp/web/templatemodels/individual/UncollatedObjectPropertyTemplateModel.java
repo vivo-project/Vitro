@@ -32,7 +32,12 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
             log.debug("Getting data for populated object property " + op.getURI());
 
             /* Get the data */
-            List<Map<String, String>> statementData = getStatementData();
+            List<Map<String, String>> statementData;
+            if (op instanceof FauxPropertyWrapper) {
+            	statementData = getUnfilteredStatementData();
+            } else {
+            	statementData = getStatementData();	
+            }
 
             /* Apply postprocessing */
             postprocess(statementData);

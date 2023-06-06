@@ -35,10 +35,12 @@ public class ModelAccessFactoryStub extends ModelAccessFactory {
 
 		contextMA = new ContextModelAccessStub();
 		requestMA = new RequestModelAccessStub();
+        ModelAccess.setInstance(contextMA);
 	}
 
 	@Override
 	public ContextModelAccess buildContextModelAccess(ServletContext ctx) {
+	    ModelAccess.setInstance(contextMA);
 		return contextMA;
 	}
 

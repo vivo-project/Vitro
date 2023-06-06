@@ -1,0 +1,29 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:BrokenPolicyBrokenTestType rdf:type ao:Policy ;
+          ao:rules ai:BrokenTestPolicyRuleSet .
+
+ai:BrokenTestPolicyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:BrokenTestRule .
+          
+ai:BrokenTestRule rdf:type ao:Rule ;
+          ao:attribute ai:ValidTestAttribute ;
+          ao:attribute ai:BrokenTestAttribute .
+          
+ai:BrokenTestAttribute rdf:type ao:Attribute ;
+         ao:type ai:Operation ;
+         ao:value ai:PublishOperation .
+         
+ai:ValidTestAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:Operation ;
+         ao:value ai:PublishOperation .
+

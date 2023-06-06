@@ -2,7 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,16 +22,19 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IdentifierPermissionSetProvider;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
@@ -39,44 +46,80 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 public class PolicyHelper {
 	private static final Log log = LogFactory.getLog(PolicyHelper.class);
 
-	/**
-	 * Are these actions authorized for the current user by the current
-	 * policies?
-	 */
-	public static boolean isAuthorizedForActions(HttpServletRequest req,
-			AuthorizationRequest... actions) {
-		return isAuthorizedForActions(req, AuthorizationRequest.andAll(actions));
-	}
-
-	/**
-	 * Are these actions authorized for the current user by the current
-	 * policies?
-	 */
-	public static boolean isAuthorizedForActions(HttpServletRequest req,
-			Iterable<? extends AuthorizationRequest> actions) {
-		return isAuthorizedForActions(req, AuthorizationRequest.andAll(actions));
-	}
-
-	/**
-	 * Are these actions authorized for the current user by the current
-	 * policies?
-	 */
-	private static boolean isAuthorizedForActions(HttpServletRequest req,
-			AuthorizationRequest ar) {
-		PolicyIface policy = ServletPolicyList.getPolicies(req);
+	public static boolean isAuthorizedForActions(HttpServletRequest req, AccessObject ar, AccessOperation operation) {
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
-		return ar.isAuthorized(ids, policy);
+		return actionRequestIsAuthorized(ids, ar, operation);
+	}
+	
+    public static boolean isAuthorizedForActions(IdentifierBundle ids, AccessObject ar, AccessOperation op) {
+        return actionRequestIsAuthorized(ids, ar, op);
+    }
+    
+    public static boolean isAuthorizedForActions(IdentifierBundle ids, AuthorizationRequest ar) {
+        if (ar == null) {
+            log.error("AuthorizationRequest is null");
+            return false;
+        }
+        if (ar.getPredefinedDecision() != DecisionResult.INCONCLUSIVE){
+            return ar.getPredefinedDecision() == DecisionResult.AUTHORIZED;
+        }
+        if (ar.isContainer()) {
+            List<AuthorizationRequest> items = ar.getItems();
+            boolean result = false;
+            for (AuthorizationRequest item : items ) {
+                result = result || isAuthorizedForActions(ids, item);
+            }
+            return result;
+        }
+        return actionRequestIsAuthorized(ids, ar.getAccessObject(), ar.getAccessOperation());
+    }
+
+    public static boolean isAuthorizedForActions(HttpServletRequest req, AuthorizationRequest ar) {
+        if (ar == null) {
+            log.error("AuthorizationRequest is null");
+            return false;
+        }
+        if (ar.getPredefinedDecision() != DecisionResult.INCONCLUSIVE){
+            return ar.getPredefinedDecision() == DecisionResult.AUTHORIZED;
+        }
+        if (ar.isContainer()) {
+            List<AuthorizationRequest> items = ar.getItems();
+            boolean result = false;
+            for (AuthorizationRequest item : items ) {
+                result = result || isAuthorizedForActions(req, item);
+            }
+            return result;
+        }
+        IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
+        return actionRequestIsAuthorized(ids, ar.getAccessObject(), ar.getAccessOperation());
+    }
+
+	private static boolean actionRequestIsAuthorized(IdentifierBundle ids, AccessObject ao, AccessOperation operation) {
+	    if (operation == null) {
+	        log.error("Opeartion is null, accessObject " + ao );
+	        return false;
+	    }
+        if (ao == null) {
+            log.error("Access object is null, operation " + operation);
+            return false;
+        }
+        AuthorizationRequest ar = new SimpleAuthorizationRequest(ao, operation);
+        Collection<String> uris = IdentifierPermissionSetProvider.getPermissionSetUris(ids);
+        ar.setRoleUris(new ArrayList<String>(uris));
+        ar.setIds(ids);
+        ar.setEditorUris(new ArrayList<String>(HasAssociatedIndividual.getIndividualUris(ids)));
+	    PolicyDecision decision = PolicyDecisionPoint.decide(ar);
+	    debug(ar, decision);
+        return decision.getDecisionResult() == DecisionResult.AUTHORIZED;
 	}
 
-	/**
-	 * Are these actions authorized for these identifiers by these policies?
-	 */
-	public static boolean isAuthorizedForActions(IdentifierBundle ids,
-			PolicyIface policy, AuthorizationRequest ar) {
-		return ar.isAuthorized(ids, policy);
-	}
+	private static void debug(AuthorizationRequest ar, PolicyDecision decision) {
+	    if (true) {//log.isDebugEnabled()
+	        log.error(String.format("Request for %s on object %s resulted in decision %s", ar.getAccessOperation(), ar.getAccessObject(), decision.getDecisionResult()));
+	    }
+    }
 
-	/**
+    /**
 	 * Is the email/password authorized for these actions? This should be used
 	 * when a controller or something needs allow actions if the user passes in
 	 * their email and password.
@@ -84,8 +127,7 @@ public class PolicyHelper {
 	 * It may be better to check this as part of a servlet Filter and add an
 	 * identifier bundle.
 	 */
-	public static boolean isAuthorizedForActions(HttpServletRequest req,
-			String email, String password, AuthorizationRequest ar) {
+	public static boolean isAuthorizedForActions(HttpServletRequest req, String email, String password, AuthorizationRequest ar) {
 		if (password == null || email == null || password.isEmpty()
 				|| email.isEmpty()) {
 			return false;
@@ -111,10 +153,8 @@ public class PolicyHelper {
 					+ "account URI: %s", email, uri));
 
 			// figure out if that account can do the actions
-			IdentifierBundle ids = ActiveIdentifierBundleFactories
-					.getUserIdentifierBundle(req, user);
-			PolicyIface policy = ServletPolicyList.getPolicies(req);
-			return ar.isAuthorized(ids, policy);
+			IdentifierBundle ids = ActiveIdentifierBundleFactories.getUserIdentifierBundle(user);
+			return isAuthorizedForActions(ids, ar);
 		} catch (Exception ex) {
 			log.error("Error while attempting to authorize actions " + ar, ex);
 			return false;
@@ -127,8 +167,7 @@ public class PolicyHelper {
 	 *
 	 * The statement is expected to be fully-populated, with no null fields.
 	 */
-	public static boolean isAuthorizedToAdd(HttpServletRequest req,
-			Statement stmt, OntModel modelToBeModified) {
+	public static boolean isAuthorizedToAdd(HttpServletRequest req,	Statement stmt, OntModel modelToBeModified) {
 		if ((req == null) || (stmt == null) || (modelToBeModified == null)) {
 			return false;
 		}
@@ -140,20 +179,20 @@ public class PolicyHelper {
 			return false;
 		}
 
-		RequestedAction action;
+		AccessObject action;
 		if (objectNode.isResource()) {
 			Property property = new Property(predicate.getURI());
 			property.setDomainVClassURI(SOME_URI);
 			property.setRangeVClassURI(SOME_URI);
-			action = new AddObjectPropertyStatement(modelToBeModified,
+			action = new ObjectPropertyStatementAccessObject(modelToBeModified,
 					subject.getURI(), property, objectNode.asResource()
 							.getURI());
 		} else {
-			action = new AddDataPropertyStatement(modelToBeModified,
+			action = new DataPropertyStatementAccessObject(modelToBeModified,
 					subject.getURI(), predicate.getURI(), objectNode
 							.asLiteral().getString());
 		}
-		return isAuthorizedForActions(req, action);
+		return isAuthorizedForActions(req, action, AccessOperation.ADD);
 	}
 
 	/**
@@ -162,8 +201,7 @@ public class PolicyHelper {
 	 *
 	 * The statement is expected to be fully-populated, with no null fields.
 	 */
-	public static boolean isAuthorizedToDrop(HttpServletRequest req,
-			Statement stmt, OntModel modelToBeModified) {
+	public static boolean isAuthorizedToDrop(HttpServletRequest req, Statement stmt, OntModel modelToBeModified) {
 		if ((req == null) || (stmt == null) || (modelToBeModified == null)) {
 			return false;
 		}
@@ -175,20 +213,20 @@ public class PolicyHelper {
 			return false;
 		}
 
-		RequestedAction action;
+		AccessObject action;
 		if (objectNode.isResource()) {
 			Property property = new Property(predicate.getURI());
 			property.setDomainVClassURI(SOME_URI);
 			property.setRangeVClassURI(SOME_URI);
-			action = new DropObjectPropertyStatement(modelToBeModified,
+			action = new ObjectPropertyStatementAccessObject(modelToBeModified,
 					subject.getURI(), property, objectNode.asResource()
 							.getURI());
 		} else {
-			action = new DropDataPropertyStatement(modelToBeModified,
+			action = new DataPropertyStatementAccessObject(modelToBeModified,
 					subject.getURI(), predicate.getURI(), objectNode
 							.asLiteral().getString());
 		}
-		return isAuthorizedForActions(req, action);
+		return isAuthorizedForActions(req, action, AccessOperation.DROP);
 	}
 
 	/**
@@ -204,8 +242,7 @@ public class PolicyHelper {
 	 * log will contain a full record of all failures. This is no more expensive
 	 * than if all statements succeeded.
 	 */
-	public static boolean isAuthorizedAsExpected(HttpServletRequest req,
-			Model additions, Model retractions, OntModel modelBeingModified) {
+	public static boolean isAuthorizedAsExpected(HttpServletRequest req, Model additions, Model retractions, OntModel modelBeingModified) {
 		if (req == null) {
 			log.warn("Can't evaluate authorization if req is null");
 			return false;
@@ -333,5 +370,6 @@ public class PolicyHelper {
 	private PolicyHelper() {
 		// nothing to do.
 	}
+
 
 }

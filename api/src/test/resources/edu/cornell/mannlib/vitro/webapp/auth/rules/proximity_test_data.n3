@@ -1,0 +1,4 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+<test:alice> <test:has_publication> <test:publication> .
+

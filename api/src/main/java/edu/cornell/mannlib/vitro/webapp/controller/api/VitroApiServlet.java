@@ -41,7 +41,7 @@ public class VitroApiServlet extends HttpServlet {
 	 * them for this action, throw an AuthException.
 	 */
 	protected void confirmAuthorization(HttpServletRequest req,
-			AuthorizationRequest requiredActions) throws AuthException {
+	        AuthorizationRequest requiredActions) throws AuthException {
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
 

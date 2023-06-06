@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:EditorUpdateDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:EditorUpdateDataPropertyRuleSet ;
+          ao:testDatasets ai:EditorUpdateDataPropertyTestDatasets ;
+          ao:policyKey ai:EditorUpdateDataPropertyPolicyKey .
+
+ai:EditorUpdateDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowEditorUpdateDataPropertyStatementRule ;
+          ao:rule ai:AllowEditorUpdateDataPropertyRule .
+
+ai:EditorUpdateDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:EditorUpdateDataPropertyDataset .
+
+ai:EditorUpdateDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:EditorUpdateDataPropertyTestData .
+          
+ai:EditorUpdateDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:DataPropertyAccesObject ;
+          ao:keyComponent auth:EDITOR ;
+          ao:keyComponent ai:UpdateOperationGroup .
+
+ai:AllowEditorUpdateDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsEditorRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:DataPropertyTypeAttribute ;
+          ao:attribute ai:EditorUpdateDataPropertyAttribute .
+
+ai:AllowEditorUpdateDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsEditorRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:DataPropertyStatementTypeAttribute ;
+          ao:attribute ai:EditorUpdateDataPropertyStatementAttribute .
+         
+ai:EditorUpdateDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:EditorUpdateDataPropertyTestData .
+
+ai:EditorUpdateDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:EditorUpdateDataPropertyTestData .
+         
+ai:EditorUpdateDataPropertyTestData rdf:type ao:TestData ;
+       .

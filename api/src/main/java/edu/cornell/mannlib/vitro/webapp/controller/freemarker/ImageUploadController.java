@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.UNAUTHORIZED;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,11 +11,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -148,24 +146,28 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			Property indMainImage = new Property();
 			indMainImage.setURI(VitroVocabulary.IND_MAIN_IMAGE);
 
-			RequestedAction ra;
+			AccessObject ra;
+			AccessOperation ao;
 			if (ACTION_DELETE.equals(action)
 					|| ACTION_DELETE_EDIT.equals(action)) {
-				ra = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
+			    ao = AccessOperation.DROP;
+				ra = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(),
 						entity.getURI(), indMainImage,
 						imageUri);
 			} else if (imageUri != null) {
-				ra = new EditObjectPropertyStatement(vreq.getJenaOntModel(),
+			    ao = AccessOperation.EDIT;
+				ra = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(),
 						entity.getURI(), indMainImage,
 						imageUri);
 			} else {
-				ra = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
+			    ao = AccessOperation.ADD;
+				ra = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(),
 						entity.getURI(), indMainImage,
-						RequestedAction.SOME_URI);
+						AccessObject.SOME_URI);
 			}
-			return ra;
+			return new SimpleAuthorizationRequest(ra, ao);
 		} catch (UserMistakeException e) {
-			return UNAUTHORIZED;
+			return AuthorizationRequest.UNAUTHORIZED;
 		}
 	}
 

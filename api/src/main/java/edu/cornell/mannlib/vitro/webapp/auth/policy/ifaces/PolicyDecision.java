@@ -8,7 +8,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces;
  * they are not authorized for some action.
  */
 public interface PolicyDecision {
-    public Authorization getAuthorized();
+    public DecisionResult getDecisionResult();
 
     public String getStackTrace();
     public String getMessage();

@@ -5,8 +5,11 @@ package edu.cornell.mannlib.vedit.controller;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRuleStore;
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -121,6 +135,39 @@ public class OperationController extends BaseEditController {
             if (status == FAILURE) {
             	retry(request, response, epo);
             	return;
+            }
+
+            // If contains restrictions
+            if (request.getParameter("_permissions") != null) {
+                // Get the namespace that we are editing
+                String entityUri = request.getParameter("_permissionsEntityURI");
+                if (StringUtils.isEmpty(entityUri)) {
+                    // If we don't have a namespace set, we are creating a new entity so use that namespace
+                    if (!StringUtils.isEmpty(request.getParameter("Namespace")) && !StringUtils.isEmpty(request.getParameter("LocalName"))) {
+                        entityUri = "" + request.getParameter("Namespace") + request.getParameter("LocalName");    
+                    }
+                }
+                String entityType = request.getParameter("_permissionsEntityType");
+                List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(request).getWebappDaoFactory());
+                List<String> roleUris = new ArrayList<>();
+                for (PermissionSet permissionSet : permissionSets) {
+                    roleUris.add(permissionSet.getUri());
+                }  
+                // Get the granted permissions from the request object
+                for (OperationGroup og : OperationGroup.values()) {
+                    String operationGroupName = og.toString().toLowerCase().split("_")[0];
+                    String[] selectedRoles = request.getParameterValues(operationGroupName + "Roles");
+                    if(StringUtils.isBlank(entityUri)) {
+                        log.error("EntityUri is blank");
+                    } else if (StringUtils.isBlank(entityType) || !EnumUtils.isValidEnum(AccessObjectType.class, entityType)) {
+                        log.error("EntityType is not valid " + entityType);
+                    } else {
+                        if (selectedRoles == null) {
+                            selectedRoles = new String[0];
+                        }
+                        EntityPolicyController.updateEntityPolicy(entityUri, AccessObjectType.valueOf(entityType), og, Arrays.asList(selectedRoles), roleUris);
+                    }
+                }
             }
 
             /* put request parameters and attributes into epo where the listeners can see */
@@ -508,5 +555,4 @@ public class OperationController extends BaseEditController {
         return SUCCESS;
 
     }
-
 }

@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +11,13 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -75,33 +76,37 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 	 */
 	private boolean allowedToDisplay(VitroRequest vreq, ObjectProperty op,
 			Individual subject) {
-		RequestedAction dop = new DisplayObjectProperty(op);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+		AccessObject dop = new ObjectPropertyAccessObject(op);
+		if (PolicyHelper.isAuthorizedForActions(vreq, dop, AccessOperation.DISPLAY)) {
 			return true;
 		}
-
-		RequestedAction dops = new DisplayObjectPropertyStatement(
-				subject.getURI(), op, SOME_URI);
-        return PolicyHelper.isAuthorizedForActions(vreq, dops);
-
+		AccessObject dops;
+		if (op instanceof FauxObjectPropertyWrapper) {
+			dops = new ObjectPropertyStatementAccessObject(null, ((FauxObjectPropertyWrapper) op).getConfigUri(), op, SOME_URI);
+		} else {
+			dops = new ObjectPropertyStatementAccessObject(null, subject.getURI(), op, SOME_URI);
+		}
+		return PolicyHelper.isAuthorizedForActions(vreq, dops, AccessOperation.DISPLAY);
     }
 
 	/**
 	 * See if the property is permitted in its own right. If not, the property
 	 * statement might still be permitted to a self-editor.
 	 */
-	private boolean allowedToDisplay(VitroRequest vreq, DataProperty dp,
-			Individual subject) {
-		RequestedAction dop = new DisplayDataProperty(dp);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+	private boolean allowedToDisplay(VitroRequest vreq, DataProperty dp, Individual subject) {
+		AccessObject dop = new DataPropertyAccessObject(dp);
+		if (PolicyHelper.isAuthorizedForActions(vreq, dop, AccessOperation.DISPLAY)) {
 			return true;
 		}
-
-		DataPropertyStatementImpl dps = new DataPropertyStatementImpl(
-				subject.getURI(), dp.getURI(), SOME_LITERAL);
-		RequestedAction dops = new DisplayDataPropertyStatement(dps);
-        return PolicyHelper.isAuthorizedForActions(vreq, dops);
-
+		DataPropertyStatementImpl dps;
+		if (dp instanceof FauxDataPropertyWrapper) {
+			dps = new DataPropertyStatementImpl(subject.getURI(), ((FauxDataPropertyWrapper) dp).getConfigUri(), SOME_LITERAL);
+		} else {
+			dps = new DataPropertyStatementImpl(subject.getURI(), dp.getURI(), SOME_LITERAL);
+		}
+        //TODO: Model should be here to correctly check authorization
+		AccessObject dops = new DataPropertyStatementAccessObject(null, dps);
+        return PolicyHelper.isAuthorizedForActions(vreq, dops, AccessOperation.DISPLAY);	
     }
 
 	protected boolean isEmpty() {

@@ -1,0 +1,138 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+##### Ontology
+<https://vivoweb.org/ontology/vitro-application/auth/vocabulary> rdf:type owl:Ontology .
+
+#### Classes
+
+ao:Policy rdf:type owl:Class ;
+     rdfs:label "Access rule policy"@en-US .
+
+ao:TestDatasets rdf:type owl:Class ;
+     rdfs:label "Test datasets"@en-US .
+     
+ao:TestDataset rdf:type owl:Class ;
+     rdfs:label "Test dataset"@en-US .
+     
+ao:TestData rdf:type owl:Class ;
+     rdfs:label "Test data"@en-US .
+     
+ao:TestValue rdf:type owl:Class ;
+     rdfs:label "Test value"@en-US .
+
+ao:Rule rdf:type owl:Class ;
+     rdfs:label "Access rule"@en-US .
+     
+ao:Rules rdf:type owl:Class ;
+     rdfs:label "Access rule set"@en-US .
+     
+ao:PolicyKey rdf:type owl:Class ;
+     rdfs:label "Policy key"@en-US .
+
+ao:Attribute rdf:type owl:Class ;
+     rdfs:label "Access rule attribute"@en-US .
+     
+ao:Test rdf:type owl:Class ;
+     rdfs:label "Test type"@en-US .
+
+ao:Operation rdf:type owl:Class ;
+     rdfs:label "Operation"@en-US .
+
+ao:OperationGroup rdf:type owl:Class ;
+     rdfs:label "Operation group"@en-US .
+
+ao:ObjectType rdf:type owl:Class ;
+     rdfs:label "Object type"@en-US .
+     
+ao:SubjectType rdf:type owl:Class ;
+     rdfs:label "Subject type"@en-US .
+
+ao:AccesObject rdf:type owl:Class ;
+     rdfs:label "Access object"@en-US .
+
+ao:AttributeType rdf:type owl:Class ;
+     rdfs:label "Attribute type"@en-US .
+     
+ao:Decision rdf:type owl:Class ;
+     rdfs:label "Decision"@en-US .
+     
+#### Data properties
+
+ao:attributeName rdf:type owl:DatatypeProperty ,
+            owl:FunctionalProperty ;
+            rdfs:domain ao:Attribute ;
+            rdfs:range xsd:string ;
+            rdfs:label "Attribute name"@en-US .
+
+ao:id rdf:type owl:DatatypeProperty ,
+            owl:FunctionalProperty ;
+            rdfs:domain ao:AttributeType ;
+            rdfs:range xsd:string ;
+            rdfs:label "id"@en-US .
+
+ao:stringValue rdf:type owl:DatatypeProperty ,
+            owl:FunctionalProperty ;
+            rdfs:range xsd:string ;
+            rdfs:label "id"@en-US .            
+
+ao:priority rdf:type owl:DatatypeProperty ,
+            owl:FunctionalProperty ;
+            rdfs:range xsd:integer ;
+            rdfs:label "priority"@en-US . 
+            
+#### Object properties
+
+ao:attribute rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Rule ;
+          rdfs:range ao:Attribute .
+          
+ao:decision rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Rule ;
+          rdfs:range ao:Decision .          
+          
+ao:rules rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Policy ;
+          rdfs:range ao:Rules .
+
+ao:testDatasets rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Policy ;
+          rdfs:range ao:TestDatasets .
+
+ao:testData rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:TestDatasets ;
+          rdfs:range ao:TestData .
+
+ao:uri rdf:type owl:ObjectProperty .
+
+ao:value rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Attribute .
+          
+ao:setValue rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Attribute .          
+    
+ao:operation rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Rule ;
+          rdfs:range ao:Operation .
+          
+ao:rule rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Policy ;
+          rdfs:range ao:Rule .
+
+ao:object rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Rule ;
+          rdfs:range ao:object .
+          
+ao:keyComponent rdf:type owl:ObjectProperty .
+          
+ao:policyKey rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Policy ;
+          rdfs:range ao:PolicyKey .            
+

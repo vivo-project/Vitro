@@ -28,12 +28,14 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -205,16 +207,19 @@ public class IndividualRdfAssembler {
 				String value = stmt.getObject().asLiteral().getString();
 				DataPropertyStatement dps = new DataPropertyStatementImpl(
 						subjectUri, predicateUri, value);
-				RequestedAction pdps = new PublishDataPropertyStatement(o, dps);
-				if (!PolicyHelper.isAuthorizedForActions(vreq, pdps)) {
+				AccessObject pdps = new DataPropertyStatementAccessObject(o, dps);
+				if (!PolicyHelper.isAuthorizedForActions(vreq, pdps, AccessOperation.PUBLISH)) {
 					log.debug("not authorized: " + pdps);
 					stmts.remove();
 				}
 			} else if (stmt.getObject().isURIResource()) {
 				String objectUri = stmt.getObject().asResource().getURI();
-				RequestedAction pops = new PublishObjectPropertyStatement(o,
-						subjectUri, predicateUri, objectUri);
-				if (!PolicyHelper.isAuthorizedForActions(vreq, pops)) {
+				 /** We don't need to know range and domain because publishing never involves faux properties. */
+				Property prop = new Property(predicateUri);
+		        prop.setDomainVClassURI("?SOME_URI");
+		        prop.setRangeVClassURI("?SOME_URI");
+				AccessObject pops = new ObjectPropertyStatementAccessObject(o, subjectUri, prop, objectUri);
+				if (!PolicyHelper.isAuthorizedForActions(vreq, pops, AccessOperation.PUBLISH)) {
 					log.debug("not authorized: " + pops);
 					stmts.remove();
 				}
