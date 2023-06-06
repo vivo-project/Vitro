@@ -37,6 +37,7 @@ ai:AllowSelfEditorUpdateObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
           ao:attribute ai:UpdateOperationAttribute ;
           ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:SelfEditorRelatedResourcesAttribute ;
           ao:attribute ai:SelfEditorUpdateObjectPropertyStatementAttribute .
          
 ai:SelfEditorUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
@@ -51,3 +52,4 @@ ai:SelfEditorUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
          
 ai:SelfEditorUpdateObjectPropertyTestData rdf:type ao:TestData ;
        .
+       

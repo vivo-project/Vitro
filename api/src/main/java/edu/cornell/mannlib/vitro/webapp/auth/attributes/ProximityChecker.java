@@ -42,7 +42,9 @@ public class ProximityChecker {
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setCommandText(queryTemplate);
         pss.setIri("personUri", personUri);
-        Query query = QueryFactory.create(pss.toString());
+        String queryText = pss.toString();
+        debug("queryText: " + queryText);
+        Query query = QueryFactory.create(queryText);
         QueryExecution queryExecution = QueryExecutionFactory.create(query, model);
         try {
             ResultSet resultSet = queryExecution.execSelect();
@@ -56,6 +58,11 @@ public class ProximityChecker {
         queryMap.put(queryMapKey, resourceUris);
         QueryResultsMapCache.update(queryMap);
         return resourceUris;
+    }
+    private static void debug(String queryText) {
+        if(log.isDebugEnabled()) {
+            log.debug(queryText);
+        }
     }
     private static String createQueryMapKey(String personUri, String queryTemplate) {
         return queryTemplate + "." + personUri;
