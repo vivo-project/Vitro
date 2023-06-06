@@ -60,22 +60,6 @@ public abstract class AuthorizationRequest {
         return editorUris;
     }
 
-    public AuthorizationRequest or(AuthorizationRequest authRequest) {
-        if (authRequest == null) {
-            return this;
-        } else {
-            return new OrAuthorizationRequest(this, authRequest);
-        }
-    };
-    
-    public AuthorizationRequest and(AuthorizationRequest authRequest) {
-        if (authRequest == null) {
-            return this;
-        } else {
-            return new AndAuthorizationRequest(this, authRequest);
-        }
-    };
-    
     public static AuthorizationRequest or(AuthorizationRequest fist, AuthorizationRequest second) {
         if (fist == null) {
             return second;
@@ -85,9 +69,12 @@ public abstract class AuthorizationRequest {
             return new OrAuthorizationRequest(fist, second);
         }
     }
+    
+    public AuthorizationRequest and(AuthorizationRequest second) {
+        return new AndAuthorizationRequest(this, second);
+    }
 
     public WRAP_TYPE getType() {
-        // TODO Auto-generated method stub
         return null;
     };
     

@@ -16,6 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObjectImpl;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -64,11 +67,16 @@ public class PageController extends FreemarkerHttpServlet{
      * Get all the required actions directly required for the page.
      */
     private AuthorizationRequest getActionsForPage( VitroRequest vreq ) throws Exception{
-        String uri = vreq.getWebappDaoFactory().getPageDao().getRequiredActions( getPageUri(vreq) );
-        if (StringUtils.isBlank(uri)) {
-            return AuthorizationRequest.AUTHORIZED;
+        List<String> simplePremUris = vreq.getWebappDaoFactory().getPageDao().getRequiredActions( getPageUri(vreq) );
+        AuthorizationRequest auth = AuthorizationRequest.AUTHORIZED;
+        for( String uri : simplePremUris ){
+            if (StringUtils.isBlank(uri)) {
+                continue;
+            }
+            AccessObjectImpl ao = new AccessObjectImpl(uri, AccessObjectType.NAMED_OBJECT);
+            auth = auth.and( new SimpleAuthorizationRequest(ao, AccessOperation.EXECUTE));
         }
-        return new SimpleAuthorizationRequest(uri);
+        return auth;
     }
 
     @Override
