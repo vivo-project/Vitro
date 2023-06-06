@@ -73,9 +73,4 @@ public abstract class AuthorizationRequest {
     public AuthorizationRequest and(AuthorizationRequest second) {
         return new AndAuthorizationRequest(this, second);
     }
-
-    public WRAP_TYPE getType() {
-        return null;
-    };
-    
 }
