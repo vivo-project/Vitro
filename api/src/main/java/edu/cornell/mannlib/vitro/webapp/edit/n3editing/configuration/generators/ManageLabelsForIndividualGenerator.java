@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -296,7 +296,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		ObjectPropertyStatementAccessObject aops = new ObjectPropertyStatementAccessObject(
 				vreq.getJenaOntModel(), individual.getURI(),
 				SOME_PREDICATE, SOME_URI);
-    	return PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(new SimpleAuthorizationRequest(aops, AccessOperation.ADD), new SimpleAuthorizationRequest(aops, AccessOperation.ADD)));
+    	return PolicyHelper.isAuthorizedForActions(vreq, AuthorizationRequest.or(new SimpleAuthorizationRequest(aops, AccessOperation.ADD), new SimpleAuthorizationRequest(aops, AccessOperation.ADD)));
 	}
 
 

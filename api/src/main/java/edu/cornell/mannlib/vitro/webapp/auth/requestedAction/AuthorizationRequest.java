@@ -13,6 +13,8 @@ public abstract class AuthorizationRequest {
     public static final AuthorizationRequest UNAUTHORIZED = new ForbiddenAuthorizationRequest();
     public static final AuthorizationRequest AUTHORIZED = new AllowedAuthorizationRequest();
     
+    public static enum WRAP_TYPE { AND , OR } ; 
+    
     IdentifierBundle ids;
     private List<String> editorUris = Collections.emptyList();
     List<String> roleUris = Collections.emptyList();
@@ -22,8 +24,8 @@ public abstract class AuthorizationRequest {
         this.roleUris = roleUris;
     }
 
-    public boolean isContainer() {
-        return false;
+    public WRAP_TYPE getWrapType() {
+        return null;
     }
 
     public DecisionResult getPredefinedDecision(){
@@ -56,6 +58,37 @@ public abstract class AuthorizationRequest {
 
     public List<String> getEditorUris(){
         return editorUris;
+    }
+
+    public AuthorizationRequest or(AuthorizationRequest authRequest) {
+        if (authRequest == null) {
+            return this;
+        } else {
+            return new OrAuthorizationRequest(this, authRequest);
+        }
+    };
+    
+    public AuthorizationRequest and(AuthorizationRequest authRequest) {
+        if (authRequest == null) {
+            return this;
+        } else {
+            return new AndAuthorizationRequest(this, authRequest);
+        }
+    };
+    
+    public static AuthorizationRequest or(AuthorizationRequest fist, AuthorizationRequest second) {
+        if (fist == null) {
+            return second;
+        } else if (second == null) {
+            return fist;
+        } else {
+            return new OrAuthorizationRequest(fist, second);
+        }
+    }
+
+    public WRAP_TYPE getType() {
+        // TODO Auto-generated method stub
+        return null;
     };
     
 }
