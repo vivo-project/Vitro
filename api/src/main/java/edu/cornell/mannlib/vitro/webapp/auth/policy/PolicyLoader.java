@@ -209,6 +209,12 @@ public class PolicyLoader {
 
     private Model userAccountsModel;
     private RDFService rdfService;
+    public static final String RULE = "rule";
+    public static final String LITERAL_VALUE = "lit_value";
+    public static final String ATTR_VALUE = "value";
+    public static final String ATTRIBUTE = "attribute";
+    public static final String TEST_ID = "testId";
+    public static final String TYPE_ID = "typeId";
     private static PolicyLoader INSTANCE;
     
     public static PolicyLoader getInstance() {

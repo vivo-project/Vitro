@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.QuerySolution;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 
 public class AccessRuleFactory {
 
@@ -12,7 +13,7 @@ public class AccessRuleFactory {
 
     public static AccessRule createRule(QuerySolution qs) {
         AccessRule ar = new SimpleAccessRule();
-        String ruleUri = qs.getResource(AccessRuleStore.RULE).getURI();
+        String ruleUri = qs.getResource(PolicyLoader.RULE).getURI();
         if (qs.contains("dataSetUri")) {
             ruleUri += "." + qs.getResource("dataSetUri").getURI();    
         }

@@ -2,13 +2,13 @@ package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
 import org.apache.jena.query.QuerySolution;
 
-import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRuleStore;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 
 public class AttributeFactory {
 
     public static Attribute createAttribute(QuerySolution qs) {
-        String typeId = qs.getLiteral(AccessRuleStore.TYPE_ID).getString();
-        String attributeUri = qs.getResource(AccessRuleStore.ATTRIBUTE).getURI();
+        String typeId = qs.getLiteral(PolicyLoader.TYPE_ID).getString();
+        String attributeUri = qs.getResource(PolicyLoader.ATTRIBUTE).getURI();
         AttributeType type = AttributeType.valueOf(typeId);
         String testId = qs.getLiteral("testId").getString();
         String value = getValue(qs);
@@ -47,12 +47,12 @@ public class AttributeFactory {
     }
 
     private static String getValue(QuerySolution qs) {
-        if (!qs.contains(AccessRuleStore.LITERAL_VALUE) ||
-            !qs.get(AccessRuleStore.LITERAL_VALUE).isLiteral()) {
-            String value = qs.getResource(AccessRuleStore.ATTR_VALUE).getURI();
+        if (!qs.contains(PolicyLoader.LITERAL_VALUE) ||
+            !qs.get(PolicyLoader.LITERAL_VALUE).isLiteral()) {
+            String value = qs.getResource(PolicyLoader.ATTR_VALUE).getURI();
             return value;
         } else {
-            String value = qs.getLiteral(AccessRuleStore.LITERAL_VALUE).toString();
+            String value = qs.getLiteral(PolicyLoader.LITERAL_VALUE).toString();
             return value;    
         }
     }
