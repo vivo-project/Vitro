@@ -76,3 +76,10 @@ ai:PersonProfileProximityToResourceUri rdf:type ao:TestData ;
         }
         """ .
 
+
+ai:SomeUriTestData rdf:type ao:TestData ;
+        ao:id "?SOME_URI" .
+        
+ai:SomeLiteralTestData rdf:type ao:TestData ;
+        ao:id "?SOME_LITERAL" .
+

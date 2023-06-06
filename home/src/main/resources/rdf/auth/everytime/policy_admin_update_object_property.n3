@@ -14,7 +14,9 @@ ai:AdminUpdateObjectPropertyPolicy rdf:type ao:Policy ;
 
 ai:AdminUpdateObjectPropertyRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowAdminUpdateObjectPropertyStatementRule ;
-          ao:rule ai:AllowAdminUpdateObjectPropertyRule .
+          ao:rule ai:AllowAdminAddObjectPropertyStatementRule ;
+          ao:rule ai:AllowAdminEditObjectPropertyStatementRule ;
+          ao:rule ai:AllowAdminDropObjectPropertyRule .
 
 ai:AdminUpdateObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
           ao:testDataset ai:AdminUpdateObjectPropertyDataset .
@@ -33,12 +35,24 @@ ai:AllowAdminUpdateObjectPropertyRule rdf:type ao:Rule;
           ao:attribute ai:ObjectPropertyTypeAttribute ;
           ao:attribute ai:AdminUpdateObjectPropertyAttribute .
 
-ai:AllowAdminUpdateObjectPropertyStatementRule rdf:type ao:Rule;
+ai:AllowAdminEditObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:EditOperationAttribute ;
           ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
           ao:attribute ai:AdminUpdateObjectPropertyStatementAttribute .
-         
+
+ai:AllowAdminAddObjectPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:AddOperationAttribute ;
+          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:AdminUpdateObjectPropertyStatementAttribute .
+
+ai:AllowAdminDropObjectPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:DropOperationAttribute ;
+          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:AdminUpdateObjectPropertyStatementAttribute .
+
 ai:AdminUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
