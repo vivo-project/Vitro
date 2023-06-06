@@ -9,7 +9,7 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 ai:PersonProfileProximityToResourceUri rdf:type ao:TestData ;
-        ao:dataValue """
+        ao:id """
         SELECT ?resourceUri WHERE {
                 {
                   ?personUri <http://purl.obolibrary.org/obo/RO_0000053> ?roleUri .

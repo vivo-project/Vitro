@@ -31,7 +31,7 @@ public class PolicyDecisionPoint {
                     log.debug("policy " + policy.toString() + " returned a null PolicyDecision");
                 }
             }catch(Throwable th){
-                log.error("ignoring exception in policy " + policy.toString(), th );
+                log.error("ignoring exception in policy " + policy.getUri(), th );
             }
         }
 

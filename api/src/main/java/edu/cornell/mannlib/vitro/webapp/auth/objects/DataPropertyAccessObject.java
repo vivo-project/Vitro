@@ -13,4 +13,9 @@ public class DataPropertyAccessObject extends AccessObject {
     public AccessObjectType getType() {
         return AccessObjectType.DATA_PROPERTY;
     }
+    
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + ": " + getObjectProperty() ;
+    }
 }
