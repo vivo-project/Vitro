@@ -25,10 +25,7 @@ final public class GraphUtils {
 
 	public static Graph unwrapUnionGraphs(Graph graph) {
 		if (graph != null && graph instanceof MultiUnion) {
-			List<Graph> subGraphs = ((MultiUnion) graph).getSubGraphs();
-			if (subGraphs == null || subGraphs.isEmpty()) {
-				return ((MultiUnion) graph).getBaseGraph();
-			}
+		    return unwrapUnionGraphs(((MultiUnion)graph).getBaseGraph());
 		}
 		return graph;
 	}

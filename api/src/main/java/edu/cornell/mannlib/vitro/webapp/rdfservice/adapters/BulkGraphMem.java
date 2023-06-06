@@ -10,7 +10,7 @@ public class BulkGraphMem extends GraphMem {
 		performAdd(t);
 	}
 
-	public final void deleteWithoutNotify(Triple t) {
+	public void deleteWithoutNotify(Triple t) {
 		checkOpen();
 		performDelete(t);
 	}

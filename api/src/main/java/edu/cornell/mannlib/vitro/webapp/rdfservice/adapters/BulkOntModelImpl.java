@@ -7,33 +7,33 @@ import org.apache.jena.rdf.model.Model;
 
 public class BulkOntModelImpl extends OntModelImpl {
 
-	public BulkOntModelImpl(OntModelSpec spec) {
-		super(spec);
-	}
-	
-	public BulkOntModelImpl(OntModelSpec owlMem, Model bareModel) {
-		super(owlMem, bareModel);
-	}
+    public BulkOntModelImpl(OntModelSpec spec) {
+        super(spec);
+    }
 
-	@Override
-	public Model remove(Model m) {
-		Graph unwrappedGraph = GraphUtils.unwrapUnionGraphs(graph);
-		if (unwrappedGraph instanceof BulkGraphMem) {
-			GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());	
-		} else {
-			super.remove(m);
-		}
-		return this;
-	}
+    public BulkOntModelImpl(OntModelSpec owlMem, Model bareModel) {
+        super(owlMem, bareModel);
+    }
 
-	@Override
-	public Model add(Model m) {
-		Graph unwrappedGraph = GraphUtils.unwrapUnionGraphs(graph);
-		if (unwrappedGraph instanceof BulkGraphMem) {
-			GraphUtils.addInto((BulkGraphMem) unwrappedGraph, m.getGraph());
-		} else {
-			super.add(m);
-		}
-		return this;
-	}
+    @Override
+    public Model remove(Model m) {
+        Graph unwrappedGraph = GraphUtils.unwrapUnionGraphs(graph);
+        if (unwrappedGraph instanceof BulkGraphMem) {
+            GraphUtils.deleteFrom((BulkGraphMem) unwrappedGraph, m.getGraph());
+        } else {
+            super.remove(m);
+        }
+        return this;
+    }
+
+    @Override
+    public Model add(Model m) {
+        Graph unwrappedGraph = GraphUtils.unwrapUnionGraphs(graph);
+        if (unwrappedGraph instanceof BulkGraphMem) {
+            GraphUtils.addInto((BulkGraphMem) unwrappedGraph, m.getGraph());
+        } else {
+            super.add(m);
+        }
+        return this;
+    }
 }
