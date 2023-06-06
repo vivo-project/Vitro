@@ -1,0 +1,119 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+###########################################################################
+### Subject attributes
+
+ai:IsRootUserAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:SubjectType ;
+         ao:value ai:RootUserSubject .
+
+ai:SubjectRoleEqualsAdminRoleAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:SubjectRole ;
+         ao:value auth:ADMIN .
+         
+ai:SubjectRoleEqualsCuratorRoleAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:SubjectRole ;
+         ao:value auth:CURATOR .
+
+ai:SubjectRoleEqualsEditorRoleAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:SubjectRole ;
+         ao:value auth:EDITOR .
+
+ai:SubjectRoleEqualsSelfEditorRoleAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:SubjectRole ;
+         ao:value auth:SELF_EDITOR .
+
+ai:SubjectRoleEqualsPublicRoleAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:SubjectRole ;
+         ao:value auth:PUBLIC .
+
+###########################################################################
+### Operation attributes
+
+ai:DisplayOperationAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:Operation ;
+         ao:value ai:DisplayOperation .
+         
+ai:PublishOperationAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:Operation ;
+         ao:value ai:PublishOperation .
+         
+ai:UpdateOperationAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:Operation ;
+         ao:value ai:UpdateOperation .
+         
+ai:EditOperationAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:Operation ;
+         ao:value ai:EditOperation .
+         
+ai:DropOperationAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:Operation ;
+         ao:value ai:DropOperation .
+         
+ai:AddOperationAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:Operation ;
+         ao:value ai:AddOperation .
+         
+###########################################################################
+### Object attributes
+
+ai:ObjectPropertyTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:ObjectPropertyAccesObject .
+
+ai:DataPropertyTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:DataPropertyAccesObject .
+
+ai:ObjectPropertyStatementTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:ObjectPropertyStatementAccesObject .
+         
+ai:DataPropertyStatementTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:DataPropertyStatementAccesObject .
+
+ai:NamedObjectTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:NamedObject .
+         
+ai:ClassTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:Class .
+         
+ai:ObjectUriInPersonProfileProximityAttribute rdf:type ao:Attribute ;
+         ao:test ai:SparqlSelectQueryContains ;
+         ao:type ai:ObjectUri ;
+         ao:value ai:Class .
+
+ai:SubjectUriInPersonProfileProximityAttribute rdf:type ao:Attribute ;
+         ao:test ai:SparqlSelectQueryContains ;
+         ao:type ai:SubjectUri ;
+         ao:value ai:Class .
+         

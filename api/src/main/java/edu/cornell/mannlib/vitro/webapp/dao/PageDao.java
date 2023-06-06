@@ -31,5 +31,5 @@ public interface PageDao {
      * Does not get required actions for any data getters that are
      * related to the page.
      */
-    List<String> getRequiredActions(String pageUri);
+    String getRequiredActions(String pageUri);
 }

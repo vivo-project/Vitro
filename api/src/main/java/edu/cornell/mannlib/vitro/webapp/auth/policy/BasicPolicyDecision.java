@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 
 /**
@@ -14,21 +14,19 @@ public class BasicPolicyDecision implements PolicyDecision{
     String debuggingInfo;
     String message;
     String StackTrace;
-    Authorization authorized;
+    DecisionResult decisionResult;
 
-
-
-    public BasicPolicyDecision( Authorization authorized, String message) {
+    public BasicPolicyDecision( DecisionResult authorized, String message) {
         super();
         this.message = message;
-        this.authorized = authorized;
+        this.decisionResult = authorized;
     }
 
-    public Authorization getAuthorized() {
-        return authorized;
+    public DecisionResult getDecisionResult() {
+        return decisionResult;
     }
-    public BasicPolicyDecision setAuthorized(Authorization auth) {
-        this.authorized = auth;
+    public BasicPolicyDecision setDecisionResult(DecisionResult decisionResult) {
+        this.decisionResult = decisionResult;
         return this;
     }
     public String getDebuggingInfo() {
@@ -53,6 +51,6 @@ public class BasicPolicyDecision implements PolicyDecision{
     }
 
     public String toString(){
-        return authorized + ": " + message;
+        return decisionResult + ": " + message;
     }
 }

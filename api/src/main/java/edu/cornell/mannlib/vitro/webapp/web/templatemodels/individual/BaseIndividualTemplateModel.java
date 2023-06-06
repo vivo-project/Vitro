@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_PREDICATE;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_PREDICATE;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -18,10 +18,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -119,13 +122,13 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 	 * an object property to the Individual being shown.
 	 */
     public boolean isEditable() {
-		AddDataPropertyStatement adps = new AddDataPropertyStatement(
+        DataPropertyStatementAccessObject adps = new DataPropertyStatementAccessObject(
 				vreq.getJenaOntModel(), individual.getURI(),
 				SOME_URI, SOME_LITERAL);
-		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
+        ObjectPropertyStatementAccessObject aops = new ObjectPropertyStatementAccessObject(
 				vreq.getJenaOntModel(), individual.getURI(),
 				SOME_PREDICATE, SOME_URI);
-    	return PolicyHelper.isAuthorizedForActions(vreq, adps.or(aops));
+    	return PolicyHelper.isAuthorizedForActions(vreq, AuthHelper.logicOr(new SimpleAuthorizationRequest(adps, AccessOperation.ADD), new SimpleAuthorizationRequest(aops, AccessOperation.ADD)));
     }
 
     public boolean getShowAdminPanel() {

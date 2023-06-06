@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:AdminUpdateDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:AdminUpdateDataPropertyRuleSet ;
+          ao:testDatasets ai:AdminUpdateDataPropertyTestDatasets ;
+          ao:policyKey ai:AdminUpdateDataPropertyPolicyKey .
+
+ai:AdminUpdateDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowAdminUpdateDataPropertyStatementRule ;
+          ao:rule ai:AllowAdminUpdateDataPropertyRule .
+
+ai:AdminUpdateDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:AdminUpdateDataPropertyDataset .
+
+ai:AdminUpdateDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:AdminUpdateDataPropertyTestData .
+          
+ai:AdminUpdateDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:DataPropertyAccesObject ;
+          ao:keyComponent auth:ADMIN ;
+          ao:keyComponent ai:UpdateOperationGroup .
+
+ai:AllowAdminUpdateDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:DataPropertyTypeAttribute ;
+          ao:attribute ai:AdminUpdateDataPropertyAttribute .
+
+ai:AllowAdminUpdateDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:DataPropertyStatementTypeAttribute ;
+          ao:attribute ai:AdminUpdateDataPropertyStatementAttribute .
+         
+ai:AdminUpdateDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:AdminUpdateDataPropertyTestData .
+
+ai:AdminUpdateDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:AdminUpdateDataPropertyTestData .
+         
+ai:AdminUpdateDataPropertyTestData rdf:type ao:TestData ;
+        .

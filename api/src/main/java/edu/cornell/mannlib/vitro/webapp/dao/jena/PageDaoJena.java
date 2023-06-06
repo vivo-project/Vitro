@@ -530,7 +530,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     /**
      * Gets the requiredActions directly associated with page.
      */
-    public List<String> getRequiredActions(String pageUri){
+    public String getRequiredActions(String pageUri){
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
         List<String> actions = new ArrayList<String>();
@@ -545,7 +545,11 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }finally{
             dModel.leaveCriticalSection();
         }
-        return actions;
+        if (actions.isEmpty()) {
+            return "";
+        } else {
+            return actions.get(0);
+        }
     }
 
     /* *************************** Utility methods ********************************* */

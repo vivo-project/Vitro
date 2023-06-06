@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:SelfEditorPublishDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:SelfEditorPublishDataPropertyRuleSet ;
+          ao:testDatasets ai:SelfEditorPublishDataPropertyTestDatasets ;
+          ao:policyKey ai:SelfEditorPublishDataPropertyPolicyKey .
+
+ai:SelfEditorPublishDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowSelfEditorPublishDataPropertyStatementRule ;
+          ao:rule ai:AllowSelfEditorPublishDataPropertyRule .
+
+ai:SelfEditorPublishDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:SelfEditorPublishDataPropertyDataset .
+
+ai:SelfEditorPublishDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:SelfEditorPublishDataPropertyTestData .
+          
+ai:SelfEditorPublishDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:DataPropertyAccesObject ;
+          ao:keyComponent auth:SELF_EDITOR ;
+          ao:keyComponent ai:PublishOperationGroup .
+
+ai:AllowSelfEditorPublishDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:DataPropertyTypeAttribute ;
+          ao:attribute ai:SelfEditorPublishDataPropertyAttribute .
+
+ai:AllowSelfEditorPublishDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:DataPropertyStatementTypeAttribute ;
+          ao:attribute ai:SelfEditorPublishDataPropertyStatementAttribute .
+
+ai:SelfEditorPublishDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:SelfEditorPublishDataPropertyTestData .
+
+ai:SelfEditorPublishDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:SelfEditorPublishDataPropertyTestData .
+         
+ai:SelfEditorPublishDataPropertyTestData rdf:type ao:TestData ;
+    .

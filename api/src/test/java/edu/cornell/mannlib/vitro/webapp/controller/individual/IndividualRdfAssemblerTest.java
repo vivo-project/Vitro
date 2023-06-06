@@ -37,15 +37,17 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.BasicPolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyStore;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -100,7 +102,7 @@ public class IndividualRdfAssemblerTest extends AbstractTestClass {
 		ctx = new ServletContextStub();
 		session = new HttpSessionStub();
 		session.setServletContext(ctx);
-
+		PolicyStore.getInstance().clear();
 		req = new HttpServletRequestStub();
 		req.setSession(session);
 
@@ -320,17 +322,17 @@ public class IndividualRdfAssemblerTest extends AbstractTestClass {
 	}
 
 	private void policyUnrestricted() {
-		ServletPolicyList.addPolicy(ctx, new UnrestrictedPolicy());
+		PolicyStore.getInstance().add(new UnrestrictedPolicy());
 	}
 
 	private void policyRestrictByPredicate(String... predicateUris) {
-		ServletPolicyList.addPolicy(ctx, new RestrictionsPolicy(predicateUris,
-				new String[0]));
+		PolicyStore.getInstance().add(new RestrictionsPolicy(predicateUris,
+        new String[0]));
 	}
 
 	private void policyRestrictByClass(String... classUris) {
-		ServletPolicyList.addPolicy(ctx, new RestrictionsPolicy(new String[0],
-				classUris));
+		PolicyStore.getInstance().add(new RestrictionsPolicy(new String[0],
+        classUris));
 	}
 
 	private void filterAndCompare(String message) {
@@ -430,29 +432,30 @@ public class IndividualRdfAssemblerTest extends AbstractTestClass {
 	// Helper class
 	// ----------------------------------------------------------------------
 
-	private abstract static class AbstractTestPolicy implements PolicyIface {
+	private abstract static class AbstractTestPolicy implements Policy {
 		@Override
-		public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
-				RequestedAction whatToAuth) {
-			if (whatToAuth instanceof PublishDataPropertyStatement) {
-				return filterDataProperty((PublishDataPropertyStatement) whatToAuth);
-			} else if (whatToAuth instanceof PublishObjectPropertyStatement) {
-				return filterObjectProperty((PublishObjectPropertyStatement) whatToAuth);
+		public PolicyDecision decide(AuthorizationRequest ar) {
+	          AccessObject whatToAuth = ar.getAccessObject();
+	          AccessOperation operation = ar.getAccessOperation();
+			if (whatToAuth instanceof DataPropertyStatementAccessObject) {
+				return filterDataProperty((DataPropertyStatementAccessObject) whatToAuth);
+			} else if (AccessOperation.PUBLISH.equals(operation) && whatToAuth instanceof ObjectPropertyStatementAccessObject) {
+				return filterObjectProperty((ObjectPropertyStatementAccessObject) whatToAuth);
 			} else {
 				return inconclusive("Bogus");
 			}
 		}
 
 		private PolicyDecision filterDataProperty(
-				PublishDataPropertyStatement pdps) {
-			return filter(pdps.getPredicateUri(), null);
+		        DataPropertyStatementAccessObject pdps) {
+			return filter(pdps.getStatementPredicateUri(), null);
 		}
 
 		private PolicyDecision filterObjectProperty(
-				PublishObjectPropertyStatement pops) {
-			String propertyUri = pops.getPredicateUri();
+		        ObjectPropertyStatementAccessObject pops) {
+			String propertyUri = pops.getStatementPredicateUri();
 			if (VitroVocabulary.RDF_TYPE.equals(propertyUri)) {
-				return filter(propertyUri, pops.getObjectUri());
+				return filter(propertyUri, pops.getStatementObject());
 			} else {
 				return filter(propertyUri, null);
 			}
@@ -462,11 +465,11 @@ public class IndividualRdfAssemblerTest extends AbstractTestClass {
 				String classUri);
 
 		protected BasicPolicyDecision authorized(String message) {
-			return new BasicPolicyDecision(Authorization.AUTHORIZED, message);
+			return new BasicPolicyDecision(DecisionResult.AUTHORIZED, message);
 		}
 
 		protected BasicPolicyDecision inconclusive(String message) {
-			return new BasicPolicyDecision(Authorization.INCONCLUSIVE, message);
+			return new BasicPolicyDecision(DecisionResult.INCONCLUSIVE, message);
 		}
 	}
 

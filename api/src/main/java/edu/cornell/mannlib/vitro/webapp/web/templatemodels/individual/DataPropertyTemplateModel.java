@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -91,7 +92,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         // If the property is populated, get the data property statements via a sparql query
         if (populatedDataPropertyList.contains(dp)) {
             log.debug("Getting data for populated data property " + getUri());
-            DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
+            DataPropertyStatementDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyStatementDao();
             List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp, queryString, constructQueries);
             for (Literal value : values) {
                 statements.add(new DataPropertyStatementTemplateModel(subjectUri, dp, value, getTemplateName(), vreq));
@@ -131,15 +132,28 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 		}
 
         // Determine whether a new statement can be added
-		RequestedAction action = new AddDataPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, propertyUri, SOME_LITERAL);
-        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
+		String fauxContextUri = null;
+		AccessObject action;
+		if (isFauxProperty(property)){
+			FauxPropertyWrapper fauxPropertywrapper = ((FauxPropertyWrapper) property);
+			fauxContextUri = fauxPropertywrapper.getContextUri();
+			action = new DataPropertyStatementAccessObject(
+					vreq.getJenaOntModel(), subjectUri, fauxPropertywrapper.getConfigUri(), SOME_LITERAL);
+		} else {
+			action = new DataPropertyStatementAccessObject(
+					vreq.getJenaOntModel(), subjectUri, propertyUri, SOME_LITERAL);
+		}
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action, AccessOperation.ADD) ) {
             return;
         }
 
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
                 "predicateUri", propertyUri);
+        
+        if (fauxContextUri != null) {
+            params.put("fauxContextUri", fauxContextUri);
+        }
 
         params.putAll(UrlBuilder.getModelParams(vreq));
 

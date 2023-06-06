@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -19,15 +19,12 @@ import net.sf.jga.algorithms.Filter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 
@@ -84,13 +81,14 @@ public class IndividualFiltering implements Individual {
 		// the DataProperty with statements. - jblake
         List<DataProperty> outdProps = new ArrayList<DataProperty>();
         List<DataProperty> dprops = _innerIndividual.getPopulatedDataPropertyList();
-        if( dprops == null )
-            return outdProps;
-		for (DataProperty dp: dprops) {
-			if (_filters.getDataPropertyStatementFilter().fn(
-					new DataPropertyStatementImpl(this._innerIndividual.getURI(), dp.getURI(), SOME_LITERAL))) {
-				outdProps.add(dp);
-			}
+		/*
+		 * if( dprops == null ) return outdProps; for (DataProperty dp: dprops) { if
+		 * (_filters.getDataPropertyStatementFilter().fn( new
+		 * DataPropertyStatementImpl(this._innerIndividual.getURI(), dp.getURI(),
+		 * SOME_LITERAL))) { outdProps.add(dp); } }
+		 */
+        if (dprops != null) {
+        	outdProps.addAll(dprops);
         }
         return outdProps;
     }
@@ -425,51 +423,6 @@ public class IndividualFiltering implements Individual {
     @Override
     public JsonNode toJSON() {
         return _innerIndividual.toJSON();
-    }
-
-    @Override
-    public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
-        return _innerIndividual.getHiddenFromDisplayBelowRoleLevel();
-    }
-
-    @Override
-    public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
-        _innerIndividual.setHiddenFromDisplayBelowRoleLevel(eR);
-    }
-
-    @Override
-    public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
-        _innerIndividual.setHiddenFromDisplayBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
-    }
-
-    @Override
-    public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-        return _innerIndividual.getProhibitedFromUpdateBelowRoleLevel();
-    }
-
-    @Override
-    public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
-        _innerIndividual.setProhibitedFromUpdateBelowRoleLevel(eR);
-    }
-
-    @Override
-    public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
-        _innerIndividual.setProhibitedFromUpdateBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
-    }
-
-    @Override
-    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
-        return _innerIndividual.getHiddenFromPublishBelowRoleLevel();
-    }
-
-    @Override
-    public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
-        _innerIndividual.setHiddenFromPublishBelowRoleLevel(eR);
-    }
-
-    @Override
-    public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
-        _innerIndividual.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
     }
 
     @Override

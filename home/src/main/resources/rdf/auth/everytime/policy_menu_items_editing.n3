@@ -1,0 +1,41 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:RestrictHomeMenuItemsEditingPolicy rdf:type ao:Policy ;
+          ao:priority 9000 ;
+          ao:rules ai:RestrictHomeMenuItemsEditingRuleSet .
+
+ai:RestrictHomeMenuItemsEditingRuleSet rdf:type ao:Rules ;
+          ao:rule ai:RestrictEditHomeMenuItems ;
+          ao:rule ai:RestrictDropHomeMenuItems .
+          
+ai:RestrictEditHomeMenuItems rdf:type ao:Rule ;
+          ao:decision ai:Deny ;
+          ao:attribute ai:EditOperationAttribute ;
+          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
+          ao:attribute ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
+          
+ai:RestrictDropHomeMenuItems rdf:type ao:Rule ;
+          ao:decision ai:Deny ;
+          ao:attribute ai:DropOperationAttribute ;
+          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
+          ao:attribute ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
+          
+ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:StatementPredicateUri ;
+         ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
+
+ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:StatementObjectUri ;
+         ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

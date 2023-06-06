@@ -1,0 +1,37 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+
+ai:CuratorSimplePermissionsPolicy rdf:type ao:Policy ;
+        ao:priority 1000 ;
+        ao:testDatasets ai:CuratorSimplePermissionsDatasets ;
+        ao:rules ai:CuratorSimplePermissionsRuleSet .
+
+ai:CuratorSimplePermissionsDatasets rdf:type ao:TestDatasets ;
+        ao:testDataset ai:CuratorSimplePermissionsDataset .
+          
+ai:CuratorSimplePermissionsDataset rdf:type ao:TestDataSet ;
+        ao:testData ai:CuratorSimplePermissionsTestData .
+
+ai:CuratorSimplePermissionsRuleSet rdf:type ao:Rules ;
+        ao:rule ai:AllowCuratorSimplePermissions .
+          
+ai:AllowCuratorSimplePermissions rdf:type ao:Rule;
+        ao:attribute ai:NamedObjectTypeAttribute ;
+        ao:attribute ai:PermissionNameInCuratorAllowed ;
+        ao:attribute ai:SubjectRoleEqualsCuratorRoleAttribute .
+          
+ai:PermissionNameInCuratorAllowed rdf:type ao:Attribute ;
+        ao:test ai:OneOf ;
+        ao:type ai:ObjectUri ;
+        ao:setValue ai:CuratorSimplePermissionsTestData .
+
+ai:CuratorSimplePermissionsTestData rdf:type ao:TestData ;
+        .

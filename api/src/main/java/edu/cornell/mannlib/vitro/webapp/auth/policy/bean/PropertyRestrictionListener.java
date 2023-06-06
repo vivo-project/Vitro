@@ -2,12 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy.bean;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 
 /**
  * Add this ChangeListener to your EditProcessObject when modifying the
@@ -15,20 +16,17 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
  * appropriate.
  */
 public class PropertyRestrictionListener implements ChangeListener {
-	private static final Log log = LogFactory
-			.getLog(PropertyRestrictionListener.class);
+	private static final Log log = LogFactory.getLog(PropertyRestrictionListener.class);
 
 	/**
 	 * If the deleted property had a non-null restriction, rebuild the bean.
 	 */
 	@Override
 	public void doDeleted(Object oldObj, EditProcessObject epo) {
-		if (oldObj instanceof RoleRestrictedProperty) {
-			RoleRestrictedProperty p = (RoleRestrictedProperty) oldObj;
-			FullPropertyKey key = new FullPropertyKey(p);
-			updateLevels(new PropertyRestrictionLevels(key, p));
+		if (oldObj instanceof Property) {
+		    EntityPolicyController.deletedEntityEvent((Property)oldObj);
 		} else {
-			log.warn("Not an instance of RoleRestrictedProperty: " + oldObj);
+			log.warn("Not an instance of Property: " + oldObj);
 		}
 	}
 
@@ -37,12 +35,10 @@ public class PropertyRestrictionListener implements ChangeListener {
 	 */
 	@Override
 	public void doInserted(Object newObj, EditProcessObject epo) {
-		if (newObj instanceof RoleRestrictedProperty) {
-			RoleRestrictedProperty p = (RoleRestrictedProperty) newObj;
-			FullPropertyKey key = new FullPropertyKey(p);
-			updateLevels(new PropertyRestrictionLevels(key, p));
+		if (newObj instanceof Property) {
+	        EntityPolicyController.insertedEntityEvent((Property)newObj);
 		} else {
-			log.warn("Not an instance of RoleRestrictedProperty: " + newObj);
+			log.warn("Not an instance of Property: " + newObj);
 		}
 	}
 
@@ -51,17 +47,12 @@ public class PropertyRestrictionListener implements ChangeListener {
 	 */
 	@Override
 	public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
-		if (newObj instanceof RoleRestrictedProperty) {
-			RoleRestrictedProperty newP = (RoleRestrictedProperty) newObj;
-			FullPropertyKey key = new FullPropertyKey(newP);
-			updateLevels(new PropertyRestrictionLevels(key, newP));
+		if (newObj instanceof Property) {
+	        EntityPolicyController.updatedEntityEvent(oldObj, newObj);
+
 		} else {
-			log.warn("Not instances of RoleRestrictedProperty: " + oldObj
+			log.warn("Not instances of Property: " + oldObj
 					+ ", " + newObj);
 		}
-	}
-
-	private void updateLevels(PropertyRestrictionLevels levels) {
-		PropertyRestrictionBean.getBean().updateProperty(levels);
 	}
 }

@@ -21,13 +21,22 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
  * used methods on those properties.
  */
 public class SelfEditingConfiguration {
-	private static final Log log = LogFactory
-			.getLog(SelfEditingConfiguration.class);
+	private static final Log log = LogFactory.getLog(SelfEditingConfiguration.class);
 
-	private static final String BEAN_ATTRIBUTE = SelfEditingConfiguration.class
-			.getName();
+	private static SelfEditingConfiguration INSTANCE;
 
-	/**
+	public static SelfEditingConfiguration getInstance() {
+        if (INSTANCE != null) {
+            return INSTANCE;
+        }
+
+        SelfEditingConfiguration bean = buildBean();
+        log.debug("Created a bean: " + bean);
+        INSTANCE = bean;
+        return bean;
+    }
+
+    /**
 	 * This configuration property tells us which data property on the
 	 * Individual is used to associate it with a net ID.
 	 */
@@ -65,20 +74,11 @@ public class SelfEditingConfiguration {
 	 * Never returns null.
 	 */
 	public static SelfEditingConfiguration getBean(ServletContext ctx) {
-		Object attr = ctx.getAttribute(BEAN_ATTRIBUTE);
-		if (attr instanceof SelfEditingConfiguration) {
-			log.debug("Found a bean: " + attr);
-			return (SelfEditingConfiguration) attr;
-		}
-
-		SelfEditingConfiguration bean = buildBean(ctx);
-		log.debug("Created a bean: " + bean);
-		ctx.setAttribute(BEAN_ATTRIBUTE, bean);
-		return bean;
+		return getInstance();
 	}
 
-	private static SelfEditingConfiguration buildBean(ServletContext ctx) {
-		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
+	private static SelfEditingConfiguration buildBean() {
+		ConfigurationProperties config = ConfigurationProperties.getInstance();
 		String selfEditingIdMatchingProperty = config
 				.getProperty(PROPERTY_SELF_EDITING_ID_MATCHING_PROPERTY);
 		return new SelfEditingConfiguration(selfEditingIdMatchingProperty);

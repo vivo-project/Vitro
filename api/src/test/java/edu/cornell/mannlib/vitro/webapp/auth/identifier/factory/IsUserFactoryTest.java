@@ -55,7 +55,7 @@ public class IsUserFactoryTest extends AbstractTestClass {
 		req = new HttpServletRequestStub();
 		req.setSession(session);
 
-		factory = new IsUserFactory(ctx);
+		factory = new IsUserFactory();
 	}
 
 	@Test

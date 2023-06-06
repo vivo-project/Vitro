@@ -82,7 +82,7 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 				ConfigurationPropertiesImpl bean = new ConfigurationPropertiesImpl(
 						stream, preempts, new BuildProperties(ctx).getMap());
 
-				ConfigurationProperties.setBean(ctx, bean);
+				ConfigurationProperties.setBean(bean);
 				ss.info(this, "Loaded " + bean.getPropertyMap().size()
 						+ " properties.");
 			} finally {

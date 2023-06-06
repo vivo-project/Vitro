@@ -52,19 +52,7 @@ public class VitroVocabulary {
     public static final String EXTERNALID = vitroURI+"externalId";
     public static final String DATAPROPERTY_ISEXTERNALID = vitroURI+"isExternalId";
 
-    public static final String HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"hiddenFromDisplayBelowRoleLevelAnnot";
-    public static final String PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromUpdateBelowRoleLevelAnnot";
-	public static final String HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"hiddenFromPublishBelowRoleLevelAnnot";
-
     public static final String MOST_SPECIFIC_TYPE = vitroURI + "mostSpecificType";
-
-    // roles
-    public static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/role#public";
-    public static final String SELF = "http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor";
-    public static final String EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#editor";
-    public static final String CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#curator";
-    public static final String DB_ADMIN = "http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin";
-    public static final String NOBODY = "http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody";
 
     public static final String SEARCH_BOOST_ANNOT = vitroURI + "searchBoostAnnot";
 
@@ -168,6 +156,8 @@ public class VitroVocabulary {
     public static final String PERMISSION_SET_FOR_PUBLIC = VITRO_AUTH + "PermissionSetForPublic";
 
     public static final String PERMISSION = VITRO_AUTH + "Permission";
+
+    public static final String PERMISSION_FOR_ENTITY = VITRO_AUTH + "forEntity";
 
     // =============== model auditing vocabulary =============================
 

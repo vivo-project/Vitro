@@ -220,12 +220,6 @@ public class JenaModelUtils {
             tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
                                                                   VitroVocabulary.PROPERTY_INPROPERTYGROUPANNOT)));
             tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
-                                                                  VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT)));
-            tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
-                                                                  VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT)));
-            tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
-            		                                              VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT)));
-            tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
                                                                   VitroVocabulary.DESCRIPTION_ANNOT)));
             tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
                                                                   VitroVocabulary.SHORTDEF)));
