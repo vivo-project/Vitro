@@ -42,6 +42,11 @@ public class ObjectPropertyAccessObject extends AccessObject {
                 log.error("FauxObjectPropertyWrapper provided in ObjectPropertyAccessObject constructor");
                 log.error(t, t);
             }
+            if (property == null) {
+                Throwable t = new Throwable();
+                log.error("null provided in ObjectPropertyAccessObject constructor");
+                log.error(t, t);
+            }
         }
     }
 }
