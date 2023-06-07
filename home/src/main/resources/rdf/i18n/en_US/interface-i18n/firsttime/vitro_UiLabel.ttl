@@ -1201,6 +1201,7 @@ uil-data:sunday.Vitro
 uil-data:password_system_has_changed.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "The password system has been updated to offer enhanced security. Please enter a new password."@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_system_has_changed" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1979,13 +1980,6 @@ uil-data:saturday.Vitro
         rdfs:label       "Saturday"@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "saturday" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:_publications_link.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "_publications_link" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:javascript_require_to_edit.Vitro
@@ -6034,13 +6028,6 @@ uil-data:custom_template_containing_content.Vitro
         rdfs:label       "Custom template containing all content"@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "custom_template_containing_content" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:name_of.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "name_of" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:content_type.Vitro

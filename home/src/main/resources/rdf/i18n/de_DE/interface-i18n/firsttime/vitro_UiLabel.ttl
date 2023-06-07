@@ -49,6 +49,7 @@ uil-data:advanced_search_tip_three.Vitro
 uil-data:file_upload_error_file_size_is_zero.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Die Größe der hochgeladenen Datei ist 0"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_size_is_zero" ;
         uil:hasPackage  "Vitro-languages" .
@@ -288,6 +289,7 @@ uil-data:password_reset_complete_subject.Vitro
 uil-data:file_upload_error_supported_actions.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Es werden nur Lösch- und Upload-Vorgänge unterstützt"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_supported_actions" ;
         uil:hasPackage  "Vitro-languages" .
@@ -743,6 +745,7 @@ uil-data:containers_do_not_pick_up_changes.Vitro
 uil-data:file_upload_error_media_type_not_allowed.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Dieser Dateityp ist nicht zulässig. Der aktuelle Dateityp ist {0}."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_media_type_not_allowed" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1166,6 +1169,7 @@ uil-data:october.Vitro
 uil-data:file_upload_subject.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Objekt"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_subject" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1978,13 +1982,6 @@ uil-data:saturday.Vitro
         uil:hasKey      "saturday" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:_publications_link.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "_publications_link" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:javascript_require_to_edit.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -2148,6 +2145,7 @@ uil-data:acct_created_email_html_text.Vitro
 uil-data:file_upload_confirm_delete.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Sind Sie sicher, dass Sie diese Datei löschen möchten?"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_confirm_delete" ;
         uil:hasPackage  "Vitro-languages" .
@@ -2931,6 +2929,7 @@ uil-data:submit_upload.Vitro
 uil-data:confirm_individual_deletion.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Sind Sie sicher, dass Sie die folgenden Daten löschen möchten?"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "confirm_individual_deletion" ;
         uil:hasPackage  "Vitro-languages" .
@@ -3314,6 +3313,7 @@ uil-data:password_capitalized.Vitro
 uil-data:file_upload_submit_label.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Hochladen"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_submit_label" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4201,6 +4201,7 @@ uil-data:add_label_for_language.Vitro
 uil-data:file_upload_error_file_not_found.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Die hochzuladende Datei wurde nicht gefunden"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_not_found" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4208,6 +4209,7 @@ uil-data:file_upload_error_file_not_found.Vitro
 uil-data:file_upload_predicate.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Prädikat"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_predicate" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4559,6 +4561,7 @@ uil-data:display_has_element_error.Vitro
 uil-data:file_upload_error_file_is_too_big.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Die hochgeladene Datei ist zu groß. Die maximale Dateigröße beträgt {0} Byte. Die hochgeladene Datei ist {1} Byte groß."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_is_too_big" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4574,6 +4577,7 @@ uil-data:template_capitalized.Vitro
 uil-data:file_upload_supported_media.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Zulässige Medientypen:"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_supported_media" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4789,6 +4793,7 @@ uil-data:hide_properties.Vitro
 uil-data:file_upload_error_file_type_not_recognized.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Dateityp nicht erkannt"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_type_not_recognized" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4812,6 +4817,7 @@ uil-data:new_account_title.Vitro
 uil-data:file_upload_no_allowed_media.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "In runtime.properties sind keine zulässigen Medientypen definiert"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_no_allowed_media" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5163,6 +5169,7 @@ uil-data:custom_template_requiring_content.Vitro
 uil-data:file_upload_error_uri_not_exists.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Die Uri {0} existiert nicht."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_uri_not_exists" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5194,6 +5201,7 @@ uil-data:view_all_accounts.Vitro
 uil-data:file_upload_file.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Datei"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_file" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5353,6 +5361,7 @@ uil-data:title_capitalized.Vitro
 uil-data:file_upload_error_no_action.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Keine Aktion angegeben"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_no_action" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5696,6 +5705,7 @@ uil-data:page_public_permission_option.Vitro
 uil-data:file_upload_error_uri_not_given.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Es wurde keine {0} URI angegeben."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_uri_not_given" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5703,6 +5713,7 @@ uil-data:file_upload_error_uri_not_given.Vitro
 uil-data:file_upload_heading.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Datei hochladen"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_heading" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6017,13 +6028,6 @@ uil-data:custom_template_containing_content.Vitro
         rdfs:label       "Benutzerdefinierte Vorlage enthält allen Inhalte"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "custom_template_containing_content" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:name_of.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "name_of" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:content_type.Vitro
