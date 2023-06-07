@@ -11,8 +11,8 @@ public class ObjectPropertyUriAttribute extends AbstractAttribute {
 
     private static final Log log = LogFactory.getLog(ObjectPropertyUriAttribute.class);
 
-    public ObjectPropertyUriAttribute(String uri, String objectUri) {
-        super(uri, objectUri);
+    public ObjectPropertyUriAttribute(String uri, String value) {
+        super(uri, value);
     }
 
     @Override

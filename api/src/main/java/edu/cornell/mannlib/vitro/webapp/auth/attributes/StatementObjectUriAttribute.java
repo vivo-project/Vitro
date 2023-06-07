@@ -10,8 +10,8 @@ public class StatementObjectUriAttribute extends AbstractAttribute {
 
     private static final Log log = LogFactory.getLog(StatementObjectUriAttribute.class);
 
-    public StatementObjectUriAttribute(String uri, String objectUri) {
-        super(uri, objectUri);
+    public StatementObjectUriAttribute(String uri, String value) {
+        super(uri, value);
     }
 
     @Override

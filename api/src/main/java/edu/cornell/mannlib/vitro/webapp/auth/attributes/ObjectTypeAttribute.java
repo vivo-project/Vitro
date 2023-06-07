@@ -10,8 +10,8 @@ public class ObjectTypeAttribute extends AbstractAttribute {
 
     private static final Log log = LogFactory.getLog(ObjectTypeAttribute.class);
 
-    public ObjectTypeAttribute(String uri, String roleValue) {
-        super(uri, roleValue);
+    public ObjectTypeAttribute(String uri, String value) {
+        super(uri, value);
     }
 
     @Override
