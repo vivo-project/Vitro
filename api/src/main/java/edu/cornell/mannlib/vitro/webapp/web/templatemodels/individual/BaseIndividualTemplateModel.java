@@ -122,13 +122,9 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 	 * an object property to the Individual being shown.
 	 */
     public boolean isEditable() {
-        DataPropertyStatementAccessObject adps = new DataPropertyStatementAccessObject(
-				vreq.getJenaOntModel(), individual.getURI(),
-				SOME_URI, SOME_LITERAL);
-        ObjectPropertyStatementAccessObject aops = new ObjectPropertyStatementAccessObject(
-				vreq.getJenaOntModel(), individual.getURI(),
-				SOME_PREDICATE, SOME_URI);
-    	return PolicyHelper.isAuthorizedForActions(vreq, AuthorizationRequest.or(new SimpleAuthorizationRequest(adps, AccessOperation.ADD), new SimpleAuthorizationRequest(aops, AccessOperation.ADD)));
+        ObjectPropertyStatementAccessObject aops = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), individual.getURI(), SOME_PREDICATE, SOME_URI);
+        SimpleAuthorizationRequest addSomeObjectProperty = new SimpleAuthorizationRequest(aops, AccessOperation.ADD);
+        return PolicyHelper.isAuthorizedForActions(vreq, addSomeObjectProperty);
     }
 
     public boolean getShowAdminPanel() {

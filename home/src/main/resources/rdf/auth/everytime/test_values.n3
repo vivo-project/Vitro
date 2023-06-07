@@ -82,4 +82,5 @@ ai:SomeUriTestData rdf:type ao:TestData ;
         
 ai:SomeLiteralTestData rdf:type ao:TestData ;
         ao:id "?SOME_LITERAL" .
+        
 
