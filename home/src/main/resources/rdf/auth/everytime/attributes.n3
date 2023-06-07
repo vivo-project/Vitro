@@ -81,6 +81,14 @@ ai:AddOperationAttribute rdf:type ao:Attribute ;
          ao:type ai:Operation ;
          ao:value ai:AddOperation .
          
+ai:UpdateAddEditOrDropOperationsAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:Operation ;
+         ao:value ai:UpdateOperation ;
+         ao:value ai:AddOperation ;
+         ao:value ai:EditOperation ;
+         ao:value ai:DropOperation .
+         
 ###########################################################################
 ### Object attributes
 

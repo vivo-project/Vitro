@@ -40,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorization
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxObjectPropertyWrapper;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -126,6 +125,10 @@ public class PolicyHelper {
 	    if (true) {//log.isDebugEnabled()
 	        AccessObject ao = ar.getAccessObject();
             log.error(String.format("Request for %s on object %s resulted in decision %s", ar.getAccessOperation(), ao, decision.getDecisionResult()));
+	        if (ao == null) {
+	            Throwable t = new Throwable();
+                log.error(t, t);
+	        }
 	    }
     }
 
