@@ -69,7 +69,7 @@ public class EntityPolicyController {
 
     public static void updatedEntityEvent(Object oldObj, Object newObj) {
         if (oldObj instanceof Property || newObj instanceof Property) {
-            log.error("update entity event old " + oldObj + " new object " + newObj );    
+            log.debug("update entity event old " + oldObj + " new object " + newObj );    
         }
     }
 
