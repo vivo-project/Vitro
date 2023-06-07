@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorization
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxObjectPropertyWrapper;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -122,7 +124,8 @@ public class PolicyHelper {
 
 	private static void debug(AuthorizationRequest ar, PolicyDecision decision) {
 	    if (true) {//log.isDebugEnabled()
-	        log.error(String.format("Request for %s on object %s resulted in decision %s", ar.getAccessOperation(), ar.getAccessObject(), decision.getDecisionResult()));
+	        AccessObject ao = ar.getAccessObject();
+            log.error(String.format("Request for %s on object %s resulted in decision %s", ar.getAccessOperation(), ao, decision.getDecisionResult()));
 	    }
     }
 

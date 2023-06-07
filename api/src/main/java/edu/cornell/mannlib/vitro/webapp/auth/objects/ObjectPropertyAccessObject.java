@@ -1,12 +1,19 @@
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxObjectPropertyWrapper;
 
 public class ObjectPropertyAccessObject extends AccessObject {
 
+    private static final Log log = LogFactory.getLog(ObjectPropertyAccessObject.class);
+
     public ObjectPropertyAccessObject(ObjectProperty objectProperty) {
         setObjectProperty(objectProperty);
+        debug(objectProperty);
     }
 
     @Override
@@ -16,6 +23,17 @@ public class ObjectPropertyAccessObject extends AccessObject {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ": " + getObjectProperty() ;
+        ObjectProperty op = getObjectProperty();
+        return getClass().getSimpleName() + ": " + (op == null ? op : op.getURI());
+    }
+    
+    private void debug(ObjectProperty property) {
+        if (true) {
+            if (property instanceof FauxObjectPropertyWrapper) {
+                Throwable t = new Throwable();
+                log.error("FauxObjectPropertyWrapper provided in ObjectPropertyAccessObject constructor");
+                log.error(t, t);
+            }
+        }
     }
 }

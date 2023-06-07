@@ -15,11 +15,14 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxDataPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxDataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -74,19 +77,23 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 	 * See if the property is permitted in its own right. If not, the property
 	 * statement might still be permitted to a self-editor.
 	 */
-	private boolean allowedToDisplay(VitroRequest vreq, ObjectProperty op,
-			Individual subject) {
-		AccessObject dop = new ObjectPropertyAccessObject(op);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dop, AccessOperation.DISPLAY)) {
+	private boolean allowedToDisplay(VitroRequest vreq, ObjectProperty op, Individual subject) {
+	    AccessObject ao;
+	    if (op instanceof FauxObjectPropertyWrapper) {
+	        ao = new FauxObjectPropertyAccessObject(op);
+	    } else {
+	        ao = new ObjectPropertyAccessObject(op);    
+	    }
+		if (PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY)) {
 			return true;
 		}
-		AccessObject dops;
+        //TODO: Model should be here to correctly check authorization
 		if (op instanceof FauxObjectPropertyWrapper) {
-			dops = new ObjectPropertyStatementAccessObject(null, ((FauxObjectPropertyWrapper) op).getConfigUri(), op, SOME_URI);
+			ao = new FauxObjectPropertyStatementAccessObject(null, subject.getURI(), (FauxObjectPropertyWrapper) op, SOME_URI);
 		} else {
-			dops = new ObjectPropertyStatementAccessObject(null, subject.getURI(), op, SOME_URI);
+			ao = new ObjectPropertyStatementAccessObject(null, subject.getURI(), op, SOME_URI);
 		}
-		return PolicyHelper.isAuthorizedForActions(vreq, dops, AccessOperation.DISPLAY);
+		return PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY);
     }
 
 	/**
@@ -94,19 +101,22 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 	 * statement might still be permitted to a self-editor.
 	 */
 	private boolean allowedToDisplay(VitroRequest vreq, DataProperty dp, Individual subject) {
-		AccessObject dop = new DataPropertyAccessObject(dp);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dop, AccessOperation.DISPLAY)) {
+        AccessObject ao;
+        if (dp instanceof FauxDataPropertyWrapper) {
+            ao = new FauxDataPropertyAccessObject(dp);
+        } else {
+            ao = new DataPropertyAccessObject(dp);    
+        }
+		if (PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY)) {
 			return true;
 		}
-		DataPropertyStatementImpl dps;
-		if (dp instanceof FauxDataPropertyWrapper) {
-			dps = new DataPropertyStatementImpl(subject.getURI(), ((FauxDataPropertyWrapper) dp).getConfigUri(), SOME_LITERAL);
-		} else {
-			dps = new DataPropertyStatementImpl(subject.getURI(), dp.getURI(), SOME_LITERAL);
-		}
         //TODO: Model should be here to correctly check authorization
-		AccessObject dops = new DataPropertyStatementAccessObject(null, dps);
-        return PolicyHelper.isAuthorizedForActions(vreq, dops, AccessOperation.DISPLAY);	
+		if (dp instanceof FauxDataPropertyWrapper) {
+			ao = new FauxDataPropertyStatementAccessObject(null, subject.getURI(), (FauxDataPropertyWrapper) dp, SOME_LITERAL);
+		} else {
+			ao = new DataPropertyStatementAccessObject(null, subject.getURI(), dp, SOME_LITERAL);
+		}
+        return PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY);	
     }
 
 	protected boolean isEmpty() {

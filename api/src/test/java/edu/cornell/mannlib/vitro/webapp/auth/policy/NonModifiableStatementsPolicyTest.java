@@ -56,17 +56,17 @@ public class NonModifiableStatementsPolicyTest extends PolicyTest{
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         
         //Data property statement
-        ao = new DataPropertyStatementAccessObject(null, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Valid", null, null);
+        ao = new DataPropertyStatementAccessObject(null, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Valid", AccessObject.SOME_URI, AccessObject.SOME_LITERAL);
         ar = new SimpleAuthorizationRequest(ao, AccessOperation.DROP);
         assertEquals(DecisionResult.UNAUTHORIZED, policy.decide(ar).getDecisionResult());
-        ao = new DataPropertyStatementAccessObject(null, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime", null, null);
+        ao = new DataPropertyStatementAccessObject(null, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime", AccessObject.SOME_URI, AccessObject.SOME_LITERAL);
         ar = new SimpleAuthorizationRequest(ao, AccessOperation.DROP);
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         
-        ao = new DataPropertyStatementAccessObject(null, null, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Valid", null);
+        ao = new DataPropertyStatementAccessObject(null, AccessObject.SOME_URI, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Valid", AccessObject.SOME_LITERAL);
         ar = new SimpleAuthorizationRequest(ao, AccessOperation.DROP);
         assertEquals(DecisionResult.UNAUTHORIZED, policy.decide(ar).getDecisionResult());
-        ao = new DataPropertyStatementAccessObject(null, null, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime", null);
+        ao = new DataPropertyStatementAccessObject(null, AccessObject.SOME_URI, "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime", AccessObject.SOME_LITERAL);
         ar = new SimpleAuthorizationRequest(ao, AccessOperation.DROP);
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
     }
