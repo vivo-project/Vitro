@@ -15,7 +15,7 @@ public abstract class AccessObject {
     public static Property SOME_PREDICATE = new Property(SOME_URI);
     public static String SOME_LITERAL = "?SOME_LITERAL";
     
-    private AccessObjectStatement statement;
+    protected AccessObjectStatement statement;
     private DataProperty dataProperty;
     private ObjectProperty objectProperty;
     

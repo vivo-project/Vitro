@@ -16,6 +16,15 @@ public class DataPropertyAccessObject extends AccessObject {
         setDataProperty(dataProperty);
         debug(dataProperty);
     }
+    
+    @Override
+    public String getUri() {
+        DataProperty dp = getDataProperty();
+        if (dp != null) {
+            return dp.getURI();
+        }
+        return null;
+    }
 
     @Override
     public AccessObjectType getType() {

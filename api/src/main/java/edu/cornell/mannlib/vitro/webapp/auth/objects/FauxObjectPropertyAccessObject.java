@@ -15,6 +15,17 @@ public class FauxObjectPropertyAccessObject extends AccessObject {
         return AccessObjectType.FAUX_OBJECT_PROPERTY;
     }
 
+    public String getUri() {
+        ObjectProperty op = getObjectProperty();
+        if (op instanceof FauxObjectPropertyWrapper) {
+            return ((FauxObjectPropertyWrapper) op).getConfigUri();
+        }
+        if (op != null) {
+            return op.getURI();
+        }
+        return null;
+    }
+    
     @Override
     public String toString() {
         ObjectProperty op = getObjectProperty();

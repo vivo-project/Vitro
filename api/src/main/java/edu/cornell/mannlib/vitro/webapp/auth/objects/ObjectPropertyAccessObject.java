@@ -15,6 +15,14 @@ public class ObjectPropertyAccessObject extends AccessObject {
         setObjectProperty(objectProperty);
         debug(objectProperty);
     }
+    
+    public String getUri() {
+        ObjectProperty op = getObjectProperty();
+        if (op != null) {
+            return op.getURI();
+        }
+        return null;
+    }
 
     @Override
     public AccessObjectType getType() {
