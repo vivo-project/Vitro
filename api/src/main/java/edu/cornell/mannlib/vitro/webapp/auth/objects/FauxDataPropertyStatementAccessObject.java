@@ -15,17 +15,28 @@ public class FauxDataPropertyStatementAccessObject extends AccessObject {
         setStatementSubject(subjectUri);
         setStatementPredicate(predicate);
         setStatementObject(dataValue);
-
-    }
-
-    @Override
-    public String toString() {
-        Property predicate = getPredicate();
-        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + ((FauxDataPropertyWrapper) predicate).getConfigUri() + "> <"+ getStatementObject() + ">";
     }
 
     @Override
     public AccessObjectType getType() {
         return AccessObjectType.FAUX_DATA_PROPERTY_STATEMENT;
+    }
+    
+    @Override
+    public String getStatementPredicateUri() {
+        if (statement == null || statement.getPredicate() == null) {
+            return null;
+        }
+        Property predicate = getPredicate();
+        if (predicate instanceof FauxDataPropertyWrapper) {
+            return ((FauxDataPropertyWrapper) predicate).getConfigUri();
+        }
+        return predicate.getURI();
+    }
+    
+    @Override
+    public String toString() {
+        Property predicate = getPredicate();
+        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + ((FauxDataPropertyWrapper) predicate).getConfigUri() + "> <"+ getStatementObject() + ">";
     }
 }

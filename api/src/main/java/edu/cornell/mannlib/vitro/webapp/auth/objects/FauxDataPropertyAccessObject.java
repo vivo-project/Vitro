@@ -15,6 +15,17 @@ public class FauxDataPropertyAccessObject extends AccessObject {
         return AccessObjectType.FAUX_DATA_PROPERTY;
     }
     
+    public String getUri() {
+        DataProperty dp = getDataProperty();
+        if (dp instanceof FauxDataPropertyWrapper) {
+            return ((FauxDataPropertyWrapper) dp).getConfigUri();
+        }
+        if (dp != null) {
+            return dp.getURI();
+        }
+        return null;
+    }
+    
     @Override
     public String toString() {
         DataProperty dp = getDataProperty();

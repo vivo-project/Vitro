@@ -21,6 +21,18 @@ public class FauxObjectPropertyStatementAccessObject extends AccessObject {
     public AccessObjectType getType() {
         return AccessObjectType.FAUX_OBJECT_PROPERTY_STATEMENT;
     }
+    
+    @Override
+    public String getStatementPredicateUri() {
+        if (statement == null || statement.getPredicate() == null) {
+            return null;
+        }
+        Property predicate = getPredicate();
+        if (predicate instanceof FauxObjectPropertyWrapper) {
+            return ((FauxObjectPropertyWrapper) predicate).getConfigUri();
+        }
+        return predicate.getURI();
+    }
 
     @Override
     public String toString() {
