@@ -11,8 +11,8 @@ public class SubjectTypeAttribute extends AbstractAttribute {
 
     private static final Log log = LogFactory.getLog(SubjectTypeAttribute.class);
 
-    public SubjectTypeAttribute(String uri, String subjectTypeValue) {
-        super(uri, subjectTypeValue);
+    public SubjectTypeAttribute(String uri, String value) {
+        super(uri, value);
     }
 
     @Override

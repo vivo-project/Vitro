@@ -11,8 +11,8 @@ public class DataPropertyUriAttribute extends AbstractAttribute {
 
     private static final Log log = LogFactory.getLog(DataPropertyUriAttribute.class);
 
-    public DataPropertyUriAttribute(String uri, String objectUri) {
-        super(uri, objectUri);
+    public DataPropertyUriAttribute(String uri, String value) {
+        super(uri, value);
     }
 
     @Override

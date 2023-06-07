@@ -9,8 +9,8 @@ public class OperationAttribute extends AbstractAttribute {
 
     private static final Log log = LogFactory.getLog(OperationAttribute.class);
 
-    public OperationAttribute(String uri, String roleValue) {
-        super(uri, roleValue);
+    public OperationAttribute(String uri, String operation) {
+        super(uri, operation);
     }
 
     @Override

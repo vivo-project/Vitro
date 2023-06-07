@@ -13,7 +13,6 @@ public abstract class AbstractAttribute implements Attribute {
     private TestType testType = TestType.EQUALS;
 
     public AbstractAttribute(String uri, String value) {
-        super();
         this.uri = uri;
         values.add(value);
     }

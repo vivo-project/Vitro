@@ -12,7 +12,7 @@ public class AccessRuleFactory {
     private static final Log log = LogFactory.getLog(AccessRuleFactory.class);
 
     public static AccessRule createRule(QuerySolution qs) {
-        AccessRule ar = new SimpleAccessRule();
+        AccessRule ar = new AccessRuleImpl();
         String ruleUri = qs.getResource(PolicyLoader.RULE).getURI();
         if (qs.contains("dataSetUri")) {
             ruleUri += "." + qs.getResource("dataSetUri").getURI();    
