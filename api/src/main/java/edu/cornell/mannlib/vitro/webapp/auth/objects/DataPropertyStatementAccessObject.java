@@ -21,6 +21,14 @@ public class DataPropertyStatementAccessObject extends AccessObject {
         setStatementObject(dataValue);
 
     }
+    
+    public DataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, Property predicate, String dataValue) {
+        setStatementOntModel(ontModel);
+        setStatementSubject(subjectUri);
+        setStatementPredicate(predicate);
+        setStatementObject(dataValue);
+
+    }
 
     public DataPropertyStatementAccessObject(OntModel ontModel, DataPropertyStatement dps) {
         setStatementOntModel(ontModel);

@@ -55,6 +55,7 @@ public class ProximityChecker {
         } finally {
             queryExecution.close();
         }
+        debug("query results: " + resourceUris);
         queryMap.put(queryMapKey, resourceUris);
         QueryResultsMapCache.update(queryMap);
         return resourceUris;

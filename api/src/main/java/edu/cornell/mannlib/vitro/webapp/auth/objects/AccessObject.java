@@ -70,7 +70,7 @@ public abstract class AccessObject {
         getStatement().setPredicate(predicate);
     }
     
-    private Property getPredicate() {
+    protected Property getPredicate() {
         initializeStatement();
         return getStatement().getPredicate();
     }
