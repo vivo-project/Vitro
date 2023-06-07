@@ -23,18 +23,22 @@ import javax.servlet.ServletContextListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AuthMigrator implements ServletContextListener {
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.vitroURI;
+
+public class AuthMigrator implements ServletContextListener { 
+    private static final String PREFIX = "http://vitro.mannlib.cornell.edu/ns/vitro/role#";
+
     private static final Log log = LogFactory.getLog(AuthMigrator.class);
 
     /**
      * Old ROLE defintions that were used by the hidden / prohibited assertions
      */
-    private static final String ROLE_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/role#public";
-    private static final String ROLE_SELF = "http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor";
-    private static final String ROLE_EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#editor";
-    private static final String ROLE_CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/role#curator";
-    private static final String ROLE_DB_ADMIN = "http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin";
-    private static final String ROLE_NOBODY = "http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody";
+    private static final String ROLE_PUBLIC = PREFIX + "public";
+    private static final String ROLE_SELF = PREFIX + "selfEditor";
+    private static final String ROLE_EDITOR = PREFIX + "editor";
+    private static final String ROLE_CURATOR = PREFIX + "curator";
+    private static final String ROLE_DB_ADMIN = PREFIX + "dbAdmin";
+    private static final String ROLE_NOBODY = PREFIX + "nobody";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -80,9 +84,9 @@ public class AuthMigrator implements ServletContextListener {
             publishRoleToPropertySetMap.put(ROLE_DB_ADMIN, AuthMigrator.getClassUri(AccessOperation.PUBLISH) + "#ADMIN");
 
             // Create a map between the permission and the appropriate sets
-            actionToRoleAndPropertySetMap.put("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#hiddenFromDisplayBelowRoleLevelAnnot",    displayRoleToPropertySetMap);
-            actionToRoleAndPropertySetMap.put("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#prohibitedFromUpdateBelowRoleLevelAnnot", updateRoleToPropertySetMap);
-            actionToRoleAndPropertySetMap.put("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#hiddenFromPublishBelowRoleLevelAnnot",    publishRoleToPropertySetMap);
+            actionToRoleAndPropertySetMap.put(vitroURI + "hiddenFromDisplayBelowRoleLevelAnnot",    displayRoleToPropertySetMap);
+            actionToRoleAndPropertySetMap.put(vitroURI + "prohibitedFromUpdateBelowRoleLevelAnnot", updateRoleToPropertySetMap);
+            actionToRoleAndPropertySetMap.put(vitroURI + "hiddenFromPublishBelowRoleLevelAnnot",    publishRoleToPropertySetMap);
 
             // Convert the assertions retrieved from the content and display models to the assertions in the new permission sets
             OntModel permissionsModel = convertRoleAuthsToPermissions(roleAuthContentModel, roleAuthDisplayModel, actionToRoleAndPropertySetMap);
@@ -146,9 +150,9 @@ public class AuthMigrator implements ServletContextListener {
 
         displayModel.enterCriticalSection(Lock.READ);
         try {
-            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#hiddenFromDisplayBelowRoleLevelAnnot"), (RDFNode) null));
-            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#prohibitedFromUpdateBelowRoleLevelAnnot"), (RDFNode) null));
-            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#hiddenFromPublishBelowRoleLevelAnnot"), (RDFNode) null));
+            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty(vitroURI + "hiddenFromDisplayBelowRoleLevelAnnot"), (RDFNode) null));
+            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty(vitroURI + "prohibitedFromUpdateBelowRoleLevelAnnot"), (RDFNode) null));
+            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty(vitroURI + "hiddenFromPublishBelowRoleLevelAnnot"), (RDFNode) null));
         } finally {
             displayModel.leaveCriticalSection();
         }

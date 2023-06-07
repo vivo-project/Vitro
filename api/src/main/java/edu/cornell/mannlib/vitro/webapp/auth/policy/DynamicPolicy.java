@@ -45,7 +45,6 @@ public class DynamicPolicy implements Policy {
 
     @Override
     public PolicyDecision decide(AuthorizationRequest ar) {
-        //IdentifierBundle ac_subject = ar.getIds();
         AccessObject whatToAuth = ar.getAccessObject();
         //if (ac_subject == null) {
         //    return defaultDecision("whomToAuth was null");
@@ -56,14 +55,14 @@ public class DynamicPolicy implements Policy {
         for (AccessRule rule : getFilteredRules(ar)) {
             if (rule.match(ar)) {
                 if(rule.isAllowMatched()) {
-                    log.debug("Access rule " + rule + " approves request " + whatToAuth);
-                    return new BasicPolicyDecision(DecisionResult.AUTHORIZED, "Dynamic policy '" + uri + "' rule '" + rule + "' approved " + ar);
+                    log.debug("Access rule " + rule.getRuleUri() + " approves request " + whatToAuth);
+                    return new BasicPolicyDecision(DecisionResult.AUTHORIZED, "Dynamic policy '" + uri + "' rule '" + rule.getRuleUri() + "' approved " + ar);
                 } else {
-                    log.debug("Access rule " + rule + " rejects request " + whatToAuth);
-                    return new BasicPolicyDecision(DecisionResult.UNAUTHORIZED, "Dynamic policy '" + uri + "' rule '" + rule + "' rejected " + ar);
+                    log.debug("Access rule " + rule.getRuleUri() + " rejects request " + whatToAuth);
+                    return new BasicPolicyDecision(DecisionResult.UNAUTHORIZED, "Dynamic policy '" + uri + "' rule '" + rule.getRuleUri() + "' rejected " + ar);
                 }
             } else {
-                log.trace("Dynamic policy '" + uri + "' rule '" + rule + "' doesn't match the request " + ar);
+                log.trace("Dynamic policy '" + uri + "' rule '" + rule.getRuleUri() + "' doesn't match the request " + ar);
             }
         }
         

@@ -40,6 +40,13 @@ ai:SubjectRoleEqualsPublicRoleAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
          ao:type ai:SubjectRole ;
          ao:value auth:PUBLIC .
+         
+ai:SubjectRoleOneOfEditorsAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:SubjectRole ;
+         ao:value auth:ADMIN ;
+         ao:value auth:CURATOR ;
+         ao:value auth:EDITOR .
 
 ###########################################################################
 ### Operation attributes
