@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:CuratorPublishFauxDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:CuratorPublishFauxDataPropertyRuleSet ;
+          ao:testDatasets ai:CuratorPublishFauxDataPropertyTestDatasets ;
+          ao:policyKey ai:CuratorPublishFauxDataPropertyPolicyKey .
+
+ai:CuratorPublishFauxDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowCuratorPublishFauxDataPropertyStatementRule ;
+          ao:rule ai:AllowCuratorPublishFauxDataPropertyRule .
+
+ai:CuratorPublishFauxDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:CuratorPublishFauxDataPropertyDataset .
+
+ai:CuratorPublishFauxDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:CuratorPublishFauxDataPropertyTestData .
+          
+ai:CuratorPublishFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:FauxDataPropertyAccesObject ;
+          ao:keyComponent auth:CURATOR ;
+          ao:keyComponent ai:PublishOperationGroup .
+
+ai:AllowCuratorPublishFauxDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:FauxDataPropertyTypeAttribute ;
+          ao:attribute ai:CuratorPublishFauxDataPropertyAttribute .
+
+ai:AllowCuratorPublishFauxDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:FauxDataPropertyStatementTypeAttribute ;
+          ao:attribute ai:CuratorPublishFauxDataPropertyStatementAttribute .
+         
+ai:CuratorPublishFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:CuratorPublishFauxDataPropertyTestData .
+         
+ai:CuratorPublishFauxDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:CuratorPublishFauxDataPropertyTestData .
+         
+ai:CuratorPublishFauxDataPropertyTestData rdf:type ao:TestData ;
+     .

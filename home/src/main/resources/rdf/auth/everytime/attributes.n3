@@ -112,6 +112,16 @@ ai:DataPropertyStatementTypeAttribute rdf:type ao:Attribute ;
          ao:type ai:ObjectType ;
          ao:value ai:DataPropertyStatementAccesObject .
 
+ai:FauxObjectPropertyStatementTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:FauxObjectPropertyStatementAccesObject .
+         
+ai:FauxDataPropertyStatementTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:FauxDataPropertyStatementAccesObject .
+
 ai:NamedObjectTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
          ao:type ai:ObjectType ;
@@ -122,6 +132,16 @@ ai:ClassTypeAttribute rdf:type ao:Attribute ;
          ao:type ai:ObjectType ;
          ao:value ai:Class .
          
+ai:FauxObjectPropertyTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:FauxObjectPropertyAccesObject .
+
+ai:FauxDataPropertyTypeAttribute rdf:type ao:Attribute ;
+         ao:test ai:Equals ;
+         ao:type ai:ObjectType ;
+         ao:value ai:FauxDataPropertyAccesObject .
+
 ai:SelfEditorRelatedResourcesAttribute rdf:type ao:Attribute ;
          ao:test ai:SparqlSelectQueryContains ;
          ao:type ai:StatementSubjectUri ;

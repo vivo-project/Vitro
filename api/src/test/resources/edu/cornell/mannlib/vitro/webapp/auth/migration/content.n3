@@ -1,0 +1,47 @@
+@prefix ocrer: <http://purl.org/net/OCRe/research.owl#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix scires: <http://vivoweb.org/ontology/scientific-research#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ocresd: <http://purl.org/net/OCRe/study_design.owl#> .
+@prefix swo:   <http://www.ebi.ac.uk/efo/swo/> .
+@prefix cito:  <http://purl.org/spar/cito/> .
+@prefix geo:   <http://aims.fao.org/aos/geopolitical.owl#> .
+@prefix ocresst: <http://purl.org/net/OCRe/statistics.owl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vivo:  <http://vivoweb.org/ontology/core#> .
+@prefix event: <http://purl.org/NET/c4dm/event.owl#> .
+@prefix vann:  <http://purl.org/vocab/vann/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix c4o:   <http://purl.org/spar/c4o/> .
+@prefix fabio: <http://purl.org/spar/fabio/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix vitro-public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ocresp: <http://purl.org/net/OCRe/study_protocol.owl#> .
+@prefix bibo:  <http://purl.org/ontology/bibo/> .
+@prefix obo:   <http://purl.obolibrary.org/obo/> .
+@prefix ro:    <http://purl.obolibrary.org/obo/ro.owl#> .
+@prefix role:  <http://vitro.mannlib.cornell.edu/ns/vitro/role#> .
+
+obo:RO_0000053  a owl:ObjectProperty ;
+        vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
+        vitro:vitro:hiddenFromPublishBelowRoleLevelAnnot role:selfEditor ;
+        vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:public .
+
+vivo:abbreviation  a owl:DatatypeProperty ;
+        vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator ;
+        vitro:vitro:hiddenFromPublishBelowRoleLevelAnnot role:dbAdmin;
+        vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:editor .
+                
+foaf:Organization  a owl:Class ;
+        vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody ;
+        vitro:vitro:hiddenFromPublishBelowRoleLevelAnnot role:editor;
+        vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:nobody .
+                
+foaf:Person a owl:Class ;
+        vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor ;
+        vitro:vitro:hiddenFromPublishBelowRoleLevelAnnot role:nobody ;
+        vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:editor .

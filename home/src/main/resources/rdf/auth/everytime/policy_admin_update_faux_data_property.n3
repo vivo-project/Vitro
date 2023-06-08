@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:AdminUpdateFauxDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:AdminUpdateFauxDataPropertyRuleSet ;
+          ao:testDatasets ai:AdminUpdateFauxDataPropertyTestDatasets ;
+          ao:policyKey ai:AdminUpdateFauxDataPropertyPolicyKey .
+
+ai:AdminUpdateFauxDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowAdminUpdateFauxDataPropertyRule ;
+          ao:rule ai:AllowAdminUpdateEditAddDropFauxDataPropertyStatementRule .
+
+ai:AdminUpdateFauxDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:AdminUpdateFauxDataPropertyDataset .
+
+ai:AdminUpdateFauxDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:AdminUpdateFauxDataPropertyTestData .
+          
+ai:AdminUpdateFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:FauxDataPropertyAccesObject ;
+          ao:keyComponent auth:ADMIN ;
+          ao:keyComponent ai:UpdateOperationGroup .
+
+ai:AllowAdminUpdateFauxDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:FauxDataPropertyTypeAttribute ;
+          ao:attribute ai:AdminUpdateFauxDataPropertyAttribute .
+
+ai:AllowAdminUpdateEditAddDropFauxDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
+          ao:attribute ai:FauxDataPropertyStatementTypeAttribute ;
+          ao:attribute ai:AdminUpdateFauxDataPropertyStatementAttribute .
+
+ai:AdminUpdateFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:AdminUpdateFauxDataPropertyTestData .
+
+ai:AdminUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:AdminUpdateFauxDataPropertyTestData .
+         
+ai:AdminUpdateFauxDataPropertyTestData rdf:type ao:TestData ;
+      .

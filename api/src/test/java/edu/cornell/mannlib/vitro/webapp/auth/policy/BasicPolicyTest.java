@@ -2,6 +2,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+
 import org.junit.Test;
 
 public class BasicPolicyTest extends PolicyTest {
@@ -34,7 +36,7 @@ public class BasicPolicyTest extends PolicyTest {
     public void testValidPolicyWithSet() {
         load(VALID_POLICY_WITH_SET);
         DynamicPolicy policy = loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/ValidTestSetPolicy");
-        countRulesAndAttributes(policy, 2, 2);
+        countRulesAndAttributes(policy, 2, Collections.singleton(2));
     }
     
     @Test

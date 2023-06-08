@@ -2,6 +2,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+
 import org.junit.Test;
 
 public class EditablePagesPolicyTest extends PolicyTest{
@@ -14,6 +16,6 @@ public class EditablePagesPolicyTest extends PolicyTest{
         String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/EditIndividualPagesPolicy";
         DynamicPolicy policy = loader.loadPolicy(policyUri);
         assertTrue(policy != null);
-        countRulesAndAttributes(policy, 1, 5);
+        countRulesAndAttributes(policy, 1, Collections.singleton(5));
     }
 }
