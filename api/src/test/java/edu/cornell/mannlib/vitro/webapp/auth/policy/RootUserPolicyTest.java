@@ -3,6 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+
 import org.junit.Test;
 
 public class RootUserPolicyTest extends PolicyTest{
@@ -16,6 +18,6 @@ public class RootUserPolicyTest extends PolicyTest{
         DynamicPolicy policy = loader.loadPolicy(policyUri);
         assertTrue(policy != null);
         assertEquals(10000, policy.getPriority());
-        countRulesAndAttributes(policy, 1, 1);
+        countRulesAndAttributes(policy, 1, Collections.singleton(1));
     }
 }

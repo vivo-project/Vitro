@@ -17,7 +17,13 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 public class EntityPolicyController {
     
     private static final Log log = LogFactory.getLog(EntityPolicyController.class);
-    
+    /**
+     * @param entityUri - entity uniform resource identifier
+     * @param aot - Access object type
+     * @param og - operation group
+     * @param selectedRoles - list of roles to assign
+     * @param allRoles - list of all available roles
+     */
     public static void updateEntityPolicy(String entityUri, AccessObjectType aot, OperationGroup og,
             List<String> selectedRoles, List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {

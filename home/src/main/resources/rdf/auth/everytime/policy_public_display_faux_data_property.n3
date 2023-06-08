@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:PublicDisplayFauxDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:PublicDisplayFauxDataPropertyRuleSet ;
+          ao:testDatasets ai:PublicDisplayFauxDataPropertyTestDatasets ;
+          ao:policyKey ai:PublicDisplayFauxDataPropertyPolicyKey .
+
+ai:PublicDisplayFauxDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowPublicDisplayFauxDataPropertyStatementRule ;
+          ao:rule ai:AllowPublicDisplayFauxDataPropertyRule .
+
+ai:PublicDisplayFauxDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:PublicDisplayFauxDataPropertyDataset .
+
+ai:PublicDisplayFauxDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:PublicDisplayFauxDataPropertyTestData .
+          
+ai:PublicDisplayFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:FauxDataPropertyAccesObject ;
+          ao:keyComponent auth:PUBLIC ;
+          ao:keyComponent ai:DisplayOperationGroup .
+
+ai:AllowPublicDisplayFauxDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsPublicRoleAttribute ;
+          ao:attribute ai:DisplayOperationAttribute ;
+          ao:attribute ai:FauxDataPropertyTypeAttribute ;
+          ao:attribute ai:PublicDisplayFauxDataPropertyAttribute .
+
+ai:AllowPublicDisplayFauxDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsPublicRoleAttribute ;
+          ao:attribute ai:DisplayOperationAttribute ;
+          ao:attribute ai:FauxDataPropertyStatementTypeAttribute ;
+          ao:attribute ai:PublicDisplayFauxDataPropertyStatementAttribute .
+         
+ai:PublicDisplayFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:PublicDisplayFauxDataPropertyTestData .
+         
+ai:PublicDisplayFauxDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:PublicDisplayFauxDataPropertyTestData .
+         
+ai:PublicDisplayFauxDataPropertyTestData rdf:type ao:TestData ;
+       .

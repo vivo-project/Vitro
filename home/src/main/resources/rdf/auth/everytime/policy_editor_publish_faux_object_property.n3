@@ -1,0 +1,53 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:EditorPublishFauxObjectPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:EditorPublishFauxObjectPropertyRuleSet ;
+          ao:testDatasets ai:EditorPublishFauxObjectPropertyTestDatasets ;
+          ao:policyKey ai:EditorPublishFauxObjectPropertyPolicyKey .
+
+ai:EditorPublishFauxObjectPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowEditorPublishFauxObjectPropertyStatementRule ;
+          ao:rule ai:AllowEditorPublishFauxObjectPropertyRule .
+
+ai:EditorPublishFauxObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:EditorPublishFauxObjectPropertyDataset .
+
+ai:EditorPublishFauxObjectPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:EditorPublishFauxObjectPropertyTestData .
+          
+ai:EditorPublishFauxObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+          ao:keyComponent auth:EDITOR ;
+          ao:keyComponent ai:PublishOperationGroup .
+
+ai:AllowEditorPublishFauxObjectPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsEditorRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:FauxObjectPropertyTypeAttribute ;
+          ao:attribute ai:EditorPublishFauxObjectPropertyAttribute .
+
+ai:AllowEditorPublishFauxObjectPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsEditorRoleAttribute ;
+          ao:attribute ai:PublishOperationAttribute ;
+          ao:attribute ai:FauxObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:EditorPublishFauxObjectPropertyStatementAttribute .
+         
+ai:EditorPublishFauxObjectPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:EditorPublishFauxObjectPropertyTestData .
+
+ai:EditorPublishFauxObjectPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:EditorPublishFauxObjectPropertyTestData .
+         
+ai:EditorPublishFauxObjectPropertyTestData rdf:type ao:TestData ;
+      .

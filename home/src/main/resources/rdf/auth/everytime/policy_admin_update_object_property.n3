@@ -13,7 +13,7 @@ ai:AdminUpdateObjectPropertyPolicy rdf:type ao:Policy ;
           ao:policyKey ai:AdminUpdateObjectPropertyPolicyKey .
 
 ai:AdminUpdateObjectPropertyRuleSet rdf:type ao:Rules ;
-          ao:rule ai:AllowAdminUpdateObjectPropertyStatementRule ;
+          ao:rule ai:AllowAdminUpdateObjectPropertyRule ;
           ao:rule ai:AllowAdminUpdateEditAddDropObjectPropertyStatementRule .
 
 ai:AdminUpdateObjectPropertyTestDatasets rdf:type ao:TestDatasets ;

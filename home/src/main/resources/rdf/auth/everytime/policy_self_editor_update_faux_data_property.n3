@@ -1,0 +1,55 @@
+# $This file is distributed under the terms of the license in LICENSE$
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+ai:SelfEditorUpdateFauxDataPropertyPolicy rdf:type ao:Policy ;
+          ao:rules ai:SelfEditorUpdateFauxDataPropertyRuleSet ;
+          ao:testDatasets ai:SelfEditorUpdateFauxDataPropertyTestDatasets ;
+          ao:policyKey ai:SelfEditorUpdateFauxDataPropertyPolicyKey .
+
+ai:SelfEditorUpdateFauxDataPropertyRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowSelfEditorUpdateFauxDataPropertyStatementRule ;
+          ao:rule ai:AllowSelfEditorUpdateFauxDataPropertyRule .
+
+ai:SelfEditorUpdateFauxDataPropertyTestDatasets rdf:type ao:TestDatasets ;
+          ao:testDataset ai:SelfEditorUpdateFauxDataPropertyDataset .
+
+ai:SelfEditorUpdateFauxDataPropertyDataset rdf:type ao:TestDataSet ;
+          ao:testData ai:SelfEditorUpdateFauxDataPropertyTestData .
+          
+ai:SelfEditorUpdateFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
+          ao:keyComponent ai:FauxDataPropertyAccesObject ;
+          ao:keyComponent auth:SELF_EDITOR ;
+          ao:keyComponent ai:UpdateOperationGroup .
+
+ai:AllowSelfEditorUpdateFauxDataPropertyRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:FauxDataPropertyTypeAttribute ;
+          ao:attribute ai:SelfEditorUpdateFauxDataPropertyAttribute .
+
+ai:AllowSelfEditorUpdateFauxDataPropertyStatementRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:FauxDataPropertyStatementTypeAttribute ;
+          ao:attribute ai:SelfEditorRelatedResourcesAttribute ;
+          ao:attribute ai:SelfEditorUpdateFauxDataPropertyStatementAttribute .
+         
+ai:SelfEditorUpdateFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:StatementPredicateUri ;
+         ao:setValue ai:SelfEditorUpdateFauxDataPropertyTestData .
+
+ai:SelfEditorUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
+         ao:test ai:OneOf ;
+         ao:type ai:ObjectUri ;
+         ao:setValue ai:SelfEditorUpdateFauxDataPropertyTestData .
+         
+ai:SelfEditorUpdateFauxDataPropertyTestData rdf:type ao:TestData ;
+       .
+       

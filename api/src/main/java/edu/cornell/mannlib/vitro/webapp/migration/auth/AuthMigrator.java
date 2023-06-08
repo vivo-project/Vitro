@@ -2,272 +2,289 @@
 
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.shared.Lock;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.HashMap;
-import java.util.Map;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.vitroURI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AuthMigrator implements ServletContextListener { 
     private static final String PREFIX = "http://vitro.mannlib.cornell.edu/ns/vitro/role#";
 
     private static final Log log = LogFactory.getLog(AuthMigrator.class);
 
-    /**
-     * Old ROLE defintions that were used by the hidden / prohibited assertions
-     */
-    private static final String ROLE_PUBLIC = PREFIX + "public";
-    private static final String ROLE_SELF = PREFIX + "selfEditor";
-    private static final String ROLE_EDITOR = PREFIX + "editor";
-    private static final String ROLE_CURATOR = PREFIX + "curator";
-    private static final String ROLE_DB_ADMIN = PREFIX + "dbAdmin";
-    private static final String ROLE_NOBODY = PREFIX + "nobody";
+    private static final String OLD_ROLE_PUBLIC = PREFIX + "public";
+    private static final String OLD_ROLE_SELF = PREFIX + "selfEditor";
+    private static final String OLD_ROLE_EDITOR = PREFIX + "editor";
+    private static final String OLD_ROLE_CURATOR = PREFIX + "curator";
+    private static final String OLD_ROLE_DB_ADMIN = PREFIX + "dbAdmin";
+    private static final String OLD_ROLE_NOBODY = PREFIX + "nobody";
+    
+    private static final String ROLE_ADMIN_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN";
+    private static final String ROLE_CURATOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR";
+    private static final String ROLE_EDITOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR";
+    private static final String ROLE_SELF_EDITOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR";
+    private static final String ROLE_PUBLIC_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
+
+    private static final String fauxTypeSpecificPatterns = 
+            "  ?context <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#configContextFor> ?base .\n"
+          + "  ?context <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasConfiguration> ?uri .\n"
+          + "  ?uri rdf:type <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyDisplayConfig> .\n";
+    protected static final Map<String,Set<String>> showMap;
+    protected static final Set<String> allRoles;
+
+    private RDFService contentRdfService;
+    private RDFService configurationRdfService;
+    private static Map<String,String> policyKeyToDataValueMap = new HashMap<String,String>();
+
+    static {
+        allRoles = new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI, ROLE_PUBLIC_URI));
+        showMap = new HashMap<>();
+        showMap.put(OLD_ROLE_PUBLIC, allRoles);
+        showMap.put(OLD_ROLE_SELF, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI)));
+        showMap.put(OLD_ROLE_EDITOR, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI)));
+        showMap.put(OLD_ROLE_CURATOR, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI)));
+        showMap.put(OLD_ROLE_DB_ADMIN, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI)));
+        showMap.put(OLD_ROLE_NOBODY, Collections.emptySet());
+    }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         long begin = System.currentTimeMillis();
-
+        ContextModelAccess modelAccess = ModelAccess.getInstance();
+        initialize(modelAccess.getRDFService(WhichService.CONTENT), modelAccess.getRDFService(WhichService.CONFIGURATION));
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
-        ContextModelAccess models = ModelAccess.getInstance();
-
-        // Get assertions from content store
-        Model roleAuthContentModel = constructRoleAuthContentModel(models);
-
-        // Get assertions from configuration store
-        Model roleAuthDisplayModel = constructRoleAuthDisplayModel(models);
-
-        if ((roleAuthContentModel != null && !roleAuthContentModel.isEmpty()) ||
-                (roleAuthDisplayModel != null && !roleAuthDisplayModel.isEmpty()) ) {
-            Map<String, Map<String, String>> actionToRoleAndPropertySetMap = new HashMap<>();
-
-            Map<String, String> displayRoleToPropertySetMap = new HashMap<>();
-            Map<String, String> updateRoleToPropertySetMap = new HashMap<>();
-            Map<String, String> publishRoleToPropertySetMap = new HashMap<>();
-
-            // Map the roles to equivalent display permissions
-            displayRoleToPropertySetMap.put(ROLE_PUBLIC,   AuthMigrator.getClassUri(AccessOperation.DISPLAY) + "#PUBLIC");
-            displayRoleToPropertySetMap.put(ROLE_SELF,     AuthMigrator.getClassUri(AccessOperation.DISPLAY) + "#SELF_EDITOR");
-            displayRoleToPropertySetMap.put(ROLE_EDITOR,   AuthMigrator.getClassUri(AccessOperation.DISPLAY) + "#EDITOR");
-            displayRoleToPropertySetMap.put(ROLE_CURATOR,  AuthMigrator.getClassUri(AccessOperation.DISPLAY) + "#CURATOR");
-            displayRoleToPropertySetMap.put(ROLE_DB_ADMIN, AuthMigrator.getClassUri(AccessOperation.DISPLAY) + "#ADMIN");
-
-            // Map the roles to equivalent update permissions
-            updateRoleToPropertySetMap.put(ROLE_PUBLIC,   AuthMigrator.getClassUri(AccessOperation.UPDATE) + "#PUBLIC");
-            updateRoleToPropertySetMap.put(ROLE_SELF,     AuthMigrator.getClassUri(AccessOperation.UPDATE) + "#SELF_EDITOR");
-            updateRoleToPropertySetMap.put(ROLE_EDITOR,   AuthMigrator.getClassUri(AccessOperation.UPDATE) + "#EDITOR");
-            updateRoleToPropertySetMap.put(ROLE_CURATOR,  AuthMigrator.getClassUri(AccessOperation.UPDATE) + "#CURATOR");
-            updateRoleToPropertySetMap.put(ROLE_DB_ADMIN, AuthMigrator.getClassUri(AccessOperation.UPDATE) + "#ADMIN");
-
-            // Map the roles to equivalent publish permissions
-            publishRoleToPropertySetMap.put(ROLE_PUBLIC,   AuthMigrator.getClassUri(AccessOperation.PUBLISH) + "#PUBLIC");
-            publishRoleToPropertySetMap.put(ROLE_SELF,     AuthMigrator.getClassUri(AccessOperation.PUBLISH) + "#SELF_EDITOR");
-            publishRoleToPropertySetMap.put(ROLE_EDITOR,   AuthMigrator.getClassUri(AccessOperation.PUBLISH) + "#EDITOR");
-            publishRoleToPropertySetMap.put(ROLE_CURATOR,  AuthMigrator.getClassUri(AccessOperation.PUBLISH) + "#CURATOR");
-            publishRoleToPropertySetMap.put(ROLE_DB_ADMIN, AuthMigrator.getClassUri(AccessOperation.PUBLISH) + "#ADMIN");
-
-            // Create a map between the permission and the appropriate sets
-            actionToRoleAndPropertySetMap.put(vitroURI + "hiddenFromDisplayBelowRoleLevelAnnot",    displayRoleToPropertySetMap);
-            actionToRoleAndPropertySetMap.put(vitroURI + "prohibitedFromUpdateBelowRoleLevelAnnot", updateRoleToPropertySetMap);
-            actionToRoleAndPropertySetMap.put(vitroURI + "hiddenFromPublishBelowRoleLevelAnnot",    publishRoleToPropertySetMap);
-
-            // Convert the assertions retrieved from the content and display models to the assertions in the new permission sets
-            OntModel permissionsModel = convertRoleAuthsToPermissions(roleAuthContentModel, roleAuthDisplayModel, actionToRoleAndPropertySetMap);
-
-            // Store the new permissions in the user accounts model
-            OntModel accountsModel = models.getOntModel(ModelNames.USER_ACCOUNTS);
-            accountsModel.add(permissionsModel);
-
-            // Get assertions from content store
-            removeRoleAuthContentModel(models, roleAuthContentModel);
-
-            // Get assertions from configuration store
-            removeRoleAuthDisplayModel(models, roleAuthDisplayModel);
-        }
-
+        log.info("Started authorization configuration update");
+        convertAuthorizationConfiguration();
+        log.info("Finished authorization configuration update");
         ss.info(this, secondsSince(begin) + " seconds to migrate auth models");
+    }
+    
+    protected void initialize(RDFService content, RDFService configuration) {
+        contentRdfService = content;
+        configurationRdfService = configuration;
+    }
+
+    protected void convertAuthorizationConfiguration() {
+        if(isArmConfiguration()) {
+            convertArmConfiguration();
+        } else {
+            convertAnnotationConfiguration();
+        }
+    }
+    
+    protected void convertAnnotationConfiguration() {
+        log.info("Started annotation configuration conversion");
+        Map<String, Map<OperationGroup, Set<String>>> opConfigs = getObjectPropertyAnnotations();
+        log.info(String.format("Found %s object property annotation configurations", opConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> dpConfigs = getDataPropertyAnnotations();
+        log.info(String.format("Found %s data property annotation configurations", dpConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> classConfigs = getClassAnnotations();
+        log.info(String.format("Found %s class annotation configurations", classConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> fopConfigs = getFauxObjectPropertyAnnotations(opConfigs.keySet());
+        log.info(String.format("Found %s faux object property annotation configurations", fopConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> fdpConfigs = getFauxDataPropertyAnnotations(dpConfigs.keySet());
+        log.info(String.format("Found %s faux data property annotation configurations", fdpConfigs.size()));
+        long lines = updatePolicyDatasets(AccessObjectType.OBJECT_PROPERTY, opConfigs);
+        log.info(String.format("Updated object property datasets, added %s values", lines));
+        lines = updatePolicyDatasets(AccessObjectType.DATA_PROPERTY, dpConfigs);
+        log.info(String.format("Updated data property datasets, added %s values", lines));
+        lines = updatePolicyDatasets(AccessObjectType.CLASS, classConfigs);
+        log.info(String.format("Updated class property datasets, added %s values", lines));
+        lines = updatePolicyDatasets(AccessObjectType.FAUX_OBJECT_PROPERTY, fopConfigs);
+        log.info(String.format("Updated faux object property datasets, added %s values", lines));
+        lines = updatePolicyDatasets(AccessObjectType.FAUX_DATA_PROPERTY, fdpConfigs);
+        log.info(String.format("Updated data property datasets, added %s values", lines));
+        PolicyLoader.getInstance().loadPolicies();
+    }
+
+    protected Map<String, Map<OperationGroup, Set<String>>> getFauxDataPropertyAnnotations(Set<String> dataProperties) {
+        String queryText = getAnnotationQuery(fauxTypeSpecificPatterns);
+        return getFauxConfigurations(queryText, configurationRdfService, dataProperties);
+    }
+
+    protected Map<String, Map<OperationGroup, Set<String>>> getFauxObjectPropertyAnnotations(Set<String> objectProperties) {
+        String queryText = getAnnotationQuery(fauxTypeSpecificPatterns);
+        return getFauxConfigurations(queryText, configurationRdfService, objectProperties);
+    }
+
+    protected Map<String, Map<OperationGroup, Set<String>>> getClassAnnotations() {
+        String queryText = getAnnotationQuery("  ?uri rdf:type owl:Class .\n");
+        return getConfigurations(queryText, contentRdfService);
+    }
+
+    protected Map<String, Map<OperationGroup, Set<String>>> getDataPropertyAnnotations() {
+        String queryText = getAnnotationQuery("  ?uri rdf:type owl:DatatypeProperty .\n");
+        return getConfigurations(queryText, contentRdfService);
+    }
+    
+    protected Map<String, Map<OperationGroup, Set<String>>> getObjectPropertyAnnotations() {
+        String queryText = getAnnotationQuery("  ?uri rdf:type owl:ObjectProperty .\n");
+        return getConfigurations(queryText, contentRdfService);
+    }
+
+    private long updatePolicyDatasets(AccessObjectType aot, Map<String, Map<OperationGroup, Set<String>>> configs) {
+        StringBuilder sb = new StringBuilder();
+        for (String entityUri : configs.keySet()) {
+            Map<OperationGroup, Set<String>> groupMap = configs.get(entityUri);
+            for (OperationGroup og : groupMap.keySet()) {
+                Set<String> roles = groupMap.get(og);
+                addDataSetStatements(entityUri, aot, og, roles, sb);
+                log.debug(String.format("Updated entity %s dataset for operation group %s access object type %s roles %s", entityUri, og, aot, roles));
+            }
+        }
+        PolicyLoader.getInstance().updateUserAccountsModel(sb.toString(), true);
+        return getLineCount(sb.toString());
+    }
+    
+    public void addDataSetStatements(String entityUri, AccessObjectType aot, OperationGroup og, Set<String> selectedRoles, StringBuilder sb) {
+        if (StringUtils.isBlank(entityUri)) {
+            return;
+        }
+        for (String role : selectedRoles) {
+            String testDataUri = getPolicyTestDataUri(aot, og, role);
+            if (testDataUri == null) {
+                log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", og, aot, role));
+                continue;
+            }
+            sb.append(String.format("<%s> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <%s> .\n", testDataUri, entityUri));
+        }
+    }
+
+    private static String getPolicyTestDataUri(AccessObjectType aot, OperationGroup og, String role) {
+        String key = aot.toString() + "." + og.toString() + "." + role ;
+        if (policyKeyToDataValueMap.containsKey(key)) {
+            return policyKeyToDataValueMap.get(key);
+        }
+        String uri = PolicyLoader.getInstance().getEntityPolicyTestDataValue(og, aot, role);
+        policyKeyToDataValueMap.put(key, uri);
+        return uri;
+    }
+    
+    /**
+     * @param targetProperties set of property URIs to get configurations from
+     * @return map of entity URIs and maps of operations and list of allowed roles  
+     */
+    private Map<String, Map<OperationGroup, Set<String>>> getFauxConfigurations(String queryText, RDFService service, Set<String> targetProperties) {
+        Map<String, Map<OperationGroup, Set<String>>> configs = new HashMap<>();
+        try {
+            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(queryText, service);
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                String baseUri = qs.getResource("base").getURI();
+                if (!targetProperties.contains(baseUri)) {
+                    continue;
+                }
+                collectConfiguration(configs, qs);
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }
+        return configs;
+    }
+    
+    /**
+     * @return map of entity URIs and maps of operations and list of allowed roles  
+     */
+    private Map<String, Map<OperationGroup, Set<String>>> getConfigurations(String queryText, RDFService service) {
+        Map<String, Map<OperationGroup, Set<String>>> configs = new HashMap<>();
+        try {
+            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(queryText, service);
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                collectConfiguration(configs, qs);
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }
+        return configs;
+    }
+
+    private void collectConfiguration(Map<String, Map<OperationGroup, Set<String>>> configs, QuerySolution qs) {
+        String uri = qs.getResource("uri").getURI();
+        String displayAnnotation = qs.getResource("display").getURI();
+        Set<String> displayRoles = showMap.get(displayAnnotation);
+
+        String publishAnnotation = qs.getResource("publish").getURI();
+        Set<String> publishRoles = showMap.get(publishAnnotation);
+        publishRoles.remove(ROLE_PUBLIC_URI);
+
+        String updateAnnotation = qs.getResource("update").getURI();
+        Set<String> updateRoles = new HashSet<>(showMap.get(updateAnnotation));
+        updateRoles.remove(ROLE_PUBLIC_URI);
+
+        Map<OperationGroup, Set<String>> config = new HashMap<>();
+        config.put(OperationGroup.UPDATE_GROUP, updateRoles);
+        config.put(OperationGroup.PUBLISH_GROUP, publishRoles);
+        config.put(OperationGroup.DISPLAY_GROUP, displayRoles);
+        configs.put(uri, config);
+    }
+
+    private void convertArmConfiguration() {
+        // TODO Auto-generated method stub
+    }
+
+    private boolean isArmConfiguration() {
+        return false;
+    }
+
+    private String getAnnotationQuery(String typeSpecificPatterns) {
+        return ""
+                + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
+                + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n"
+                + "SELECT ?base ?uri ?update ?display ?publish\n"
+                + "WHERE {\n"
+                + typeSpecificPatterns
+                + "  OPTIONAL { ?uri vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayAssigned . }\n"
+                + "  BIND (COALESCE(?displayAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ) AS ?display )\n"
+                + "  OPTIONAL { ?uri vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateAssigned . }\n"
+                + "  BIND (COALESCE(?updateAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ) AS ?update )\n"
+                + "  OPTIONAL { ?uri vitro:hiddenFromPublishBelowRoleLevelAnnot ?publishAssigned . }\n"
+                + "  BIND (COALESCE(?publishAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ) AS ?publish )\n"
+                + "  FILTER (!isBlank(?uri))\n"
+                + "} \n";
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         // Nothing to tear down.
     }
+    
+    private long getLineCount(String lines) {
+        Matcher matcher = Pattern.compile("\n").matcher(lines);
+        long i = 0;
+        while (matcher.find()) {
+            i ++;
+        }
+        return i;
+    }
 
     private long secondsSince(long startTime) {
         return (System.currentTimeMillis() - startTime) / 1000;
-    }
-
-    private Model constructRoleAuthContentModel(ContextModelAccess models) {
-        RDFService rdfService = models.getRDFService();
-        Model constructedModel = ModelFactory.createDefaultModel();
-
-        String construct = "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "CONSTRUCT \n" +
-                "{\n" +
-                "   ?displaySubj vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayObj . \n" +
-                "   ?updateSubj vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateObj . \n" +
-                "   ?publishSubj vitro:hiddenFromPublishBelowRoleLevelAnnot ?publishObj . \n" +
-                "} WHERE { \n" +
-                "   { \n" +
-                "       ?displaySubj vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayObj . \n" +
-                "   } UNION { \n" +
-                "       ?updateSubj vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateObj . \n" +
-                "   } UNION { \n" +
-                "       ?publishSubj vitro:hiddenFromPublishBelowRoleLevelAnnot ?publishObj . \n" +
-                "   }\n" +
-                "}\n";
-
-        try {
-            rdfService.sparqlConstructQuery(construct, constructedModel);
-        } catch (RDFServiceException e) {
-            return null;
-        }
-
-        return constructedModel;
-    }
-
-    private Model constructRoleAuthDisplayModel(ContextModelAccess models) {
-        OntModel displayModel = models.getOntModel(ModelNames.DISPLAY);
-
-        Model constructedModel = ModelFactory.createDefaultModel();
-
-        displayModel.enterCriticalSection(Lock.READ);
-        try {
-            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty(vitroURI + "hiddenFromDisplayBelowRoleLevelAnnot"), (RDFNode) null));
-            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty(vitroURI + "prohibitedFromUpdateBelowRoleLevelAnnot"), (RDFNode) null));
-            constructedModel.add(displayModel.listStatements(null, displayModel.getProperty(vitroURI + "hiddenFromPublishBelowRoleLevelAnnot"), (RDFNode) null));
-        } finally {
-            displayModel.leaveCriticalSection();
-        }
-
-        return constructedModel;
-    }
-
-    private void removeRoleAuthContentModel(ContextModelAccess models, Model roleAuthContentModel) {
-        OntModel tboxModel = models.getOntModelSelector().getTBoxModel();
-        tboxModel.enterCriticalSection(Lock.WRITE);
-
-        try {
-            tboxModel.remove(roleAuthContentModel);
-        } finally {
-            tboxModel.leaveCriticalSection();
-        }
-    }
-
-    private void removeRoleAuthDisplayModel(ContextModelAccess models, Model roleAuthDisplayModel) {
-        OntModel displayModel = models.getOntModel(ModelNames.DISPLAY);
-
-        displayModel.enterCriticalSection(Lock.WRITE);
-        try {
-            displayModel.remove(roleAuthDisplayModel);
-        } finally {
-            displayModel.leaveCriticalSection();
-        }
-    }
-
-    private OntModel convertRoleAuthsToPermissions(Model roleAuthContentModel, Model roleAuthDisplayModel, Map<String, Map<String, String>> actionToRoleAndPropertySetMap) {
-        OntModel permissionsModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-
-        if (roleAuthContentModel != null && !roleAuthContentModel.isEmpty()) {
-            convertModel(permissionsModel, roleAuthContentModel, actionToRoleAndPropertySetMap);
-        }
-
-        if (roleAuthDisplayModel != null && !roleAuthDisplayModel.isEmpty()) {
-            convertModel(permissionsModel, roleAuthDisplayModel, actionToRoleAndPropertySetMap);
-        }
-
-        return permissionsModel;
-    }
-
-    private void convertModel(OntModel permissionsModel, Model roleAuthModel, Map<String, Map<String, String>> actionToRoleAndPropertySetMap) {
-        StmtIterator iterator = roleAuthModel.listStatements();
-
-        while (iterator.hasNext()) {
-            Statement stmt = iterator.next();
-
-            Map<String, String> roleToPropertySetUriMap = null;
-
-            Property property = stmt.getPredicate();
-            roleToPropertySetUriMap = actionToRoleAndPropertySetMap.get(property.getURI());
-            if (roleToPropertySetUriMap != null) {
-                Resource subject = stmt.getSubject();
-
-                if (subject != null && subject.isURIResource()) {
-                    RDFNode objectNode = stmt.getObject();
-                    if (objectNode.isResource()) {
-                        String role = ((Resource) objectNode).getURI();
-                        switch (role) {
-                            case ROLE_PUBLIC:
-                                addPermissionToModel(permissionsModel, roleToPropertySetUriMap, ROLE_PUBLIC, subject.getURI());
-
-                                // Fall through to grant additional rights
-
-                            case ROLE_SELF:
-                                addPermissionToModel(permissionsModel, roleToPropertySetUriMap, ROLE_SELF, subject.getURI());
-
-                                // Fall through to grant additional rights
-
-                            case ROLE_EDITOR:
-                                addPermissionToModel(permissionsModel, roleToPropertySetUriMap, ROLE_EDITOR, subject.getURI());
-
-                                // Fall through to grant additional rights
-
-                            case ROLE_CURATOR:
-                                addPermissionToModel(permissionsModel, roleToPropertySetUriMap, ROLE_CURATOR, subject.getURI());
-
-                                // Fall through to grant additional rights
-
-                            case ROLE_DB_ADMIN:
-                                addPermissionToModel(permissionsModel, roleToPropertySetUriMap, ROLE_DB_ADMIN, subject.getURI());
-
-                                // Fall through to grant additional rights
-
-                            case ROLE_NOBODY:
-                                break;
-
-                            default:
-                                log.warn("Unknown role <" + property.getURI() + ">");
-                                break;
-                        }
-                    } else {
-                        log.warn("Object node is not a resource");
-                    }
-                } else {
-                    log.warn("Can't process this resource");
-                }
-            }
-        }
-    }
-
-    private void addPermissionToModel(OntModel permissionsModel, Map<String, String> roleToPropertySetUriMap, String roleUri, String resourceUri) {
-        if (roleToPropertySetUriMap.containsKey(roleUri)) {
-            permissionsModel.add(
-                    permissionsModel.createResource(roleToPropertySetUriMap.get(roleUri)),
-                    permissionsModel.createProperty(VitroVocabulary.PERMISSION_FOR_ENTITY),
-                    permissionsModel.createResource(resourceUri)
-            );
-        }
-    }
-
-    public static String getClassUri(AccessOperation action) {
-        final String actionStr = action.toString();
-        return "java:edu.cornell.mannlib.vitro.webapp.auth.permissions.Entity" + actionStr.substring(0,1).toUpperCase() + actionStr.substring(1).toLowerCase() + "Permission";
     }
 }

@@ -13,7 +13,7 @@ ai:AdminDisplayFauxObjectPropertyPolicy rdf:type ao:Policy ;
           ao:policyKey ai:AdminDisplayFauxObjectPropertyPolicyKey .
 
 ai:AdminDisplayFauxObjectPropertyRuleSet rdf:type ao:Rules ;
-          ao:rule ai:AllowAdminDisplayFauxObjectPropertyStatementRule ;
+          ao:rule ai:AllowAdminDisplayObjectStatementPropertyRule ;
           ao:rule ai:AllowAdminDisplayFauxObjectPropertyRule .
 
 ai:AdminDisplayFauxObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
@@ -33,7 +33,7 @@ ai:AllowAdminDisplayFauxObjectPropertyRule rdf:type ao:Rule;
           ao:attribute ai:FauxObjectPropertyTypeAttribute ;
           ao:attribute ai:AdminDisplayFauxObjectPropertyAttribute .
 
-ai:AllowAdminDisplayFauxObjectPropertyStatementRule rdf:type ao:Rule;
+ai:AllowAdminDisplayObjectStatementPropertyRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
           ao:attribute ai:DisplayOperationAttribute ;
           ao:attribute ai:FauxObjectPropertyStatementTypeAttribute ;

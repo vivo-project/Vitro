@@ -175,7 +175,7 @@ public class PolicyLoader {
       + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
       + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
       + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-      + "SELECT DISTINCT ?" + POLICY + " ?value ?valueId ( COUNT(?key) AS ?keySize ) \n"
+      + "SELECT DISTINCT ?" + POLICY + "?testData ?value ?valueId ( COUNT(?key) AS ?keySize ) \n"
       + "WHERE {\n"
       + "  ?" + POLICY + " ao:policyKey ?policyKeyUri .\n"
       + "  ?" + POLICY + " ao:testDatasets ?testDataSets .\n"
@@ -186,7 +186,7 @@ public class PolicyLoader {
       + "  }"
       + "  ?policyKeyUri ao:keyComponent ?key .\n";
 
-    private static final String policyKeyTemplateSuffix = "} GROUP BY ?" + POLICY + " ?value ?valueId";
+    private static final String policyKeyTemplateSuffix = "} GROUP BY ?" + POLICY + " ?value ?valueId ?testData";
    
     private static final String policyStatementByKeyTemplatePrefix = 
           "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -241,7 +241,7 @@ public class PolicyLoader {
         INSTANCE = new PolicyLoader(model);
     }
     
-    private void loadPolicies() {
+    public void loadPolicies() {
         List<String> policyUris = getPolicyUris();
         for (String uri : policyUris) {
             debug("Loading policy %s", uri);
@@ -360,7 +360,8 @@ public class PolicyLoader {
                 if (expectedSize != keySize) {
                     continue;
                 }
-                return qs.getResource(POLICY).getURI();
+                uri = qs.getResource(POLICY).getURI();
+                break;
             }
         } catch (Exception e) {
             log.error(e, e);
@@ -368,6 +369,38 @@ public class PolicyLoader {
             qexec.close();
         }
         return uri;
+    }
+    
+    public String getEntityPolicyTestDataValue(OperationGroup og, AccessObjectType aot, String role) {
+        String valueUri = null;
+        long expectedSize = 3;
+        final String queryText = getPolicyTestValuesByKeyQuery(new String[]{role}, new String[]{og.toString(), aot.toString()});
+        debug("SPARQL Query to get policy data set value:\n %s", queryText);
+        Query query = QueryFactory.create(queryText);
+        QueryExecution qexec = QueryExecutionFactory.create(query, getUserAccountsModel());
+        try {
+            ResultSet rs = qexec.execSelect();
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                if (!qs.contains(POLICY) || 
+                    !qs.contains("keySize") || 
+                    !qs.get("keySize").isLiteral()) {
+                 continue;  
+                }
+                long keySize = qs.getLiteral("keySize").getLong();
+                if (expectedSize != keySize) {
+                    continue;
+                }
+                if (qs.contains("testData") && qs.get("testData").isResource()) {
+                    valueUri = qs.getResource("testData").getURI();
+                } 
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        } finally {
+            qexec.close();
+        }
+        return valueUri;
     }
     
     public void modifyPolicyDataSetValue(String entityUri, OperationGroup og, AccessObjectType aot, String role, boolean isAdd) {
@@ -390,11 +423,15 @@ public class PolicyLoader {
     }
     
     private void updateUserAccountsModel(Model data, boolean isAdd) {
+        StringWriter sw = new StringWriter();
+        data.write(sw, "TTL");
+        updateUserAccountsModel(sw.toString(), isAdd);
+    }
+
+    public void updateUserAccountsModel(String data, boolean isAdd) {
         try {
             ChangeSet changeSet = makeChangeSet();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            data.write(baos, "TTL");
-            InputStream in = new ByteArrayInputStream(baos.toByteArray());
+            InputStream in = new ByteArrayInputStream(data.getBytes());
             debug(modelToString(data, isAdd));
             if (isAdd) {
                 changeSet.addAddition(in, ModelSerializationFormat.N3, ModelNames.USER_ACCOUNTS);    
@@ -409,10 +446,8 @@ public class PolicyLoader {
         }
     }
 
-    private String modelToString(Model ruleData, boolean isAdd) {
-        StringWriter sw = new StringWriter();
-        ruleData.write(sw, "TTL");
-        String message = (isAdd ? "Adding to" : "Removing from") + " user accounts model \n" + sw.toString();
+    private String modelToString(String ruleData, boolean isAdd) {
+        String message = (isAdd ? "Adding to" : "Removing from") + " user accounts model \n" + ruleData;
         return message;
     }
     
