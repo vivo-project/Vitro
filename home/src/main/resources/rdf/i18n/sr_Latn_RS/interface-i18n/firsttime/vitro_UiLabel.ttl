@@ -745,7 +745,7 @@ uil-data:containers_do_not_pick_up_changes.Vitro
 uil-data:file_upload_error_media_type_not_allowed.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Fajl media tip nije dozvoljen. Media tip otpremljenog fajla je {0}."@sr-Latn-RS ;
+        rdfs:label       "Media tip fajla nije dozvoljen. Media tip otpremljenog fajla je {0}."@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_media_type_not_allowed" ;
         uil:hasPackage  "Vitro-languages" .
