@@ -14,11 +14,6 @@ public class BasicPolicyTest extends PolicyTest {
     public static final String BROKEN_POLICY_BROKEN_TYPE_ID = TEST_RESOURCES_PREFIX + "test_policy_broken4.n3";
     public static final String BROKEN_POLICY_BROKEN_ATTRIBUTE_VALUES = TEST_RESOURCES_PREFIX + "test_policy_broken5.n3";
 
-    public static final String VALID_POLICY = TEST_RESOURCES_PREFIX + "test_policy_valid.n3";
-    public static final String VALID_POLICY_WITH_SET = TEST_RESOURCES_PREFIX + "test_policy_valid_set.n3";
-    public static final String BROKEN_POLICY_WITH_SET = TEST_RESOURCES_PREFIX + "test_policy_broken_set.n3";
-    public static final String POLICY_KEY_TEST = TEST_RESOURCES_PREFIX + "test_policy_key.n3";
-
 
     @Test
     public void testGetPolicyUris() {

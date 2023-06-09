@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyTest;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 public class AuthMigratorTest extends PolicyTest {
@@ -58,11 +59,11 @@ public class AuthMigratorTest extends PolicyTest {
     @Test
     public void testConvertAnnotationConfiguration() {
         Model tmpModel = ModelFactory.createDefaultModel();
-        tmpModel.add(userAccountsModel);
+        tmpModel.add(ds.getNamedModel(ModelNames.USER_ACCOUNTS));
         long initialSize = userAccountsModel.size();
         migrator.convertAnnotationConfiguration();
-        assertTrue(userAccountsModel.size() > initialSize);
-        Model diff = userAccountsModel.difference(tmpModel);
+        assertTrue(ds.getNamedModel(ModelNames.USER_ACCOUNTS).size() > initialSize);
+        Model diff = ds.getNamedModel(ModelNames.USER_ACCOUNTS).difference(tmpModel);
         try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
             diff.write(baos, "TTL");
             String newData = baos.toString();

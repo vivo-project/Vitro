@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
@@ -18,6 +20,8 @@ import org.junit.Before;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 public class PolicyTest {
     public static final String USER_ACCOUNTS_HOME_EVERYTIME = "../home/src/main/resources/rdf/auth/everytime/";
@@ -129,6 +133,12 @@ public class PolicyTest {
     public static final String SELF_EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "policy_self_editor_update_faux_data_property.n3";
     
     protected static final String TEST_RESOURCES_PREFIX = "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/rules/";
+
+    public static final String VALID_POLICY = TEST_RESOURCES_PREFIX + "test_policy_valid.n3";
+    public static final String VALID_POLICY_WITH_SET = TEST_RESOURCES_PREFIX + "test_policy_valid_set.n3";
+    public static final String BROKEN_POLICY_WITH_SET = TEST_RESOURCES_PREFIX + "test_policy_broken_set.n3";
+    public static final String POLICY_KEY_TEST = TEST_RESOURCES_PREFIX + "test_policy_key.n3";
+    
     protected static final List<String> ROLE_LIST = Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI, ROLE_PUBLIC_URI);
     public static final String PREFIX = "https://vivoweb.org/ontology/vitro-application/auth/individual/";
     public static final String DATASET = "_dataset";
@@ -138,10 +148,13 @@ public class PolicyTest {
 
     protected Model userAccountsModel;
     protected PolicyLoader loader;
+    protected Dataset ds;
 
     @Before
     public void init() {
         userAccountsModel = ModelFactory.createDefaultModel();
+        ds = DatasetFactory.createTxnMem();
+        ds.addNamedModel(ModelNames.USER_ACCOUNTS, userAccountsModel);
         load(ATTRIBUTES_PATH);
         load(OPERATIONS_PATH);
         load(OPERATION_GROUPS);
@@ -151,8 +164,9 @@ public class PolicyTest {
         load(TEST_TYPES_PATH);
         load(TEST_VALUES_PATH);
         load(TEST_DECISIONS);
+        RDFServiceModel rdfService = new RDFServiceModel(ds);
         
-        PolicyLoader.initialize(userAccountsModel);
+        PolicyLoader.initialize(rdfService);
         loader = PolicyLoader.getInstance();
     }
     
@@ -272,7 +286,14 @@ public class PolicyTest {
     }
     
     protected void load(String filePath) {
-        load(userAccountsModel, filePath);
+        try {
+            userAccountsModel.enterCriticalSection(Lock.WRITE);
+            userAccountsModel.read(filePath);
+        } finally {
+            userAccountsModel.leaveCriticalSection();
+        }
+        ds.replaceNamedModel("http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts", userAccountsModel);
+
     }
     
     protected void load(Model m, String filePath) {
