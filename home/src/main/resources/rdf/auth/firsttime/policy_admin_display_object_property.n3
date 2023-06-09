@@ -13,7 +13,7 @@ ai:AdminDisplayObjectPropertyPolicy rdf:type ao:Policy ;
           ao:policyKey ai:AdminDisplayObjectPropertyPolicyKey .
 
 ai:AdminDisplayObjectPropertyRuleSet rdf:type ao:Rules ;
-          ao:rule ai:AllowAdminDisplayObjectStatementPropertyRule ;
+          ao:rule ai:AllowAdminDisplayObjectPropertyStatementRule ;
           ao:rule ai:AllowAdminDisplayObjectPropertyRule .
 
 ai:AdminDisplayObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
@@ -33,7 +33,7 @@ ai:AllowAdminDisplayObjectPropertyRule rdf:type ao:Rule;
           ao:attribute ai:ObjectPropertyTypeAttribute ;
           ao:attribute ai:AdminDisplayObjectPropertyAttribute .
 
-ai:AllowAdminDisplayObjectStatementPropertyRule rdf:type ao:Rule;
+ai:AllowAdminDisplayObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
           ao:attribute ai:DisplayOperationAttribute ;
           ao:attribute ai:ObjectPropertyStatementTypeAttribute ;

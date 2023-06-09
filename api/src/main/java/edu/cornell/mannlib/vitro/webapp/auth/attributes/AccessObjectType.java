@@ -4,7 +4,6 @@ public enum AccessObjectType {
     ANY,
     CLASS,
     NAMED_OBJECT,
-    FAUX_PROPERTY,
     DATA_PROPERTY,
     OBJECT_PROPERTY,
     DATA_PROPERTY_STATEMENT,

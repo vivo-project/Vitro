@@ -1,9 +1,14 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Test;
 
 public class BasicPolicyTest extends PolicyTest {
@@ -76,4 +81,23 @@ public class BasicPolicyTest extends PolicyTest {
         assertTrue(policy == null);
     }
     
+    @Test
+    public void testDuplicateTriplesInPolicies() {
+        Model m = ModelFactory.createDefaultModel();
+        Map<String,Long> pathToSizeMap = new HashMap<>();
+        for ( String entityPolicyPath : entityPolicies) {
+            load(m, entityPolicyPath);
+            pathToSizeMap.put(entityPolicyPath, m.size());
+            m.removeAll();
+        }
+        long cumulativeSize = 0;
+        for ( String entityPolicyPath : entityPolicies) {
+            load(m, entityPolicyPath);
+            cumulativeSize += pathToSizeMap.get(entityPolicyPath);
+            if (cumulativeSize != m.size()) {
+                System.out.println(entityPolicyPath);
+            }
+            assertEquals(cumulativeSize, m.size());
+        }
+    }
 }
