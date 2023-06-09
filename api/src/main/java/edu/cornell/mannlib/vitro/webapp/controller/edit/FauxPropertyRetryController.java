@@ -72,8 +72,15 @@ public class FauxPropertyRetryController extends BaseEditController {
 		req.setAttribute("scripts", "/templates/edit/formBasic.js");
 		req.setAttribute("title", "Faux Property Editing Form");
 		req.setAttribute("_action", epo.getAction());
+		AccessObjectType aot;
+		if (populator.isFauxDataProperty()) {
+		    aot = AccessObjectType.FAUX_DATA_PROPERTY;
+		} else {
+		    aot = AccessObjectType.FAUX_OBJECT_PROPERTY;
+		}
+        req.setAttribute("_faux_property_type", aot);
 
-		addAccessAttributes(req, populator.beanForEditing.getConfigUri(), AccessObjectType.FAUX_PROPERTY);
+		addAccessAttributes(req, populator.beanForEditing.getConfigUri(), aot);
 
 		setRequestAttributes(req, epo);
 
@@ -108,7 +115,11 @@ public class FauxPropertyRetryController extends BaseEditController {
 		
 		private boolean isFauxDataProperty = false;
 
-		EpoPopulator(HttpServletRequest req, EditProcessObject epo) {
+		public boolean isFauxDataProperty() {
+            return isFauxDataProperty;
+        }
+
+        EpoPopulator(HttpServletRequest req, EditProcessObject epo) {
 			this.req = new VitroRequest(req);
 			this.ctx = req.getSession().getServletContext();
 			this.wadf = ModelAccess.on(req).getWebappDaoFactory(POLICY_NEUTRAL);
