@@ -157,7 +157,9 @@ public class AuthMigrator implements ServletContextListener {
                 log.debug(String.format("Updated entity %s dataset for operation group %s access object type %s roles %s", entityUri, og, aot, roles));
             }
         }
+        long begin = System.currentTimeMillis();
         PolicyLoader.getInstance().updateUserAccountsModel(sb.toString(), true);
+        log.info(secondsSince(begin) + "Spent on write to model");
         return getLineCount(sb.toString());
     }
     
@@ -171,7 +173,7 @@ public class AuthMigrator implements ServletContextListener {
                 log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", og, aot, role));
                 continue;
             }
-            sb.append(String.format("<%s> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <%s> .\n", testDataUri, entityUri));
+            sb.append("<").append(testDataUri).append("> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <").append(entityUri).append("> .\n");
         }
     }
 

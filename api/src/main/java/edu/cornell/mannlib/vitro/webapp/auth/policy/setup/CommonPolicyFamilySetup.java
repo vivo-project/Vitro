@@ -14,6 +14,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProxyEditingR
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsRootUserFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsUserFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -27,7 +29,8 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
-		    PolicyLoader.initialize(null);
+		    PolicyLoader.initialize(ModelAccess.getInstance().getRDFService(WhichService.CONFIGURATION));
+		    PolicyLoader.getInstance().loadPolicies();
 			factory(new IsUserFactory());
 			factory(new IsRootUserFactory());
 			factory(new HasProfileOrIsBlacklistedFactory());
