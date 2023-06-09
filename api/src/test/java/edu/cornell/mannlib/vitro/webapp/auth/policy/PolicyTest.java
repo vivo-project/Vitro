@@ -24,8 +24,9 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 public class PolicyTest {
-    public static final String USER_ACCOUNTS_HOME_EVERYTIME = "../home/src/main/resources/rdf/auth/everytime/";
     public static final String USER_ACCOUNTS_HOME_FIRSTTIME = "../home/src/main/resources/rdf/auth/firsttime/";
+
+    public static final String USER_ACCOUNTS_HOME_EVERYTIME = USER_ACCOUNTS_HOME_FIRSTTIME;
 
     protected static final String ROLE_ADMIN_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN";
     protected static final String ROLE_EDITOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR";
