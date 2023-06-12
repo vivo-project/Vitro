@@ -111,6 +111,4 @@ public class EntityPolicyController {
         policyKeyToDataValueMap.put(key, uri);
         return uri;
     }
-
-    
 }

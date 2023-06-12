@@ -239,13 +239,13 @@ public class PolicyTest {
     
     protected Model accessControlModel;
     protected PolicyLoader loader;
-    protected Dataset ds;
+    protected Dataset configurationDataSet;
 
     @Before
     public void init() {
         accessControlModel = ModelFactory.createDefaultModel();
-        ds = DatasetFactory.createTxnMem();
-        ds.addNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
+        configurationDataSet = DatasetFactory.createTxnMem();
+        configurationDataSet.addNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
         load(ATTRIBUTES_PATH);
         load(OPERATIONS_PATH);
         load(OPERATION_GROUPS);
@@ -255,7 +255,7 @@ public class PolicyTest {
         load(TEST_TYPES_PATH);
         load(TEST_VALUES_PATH);
         load(TEST_DECISIONS);
-        RDFServiceModel rdfService = new RDFServiceModel(ds);
+        RDFServiceModel rdfService = new RDFServiceModel(configurationDataSet);
         
         PolicyLoader.initialize(rdfService);
         loader = PolicyLoader.getInstance();
@@ -299,7 +299,7 @@ public class PolicyTest {
         } finally {
             accessControlModel.leaveCriticalSection();
         }
-        ds.replaceNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
+        configurationDataSet.replaceNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
 
     }
     
