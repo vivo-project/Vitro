@@ -5361,7 +5361,7 @@ uil-data:title_capitalized.Vitro
 uil-data:file_upload_error_no_action.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Действие не было указан"@ru-RU ;
+        rdfs:label       "Действие не было указано"@ru-RU ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_no_action" ;
         uil:hasPackage  "Vitro-languages" .
