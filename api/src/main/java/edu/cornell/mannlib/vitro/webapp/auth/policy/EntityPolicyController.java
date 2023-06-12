@@ -1,9 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 public class EntityPolicyController {
     
     private static final Log log = LogFactory.getLog(EntityPolicyController.class);
+    private static Map<String,String> policyKeyToDataValueMap = new HashMap<String,String>();
+
     /**
      * @param entityUri - entity uniform resource identifier
      * @param aot - Access object type
@@ -64,9 +68,18 @@ public class EntityPolicyController {
         return grantedRoles;
     }
     
-    private static boolean isUriInTestDataset(String entityUri, OperationGroup og, AccessObjectType aot, String role) {
-        Set<String> values = PolicyLoader.getInstance().getPolicyDataSetValues(og, aot, role);
-        return values.contains(entityUri);
+    public static void getDataValueStatements(String entityUri, AccessObjectType aot, OperationGroup og, Set<String> selectedRoles, StringBuilder sb) {
+        if (StringUtils.isBlank(entityUri)) {
+            return;
+        }
+        for (String role : selectedRoles) {
+            String testDataUri = getPolicyTestDataUri(aot, og, role);
+            if (testDataUri == null) {
+                log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", og, aot, role));
+                continue;
+            }
+            sb.append("<").append(testDataUri).append("> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <").append(entityUri).append("> .\n");
+        }
     }
 
     public static void deletedEntityEvent(Property oldObj) {
@@ -82,4 +95,22 @@ public class EntityPolicyController {
     public static void insertedEntityEvent(Property newObj) {
         log.debug("Nothing to do " + newObj );
     }
+
+    
+    private static boolean isUriInTestDataset(String entityUri, OperationGroup og, AccessObjectType aot, String role) {
+        Set<String> values = PolicyLoader.getInstance().getPolicyDataSetValues(og, aot, role);
+        return values.contains(entityUri);
+    }
+    
+    private static String getPolicyTestDataUri(AccessObjectType aot, OperationGroup og, String role) {
+        String key = aot.toString() + "." + og.toString() + "." + role ;
+        if (policyKeyToDataValueMap.containsKey(key)) {
+            return policyKeyToDataValueMap.get(key);
+        }
+        String uri = PolicyLoader.getInstance().getEntityPolicyTestDataValue(og, aot, role);
+        policyKeyToDataValueMap.put(key, uri);
+        return uri;
+    }
+
+    
 }

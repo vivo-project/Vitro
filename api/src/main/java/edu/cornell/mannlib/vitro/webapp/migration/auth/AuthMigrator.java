@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -12,7 +13,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.QuerySolution;
@@ -58,8 +58,6 @@ public class AuthMigrator implements ServletContextListener {
 
     private RDFService contentRdfService;
     private RDFService configurationRdfService;
-    private static Map<String,String> policyKeyToDataValueMap = new HashMap<String,String>();
-
     static {
         allRoles = new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI, ROLE_PUBLIC_URI));
         showMap = new HashMap<>();
@@ -154,40 +152,16 @@ public class AuthMigrator implements ServletContextListener {
             Map<OperationGroup, Set<String>> groupMap = configs.get(entityUri);
             for (OperationGroup og : groupMap.keySet()) {
                 Set<String> rolesToAdd = groupMap.get(og);
-                getDataValueStatements(entityUri, aot, og, rolesToAdd, additions);
+                EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToAdd, additions);
                 Set<String> rolesToRemove = new HashSet<>(allRoles);
                 rolesToRemove.removeAll(rolesToAdd);
-                getDataValueStatements(entityUri, aot, og, rolesToRemove, removals);
+                EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToRemove, removals);
                 log.debug(String.format("Updated entity %s dataset for operation group %s access object type %s roles %s", entityUri, og, aot, rolesToAdd));
             }
         }
         PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
         PolicyLoader.getInstance().updateAccessControlModel(removals.toString(), false);
         return new Long[]{getLineCount(additions.toString()), getLineCount(removals.toString())};
-    }
-    
-    public void getDataValueStatements(String entityUri, AccessObjectType aot, OperationGroup og, Set<String> selectedRoles, StringBuilder sb) {
-        if (StringUtils.isBlank(entityUri)) {
-            return;
-        }
-        for (String role : selectedRoles) {
-            String testDataUri = getPolicyTestDataUri(aot, og, role);
-            if (testDataUri == null) {
-                log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", og, aot, role));
-                continue;
-            }
-            sb.append("<").append(testDataUri).append("> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <").append(entityUri).append("> .\n");
-        }
-    }
-
-    private static String getPolicyTestDataUri(AccessObjectType aot, OperationGroup og, String role) {
-        String key = aot.toString() + "." + og.toString() + "." + role ;
-        if (policyKeyToDataValueMap.containsKey(key)) {
-            return policyKeyToDataValueMap.get(key);
-        }
-        String uri = PolicyLoader.getInstance().getEntityPolicyTestDataValue(og, aot, role);
-        policyKeyToDataValueMap.put(key, uri);
-        return uri;
     }
     
     /**
@@ -280,6 +254,10 @@ public class AuthMigrator implements ServletContextListener {
         // Nothing to tear down.
     }
     
+    private long secondsSince(long startTime) {
+        return (System.currentTimeMillis() - startTime) / 1000;
+    }
+
     private long getLineCount(String lines) {
         Matcher matcher = Pattern.compile("\n").matcher(lines);
         long i = 0;
@@ -287,9 +265,5 @@ public class AuthMigrator implements ServletContextListener {
             i ++;
         }
         return i;
-    }
-
-    private long secondsSince(long startTime) {
-        return (System.currentTimeMillis() - startTime) / 1000;
     }
 }
