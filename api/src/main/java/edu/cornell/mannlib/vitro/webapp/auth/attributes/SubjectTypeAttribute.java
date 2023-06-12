@@ -30,6 +30,6 @@ public class SubjectTypeAttribute extends AbstractAttribute {
 
     @Override
     public AttributeType getAttributeType() {
-        return AttributeType.ACCESS_OBJECT_TYPE;
+        return AttributeType.SUBJECT_TYPE;
     }
 }
