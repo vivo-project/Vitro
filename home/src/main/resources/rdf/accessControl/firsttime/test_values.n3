@@ -73,6 +73,10 @@ ai:PersonProfileProximityToResourceUri rdf:type ao:TestData ;
                   ?roleUri <http://vivoweb.org/ontology/core#contributesTo> ?resourceUri .
                   ?resourceUri a <http://vivoweb.org/ontology/core#Service> .
                 }
+                UNION
+                { 
+                  BIND ( ?personUri as ?resourceUri)
+                }
         }
         """ .
 
