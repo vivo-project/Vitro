@@ -11,10 +11,19 @@ ai:EditIndividualPagesPolicy rdf:type ao:Policy ;
           ao:rules ai:EditIndividualPagesRuleSet .
 
 ai:EditIndividualPagesRuleSet rdf:type ao:Rules ;
+          ao:rule ai:AllowEditRelatedPagesRule ;
           ao:rule ai:AllowEditIndividualPagesRule .
 
 ai:AllowEditIndividualPagesRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleOneOfEditorsAttribute ;
+          ao:attribute ai:AddOperationAttribute ;
+          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+          ao:attribute ai:SomeObjectUriAttribute ;
+          ao:attribute ai:SomePredicateAttribute .
+          
+ai:AllowEditRelatedPagesRule rdf:type ao:Rule;
+          ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+          ao:attribute ai:StatementObjectUriContainsSelfEditorResourceAttribute;
           ao:attribute ai:AddOperationAttribute ;
           ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
           ao:attribute ai:SomeObjectUriAttribute ;
@@ -29,3 +38,9 @@ ai:SomeObjectUriAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
          ao:type ai:StatementObjectUri ;
          ao:value ai:SomeUriTestData .
+         
+ai:StatementObjectUriContainsSelfEditorResourceAttribute rdf:type ao:Attribute ;
+         ao:test ai:SparqlSelectQueryContains ;
+         ao:type ai:StatementSubjectUri ;
+         ao:value ai:PersonProfileProximityToResourceUri .
+
