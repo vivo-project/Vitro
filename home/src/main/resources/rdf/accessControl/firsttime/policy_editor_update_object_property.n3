@@ -46,7 +46,7 @@ ai:EditorUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:EditorUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorUpdateObjectPropertyTestData .
          
 ai:EditorUpdateObjectPropertyTestData rdf:type ao:TestData ;

@@ -34,7 +34,7 @@ ai:AllowSelfEditorPublishClassRule rdf:type ao:Rule;
          
 ai:SelfEditorPublishClassAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorPublishClassTestData .
          
 ai:SelfEditorPublishClassTestData rdf:type ao:TestData ;

@@ -94,52 +94,52 @@ ai:UpdateAddEditOrDropOperationsAttribute rdf:type ao:Attribute ;
 
 ai:ObjectPropertyTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:ObjectPropertyAccesObject .
 
 ai:DataPropertyTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:DataPropertyAccesObject .
 
 ai:ObjectPropertyStatementTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:ObjectPropertyStatementAccesObject .
          
 ai:DataPropertyStatementTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:DataPropertyStatementAccesObject .
 
 ai:FauxObjectPropertyStatementTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:FauxObjectPropertyStatementAccesObject .
          
 ai:FauxDataPropertyStatementTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:FauxDataPropertyStatementAccesObject .
 
 ai:NamedObjectTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:NamedObject .
          
 ai:ClassTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:Class .
          
 ai:FauxObjectPropertyTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:FauxObjectPropertyAccesObject .
 
 ai:FauxDataPropertyTypeAttribute rdf:type ao:Attribute ;
          ao:test ai:Equals ;
-         ao:type ai:ObjectType ;
+         ao:type ai:AccessObjectType ;
          ao:value ai:FauxDataPropertyAccesObject .
 
 ai:SelfEditorRelatedResourcesAttribute rdf:type ao:Attribute ;

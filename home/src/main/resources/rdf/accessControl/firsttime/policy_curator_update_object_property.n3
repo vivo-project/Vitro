@@ -46,7 +46,7 @@ ai:CuratorUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:CuratorUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:CuratorUpdateObjectPropertyTestData .
          
 ai:CuratorUpdateObjectPropertyTestData rdf:type ao:TestData ;

@@ -46,7 +46,7 @@ ai:AdminPublishObjectPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:AdminPublishObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminPublishObjectPropertyTestData .
          
 ai:AdminPublishObjectPropertyTestData rdf:type ao:TestData ;

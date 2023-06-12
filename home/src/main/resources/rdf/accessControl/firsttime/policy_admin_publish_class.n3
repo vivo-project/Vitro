@@ -34,7 +34,7 @@ ai:AllowAdminPublishClassRule rdf:type ao:Rule;
          
 ai:AdminPublishClassAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminPublishClassTestData .
          
 ai:AdminPublishClassTestData rdf:type ao:TestData ;

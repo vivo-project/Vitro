@@ -34,7 +34,7 @@ ai:AllowAdminUpdateClassRule rdf:type ao:Rule;
          
 ai:AdminUpdateClassAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminUpdateClassTestData .
          
 ai:AdminUpdateClassTestData rdf:type ao:TestData ;

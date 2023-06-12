@@ -46,7 +46,7 @@ ai:EditorPublishFauxObjectPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:EditorPublishFauxObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorPublishFauxObjectPropertyTestData .
          
 ai:EditorPublishFauxObjectPropertyTestData rdf:type ao:TestData ;

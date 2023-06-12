@@ -46,7 +46,7 @@ ai:CuratorUpdateFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:CuratorUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:CuratorUpdateFauxDataPropertyTestData .
          
 ai:CuratorUpdateFauxDataPropertyTestData rdf:type ao:TestData ;

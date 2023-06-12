@@ -46,7 +46,7 @@ ai:SelfEditorPublishObjectPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:SelfEditorPublishObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorPublishObjectPropertyTestData .
          
 ai:SelfEditorPublishObjectPropertyTestData rdf:type ao:TestData ;

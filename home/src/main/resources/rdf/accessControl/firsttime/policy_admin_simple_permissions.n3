@@ -30,7 +30,7 @@ ai:AllowAdminSimplePermissions rdf:type ao:Rule;
           
 ai:PermissionNameInAdminAllowed rdf:type ao:Attribute ;
         ao:test ai:OneOf ;
-        ao:type ai:ObjectUri ;
+        ao:type ai:AccessObjectUri ;
         ao:setValue ai:AdminSimplePermissionsTestData .
 
 ai:AdminSimplePermissionsTestData rdf:type ao:TestData ;

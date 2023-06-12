@@ -46,7 +46,7 @@ ai:PublicDisplayFauxObjectPropertyStatementAttribute rdf:type ao:Attribute ;
          
 ai:PublicDisplayFauxObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:PublicDisplayFauxObjectPropertyTestData .
          
 ai:PublicDisplayFauxObjectPropertyTestData rdf:type ao:TestData ;

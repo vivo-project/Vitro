@@ -34,7 +34,7 @@ ai:AllowCuratorUpdateClassRule rdf:type ao:Rule;
          
 ai:CuratorUpdateClassAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:CuratorUpdateClassTestData .
          
 ai:CuratorUpdateClassTestData rdf:type ao:TestData ;

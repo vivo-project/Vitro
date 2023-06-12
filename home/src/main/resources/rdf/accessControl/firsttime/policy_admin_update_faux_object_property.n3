@@ -46,7 +46,7 @@ ai:AdminUpdateFauxObjectPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:AdminUpdateFauxObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminUpdateFauxObjectPropertyTestData .
          
 ai:AdminUpdateFauxObjectPropertyTestData rdf:type ao:TestData ;

@@ -30,7 +30,7 @@ ai:AllowEditorSimplePermissions rdf:type ao:Rule;
           
 ai:PermissionNameInEditorAllowed rdf:type ao:Attribute ;
         ao:test ai:OneOf ;
-        ao:type ai:ObjectUri ;
+        ao:type ai:AccessObjectUri ;
         ao:setValue ai:EditorSimplePermissionsTestData .
 
 ai:EditorSimplePermissionsTestData rdf:type ao:TestData ;

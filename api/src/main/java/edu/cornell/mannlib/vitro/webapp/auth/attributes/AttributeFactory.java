@@ -21,10 +21,10 @@ public class AttributeFactory {
         case OPERATION:
             at = new OperationAttribute(attributeUri, value);
             break;
-        case OBJECT_URI:
-            at = new ObjectUriAttribute(attributeUri, value);
+        case ACCESS_OBJECT_URI:
+            at = new AccessObjectUriAttribute(attributeUri, value);
             break;
-        case OBJECT_TYPE:
+        case ACCESS_OBJECT_TYPE:
             at = new ObjectTypeAttribute(attributeUri, value);
             break;
         case SUBJECT_TYPE:

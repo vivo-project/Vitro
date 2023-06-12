@@ -47,7 +47,7 @@ ai:SelfEditorUpdateFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:SelfEditorUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorUpdateFauxDataPropertyTestData .
          
 ai:SelfEditorUpdateFauxDataPropertyTestData rdf:type ao:TestData ;

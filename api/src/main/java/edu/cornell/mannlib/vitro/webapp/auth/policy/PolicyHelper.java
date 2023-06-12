@@ -40,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorization
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -113,7 +114,11 @@ public class PolicyHelper {
         }
         AuthorizationRequest ar = new SimpleAuthorizationRequest(ao, operation);
         Collection<String> uris = IdentifierPermissionSetProvider.getPermissionSetUris(ids);
+        if (uris.isEmpty()) {
+            uris.add(VitroVocabulary.VITRO_AUTH + "PUBLIC");
+        }
         ar.setRoleUris(new ArrayList<String>(uris));
+        
         ar.setIds(ids);
         ar.setEditorUris(new ArrayList<String>(HasAssociatedIndividual.getIndividualUris(ids)));
 	    PolicyDecision decision = PolicyDecisionPoint.decide(ar);
