@@ -34,7 +34,7 @@ ai:AllowEditorUpdateClassRule rdf:type ao:Rule;
          
 ai:EditorUpdateClassAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorUpdateClassTestData .
          
 ai:EditorUpdateClassTestData rdf:type ao:TestData ;

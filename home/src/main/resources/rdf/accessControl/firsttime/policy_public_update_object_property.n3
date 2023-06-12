@@ -46,7 +46,7 @@ ai:PublicUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:PublicUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:PublicUpdateObjectPropertyTestData .
          
 ai:PublicUpdateObjectPropertyTestData rdf:type ao:TestData ;

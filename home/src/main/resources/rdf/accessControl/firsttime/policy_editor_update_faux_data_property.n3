@@ -46,7 +46,7 @@ ai:EditorUpdateFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:EditorUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorUpdateFauxDataPropertyTestData .
          
 ai:EditorUpdateFauxDataPropertyTestData rdf:type ao:TestData ;

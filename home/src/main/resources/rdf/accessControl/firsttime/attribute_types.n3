@@ -17,11 +17,11 @@ ai:SubjectRole rdf:type ao:AttributeType ;
 ai:SubjectType rdf:type ao:AttributeType ;
          ao:id "SUBJECT_TYPE" .
 
-ai:ObjectUri rdf:type ao:AttributeType ;
-         ao:id "OBJECT_URI" .
+ai:AccessObjectUri rdf:type ao:AttributeType ;
+         ao:id "ACCESS_OBJECT_URI" .
          
-ai:ObjectType rdf:type ao:AttributeType ;
-         ao:id "OBJECT_TYPE" .
+ai:AccessObjectType rdf:type ao:AttributeType ;
+         ao:id "ACCESS_OBJECT_TYPE" .
 
 ai:Operation rdf:type ao:AttributeType ;
          ao:id "OPERATION" .
@@ -44,11 +44,5 @@ ai:StatementPredicateUri rdf:type ao:AttributeType ;
 ai:StatementSubjectUri rdf:type ao:AttributeType ;
          ao:id "STATEMENT_SUBJECT_URI" .
 
-ai:ObjectPropertyUri rdf:type ao:AttributeType ;
-         ao:id "OBJECT_PROPERTY_URI" .
-         
-ai:DataPropertyUri rdf:type ao:AttributeType ;
-         ao:id "DATA_PROPERTY_URI" .
-      
 ai:StatementObjectUri rdf:type ao:AttributeType ;
          ao:id "STATEMENT_OBJECT_URI" .

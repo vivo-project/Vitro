@@ -46,7 +46,7 @@ ai:PublicDisplayDataPropertyStatementAttribute rdf:type ao:Attribute ;
          
 ai:PublicDisplayDataPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:PublicDisplayDataPropertyTestData .
          
 ai:PublicDisplayDataPropertyTestData rdf:type ao:TestData ;

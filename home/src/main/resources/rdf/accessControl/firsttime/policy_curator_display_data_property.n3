@@ -46,7 +46,7 @@ ai:CuratorDisplayDataPropertyStatementAttribute rdf:type ao:Attribute ;
 
 ai:CuratorDisplayDataPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
-         ao:type ai:ObjectUri ;
+         ao:type ai:AccessObjectUri ;
          ao:setValue ai:CuratorDisplayDataPropertyTestData .
 
 ai:CuratorDisplayDataPropertyTestData rdf:type ao:TestData ;
