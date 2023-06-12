@@ -109,16 +109,16 @@ public class AuthMigrator implements ServletContextListener {
         log.info(String.format("Found %s faux object property annotation configurations", fopConfigs.size()));
         Map<String, Map<OperationGroup, Set<String>>> fdpConfigs = getFauxDataPropertyAnnotations(dpConfigs.keySet());
         log.info(String.format("Found %s faux data property annotation configurations", fdpConfigs.size()));
-        long lines = updatePolicyDatasets(AccessObjectType.OBJECT_PROPERTY, opConfigs);
-        log.info(String.format("Updated object property datasets, added %s values", lines));
-        lines = updatePolicyDatasets(AccessObjectType.DATA_PROPERTY, dpConfigs);
-        log.info(String.format("Updated data property datasets, added %s values", lines));
-        lines = updatePolicyDatasets(AccessObjectType.CLASS, classConfigs);
-        log.info(String.format("Updated class property datasets, added %s values", lines));
-        lines = updatePolicyDatasets(AccessObjectType.FAUX_OBJECT_PROPERTY, fopConfigs);
-        log.info(String.format("Updated faux object property datasets, added %s values", lines));
-        lines = updatePolicyDatasets(AccessObjectType.FAUX_DATA_PROPERTY, fdpConfigs);
-        log.info(String.format("Updated data property datasets, added %s values", lines));
+        Long[] valueCounts = updatePolicyDatasets(AccessObjectType.OBJECT_PROPERTY, opConfigs);
+        log.info(String.format("Updated object property datasets. Added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        valueCounts = updatePolicyDatasets(AccessObjectType.DATA_PROPERTY, dpConfigs);
+        log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        valueCounts = updatePolicyDatasets(AccessObjectType.CLASS, classConfigs);
+        log.info(String.format("Updated class property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        valueCounts = updatePolicyDatasets(AccessObjectType.FAUX_OBJECT_PROPERTY, fopConfigs);
+        log.info(String.format("Updated faux object property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        valueCounts = updatePolicyDatasets(AccessObjectType.FAUX_DATA_PROPERTY, fdpConfigs);
+        log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
         PolicyLoader.getInstance().loadPolicies();
     }
 
@@ -147,23 +147,26 @@ public class AuthMigrator implements ServletContextListener {
         return getConfigurations(queryText, contentRdfService);
     }
 
-    private long updatePolicyDatasets(AccessObjectType aot, Map<String, Map<OperationGroup, Set<String>>> configs) {
-        StringBuilder sb = new StringBuilder();
+    private Long[] updatePolicyDatasets(AccessObjectType aot, Map<String, Map<OperationGroup, Set<String>>> configs) {
+        StringBuilder additions = new StringBuilder();
+        StringBuilder removals = new StringBuilder();
         for (String entityUri : configs.keySet()) {
             Map<OperationGroup, Set<String>> groupMap = configs.get(entityUri);
             for (OperationGroup og : groupMap.keySet()) {
-                Set<String> roles = groupMap.get(og);
-                addDataSetStatements(entityUri, aot, og, roles, sb);
-                log.debug(String.format("Updated entity %s dataset for operation group %s access object type %s roles %s", entityUri, og, aot, roles));
+                Set<String> rolesToAdd = groupMap.get(og);
+                getDataValueStatements(entityUri, aot, og, rolesToAdd, additions);
+                Set<String> rolesToRemove = new HashSet<>(allRoles);
+                rolesToRemove.removeAll(rolesToAdd);
+                getDataValueStatements(entityUri, aot, og, rolesToRemove, removals);
+                log.debug(String.format("Updated entity %s dataset for operation group %s access object type %s roles %s", entityUri, og, aot, rolesToAdd));
             }
         }
-        long begin = System.currentTimeMillis();
-        PolicyLoader.getInstance().updateAccessControlModel(sb.toString(), true);
-        log.info(secondsSince(begin) + "Spent on write to model");
-        return getLineCount(sb.toString());
+        PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
+        PolicyLoader.getInstance().updateAccessControlModel(removals.toString(), false);
+        return new Long[]{getLineCount(additions.toString()), getLineCount(removals.toString())};
     }
     
-    public void addDataSetStatements(String entityUri, AccessObjectType aot, OperationGroup og, Set<String> selectedRoles, StringBuilder sb) {
+    public void getDataValueStatements(String entityUri, AccessObjectType aot, OperationGroup og, Set<String> selectedRoles, StringBuilder sb) {
         if (StringUtils.isBlank(entityUri)) {
             return;
         }
