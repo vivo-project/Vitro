@@ -13,7 +13,7 @@ ai:AdminDisplayDataPropertyPolicy rdf:type ao:Policy ;
           ao:policyKey ai:AdminDisplayDataPropertyPolicyKey .
 
 ai:AdminDisplayDataPropertyRuleSet rdf:type ao:Rules ;
-          ao:rule ai:AdminDisplayDataPropertyStatementAttribute ;
+          ao:rule ai:AllowAdminDisplayDataPropertyStatementRule ;
           ao:rule ai:AllowAdminDisplayDataPropertyRule .
 
 ai:AdminDisplayDataPropertyTestDatasets rdf:type ao:TestDatasets ;
@@ -48,6 +48,6 @@ ai:AdminDisplayDataPropertyAttribute rdf:type ao:Attribute ;
          ao:test ai:OneOf ;
          ao:type ai:ObjectUri ;
          ao:setValue ai:AdminDisplayDataPropertyTestData .
-         
+
 ai:AdminDisplayDataPropertyTestData rdf:type ao:TestData ;
        .
