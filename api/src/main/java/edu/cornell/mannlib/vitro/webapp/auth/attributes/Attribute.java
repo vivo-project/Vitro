@@ -21,4 +21,7 @@ public interface Attribute {
     public void addValue(String value);
 
     public void setTestType(TestType valueOf);
+
+    public long getComputationalCost();
+
 }

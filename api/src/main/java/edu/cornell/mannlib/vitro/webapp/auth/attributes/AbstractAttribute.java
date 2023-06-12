@@ -10,6 +10,8 @@ public abstract class AbstractAttribute implements Attribute {
     
     private Set<String> values = new HashSet<>();
     private String uri;
+    private long computationalCost;
+
     private TestType testType = TestType.EQUALS;
 
     public AbstractAttribute(String uri, String value) {
@@ -31,6 +33,7 @@ public abstract class AbstractAttribute implements Attribute {
     
     public void setTestType(TestType testType) {
         this.testType = testType;
+        adjustComputationCost(testType);
     }
     
     @Override
@@ -65,5 +68,28 @@ public abstract class AbstractAttribute implements Attribute {
                 .append(getUri())
                 .append(getValues())
                 .toHashCode();
+    }
+
+    public long getComputationalCost() {
+        return computationalCost;
+    }
+    
+    private void adjustComputationCost(TestType testType) {
+        switch (testType) {
+        case ONE_OF:
+            computationalCost += 100;
+            return ;
+        case NOT_ONE_OF:
+            computationalCost += 100;
+            return ;
+        case STARTS_WITH:
+            computationalCost += 1000;
+            return ;
+        case SPARQL_SELECT_QUERY_CONTAINS:
+            computationalCost += 10000;
+            return ;
+        default :
+            return ;
+        }
     }
 }
