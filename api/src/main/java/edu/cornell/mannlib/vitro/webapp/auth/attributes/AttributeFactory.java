@@ -25,7 +25,7 @@ public class AttributeFactory {
             at = new AccessObjectUriAttribute(attributeUri, value);
             break;
         case ACCESS_OBJECT_TYPE:
-            at = new ObjectTypeAttribute(attributeUri, value);
+            at = new AccessObjectTypeAttribute(attributeUri, value);
             break;
         case SUBJECT_TYPE:
             at = new SubjectTypeAttribute(attributeUri, value);
