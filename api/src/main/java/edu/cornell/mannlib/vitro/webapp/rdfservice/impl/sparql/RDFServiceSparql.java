@@ -38,8 +38,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.apache.jena.riot.RDFDataMgr;
-
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -55,8 +53,10 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Quad;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -691,7 +691,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			log.warn("This likely indicates a problem; excessive data may be deleted.");
 		}
 
-		Query rootFinderQuery = QueryFactory.create(BNODE_ROOT_QUERY);
+		Query rootFinderQuery = QueryFactory.create(JenaModelUtils.BNODE_ROOT_QUERY);
 		QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
 		try {
 			ResultSet rs = qe.execSelect();
