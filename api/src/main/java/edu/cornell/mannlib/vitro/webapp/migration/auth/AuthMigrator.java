@@ -158,7 +158,7 @@ public class AuthMigrator implements ServletContextListener {
             }
         }
         long begin = System.currentTimeMillis();
-        PolicyLoader.getInstance().updateUserAccountsModel(sb.toString(), true);
+        PolicyLoader.getInstance().updateAccessControlModel(sb.toString(), true);
         log.info(secondsSince(begin) + "Spent on write to model");
         return getLineCount(sb.toString());
     }

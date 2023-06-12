@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 public class PolicyTest {
-    public static final String USER_ACCOUNTS_HOME_FIRSTTIME = "../home/src/main/resources/rdf/auth/firsttime/";
+    public static final String USER_ACCOUNTS_HOME_FIRSTTIME = "../home/src/main/resources/rdf/accessControl/firsttime/";
 
     public static final String USER_ACCOUNTS_HOME_EVERYTIME = USER_ACCOUNTS_HOME_FIRSTTIME;
 
@@ -237,15 +237,15 @@ public class PolicyTest {
             SELF_EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH
             );
     
-    protected Model userAccountsModel;
+    protected Model accessControlModel;
     protected PolicyLoader loader;
     protected Dataset ds;
 
     @Before
     public void init() {
-        userAccountsModel = ModelFactory.createDefaultModel();
+        accessControlModel = ModelFactory.createDefaultModel();
         ds = DatasetFactory.createTxnMem();
-        ds.addNamedModel(ModelNames.USER_ACCOUNTS, userAccountsModel);
+        ds.addNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
         load(ATTRIBUTES_PATH);
         load(OPERATIONS_PATH);
         load(OPERATION_GROUPS);
@@ -294,12 +294,12 @@ public class PolicyTest {
     
     protected void load(String filePath) {
         try {
-            userAccountsModel.enterCriticalSection(Lock.WRITE);
-            userAccountsModel.read(filePath);
+            accessControlModel.enterCriticalSection(Lock.WRITE);
+            accessControlModel.read(filePath);
         } finally {
-            userAccountsModel.leaveCriticalSection();
+            accessControlModel.leaveCriticalSection();
         }
-        ds.replaceNamedModel("http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts", userAccountsModel);
+        ds.replaceNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
 
     }
     

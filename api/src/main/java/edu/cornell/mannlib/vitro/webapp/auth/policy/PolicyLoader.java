@@ -47,7 +47,7 @@ public class PolicyLoader {
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n" 
             + "SELECT DISTINCT ?" + POLICY + " ?" + PRIORITY + " \n" 
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
             + "    ?" + POLICY + " rdf:type ao:Policy .\n" 
             + "    OPTIONAL {?" + POLICY + " ao:priority ?set_priority" 
             + " . }\n"
@@ -64,7 +64,7 @@ public class PolicyLoader {
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n" 
             + "SELECT DISTINCT ?" + PRIORITY + " \n" 
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
             + "    ?" + POLICY  + " rdf:type ao:Policy .\n" 
             + "    OPTIONAL {?" + POLICY + " ao:priority ?set_priority" + " . }\n"
             + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n" 
@@ -79,7 +79,7 @@ public class PolicyLoader {
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?dataSet \n" + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "       ?policy ao:testDatasets ?dataSets .\n" 
             + "       ?policy rdf:type ao:Policy .\n"
             + "       ?dataSets ao:testDataset ?dataSet .\n" 
@@ -94,7 +94,7 @@ public class PolicyLoader {
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?rules ?rule ?attribute ?testId ?typeId ?value ?lit_value ?decision_id \n" + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "?policy rdf:type ao:Policy .\n" 
             + "?policy ao:rules ?rules . \n" 
             + "?rules ao:rule ?rule . \n"
@@ -129,7 +129,7 @@ public class PolicyLoader {
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?rules ?rule ?attribute ?testId ?typeId ?value ?lit_value ?decision_id ?dataSetUri \n"
             + "WHERE {\n" 
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "?policy rdf:type ao:Policy .\n" 
             + "?policy ao:rules ?rules . \n" 
             + "?rules rdf:type ao:Rules . \n"
@@ -176,7 +176,7 @@ public class PolicyLoader {
             + "SELECT DISTINCT ?"
             + POLICY + "?testData ?value ?valueId ( COUNT(?key) AS ?keySize ) \n" 
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
             + "  ?" + POLICY + " ao:policyKey ?policyKeyUri .\n" 
             + "  ?" + POLICY + " ao:testDatasets ?testDataSets .\n"
             + "  ?testDataSets ao:testDataset ?dataSet . \n" 
@@ -200,7 +200,7 @@ public class PolicyLoader {
             + "  ?testData ao:dataValue <%s> .\n" 
             + "}\n" 
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
             + "  ?" + POLICY + " ao:policyKey ?policyKeyUri .\n" 
             + "  ?" + POLICY + " ao:testDatasets ?testDataSets .\n"
             + "  ?testDataSets ao:testDataset ?dataSet . \n" 
@@ -398,18 +398,18 @@ public class PolicyLoader {
     private void updateUserAccountsModel(Model data, boolean isAdd) {
         StringWriter sw = new StringWriter();
         data.write(sw, "TTL");
-        updateUserAccountsModel(sw.toString(), isAdd);
+        updateAccessControlModel(sw.toString(), isAdd);
     }
 
-    public void updateUserAccountsModel(String data, boolean isAdd) {
+    public void updateAccessControlModel(String data, boolean isAdd) {
         try {
             ChangeSet changeSet = makeChangeSet();
             InputStream in = new ByteArrayInputStream(data.getBytes());
             debug(modelToString(data, isAdd));
             if (isAdd) {
-                changeSet.addAddition(in, ModelSerializationFormat.N3, ModelNames.USER_ACCOUNTS);
+                changeSet.addAddition(in, ModelSerializationFormat.N3, ModelNames.ACCESS_CONTROL);
             } else {
-                changeSet.addRemoval(in, ModelSerializationFormat.N3, ModelNames.USER_ACCOUNTS);
+                changeSet.addRemoval(in, ModelSerializationFormat.N3, ModelNames.ACCESS_CONTROL);
             }
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException e) {
