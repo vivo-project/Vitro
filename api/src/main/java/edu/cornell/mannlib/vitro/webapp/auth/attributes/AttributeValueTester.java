@@ -55,8 +55,12 @@ public class AttributeValueTester {
         }
         List<String> personUris = ar.getEditorUris();
         if (personUris.isEmpty()) {
-            log.debug("SparqlQueryContins person uri is empty");
-            return false;
+            if (queryTemplate.contains("?personUri")) {
+                log.debug("Subject has no person URIs");
+                return false;    
+            } else {
+                personUris.add("");
+            }
         }
         List<String> resourceUris = Arrays.asList(ao.getResourceUris());
         return ProximityChecker.isAanyRelated(m, resourceUris, personUris, queryTemplate);
