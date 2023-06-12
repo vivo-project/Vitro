@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Test;
@@ -48,7 +50,7 @@ public class AnnotationMigratorTest extends AuthMigratorTest {
         try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
             diff.write(baos, "TTL");
             String newData = baos.toString();
-            //System.out.println(newData);
+            assertFalse(StringUtils.isBlank(newData));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -141,10 +141,10 @@ public class AnnotationMigrator {
     private void collectConfiguration(Map<String, Map<OperationGroup, Set<String>>> configs, QuerySolution qs) {
         String uri = qs.getResource("uri").getURI();
         String displayAnnotation = qs.getResource("display").getURI();
-        Set<String> displayRoles = showMap.get(displayAnnotation);
+        Set<String> displayRoles = new HashSet<>(showMap.get(displayAnnotation));
     
         String publishAnnotation = qs.getResource("publish").getURI();
-        Set<String> publishRoles = showMap.get(publishAnnotation);
+        Set<String> publishRoles = new HashSet<>(showMap.get(publishAnnotation));
         publishRoles.remove(ROLE_PUBLIC_URI);
     
         String updateAnnotation = qs.getResource("update").getURI();
