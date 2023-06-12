@@ -4817,7 +4817,7 @@ uil-data:new_account_title.Vitro
 uil-data:file_upload_no_allowed_media.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Ни одного типа меди файлов не указанов в runtime.properties"@ru-RU ;
+        rdfs:label       "Ни одного типа медиа файлов не указано в runtime.properties"@ru-RU ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_no_allowed_media" ;
         uil:hasPackage  "Vitro-languages" .
