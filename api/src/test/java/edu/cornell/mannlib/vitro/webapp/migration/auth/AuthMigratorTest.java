@@ -59,11 +59,11 @@ public class AuthMigratorTest extends PolicyTest {
     @Test
     public void testConvertAnnotationConfiguration() {
         Model tmpModel = ModelFactory.createDefaultModel();
-        tmpModel.add(ds.getNamedModel(ModelNames.USER_ACCOUNTS));
-        long initialSize = userAccountsModel.size();
+        tmpModel.add(ds.getNamedModel(ModelNames.ACCESS_CONTROL));
+        long initialSize = accessControlModel.size();
         migrator.convertAnnotationConfiguration();
-        assertTrue(ds.getNamedModel(ModelNames.USER_ACCOUNTS).size() > initialSize);
-        Model diff = ds.getNamedModel(ModelNames.USER_ACCOUNTS).difference(tmpModel);
+        assertTrue(ds.getNamedModel(ModelNames.ACCESS_CONTROL).size() > initialSize);
+        Model diff = ds.getNamedModel(ModelNames.ACCESS_CONTROL).difference(tmpModel);
         try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
             diff.write(baos, "TTL");
             String newData = baos.toString();
