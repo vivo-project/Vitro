@@ -280,7 +280,7 @@ public class PolicyTest {
                 }
             }
             assertTrue(attrCount.contains(ar.getAttributes().size()));
-            for (Attribute att : ar.getAttributes().values()) {
+            for (Attribute att : ar.getAttributes()) {
                 assertTrue(att.getValues().size() > 0); 
             }
         }

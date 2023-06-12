@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.rules;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
@@ -19,7 +19,7 @@ public interface AccessRule {
 
     public void setRuleUri(String ruleUri);
     
-	public Map<String, Attribute> getAttributes();
+	public List<Attribute> getAttributes();
 	
 	public boolean match(AuthorizationRequest ar);
 	

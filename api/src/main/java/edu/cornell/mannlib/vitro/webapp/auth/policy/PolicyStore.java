@@ -71,7 +71,7 @@ public class PolicyStore implements Policies {
                 if ( lps.getPriority() > rps.getPriority() ) {
                     return -1;
                 } else 
-                if (lps.getPriority() > rps.getPriority()) {
+                if (lps.getPriority() < rps.getPriority()) {
                     return 1;
                 }
                 return lps.getUri().compareTo(lps.getUri()); 
