@@ -544,10 +544,6 @@ public class JenaModelUtils {
             Model constructedRemovals = qe.execConstruct();
             try {
             	removeFrom.enterCriticalSection(Lock.WRITE);
-            	log.info("Removing contructed:");
-            	StringWriter sw = new StringWriter();
-            	constructedRemovals.write(sw, "TTL");
-            	log.info(sw.toString());
             	removeFrom.remove(constructedRemovals);
             } finally {
             	removeFrom.leaveCriticalSection();
