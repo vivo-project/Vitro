@@ -109,26 +109,67 @@ public class ArmMigrator {
         }
         return removals;
     }
+    
+    private Set<String> getFauxByBase(String baseUri) {
+        Set<String> entities = new HashSet<>();
+        String queryText = getQueryText(AccessObjectType.FAUX_OBJECT_PROPERTY);
+        RDFService service = getRdfService(AccessObjectType.FAUX_OBJECT_PROPERTY);
+        try {
+            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(queryText, service);
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                String entity = qs.getResource("uri").getURI();
+                String base = qs.getResource("base").getURI();
+                if (baseUri.equals(base)) {
+                    entities.add(entity);
+                }
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }
+        return entities;
+    }
 
     protected void collectAdditions(Map<AccessObjectType, Set<String>> entityTypeMap, StringBuilder additions) {
+        
         for (String role : armRoles) {
             String newRole = roleMap.get(role);
             for (String operation : armOperations) {
                 String permissionUri = getArmPermissionSubject(operation, role);
-                Set<String> entities = getArmEntites(permissionUri);
+                Set<String> armEntities = getArmEntites(permissionUri);
                 OperationGroup og = operationMap.get(operation);
-                for (AccessObjectType aot : entityTypes) {
-                    if (entities.isEmpty()) {
-                        continue;
+                Set<String> addFauxOP = new HashSet<>();
+                Set<String> addFauxDP = new HashSet<>();
+                for (AccessObjectType type : entityTypes) {
+                    Set<String> allTypeEntitities = entityTypeMap.get(type);
+                    HashSet<String> intersectionEntities = new HashSet<>(armEntities);
+                    intersectionEntities.retainAll(allTypeEntitities);
+                    
+                    //Workaround for ARM behavior 
+                    if (AccessObjectType.OBJECT_PROPERTY.equals(type)) {
+                        //find all faux object properties for each of base property from entityUri set
+                        //and add to the list of additional faux object properties
+                        for (String entity: intersectionEntities) {
+                            Set<String> faux = getFauxByBase(entity);
+                            addFauxOP.addAll(faux);
+                        }
                     }
-                    Set<String> retainEntitities = entityTypeMap.get(aot);
-                    if (retainEntitities.isEmpty()) {
-                        continue;
+                    if (AccessObjectType.DATA_PROPERTY.equals(type)) {
+                        //find all faux data properties for each of base property from entityUri set
+                        //and add to the list of additional faux data properties
+                        for (String entity: intersectionEntities) {
+                            Set<String> faux = getFauxByBase(entity);
+                            addFauxDP.addAll(faux);
+                        }
                     }
-                    HashSet<String> typeEntities = new HashSet<>(entities);
-                    typeEntities.retainAll(retainEntitities);
-                    for (String entityUri : typeEntities) {
-                        EntityPolicyController.getDataValueStatements(entityUri, aot, og, Collections.singleton(newRole), additions);    
+                    if (AccessObjectType.FAUX_OBJECT_PROPERTY.equals(type)) {
+                        intersectionEntities.addAll(addFauxOP);
+                    }
+                    if (AccessObjectType.FAUX_DATA_PROPERTY.equals(type)) {
+                        intersectionEntities.addAll(addFauxDP);
+                    }
+                    for (String entityUri : intersectionEntities) {
+                        EntityPolicyController.getDataValueStatements(entityUri, type, og, Collections.singleton(newRole), additions);    
                     }
                 }
             }
@@ -154,15 +195,15 @@ public class ArmMigrator {
                 String entity = qs.getResource("uri").getURI();
                 if (AccessObjectType.FAUX_DATA_PROPERTY.equals(type)){
                     String baseUri = qs.getResource("base").getURI();
-                    Set<String> set = map.get(AccessObjectType.DATA_PROPERTY);
-                    if (!set.contains(baseUri)) {
+                    Set<String> dataPropSet = map.get(AccessObjectType.DATA_PROPERTY);
+                    if (!dataPropSet.contains(baseUri)) {
                         continue;
                     }
                 }
                 if (AccessObjectType.FAUX_OBJECT_PROPERTY.equals(type)){
                     String baseUri = qs.getResource("base").getURI();
-                    Set<String> set = map.get(AccessObjectType.OBJECT_PROPERTY);
-                    if (!set.contains(baseUri)) {
+                    Set<String> objectPropSet = map.get(AccessObjectType.OBJECT_PROPERTY);
+                    if (!objectPropSet.contains(baseUri)) {
                         continue;
                     }
                 }
