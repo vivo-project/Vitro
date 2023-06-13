@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -408,21 +409,18 @@ public class JenaModelUtils {
     }
     
     /**
-     * Remove statements from a graph in a dataset by separating statements
+     * Remove statements from a model by separating statements
      * containing blank nodes from those that have no blank nodes.
-     * The blank node triples are removed by treating blank nodes as variables and
+     * The blank node statements are removed by treating blank nodes as variables and
      * constructing the matching subgraphs for deletion.
      * The other statements are removed normally.
-     * @param model containing statements to be removed
-     * @param dataset from which to be deleted
-     * @param graphURI the URI of the named graph in the dataset from which
-     *         statements are to be removed.  If null, the dataset's default
-     *         (unnamed) graph will be used.
+     * @param toRemove containing statements to be removed
+     * @param removeFrom from which statements should be removed
      */
-    public static void removeWithBlankNodesAsVariables(Model model, Dataset dataset, String graphURI) {
+    public static void removeWithBlankNodesAsVariables(Model toRemove, Model removeFrom) {
     	List<Statement> blankNodeStatements = new ArrayList<Statement>();
     	List<Statement> nonBlankNodeStatements = new ArrayList<Statement>();
-    	StmtIterator stmtIt = model.listStatements();
+    	StmtIterator stmtIt = toRemove.listStatements();
         while (stmtIt.hasNext()) {
             Statement stmt = stmtIt.nextStatement();
             if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
@@ -434,11 +432,9 @@ public class JenaModelUtils {
         if(!blankNodeStatements.isEmpty()) {
         	Model blankNodeModel = ModelFactory.createDefaultModel();
         	blankNodeModel.add(blankNodeStatements);
-        	removeBlankNodesUsingSparqlConstruct(blankNodeModel, dataset, graphURI);	
+        	removeBlankNodesUsingSparqlConstruct(blankNodeModel, removeFrom);	
         }
         if(!nonBlankNodeStatements.isEmpty()) {
-            Model removeFrom = (graphURI == null)
-            		? dataset.getDefaultModel() : dataset.getNamedModel(graphURI);
             try {
             	removeFrom.enterCriticalSection(Lock.WRITE);
             	removeFrom.remove(nonBlankNodeStatements);
@@ -449,7 +445,7 @@ public class JenaModelUtils {
     }
     
     private static void removeBlankNodesUsingSparqlConstruct(Model blankNodeModel,
-    		Dataset dataset, String graphURI) {
+    		Model removeFrom) {
         log.debug("blank node model size " + blankNodeModel.size());
         if (blankNodeModel.size() == 1) {
             log.debug("Deleting single triple with blank node: " + blankNodeModel);
@@ -471,14 +467,8 @@ public class JenaModelUtils {
                 QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
                 try {
                     Model tree = qee.execDescribe();
-                    Dataset ds = DatasetFactory.createMem();
-                    if (graphURI == null) {
-                        ds.setDefaultModel(dataset.getDefaultModel());
-                    } else {
-                        ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));
-                    }
                     if (s.isAnon()) {
-                        JenaModelUtils.removeUsingSparqlConstruct(tree, ds, graphURI);
+                        JenaModelUtils.removeUsingSparqlConstruct(tree, removeFrom);
                     } else {
                         StmtIterator sit = tree.listStatements(s, null, (RDFNode) null);
                         while (sit.hasNext()) {
@@ -500,7 +490,7 @@ public class JenaModelUtils {
                                 }
                             }
                             m2.add(stmt);
-                            JenaModelUtils.removeUsingSparqlConstruct(m2, ds, graphURI);
+                            JenaModelUtils.removeUsingSparqlConstruct(m2, removeFrom);
                         }
                     }
                 } finally {
@@ -526,19 +516,15 @@ public class JenaModelUtils {
     private static final boolean WHERE_CLAUSE = true;
     
     /**
-     * Remove statements from a graph in a dataset by first constructing
+     * Remove statements from a model by first constructing
      * the statements to be removed with a SPARQL query that treats
      * each blank node ID as a variable.
      * This allows matching blank node structures to be removed even though
      * the internal blank node IDs are different.
-     * @param model containing statements to be removed
-     * @param dataset from which to be deleted
-     * @param graphURI the URI of the named graph in the dataset from which
-     *         statements are to be removed.  If null, the dataset's default
-     *         (unnamed) graph will be used.
+     * @param toRemove containing statements to be removed
+     * @param removeFrom from which statements should be removed
      */
-    public static void removeUsingSparqlConstruct(Model toRemove, Dataset dataset,
-    		String graphURI) {
+    public static void removeUsingSparqlConstruct(Model toRemove, Model removeFrom) {
         if(toRemove.isEmpty()) {
         	return;
         }
@@ -548,26 +534,20 @@ public class JenaModelUtils {
         queryBuff.append("CONSTRUCT { \n");
         addStatementPatterns(stmts, queryBuff, !WHERE_CLAUSE);
         queryBuff.append("} WHERE { \n");
-        if (graphURI != null) {
-            queryBuff.append("    GRAPH <").append(graphURI).append("> { \n");
-        }
         addStatementPatterns(stmts, queryBuff, WHERE_CLAUSE);
-        if (graphURI != null) {
-            queryBuff.append("    } \n");
-        }
         queryBuff.append("} \n");
         String queryStr = queryBuff.toString();
         log.debug(queryBuff.toString());
         Query construct = QueryFactory.create(queryStr);
-        Model modelForConstruct = (graphURI == null)
-        		? dataset.getDefaultModel() : dataset.getNamedModel(graphURI);
-        QueryExecution qe = QueryExecutionFactory.create(construct, modelForConstruct);
+        QueryExecution qe = QueryExecutionFactory.create(construct, removeFrom);
         try {
             Model constructedRemovals = qe.execConstruct();
-            Model removeFrom = (graphURI == null)
-            		? dataset.getDefaultModel() : dataset.getNamedModel(graphURI);
             try {
             	removeFrom.enterCriticalSection(Lock.WRITE);
+            	log.info("Removing contructed:");
+            	StringWriter sw = new StringWriter();
+            	constructedRemovals.write(sw, "TTL");
+            	log.info(sw.toString());
             	removeFrom.remove(constructedRemovals);
             } finally {
             	removeFrom.leaveCriticalSection();

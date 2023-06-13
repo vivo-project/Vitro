@@ -95,7 +95,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
                         m = dataset.getDefaultModel();
                     }
                 }
-                operateOnModel(m, modelChange, null);
+                operateOnModel(m, modelChange);
             }
 
             // notify listeners of triple changes

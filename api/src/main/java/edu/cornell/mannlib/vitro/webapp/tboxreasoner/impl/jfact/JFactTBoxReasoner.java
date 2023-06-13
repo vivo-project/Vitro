@@ -84,9 +84,7 @@ public class JFactTBoxReasoner implements
 		filteredAssertionsModel.add(changes.getAddedStatements());
 		Model removals = ModelFactory.createDefaultModel();
 		removals.add(changes.getRemovedStatements());
-		Dataset dataset = DatasetFactory.createGeneral();
-		dataset.setDefaultModel(filteredAssertionsModel);
-		JenaModelUtils.removeWithBlankNodesAsVariables(removals, dataset, null);
+		JenaModelUtils.removeWithBlankNodesAsVariables(removals, filteredAssertionsModel);
 		clearEmptyAxiomStatements();
 	}
 

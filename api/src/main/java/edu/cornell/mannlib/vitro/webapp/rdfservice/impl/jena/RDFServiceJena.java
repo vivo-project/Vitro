@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -34,6 +36,8 @@ import org.apache.jena.sdb.SDB;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.log4j.lf5.util.StreamUtils;
+
+import com.github.benmanes.caffeine.cache.RemovalListener;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -85,7 +89,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 				Model model = (modelChange.getGraphURI() == null) ?
 						dataset.getDefaultModel() :
 						dataset.getNamedModel(modelChange.getGraphURI());
-				operateOnModel(model, modelChange, dataset);
+				operateOnModel(model, modelChange);
 			} finally {
 				dataset.getLock().leaveCriticalSection();
 			}
@@ -98,7 +102,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		}
 	}
 
-    protected void operateOnModel(Model model, ModelChange modelChange, Dataset dataset) {
+    protected void operateOnModel(Model model, ModelChange modelChange) {
         model.enterCriticalSection(Lock.WRITE);
         try {
 			if (log.isDebugEnabled()) {
@@ -109,11 +113,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             	model.add(addition);
             } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
                 Model removal = parseModel(modelChange);
-                if (dataset != null) {
-                    JenaModelUtils.removeWithBlankNodesAsVariables(removal, dataset, modelChange.getGraphURI());
-                } else {
-                    model.remove(removal);
-                }
+                JenaModelUtils.removeWithBlankNodesAsVariables(removal, model);
             } else {
                 log.error("unrecognized operation type");
             }

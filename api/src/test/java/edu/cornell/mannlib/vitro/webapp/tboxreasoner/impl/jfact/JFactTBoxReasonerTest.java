@@ -74,9 +74,7 @@ public class JFactTBoxReasonerTest {
 		waitForTBoxReasoning(driver);
 		// Confirm that union model now contains inferred triples
 		Assert.assertTrue(tboxUnion.size() > additions.size());
-		Dataset dataset = DatasetFactory.createGeneral();
-		dataset.setDefaultModel(tboxAssertions.getBaseModel());
-		JenaModelUtils.removeWithBlankNodesAsVariables(subtractions, dataset, null);
+		JenaModelUtils.removeWithBlankNodesAsVariables(subtractions, tboxAssertions.getBaseModel());
 		tboxAssertions.getBaseModel().notifyEvent(new EditEvent(null, false));
 		waitForTBoxReasoning(driver);
 		// Confirm that no statements related to classes a, b or c remain in the
