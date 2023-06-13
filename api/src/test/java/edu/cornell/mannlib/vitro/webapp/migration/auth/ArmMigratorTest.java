@@ -100,14 +100,15 @@ public class ArmMigratorTest extends AuthMigratorTest {
         StringBuilder additions = new StringBuilder();
         armMigrator.collectAdditions(entityTypeMap, additions);
         String stringResult = additions.toString();
+        System.out.println(stringResult);
         assertFalse(stringResult.isEmpty());
-        assertEquals(15, getCount("\n", stringResult));
-        assertEquals(15, getCount(dataValue, stringResult));
+        assertEquals(18, getCount("\n", stringResult));
+        assertEquals(18, getCount(dataValue, stringResult));
         assertEquals(3, getCount(OBJECT_PROPERTY_URI, stringResult));
         assertEquals(3, getCount(CLASS_URI, stringResult));
         assertEquals(3, getCount(DATA_PROPERTY_URI, stringResult));
-        assertEquals(3, getCount(FAUX_DATA_PROPERTY_URI, stringResult));
-        assertEquals(3, getCount(FAUX_OBJECT_PROPERTY_URI, stringResult));
+        assertEquals(5, getCount(FAUX_DATA_PROPERTY_URI, stringResult));
+        assertEquals(4, getCount(FAUX_OBJECT_PROPERTY_URI, stringResult));
     }
     
     private static long getCount(String pattern, String lines) {
