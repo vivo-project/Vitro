@@ -165,4 +165,9 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     public Map<String, Object> getVerboseDisplay() {
         return verboseDisplay;
     }
+    
+    protected boolean isFaux() {
+        return fauxProperty != null;
+    }
+    
 }

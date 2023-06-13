@@ -46,9 +46,6 @@ public class DynamicPolicy implements Policy {
     @Override
     public PolicyDecision decide(AuthorizationRequest ar) {
         AccessObject whatToAuth = ar.getAccessObject();
-        //if (ac_subject == null) {
-        //    return defaultDecision("whomToAuth was null");
-        //}
         if (whatToAuth == null) {
             return defaultDecision("whatToAuth was null");
         }

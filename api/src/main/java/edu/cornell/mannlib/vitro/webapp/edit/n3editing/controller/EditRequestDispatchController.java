@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller;
 
-import static edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils.getPredicateUri;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +18,8 @@ import org.apache.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxDataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -82,33 +82,43 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
 		String domainUri = EditConfigurationUtils.getDomainUri(vreq);
 		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
-		String fauxContextUri = getFauxConfigUri(vreq);
-		if(!StringUtils.isBlank(fauxContextUri)) {
-			predicateUri = fauxContextUri;
-		}
+		FauxProperty fauxProperty = getFauxConfigUri(vreq);
 		Property predicateProp = new Property();
 		predicateProp.setURI(predicateUri);
 		predicateProp.setDomainVClassURI(domainUri);
 		predicateProp.setRangeVClassURI(rangeUri);
 		OntModel ontModel = ModelAccess.on(vreq).getOntModel();
-		ObjectPropertyStatementAccessObject objectPropertyAction;
-		AccessOperation ao;
+		AccessObject objectPropertyAccessObject;
+		AccessObject dataPropertyAccessObject;
+		AccessOperation accessOperation;
 		if (StringUtils.isBlank(objectUri)) {
-			objectPropertyAction = new ObjectPropertyStatementAccessObject(ontModel, subjectUri, predicateProp, AccessObject.SOME_URI);
-			ao = AccessOperation.ADD;
+		    if (fauxProperty == null) {
+		        objectPropertyAccessObject = new ObjectPropertyStatementAccessObject(ontModel, subjectUri, predicateProp, AccessObject.SOME_URI);    
+		    } else {
+		        objectPropertyAccessObject = new FauxObjectPropertyStatementAccessObject(ontModel, subjectUri, fauxProperty, AccessObject.SOME_URI);
+		    }
+			accessOperation = AccessOperation.ADD;
 		} else {
-            objectPropertyAction = new ObjectPropertyStatementAccessObject(ontModel, subjectUri, predicateProp, objectUri);
+		    if (fauxProperty == null) {
+		        objectPropertyAccessObject = new ObjectPropertyStatementAccessObject(ontModel, subjectUri, predicateProp, objectUri);
+		    } else {
+	            objectPropertyAccessObject = new FauxObjectPropertyStatementAccessObject(ontModel, subjectUri, fauxProperty, objectUri);
+		    }
 			if (isDeleteForm(vreq)) {
-				ao = AccessOperation.DROP;
+				accessOperation = AccessOperation.DROP;
 			} else {
-				ao = AccessOperation.EDIT;
+				accessOperation = AccessOperation.EDIT;
 			}
 		}
-		final DataPropertyStatementAccessObject editDataPropertyStatement = new DataPropertyStatementAccessObject(ontModel, subjectUri, predicateUri, objectUri);
+		if (fauxProperty == null) {
+		    dataPropertyAccessObject = new DataPropertyStatementAccessObject(ontModel, subjectUri, predicateUri, objectUri);    
+		} else {
+		    dataPropertyAccessObject = new FauxDataPropertyStatementAccessObject(ontModel, subjectUri, fauxProperty, objectUri);
+		}
         boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, 
 		        AuthorizationRequest.or(
-		                new SimpleAuthorizationRequest(editDataPropertyStatement, AccessOperation.EDIT), 
-		                new SimpleAuthorizationRequest(objectPropertyAction, ao)));
+		                new SimpleAuthorizationRequest(dataPropertyAccessObject, AccessOperation.EDIT), 
+		                new SimpleAuthorizationRequest(objectPropertyAccessObject, accessOperation)));
 		if (!isAuthorized) {
 			// If request is for new individual, return simple do back end editing action permission
 			if (StringUtils.isNotEmpty(EditConfigurationUtils.getTypeOfNew(vreq))) {
@@ -120,16 +130,14 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		return isAuthorized? SimplePermission.DO_FRONT_END_EDITING.ACTION: AuthorizationRequest.UNAUTHORIZED;
 	}
 	
-    public static String getFauxConfigUri(VitroRequest vreq) {
+    public static FauxProperty getFauxConfigUri(VitroRequest vreq) {
     	String fauxContextUri = vreq.getParameter("fauxContextUri");
     	if (fauxContextUri != null) {
         	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         	FauxProperty fp = wdf.getFauxPropertyDao().getFauxPropertyFromContextUri(fauxContextUri);
-        	if (fp != null) {
-        		return fp.getConfigUri();	
-        	}
+        	return fp;
     	} 
-    	return "";
+    	return null;
     }
     
     	private boolean isIndividualDeletion(VitroRequest vreq) {

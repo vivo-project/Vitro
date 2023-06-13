@@ -10,6 +10,7 @@ import org.apache.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxDataPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
@@ -47,9 +48,8 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         // Determine whether the statement can be deleted
 		DataPropertyStatement dps = makeStatement();
         AccessObject action;
-        if (property instanceof FauxPropertyWrapper) {
-            DataPropertyStatement dpfs = makeFauxStatement();
-            action = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), dpfs);
+        if (isFaux()) {
+            action = new FauxDataPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, literalValue.getLexicalForm());
         } else {
             action = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), dps);
         }
@@ -64,8 +64,8 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                 "datapropKey", makeHash(dps),
                 "cmd", "delete");
 
-        if (property instanceof FauxPropertyWrapper) {
-            params.put("fauxContextUri",((FauxPropertyWrapper)property).getContextUri());
+        if (isFaux()) {
+            params.put("fauxContextUri",fauxProperty.getContextUri());
         }
         
         params.put("templateName", templateName);
@@ -83,15 +83,14 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 
         // Determine whether the statement can be edited
 		DataPropertyStatement dps = makeStatement();
-        AccessObject action;
-        if (property instanceof FauxPropertyWrapper) {
-            DataPropertyStatement dpfs = makeFauxStatement();
-            action = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), dpfs);
+        AccessObject ao;
+        if (isFaux()) {
+            ao = new FauxDataPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, literalValue.getLexicalForm());
         } else {
-            action = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), dps);
+            ao = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), dps);
         }
 		
-        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action, AccessOperation.EDIT) ) {
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.EDIT) ) {
             return "";
         }
 
@@ -100,8 +99,8 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                 "predicateUri", property.getURI(),
                 "datapropKey", makeHash(dps));
 
-        if (property instanceof FauxPropertyWrapper) {
-            params.put("fauxContextUri",((FauxPropertyWrapper)property).getContextUri());
+        if (isFaux()) {
+            params.put("fauxContextUri",fauxProperty.getContextUri());
         }
         
         if ( deleteUrl.isEmpty() ) {
@@ -116,15 +115,6 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 	private DataPropertyStatement makeStatement() {
 		DataPropertyStatement dps;
 		dps = new DataPropertyStatementImpl(subjectUri, property.getURI(), literalValue.getLexicalForm());	
-		// Language and datatype are needed to get the correct hash value
-		dps.setLanguage(literalValue.getLanguage());
-		dps.setDatatypeURI(literalValue.getDatatypeURI());
-		return dps;
-	}
-	
-	private DataPropertyStatement makeFauxStatement() {
-		DataPropertyStatement dps;
-		dps = new DataPropertyStatementImpl(subjectUri, ((FauxPropertyWrapper)property).getConfigUri(), literalValue.getLexicalForm());	
 		// Language and datatype are needed to get the correct hash value
 		dps.setLanguage(literalValue.getLanguage());
 		dps.setDatatypeURI(literalValue.getDatatypeURI());

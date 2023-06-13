@@ -123,7 +123,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
         // Determine whether a new statement can be added
 		AccessObject ao; 
-		if (fauxProperty != null) {
+		if (isFaux()) {
 		    ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, SOME_URI);
 		} else {
 	        ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, SOME_URI);
@@ -146,7 +146,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
     		
-            if (fauxProperty != null){
+            if (isFaux()){
                 String fauxPropertyContextUri = fauxProperty.getContextUri();
                 params.put("fauxContextUri", fauxPropertyContextUri);
             } 
