@@ -29,13 +29,13 @@ ai:PublicUpdateObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowPublicUpdateObjectPropertyRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsPublicRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:ObjectPropertyTypeAttribute ;
           ao:attribute ai:PublicUpdateObjectPropertyAttribute .
 
 ai:AllowPublicUpdateObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsPublicRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
           ao:attribute ai:PublicUpdateObjectPropertyStatementAttribute .
          

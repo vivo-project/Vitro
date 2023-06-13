@@ -28,7 +28,7 @@ ai:AdminUpdateClassPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowAdminUpdateClassRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:ClassTypeAttribute ;
           ao:attribute ai:AdminUpdateClassAttribute .
          

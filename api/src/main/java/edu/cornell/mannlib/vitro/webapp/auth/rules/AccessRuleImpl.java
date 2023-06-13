@@ -53,6 +53,9 @@ public class AccessRuleImpl implements AccessRule {
     public boolean match(AuthorizationRequest ar) {
        for (Attribute attribute : attributes) {
            if (!attribute.match(ar)) {
+               if (log.isDebugEnabled()) {
+                   log.debug(String.format("Attribute %s didn't match", attribute.getUri()));    
+               }
                return false;
            }
        }

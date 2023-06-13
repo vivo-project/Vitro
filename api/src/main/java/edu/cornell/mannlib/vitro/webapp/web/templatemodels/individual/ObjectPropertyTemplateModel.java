@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -110,20 +111,25 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         objectKey = getQueryObjectVariableName();
 
         if (editing) {
-        	setAddUrl(op);
+        	setAddUrl();
         }
     }
 
-    protected void setAddUrl(Property property) {
+    protected void setAddUrl() {
     	// Is the add link suppressed for this property?
     	if (property.isAddLinkSuppressed()) {
     		return;
     	}
 
         // Determine whether a new statement can be added
-		AccessObject action = new ObjectPropertyStatementAccessObject(
-				vreq.getJenaOntModel(), subjectUri, property, SOME_URI);
-        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action, AccessOperation.ADD) ) {
+		AccessObject ao; 
+		if (fauxProperty != null) {
+		    ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, SOME_URI);
+		} else {
+	        ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, SOME_URI);
+		}
+		
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.ADD) ) {
             return;
         }
 
@@ -140,8 +146,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
     		
-            if (isFauxProperty(property)){
-                String fauxPropertyContextUri = ((FauxPropertyWrapper)property).getContextUri();
+            if (fauxProperty != null){
+                String fauxPropertyContextUri = fauxProperty.getContextUri();
                 params.put("fauxContextUri", fauxPropertyContextUri);
             } 
 

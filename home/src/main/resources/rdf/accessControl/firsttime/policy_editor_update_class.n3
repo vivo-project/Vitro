@@ -28,7 +28,7 @@ ai:EditorUpdateClassPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowEditorUpdateClassRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsEditorRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:ClassTypeAttribute ;
           ao:attribute ai:EditorUpdateClassAttribute .
          

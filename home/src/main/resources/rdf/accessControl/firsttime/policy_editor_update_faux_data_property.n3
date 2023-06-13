@@ -29,13 +29,13 @@ ai:EditorUpdateFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowEditorUpdateFauxDataPropertyRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsEditorRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:FauxDataPropertyTypeAttribute ;
           ao:attribute ai:EditorUpdateFauxDataPropertyAttribute .
 
 ai:AllowEditorUpdateFauxDataPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsEditorRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:FauxDataPropertyStatementTypeAttribute ;
           ao:attribute ai:EditorUpdateFauxDataPropertyStatementAttribute .
          

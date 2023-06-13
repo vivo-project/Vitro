@@ -28,7 +28,7 @@ ai:PublicUpdateClassPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowPublicUpdateClassRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsPublicRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:ClassTypeAttribute ;
           ao:attribute ai:PublicUpdateClassAttribute .
          

@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
 import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_PREDICATE;
 import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
@@ -19,11 +18,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;

@@ -29,7 +29,7 @@ ai:AdminUpdateFauxObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowAdminUpdateFauxObjectPropertyRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:FauxObjectPropertyTypeAttribute ;
           ao:attribute ai:AdminUpdateFauxObjectPropertyAttribute .
 
