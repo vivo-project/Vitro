@@ -456,9 +456,6 @@ public class JenaModelUtils {
         QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
         try {
             ResultSet rs = qe.execSelect();
-            if (!rs.hasNext()) {
-                log.warn("No rooted blank node trees; deletion is not possible.");
-            }
             while (rs.hasNext()) {
                 QuerySolution qs = rs.next();
                 Resource s = qs.getResource("s");
@@ -467,32 +464,7 @@ public class JenaModelUtils {
                 QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
                 try {
                     Model tree = qee.execDescribe();
-                    if (s.isAnon()) {
-                        JenaModelUtils.removeUsingSparqlConstruct(tree, removeFrom);
-                    } else {
-                        StmtIterator sit = tree.listStatements(s, null, (RDFNode) null);
-                        while (sit.hasNext()) {
-                            Statement stmt = sit.nextStatement();
-                            RDFNode n = stmt.getObject();
-                            Model m2 = ModelFactory.createDefaultModel();
-                            if (n.isResource()) {
-                                Resource s2 = (Resource) n;
-                                // now run yet another describe query
-                                String smallerTree = makeDescribe(s2);
-                                log.debug(smallerTree);
-                                Query smallerTreeQuery = QueryFactory.create(smallerTree);
-                                QueryExecution qe3 = QueryExecutionFactory.create(
-                                        smallerTreeQuery, tree);
-                                try {
-                                    qe3.execDescribe(m2);
-                                } finally {
-                                    qe3.close();
-                                }
-                            }
-                            m2.add(stmt);
-                            JenaModelUtils.removeUsingSparqlConstruct(m2, removeFrom);
-                        }
-                    }
+                    JenaModelUtils.removeUsingSparqlConstruct(tree, removeFrom);
                 } finally {
                     qee.close();
                 }
