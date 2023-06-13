@@ -235,7 +235,7 @@ public class PolicyLoader {
             debug("Loading policy %s", uri);
             DynamicPolicy policy = loadPolicy(uri);
             if (policy != null) {
-                log.info("Loaded policy " + uri);
+                log.debug("Loaded policy " + uri);
                 // take policy priority into account
                 PolicyStore.getInstance().add(policy);
             }

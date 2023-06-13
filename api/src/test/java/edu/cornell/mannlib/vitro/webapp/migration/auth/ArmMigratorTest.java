@@ -100,7 +100,6 @@ public class ArmMigratorTest extends AuthMigratorTest {
         StringBuilder additions = new StringBuilder();
         armMigrator.collectAdditions(entityTypeMap, additions);
         String stringResult = additions.toString();
-        System.out.println(stringResult);
         assertFalse(stringResult.isEmpty());
         assertEquals(18, getCount("\n", stringResult));
         assertEquals(18, getCount(dataValue, stringResult));

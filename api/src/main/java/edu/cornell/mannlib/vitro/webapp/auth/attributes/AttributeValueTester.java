@@ -50,7 +50,7 @@ public class AttributeValueTester {
         AccessObject ao = ar.getAccessObject();
         Model m = ao.getStatementOntModel();
         if (m == null) {
-            log.error("SparqlQueryContains model is not provided");
+            log.debug("SparqlQueryContains model is not provided");
             return false;
         }
         List<String> personUris = ar.getEditorUris();
