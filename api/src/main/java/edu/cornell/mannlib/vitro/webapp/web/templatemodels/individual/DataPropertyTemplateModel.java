@@ -135,7 +135,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         // Determine whether a new statement can be added
 		String fauxContextUri = null;
 		AccessObject action;
-		if (fauxProperty != null){
+		if (isFaux()){
 			fauxContextUri = fauxProperty.getContextUri();
 			action = new FauxDataPropertyStatementAccessObject(
 					vreq.getJenaOntModel(), subjectUri, fauxProperty, SOME_LITERAL);

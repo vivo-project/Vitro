@@ -642,7 +642,7 @@ public class PolicyLoader {
 
     private static void debug(String template, Object... objects) {
         if (log.isDebugEnabled()) {
-            log.error(String.format(template, objects));
+            log.debug(String.format(template, objects));
         }
     }
 

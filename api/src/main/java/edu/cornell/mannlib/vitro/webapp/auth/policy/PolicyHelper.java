@@ -126,13 +126,9 @@ public class PolicyHelper {
 	}
 
 	private static void debug(AuthorizationRequest ar, PolicyDecision decision) {
-	    if (true) {//log.isDebugEnabled()
+	    if (log.isDebugEnabled()) {
 	        AccessObject ao = ar.getAccessObject();
-            log.error(String.format("Request for %s on object %s resulted in decision %s", ar.getAccessOperation(), ao, decision.getDecisionResult()));
-	        if (ao == null) {
-	            Throwable t = new Throwable();
-                log.error(t, t);
-	        }
+            log.debug(String.format("Request for %s on object %s resulted in decision %s", ar.getAccessOperation(), ao, decision.getDecisionResult()));
 	    }
     }
 

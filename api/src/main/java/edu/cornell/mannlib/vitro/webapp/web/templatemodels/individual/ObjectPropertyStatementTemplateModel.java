@@ -73,8 +73,8 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 "cmd", "delete",
                 "objectKey", objectKey);
 
-        if (property instanceof FauxPropertyWrapper) {
-            params.put("fauxContextUri", ((FauxPropertyWrapper) property).getContextUri());
+        if (isFaux()) {
+            params.put("fauxContextUri", fauxProperty.getContextUri());
         }
 
         for ( String key : data.keySet() ) {
@@ -127,8 +127,8 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 "predicateUri", property.getURI(),
                 "objectUri", objectUri);
 
-        if (property instanceof FauxPropertyWrapper) {
-            params.put("fauxContextUri",((FauxPropertyWrapper)property).getContextUri());
+        if (isFaux()) {
+            params.put("fauxContextUri", fauxProperty.getContextUri());
         }
         
         if ( deleteUrl.isEmpty() ) {
