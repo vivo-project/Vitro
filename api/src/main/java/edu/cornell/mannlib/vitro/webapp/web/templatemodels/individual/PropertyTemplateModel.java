@@ -40,12 +40,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private String name;
     private int displayLimit;
 
+    protected FauxProperty fauxProperty;
+
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq, String name) {
         this.vreq = vreq;
         subjectUri = subject.getURI();
         this.property = property;
         if (isFauxProperty(property)) {
-            FauxProperty fauxProperty = getFauxProperty(property);
+            fauxProperty = getFauxProperty(property);
             this.name = fauxProperty.getDisplayName();
             this.displayLimit = fauxProperty.getDisplayLimit();
             propertyUri = fauxProperty.getBaseURI();
@@ -58,7 +60,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         setVerboseDisplayValues(property);
     }
 
-    private FauxProperty getFauxProperty(Property property) {
+    protected FauxProperty getFauxProperty(Property property) {
         return ((FauxPropertyWrapper) property).getFauxProperty();
     }
 

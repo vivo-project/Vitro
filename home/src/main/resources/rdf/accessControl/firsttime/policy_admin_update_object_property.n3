@@ -29,7 +29,7 @@ ai:AdminUpdateObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowAdminUpdateObjectPropertyRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:ObjectPropertyTypeAttribute ;
           ao:attribute ai:AdminUpdateObjectPropertyAttribute .
 

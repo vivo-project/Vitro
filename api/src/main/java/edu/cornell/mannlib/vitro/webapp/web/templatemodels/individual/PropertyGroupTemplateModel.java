@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -36,8 +37,6 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
     private final String name;
     private final List<PropertyTemplateModel> properties;
-
-
 
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group,
             Individual subject, boolean editing,
@@ -89,7 +88,8 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 		}
         //TODO: Model should be here to correctly check authorization
 		if (op instanceof FauxObjectPropertyWrapper) {
-			ao = new FauxObjectPropertyStatementAccessObject(null, subject.getURI(), (FauxObjectPropertyWrapper) op, SOME_URI);
+			final FauxProperty fauxProperty = ((FauxObjectPropertyWrapper) op).getFauxProperty();
+            ao = new FauxObjectPropertyStatementAccessObject(null, subject.getURI(), fauxProperty, SOME_URI);
 		} else {
 			ao = new ObjectPropertyStatementAccessObject(null, subject.getURI(), op, SOME_URI);
 		}
@@ -112,7 +112,8 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 		}
         //TODO: Model should be here to correctly check authorization
 		if (dp instanceof FauxDataPropertyWrapper) {
-			ao = new FauxDataPropertyStatementAccessObject(null, subject.getURI(), (FauxDataPropertyWrapper) dp, SOME_LITERAL);
+		    final FauxProperty fauxProperty = ((FauxDataPropertyWrapper) dp).getFauxProperty();
+			ao = new FauxDataPropertyStatementAccessObject(null, subject.getURI(), fauxProperty, SOME_LITERAL);
 		} else {
 			ao = new DataPropertyStatementAccessObject(null, subject.getURI(), dp, SOME_LITERAL);
 		}

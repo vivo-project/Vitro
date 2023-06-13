@@ -17,6 +17,7 @@ import org.apache.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxDataPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -102,11 +103,11 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         }
 
         if ( editing ) {
-        	setAddUrl(dp);
+        	setAddUrl();
         }
     }
 
-    protected void setAddUrl(Property property) {
+    protected void setAddUrl() {
 
         DataProperty dp = (DataProperty) property;
         // NIHVIVO-2790 vitro:moniker now included in the display, but don't allow new statements
@@ -134,14 +135,12 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         // Determine whether a new statement can be added
 		String fauxContextUri = null;
 		AccessObject action;
-		if (isFauxProperty(property)){
-			FauxPropertyWrapper fauxPropertywrapper = ((FauxPropertyWrapper) property);
-			fauxContextUri = fauxPropertywrapper.getContextUri();
-			action = new DataPropertyStatementAccessObject(
-					vreq.getJenaOntModel(), subjectUri, fauxPropertywrapper.getConfigUri(), SOME_LITERAL);
+		if (fauxProperty != null){
+			fauxContextUri = fauxProperty.getContextUri();
+			action = new FauxDataPropertyStatementAccessObject(
+					vreq.getJenaOntModel(), subjectUri, fauxProperty, SOME_LITERAL);
 		} else {
-			action = new DataPropertyStatementAccessObject(
-					vreq.getJenaOntModel(), subjectUri, propertyUri, SOME_LITERAL);
+			action = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, dp, SOME_LITERAL);
 		}
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action, AccessOperation.ADD) ) {
             return;

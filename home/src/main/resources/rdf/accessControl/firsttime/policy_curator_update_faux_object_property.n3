@@ -29,13 +29,13 @@ ai:CuratorUpdateFauxObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowCuratorUpdateFauxObjectPropertyRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:FauxObjectPropertyTypeAttribute ;
           ao:attribute ai:CuratorUpdateFauxObjectPropertyAttribute .
 
 ai:AllowCuratorUpdateFauxObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsAdminRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:FauxObjectPropertyStatementTypeAttribute ;
           ao:attribute ai:CuratorUpdateFauxObjectPropertyStatementAttribute .
          

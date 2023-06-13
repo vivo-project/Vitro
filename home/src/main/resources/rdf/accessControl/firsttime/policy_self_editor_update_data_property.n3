@@ -29,13 +29,13 @@ ai:SelfEditorUpdateDataPropertyPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowSelfEditorUpdateDataPropertyRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:DataPropertyTypeAttribute ;
           ao:attribute ai:SelfEditorUpdateDataPropertyAttribute .
 
 ai:AllowSelfEditorUpdateDataPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:DataPropertyStatementTypeAttribute ;
           ao:attribute ai:SelfEditorRelatedResourcesAttribute ;
           ao:attribute ai:SelfEditorUpdateDataPropertyStatementAttribute .

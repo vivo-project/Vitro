@@ -28,7 +28,7 @@ ai:CuratorUpdateClassPolicyKey rdf:type ao:PolicyKey ;
 
 ai:AllowCuratorUpdateClassRule rdf:type ao:Rule;
           ao:attribute ai:SubjectRoleEqualsCuratorRoleAttribute ;
-          ao:attribute ai:UpdateOperationAttribute ;
+          ao:attribute ai:UpdateAddEditOrDropOperationsAttribute ;
           ao:attribute ai:ClassTypeAttribute ;
           ao:attribute ai:CuratorUpdateClassAttribute .
          

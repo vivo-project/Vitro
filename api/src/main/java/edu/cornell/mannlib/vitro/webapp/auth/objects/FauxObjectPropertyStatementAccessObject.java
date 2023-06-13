@@ -5,15 +5,16 @@ package edu.cornell.mannlib.vitro.webapp.auth.objects;
 import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxObjectPropertyWrapper;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 
 public class FauxObjectPropertyStatementAccessObject extends AccessObject {
 
-	public FauxObjectPropertyStatementAccessObject(Model ontModel, String subjectUri, FauxObjectPropertyWrapper predicate, String objectUri) {
+	private FauxProperty predicate;
+
+    public FauxObjectPropertyStatementAccessObject(Model ontModel, String subjectUri, FauxProperty fauxProperty, String objectUri) {
 	    setStatementOntModel(ontModel);
         setStatementSubject(subjectUri);
-        setStatementPredicate(predicate);
+        predicate = fauxProperty;
         setStatementObject(objectUri);
 	}
 
@@ -24,19 +25,11 @@ public class FauxObjectPropertyStatementAccessObject extends AccessObject {
     
     @Override
     public String getStatementPredicateUri() {
-        if (statement == null || statement.getPredicate() == null) {
-            return null;
-        }
-        Property predicate = getPredicate();
-        if (predicate instanceof FauxObjectPropertyWrapper) {
-            return ((FauxObjectPropertyWrapper) predicate).getConfigUri();
-        }
-        return predicate.getURI();
+        return predicate.getConfigUri();
     }
 
     @Override
     public String toString() {
-        Property predicate = getPredicate();
-        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + ((FauxObjectPropertyWrapper) predicate).getConfigUri() + "> <"+ getStatementObject() + ">";
+        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + predicate.getConfigUri() + "> <"+ getStatementObject() + ">";
     }
 }

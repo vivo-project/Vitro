@@ -5,15 +5,16 @@ package edu.cornell.mannlib.vitro.webapp.auth.objects;
 import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxDataPropertyWrapper;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 
 public class FauxDataPropertyStatementAccessObject extends AccessObject {
 
-    public FauxDataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, FauxDataPropertyWrapper predicate, String dataValue) {
+    private FauxProperty predicate;
+
+    public FauxDataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, FauxProperty predicate, String dataValue) {
         setStatementOntModel(ontModel);
         setStatementSubject(subjectUri);
-        setStatementPredicate(predicate);
+        this.predicate = predicate;
         setStatementObject(dataValue);
     }
 
@@ -24,19 +25,11 @@ public class FauxDataPropertyStatementAccessObject extends AccessObject {
     
     @Override
     public String getStatementPredicateUri() {
-        if (statement == null || statement.getPredicate() == null) {
-            return null;
-        }
-        Property predicate = getPredicate();
-        if (predicate instanceof FauxDataPropertyWrapper) {
-            return ((FauxDataPropertyWrapper) predicate).getConfigUri();
-        }
-        return predicate.getURI();
+        return predicate.getConfigUri();
     }
     
     @Override
     public String toString() {
-        Property predicate = getPredicate();
-        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + ((FauxDataPropertyWrapper) predicate).getConfigUri() + "> <"+ getStatementObject() + ">";
+        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + predicate.getConfigUri() + "> <"+ getStatementObject() + ">";
     }
 }
