@@ -56,6 +56,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public abstract class RDFServiceJena extends RDFServiceImpl implements RDFService {
 
@@ -64,6 +65,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     protected abstract DatasetWrapper getDatasetWrapper();
 
     protected volatile boolean rebuildGraphURICache = true;
+    protected volatile boolean isRebuildGraphURICacheRunning = false;
     protected final List<String> graphURIs = Collections.synchronizedList(new ArrayList<>());
 
     @Override
@@ -319,23 +321,24 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public List<String> getGraphURIs() throws RDFServiceException {
-        if (rebuildGraphURICache) {
+        if (rebuildGraphURICache && !isRebuildGraphURICacheRunning) {
             rebuildGraphUris();
         }
         return graphURIs;
     }
 
     protected void rebuildGraphUris() {
-        Thread thread = new Thread(new Runnable() {
+        Thread thread = new VitroBackgroundThread(new Runnable() {
             public void run() {
                 synchronized (RDFServiceJena.class) {
                     if (rebuildGraphURICache) {
                         DatasetWrapper dw = getDatasetWrapper();
                         try {
+                            isRebuildGraphURICacheRunning = true;
                             Dataset d = dw.getDataset();
                             Set<String> newGraphUris = new HashSet<>();
+                            d.begin(ReadWrite.READ);
                             try {
-                                d.begin(ReadWrite.READ);
                                 Iterator<String> nameIt = d.listNames();
                                 while (nameIt.hasNext()) {
                                     newGraphUris.add(nameIt.next());
@@ -356,13 +359,14 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                         } catch (Exception e) {
                             log.error(e, e);
                         } finally {
+                            isRebuildGraphURICacheRunning = false;
                             dw.close();
                             rebuildGraphURICache = false;
                         }
                     }
                 }
             }
-        });
+        }, "Rebuild graphURI cache thread");
         thread.start();
     }
 
