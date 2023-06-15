@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.jfact;
 
+import static org.semanticweb.owlapi.vocab.OWLRDFVocabulary.OWL_AXIOM;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -9,17 +11,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
-
-import uk.ac.manchester.cs.jfact.JFactFactory;
-
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.ObjectProperty;
 import org.apache.jena.ontology.OntModel;
@@ -32,13 +23,21 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxChanges;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.TBoxInferencesAccumulator;
-
-import static org.semanticweb.owlapi.vocab.OWLRDFVocabulary.OWL_AXIOM;
+import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /**
  * An implementation of the JFact reasoner for the TBox.
@@ -81,7 +80,9 @@ public class JFactTBoxReasoner implements
 		log.debug("Adding " + changes.getAddedStatements().size()
 				+ ", removing " + changes.getRemovedStatements().size());
 		filteredAssertionsModel.add(changes.getAddedStatements());
-		filteredAssertionsModel.remove(changes.getRemovedStatements());
+		Model removals = ModelFactory.createDefaultModel();
+		removals.add(changes.getRemovedStatements());
+		JenaModelUtils.removeWithBlankNodesAsVariables(removals, filteredAssertionsModel);
 		clearEmptyAxiomStatements();
 	}
 

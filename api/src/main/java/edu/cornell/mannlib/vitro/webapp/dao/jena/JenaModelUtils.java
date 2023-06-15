@@ -2,15 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.graph.Triple;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
@@ -21,12 +23,16 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -39,6 +45,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 
 public class JenaModelUtils {
 
+	public static final String BNODE_ROOT_QUERY =
+	        "SELECT DISTINCT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
     private static final Log log = LogFactory.getLog(JenaModelUtils.class.getName());
 
     private static final Set<String>  nonIndividualTypeURIs ;
@@ -397,6 +405,191 @@ public class JenaModelUtils {
 
         return aboxModel;
 
+    }
+    
+    /**
+     * Remove statements from a model by separating statements
+     * containing blank nodes from those that have no blank nodes.
+     * The blank node statements are removed by treating blank nodes as variables and
+     * constructing the matching subgraphs for deletion.
+     * The other statements are removed normally.
+     * @param toRemove containing statements to be removed
+     * @param removeFrom from which statements should be removed
+     */
+    public static void removeWithBlankNodesAsVariables(Model toRemove, Model removeFrom) {
+    	List<Statement> blankNodeStatements = new ArrayList<Statement>();
+    	List<Statement> nonBlankNodeStatements = new ArrayList<Statement>();
+    	StmtIterator stmtIt = toRemove.listStatements();
+        while (stmtIt.hasNext()) {
+            Statement stmt = stmtIt.nextStatement();
+            if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+                blankNodeStatements.add(stmt);
+            } else {
+            	nonBlankNodeStatements.add(stmt);
+            }
+        }
+        if(!blankNodeStatements.isEmpty()) {
+        	Model blankNodeModel = ModelFactory.createDefaultModel();
+        	blankNodeModel.add(blankNodeStatements);
+        	removeBlankNodesUsingSparqlConstruct(blankNodeModel, removeFrom);	
+        }
+        if(!nonBlankNodeStatements.isEmpty()) {
+            try {
+            	removeFrom.enterCriticalSection(Lock.WRITE);
+            	removeFrom.remove(nonBlankNodeStatements);
+            } finally {
+            	removeFrom.leaveCriticalSection();
+            }        	
+        }
+    }
+    
+    private static void removeBlankNodesUsingSparqlConstruct(Model blankNodeModel,
+    		Model removeFrom) {
+        log.debug("blank node model size " + blankNodeModel.size());
+        if (blankNodeModel.size() == 1) {
+            log.debug("Deleting single triple with blank node: " + blankNodeModel);
+            log.debug("This could result in the deletion of multiple triples"
+            		+ " if multiple blank nodes match the same triple pattern.");
+        }
+        Query rootFinderQuery = QueryFactory.create(BNODE_ROOT_QUERY);
+        QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
+        try {
+            ResultSet rs = qe.execSelect();
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                Resource s = qs.getResource("s");
+                String treeFinder = makeDescribe(s);
+                Query treeFinderQuery = QueryFactory.create(treeFinder);
+                QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
+                try {
+                    Model tree = qee.execDescribe();
+                    JenaModelUtils.removeUsingSparqlConstruct(tree, removeFrom);
+                } finally {
+                    qee.close();
+                }
+            }
+        } finally {
+            qe.close();
+        }
+    }
+
+    private static String makeDescribe(Resource s) {
+        StringBuilder query = new StringBuilder("DESCRIBE <") ;
+        if (s.isAnon()) {
+            query.append("_:").append(s.getId().toString());
+        } else {
+            query.append(s.getURI());
+        }
+        query.append(">");
+        return query.toString();
+    }
+
+    private static final boolean WHERE_CLAUSE = true;
+    
+    /**
+     * Remove statements from a model by first constructing
+     * the statements to be removed with a SPARQL query that treats
+     * each blank node ID as a variable.
+     * This allows matching blank node structures to be removed even though
+     * the internal blank node IDs are different.
+     * @param toRemove containing statements to be removed
+     * @param removeFrom from which statements should be removed
+     */
+    public static void removeUsingSparqlConstruct(Model toRemove, Model removeFrom) {
+        if(toRemove.isEmpty()) {
+        	return;
+        }
+        List<Statement> stmts = toRemove.listStatements().toList();
+        stmts = sort(stmts);
+        StringBuffer queryBuff = new StringBuffer();
+        queryBuff.append("CONSTRUCT { \n");
+        addStatementPatterns(stmts, queryBuff, !WHERE_CLAUSE);
+        queryBuff.append("} WHERE { \n");
+        addStatementPatterns(stmts, queryBuff, WHERE_CLAUSE);
+        queryBuff.append("} \n");
+        String queryStr = queryBuff.toString();
+        log.debug(queryBuff.toString());
+        Query construct = QueryFactory.create(queryStr);
+        QueryExecution qe = QueryExecutionFactory.create(construct, removeFrom);
+        try {
+            Model constructedRemovals = qe.execConstruct();
+            try {
+            	removeFrom.enterCriticalSection(Lock.WRITE);
+            	removeFrom.remove(constructedRemovals);
+            } finally {
+            	removeFrom.leaveCriticalSection();
+            }
+        } finally {
+            qe.close();
+        }
+    }
+    
+    private static List<Statement> sort(List<Statement> stmts) {
+        List<Statement> output = new ArrayList<Statement>();
+        int originalSize = stmts.size();
+        if(originalSize == 1) {
+            return stmts;
+        }
+        List <Statement> remaining = stmts;
+        ConcurrentLinkedQueue<Resource> subjQueue = new ConcurrentLinkedQueue<Resource>();
+        for(Statement stmt : remaining) {
+            if(stmt.getSubject().isURIResource()) {
+                subjQueue.add(stmt.getSubject());
+                break;
+            }
+        }
+        if (subjQueue.isEmpty()) {
+            log.warn("No named subject in statement patterns");
+            return stmts;
+        }
+        while(remaining.size() > 0) {
+            if(subjQueue.isEmpty()) {
+                subjQueue.add(remaining.get(0).getSubject());
+            }
+            while(!subjQueue.isEmpty()) {
+                Resource subj = subjQueue.poll();
+                List<Statement> temp = new ArrayList<Statement>();
+                for (Statement stmt : remaining) {
+                    if(stmt.getSubject().equals(subj)) {
+                        output.add(stmt);
+                        if (stmt.getObject().isResource()) {
+                            subjQueue.add((Resource) stmt.getObject());
+                        }
+                    } else {
+                        temp.add(stmt);
+                    }
+                }
+                remaining = temp;
+            }
+        }
+        if(output.size() != originalSize) {
+            throw new RuntimeException("original list size was " + originalSize +
+                    " but sorted size is " + output.size());
+        }
+        return output;
+    }
+
+    private static void addStatementPatterns(List<Statement> stmts,
+    		StringBuffer patternBuff, boolean whereClause) {
+        for(Statement stmt : stmts) {
+            Triple t = stmt.asTriple();
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getObject(), null));
+            patternBuff.append(" .\n");
+            if (whereClause) {
+                if (t.getSubject().isBlank()) {
+                    patternBuff.append("    FILTER(isBlank(").append(
+                    		SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
+                }
+                if (t.getObject().isBlank()) {
+                    patternBuff.append("    FILTER(isBlank(").append(
+                    		SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
+                }
+            }
+        }
     }
 
 }
