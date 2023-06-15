@@ -206,7 +206,7 @@ public class JSONConverter {
 		} catch (JsonProcessingException e) {
 			log.error(e, e);
 		}
-		if (node == null) {
+		if (node == null || node.isMissingNode()) {
 			String message = "Error reading json:\n" + jsonString;
 			throw new ConversionException(message);
 		}
@@ -245,12 +245,15 @@ public class JSONConverter {
 		try {
 			if (request.getReader() != null && request.getReader().lines() != null) {
 				jsonString = request.getReader().lines().collect(Collectors.joining());
+				if (StringUtils.isBlank(jsonString)) {
+				    jsonString = "{}";
+				}
 				jsonRequest = readJson(jsonString);
 			}
 		} catch (IOException e) {
 			log.error(e, e);
 		}
-		if (jsonRequest == null) {
+		if (jsonRequest == null || jsonRequest.isMissingNode()) {
 			String message = "Error reading input json:\n" + jsonString;
 			throw new ConversionException(message);
 		}
