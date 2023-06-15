@@ -378,6 +378,13 @@
             rdfs:range xsd:boolean ;
             rdfs:label "is optional"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#isOptionalParam
+:isOptionalParam rdf:type owl:DatatypeProperty ,
+                     owl:FunctionalProperty ;
+            rdfs:domain :Parameter ;
+            rdfs:range xsd:boolean ;
+            rdfs:label "is optional"@en-US .
+
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#languageFiltering
 :languageFiltering rdf:type owl:DatatypeProperty ,
