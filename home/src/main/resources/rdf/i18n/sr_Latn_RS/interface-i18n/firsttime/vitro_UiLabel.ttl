@@ -49,6 +49,7 @@ uil-data:advanced_search_tip_three.Vitro
 uil-data:file_upload_error_file_size_is_zero.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Veličina otpremljenog fajla je 0"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_size_is_zero" ;
         uil:hasPackage  "Vitro-languages" .
@@ -288,6 +289,7 @@ uil-data:password_reset_complete_subject.Vitro
 uil-data:file_upload_error_supported_actions.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Dozvoljeno je samo brisanje i otpremanje"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_supported_actions" ;
         uil:hasPackage  "Vitro-languages" .
@@ -743,6 +745,7 @@ uil-data:containers_do_not_pick_up_changes.Vitro
 uil-data:file_upload_error_media_type_not_allowed.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Media tip fajla nije dozvoljen. Media tip otpremljenog fajla je {0}."@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_media_type_not_allowed" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1166,6 +1169,7 @@ uil-data:october.Vitro
 uil-data:file_upload_subject.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "subjekat"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_subject" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1197,6 +1201,7 @@ uil-data:sunday.Vitro
 uil-data:password_system_has_changed.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Sistem je ažuriran kako bi bio sigurniji. Molimo Vas unesite novu lozinku."@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_system_has_changed" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1977,13 +1982,6 @@ uil-data:saturday.Vitro
         uil:hasKey      "saturday" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:_publications_link.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "_publications_link" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:javascript_require_to_edit.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -2147,6 +2145,7 @@ uil-data:acct_created_email_html_text.Vitro
 uil-data:file_upload_confirm_delete.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Da li ste sigurni da želite da obrišete ovaj fajl?"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_confirm_delete" ;
         uil:hasPackage  "Vitro-languages" .
@@ -2930,6 +2929,7 @@ uil-data:submit_upload.Vitro
 uil-data:confirm_individual_deletion.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Da li ste sigurni da želite da obrišete sledeću instancu?"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "confirm_individual_deletion" ;
         uil:hasPackage  "Vitro-languages" .
@@ -3313,6 +3313,7 @@ uil-data:password_capitalized.Vitro
 uil-data:file_upload_submit_label.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Otpremi (upload)"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_submit_label" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4200,6 +4201,7 @@ uil-data:add_label_for_language.Vitro
 uil-data:file_upload_error_file_not_found.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Fajl koji je potrebno otpremiti nije pronađen"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_not_found" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4207,6 +4209,7 @@ uil-data:file_upload_error_file_not_found.Vitro
 uil-data:file_upload_predicate.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "predikat"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_predicate" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4558,6 +4561,7 @@ uil-data:display_has_element_error.Vitro
 uil-data:file_upload_error_file_is_too_big.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Otpremljeni fajl je prevelik. Maksimalna dozvoljena veličina je {0} bajtova. Veličina otpremljenog fajla je {1} bajtova."@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_is_too_big" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4573,6 +4577,7 @@ uil-data:template_capitalized.Vitro
 uil-data:file_upload_supported_media.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Dozvoljeni media tipovi: "@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_supported_media" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4788,6 +4793,7 @@ uil-data:hide_properties.Vitro
 uil-data:file_upload_error_file_type_not_recognized.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Tip fajla nije prepoznat"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_file_type_not_recognized" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4811,6 +4817,7 @@ uil-data:new_account_title.Vitro
 uil-data:file_upload_no_allowed_media.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Dozvoljeni media tipovi nisu definisani u runtime.properties"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_no_allowed_media" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5162,6 +5169,7 @@ uil-data:custom_template_requiring_content.Vitro
 uil-data:file_upload_error_uri_not_exists.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "URI {0} ne postoji."@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_uri_not_exists" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5193,6 +5201,7 @@ uil-data:view_all_accounts.Vitro
 uil-data:file_upload_file.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "fajl"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_file" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5352,6 +5361,7 @@ uil-data:title_capitalized.Vitro
 uil-data:file_upload_error_no_action.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Akcija nije definisana"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_no_action" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5695,6 +5705,7 @@ uil-data:page_public_permission_option.Vitro
 uil-data:file_upload_error_uri_not_given.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "URI {0} nije definisan"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_error_uri_not_given" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5702,6 +5713,7 @@ uil-data:file_upload_error_uri_not_given.Vitro
 uil-data:file_upload_heading.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        rdfs:label       "Otpremanje fajla"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "file_upload_heading" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6016,13 +6028,6 @@ uil-data:custom_template_containing_content.Vitro
         rdfs:label       "Prilagođen šablon koji sadrži sav sadržaj"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "custom_template_containing_content" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:name_of.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "name_of" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:content_type.Vitro
