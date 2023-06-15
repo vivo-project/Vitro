@@ -12,8 +12,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DefaultDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
@@ -22,10 +24,13 @@ public class SparqlSelectQuery extends SparqlQuery {
 
 	public static final Log log = LogFactory.getLog(SparqlSelectQuery.class);
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
-	public void addOutputParameter(Parameter param) {
-		outputParams.add(param);
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
+    public void addOutputParameter(Parameter param) throws InitializationException {
+        if (ModelView.isModel(param)) {
+            throw new InitializationException("Model parameter can't be provided by SPARQL select query");
+        }
+        outputParams.add(param);
+    }
 
 	@Override
 	public OperationResult runOperation(DataStore dataStore) {
