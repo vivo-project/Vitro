@@ -18,7 +18,7 @@
         a                       dynapi:Model ;
         dynapi:name             "ABOX_ASSERTIONS" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
-        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-2ABOX_ASSERTIONS" ;
+        dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-2" ;
         rdfs:label              "abox assertions model"@en-US ;
         dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
         vitro:mostSpecificType  dynapi:Model .
