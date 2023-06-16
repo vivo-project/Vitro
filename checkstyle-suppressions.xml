@@ -1228,6 +1228,7 @@
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]servlet[\\/]setup[\\/]RDFFilesLoaderTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]servlet[\\/]setup[\\/]UpdateKnowledgeBaseTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]startup[\\/]StartupManagerTest\.java" checks="."/>
+    <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]tboxreasoner[\\/]impl[\\/]jfact[\\/]JFactTBoxReasonerTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]test[\\/]JenaOntologyLoader\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]configuration[\\/]ConfigurationBeanLoaderTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]configuration[\\/]ConfigurationBeanLoaderTestBase\.java" checks="."/>
