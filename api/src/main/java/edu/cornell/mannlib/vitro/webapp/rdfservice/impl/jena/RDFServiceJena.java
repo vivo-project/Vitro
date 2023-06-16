@@ -8,12 +8,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.log4j.lf5.util.StreamUtils;
+
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -21,19 +33,14 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
-import org.apache.jena.query.Syntax;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sdb.SDB;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -49,6 +56,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public abstract class RDFServiceJena extends RDFServiceImpl implements RDFService {
 
@@ -57,7 +65,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     protected abstract DatasetWrapper getDatasetWrapper();
 
     protected volatile boolean rebuildGraphURICache = true;
-    private final List<String> graphURIs = new ArrayList<>();
+    protected volatile boolean isRebuildGraphURICacheRunning = false;
+    protected final List<String> graphURIs = Collections.synchronizedList(new ArrayList<>());
 
     @Override
 	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
@@ -312,27 +321,53 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public List<String> getGraphURIs() throws RDFServiceException {
-        if (rebuildGraphURICache) {
-            synchronized (RDFServiceJena.class) {
-                if (rebuildGraphURICache) {
-                    DatasetWrapper dw = getDatasetWrapper();
-                    try {
-                        Dataset d = dw.getDataset();
-                        Iterator<String> nameIt = d.listNames();
-                        graphURIs.clear();
-                        while (nameIt.hasNext()) {
-                            graphURIs.add(nameIt.next());
+        if (rebuildGraphURICache && !isRebuildGraphURICacheRunning) {
+            rebuildGraphUris();
+        }
+        return graphURIs;
+    }
+
+    protected void rebuildGraphUris() {
+        Thread thread = new VitroBackgroundThread(new Runnable() {
+            public void run() {
+                synchronized (RDFServiceJena.class) {
+                    if (rebuildGraphURICache) {
+                        DatasetWrapper dw = getDatasetWrapper();
+                        try {
+                            isRebuildGraphURICacheRunning = true;
+                            Dataset d = dw.getDataset();
+                            Set<String> newGraphUris = new HashSet<>();
+                            d.begin(ReadWrite.READ);
+                            try {
+                                Iterator<String> nameIt = d.listNames();
+                                while (nameIt.hasNext()) {
+                                    newGraphUris.add(nameIt.next());
+                                }
+                            } finally {
+                                d.end();
+                            }
+                            Set<String> oldGraphUris = new HashSet<String>(graphURIs);
+                            if (newGraphUris.equals(oldGraphUris)) {
+                                return;
+                            }
+                            Set<String> removedGraphUris = new HashSet<String>(oldGraphUris);
+                            removedGraphUris.removeAll(newGraphUris);
+                            graphURIs.removeAll(removedGraphUris);
+                            Set<String> addedGraphUris = new HashSet<String>(newGraphUris);
+                            addedGraphUris.removeAll(oldGraphUris);
+                            graphURIs.addAll(addedGraphUris);
+                        } catch (Exception e) {
+                            log.error(e, e);
+                        } finally {
+                            isRebuildGraphURICacheRunning = false;
+                            dw.close();
+                            rebuildGraphURICache = false;
                         }
-                        return graphURIs;
-                    } finally {
-                        dw.close();
-                        rebuildGraphURICache = false;
                     }
                 }
             }
-        }
-
-        return graphURIs;
+        }, "Rebuild graphURI cache thread");
+        thread.start();
     }
 
     @Override
