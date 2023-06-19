@@ -10,7 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class ConditionIsInitializedByDefault implements Condition {
+public class ConditionIsNotInitializedByDefault implements Condition {
 
     private Parameters inputParams = new Parameters();
     

@@ -68,7 +68,7 @@ dynapi:ConditionContainerContains rdfs:subClassOf components:conditions.Conditio
 
 dynapi:ConditionHasTrueValue rdfs:subClassOf components:conditions.ConditionHasValueTrue .
 
-dynapi:ConditionIsInitializedByDefault rdfs:subClassOf components:conditions.ConditionIsInitializedByDefault .
+dynapi:ConditionIsNotInitializedByDefault rdfs:subClassOf components:conditions.ConditionIsNotInitializedByDefault .
 
 dynapi:UserGroup rdfs:subClassOf access:UserGroup .
 

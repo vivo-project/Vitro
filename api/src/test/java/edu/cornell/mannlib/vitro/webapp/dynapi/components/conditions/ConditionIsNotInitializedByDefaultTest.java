@@ -11,16 +11,16 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 
-public class ConditionIsInitializedByDefaultTest extends ServletContextTest{
+public class ConditionIsNotInitializedByDefaultTest extends ServletContextTest{
 
    @Test
-   public void testConditionIsInitilaizedByDefault() {
+   public void testConditionIsNotInitilaizedByDefault() {
        DataStore store = new DataStore();
        Parameter testParam = new StringParam("param name");
        Data testData = new Data(testParam);
        testData.setRawString("test value");
        store.addData(testParam.getName(), testData);
-       Condition c = new ConditionIsInitializedByDefault();
+       Condition c = new ConditionIsNotInitializedByDefault();
        c.getInputParams().add(testParam);
        assertTrue(c.isSatisfied(store));
        testData.initializeDefault();
