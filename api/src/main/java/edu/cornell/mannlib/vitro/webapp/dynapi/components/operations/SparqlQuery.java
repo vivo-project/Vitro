@@ -32,12 +32,18 @@ public abstract class SparqlQuery extends AbstractOperation implements ContextMo
 
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-    public void addInputParameter(Parameter param) {
+    public void addInputParameter(Parameter param) throws InitializationException {
+        if (ModelView.isModel(param)) {
+            throw new InitializationException("Model parameter can't be input for SPARQL query");
+        }
         inputParams.add(param);
     }
     
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresPlainParameter")
-    public void addInputSubstitutionParameter(Parameter param) {
+    public void addInputSubstitutionParameter(Parameter param) throws InitializationException {
+        if (ModelView.isModel(param)) {
+            throw new InitializationException("Model parameter can't be input for SPARQL query");
+        }
         inputParams.add(param);
         substitutionParams.add(param);
     }
