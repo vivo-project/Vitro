@@ -68,6 +68,8 @@ dynapi:ConditionContainerContains rdfs:subClassOf components:conditions.Conditio
 
 dynapi:ConditionHasTrueValue rdfs:subClassOf components:conditions.ConditionHasValueTrue .
 
+dynapi:ConditionIsInitializedByDefault rdfs:subClassOf components:conditions.ConditionIsInitializedByDefault .
+
 dynapi:UserGroup rdfs:subClassOf access:UserGroup .
 
 dynapi:AccessWhitelist rdfs:subClassOf access:AccessWhitelist .

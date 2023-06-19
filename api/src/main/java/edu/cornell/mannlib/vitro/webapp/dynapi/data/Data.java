@@ -12,6 +12,7 @@ public class Data {
     private String rawString = null;
     private Object object = null;
     private Parameter param = null;
+    private boolean defaultInitialized = false;
 
     public Data(Parameter param) {
         this.param = param;
@@ -19,6 +20,7 @@ public class Data {
 
     protected void setObject(Object object) {
         this.object = object;
+        defaultInitialized = false;
     }
 
     protected Object getObject() {
@@ -69,6 +71,7 @@ public class Data {
         final ParameterType type = param.getType();
         final ImplementationType implementationType = type.getImplementationType();
         object = implementationType.deserialize(type, rawString);
+        defaultInitialized = false;
     }
 
     public String getSerializedValue() {
@@ -85,6 +88,7 @@ public class Data {
         ImplementationType implementationType = type.getImplementationType();
         String defaultValue = param.getDefaultValue();
         object = implementationType.deserialize(type, defaultValue);
+        defaultInitialized = true;
     }
 
     @Override
@@ -113,6 +117,10 @@ public class Data {
 
     public void copyObject(Data assignableData) {
         this.object = assignableData.getObject();
+    }
+
+    public boolean isDefaultInitialized() {
+        return defaultInitialized;
     }
 
 }
