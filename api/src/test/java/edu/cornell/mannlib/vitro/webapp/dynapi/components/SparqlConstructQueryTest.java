@@ -167,7 +167,6 @@ public class SparqlConstructQueryTest {
 		dataStore.addData(STR_VAR, strData);
 		Parameter outputModelParam = ParameterUtils.createModelParameter(OUT_MODEL);
 		sparql.addOutputParameter(outputModelParam);
-		sparql.addInputParameter(outputModelParam);
 		Data writeModelData = new Data(outputModelParam);
 		OntModelImpl writeModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
 		TestView.setObject(writeModelData, writeModel);
