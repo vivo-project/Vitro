@@ -665,6 +665,11 @@
                      rdfs:subClassOf :Condition ;
                      rdfs:label "Condition is all parameter are set to true"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionIsNotInitializedByDefault
+:ConditionIsNotInitializedByDefault rdf:type owl:Class ;
+                     rdfs:subClassOf :Condition ;
+                     rdfs:label "Condition is not parameter data initialized with default value"@en-US .
+
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ConditionalStep
 :ConditionalStep rdf:type owl:Class ;
                  rdfs:subClassOf :Step ;
