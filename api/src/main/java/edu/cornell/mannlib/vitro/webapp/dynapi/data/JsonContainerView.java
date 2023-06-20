@@ -119,6 +119,9 @@ public class JsonContainerView {
 
         for (String var : vars) {
             RDFNode node = solution.get(var);
+            if(node == null) {
+                continue;
+            }
             if (node.isLiteral()) {
                 Literal literal = (Literal) node;
                 Parameter param = LiteralParamFactory.createLiteral(literal, var);
