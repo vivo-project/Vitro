@@ -9,6 +9,8 @@ public class LiteralParamFactory {
 
 	private static final String LANG_STRING_DATA_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
 	private static final String PLAIN_STRING_DATA_TYPE = "http://www.w3.org/2001/XMLSchema#string";
+	private static final String INTEGER_DATA_TYPE = "http://www.w3.org/2001/XMLSchema#integer";
+
 
 	public static Parameter createLiteral(Literal literal, String var) {
 		RDFDatatype dataType = literal.getDatatype();
@@ -21,6 +23,10 @@ public class LiteralParamFactory {
 		if (PLAIN_STRING_DATA_TYPE.equals(dataTypeUri)) {
 			return new StringPlainLiteralParam(var);
 		}
+		
+        if (INTEGER_DATA_TYPE.equals(dataTypeUri)) {
+            return new IntegerLiteralParam(var);
+        }
 		throw new RuntimeException(
 				"Parameter for " + dataTypeUri + " not implemented in " + LiteralParamFactory.class.getSimpleName());
 	}
