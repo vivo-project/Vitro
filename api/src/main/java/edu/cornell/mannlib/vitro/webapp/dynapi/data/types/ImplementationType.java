@@ -82,6 +82,8 @@ public class ImplementationType {
 		try {
 			return config.getConversionMethod().invoke(type, input);
 		} catch (ConversionException e) {
+		    log.error("input: " + input);
+		    log.error("type: " + type);
 			log.error(e, e);
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
