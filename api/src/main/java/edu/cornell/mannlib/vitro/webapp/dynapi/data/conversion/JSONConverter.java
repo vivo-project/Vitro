@@ -169,7 +169,7 @@ public class JSONConverter {
             JsonNode node = ctx.read(paramPath, JsonNode.class);
             if (node != null && !node.isMissingNode() && !node.isNull()) {
                 Data data = new Data(param);
-                data.setRawString(node.toString());
+                data.setRawString(node.asText());
                 data.earlyInitialization();
                 dataStore.addData(name, data);    
             }
