@@ -28,16 +28,19 @@ public class N3Template extends AbstractOperation {
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasModel", minOccurs = 1, maxOccurs = 1)
 	public void setTemplateModel(Parameter param) throws InitializationException{
 		if (!ModelView.isModel(param)) {
-			throw new InitializationException("Only model parameters accepted on setQueryModel");
+			throw new InitializationException("Only model parameters accepted on hasModel");
 		}
 		modelParam = param;
 		inputParams.add(param);
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
-	public void addInputParameter(Parameter param) {
-		inputParams.add(param);
-	}
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+    public void addInputParameter(Parameter param) throws InitializationException {
+        if (ModelView.isModel(param)) {
+            throw new InitializationException("Model parameter can't be provided as input to N3 Template");
+        }
+        inputParams.add(param);
+    }
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#N3TextAdditions", minOccurs = 0, maxOccurs = 1)
 	public void setN3TextAdditions(String n3TextAdditions) {

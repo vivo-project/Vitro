@@ -20,7 +20,6 @@
         rdfs:label                          "Test SparqlConstructQuery component"@en-US ;
 		dynapi:sparqlQueryText              "SELECT ?object WHERE { ?uri <test:property> ?object . } " ;
         dynapi:providesParameter            <test:object_param> ;
-        dynapi:requiresParameter            <test:query_model> ;
         dynapi:requiresParameter            <test:uri_param> ;
         dynapi:hasModel                     <test:query_model> .
 
