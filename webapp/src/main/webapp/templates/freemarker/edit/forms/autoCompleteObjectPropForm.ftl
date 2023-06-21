@@ -119,7 +119,7 @@ Also multiple types parameter set to true only if more than one type returned-->
         acSelectOnly: 'true',
         sparqlForAcFilter: '${sparqlForAcFilter?js_string}',
         sparqlQueryUrl: '${sparqlQueryUrl?js_string}',
-        acFilterForIndividuals: ${acFilterForIndividuals?js_string},
+        acFilterForIndividuals: ${acFilterForIndividuals},
         defaultTypeName: '${propertyNameForDisplay?js_string}', // used in repair mode to generate button text
         baseHref: '${urls.base}/individual?uri='
     };
