@@ -3,70 +3,84 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 import org.apache.jena.rdf.model.RDFNode;
 
 public class FilterValue {
-	
-	private String id;
-	private String name = "";
-	private int order;
 
-	private long count;
+    private String id;
+    private String name = "";
+    private int order;
 
-	private boolean selected = false;
+    private long count;
 
-	private boolean defaultPublic;
-	
-	public FilterValue(String id) {
-		this.id = id;
-	}
+    private boolean selected = false;
 
-	public boolean isDefaultPublic() {
-		return defaultPublic;
-	}
+    private boolean defaultPublic;
 
-	public String getName() {
-		return name;
-	}
+    private boolean publiclyAvailable = true;
 
-	public void setName(String label) {
-		this.name = label;
-	}
-	
-	public void setName(RDFNode rdfNode) {
-		if (rdfNode != null) {
-			name = rdfNode.asLiteral().getLexicalForm();
-		}		
-	}
-	
-	public Integer getOrder() {
-		return order;
-	}
+    public boolean isPubliclyAvailable() {
+        return publiclyAvailable;
+    }
 
-	public void setOrder(RDFNode rdfNode) {
-		if (rdfNode != null) {
-			order = rdfNode.asLiteral().getInt();
-		}
-	}
+    public void setPubliclyAvailable(RDFNode rdfNode) {
+        if (rdfNode != null && rdfNode.isLiteral()) {
+            publiclyAvailable = rdfNode.asLiteral().getBoolean();
+        } else {
+            publiclyAvailable = false;
+        }
+    }
 
-	public String getId() {
-		return id;
-	}
+    public FilterValue(String id) {
+        this.id = id;
+    }
 
-	public void setCount(long count) {
-		this.count = count;
-	}
+    public boolean isDefaultPublic() {
+        return defaultPublic;
+    }
 
-	public long getCount() {
-		return count;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setSelected(boolean value) {
-		this.selected = value;
-	}
-	
-	public boolean getSelected() {
-		return selected;
-	}
+    public void setName(String label) {
+        this.name = label;
+    }
 
-	public void setDefaultPublic(boolean b) {
-		defaultPublic = b;
-	}
+    public void setName(RDFNode rdfNode) {
+        if (rdfNode != null) {
+            name = rdfNode.asLiteral().getLexicalForm();
+        }
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(RDFNode rdfNode) {
+        if (rdfNode != null) {
+            order = rdfNode.asLiteral().getInt();
+        }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public void setSelected(boolean value) {
+        this.selected = value;
+    }
+
+    public boolean getSelected() {
+        return selected;
+    }
+
+    public void setDefaultPublic(boolean b) {
+        defaultPublic = b;
+    }
 }

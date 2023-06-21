@@ -135,7 +135,7 @@ search:hasKnownValue  a                owl:ObjectProperty ;
 
 search:public  a                      owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   [ a            owl:Class ;
-                                        owl:unionOf  ( search:Filter search:FilterGroup )
+                                        owl:unionOf  ( search:Filter search:FilterGroup search:FilterValue )
                                       ] ;
         rdfs:range                    xsd:boolean .
 
