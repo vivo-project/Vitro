@@ -644,8 +644,7 @@ var customForm = {
         if ( this.templateDefinedAcTypes && !this.defaultAcType.length ) {
             this.defaultAcType = this.acTypes[acTypeKey];
         }
-        var selectedTypeLength = selectedType.val().length;
-        if ( selectedTypeLength !== 'undefined') {
+        if ( selectedType.val().length ) {
             this.acTypes[acTypeKey] = selectedType.val();
             this.typeName = selectedType.html();
             if ( this.editMode == 'edit' ) {
