@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.matcher;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -15,6 +16,8 @@ public class APIResponseMatcher implements ArgumentMatcher<String>{
     private Boolean json;
 
     private String path;
+    
+    private boolean update = false;
 
     public APIResponseMatcher(Boolean json, String path) {
         this.json = json;
@@ -26,7 +29,25 @@ public class APIResponseMatcher implements ArgumentMatcher<String>{
         String expectedJson = readJson(path);
         OpenAPI expected = readSpec(true, expectedJson);
         OpenAPI actual = readSpec(json, actualString);
-        return actual.equals(expected);
+        boolean isEquals = actual.equals(expected);
+        if (update && !isEquals) {
+            updateFile(actualString);
+        }
+        return isEquals;
+    }
+
+    private void updateFile(String actualString) {
+        File file;
+        try {
+            file = getJson();
+            try (FileWriter writer = new FileWriter(file);) {
+                writer.write(actualString);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
     }
 
     private OpenAPI readSpec(Boolean json, String spec) {

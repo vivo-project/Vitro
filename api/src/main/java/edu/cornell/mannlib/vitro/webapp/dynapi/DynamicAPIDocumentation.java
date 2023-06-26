@@ -2,7 +2,9 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static java.lang.String.format;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +51,7 @@ import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
 public class DynamicAPIDocumentation {
@@ -92,6 +95,8 @@ public class DynamicAPIDocumentation {
         log.info("Matched api (" + apiInformation.getVersion() + ") is " + apiInformation.getTitle() + ".");
 
         openApi.setInfo(info(apiInformation));
+        
+        openApi.setServers(getServers(requestPath));
 
         Paths paths = new Paths();
 
@@ -171,6 +176,14 @@ public class DynamicAPIDocumentation {
         return openApi;
     }
 
+    private List<Server> getServers(DocsRequestPath requestPath) {
+        List<Server> servers = new ArrayList<>();
+        Server server = new Server();
+        server.setUrl(requestPath.getServerUrl());
+        servers.add(server);
+        return servers;
+    }
+
     private OpenAPI generateRpcDocs(DocsRequestPath requestPath) {
         OpenAPI openApi = new OpenAPI();
 
@@ -185,6 +198,8 @@ public class DynamicAPIDocumentation {
         apiInformation.setVersion("");
 
         openApi.setInfo(info(apiInformation));
+        
+        openApi.setServers(getServers(requestPath));
 
         if (requestPath.getRPCName() == null) {
 
