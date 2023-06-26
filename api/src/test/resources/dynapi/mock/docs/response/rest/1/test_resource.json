@@ -5,6 +5,9 @@
     "description" : "A test dynamic API",
     "version" : "1"
   },
+  "servers" : [ {
+    "url" : "http://127.0.0.1:8080/vitro"
+  } ],
   "tags" : [ {
     "name" : "test_resource",
     "description" : "REST test_resource (0.1.0)"
