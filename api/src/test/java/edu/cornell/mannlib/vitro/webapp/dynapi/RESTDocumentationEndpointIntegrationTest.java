@@ -101,6 +101,10 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
         }
 
         when(request.getServletPath()).thenReturn("/api/docs/rest");
+        when(request.getServerName()).thenReturn("127.0.0.1");
+        when(request.getScheme()).thenReturn("http");
+        when(request.getServerPort()).thenReturn(8080);
+        when(request.getContextPath()).thenReturn("/vitro");
         when(request.getPathInfo()).thenReturn(pathInfo);
         when(request.getHeader("Accept")).thenReturn(mimeType);
         when(request.getContentType()).thenReturn(mimeType);

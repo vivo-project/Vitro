@@ -27,6 +27,8 @@ public class DocsRequestPath {
     private final String resourceName;
 
     private final String rpcName;
+    
+    private final String serverUrl;
 
     private DocsRequestPath(HttpServletRequest request) {
         servletPath = request != null && request.getServletPath() != null
@@ -54,6 +56,26 @@ public class DocsRequestPath {
             resourceName = null;
             rpcName = null;
         }
+        
+        serverUrl = getServerUrl(request);
+    }
+
+    private String getServerUrl(HttpServletRequest request) {
+        String scheme = request.getHeader("x-forwarded-proto");
+        if (scheme == null) {
+            scheme = request.getScheme();    
+        }
+        String serverName = request.getServerName();
+        int port = request.getServerPort();
+        String portPart; 
+        if ((scheme.equals("https") && port == 443) ||
+            (scheme.equals("http") && port == 80)){
+            portPart = "";
+        } else {
+            portPart = ":" + port ;
+        }
+        String servletPart = request.getContextPath();
+        return scheme + "://" + serverName + portPart + servletPart;
     }
 
     public RequestType getType() {
@@ -82,6 +104,10 @@ public class DocsRequestPath {
 
     public String getRPCName() {
         return rpcName;
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
     }
 
     public boolean isValid() {

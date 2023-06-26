@@ -5,6 +5,9 @@
     "description" : "An RPC API.",
     "version" : ""
   },
+  "servers" : [ {
+    "url" : "http://127.0.0.1:8080/vitro"
+  } ],
   "tags" : [ {
     "name" : "test_document",
     "description" : "RPC test_document"
