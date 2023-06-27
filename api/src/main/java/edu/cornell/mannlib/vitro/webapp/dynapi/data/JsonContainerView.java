@@ -27,7 +27,7 @@ public class JsonContainerView {
         Map<String, JsonContainer> jsonArrays = new HashMap<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
+            if (param.isJsonContainer() && isJsonArray(param)) {
                 JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
                 jsonArrays.put(name, arrayNode);
             }
@@ -79,7 +79,7 @@ public class JsonContainerView {
         List<JsonContainer> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
+            if (param.isJsonContainer() && isJsonArray(param)) {
                 JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
                 jsonArrays.add(arrayNode);
             }
@@ -87,10 +87,14 @@ public class JsonContainerView {
         return jsonArrays;
     }
 
+    public static boolean isJsonArray(Parameter param) {
+        return JSON_ARRAY.equals(param.getType().getName());
+    }
+
     public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (param.isJsonContainer() && JSON_ARRAY.equals(param.getType().getName())) {
+            if (param.isJsonContainer() && isJsonArray(param)) {
                 return true;
             }
         }

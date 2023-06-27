@@ -41,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.RdfView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.BinaryView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.BooleanView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
@@ -63,7 +64,7 @@ public class JSONConverter {
 		JsonNode jsonRequest = injectResourceId(jsonString, dataStore, procedure);
 		Set<ValidationMessage> messages = schema.validate(jsonRequest);
 		if (!messages.isEmpty()) {
-			validationFailed(jsonRequest, messages);
+			validationFailed(jsonRequest, schema, messages);
 		}
 		Parameters required = procedure.getInputParams();
 		ReadContext ctx = JsonPath.using(jsonPathConfig).parse(jsonRequest.toString());
@@ -291,6 +292,13 @@ public class JSONConverter {
 		for (String name : params.getNames()) {
 			Parameter parameter = params.get(name);
 			String type = parameter.getType().getSerializationType().getName();
+			if (type.equals("json container")) {
+			    if (JsonContainerView.isJsonArray(parameter)) {
+			        type = "array";    
+			    } else {
+			        type = "object";
+			    }
+			}
 			ObjectNode paramNode = mapper.createObjectNode();
 			paramNode.put(TYPE, type);
 			properties.set(name, paramNode);
@@ -310,14 +318,15 @@ public class JSONConverter {
 				.options(Option.DEFAULT_PATH_LEAF_TO_NULL, Option.SUPPRESS_EXCEPTIONS).build();
 	}
 
-	private static void validationFailed(JsonNode jsonRequest, Set<ValidationMessage> messages)
-			throws ConversionException {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Json validation failed:\n");
-		for (ValidationMessage vm : messages) {
-			sb.append(vm.toString() + "\n");
-		}
-		sb.append("input json:\n" + jsonRequest);
-		throw new ConversionException(sb.toString());
-	}
+    private static void validationFailed(JsonNode jsonRequest, JsonSchema schema, Set<ValidationMessage> messages)
+            throws ConversionException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Json validation failed:\n");
+        for (ValidationMessage vm : messages) {
+            sb.append(vm.toString() + "\n");
+        }
+        sb.append("schema:\n" + schema);
+        sb.append("\ninput json:\n" + jsonRequest);
+        throw new ConversionException(sb.toString());
+    }
 }
