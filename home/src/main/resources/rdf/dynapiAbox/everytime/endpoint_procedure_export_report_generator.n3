@@ -25,7 +25,7 @@
          prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
          prefix xsd: <http://www.w3.org/2001/XMLSchema#>
          CONSTRUCT { 
-                 ?report_generator_uri 
+                 ?resource_id 
                  rdf:type dynapi:Procedure ;
                  dynapi:description ?gen_description ;
                  dynapi:name ?gen_name ;
@@ -81,13 +81,13 @@
                  dynapi:report ?report_param .
                  
          } WHERE { 
-                 ?report_generator_uri
+                 ?resource_id
                  dynapi:description ?gen_description ;
                  dynapi:name ?gen_name ;
                  dynapi:hasFirstStep ?firstStep ;
                  dynapi:providesParameter ?report_param .
                                
-                 ?report_generator_uri (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
+                 ?resource_id (dynapi:hasFirstStep|dynapi:hasNextStep)* ?step .
                  
                  ?step dynapi:hasOperation ?operation .
                  
@@ -154,5 +154,5 @@
 
 <https://vivoweb.org/procedure/export_report_generator/parameter/report_generator_uri>
         a                                   dynapi:Parameter ;
-        dynapi:name                         "report_generator_uri" ;
+        dynapi:name                         "resource_id" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
