@@ -57,6 +57,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 @RunWith(Parameterized.class)
 public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
 
+    private static final String REPORT_GENERATOR_URI = "resource_id";
     private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
 	private static final String CREATE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_create_report_generator.n3";
 	private static final String EXECUTE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_execute_report_generator.n3";
@@ -171,7 +172,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
         
         DataStore reportStore = new DataStore();
         reportStore.setUser(user);
-        Data uriData = store.getData("report_generator_uri");
+        Data uriData = store.getData(REPORT_GENERATOR_URI);
         assertTrue(uriData != null);
         reportStore.addData(uriData.getParam().getName(), uriData);
         try(Procedure reportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/execute_report_generator");){
@@ -286,7 +287,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             Parameters internalParams = importReportGenerator.getInternalParams();
             Converter.convertInternalParams(internalParams, importReportStore);
             assertTrue(OperationResult.ok().equals(importReportGenerator.run(importReportStore)));
-            Data importedUriData = importReportStore.getData("report_generator_uri");
+            Data importedUriData = importReportStore.getData(REPORT_GENERATOR_URI);
             assertTrue(uriData.getSerializedValue().equals(importedUriData.getSerializedValue()));
             assertTrue(ontModel.size() == modelSizeWithReportGenerator);
             assertTrue(procedurePool.count() == procedureCountWithReportGenerator);

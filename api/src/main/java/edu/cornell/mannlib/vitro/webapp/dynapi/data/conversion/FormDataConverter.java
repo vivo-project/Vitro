@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.RESTEndpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -55,8 +57,12 @@ public class FormDataConverter {
         for (String name : required.getNames()) {
 			String[] values = received.get(name);
 			if (values == null || values.length == 0) {
-				String message = String.format("Parameter %s not found", name);
-				throw new ConversionException(message);
+			    if (name.equals(RESTEndpoint.RESOURCE_ID) && !StringUtils.isBlank(dataStore.getResourceId())) {
+			        values = new String[] {dataStore.getResourceId()};
+			    } else {
+			        String message = String.format("Parameter %s not found", name);
+	                throw new ConversionException(message);    
+			    }
 			}
 			Parameter param = required.get(name);
 			
