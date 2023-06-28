@@ -571,12 +571,12 @@
 <https://vivoweb.org/procedure/create_report/parameter/container/construct_queries>
         a                                   dynapi:Parameter ;
         dynapi:name                         "construct_queries" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArray> .
         
 <https://vivoweb.org/procedure/create_report/parameter/container/select_queries>
         a                                   dynapi:Parameter ;
         dynapi:name                         "select_queries" ;
-        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainer> .
+        dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/JsonContainerArray> .
         
 
 <https://vivoweb.org/procedure/create_report/parameter/template_base64>
