@@ -8,13 +8,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
@@ -33,7 +34,7 @@ public abstract class Endpoint extends VitroHttpServlet {
             procedurePool.printKeys();
         }
         Procedure procedure = procedurePool.get(procedureUri);
-        UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
+        UserAccount user = getUser(request);
         if (!procedure.hasPermissions(user)) {
             procedure.removeClient();
             OperationResult.notAuthorized().prepareResponse(response);
@@ -73,6 +74,15 @@ public abstract class Endpoint extends VitroHttpServlet {
         }
         OperationResult.ok().prepareResponse(response);
         return;
+    }
+
+    private UserAccount getUser(HttpServletRequest request) {
+        UserAccount user = (UserAccount) request.getSession(false).getAttribute("user");
+        if (user != null) {
+            return user;
+        }
+        user = LoginStatusBean.getCurrentUser(request);
+        return user;
     }
 
     public static void collectDependencies(Procedure procedure, DataStore dataStore, ProcedurePool procedurePool) throws InitializationException {
