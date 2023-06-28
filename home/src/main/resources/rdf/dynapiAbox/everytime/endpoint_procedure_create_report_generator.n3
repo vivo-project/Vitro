@@ -34,7 +34,7 @@
         dynapi:N3TextAdditions              
         """
         @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
-        ?report_generator_uri
+        ?resource_id
         	a                                   dynapi:Procedure ;
         	dynapi:name                         ?report_generator_name ;
         	dynapi:description                  ?report_generator_description ;
@@ -667,7 +667,7 @@
 
 <https://vivoweb.org/procedure/create_report/parameter/report_generator_uri>
         a                                   dynapi:Parameter ;
-        dynapi:name                         "report_generator_uri" ;
+        dynapi:name                         "resource_id" ;
         dynapi:defaultValue                 "https://vivoweb.org/procedure/report_generator/,java_uuid_number" ;
         dynapi:isInternal                   "true"^^xsd:boolean ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/generated-uri> .

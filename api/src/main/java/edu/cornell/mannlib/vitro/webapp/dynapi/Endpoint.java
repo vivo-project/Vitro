@@ -41,6 +41,9 @@ public abstract class Endpoint extends VitroHttpServlet {
         }
         DataStore dataStore = new DataStore();
         dataStore.setUser(user);
+        if (requestPath.isResourceRequest()) {
+            dataStore.setResourceID(requestPath.getResourceId());
+        }
         try {
             collectDependencies(procedure, dataStore, procedurePool);
             Converter.convertFromRequest(request, procedure, dataStore);
@@ -50,9 +53,6 @@ public abstract class Endpoint extends VitroHttpServlet {
             procedure.removeClient();
             OperationResult.internalServerError().prepareResponse(response);
             return;
-        }
-        if (requestPath.isResourceRequest()) {
-            dataStore.setResourceID(requestPath.getResourceId());
         }
         OperationResult result = procedure.run(dataStore);
         if (!result.hasSuccess()) {
