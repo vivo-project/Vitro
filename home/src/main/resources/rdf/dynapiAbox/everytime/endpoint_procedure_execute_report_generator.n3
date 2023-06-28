@@ -24,8 +24,8 @@
          prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
          SELECT ?is_report_generator WHERE { 
          bind( if(exists{
-                ?report_generator_uri rdf:type dynapi:Procedure . 
-                ?report_generator_uri dynapi:providesParameter ?parameter . 
+                ?resource_id rdf:type dynapi:Procedure . 
+                ?resource_id dynapi:providesParameter ?parameter . 
                 ?parameter rdf:type dynapi:Parameter ;
 		dynapi:name "report" ;
 		dynapi:hasType <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/binary-file> .  
@@ -82,7 +82,7 @@
 
 <https://vivoweb.org/procedure/execute_report_generator/parameter/report_generator_uri>
         a                                   dynapi:Parameter ;
-        dynapi:name                         "report_generator_uri" ;
+        dynapi:name                         "resource_id" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
         
 <https://vivoweb.org/procedure/execute_report_generator/parameter/is_report_generator>

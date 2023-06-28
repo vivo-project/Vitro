@@ -24,8 +24,8 @@
         dynapi:sparqlQueryText              """
         prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>
         prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        SELECT ?report_generator_uri WHERE { 
-               ?report_generator_uri a dynapi:Procedure . 
+        SELECT ?resource_id WHERE { 
+               ?resource_id a dynapi:Procedure . 
          }
          """ ;
         dynapi:hasModel                     <https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_configuration_graph> .
@@ -62,5 +62,5 @@
 
 <https://vivoweb.org/procedure/import_report_generator/parameter/report_generator_uri>
         a                                   dynapi:Parameter ;
-        dynapi:name                         "report_generator_uri" ;
+        dynapi:name                         "resource_id" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/uri> .
