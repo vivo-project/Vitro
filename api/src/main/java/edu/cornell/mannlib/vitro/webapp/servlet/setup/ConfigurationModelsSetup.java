@@ -6,7 +6,6 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -14,10 +13,17 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -40,7 +46,6 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			setupModel(ctx, DISPLAY_TBOX, "displayTbox");
 			setupModel(ctx, DISPLAY_DISPLAY, "displayDisplay");
 			setupModel(ctx, USER_ACCOUNTS, "auth");
-			setupModel(ctx, INTERFACE_I18N, "interface-i18n");
 			ss.info(this, "Set up the display models and the user accounts model.");
 		} catch (Exception e) {
 			ss.fatal(this, e.getMessage(), e.getCause());
@@ -93,7 +98,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		OntModel baseModelFirsttime = VitroModelFactory.createOntologyModel();
 		RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, baseModelFirsttime, true);
 
-		if (RDFFilesLoader.areIsomporphic(baseModelFirsttime, baseModelFirsttimeBackup)) {
+		if (baseModelFirsttime.isIsomorphicWith(baseModelFirsttimeBackup)) {
 			log.debug("They are the same, so do nothing: '" + modelPath + "'");
 		} else {
 			log.debug("They differ:" + modelPath + ", compare values in configuration models with user's triplestore");
@@ -127,8 +132,9 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 
 		// remove special cases for display, problem with blank nodes
 		if (modelIdString.equals("display")) {
-			RDFFilesLoader.removeBlankTriples(difOldNew);
-			RDFFilesLoader.removeBlankTriples(difNewOld);
+
+			removeBlankTriples(difOldNew);
+			removeBlankTriples(difNewOld);
 		}
 
 		if (difOldNew.isEmpty() && difNewOld.isEmpty()) {
@@ -143,7 +149,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 				log.debug("Difference for " + modelIdString + " (old -> new), these triples should be removed: " + out);
 
 				// Check if the UI-changes Overlap with the changes made in the fristtime-files 
-				RDFFilesLoader.removeChangesThatConflictWithUIEdits(baseModel, userModel, difOldNew);
+				checkUiChangesOverlapWithFileChanges(baseModel, userModel, difOldNew);
 
 				// before we remove the triples, we need to compare values in back up firsttime with user's triplestore
 				// if the triples which should be removed are still in user´s triplestore, remove them
@@ -161,7 +167,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 				log.debug("Difference for " + modelIdString + " (new -> old), these triples should be added: " + out2);
 
 				// Check if the UI-changes Overlap with the changes made in the fristtime-files
-				RDFFilesLoader.removeChangesThatConflictWithUIEdits(baseModel, userModel, difNewOld);
+				checkUiChangesOverlapWithFileChanges(baseModel, userModel, difNewOld);
 
 				// before we add the triples, we need to compare values in back up firsttime with user's triplestore
 				// if the triples which should be added are not already in user´s triplestore, add them
@@ -178,6 +184,85 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			}
 		}
 		return updatedFiles;
+	}
+
+	/**
+	 * Check if the UI-changes Overlap with the changes made in the fristtime-files, if they overlap these changes are not applied to the user-model (UI)
+	 * 
+	 * @param baseModel firsttime backup model
+	 * @param userModel current state in the system (user/UI-model)
+	 * @param changesModel the changes between firsttime-files and firttime-backup
+	 */
+	private void checkUiChangesOverlapWithFileChanges(Model baseModel, Model userModel, Model changesModel) {
+		log.debug("Beginn check if subtractions from Backup-firsttime model to current state of firsttime-files were changed in user-model (via UI)");
+		Model changesUserModel = userModel.difference(baseModel);
+		List<Statement> changedInUIandFileStatements = new ArrayList<Statement>();
+
+		if(!changesUserModel.isEmpty())
+		{
+			removeBlankTriples(changesUserModel);
+
+			StringWriter out3 = new StringWriter();
+			changesUserModel.write(out3, "TTL"); 
+			log.debug("There were changes in the user-model via UI which have also changed in the firsttime files, the following triples will not be updated");
+
+			// iterate all statements and check if the ones which should be removed were not changed via the UI
+			StmtIterator iter = changesUserModel.listStatements();
+			while (iter.hasNext()) {
+				Statement stmt      = iter.nextStatement();  // get next statement
+				Resource  subject   = stmt.getSubject();     // get the subject
+				Property predicate  = stmt.getPredicate();    // get the predicate
+				RDFNode   object    = stmt.getObject();      // get the object			
+			
+				StmtIterator iter2 = changesModel.listStatements();
+
+				while (iter2.hasNext()) {
+					Statement stmt2      = iter2.nextStatement();  // get next statement
+					Resource  subject2   = stmt2.getSubject();     // get the subject
+					Property predicate2  = stmt2.getPredicate();    // get the predicate
+					RDFNode   object2    = stmt2.getObject();      // get the object
+
+					// if subject and predicate are equal but the object differs and the language tag is the same, do not update these triples
+					// this case indicates an change in the UI, which should not be overwriten from the firsttime files
+					if(subject.equals(subject2) && predicate.equals(predicate2) && !object.equals(object2) ) {
+						// if object is an literal, check the language tag
+						if (object.isLiteral() && object2.isLiteral()) {
+							// if the langauge tag is the same, remove this triple from the update list
+							if(object.asLiteral().getLanguage().equals(object2.asLiteral().getLanguage())) {
+								log.debug("This two triples changed UI and files: \n UI: " + stmt + " \n file: " +stmt2);
+								changedInUIandFileStatements.add(stmt2);
+							}
+						} else {
+							log.debug("This two triples changed UI and files: \n UI: " + stmt + " \n file: " +stmt2);
+							changedInUIandFileStatements.add(stmt2);
+						}
+					}
+				}
+			}
+			// remove triples which were changed in the user model (UI) from the list
+			changesModel.remove(changedInUIandFileStatements);
+		} else {
+			log.debug("There were no changes in the user-model via UI compared to the backup-firsttime-model");
+		}
+	}
+	
+	/**
+	 * Remove all triples where subject or object is blank (Anon)
+	 */
+	private void removeBlankTriples(Model model) {
+		StmtIterator iter = model.listStatements();
+		List<Statement> removeStatement = new ArrayList<Statement>();
+		while (iter.hasNext()) {
+			Statement stmt      = iter.nextStatement();  // get next statement
+			Resource  subject   = stmt.getSubject();     // get the subject
+			RDFNode   object    = stmt.getObject();      // get the object			
+
+			if(subject.isAnon() || object.isAnon())
+			{
+				removeStatement.add(stmt);
+			}
+		}
+		model.remove(removeStatement);
 	}
 
 	@Override
