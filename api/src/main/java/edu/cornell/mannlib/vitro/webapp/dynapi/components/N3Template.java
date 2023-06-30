@@ -6,10 +6,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class N3Template implements Template{
 
 	private String n3Text;
+  	private Parameters requiredParams = new Parameters();
 
-	@Override
-	public void dereference() {
-		
+  	//region @Property Setters
+
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
+	public void addRequiredParameter(Parameter param) {
+		requiredParams.add(param);
 	}
 
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasN3Text", minOccurs = 1, maxOccurs = 1)
@@ -17,34 +20,29 @@ public class N3Template implements Template{
 		this.n3Text = n3Text;
 	}
 
-	@Override
-	public OperationResult run(OperationData input) {
-		
-		return null;
-	}
+	//endregion
 
-	@Override
-	public void addRequiredParameter(Parameter param) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addProvidedParameter(Parameter param) {
-		// TODO Auto-generated method stub
-		
-	}
+	//region Getters
 
 	@Override
 	public Parameters getRequiredParams() {
-		// TODO Auto-generated method stub
-		return null;
+		return requiredParams;
 	}
 
 	@Override
 	public Parameters getProvidedParams() {
-		// TODO Auto-generated method stub
+		return new Parameters();
+	}
+
+	//endregion
+
+	@Override
+	public OperationResult run(OperationData input) {
 		return null;
 	}
 
+	@Override
+	public void dereference() {
+
+	}
 }

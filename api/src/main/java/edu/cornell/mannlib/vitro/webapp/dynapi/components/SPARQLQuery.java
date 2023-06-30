@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class SPARQLQuery implements Operation{
+public class SPARQLQuery implements Operation {
 
  	private static final Log log = LogFactory.getLog(SPARQLQuery.class);
 
@@ -30,12 +30,12 @@ public class SPARQLQuery implements Operation{
 	public void dereference() {
 		//TODO
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter")
 	public void addRequiredParameter(Parameter param) {
-		requiredParams.add(param);	
+		requiredParams.add(param);
 	}
-	
+
 	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter")
 	public void addProvidedParameter(Parameter param) {
 		providedParams.add(param);
@@ -50,11 +50,13 @@ public class SPARQLQuery implements Operation{
 	public void setQueryModel(ModelComponent model) {
 		this.modelComponent = model;
 	}
-	
+	 
+	@Override
 	public Parameters getRequiredParams() {
 		return requiredParams;
 	}
 
+	@Override
 	public Parameters getProvidedParams() {
 		return providedParams;
 	}

@@ -3,21 +3,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static org.easymock.EasyMock.*;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Assert;
-
 import org.junit.Test;
 
-import stubs.edu.cornell.mannlib.vitro.webapp.dao.ApplicationDaoStub;
-import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.ApplicationDaoStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.javax.servlet.http.HttpServletRequestStub;
 
 public class UrlBuilderTest extends AbstractTestClass {
 
@@ -114,7 +110,7 @@ public class UrlBuilderTest extends AbstractTestClass {
     }
 
     protected VitroRequest makeMockVitroRequest( final String defaultNS){
-        HttpServletRequest req = createMock( HttpServletRequest.class );
+        HttpServletRequestStub req = new HttpServletRequestStub();
         return new VitroRequest(req){
 
             @Override
