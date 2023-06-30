@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.SolrQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -28,10 +27,10 @@ public class SolrQueryTest extends ServletContextTest{
     private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-solr-test.n3";
     private final static String TEST_SOLR_QUERY_URI="https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery";
 
+    private static MockedStatic<ApplicationUtils> applicationUtils;
+
     @Spy
     private SolrQuery solrQuery;
-
-    private static MockedStatic<ApplicationUtils> applicationUtils;
 
     @Mock
     ApplicationImpl application;
@@ -69,7 +68,7 @@ public class SolrQueryTest extends ServletContextTest{
     @Test
     public void testLoadingAndPropertiesSetup() throws IOException, ConfigurationBeanLoaderException {
         loadDefaultModel();
-        loadModelsFromN3(TEST_DATA_PATH.split("\\.")[1],TEST_DATA_PATH);
+        loadModels(TEST_DATA_PATH.split("\\.")[1], TEST_DATA_PATH);
 
         SolrQuery query = loader.loadInstance(TEST_SOLR_QUERY_URI, SolrQuery.class);
         assertNotNull(query);

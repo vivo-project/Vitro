@@ -1,8 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_SERVLET_PATH;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_IMPLEMENTED;
+import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -34,10 +34,9 @@ import org.junit.runners.Parameterized.Parameter;
 import org.mockito.MockedStatic;
 
 @RunWith(Parameterized.class)
-public class RPCEndpointIT extends ServletContextIT {
+public class RPCEndpointITest extends ServletContextITest {
 
-    private final static String URI_CONTEXT = "/api/rpc/";
-    private final static String URI_BASE = "http://localhost" + URI_CONTEXT;
+    private final static String URI_BASE = "http://localhost:8080" + RPC_SERVLET_PATH;
 
     private RPCEndpoint rpcEndpoint;
 
@@ -92,13 +91,13 @@ public class RPCEndpointIT extends ServletContextIT {
         loadDefaultModel();
 
         when(request.getServletContext()).thenReturn(servletContext);
-        when(request.getContextPath()).thenReturn(URI_CONTEXT);
+        when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
 
         actionPool.init(request.getServletContext());
         actionPool.reload();
 
         if (testAction != null) {
-            StringBuffer buffer = new StringBuffer(URI_BASE + testAction);
+            StringBuffer buffer = new StringBuffer(URI_BASE + "/" + testAction);
             when(request.getRequestURL()).thenReturn(buffer);
             when(request.getPathInfo()).thenReturn("/" + testAction);
         }
@@ -123,8 +122,8 @@ public class RPCEndpointIT extends ServletContextIT {
     public void doGetTest() {
         rpcEndpoint.doGet(request, response);
 
-        // For all permutations, this should return HTTP 501.
-        assertResponseStatus(SC_NOT_IMPLEMENTED);
+        // For all permutations, this should return HTTP 405.
+        assertResponseStatus(SC_METHOD_NOT_ALLOWED);
     }
 
     @Test
@@ -137,16 +136,16 @@ public class RPCEndpointIT extends ServletContextIT {
     public void doDeleteTest() {
         rpcEndpoint.doDelete(request, response);
 
-        // For all permutations, this should return HTTP 501.
-        assertResponseStatus(SC_NOT_IMPLEMENTED);
+        // For all permutations, this should return HTTP 405.
+        assertResponseStatus(SC_METHOD_NOT_ALLOWED);
     }
 
     @Test
     public void doPutTest() {
         rpcEndpoint.doPut(request, response);
 
-        // For all permutations, this should return HTTP 501.
-        assertResponseStatus(SC_NOT_IMPLEMENTED);
+        // For all permutations, this should return HTTP 405.
+        assertResponseStatus(SC_METHOD_NOT_ALLOWED);
     }
 
     private void assertResponseStatus(int status) {
@@ -158,8 +157,7 @@ public class RPCEndpointIT extends ServletContextIT {
      * @throws IOException
      */
     protected void mockSparqlResponseEmptySuccess() throws IOException {
-        String json = readMockFile("sparql/response/json/sparql-empty-success.json");
-        InputStream stream = new ByteArrayInputStream(json.getBytes());
+        InputStream stream = readMockFileAsInputStream("sparql/response/json/sparql-empty-success.json");
         when(queryExecution.execSelect()).thenReturn(ResultSetFactory.fromJSON(stream));
     }
 
@@ -167,7 +165,6 @@ public class RPCEndpointIT extends ServletContextIT {
     public static Collection<Object[]> requests() throws MalformedURLException, NoSuchMethodException, SecurityException {
         int nf = SC_NOT_FOUND;
         int se = SC_INTERNAL_SERVER_ERROR;
-        int ni = SC_NOT_IMPLEMENTED;
         int ok = SC_OK;
 
         String actionIsEmpty = "";
@@ -181,14 +178,14 @@ public class RPCEndpointIT extends ServletContextIT {
         String emailIsGood = "example@localhost";
 
         Method[] before = new Method[] {
-            RPCEndpointIT.class.getDeclaredMethod("mockSparqlResponseEmptySuccess")
+            RPCEndpointITest.class.getDeclaredMethod("mockSparqlResponseEmptySuccess")
         };
 
         return Arrays.asList(new Object[][] {
             // action          limit         email         status before       after   testMessage
             { null,            null,         null,         nf,    null,        null,   "NULL Request" },
             { actionIsEmpty,   null,         null,         nf,    null,        null,   "Empty Action" },
-            { actionIsUnknown, null,         null,         ni,    null,        null,   "Unknown Action" },
+            { actionIsUnknown, null,         null,         se,    null,        null,   "Unknown Action" },
             { actionIsGood,    null,         null,         se,    null,        null,   "NULL Limit" },
             { actionIsGood,    limitIsEmpty, null,         se,    null,        null,   "Empty Limit" },
             { actionIsGood,    limitIsBad,   null,         se,    null,        null,   "Bad Limit" },

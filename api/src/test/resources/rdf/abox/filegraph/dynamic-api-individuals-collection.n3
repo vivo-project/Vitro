@@ -5,12 +5,11 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/testCollectionAction1>
         a                                   dynapi:action ;
         rdfs:label                          "Test collection action 1"@en-US ;
-        dynapi:assignedRPC                  <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateCollectionRPC1> ;
-        dynapi:firstStep                    <https://vivoweb.org/ontology/vitro-dynamic-api/step/testCollectionStep1> .
+        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateCollectionRPC1> ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testCollectionStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/testCollectionStep1>
         a                                   dynapi:step, dynapi:operationalStep ;
@@ -19,56 +18,54 @@
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateCollectionRPC1>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc create collection 1" ;
-        dynapi:rpcName                      "test_collection"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
-        dynapi:rpcAPIVersionMin             "1.0.0" .
+        rdfs:label                          "Test rpc create collection 1"@en-US ;
+        dynapi:name                         "test_collection" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
+        dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetCollectionRPC1>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc get collection 1" ;
-        dynapi:rpcName                      "test_collection"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
-        dynapi:rpcAPIVersionMin             "1.0.0" .
+        rdfs:label                          "Test rpc get collection 1"@en-US ;
+        dynapi:name                         "test_collection" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get> ;
+        dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateCollectionRPC1>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc update collection 1" ;
-        dynapi:rpcName                      "test_collection"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
-        dynapi:rpcAPIVersionMin             "1.0.0" .
+        rdfs:label                          "Test rpc update collection 1"@en-US ;
+        dynapi:name                         "test_collection" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchCollectionRPC1>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc patch collection 1" ;
-        dynapi:rpcName                      "test_collection"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
-        dynapi:rpcAPIVersionMin             "1.0.0" .
+        rdfs:label                          "Test rpc patch collection 1"@en-US ;
+        dynapi:name                         "test_collection" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch> ;
+        dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteCollectionRPC1>
         a                                   dynapi:rpc ;
-        dynapi:resourceName                 "Test rpc delete collection 1" ;
-        dynapi:rpcName                      "test_collection"@en-US ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
-        dynapi:rpcAPIVersionMin             "1.0.0" .
+        rdfs:label                          "Test rpc delete collection 1"@en-US ;
+        dynapi:name                         "test_collection" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete> ;
+        dynapi:minAPIVersion                "1.0.0" .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_collection_custom_action1>
         a                                   dynapi:customRESTAction ;
-        dynapi:resourceName                 "Test collection custom action 1" ;
-        dynapi:customRESTActionName         "test_collection_custom_action_name" ;
-        dynapi:forwardTo                    <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateCollectionRPC1> ;
-        dynapi:defaultMethod                <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
-        dynapi:rpcAPIVersionMin             "1.0.0" .
+        rdfs:label                          "Test collection custom action 1"@en-US ;
+        dynapi:name                         "test_collection_custom_action_name" ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:forwardsTo                   <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateCollectionRPC1> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/resource/testCollectionResource1>
-        a                                   dynapi:resource ;
-        dynapi:resourceName                 "test_collection_resource" ;
-        rdfs:label                          "Test collection resource 1"@en-US ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testCollectionResource1>
+        a                                   dynapi:resourceAPI ;
+        rdfs:label                          "Test collection resourceAPI 1"@en-US ;
+        dynapi:name                         "test_collection_resource" ;
+        dynapi:minAPIVersion                "1.0.0" ;
         dynapi:onPost                       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testCreateCollectionRPC1> ;
         dynapi:onGet                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testGetCollectionRPC1> ;
         dynapi:onPut                        <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testUpdateCollectionRPC1> ;
         dynapi:onPatch                      <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testPatchCollectionRPC1> ;
         dynapi:onDelete                     <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/testDeleteCollectionRPC1> ;
-        dynapi:hasCustomRESTAction          <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_collection_custom_action1> ;
-        dynapi:restAPIVersionMin            "1.0.0" .
-
+        dynapi:hasCustomRESTAction          <https://vivoweb.org/ontology/vitro-dynamic-api/custom_actions/test_collection_custom_action1> .

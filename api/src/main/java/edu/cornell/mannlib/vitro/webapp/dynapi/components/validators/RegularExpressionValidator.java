@@ -16,7 +16,7 @@ public class RegularExpressionValidator extends AbstractValidator {
 		return regularExpression;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validatorRegularExpressionValue", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#regularExpression", minOccurs = 1, maxOccurs = 1)
 	public void setRegularExpression (String regularExpression) {
 		this.regularExpression = regularExpression;
 	}

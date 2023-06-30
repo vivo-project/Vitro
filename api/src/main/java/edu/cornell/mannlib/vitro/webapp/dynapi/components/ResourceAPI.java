@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class Resource implements Versionable<ResourceKey> {
+public class ResourceAPI implements Versionable<ResourceAPIKey> {
 
 	private String name;
 	private String versionMin;
@@ -34,7 +34,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return versionMin;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMin", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#minAPIVersion", minOccurs = 0, maxOccurs = 1)
 	public void setVersionMin(String versionMin) {
 		this.versionMin = versionMin;
 	}
@@ -44,7 +44,7 @@ public class Resource implements Versionable<ResourceKey> {
 		return versionMax;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#restAPIVersionMax", minOccurs = 0, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#maxAPIVersion", maxOccurs = 1)
 	public void setVersionMax(String versionMax) {
 		this.versionMax = versionMax;
 	}
@@ -53,14 +53,14 @@ public class Resource implements Versionable<ResourceKey> {
 		return name;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#resourceName", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	@Override
-	public ResourceKey getKey() {
-		return ResourceKey.of(name, versionMin);
+	public ResourceAPIKey getKey() {
+		return ResourceAPIKey.of(name, versionMin);
 	}
 
 	@Override
