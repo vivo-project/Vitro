@@ -34,14 +34,15 @@ public class ModelNames {
 	public static final String DISPLAY_TBOX_FIRSTTIME_BACKUP = DISPLAY_TBOX + "FirsttimeBackup";
 	public static final String DISPLAY_DISPLAY = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
 	public static final String DISPLAY_DISPLAY_FIRSTTIME_BACKUP = DISPLAY_DISPLAY + "FirsttimeBackup";
-	
 	public static final String DYNAMIC_API_ABOX = "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox";
 	public static final String DYNAMIC_API_ABOX_FIRSTTIME_BACKUP = DYNAMIC_API_ABOX + "FirsttimeBackup";
 	public static final String DYNAMIC_API_TBOX = "http://vitro.mannlib.cornell.edu/default/dynamic-api-tbox";
 	public static final String DYNAMIC_API_TBOX_FIRSTTIME_BACKUP = DYNAMIC_API_TBOX + "FirsttimeBackup";
 	public static final String SHAPES = "http://vitro.mannlib.cornell.edu/default/shapes";
 	public static final String SHAPES_FIRSTTIME_BACKUP = SHAPES + "FirsttimeBackup";
-	
+	public static final String INTERFACE_I18N = "http://vitro.mannlib.cornell.edu/default/interface-i18n";
+	public static final String INTERFACE_I18N_FIRSTTIME_BACKUP = INTERFACE_I18N + "FirsttimeBackup";
+
 	/**
 	 * A map of the URIS, keyed by their short names, intended only for display
 	 * purposes.
@@ -77,6 +78,9 @@ public class ModelNames {
 		map.put("DYNAMIC_API_TBOX_FIRSTTIME_BACKUP", DYNAMIC_API_TBOX_FIRSTTIME_BACKUP);
         map.put("SHAPES", SHAPES);
         map.put("SHAPES_FIRSTTIME_BACKUP", SHAPES_FIRSTTIME_BACKUP);
+		map.put("INTERFACE_I18N", INTERFACE_I18N);
+		map.put("INTERFACE_I18N_FIRSTTIME_BACKUP", INTERFACE_I18N_FIRSTTIME_BACKUP);
+
 		return Collections.unmodifiableMap(map);
 	}
 

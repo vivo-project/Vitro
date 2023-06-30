@@ -34,7 +34,9 @@ public abstract class ConfigurationTripleSource implements TripleSource {
 			DYNAMIC_API_TBOX_FIRSTTIME_BACKUP,
 	        SHAPES,
 	        SHAPES_FIRSTTIME_BACKUP,
-			};
+			INTERFACE_I18N,
+			INTERFACE_I18N_FIRSTTIME_BACKUP,
+	};
 
 	/**
 	 * These decorators are added to a Configuration ModelMaker, regardless of
