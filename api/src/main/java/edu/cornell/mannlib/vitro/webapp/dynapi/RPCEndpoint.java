@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_BASE_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_SERVLET_PATH;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
 
-@WebServlet(name = "RPCEndpoint", urlPatterns = { RPC_BASE_PATH + "/*" })
+@WebServlet(name = "RPCEndpoint", urlPatterns = { RPC_SERVLET_PATH + "/*" })
 public class RPCEndpoint extends VitroHttpServlet {
 
 	private static final Log log = LogFactory.getLog(RESTEndpoint.class);
@@ -23,7 +23,7 @@ public class RPCEndpoint extends VitroHttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		OperationResult.notImplemented().prepareResponse(response);
+		OperationResult.methodNotAllowed().prepareResponse(response);
 	}
 
 	@Override
@@ -48,12 +48,12 @@ public class RPCEndpoint extends VitroHttpServlet {
 
 	@Override
 	public void doDelete(HttpServletRequest request, HttpServletResponse response) {
-		OperationResult.notImplemented().prepareResponse(response);
+		OperationResult.methodNotAllowed().prepareResponse(response);
 	}
 
 	@Override
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
-		OperationResult.notImplemented().prepareResponse(response);
+		OperationResult.methodNotAllowed().prepareResponse(response);
 	}
 
 }

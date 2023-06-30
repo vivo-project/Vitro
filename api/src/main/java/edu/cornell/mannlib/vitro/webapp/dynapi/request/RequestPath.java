@@ -11,9 +11,9 @@ public class RequestPath {
 
     public static final String RESOURCE_ID_PARAM = "RESOURCE_ID";
 
-    public static final String API_BASE_PATH = "/api";
-    public static final String RPC_BASE_PATH = API_BASE_PATH + "/rpc";
-    public static final String REST_BASE_PATH = API_BASE_PATH + "/rest";
+    public static final String API_SERVLET_PATH = "/api";
+    public static final String RPC_SERVLET_PATH = API_SERVLET_PATH + "/rpc";
+    public static final String REST_SERVLET_PATH = API_SERVLET_PATH + "/rest";
 
     private final RequestType type;
 
@@ -28,8 +28,8 @@ public class RequestPath {
     private final String actionName;
 
     private RequestPath(HttpServletRequest request) {
-        String contextPath = request != null && request.getContextPath() != null
-                ? request.getContextPath()
+        String servletPath = request != null && request.getServletPath() != null
+                ? request.getServletPath()
                 : EMPTY;
         String pathInfo = request != null && request.getPathInfo() != null
                 ? request.getPathInfo()
@@ -37,13 +37,13 @@ public class RequestPath {
 
         pathParts = pathInfo.split("/");
 
-        if (contextPath.toLowerCase().contains(RPC_BASE_PATH)) {
+        if (servletPath.toLowerCase().contains(RPC_SERVLET_PATH)) {
             type = RequestType.RPC;
             actionName = pathParts.length > 1 ? pathParts[1] : null;
             resourceVersion = null;
             resourceName = null;
             resourceId = null;
-        } else if (contextPath.toLowerCase().contains(REST_BASE_PATH)) {
+        } else if (servletPath.toLowerCase().contains(REST_SERVLET_PATH)) {
             type = RequestType.REST;
             resourceVersion = pathParts.length > 1 ? pathParts[1] : null;
             resourceName = pathParts.length > 2 ? pathParts[2] : null;
@@ -122,6 +122,25 @@ public class RequestPath {
         }
 
         return isValid;
+    }
+
+    public boolean isMethodAllowed(String method) {
+        switch (method.toUpperCase()) {
+            case "POST":
+                return resourceId == null;
+            case "PUT":
+            case "PATCH":
+            case "DELETE":
+                return resourceId != null;
+            case "GET":
+                return true;
+            case "HEAD": // this will likely want to be true when supported
+            case "CONNECT":
+            case "OPTIONS":
+            case "TRACE":
+            default:
+        }
+        return false;
     }
 
     public boolean isCustomRestAction() {

@@ -3,7 +3,9 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,7 +14,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Before;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
@@ -21,10 +23,10 @@ import stubs.javax.servlet.ServletContextStub;
 public abstract class ServletContextTest {
 
     protected final static String TEST_ACTION_NAME = "test_action";
-    protected final static ResourceKey TEST_RESOURCE_KEY = ResourceKey.of("test_resource", "0.1.0");
+    protected final static ResourceAPIKey TEST_RESOURCE_KEY = ResourceAPIKey.of("test_resource", "0.1.0");
 
     protected final static String TEST_PERSON_ACTION_NAME = "test_person";
-    protected final static ResourceKey TEST_PERSON_RESOURCE_KEY = ResourceKey.of("test_person_resource", "1.0.0");
+    protected final static ResourceAPIKey TEST_PERSON_RESOURCE_KEY = ResourceAPIKey.of("test_person_resource", "1.0.0");
 
     protected ServletContextStub servletContext;
     protected ModelAccessFactoryStub modelAccessFactory;
@@ -45,14 +47,6 @@ public abstract class ServletContextTest {
         contentModelAccess.setOntModel(FULL_UNION, ontModel);
 
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
-    }
-
-    protected void loadModelsFromN3(String fileFormat, String... paths) throws IOException {
-        for(String path : paths){
-            loadModel(
-                    new RDFFile(fileFormat, path)
-            );
-        }
     }
 
     protected void loadTestModel() throws IOException {
@@ -83,10 +77,22 @@ public abstract class ServletContextTest {
         }
     }
 
+    protected void loadModels(String fileFormat, String... paths) throws IOException {
+        for (String path : paths) {
+            loadModel(new RDFFile(fileFormat, path));
+        }
+    }
+
     protected String readFile(String path) throws IOException {
         Path p = new File(path).toPath();
 
         return new String(Files.readAllBytes(p));
+    }
+
+    protected InputStream readFileAsInputStream(String path) throws IOException {
+        File file = new File(path);
+
+        return new FileInputStream(file);
     }
 
     protected class RDFFile {

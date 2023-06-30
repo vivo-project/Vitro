@@ -1,7 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_BASE_PATH;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
+import static java.lang.String.format;
+import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockStatic;
@@ -33,18 +35,17 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Resource;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 
 @RunWith(Parameterized.class)
 public class RESTEndpointTest {
 
 	private final static String PATH_INFO = "/1/test";
-	private final static String CONTEXT_PATH = REST_BASE_PATH + PATH_INFO;
 
 	private Map<String, String[]> params = new HashMap<>();
 
-	private MockedStatic<ResourcePool> resourcePoolStatic;
+	private MockedStatic<ResourceAPIPool> resourceAPIPoolStatic;
 
 	private MockedStatic<ActionPool> actionPoolStatic;
 
@@ -52,13 +53,13 @@ public class RESTEndpointTest {
 	private ServletContext context;
 
 	@Mock
-	private ResourcePool resourcePool;
+	private ResourceAPIPool resourceAPIPool;
 
 	@Mock
 	private ActionPool actionPool;
 
 	@Mock
-	private Resource resource;
+	private ResourceAPI resourceAPI;
 
 	@Mock
 	private RPC rpc;
@@ -81,16 +82,28 @@ public class RESTEndpointTest {
 	public String testMethod;
 
 	@Parameter(1)
-	public String testAction;
+	public String testPathInfo;
+
+	@Parameter(2)
+	public String testActionName;
+
+	@Parameter(3)
+	public int[] expectedCounts;
+
+	@Parameter(4)
+	public int expectedStatus;
+
+	@Parameter(5)
+	public String testMessage;
 
 	@Before
 	public void beforeEach() {
 		MockitoAnnotations.openMocks(this);
-		resourcePoolStatic = mockStatic(ResourcePool.class);
+		resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
 		actionPoolStatic = mockStatic(ActionPool.class);
 
-		when(ResourcePool.getInstance()).thenReturn(resourcePool);
-		when(resourcePool.get(any(ResourceKey.class))).thenReturn(resource);
+		when(ResourceAPIPool.getInstance()).thenReturn(resourceAPIPool);
+		when(resourceAPIPool.get(any(ResourceAPIKey.class))).thenReturn(resourceAPI);
 
 		when(ActionPool.getInstance()).thenReturn(actionPool);
 		when(actionPool.get(any(String.class))).thenReturn(action);
@@ -103,50 +116,36 @@ public class RESTEndpointTest {
 
 	@After
 	public void afterEach() {
-		resourcePoolStatic.close();
+		resourceAPIPoolStatic.close();
 		actionPoolStatic.close();
 	}
 
 	@Test
 	public void doTest() {
-		prepareMocks(testMethod, testAction);
-		run(testMethod);
-		verifyMocksOk();
-	}
+		when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
+		when(request.getMethod()).thenReturn(testMethod);
+		when(request.getPathInfo()).thenReturn(testPathInfo);
 
-	@Test
-	public void doTestNotFound() {
-		prepareMocksNotFound(testMethod, testAction);
-		run(testMethod);
-		verifyMocksNotFound();
-	}
+		when(action.run(any(OperationData.class)))
+			.thenReturn(new OperationResult(expectedStatus));
 
-	@Test
-	public void doTestUnsupportedMethod() {
-		prepareMocksUnsupportedMethod(testMethod, testAction);
-		run(testMethod);
-		verifyMocksUnsupportedMethod();
-	}
+		when(httpMethod.getName()).thenReturn(testMethod);
 
-	@Test
-	public void doTestRPCNotImplemented() {
-		prepareMocksRPCNotImplemented(testMethod, testAction);
-		run(testMethod);
-		verifyMocksRPCNotImplemented();
-	}
+		when(rpc.getName()).thenReturn(testActionName);
+		when(rpc.getHttpMethod()).thenReturn(httpMethod);
 
-	@Test
-	public void doTestCustomAction() {
-		prepareMocksCustomAction(testMethod, testAction);
-		run(testMethod);
-		verifyMocksCustomActionOk();
-	}
+		when(resourceAPI.getRestRPC(testMethod)).thenReturn(rpc);
+		when(resourceAPI.getCustomRestActionRPC(testActionName)).thenReturn(rpc);
+		doNothing().when(resourceAPI).removeClient();
 
-	@Test
-	public void doTestCustomActionUnsupported() {
-		prepareMocksUnsupportedCustomAction(testMethod, testAction);
 		run(testMethod);
-		verifyMocksCustomActionUnsupported();
+
+		verify(resourceAPI, times(expectedCounts[0])).getRestRPC(any());
+		verify(resourceAPI, times(expectedCounts[1])).getCustomRestActionRPC(any());
+		verify(resourceAPI, times(expectedCounts[2])).removeClient();
+		verify(action, times(expectedCounts[3])).run(any());
+		verify(action, times(expectedCounts[4])).removeClient();
+		verify(response, times(expectedCounts[5])).setStatus(expectedStatus);
 	}
 
 	private void run(String method) {
@@ -171,104 +170,28 @@ public class RESTEndpointTest {
 		}
 	}
 
-	private void prepareMocks(String method, String actionName) {
-		when(request.getMethod()).thenReturn(method);
-		when(request.getContextPath()).thenReturn(CONTEXT_PATH);
-		when(request.getPathInfo()).thenReturn(PATH_INFO);
-
-		when(action.run(any(OperationData.class)))
-			.thenReturn(new OperationResult(HttpServletResponse.SC_OK));
-
-		when(httpMethod.getName()).thenReturn(method);
-
-		when(rpc.getName()).thenReturn(actionName);
-		when(rpc.getHttpMethod()).thenReturn(httpMethod);
-
-		when(resource.getRestRPC(method)).thenReturn(rpc);
-		doNothing().when(resource).removeClient();
-	}
-
-	private void prepareMocksNotFound(String method, String actionName) {
-		prepareMocks(method, actionName);
-		when(request.getPathInfo()).thenReturn(EMPTY);
-	}
-
-	private void prepareMocksUnsupportedMethod(String method, String actionName) {
-		prepareMocks(method, actionName);
-		when(resource.getRestRPC(method))
-				.thenThrow(new UnsupportedOperationException("Unsupported method"));
-	}
-
-	private void prepareMocksRPCNotImplemented(String method, String actionName) {
-		prepareMocks(method, actionName);
-		when(httpMethod.getName()).thenReturn("FUBAR");
-	}
-
-	private void prepareMocksCustomAction(String method, String actionName) {
-		when(request.getMethod()).thenReturn(method);
-		when(request.getContextPath()).thenReturn(CONTEXT_PATH + "/" + actionName);
-		when(request.getPathInfo()).thenReturn(PATH_INFO + "/" + actionName);
-
-		when(action.run(any(OperationData.class)))
-			.thenReturn(new OperationResult(HttpServletResponse.SC_OK));
-
-		when(httpMethod.getName()).thenReturn(method);
-
-		when(rpc.getName()).thenReturn(actionName);
-		when(rpc.getHttpMethod()).thenReturn(httpMethod);
-
-		when(resource.getCustomRestActionRPC(actionName)).thenReturn(rpc);
-		doNothing().when(resource).removeClient();
-	}
-
-	private void prepareMocksUnsupportedCustomAction(String method, String actionName) {
-		prepareMocksCustomAction(method, actionName);
-		when(resource.getCustomRestActionRPC(actionName))
-			.thenThrow(new UnsupportedOperationException("Unsupported custom action"));
-	}
-
-	private void verifyMocksOk() {
-		verifyMocks(new int[] { 1, 0, 1, 1, 1, 1 }, HttpServletResponse.SC_OK);
-	}
-
-	private void verifyMocksNotFound() {
-		verifyMocks(new int[] { 0, 0, 0, 0, 0, 1 }, HttpServletResponse.SC_NOT_FOUND);
-	}
-
-	private void verifyMocksUnsupportedMethod() {
-		verifyMocks(new int[] { 1, 0, 1, 0, 0, 1 }, HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-
-	private void verifyMocksRPCNotImplemented() {
-		verifyMocks(new int[] { 1, 0, 1, 0, 0, 1 }, HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-
-	private void verifyMocksCustomActionOk() {
-		verifyMocks(new int[] { 0, 1, 1, 1, 1, 1 }, HttpServletResponse.SC_OK);
-	}
-
-	private void verifyMocksCustomActionUnsupported() {
-		verifyMocks(new int[] { 0, 1, 1, 0, 0, 1 }, HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-
-	private void verifyMocks(int[] times, int status) {
-		verify(resource, times(times[0])).getRestRPC(any());
-		verify(resource, times(times[1])).getCustomRestActionRPC(any());
-		verify(resource, times(times[2])).removeClient();
-		verify(action, times(times[3])).run(any());
-		verify(action, times(times[4])).removeClient();
-		verify(response, times(times[5])).setStatus(status);
-	}
-
 	@Parameterized.Parameters
-	public static Collection<String[]> requests() {
-		return Arrays.asList(new String[][] {
-			// method action
-			{ "POST", "test" },
-			{ "GET", "test" },
-			{ "PUT", "test" },
-			{ "PATCH", "test" },
-			{ "DELETE", "test" }
+	public static Collection<Object[]> requests() {
+		String actionName = "test";
+		String customRestActionPathInfo = format("%s/%s", PATH_INFO, actionName);
+
+		return Arrays.asList(new Object[][] {
+			// expected counts key
+			// resource.getRestRPC, resource.getCustomRestActionRPC, resource.removeClient, action.run, action.removeClient, response.setStatus
+
+			// method   path info                 action      expected counts                 expected status
+			{ "POST",   PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Create collection resource" },
+			{ "GET",    PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Get collection resources" },
+			{ "PUT",    PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot put on resource collecion" },
+			{ "PATCH",  PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot patch on resource collection" },
+			{ "DELETE", PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot delete on resource collection" },
+
+			{ "POST",   customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_OK,                 "Resource found with supported method" },
+			{ "GET",    customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with unsupported method" },
+			{ "PUT",    customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
+			{ "PATCH",  customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
+			{ "DELETE", customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" }
+			
 		});
 	}
 
