@@ -2,8 +2,6 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,7 +17,7 @@ public class DefaultAction extends Action {
 				log.debug("param value " + value);
 			}
 		}
-		OperationResult result = new OperationResult(HttpServletResponse.SC_BAD_REQUEST);
-		return result;
+
+		return OperationResult.badRequest();
 	}
 }

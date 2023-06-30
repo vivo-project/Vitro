@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.request;
 
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.RPC_SERVLET_PATH;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -27,7 +30,7 @@ public class RequestPathTest {
 
     @Test
     public void testRpc() {
-        when(request.getContextPath()).thenReturn("/api/rpc/create");
+        when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/create");
 
         RequestPath requestPath = RequestPath.from(request);
@@ -41,25 +44,25 @@ public class RequestPathTest {
         assertEquals(null, requestPath.getResourceId());
 
 
-        when(request.getContextPath()).thenReturn("/api/rpc/");
+        when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/");
 
         assertFalse(RequestPath.from(request).isValid());
 
 
-        when(request.getContextPath()).thenReturn(null);
+        when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn("/create");
 
         assertFalse(RequestPath.from(request).isValid());
 
 
-        when(request.getContextPath()).thenReturn("/api/rpc");
+        when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(RequestPath.from(request).isValid());
 
 
-        when(request.getContextPath()).thenReturn(null);
+        when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(RequestPath.from(request).isValid());
@@ -67,7 +70,7 @@ public class RequestPathTest {
 
     @Test
     public void testRestCollection() {
-        when(request.getContextPath()).thenReturn("/api/rest/1/persons");
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/1/persons");
 
         RequestPath requestPath = RequestPath.from(request);
@@ -81,25 +84,25 @@ public class RequestPathTest {
         assertEquals(null, requestPath.getActionName());
 
 
-        when(request.getContextPath()).thenReturn("/api/rest/");
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/");
 
         assertFalse(RequestPath.from(request).isValid());
 
 
-        when(request.getContextPath()).thenReturn(null);
+        when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn("/1/persons");
 
         assertFalse(RequestPath.from(request).isValid());
 
 
-        when(request.getContextPath()).thenReturn("/api/rest");
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(RequestPath.from(request).isValid());
 
 
-        when(request.getContextPath()).thenReturn(null);
+        when(request.getServletPath()).thenReturn(null);
         when(request.getPathInfo()).thenReturn(null);
 
         assertFalse(RequestPath.from(request).isValid());
@@ -107,7 +110,7 @@ public class RequestPathTest {
 
     @Test
     public void testRestCustomAction() {
-        when(request.getContextPath()).thenReturn("/api/rest/1/persons/dedupe");
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/1/persons/dedupe");
 
         RequestPath requestPath = RequestPath.from(request);
@@ -123,7 +126,7 @@ public class RequestPathTest {
 
     @Test
     public void testRestIndividual() {
-        when(request.getContextPath()).thenReturn("/api/rest/1/persons/resource:" + encodedResourceId);
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/1/persons/resource:" + encodedResourceId);
 
         RequestPath requestPath = RequestPath.from(request);
@@ -139,7 +142,7 @@ public class RequestPathTest {
 
     @Test
     public void testRestIndividualCustomAction() {
-        when(request.getContextPath()).thenReturn("/api/rest/1/persons/resource:" + encodedResourceId + "/patch");
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/1/persons/resource:" + encodedResourceId + "/patch");
 
         RequestPath requestPath = RequestPath.from(request);
@@ -155,17 +158,17 @@ public class RequestPathTest {
 
     @Test
     public void testNotFound() {
-        when(request.getContextPath()).thenReturn("/api/rest/1/persons/resource:" + encodedResourceId + "/patch/foo");
+        when(request.getServletPath()).thenReturn(REST_SERVLET_PATH);
         when(request.getPathInfo()).thenReturn("/1/persons/resource:" + encodedResourceId + "/patch/foo");
 
         assertFalse(RequestPath.from(request).isValid());
 
-        when(request.getContextPath()).thenReturn("/api/bar/1/persons");
+        when(request.getServletPath()).thenReturn("/api/bar");
         when(request.getPathInfo()).thenReturn("/1/persons");
 
         assertFalse(RequestPath.from(request).isValid());
 
-        when(request.getContextPath()).thenReturn("/some/random/path");
+        when(request.getServletPath()).thenReturn("/some/random/path");
         when(request.getPathInfo()).thenReturn("/3/2/1");
 
         assertFalse(RequestPath.from(request).isValid());

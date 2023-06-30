@@ -10,7 +10,7 @@ public class HTTPMethod {
 		return name;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#methodName", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
 	}

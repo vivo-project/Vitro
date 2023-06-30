@@ -17,7 +17,7 @@ public class CustomRESTAction implements Removable {
 		return name;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#customRESTActionName", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -26,7 +26,7 @@ public class CustomRESTAction implements Removable {
 		return targetRPC;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#forwardTo", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#forwardsTo", minOccurs = 1, maxOccurs = 1)
 	public void setTargetRPC(RPC rpc) {
 		this.targetRPC = rpc;
 	}

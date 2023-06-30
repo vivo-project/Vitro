@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_BASE_PATH;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath.REST_SERVLET_PATH;
 import static java.lang.String.format;
 
 import java.io.IOException;
@@ -15,19 +15,20 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Resource;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.RequestPath;
 
-@WebServlet(name = "RESTEndpoint", urlPatterns = { REST_BASE_PATH + "/*" })
+@WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
 public class RESTEndpoint extends VitroHttpServlet {
 
 	private static final Log log = LogFactory.getLog(RESTEndpoint.class);
 
-	private ResourcePool resourcePool = ResourcePool.getInstance();
+	private ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
 	private ActionPool actionPool = ActionPool.getInstance();
 
 	@Override
@@ -64,66 +65,81 @@ public class RESTEndpoint extends VitroHttpServlet {
 	}
 
 	private void process(HttpServletRequest request, HttpServletResponse response) {
+		String method = request.getMethod();
 		RequestPath requestPath = RequestPath.from(request);
 
-		if (requestPath.isValid()) {
-			ResourceKey resourceKey = ResourceKey.of(requestPath.getResourceName(), requestPath.getResourceVersion());
+		if (!requestPath.isValid()) {
+			log.error(format("Request path %s is not found", request.getPathInfo()));
+			OperationResult.notFound().prepareResponse(response);
+			return;
+		}
 
-			if (log.isDebugEnabled()) {
-				resourcePool.printKeys();
-			}
-			Resource resource = resourcePool.get(resourceKey);
-			ResourceKey key = resource.getKey();
-			String method = request.getMethod();
+		if (!requestPath.isMethodAllowed(method)) {
+			log.error(format("Method %s not allowed at path %s", method, request.getPathInfo()));
+			OperationResult.methodNotAllowed().prepareResponse(response);
+			return;
+		}
 
-			RPC rpc = null;
+		ResourceAPIKey resourceAPIKey = ResourceAPIKey.of(requestPath.getResourceName(), requestPath.getResourceVersion());
 
-			if (requestPath.isCustomRestAction()) {
-				String customRestActionName = requestPath.getActionName();
-				try {
-					rpc = resource.getCustomRestActionRPC(customRestActionName);
-				} catch (UnsupportedOperationException e) {
-					log.error(format("Custom REST action %s not implemented for resource %s", customRestActionName, key), e);
-					OperationResult.notImplemented().prepareResponse(response);
-					return;
-				} finally {
-					resource.removeClient();
-				}
-			} else {
-				try {
-					rpc = resource.getRestRPC(method);
-				} catch (UnsupportedOperationException e) {
-					log.error(format("Method %s not implemented for resource %s", method, key), e);
-					OperationResult.notImplemented().prepareResponse(response);
-					return;
-				} finally {
-					resource.removeClient();
-				}
-			}
+		if (log.isDebugEnabled()) {
+			resourceAPIPool.printKeys();
+		}
+		ResourceAPI resourceAPI = resourceAPIPool.get(resourceAPIKey);
 
-			HTTPMethod rpcMethod = rpc.getHttpMethod();
+		if (resourceAPI instanceof DefaultResourceAPI) {
+			log.error(format("ResourceAPI %s not found", resourceAPIKey));
+			OperationResult.notFound().prepareResponse(response);
+			return;
+		}
 
-			if (rpcMethod == null || !rpcMethod.getName().toUpperCase().equals(method)) {
-				log.error(format("Remote Procedure Call not implemented for resource %s with method %s", key, method));
-				OperationResult.notImplemented().prepareResponse(response);
-				return;
-			}
+		ResourceAPIKey key = resourceAPI.getKey();
 
-			String actionName = rpc.getName();
+		RPC rpc = null;
 
-			if (log.isDebugEnabled()) {
-				actionPool.printKeys();
-			}
-			Action action = actionPool.get(actionName);
-			OperationData input = new OperationData(request);
+		if (requestPath.isCustomRestAction()) {
+			String customRestActionName = requestPath.getActionName();
 			try {
-				OperationResult result = action.run(input);
-				result.prepareResponse(response);
+				rpc = resourceAPI.getCustomRestActionRPC(customRestActionName);
+			} catch (UnsupportedOperationException e) {
+				log.error(format("Custom REST action %s not implemented for resource %s", customRestActionName, key), e);
+				OperationResult.methodNotAllowed().prepareResponse(response);
+				return;
 			} finally {
-				action.removeClient();
+				resourceAPI.removeClient();
 			}
 		} else {
-			OperationResult.notFound().prepareResponse(response);
+			try {
+				rpc = resourceAPI.getRestRPC(method);
+			} catch (UnsupportedOperationException e) {
+				log.error(format("Method %s not implemented for resource %s", method, key), e);
+				OperationResult.methodNotAllowed().prepareResponse(response);
+				return;
+			} finally {
+				resourceAPI.removeClient();
+			}
+		}
+
+		HTTPMethod rpcMethod = rpc.getHttpMethod();
+
+		if (rpcMethod == null || !rpcMethod.getName().toUpperCase().equals(method)) {
+			log.error(format("Remote Procedure Call not implemented for resource %s with method %s", key, method));
+			OperationResult.methodNotAllowed().prepareResponse(response);
+			return;
+		}
+
+		String actionName = rpc.getName();
+
+		if (log.isDebugEnabled()) {
+			actionPool.printKeys();
+		}
+		Action action = actionPool.get(actionName);
+		OperationData input = new OperationData(request);
+		try {
+			OperationResult result = action.run(input);
+			result.prepareResponse(response);
+		} finally {
+			action.removeClient();
 		}
 	}
 

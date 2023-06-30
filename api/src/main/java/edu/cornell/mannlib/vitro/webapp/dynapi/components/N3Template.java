@@ -15,7 +15,7 @@ public class N3Template implements Template{
 		requiredParams.add(param);
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasN3Text", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#n3Text", minOccurs = 1, maxOccurs = 1)
 	public void setN3Text(String n3Text) {
 		this.n3Text = n3Text;
 	}

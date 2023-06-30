@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.OperationData;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
@@ -34,17 +32,17 @@ public class Action implements Poolable<String>, Operation, Link {
 	@Override
 	public OperationResult run(OperationData input) {
 		if (firstStep == null) {
-			return new OperationResult(HttpServletResponse.SC_NOT_IMPLEMENTED);
+			return OperationResult.internalServerError();
 		}
 		return firstStep.run(input);
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#firstStep", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", minOccurs = 1, maxOccurs = 1)
 	public void setStep(OperationalStep step) {
 		this.firstStep = step;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#assignedRPC", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasAssignedRPC", minOccurs = 1, maxOccurs = 1)
 	public void setRPC(RPC rpc) {
 		this.rpc = rpc;
 	}
