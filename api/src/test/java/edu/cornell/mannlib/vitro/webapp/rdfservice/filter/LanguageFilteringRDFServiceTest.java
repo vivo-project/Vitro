@@ -4,12 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.filter;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -22,15 +21,9 @@ import org.junit.Test;
 
 import stubs.org.apache.jena.rdf.model.LiteralStub;
 
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 /**
  * This is the matching order we expect to see:
@@ -43,14 +36,11 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceMod
  * </pre>
  */
 public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
-
 	private static final Log log = LogFactory
 			.getLog(LanguageFilteringRDFServiceTest.class);
 
 	private static final String COLLATOR_CLASSNAME = "edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService$RowIndexedLiteralSortByLang";
 	private static final String RIL_CLASSNAME = "edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService$RowIndexedLiteral";
-
-	private static final String TEST_CONSTRUCT_QUERY = "CONSTRUCT { ?s ?o ?p . } WHERE { ?s ?o ?p . }";
 
 	private LanguageFilteringRDFService filteringRDFService;
 	private List<Object> listOfRowIndexedLiterals;
@@ -168,113 +158,6 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 		testBothWays();
 	}
 
-	@Test
-	public void sparqlConstructQueryTestGetPreferredExistingLang() throws RDFServiceException {
-		preferredLanguages = list("en-US", "de-DE");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelEn_De_NoTag.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		assertEquals(model.listStatements().next().getObject().toString(), "US label@en-US");
-	}
-	
-	@Test
-	public void sparqlConstructQueryTestGetSecodAvailPreferredLang() throws RDFServiceException {
-		preferredLanguages = list("en-US", "de-DE");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelDe_NoTag.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		assertEquals(model.listStatements().next().getObject().toString(), "DE label@de-DE");
-	}
-
-	@Test
-	public void sparqlConstructQueryTestGetNoTagAsLangsNotAvailable() throws RDFServiceException {
-		preferredLanguages = list("en-US", "de-DE");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelNoTag.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		assertEquals(model.listStatements().next().getObject().toString(), "no tag label");
-	}
-	
-	@Test
-	public void sparqlConstructQueryTestPrivateFallback1() throws RDFServiceException {
-		preferredLanguages = list("fr-CA");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelPrivateFallback.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		final String expected = "fr@fr";
-		assertEquals(expected, model.listStatements().next().getObject().toString());
-	}
-
-	@Test
-	public void sparqlConstructQueryTestPrivateFallback2() throws RDFServiceException {
-		preferredLanguages = list("fr");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelPrivateFallback2.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		final String expected = "TIB FR ca@fr-CA-x-tib";
-		assertEquals(expected, model.listStatements().next().getObject().toString());
-	}
-
-	@Test
-	public void sparqlConstructQueryTestPrivateFallback3() throws RDFServiceException {
-		preferredLanguages = list("fr-CA-x-tib");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelPrivateFallback3.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		final String expected = "fr@fr";
-		assertEquals(expected, model.listStatements().next().getObject().toString());
-	}
-	
-	@Test
-	public void sparqlConstructQueryTestPrivate() throws RDFServiceException {
-		preferredLanguages = list("fr-CA-x-tib");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelPrivate.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		final String expected = "TIB FR ca@fr-CA-x-tib";
-		assertEquals(expected, model.listStatements().next().getObject().toString());
-	}
-	
-	@Test
-	public void sparqlConstructQueryTestFallback1() throws RDFServiceException {
-		preferredLanguages = list("fr-CA");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelFallback.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		final String expected = "fr CH@fr-CH";
-		assertEquals(expected, model.listStatements().next().getObject().toString());
-	}
-	
-	@Test
-	public void sparqlConstructQueryTestFallback2() throws RDFServiceException {
-		preferredLanguages = list("fr");
-		OntModel model;
-		createLanguageFilter("LangFilteringTestModelFallback.n3");
-		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		filteringRDFService.sparqlConstructQuery(TEST_CONSTRUCT_QUERY, model);
-		assertEquals(model.size(),1);
-		final String expected = "fr CH@fr-CH";
-		assertEquals(expected, model.listStatements().next().getObject().toString());
-	}
-
-
-
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------
@@ -284,7 +167,7 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 	 * sort again.
 	 */
 	private void testBothWays() {
-		createLanguageFilter(null);
+		createLanguageFilter();
 
 		buildListOfLiterals();
 		sortListOfLiterals();
@@ -301,7 +184,7 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 	 * thrown, and no languages are "lost in translation".
 	 */
 	private void testArbitraryOrder() {
-		createLanguageFilter(null);
+		createLanguageFilter();
 
 		buildListOfLiterals();
 		sortListOfLiterals();
@@ -310,20 +193,16 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 		buildReversedListOfLiterals();
 		sortListOfLiterals();
 		assertLanguages("sort reversed literals");
+
 	}
 
 	private List<String> list(String... strings) {
 		return new ArrayList<String>(Arrays.asList(strings));
 	}
 
-	private void createLanguageFilter(String fileName) {
-		OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		if (fileName != null) {
-			Reader reader = new InputStreamReader(this.getClass().getResourceAsStream(fileName));
-			model.read(reader, "http://test.edu/", "N3");
-		}
-		RDFService rdfService = new RDFServiceModel(model);
-		filteringRDFService = new LanguageFilteringRDFService(rdfService,	preferredLanguages);
+	private void createLanguageFilter() {
+		filteringRDFService = new LanguageFilteringRDFService(null,
+				preferredLanguages);
 	}
 
 	private void buildListOfLiterals() {
