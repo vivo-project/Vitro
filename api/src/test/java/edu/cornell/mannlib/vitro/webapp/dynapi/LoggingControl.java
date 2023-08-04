@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 
 public class LoggingControl {
@@ -50,6 +51,7 @@ public class LoggingControl {
     }
 
     public static void offLogs() {
+        offLog(RESTEndpoint.class);
         offLog(ResourceAPIPool.class);
         offLog(RPCPool.class);
         offLog(ProcedurePool.class);
@@ -57,6 +59,7 @@ public class LoggingControl {
     }
 
     public static void restoreLogs() {
+        restoreLog(RESTEndpoint.class);
         restoreLog(ResourceAPIPool.class);
         restoreLog(RPCPool.class);
         restoreLog(ProcedurePool.class);
