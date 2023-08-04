@@ -100,7 +100,7 @@ public class RESTEndpoint extends Endpoint {
             try {
                 procedureUri = resourceAPI.getProcedureUriByActionName(method, actionName);
             } catch (UnsupportedOperationException e) {
-                log.error(format("Custom REST action %s not implemented for resource %s", actionName, key), e);
+                log.error(format("Custom REST action %s not implemented for resource %s and method %s", actionName, key, method), e);
                 OperationResult.methodNotAllowed().prepareResponse(response);
                 return;
             } finally {
