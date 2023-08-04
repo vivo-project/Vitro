@@ -150,18 +150,18 @@ public class ResourceAPI extends AbstractPoolComponent implements Versionable<Re
         }
     }
 
-    public String getProcedureUriByActionName(String name) {
-        String uri = getProcedureUriByCustomActionName(name);
+    public String getProcedureUriByActionName(String method, String actionName) {
+        String uri = getProcedureUriByCustomActionName(method, actionName);
         if (uri != null) {
             return uri;
         }
         throw new UnsupportedOperationException("Unsupported custom action");
     }
 
-    private String getProcedureUriByCustomActionName(String name) {
+    private String getProcedureUriByCustomActionName(String method, String name) {
         String uri = null;
         for (CustomRESTAction customRestAction : customRESTActions) {
-            if (customRestAction.getName().equals(name)) {
+            if (customRestAction.getName().equals(name) && method.equals(customRestAction.getHttpMethodName())) {
                 uri = customRestAction.getTargetProcedureUri();
                 break;
             }
