@@ -195,7 +195,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		if( VitroVocabulary.OWL_THING.equals( type )){
     			query.setQuery( "*:*" );
     		}else{
-    			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
+    			query.setQuery( VitroSearchTermNames.RDFTYPE + ":\"" + type + "\"");
     		}
     		query.setRows(0);
     		SearchResponse rsp = searchEngine.query(query);
@@ -568,7 +568,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	for( VClass type:types){
     		//search  for type count.
     		SearchQuery query = searchEngine.createQuery();
-    		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type.getURI());
+    		query.setQuery( VitroSearchTermNames.RDFTYPE + ":\"" + type.getURI() + "\"");
     		query.setRows(0);
 
     		SearchResponse rsp = searchEngine.query(query);

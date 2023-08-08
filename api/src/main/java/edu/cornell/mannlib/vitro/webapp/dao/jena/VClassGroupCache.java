@@ -316,7 +316,7 @@ public class VClassGroupCache implements SearchIndexer.Listener {
 
         SearchQuery query = searchEngine.createQuery().
             setRows(0).
-            setQuery(VitroSearchTermNames.CLASSGROUP_URI + ":" + groupUri ).
+            setQuery(VitroSearchTermNames.CLASSGROUP_URI + ":\"" + groupUri + "\"").
             addFacetFields( facetOnField ). //facet on type to get counts for classes in classgroup
             setFacetMinCount(0);
 

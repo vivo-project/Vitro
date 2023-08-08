@@ -54,7 +54,7 @@ public class IndividualsViaSearchQueryOptions extends IndividualsViaVClassOption
 			if( VitroVocabulary.OWL_THING.equals( vclassURI )){
 				query.setQuery( "*:*" );
 			}else{
-				query.setQuery( VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS + ":" + vclassURI);
+				query.setQuery( VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS + ":\"" + vclassURI + "\"");
 			}
 			 query.setStart(0)
              .setRows(1000);
