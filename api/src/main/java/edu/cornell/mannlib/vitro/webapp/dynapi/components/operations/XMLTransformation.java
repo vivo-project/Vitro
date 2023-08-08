@@ -22,8 +22,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class XMLTransformation extends AbstractOperation {
@@ -53,7 +55,7 @@ public class XMLTransformation extends AbstractOperation {
 
     @Override
     public OperationResult runOperation(DataStore dataStore) throws Exception {
-        String is = SimpleDataView.getStringRepresentation(inputXmlParam.getName(), dataStore);
+        String is = getInputString(dataStore);
         String styles = SimpleDataView.getStringRepresentation(xsltParam.getName(), dataStore);
         ByteArrayOutputStream output = transform(is, styles);
         Data outputData = new Data(outputXmlParam);
@@ -61,6 +63,13 @@ public class XMLTransformation extends AbstractOperation {
         outputData.initializeFromString();
         dataStore.addData(outputXmlParam.getName(), outputData);
         return OperationResult.ok();
+    }
+
+    private String getInputString(DataStore dataStore) {
+        if (ModelView.isModel(inputXmlParam)) {
+            return ModelView.getModelRDFXmlRepresentation(dataStore, inputXmlParam);
+        }
+        return SimpleDataView.getStringRepresentation(inputXmlParam.getName(), dataStore);
     }
 
     private ByteArrayOutputStream transform(String input, String styles) throws Exception {
