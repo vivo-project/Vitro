@@ -50,6 +50,7 @@ public class LoggingControl {
     }
 
     public static void offLogs() {
+        offLog(RESTEndpoint.class);
         offLog(ResourceAPIPool.class);
         offLog(RPCPool.class);
         offLog(ProcedurePool.class);
@@ -57,6 +58,7 @@ public class LoggingControl {
     }
 
     public static void restoreLogs() {
+        restoreLog(RESTEndpoint.class);
         restoreLog(ResourceAPIPool.class);
         restoreLog(RPCPool.class);
         restoreLog(ProcedurePool.class);

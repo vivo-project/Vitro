@@ -167,13 +167,13 @@ public class RESTEndpointTest {
 
         String procedureUri = "resource_uri";
         when(resourceAPI.getProcedureUri(testMethod, false)).thenReturn(procedureUri);
-        when(resourceAPI.getProcedureUriByActionName(testActionName)).thenReturn(procedureUri);
+        when(resourceAPI.getProcedureUriByActionName(testMethod, testActionName)).thenReturn(procedureUri);
         doNothing().when(resourceAPI).removeClient();
 
         run(testMethod);
 
         verify(resourceAPI, times(testExpectedCounts[0])).getProcedureUri(any(), anyBoolean());
-        verify(resourceAPI, times(testExpectedCounts[1])).getProcedureUriByActionName(any());
+        verify(resourceAPI, times(testExpectedCounts[1])).getProcedureUriByActionName(testMethod, testActionName);
         verify(resourceAPI, times(testExpectedCounts[2])).removeClient();
         verify(procedure, times(testExpectedCounts[3])).run(any());
         verify(procedure, times(testExpectedCounts[4])).removeClient();
@@ -218,8 +218,8 @@ public class RESTEndpointTest {
             { "PATCH",  PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot patch on resource collection" },
             { "DELETE", PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot delete on resource collection" },
 
-            { "POST",   customRestActionPathInfo, actionName, new int[] { 0, 0, 1, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
-            { "GET",    customRestActionPathInfo, actionName, new int[] { 0, 0, 1, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with unsupported method" },
+            { "POST",   customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
+            { "GET",    customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
             { "PUT",    customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
             { "PATCH",  customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
             { "DELETE", customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" }
