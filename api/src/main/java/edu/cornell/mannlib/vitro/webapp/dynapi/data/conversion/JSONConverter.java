@@ -158,7 +158,7 @@ public class JSONConverter {
 		String paramPath = getReadPath(name, param, procedure);
 		JsonNode node = ctx.read(paramPath, JsonNode.class);
 		Data data = new Data(param);
-		data.setRawString(node.toString());
+		data.setRawString(node.asText());
 		data.earlyInitialization();
 		dataStore.addData(name, data);
 	}
