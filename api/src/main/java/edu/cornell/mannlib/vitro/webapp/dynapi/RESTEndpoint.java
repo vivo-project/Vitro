@@ -96,16 +96,11 @@ public class RESTEndpoint extends Endpoint {
         String procedureUri = null;
 
         if (requestPath.isCustomRestAction()) {
-            
-            if (!"PUT".equals(method)) {
-                resourceAPI.removeClient();
-                OperationResult.methodNotAllowed().prepareResponse(response); return;
-            }
             String actionName = requestPath.getCustomRestActionName();
             try {
-                procedureUri = resourceAPI.getProcedureUriByActionName(actionName);
+                procedureUri = resourceAPI.getProcedureUriByActionName(method, actionName);
             } catch (UnsupportedOperationException e) {
-                log.error(format("Custom REST action %s not implemented for resource %s", actionName, key), e);
+                log.error(format("Custom REST action %s not implemented for resource %s and method %s", actionName, key, method), e);
                 OperationResult.methodNotAllowed().prepareResponse(response);
                 return;
             } finally {
