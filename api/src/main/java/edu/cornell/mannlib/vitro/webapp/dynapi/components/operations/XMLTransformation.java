@@ -77,8 +77,11 @@ public class XMLTransformation extends AbstractOperation {
         InputStream styleInputStream = IOUtils.toInputStream(styles, StandardCharsets.UTF_8);
         Source stylesource = new StreamSource(styleInputStream);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
         Transformer transformer = transformerFactory.newTransformer(stylesource);
+        if (transformer == null) {
+            throw new Exception("Failed to initialize transformer. Check styles.");
+        }
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(inputStream);
