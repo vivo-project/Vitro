@@ -7,8 +7,11 @@ import java.nio.charset.StandardCharsets;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -34,11 +37,13 @@ public class XMLTransformation extends AbstractOperation {
     private Parameter xsltParam;
     private Parameter inputXmlParam;
     private Parameter outputXmlParam;
+    private Templates transformTemplates;
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#xslt", minOccurs = 1, maxOccurs = 1)
     public void setXsltParam(Parameter xsltParam) throws InitializationException {
         this.xsltParam = xsltParam;
         inputParams.add(xsltParam);
+        prepareTransformTemplates();
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#inputXml", minOccurs = 1, maxOccurs = 1)
@@ -74,19 +79,44 @@ public class XMLTransformation extends AbstractOperation {
 
     private ByteArrayOutputStream transform(String input, String styles) throws Exception {
         InputStream inputStream = IOUtils.toInputStream(input, StandardCharsets.UTF_8);
-        InputStream styleInputStream = IOUtils.toInputStream(styles, StandardCharsets.UTF_8);
-        Source stylesource = new StreamSource(styleInputStream);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
-        Transformer transformer = transformerFactory.newTransformer(stylesource);
-        if (transformer == null) {
-            throw new Exception("Failed to initialize transformer. Check styles.");
-        }
+        Transformer transformer = getTransformer(styles);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(inputStream);
         transformer.transform(new DOMSource(doc), new StreamResult(output));
         return output;
+    }
+    
+    private void prepareTransformTemplates() throws InitializationException{
+        try {
+          if (xsltParam.isInternal() && !xsltParam.isOptional()) {
+              String defaultValue = xsltParam.getDefaultValue();
+              if (defaultValue != null) {
+                  InputStream styleInputStream = IOUtils.toInputStream(defaultValue, StandardCharsets.UTF_8);
+                  Source stylesource = new StreamSource(styleInputStream);
+                  TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+                  transformTemplates = transformerFactory.newTemplates(stylesource);
+              }
+          }
+        } catch (Exception e){
+            throw new InitializationException(e.getMessage());
+        }
+    }
+    
+    private Transformer getTransformer(String styles)
+            throws TransformerFactoryConfigurationError, TransformerConfigurationException, Exception {
+        if (transformTemplates != null) {
+            return transformTemplates.newTransformer();
+        }
+        InputStream styleInputStream = IOUtils.toInputStream(styles, StandardCharsets.UTF_8);
+        Source stylesource = new StreamSource(styleInputStream);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+        Transformer transformer = transformerFactory.newTransformer(stylesource);
+        if (transformer == null) {
+            throw new Exception("Failed to initialize transformer. Check styles.");
+        }
+        return transformer;
     }
     
     @Override
