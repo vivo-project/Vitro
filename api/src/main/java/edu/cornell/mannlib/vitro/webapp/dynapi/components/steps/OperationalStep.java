@@ -66,16 +66,24 @@ public class OperationalStep implements Step {
 
     public OperationResult run(DataStore data) {
         OperationResult result = OperationResult.badRequest();
-        log.debug("Processing in STEP");
-        log.debug("Execution step is optional? " + optional);
+        long start = System.currentTimeMillis();
+        if (log.isDebugEnabled()) {
+            log.debug("Started execution in step.");
+            if (optional) {
+                log.debug("Operation step is optional.");    
+            }
+        }
         if (operation != null) {
-            log.debug("Operation not null");
             ParameterSubstitutor.forwardSubstitution(substitutions, data);    
             result = operation.run(data);
             ParameterSubstitutor.backwardSubstitution(substitutions, data);
             if (!optional && result.hasError()) {
                 return result;
             }
+        }
+        if (log.isDebugEnabled()) {
+            long time = System.currentTimeMillis() - start;
+            log.debug("Step execution time: " + time + "ms");
         }
         return nextStep.run(data);
     }

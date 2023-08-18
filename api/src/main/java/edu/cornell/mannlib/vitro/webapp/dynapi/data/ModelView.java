@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
@@ -63,6 +64,10 @@ public class ModelView {
 			}
 		}
 		return list;
+	}
+	
+	public static String getModelRDFXmlRepresentation(DataStore dataStore, Parameter param) {
+	    return DynapiInMemoryOntModel.serialize(getModel(dataStore, param), "RDF/XML");
 	}
 
 	public static void addModel(DataStore dataStore, Model model, Parameter outputParam) {
