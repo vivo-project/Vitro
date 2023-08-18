@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -32,12 +33,13 @@ public class XMLValidation extends AbstractOperation {
     private Parameter inputXmlParam;
     private Parameter validationResult;
     private Parameter errorMessage;
-
+    private Schema defaultSchema;
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#xsd", minOccurs = 1, maxOccurs = 1)
     public void setSchemaParam(Parameter schemaParam) throws InitializationException {
         this.schemaParam = schemaParam;
         inputParams.add(schemaParam);
+        prepareSchema();
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#inputXml", minOccurs = 1, maxOccurs = 1)
@@ -86,10 +88,7 @@ public class XMLValidation extends AbstractOperation {
     private String validate(String input, String stringSchema) {
         try {
             InputStream inputStream = IOUtils.toInputStream(input, StandardCharsets.UTF_8);
-            InputStream schemaInputStream = IOUtils.toInputStream(stringSchema, StandardCharsets.UTF_8);
-            Source schemaSource = new StreamSource(schemaInputStream);
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(schemaSource);
+            Schema schema = getSchema(stringSchema);
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(inputStream));
         } catch (Exception e) {
@@ -97,6 +96,30 @@ public class XMLValidation extends AbstractOperation {
             return e.getMessage();
         }
         return "";
+    }
+    
+    private void prepareSchema() throws InitializationException{
+        try {
+          if (schemaParam.isInternal() && !schemaParam.isOptional()) {
+              String defaultValue = schemaParam.getDefaultValue();
+              if (defaultValue != null) {
+                  defaultSchema = getSchema(defaultValue);    
+              }
+          }
+        } catch (Exception e){
+            throw new InitializationException(e.getMessage());
+        }
+    }
+
+    private Schema getSchema(String stringSchema) throws SAXException {
+        if (defaultSchema != null) {
+            return defaultSchema;
+        }
+        InputStream schemaInputStream = IOUtils.toInputStream(stringSchema, StandardCharsets.UTF_8);
+        Source schemaSource = new StreamSource(schemaInputStream);
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = factory.newSchema(schemaSource);
+        return schema;
     }
     
     @Override
