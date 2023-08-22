@@ -4,9 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
@@ -21,80 +18,81 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import net.sf.jga.fn.UnaryFunctor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * Filter the properties depending on what DisplayByRolePermission is on the
- * request. If no request, or no permission, use the Public permission.
+ * Filter the properties depending on what DisplayByRolePermission is on the request. If no request, or no permission,
+ * use the Public permission.
  */
 public class FilterByDisplayPermission extends VitroFiltersImpl {
-	private static final Log log = LogFactory.getLog(FilterByDisplayPermission.class);
-	IdentifierBundle accessSubject = ActiveIdentifierBundleFactories.getUserIdentifierBundle(null);
+    private static final Log log = LogFactory.getLog(FilterByDisplayPermission.class);
+    IdentifierBundle accessSubject = ActiveIdentifierBundleFactories.getUserIdentifierBundle(null);
 
-	public FilterByDisplayPermission() {
-	    setDataPropertyFilter(new DataPropertyFilterByPolicy());
-	    setObjectPropertyFilter(new ObjectPropertyFilterByPolicy());
-	    setDataPropertyStatementFilter(new DataPropertyStatementFilterByPolicy());
-	    setObjectPropertyStatementFilter(new ObjectPropertyStatementFilterByPolicy());
-	}
+    public FilterByDisplayPermission() {
+        setDataPropertyFilter(new DataPropertyFilterByPolicy());
+        setObjectPropertyFilter(new ObjectPropertyFilterByPolicy());
+        setDataPropertyStatementFilter(new DataPropertyStatementFilterByPolicy());
+        setObjectPropertyStatementFilter(new ObjectPropertyStatementFilterByPolicy());
+    }
 
-	boolean checkAuthorization(AccessObject accessObject) {
-		boolean decision = PolicyHelper.isAuthorizedForActions(accessSubject, accessObject, AccessOperation.DISPLAY);
-		log.debug("decision is " + decision);
-		return decision;
-	}
+    boolean checkAuthorization(AccessObject accessObject) {
+        boolean decision = PolicyHelper.isAuthorizedForActions(accessSubject, accessObject, AccessOperation.DISPLAY);
+        log.debug("decision is " + decision);
+        return decision;
+    }
 
-	/**
-	 * Private Classes
-	 */
+    /**
+     * Private Classes
+     */
 
-	private class DataPropertyFilterByPolicy extends UnaryFunctor<DataProperty, Boolean> {
-		@Override
-		public Boolean fn(DataProperty dp) {
-			return checkAuthorization(new DataPropertyAccessObject(dp));
-		}
-	}
+    private class DataPropertyFilterByPolicy extends UnaryFunctor<DataProperty, Boolean> {
+        @Override
+        public Boolean fn(DataProperty dp) {
+            return checkAuthorization(new DataPropertyAccessObject(dp));
+        }
+    }
 
-	private class ObjectPropertyFilterByPolicy extends UnaryFunctor<ObjectProperty, Boolean> {
-		@Override
-		public Boolean fn(ObjectProperty op) {
-			return checkAuthorization(new ObjectPropertyAccessObject(op));
-		}
-	}
+    private class ObjectPropertyFilterByPolicy extends UnaryFunctor<ObjectProperty, Boolean> {
+        @Override
+        public Boolean fn(ObjectProperty op) {
+            return checkAuthorization(new ObjectPropertyAccessObject(op));
+        }
+    }
 
-	private class DataPropertyStatementFilterByPolicy extends UnaryFunctor<DataPropertyStatement, Boolean> {
-		@Override
-		public Boolean fn(DataPropertyStatement dps) {
-		    //TODO: Model should be here to correctly check authorization
-			return checkAuthorization(new DataPropertyStatementAccessObject(null, dps));
-		}
-	}
+    private class DataPropertyStatementFilterByPolicy extends UnaryFunctor<DataPropertyStatement, Boolean> {
+        @Override
+        public Boolean fn(DataPropertyStatement dps) {
+            //TODO: Model should be here to correctly check authorization
+            return checkAuthorization(new DataPropertyStatementAccessObject(null, dps));
+        }
+    }
 
-	private class ObjectPropertyStatementFilterByPolicy extends UnaryFunctor<ObjectPropertyStatement, Boolean> {
-		@Override
-		public Boolean fn(ObjectPropertyStatement ops) {
-			String subjectUri = ops.getSubjectURI();
-			ObjectProperty predicate = getOrCreateProperty(ops);
-			String objectUri = ops.getObjectURI();
-			return checkAuthorization(new ObjectPropertyStatementAccessObject(null, subjectUri, predicate, objectUri));
-		}
+    private class ObjectPropertyStatementFilterByPolicy extends UnaryFunctor<ObjectPropertyStatement, Boolean> {
+        @Override
+        public Boolean fn(ObjectPropertyStatement ops) {
+            String subjectUri = ops.getSubjectURI();
+            ObjectProperty predicate = getOrCreateProperty(ops);
+            String objectUri = ops.getObjectURI();
+            return checkAuthorization(new ObjectPropertyStatementAccessObject(null, subjectUri, predicate, objectUri));
+        }
 
-		/**
-		 * It would be nice if every ObjectPropertyStatement held a real
-		 * ObjectProperty. If it doesn't, we do the next best thing, but it
-		 * won't recognize any applicable Faux properties.
-		 */
-		private ObjectProperty getOrCreateProperty(ObjectPropertyStatement ops) {
-			if (ops.getProperty() != null) {
-				return ops.getProperty();
-			}
-			if (ops.getPropertyURI() ==  null) {
-				return null;
-			}
-			ObjectProperty op = new ObjectProperty();
-			op.setURI(ops.getPropertyURI());
-			op.setDomainVClassURI(SOME_URI);
-			op.setRangeVClassURI(SOME_URI);
-			return op;
-		}
-	}
+        /**
+         * It would be nice if every ObjectPropertyStatement held a real ObjectProperty. If it doesn't, we do the next
+         * best thing, but it won't recognize any applicable Faux properties.
+         */
+        private ObjectProperty getOrCreateProperty(ObjectPropertyStatement ops) {
+            if (ops.getProperty() != null) {
+                return ops.getProperty();
+            }
+            if (ops.getPropertyURI() == null) {
+                return null;
+            }
+            ObjectProperty op = new ObjectProperty();
+            op.setURI(ops.getPropertyURI());
+            op.setDomainVClassURI(SOME_URI);
+            op.setRangeVClassURI(SOME_URI);
+            return op;
+        }
+    }
 }

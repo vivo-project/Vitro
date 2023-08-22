@@ -7,7 +7,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class AbstractAttribute implements Attribute {
-    
+
     private Set<String> values = new HashSet<>();
     private String uri;
     private long computationalCost;
@@ -18,7 +18,7 @@ public abstract class AbstractAttribute implements Attribute {
         this.uri = uri;
         values.add(value);
     }
-    
+
     public String getUri() {
         return uri;
     }
@@ -26,21 +26,21 @@ public abstract class AbstractAttribute implements Attribute {
     public void setUri(String uri) {
         this.uri = uri;
     }
-    
+
     public TestType getTestType() {
         return testType;
     }
-    
+
     public void setTestType(TestType testType) {
         this.testType = testType;
         adjustComputationCost(testType);
     }
-    
+
     @Override
     public void addValue(String value) {
         values.add(value);
     }
-    
+
     @Override
     public Set<String> getValues() {
         return values;
@@ -55,7 +55,7 @@ public abstract class AbstractAttribute implements Attribute {
             return true;
         }
         AbstractAttribute compared = (AbstractAttribute) object;
-    
+
         return new EqualsBuilder()
                 .append(getUri(), compared.getUri())
                 .append(getValues(), compared.getValues())
@@ -73,23 +73,23 @@ public abstract class AbstractAttribute implements Attribute {
     public long getComputationalCost() {
         return computationalCost;
     }
-    
+
     private void adjustComputationCost(TestType testType) {
         switch (testType) {
-        case ONE_OF:
-            computationalCost += 100;
-            return ;
-        case NOT_ONE_OF:
-            computationalCost += 100;
-            return ;
-        case STARTS_WITH:
-            computationalCost += 1000;
-            return ;
-        case SPARQL_SELECT_QUERY_CONTAINS:
-            computationalCost += 10000;
-            return ;
-        default :
-            return ;
+            case ONE_OF:
+                computationalCost += 100;
+                return;
+            case NOT_ONE_OF:
+                computationalCost += 100;
+                return;
+            case STARTS_WITH:
+                computationalCost += 1000;
+                return;
+            case SPARQL_SELECT_QUERY_CONTAINS:
+                computationalCost += 10000;
+                return;
+            default:
+                return;
         }
     }
 }

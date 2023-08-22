@@ -10,15 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
@@ -28,10 +19,18 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 
 public class PolicyLoader {
 
@@ -44,15 +43,15 @@ public class PolicyLoader {
             + "prefix xsd: <http://www.w3.org/2001/XMLSchema#>\n"
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
-            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n" 
-            + "SELECT DISTINCT ?" + POLICY + " ?" + PRIORITY + " \n" 
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "SELECT DISTINCT ?" + POLICY + " ?" + PRIORITY + " \n"
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
-            + "    ?" + POLICY + " rdf:type ao:Policy .\n" 
-            + "    OPTIONAL {?" + POLICY + " ao:priority ?set_priority" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?" + POLICY + " rdf:type ao:Policy .\n"
+            + "    OPTIONAL {?" + POLICY + " ao:priority ?set_priority"
             + " . }\n"
-            + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n" 
-            + "  }\n" 
+            + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n"
+            + "  }\n"
             + "} ORDER BY ?" + PRIORITY;
 
     private static final String PRIORITY_QUERY = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -61,14 +60,14 @@ public class PolicyLoader {
             + "prefix xsd: <http://www.w3.org/2001/XMLSchema#>\n"
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
-            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n" 
-            + "SELECT DISTINCT ?" + PRIORITY + " \n" 
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "SELECT DISTINCT ?" + PRIORITY + " \n"
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
-            + "    ?" + POLICY  + " rdf:type ao:Policy .\n" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?" + POLICY  + " rdf:type ao:Policy .\n"
             + "    OPTIONAL {?" + POLICY + " ao:priority ?set_priority" + " . }\n"
-            + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n" 
-            + "  }\n" 
+            + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n"
+            + "  }\n"
             + "} ORDER BY ?" + PRIORITY;
 
     private static final String DATASET_QUERY = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -80,10 +79,10 @@ public class PolicyLoader {
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?dataSet \n" + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "       ?policy ao:testDatasets ?dataSets .\n" 
+            + "       ?policy ao:testDatasets ?dataSets .\n"
             + "       ?policy rdf:type ao:Policy .\n"
-            + "       ?dataSets ao:testDataset ?dataSet .\n" 
-            + "  }\n" 
+            + "       ?dataSets ao:testDataset ?dataSet .\n"
+            + "  }\n"
             + "} ORDER BY ?dataSet";
 
     private static final String NO_DATASET_RULES_QUERY = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -95,29 +94,29 @@ public class PolicyLoader {
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?rules ?rule ?attribute ?testId ?typeId ?value ?lit_value ?decision_id \n" + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "?policy rdf:type ao:Policy .\n" 
-            + "?policy ao:rules ?rules . \n" 
+            + "?policy rdf:type ao:Policy .\n"
+            + "?policy ao:rules ?rules . \n"
             + "?rules ao:rule ?rule . \n"
-            + "?rule ao:attribute ?attribute .\n" 
-            + "OPTIONAL {\n" 
-            + "  ?attribute ao:test ?attributeTest .\n"
-            + "  OPTIONAL {\n" 
-            + "    ?attributeTest ao:id ?testId . \n" 
-            + "  }\n" 
-            + "}" 
+            + "?rule ao:attribute ?attribute .\n"
             + "OPTIONAL {\n"
-            + "  ?attribute ao:type ?attributeType . \n" 
-            + "  OPTIONAL {\n" 
+            + "  ?attribute ao:test ?attributeTest .\n"
+            + "  OPTIONAL {\n"
+            + "    ?attributeTest ao:id ?testId . \n"
+            + "  }\n"
+            + "}"
+            + "OPTIONAL {\n"
+            + "  ?attribute ao:type ?attributeType . \n"
+            + "  OPTIONAL {\n"
             + "    ?attributeType ao:id ?typeId . \n"
-            + "  }\n" 
-            + "}\n" 
-            + "OPTIONAL {\n" 
+            + "  }\n"
+            + "}\n"
+            + "OPTIONAL {\n"
             + "   ?rule ao:decision ?decision . \n"
-            + "   ?decision ao:id ?decision_id . \n" 
-            + "}\n" 
+            + "   ?decision ao:id ?decision_id . \n"
+            + "}\n"
             + "?attribute ao:value ?value . \n"
-            + "OPTIONAL {?value ao:id ?lit_value . }\n" 
-            + "  }\n" 
+            + "OPTIONAL {?value ao:id ?lit_value . }\n"
+            + "  }\n"
             + "} ORDER BY ?rule ?attribute";
 
     private static final String DATASET_RULES_QUERY = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -128,82 +127,82 @@ public class PolicyLoader {
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?rules ?rule ?attribute ?testId ?typeId ?value ?lit_value ?decision_id ?dataSetUri \n"
-            + "WHERE {\n" 
+            + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "?policy rdf:type ao:Policy .\n" 
-            + "?policy ao:rules ?rules . \n" 
+            + "?policy rdf:type ao:Policy .\n"
+            + "?policy ao:rules ?rules . \n"
             + "?rules rdf:type ao:Rules . \n"
-            + "?rules ao:rule ?rule . \n" 
+            + "?rules ao:rule ?rule . \n"
             + "?rule ao:attribute ?attribute . \n"
-            + "?attribute rdf:type ao:Attribute .\n" 
-            + "OPTIONAL {\n" 
+            + "?attribute rdf:type ao:Attribute .\n"
+            + "OPTIONAL {\n"
             + "  ?attribute ao:test ?attributeTest .\n"
-            + "  OPTIONAL {\n" 
-            + "    ?attributeTest ao:id ?testId . \n" 
-            + "  }\n" 
-            + "}" 
+            + "  OPTIONAL {\n"
+            + "    ?attributeTest ao:id ?testId . \n"
+            + "  }\n"
+            + "}"
             + "OPTIONAL {\n"
-            + "  ?attribute ao:type ?attributeType . \n" 
-            + "  OPTIONAL {\n" 
+            + "  ?attribute ao:type ?attributeType . \n"
+            + "  OPTIONAL {\n"
             + "    ?attributeType ao:id ?typeId . \n"
-            + "  }\n" 
-            + "}\n" 
-            + "OPTIONAL {\n" 
-            + "   ?rule ao:decision ?decision . \n"
-            + "   ?decision ao:id ?decision_id . \n" 
-            + "}\n" 
-            + "OPTIONAL {\n"
-            + "   ?attribute ao:setValue ?testData . \n" 
-            + "   ?dataSet ao:testData ?testData . \n"
-            + "   ?testData ao:dataValue ?value . \n" 
-            + "   OPTIONAL {?value ao:id ?lit_value . }\n" 
+            + "  }\n"
             + "}\n"
-            + "OPTIONAL {\n" 
-            + "   ?attribute ao:value ?value . \n" 
+            + "OPTIONAL {\n"
+            + "   ?rule ao:decision ?decision . \n"
+            + "   ?decision ao:id ?decision_id . \n"
+            + "}\n"
+            + "OPTIONAL {\n"
+            + "   ?attribute ao:setValue ?testData . \n"
+            + "   ?dataSet ao:testData ?testData . \n"
+            + "   ?testData ao:dataValue ?value . \n"
             + "   OPTIONAL {?value ao:id ?lit_value . }\n"
-            + "}\n" + "BIND(?dataSet as ?dataSetUri)\n" 
-            + "  }\n" 
+            + "}\n"
+            + "OPTIONAL {\n"
+            + "   ?attribute ao:value ?value . \n"
+            + "   OPTIONAL {?value ao:id ?lit_value . }\n"
+            + "}\n" + "BIND(?dataSet as ?dataSetUri)\n"
+            + "  }\n"
             + "} ORDER BY ?rule ?attribute";
 
-    private static final String policyKeyTemplatePrefix = 
+    private static final String policyKeyTemplatePrefix =
               "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "prefix owl: <http://www.w3.org/2002/07/owl#>\n"
             + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "prefix xsd: <http://www.w3.org/2001/XMLSchema#>\n"
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
-            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n" 
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?"
-            + POLICY + "?testData ?value ?valueId ( COUNT(?key) AS ?keySize ) \n" 
+            + POLICY + "?testData ?value ?valueId ( COUNT(?key) AS ?keySize ) \n"
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
-            + "  ?" + POLICY + " ao:policyKey ?policyKeyUri .\n" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "  ?" + POLICY + " ao:policyKey ?policyKeyUri .\n"
             + "  ?" + POLICY + " ao:testDatasets ?testDataSets .\n"
-            + "  ?testDataSets ao:testDataset ?dataSet . \n" 
+            + "  ?testDataSets ao:testDataset ?dataSet . \n"
             + "  ?dataSet ao:testData ?testData . \n"
-            + "  OPTIONAL { ?testData ao:dataValue ?value . \n" 
-            + "    OPTIONAL { ?value ao:id ?valueId . } \n" 
+            + "  OPTIONAL { ?testData ao:dataValue ?value . \n"
+            + "    OPTIONAL { ?value ao:id ?valueId . } \n"
             + "  }"
             + "  ?policyKeyUri ao:keyComponent ?key .\n";
 
     private static final String policyKeyTemplateSuffix = "}} GROUP BY ?" + POLICY + " ?value ?valueId ?testData";
 
-    private static final String policyStatementByKeyTemplatePrefix = 
+    private static final String policyStatementByKeyTemplatePrefix =
               "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "prefix owl: <http://www.w3.org/2002/07/owl#>\n"
             + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "prefix xsd: <http://www.w3.org/2001/XMLSchema#>\n"
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
-            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n" 
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "CONSTRUCT { \n"
-            + "  ?testData ao:dataValue <%s> .\n" 
-            + "}\n" 
+            + "  ?testData ao:dataValue <%s> .\n"
+            + "}\n"
             + "WHERE {\n"
-            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n" 
-            + "  ?" + POLICY + " ao:policyKey ?policyKeyUri .\n" 
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "  ?" + POLICY + " ao:policyKey ?policyKeyUri .\n"
             + "  ?" + POLICY + " ao:testDatasets ?testDataSets .\n"
-            + "  ?testDataSets ao:testDataset ?dataSet . \n" 
+            + "  ?testDataSets ao:testDataset ?dataSet . \n"
             + "  ?dataSet ao:testData ?testData . \n";
 
     private static final String policyStatementByKeyTemplateSuffix = "}}";

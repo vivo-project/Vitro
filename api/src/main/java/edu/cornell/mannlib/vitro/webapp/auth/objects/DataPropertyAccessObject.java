@@ -1,11 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxDataPropertyWrapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DataPropertyAccessObject extends AccessObject {
 
@@ -15,7 +14,7 @@ public class DataPropertyAccessObject extends AccessObject {
         setDataProperty(dataProperty);
         debug(dataProperty);
     }
-    
+
     @Override
     public String getUri() {
         DataProperty dp = getDataProperty();
@@ -29,13 +28,13 @@ public class DataPropertyAccessObject extends AccessObject {
     public AccessObjectType getType() {
         return AccessObjectType.DATA_PROPERTY;
     }
-    
+
     @Override
     public String toString() {
         DataProperty dp = getDataProperty();
         return getClass().getSimpleName() + ": " + (dp == null ? dp : dp.getURI());
     }
-    
+
     private void debug(DataProperty dataProperty) {
         if (true) {
             if (dataProperty instanceof FauxDataPropertyWrapper) {

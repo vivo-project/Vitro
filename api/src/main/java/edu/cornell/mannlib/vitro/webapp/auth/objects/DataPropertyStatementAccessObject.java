@@ -2,11 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
-import org.apache.jena.ontology.OntModel;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import org.apache.jena.ontology.OntModel;
 
 /**
  * A base class for requested actions that involve adding, editing, or dropping
@@ -14,15 +13,17 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
  */
 public class DataPropertyStatementAccessObject extends AccessObject {
 
-    public DataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, String predicateUri, String dataValue) {
+    public DataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, String predicateUri,
+            String dataValue) {
         setStatementOntModel(ontModel);
         setStatementSubject(subjectUri);
         setStatementPredicate(new Property(predicateUri));
         setStatementObject(dataValue);
 
     }
-    
-    public DataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, Property predicate, String dataValue) {
+
+    public DataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, Property predicate,
+            String dataValue) {
         setStatementOntModel(ontModel);
         setStatementSubject(subjectUri);
         setStatementPredicate(predicate);
@@ -39,7 +40,8 @@ public class DataPropertyStatementAccessObject extends AccessObject {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + getStatementPredicateUri() + "> <"+ getStatementObject() + ">";
+        return getClass().getSimpleName() + ": <" + getStatementSubject() + "> <" + getStatementPredicateUri() + "> <"
+                + getStatementObject() + ">";
     }
 
     @Override

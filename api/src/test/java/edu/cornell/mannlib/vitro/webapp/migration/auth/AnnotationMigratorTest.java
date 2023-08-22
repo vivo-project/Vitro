@@ -9,21 +9,20 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
-
-    
 public class AnnotationMigratorTest extends AuthMigratorTest {
-    
+
     @Test
     public void testGetAnnotationConfigs() {
-        AnnotationMigrator annotationMigrator = new AnnotationMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet));
+        AnnotationMigrator annotationMigrator = new AnnotationMigrator(new RDFServiceModel(contentModel),
+                new RDFServiceModel(configurationDataSet));
         Map<String, Map<OperationGroup, Set<String>>> configs = annotationMigrator.getObjectPropertyAnnotations();
         Set<String> ops = configs.keySet();
         assertEquals(1, configs.size());
@@ -37,17 +36,18 @@ public class AnnotationMigratorTest extends AuthMigratorTest {
         configs = annotationMigrator.getFauxDataPropertyAnnotations(dps);
         assertEquals(1, configs.size());
     }
-    
+
     @Test
     public void testConvertAnnotationConfiguration() {
-        AnnotationMigrator annotationMigrator = new AnnotationMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet));
+        AnnotationMigrator annotationMigrator = new AnnotationMigrator(new RDFServiceModel(contentModel),
+                new RDFServiceModel(configurationDataSet));
         Model tmpModel = ModelFactory.createDefaultModel();
         tmpModel.add(configurationDataSet.getNamedModel(ModelNames.ACCESS_CONTROL));
         long initialSize = accessControlModel.size();
         annotationMigrator.migrateConfiguration();
         assertTrue(configurationDataSet.getNamedModel(ModelNames.ACCESS_CONTROL).size() > initialSize);
         Model diff = configurationDataSet.getNamedModel(ModelNames.ACCESS_CONTROL).difference(tmpModel);
-        try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             diff.write(baos, "TTL");
             String newData = baos.toString();
             assertFalse(StringUtils.isBlank(newData));
@@ -55,7 +55,7 @@ public class AnnotationMigratorTest extends AuthMigratorTest {
             e.printStackTrace();
         }
     }
-    
+
     @Test
     public void testConfigurationVersion() {
         Model tmpModel = ModelFactory.createDefaultModel();

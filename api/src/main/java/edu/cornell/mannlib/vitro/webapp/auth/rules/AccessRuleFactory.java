@@ -1,11 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.auth.rules;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.QuerySolution;
-
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 
 public class AccessRuleFactory {
 
@@ -15,7 +14,7 @@ public class AccessRuleFactory {
         AccessRule ar = new AccessRuleImpl();
         String ruleUri = qs.getResource(PolicyLoader.RULE).getURI();
         if (qs.contains("dataSetUri")) {
-            ruleUri += "." + qs.getResource("dataSetUri").getURI();    
+            ruleUri += "." + qs.getResource("dataSetUri").getURI();
         }
 
         ar.setRuleUri(ruleUri);

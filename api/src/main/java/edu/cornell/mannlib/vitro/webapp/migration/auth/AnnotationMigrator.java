@@ -1,5 +1,12 @@
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
+import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ALL_ROLES;
+import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_ADMIN_URI;
+import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_CURATOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_EDITOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_PUBLIC_URI;
+import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_SELF_EDITOR_URI;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,22 +14,19 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 
 public class AnnotationMigrator {
-    
+
     private static final Log log = LogFactory.getLog(AnnotationMigrator.class);
 
     private static final String PREFIX = "http://vitro.mannlib.cornell.edu/ns/vitro/role#";
@@ -32,18 +36,20 @@ public class AnnotationMigrator {
     private static final String OLD_ROLE_CURATOR = PREFIX + "curator";
     private static final String OLD_ROLE_DB_ADMIN = PREFIX + "dbAdmin";
     private static final String OLD_ROLE_NOBODY = PREFIX + "nobody";
-    
+
     private RDFService contentRdfService;
     private RDFService configurationRdfService;
-    private Map<String,Set<String>> showMap;
-    
+    private Map<String, Set<String>> showMap;
+
     public AnnotationMigrator(RDFService contentRdfService, RDFService configurationRdfService) {
         this.contentRdfService = contentRdfService;
         this.configurationRdfService = configurationRdfService;
         showMap = new HashMap<>();
-        showMap.put(OLD_ROLE_PUBLIC, allRoles);
-        showMap.put(OLD_ROLE_SELF, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI)));
-        showMap.put(OLD_ROLE_EDITOR, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI)));
+        showMap.put(OLD_ROLE_PUBLIC, ALL_ROLES);
+        showMap.put(OLD_ROLE_SELF, new HashSet<String>(
+                Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI)));
+        showMap.put(OLD_ROLE_EDITOR,
+                new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI)));
         showMap.put(OLD_ROLE_CURATOR, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI)));
         showMap.put(OLD_ROLE_DB_ADMIN, new HashSet<String>(Arrays.asList(ROLE_ADMIN_URI)));
         showMap.put(OLD_ROLE_NOBODY, Collections.emptySet());
@@ -62,15 +68,20 @@ public class AnnotationMigrator {
         Map<String, Map<OperationGroup, Set<String>>> fdpConfigs = getFauxDataPropertyAnnotations(dpConfigs.keySet());
         log.info(String.format("Found %s faux data property annotation configurations", fdpConfigs.size()));
         Long[] valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.OBJECT_PROPERTY, opConfigs);
-        log.info(String.format("Updated object property datasets. Added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        log.info(String.format("Updated object property datasets. Added %d values, removed %d values", valueCounts[0],
+                valueCounts[1]));
         valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.DATA_PROPERTY, dpConfigs);
-        log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0],
+                valueCounts[1]));
         valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.CLASS, classConfigs);
-        log.info(String.format("Updated class property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        log.info(String.format("Updated class property datasets, added %d values, removed %d values", valueCounts[0],
+                valueCounts[1]));
         valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.FAUX_OBJECT_PROPERTY, fopConfigs);
-        log.info(String.format("Updated faux object property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        log.info(String.format("Updated faux object property datasets, added %d values, removed %d values",
+                valueCounts[0], valueCounts[1]));
         valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.FAUX_DATA_PROPERTY, fdpConfigs);
-        log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0], valueCounts[1]));
+        log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0],
+                valueCounts[1]));
         PolicyLoader.getInstance().loadPolicies();
     }
 
@@ -79,7 +90,8 @@ public class AnnotationMigrator {
         return getFauxConfigurations(queryText, configurationRdfService, dataProperties);
     }
 
-    protected Map<String, Map<OperationGroup, Set<String>>> getFauxObjectPropertyAnnotations(Set<String> objectProperties) {
+    protected Map<String, Map<OperationGroup, Set<String>>> getFauxObjectPropertyAnnotations(
+            Set<String> objectProperties) {
         String queryText = getAnnotationQuery(fauxTypeSpecificPatterns);
         return getFauxConfigurations(queryText, configurationRdfService, objectProperties);
     }
@@ -100,7 +112,7 @@ public class AnnotationMigrator {
     }
 
     /**
-     * @return map of entity URIs and maps of operations and list of allowed roles  
+     * @return map of entity URIs and maps of operations and list of allowed roles
      */
     private Map<String, Map<OperationGroup, Set<String>>> getConfigurations(String queryText, RDFService service) {
         Map<String, Map<OperationGroup, Set<String>>> configs = new HashMap<>();
@@ -118,9 +130,10 @@ public class AnnotationMigrator {
 
     /**
      * @param targetProperties set of property URIs to get configurations from
-     * @return map of entity URIs and maps of operations and list of allowed roles  
+     * @return map of entity URIs and maps of operations and list of allowed roles
      */
-    private Map<String, Map<OperationGroup, Set<String>>> getFauxConfigurations(String queryText, RDFService service, Set<String> targetProperties) {
+    private Map<String, Map<OperationGroup, Set<String>>> getFauxConfigurations(String queryText, RDFService service,
+            Set<String> targetProperties) {
         Map<String, Map<OperationGroup, Set<String>>> configs = new HashMap<>();
         try {
             ResultSet rs = RDFServiceUtils.sparqlSelectQuery(queryText, service);
@@ -142,15 +155,15 @@ public class AnnotationMigrator {
         String uri = qs.getResource("uri").getURI();
         String displayAnnotation = qs.getResource("display").getURI();
         Set<String> displayRoles = new HashSet<>(showMap.get(displayAnnotation));
-    
+
         String publishAnnotation = qs.getResource("publish").getURI();
         Set<String> publishRoles = new HashSet<>(showMap.get(publishAnnotation));
         publishRoles.remove(ROLE_PUBLIC_URI);
-    
+
         String updateAnnotation = qs.getResource("update").getURI();
         Set<String> updateRoles = new HashSet<>(showMap.get(updateAnnotation));
         updateRoles.remove(ROLE_PUBLIC_URI);
-    
+
         Map<OperationGroup, Set<String>> config = new HashMap<>();
         config.put(OperationGroup.UPDATE_GROUP, updateRoles);
         config.put(OperationGroup.PUBLISH_GROUP, publishRoles);
@@ -162,26 +175,21 @@ public class AnnotationMigrator {
         return ""
                 + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
                 + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n"
-                + "SELECT ?base ?uri ?update ?display ?publish\n"
-                + "WHERE {\n"
-                + typeSpecificPatterns
-                + "{  OPTIONAL { ?uri vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayAssigned . }\n"
-                + "  BIND (COALESCE(?displayAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ) AS ?display )\n"
-                + "  OPTIONAL { ?uri vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateAssigned . }\n"
-                + "  BIND (COALESCE(?updateAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor> ) AS ?update )\n"
-                + "  OPTIONAL { ?uri vitro:hiddenFromPublishBelowRoleLevelAnnot ?publishAssigned . }\n"
-                + "  BIND (COALESCE(?publishAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ) AS ?publish )\n"
-                + "  FILTER (!isBlank(?uri))\n"
-                + "}} \n";
+                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" + "SELECT ?base ?uri ?update ?display ?publish\n"
+                + "WHERE {\n" + typeSpecificPatterns
+                + "{OPTIONAL { ?uri vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayAssigned . }\n"
+                + "BIND (COALESCE(?displayAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#public>) AS ?display)\n"
+                + "OPTIONAL { ?uri vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateAssigned . }\n"
+                + "BIND (COALESCE(?updateAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor>) AS ?update)\n"
+                + "OPTIONAL { ?uri vitro:hiddenFromPublishBelowRoleLevelAnnot ?publishAssigned . }\n"
+                + "BIND (COALESCE(?publishAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#public>) AS ?publish)\n"
+                + "FILTER (!isBlank(?uri))\n" + "}} \n";
     }
 
-    private static final String fauxTypeSpecificPatterns = ""
-      + "GRAPH <" + ModelNames.DISPLAY + "> {"
-      + "  ?context <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#configContextFor> ?base .\n"
-      + "  ?context <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasConfiguration> ?uri .\n"
-      + "  ?uri rdf:type <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyDisplayConfig> .\n"
-      + "} GRAPH <" + ModelNames.DISPLAY + ">";
-
+    private static final String fauxTypeSpecificPatterns = "" + "GRAPH <" + ModelNames.DISPLAY + "> {"
+            + "  ?context <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#configContextFor> ?base .\n"
+            + "  ?context <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasConfiguration> ?uri .\n"
+            + "  ?uri rdf:type <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyDisplayConfig> .\n"
+            + "} GRAPH <" + ModelNames.DISPLAY + ">";
 
 }

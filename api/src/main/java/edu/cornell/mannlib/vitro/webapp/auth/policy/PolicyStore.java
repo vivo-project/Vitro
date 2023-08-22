@@ -10,13 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
-
 public class PolicyStore implements Policies {
-    
+
     private static final Comparator<Policy> comparator = getPolicyComparator();
     private static PolicyStore INSTANCE = new PolicyStore();
     private static final Log log = LogFactory.getLog(PolicyStore.class);
@@ -24,10 +23,11 @@ public class PolicyStore implements Policies {
     private PolicyStore() {
         INSTANCE = this;
     }
-    
+
     public static PolicyStore getInstance() {
         return INSTANCE;
     }
+
     protected List<Policy> policyList = Collections.synchronizedList(new ArrayList<Policy>());
     protected Map<String, Policy> policyMap = Collections.synchronizedMap(new LinkedHashMap<String, Policy>());
 
@@ -55,7 +55,7 @@ public class PolicyStore implements Policies {
         policyList.clear();
         policyMap.clear();
     }
-    
+
     public List<String> getUris() {
         List<String> uris = new LinkedList<>();
         for (Policy policy : policyList) {
@@ -63,18 +63,17 @@ public class PolicyStore implements Policies {
         }
         return uris;
     }
-    
+
     private static Comparator<Policy> getPolicyComparator() {
         return new Comparator<Policy>() {
             @Override
             public int compare(Policy lps, Policy rps) {
-                if ( lps.getPriority() > rps.getPriority() ) {
+                if (lps.getPriority() > rps.getPriority()) {
                     return -1;
-                } else 
-                if (lps.getPriority() < rps.getPriority()) {
+                } else if (lps.getPriority() < rps.getPriority()) {
                     return 1;
                 }
-                return lps.getUri().compareTo(lps.getUri()); 
+                return lps.getUri().compareTo(lps.getUri());
             }
         };
     }

@@ -1,10 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
-
-import org.apache.jena.rdf.model.Model;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import org.apache.jena.rdf.model.Model;
 
 public class AccessObjectStatement {
 
@@ -45,19 +43,18 @@ public class AccessObjectStatement {
         this.object = object;
     }
 
-
     public String[] getResourceUris(AccessObjectType type) {
         switch (type) {
-        case DATA_PROPERTY_STATEMENT:
-            return new String[] { getSubject() };
-        case OBJECT_PROPERTY_STATEMENT:
-            return new String[] { getSubject(), getObject() };
-        case FAUX_DATA_PROPERTY_STATEMENT:
-            return new String[] { getSubject(), getObject() };
-        case FAUX_OBJECT_PROPERTY_STATEMENT:
-            return new String[] { getSubject(), getObject() };
-        default: 
-            return new String[0];
+            case DATA_PROPERTY_STATEMENT:
+                return new String[] { getSubject() };
+            case OBJECT_PROPERTY_STATEMENT:
+                return new String[] { getSubject(), getObject() };
+            case FAUX_DATA_PROPERTY_STATEMENT:
+                return new String[] { getSubject(), getObject() };
+            case FAUX_OBJECT_PROPERTY_STATEMENT:
+                return new String[] { getSubject(), getObject() };
+            default:
+                return new String[0];
         }
     }
 }

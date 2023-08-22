@@ -2,6 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.ParameterizedSparqlString;
@@ -13,14 +17,11 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class ProximityChecker {
-	private static final Log log = LogFactory.getLog(ProximityChecker.class);
+    private static final Log log = LogFactory.getLog(ProximityChecker.class);
 
-    public static boolean isAanyRelated(Model ontModel, List<String> resourceUris, List<String> personUris, String query) {
+    public static boolean isAanyRelated(Model ontModel, List<String> resourceUris, List<String> personUris,
+            String query) {
         for (String personUri : personUris) {
             List<String> connectedResourceUris = getRelatedUris(ontModel, personUri, query);
             for (String connectedResourceUri : connectedResourceUris) {
@@ -31,8 +32,9 @@ public class ProximityChecker {
         }
         return false;
     }
+
     private static List<String> getRelatedUris(Model model, String personUri, String queryTemplate) {
-    	HashMap<String, List<String>> queryMap = QueryResultsMapCache.get();
+        HashMap<String, List<String>> queryMap = QueryResultsMapCache.get();
         String queryMapKey = createQueryMapKey(personUri, queryTemplate);
         if (queryMap.containsKey(queryMapKey)) {
             return queryMap.get(queryMapKey);
@@ -60,11 +62,13 @@ public class ProximityChecker {
         QueryResultsMapCache.update(queryMap);
         return resourceUris;
     }
+
     private static void debug(String queryText) {
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug(queryText);
         }
     }
+
     private static String createQueryMapKey(String personUri, String queryTemplate) {
         return queryTemplate + "." + personUri;
     }

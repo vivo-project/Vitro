@@ -18,12 +18,12 @@ public class SimpleAuthorizationRequest extends AuthorizationRequest {
     }
 
     private AccessOperation operation;
-    
+
     public SimpleAuthorizationRequest(AccessObject object, AccessOperation operation) {
         this.object = object;
         this.operation = operation;
     }
-    
+
     public SimpleAuthorizationRequest(String namedAccessObject) {
         this.object = new AccessObjectImpl(namedAccessObject);
         this.operation = AccessOperation.EXECUTE;

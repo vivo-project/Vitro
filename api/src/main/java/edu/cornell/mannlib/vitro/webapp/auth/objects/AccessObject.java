@@ -2,23 +2,22 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
-import org.apache.jena.rdf.model.Model;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import org.apache.jena.rdf.model.Model;
 
 public abstract class AccessObject {
 
     public static String SOME_URI = "?SOME_URI";
     public static Property SOME_PREDICATE = new Property(SOME_URI);
     public static String SOME_LITERAL = "?SOME_LITERAL";
-    
+
     protected AccessObjectStatement statement;
     private DataProperty dataProperty;
     private ObjectProperty objectProperty;
-    
+
     public ObjectProperty getObjectProperty() {
         return objectProperty;
     }
@@ -30,15 +29,15 @@ public abstract class AccessObject {
     public String getUri() {
         return null;
     }
-    
+
     public AccessObjectType getType() {
         return AccessObjectType.ANY;
     };
-    
+
     public AccessObjectStatement getStatement() {
         return statement;
     };
-    
+
     protected void initializeStatement() {
         if (statement == null) {
             statement = new AccessObjectStatement();
@@ -54,7 +53,7 @@ public abstract class AccessObject {
         initializeStatement();
         return getStatement().getModel();
     }
-    
+
     public void setStatementSubject(String subject) {
         initializeStatement();
         getStatement().setSubject(subject);
@@ -64,12 +63,12 @@ public abstract class AccessObject {
         initializeStatement();
         return getStatement().getSubject();
     }
-    
+
     public void setStatementPredicate(Property predicate) {
         initializeStatement();
         getStatement().setPredicate(predicate);
     }
-    
+
     protected Property getPredicate() {
         initializeStatement();
         return getStatement().getPredicate();
@@ -82,7 +81,7 @@ public abstract class AccessObject {
         Property predicate = getPredicate();
         return predicate.getURI();
     }
-    
+
     public void setStatementObject(String objectUri) {
         initializeStatement();
         this.getStatement().setObject(objectUri);
@@ -92,7 +91,7 @@ public abstract class AccessObject {
         initializeStatement();
         return getStatement().getObject();
     }
-    
+
     public DataProperty getDataProperty() {
         return dataProperty;
     }
@@ -100,10 +99,10 @@ public abstract class AccessObject {
     public void setDataProperty(DataProperty dataProperty) {
         this.dataProperty = dataProperty;
     }
-    
+
     public String[] getResourceUris() {
         initializeStatement();
         return getStatement().getResourceUris(getType());
     }
-    
+
 }

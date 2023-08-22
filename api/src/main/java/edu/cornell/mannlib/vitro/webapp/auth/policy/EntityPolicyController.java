@@ -8,18 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
-
 public class EntityPolicyController {
-    
+
     private static final Log log = LogFactory.getLog(EntityPolicyController.class);
-    private static Map<String,String> policyKeyToDataValueMap = new HashMap<String,String>();
+    private static Map<String, String> policyKeyToDataValueMap = new HashMap<String, String>();
 
     /**
      * @param entityUri - entity uniform resource identifier
@@ -40,7 +39,8 @@ public class EntityPolicyController {
             final PolicyLoader loader = PolicyLoader.getInstance();
             final String policyUri = loader.getPolicyUriByKey(og, aot, role);
             if (policyUri == null) {
-                log.debug(String.format("Policy wasn't found by key:\n%s\n%s\n%s", og.toString(), aot.toString(), role));
+                log.debug(
+                        String.format("Policy wasn't found by key:\n%s\n%s\n%s", og.toString(), aot.toString(), role));
                 continue;
             }
             if (isSelected && !isInDataSet) {
@@ -54,8 +54,9 @@ public class EntityPolicyController {
             }
         }
     }
-    
-    public static List<String> getGrantedRoles(String entityUri, OperationGroup og, AccessObjectType aot, List<String> allRoles) {
+
+    public static List<String> getGrantedRoles(String entityUri, OperationGroup og, AccessObjectType aot,
+            List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {
             return Collections.emptyList();
         }
@@ -67,8 +68,9 @@ public class EntityPolicyController {
         }
         return grantedRoles;
     }
-    
-    public static void getDataValueStatements(String entityUri, AccessObjectType aot, OperationGroup og, Set<String> selectedRoles, StringBuilder sb) {
+
+    public static void getDataValueStatements(String entityUri, AccessObjectType aot, OperationGroup og,
+            Set<String> selectedRoles, StringBuilder sb) {
         if (StringUtils.isBlank(entityUri)) {
             return;
         }
@@ -78,32 +80,33 @@ public class EntityPolicyController {
                 log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", og, aot, role));
                 continue;
             }
-            sb.append("<").append(testDataUri).append("> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <").append(entityUri).append("> .\n");
+            sb.append("<").append(testDataUri)
+                    .append("> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <")
+                    .append(entityUri).append("> .\n");
         }
     }
 
     public static void deletedEntityEvent(Property oldObj) {
-        log.debug("Don't delete access rule if property has been deleted " + oldObj );
+        log.debug("Don't delete access rule if property has been deleted " + oldObj);
     }
 
     public static void updatedEntityEvent(Object oldObj, Object newObj) {
         if (oldObj instanceof Property || newObj instanceof Property) {
-            log.debug("update entity event old " + oldObj + " new object " + newObj );    
+            log.debug("update entity event old " + oldObj + " new object " + newObj);
         }
     }
 
     public static void insertedEntityEvent(Property newObj) {
-        log.debug("Nothing to do " + newObj );
+        log.debug("Nothing to do " + newObj);
     }
 
-    
     private static boolean isUriInTestDataset(String entityUri, OperationGroup og, AccessObjectType aot, String role) {
         Set<String> values = PolicyLoader.getInstance().getPolicyDataSetValues(og, aot, role);
         return values.contains(entityUri);
     }
-    
+
     private static String getPolicyTestDataUri(AccessObjectType aot, OperationGroup og, String role) {
-        String key = aot.toString() + "." + og.toString() + "." + role ;
+        String key = aot.toString() + "." + og.toString() + "." + role;
         if (policyKeyToDataValueMap.containsKey(key)) {
             return policyKeyToDataValueMap.get(key);
         }
