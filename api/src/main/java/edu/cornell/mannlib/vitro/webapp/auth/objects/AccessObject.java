@@ -30,9 +30,7 @@ public abstract class AccessObject {
         return null;
     }
 
-    public AccessObjectType getType() {
-        return AccessObjectType.ANY;
-    };
+    public abstract AccessObjectType getType();
 
     public AccessObjectStatement getStatement() {
         return statement;
