@@ -1,11 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxObjectPropertyWrapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ObjectPropertyAccessObject extends AccessObject {
 
@@ -15,7 +14,7 @@ public class ObjectPropertyAccessObject extends AccessObject {
         setObjectProperty(objectProperty);
         debug(objectProperty);
     }
-    
+
     public String getUri() {
         ObjectProperty op = getObjectProperty();
         if (op != null) {
@@ -34,7 +33,7 @@ public class ObjectPropertyAccessObject extends AccessObject {
         ObjectProperty op = getObjectProperty();
         return getClass().getSimpleName() + ": " + (op == null ? op : op.getURI());
     }
-    
+
     private void debug(ObjectProperty property) {
         if (true) {
             if (property instanceof FauxObjectPropertyWrapper) {

@@ -5,6 +5,6 @@ public enum TestType {
     NOT_EQUALS,
     ONE_OF,
     NOT_ONE_OF,
-    STARTS_WITH, 
+    STARTS_WITH,
     SPARQL_SELECT_QUERY_CONTAINS
 }

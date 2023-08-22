@@ -7,12 +7,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
 public interface Policies {
 
     public List<Policy> getList();
-    
+
     public boolean contains(Policy policy);
 
     public void add(Policy policy);
 
     public long size();
-    
+
     public void clear();
 }

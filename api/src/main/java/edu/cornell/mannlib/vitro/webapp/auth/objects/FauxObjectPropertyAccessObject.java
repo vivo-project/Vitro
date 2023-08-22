@@ -25,7 +25,7 @@ public class FauxObjectPropertyAccessObject extends AccessObject {
         }
         return null;
     }
-    
+
     @Override
     public String toString() {
         ObjectProperty op = getObjectProperty();

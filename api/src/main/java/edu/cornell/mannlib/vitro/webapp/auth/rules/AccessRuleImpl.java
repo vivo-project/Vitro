@@ -11,21 +11,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeType;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeType;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-
 public class AccessRuleImpl implements AccessRule {
     private static final Log log = LogFactory.getLog(AccessRuleImpl.class);
-    protected Map<String,Attribute> attributeMap = new HashMap<>();
+    protected Map<String, Attribute> attributeMap = new HashMap<>();
     protected List<Attribute> attributes = new ArrayList<Attribute>();
     private static final Comparator<Attribute> comparator = getAttributeComparator();
-
 
     private boolean allowMatched = true;
     private String ruleUri;
@@ -45,26 +43,26 @@ public class AccessRuleImpl implements AccessRule {
     public void setRuleUri(String ruleUri) {
         this.ruleUri = ruleUri;
     }
-    
+
     public List<Attribute> getAttributes() {
         return attributes;
     }
-    
+
     public boolean match(AuthorizationRequest ar) {
-       for (Attribute attribute : attributes) {
-           if (!attribute.match(ar)) {
-               if (log.isDebugEnabled()) {
-                   log.debug(String.format("Attribute %s didn't match", attribute.getUri()));    
-               }
-               return false;
-           }
-       }
-       return true;
+        for (Attribute attribute : attributes) {
+            if (!attribute.match(ar)) {
+                if (log.isDebugEnabled()) {
+                    log.debug(String.format("Attribute %s didn't match", attribute.getUri()));
+                }
+                return false;
+            }
+        }
+        return true;
     }
 
     public void addAttribute(Attribute attr) {
         if (attributeMap.containsKey(attr.getUri())) {
-            log.error(String.format("attribute %s already exists in the rule",attr.getUri()));
+            log.error(String.format("attribute %s already exists in the rule", attr.getUri()));
         }
         attributes.add(attr);
         Collections.sort(attributes, comparator);
@@ -86,7 +84,7 @@ public class AccessRuleImpl implements AccessRule {
                 .append(getAttributes(), compared.getAttributes())
                 .isEquals();
     }
-    
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder(15, 101)
@@ -98,37 +96,35 @@ public class AccessRuleImpl implements AccessRule {
     public Set<String> getAttributeUris() {
         return attributeMap.keySet();
     }
-    
+
     public boolean containsAttributeUri(String uri) {
         return attributeMap.containsKey(uri);
     }
 
-    public Set<Attribute> getAttributesByType(AttributeType type){
+    public Set<Attribute> getAttributesByType(AttributeType type) {
         return getAttributes().stream().filter(a -> a.getAttributeType().equals(type)).collect(Collectors.toSet());
     }
-    
+
     public long getAttributesCount() {
         return attributes.size();
     }
-    
+
     public Attribute getAttribute(String uri) {
         return attributeMap.get(uri);
     }
-    
+
     private static Comparator<Attribute> getAttributeComparator() {
         return new Comparator<Attribute>() {
             @Override
             public int compare(Attribute latt, Attribute ratt) {
-                if ( latt.getComputationalCost() > ratt.getComputationalCost() ) {
+                if (latt.getComputationalCost() > ratt.getComputationalCost()) {
                     return -1;
-                } else 
-                if (latt.getComputationalCost() < ratt.getComputationalCost()) {
+                } else if (latt.getComputationalCost() < ratt.getComputationalCost()) {
                     return 1;
                 }
-                return latt.getUri().compareTo(latt.getUri()); 
+                return latt.getUri().compareTo(latt.getUri());
             }
         };
     }
 
-    
 }

@@ -1,11 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SubjectTypeAttribute extends AbstractAttribute {
 
@@ -25,7 +24,7 @@ public class SubjectTypeAttribute extends AbstractAttribute {
         } else {
             log.debug("Attribute subject type don't match requested object type '");
             return false;
-        }    
+        }
     }
 
     @Override

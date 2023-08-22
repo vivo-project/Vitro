@@ -4,7 +4,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 
-public class AllowedAuthorizationRequest extends AuthorizationRequest{
+public class AllowedAuthorizationRequest extends AuthorizationRequest {
 
     private DecisionResult decision;
 

@@ -1,9 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 public class OperationAttribute extends AbstractAttribute {
 

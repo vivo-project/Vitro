@@ -4,11 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.junit.Test;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectUriAttribute;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.TestType;
+import org.junit.Test;
 
 public class AccessRuleTest {
 

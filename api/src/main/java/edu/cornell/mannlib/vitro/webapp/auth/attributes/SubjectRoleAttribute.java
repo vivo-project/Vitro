@@ -2,10 +2,9 @@ package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 public class SubjectRoleAttribute extends AbstractAttribute {
 
@@ -18,7 +17,7 @@ public class SubjectRoleAttribute extends AbstractAttribute {
     @Override
     public boolean match(AuthorizationRequest ar) {
         final List<String> inputValues = ar.getRoleUris();
-        if (AttributeValueTester.test(this,  ar, inputValues.toArray(new String[0]))) {
+        if (AttributeValueTester.test(this, ar, inputValues.toArray(new String[0]))) {
             log.debug("Attribute match requested '" + inputValues + "'");
             return true;
         }

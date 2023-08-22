@@ -18,20 +18,20 @@ public interface AccessRule {
     public String getRuleUri();
 
     public void setRuleUri(String ruleUri);
-    
-	public List<Attribute> getAttributes();
-	
-	public boolean match(AuthorizationRequest ar);
-	
-	public void addAttribute(Attribute attr);
+
+    public List<Attribute> getAttributes();
+
+    public boolean match(AuthorizationRequest ar);
+
+    public void addAttribute(Attribute attr);
 
     public Set<String> getAttributeUris();
-    
+
     public boolean containsAttributeUri(String uri);
 
     public Set<Attribute> getAttributesByType(AttributeType type);
-    
+
     public long getAttributesCount();
-    
+
     public Attribute getAttribute(String uri);
 }

@@ -7,12 +7,12 @@ import java.util.Collections;
 
 import org.junit.Test;
 
-public class RootUserPolicyTest extends PolicyTest{
+public class RootUserPolicyTest extends PolicyTest {
 
     public static final String ROOT_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "policy_root_user.n3";
 
     @Test
-    public void testLoadRootUserPolicy() {        
+    public void testLoadRootUserPolicy() {
         load(ROOT_POLICY_PATH);
         String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/RootUserPolicy";
         DynamicPolicy policy = loader.loadPolicy(policyUri);

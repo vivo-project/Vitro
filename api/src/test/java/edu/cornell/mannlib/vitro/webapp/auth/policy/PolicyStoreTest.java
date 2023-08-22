@@ -24,7 +24,7 @@ public class PolicyStoreTest {
         assertEquals(5, store.getList().get(0).getPriority());
         store.clear();
     }
-    
+
     @Test
     public void testPriorityDuplicates() {
         PolicyStore store = PolicyStore.getInstance();
@@ -42,7 +42,7 @@ public class PolicyStoreTest {
         assertEquals(4, store.size());
         store.clear();
     }
-    
+
     @Test
     public void testUriDuplicates() {
         PolicyStore store = PolicyStore.getInstance();
@@ -51,11 +51,11 @@ public class PolicyStoreTest {
         assertEquals(1, store.size());
         store.add(new DynamicPolicy("not unique", 0));
         assertEquals(2, store.size());
-        //replace current policy with the same priority
+        // replace current policy with the same priority
         store.add(new DynamicPolicy("not unique", 0));
         assertEquals(2, store.size());
         assertEquals(0, store.getList().get(0).getPriority());
-        //replace current policy with different priority
+        // replace current policy with different priority
         store.add(new DynamicPolicy("not unique", 1));
         assertEquals(2, store.size());
         assertEquals(1, store.getList().get(0).getPriority());

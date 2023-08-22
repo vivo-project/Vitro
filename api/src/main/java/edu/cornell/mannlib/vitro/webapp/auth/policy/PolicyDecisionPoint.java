@@ -1,12 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PolicyDecisionPoint {
 
@@ -16,22 +15,26 @@ public class PolicyDecisionPoint {
         PolicyDecision pd = null;
         PolicyDecisionLogger logger = new PolicyDecisionLogger(ar.getIds(), ar.getAccessObject());
         PolicyStore store = PolicyStore.getInstance();
-        for(Policy policy : store.getList()){
-            try{
+        for (Policy policy : store.getList()) {
+            try {
                 pd = policy.decide(ar);
                 logger.log(policy, pd);
-                if( pd != null ){
-                    if(  pd.getDecisionResult() == DecisionResult.AUTHORIZED )
+                if (pd != null) {
+                    if (pd.getDecisionResult() == DecisionResult.AUTHORIZED) {
                         return pd;
-                    if( pd.getDecisionResult() == DecisionResult.UNAUTHORIZED )
+                    }
+                    if (pd.getDecisionResult() == DecisionResult.UNAUTHORIZED) {
                         return pd;
-                    if( pd.getDecisionResult() == DecisionResult.INCONCLUSIVE )
+                    }
+
+                    if (pd.getDecisionResult() == DecisionResult.INCONCLUSIVE) {
                         continue;
-                } else{
+                    }
+                } else {
                     log.debug("policy " + policy.toString() + " returned a null PolicyDecision");
                 }
-            }catch(Throwable th){
-                log.error("ignoring exception in policy " + policy.getUri(), th );
+            } catch (Throwable th) {
+                log.error("ignoring exception in policy " + policy.getUri(), th);
             }
         }
 
