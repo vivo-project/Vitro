@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
@@ -36,17 +37,22 @@ public class AuthorizationRequestTest extends AbstractTestClass {
 	// Helper classes
 	// ----------------------------------------------------------------------
 
-	private static class MyAuth extends AccessObject {
-		private final String name;
+    private static class MyAuth extends AccessObject {
+        private final String name;
 
-		public MyAuth(String name) {
-			this.name = name;
-		}
+        public MyAuth(String name) {
+            this.name = name;
+        }
 
-		@Override
-		public String toString() {
-			return "MyAuth[" + name + "]";
-		}
+        @Override
+        public AccessObjectType getType() {
+            return null;
+        }
 
-	}
+        @Override
+        public String toString() {
+            return "MyAuth[" + name + "]";
+        }
+
+    }
 }

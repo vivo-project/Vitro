@@ -14,6 +14,7 @@ import org.junit.Test;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
@@ -94,14 +95,29 @@ public class PolicyHelper_AuthorizationRequestTest {
 	// ----------------------------------------------------------------------
 
 	public static class Action1 extends AccessObject {
+
+        @Override
+        public AccessObjectType getType() {
+            return null;
+        }
 		// actions must be public, with public constructor
 	}
 
 	public static class Action2 extends AccessObject {
+	    
+        @Override
+        public AccessObjectType getType() {
+            return null;
+        }
 		// actions must be public, with public constructor
 	}
 
 	public static class Action3 extends AccessObject {
+	    
+        @Override
+        public AccessObjectType getType() {
+            return null;
+        }
 		// actions must be public, with public constructor
 	}
 
