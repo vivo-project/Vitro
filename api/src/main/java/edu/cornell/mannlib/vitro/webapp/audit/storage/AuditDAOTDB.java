@@ -45,6 +45,7 @@ public class AuditDAOTDB extends AuditDAOJena {
      */
     public static void shutdown() {
         if (dataset != null) {
+            TDBFactory.release(dataset);
             dataset.close();
             dataset = null;
         }
