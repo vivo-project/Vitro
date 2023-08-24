@@ -46,7 +46,6 @@ public class AuditDaoTDBTest {
     public void closeModule() throws IOException {
         AuditDAOTDB.shutdown();
         AuditDAOFactory.shutdown();
-        FileUtils.cleanDirectory(folder.getRoot());
     }
 
     @Test
