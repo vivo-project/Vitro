@@ -7,7 +7,6 @@ import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,20 +24,21 @@ public class AuditChangeListener extends StatementListener implements ModelChang
     public void notifyModelChange(ModelChange modelChange) {
 
         // Convert the serialized statements into a Jena Model
-        Model changes = RDFServiceUtils.parseModel(modelChange.getSerializedModel(), modelChange.getSerializationFormat());
+        Model changes =
+                RDFServiceUtils.parseModel(modelChange.getSerializedModel(), modelChange.getSerializationFormat());
 
         // Get the changeset for the current request
         AuditChangeSet auditChangeset = new AuditChangeSet();
         Model additions = auditChangeset.getAddedModel(modelChange.getGraphURI());
-        
-            String userId = modelChange.getUserId();
-            if (StringUtils.isBlank(userId)) {
-                Exception e = new Exception();
-                log.debug("User id is not provided.", e);
-                userId = AuditVocabulary.RESOURCE_UNKNOWN;
-            }
+
+        String userId = modelChange.getUserId();
+        if (StringUtils.isBlank(userId)) {
+            Exception e = new Exception();
+            log.debug("User id is not provided.", e);
+            userId = AuditVocabulary.RESOURCE_UNKNOWN;
+        }
         auditChangeset.setUserId(userId);
-        
+
         // Is the change adding or removing statements?
         if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
             // If we are removing statements, make sure we don't retain them in the additions

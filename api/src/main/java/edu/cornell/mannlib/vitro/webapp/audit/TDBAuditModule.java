@@ -2,14 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit;
 
+import java.nio.file.Path;
+
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOFactory;
 import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOTDB;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-
-import java.nio.file.Path;
 
 /**
  * Implementation of the AuditModule that uses Jena TDB storage

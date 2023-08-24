@@ -20,7 +20,7 @@ public class AuditResults {
         this.limit = limit;
         this.datasets = datasets;
     }
-    
+
     public long getLimit() {
         return limit;
     }

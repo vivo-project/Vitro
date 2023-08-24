@@ -2,21 +2,20 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-
-import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary;
-
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+
+import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 
 /**
  * The current set of changes for a triple store, as tracked against a single request
@@ -29,21 +28,20 @@ public class AuditChangeSet {
     private final Date requestTime;
 
     // The statements added to the triple store
-    private Dataset addedDataset   = null;
+    private Dataset addedDataset = null;
 
     // The statements removed from the triple store
     private Dataset removedDataset = null;
 
     // The statements removed from the triple store
     private String userId = AuditVocabulary.RESOURCE_UNKNOWN;
-    
+
     private String userEmail = "";
 
     private String userFirstName = "";
 
     private String userLastName = "";
 
-    
     public String getUserEmail() {
         return userEmail;
     }
@@ -86,6 +84,7 @@ public class AuditChangeSet {
 
     /**
      * Create a change set for a given UUID / request time (e.g. for reading from the audit store)
+     * 
      * @param id
      * @param requestTime
      */

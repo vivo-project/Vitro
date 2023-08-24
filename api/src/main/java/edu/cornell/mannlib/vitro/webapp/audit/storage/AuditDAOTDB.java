@@ -2,10 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit.storage;
 
+import java.io.File;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.tdb.TDBFactory;
-
-import java.io.File;
 
 /**
  * Implementation of Audit store that uses Jena TDB

@@ -10,6 +10,13 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAO;
+import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOFactory;
+import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOTDB;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -18,14 +25,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAO;
-import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOFactory;
-import edu.cornell.mannlib.vitro.webapp.audit.storage.AuditDAOTDB;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 public class AuditDaoTDBTest {
 

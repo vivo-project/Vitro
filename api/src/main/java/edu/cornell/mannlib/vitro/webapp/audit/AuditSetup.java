@@ -2,17 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit;
 
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,7 +23,6 @@ public class AuditSetup implements ServletContextListener {
     private static final AuditChangeListener CHANGE_LISTENER = new AuditChangeListener();
     // Collection to track content models per request (thread)
     private static final Log log = LogFactory.getLog(AuditSetup.class.getName());
-
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -41,6 +39,7 @@ public class AuditSetup implements ServletContextListener {
 
     /**
      * Register a change listener with the RDFService
+     * 
      * @param ctx
      */
     protected synchronized void registerChangeListener(RDFService rdfService) {
@@ -53,9 +52,10 @@ public class AuditSetup implements ServletContextListener {
 
     /**
      * Check that the audit module has been initialized
+     * 
      * @return
      */
-    private boolean isAuditEnabled(){
+    private boolean isAuditEnabled() {
         try {
             // Audit module is enabled if there is one available in the application
             return ApplicationUtils.instance().getAuditModule() != null;

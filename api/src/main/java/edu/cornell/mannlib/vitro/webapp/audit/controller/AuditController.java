@@ -1,5 +1,14 @@
 package edu.cornell.mannlib.vitro.webapp.audit.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.annotation.WebServlet;
+
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.audit.AuditChangeSet;
 import edu.cornell.mannlib.vitro.webapp.audit.AuditResults;
@@ -18,25 +27,15 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.servlet.annotation.WebServlet;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * UI for browsing audit entries
  */
-@WebServlet(name = "AuditViewer", urlPatterns = {"/audit/*"} )
+@WebServlet(name = "AuditViewer", urlPatterns = { "/audit/*" })
 public class AuditController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(AuditController.class);
 
@@ -79,7 +78,7 @@ public class AuditController extends FreemarkerHttpServlet {
         int offset = getOffset(vreq);
         body.put("offset", offset);
         // Get the limit parameter (or default 10 if unset)
-        int limit  = getLimit(vreq);
+        int limit = getLimit(vreq);
         body.put("limit", String.valueOf(limit));
         body.put("limits", limits);
         // Get the start_date parameter (or week ago if unset)
@@ -101,10 +100,11 @@ public class AuditController extends FreemarkerHttpServlet {
         // Get the Audit DAO
         AuditDAO auditDAO = AuditDAOFactory.getAuditDAO();
         // Find a page of audit entries for the current user
-        AuditResults results = auditDAO.find(offset, limit, dateToTimeStamp(startDate), dateToTimeStamp(endDate), userUri, graphUri, ASC_ORDER.equals(order));
-        List <String> users = auditDAO.getUsers();
+        AuditResults results = auditDAO.find(offset, limit, dateToTimeStamp(startDate), dateToTimeStamp(endDate),
+                userUri, graphUri, ASC_ORDER.equals(order));
+        List<String> users = auditDAO.getUsers();
         body.put("users", users);
-        List <String> graphUris = auditDAO.getGraphs();
+        List<String> graphUris = auditDAO.getGraphs();
         body.put("graphs", graphUris);
 
         setUserData(results.getDatasets(), uad);
@@ -113,10 +113,12 @@ public class AuditController extends FreemarkerHttpServlet {
 
         // Create next / previous links
         if (offset > 0) {
-            body.put("prevPage", getPreviousPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order, userUri, graphUri, vreq.getServletPath()));
+            body.put("prevPage", getPreviousPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order,
+                    userUri, graphUri, vreq.getServletPath()));
         }
         if (offset < (results.getTotal() - limit)) {
-            body.put("nextPage", getNextPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order, userUri, graphUri, vreq.getServletPath()));
+            body.put("nextPage", getNextPageLink(offset, limit, sdf.format(startDate), sdf.format(endDate), order,
+                    userUri, graphUri, vreq.getServletPath()));
         }
 
         // Pass the user name to Freemarker
@@ -168,9 +170,9 @@ public class AuditController extends FreemarkerHttpServlet {
      */
     private int getLimit(VitroRequest vreq) {
         int limit = 0;
-        try{
+        try {
             limit = Integer.parseInt(vreq.getParameter(PARAM_LIMIT));
-        }catch (Throwable e) {
+        } catch (Throwable e) {
             log.debug(e, e);
             limit = 10;
         }
@@ -185,9 +187,9 @@ public class AuditController extends FreemarkerHttpServlet {
      */
     private int getOffset(VitroRequest vreq) {
         int offset = 0;
-        try{
+        try {
             offset = Integer.parseInt(vreq.getParameter(PARAM_OFFSET));
-        }catch (Throwable e) {
+        } catch (Throwable e) {
             log.debug(e, e);
             offset = 0;
         }
@@ -210,9 +212,9 @@ public class AuditController extends FreemarkerHttpServlet {
         } catch (Exception e) {
             log.error(e, e);
         }
-        return DateUtils.addDays(new Date(),-7);
+        return DateUtils.addDays(new Date(), -7);
     }
-    
+
     /**
      * Get end date
      *
@@ -231,6 +233,7 @@ public class AuditController extends FreemarkerHttpServlet {
         }
         return DateUtils.addDays(new Date(), 1);
     }
+
     /**
      * Get user
      *
@@ -239,12 +242,12 @@ public class AuditController extends FreemarkerHttpServlet {
      */
     private String getUserUri(VitroRequest vreq) {
         String user = vreq.getParameter(PARAM_USER_URI);
-        if ( user == null) {
+        if (user == null) {
             return "";
         }
         return user;
     }
-    
+
     /**
      * Get graph
      *
@@ -253,40 +256,43 @@ public class AuditController extends FreemarkerHttpServlet {
      */
     private String getGraph(VitroRequest vreq) {
         String graph = vreq.getParameter(PARAM_GRAPH);
-        if ( graph == null) {
+        if (graph == null) {
             return "";
         }
         return graph;
     }
+
     /*
-    * Get order
-    *
-    * @param vreq
-    * @return empty string if graph wasn't set
-    */
-   private String getOrder(VitroRequest vreq) {
-       String order = vreq.getParameter(PARAM_ORDER);
-       if ( StringUtils.isBlank(order) || DESC_ORDER.equals(order)) {
-           return DESC_ORDER;
-       }
-       return ASC_ORDER;
-   }
-    
+     * Get order
+     *
+     * @param vreq
+     * 
+     * @return empty string if graph wasn't set
+     */
+    private String getOrder(VitroRequest vreq) {
+        String order = vreq.getParameter(PARAM_ORDER);
+        if (StringUtils.isBlank(order) || DESC_ORDER.equals(order)) {
+            return DESC_ORDER;
+        }
+        return ASC_ORDER;
+    }
+
     /**
      * Generate the link to the previous page
      *
      * @param offset
      * @param limit
      * @param baseUrl
-     * @param string 
-     * @param graphUri 
-     * @param userUri 
-     * @param order 
+     * @param string
+     * @param graphUri
+     * @param userUri
+     * @param order
      * @return
      */
-    private String getPreviousPageLink(int offset, int limit, String startDate, String endDate, String order, String userUri, String graphUri, String baseUrl) {
+    private String getPreviousPageLink(int offset, int limit, String startDate, String endDate, String order,
+            String userUri, String graphUri, String baseUrl) {
         UrlBuilder.ParamMap params = new UrlBuilder.ParamMap();
-        params.put(PARAM_OFFSET, String.valueOf(offset-limit));
+        params.put(PARAM_OFFSET, String.valueOf(offset - limit));
         params.put(PARAM_LIMIT, String.valueOf(limit));
         params.put(PARAM_START_DATE, startDate);
         params.put(PARAM_END_DATE, endDate);
@@ -302,15 +308,16 @@ public class AuditController extends FreemarkerHttpServlet {
      * @param offset
      * @param limit
      * @param baseUrl
-     * @param string 
-     * @param graphUri 
-     * @param userUri 
-     * @param order 
+     * @param string
+     * @param graphUri
+     * @param userUri
+     * @param order
      * @return
      */
-    private String getNextPageLink(int offset, int limit, String startDate, String endDate, String order, String userUri, String graphUri, String baseUrl) {
+    private String getNextPageLink(int offset, int limit, String startDate, String endDate, String order,
+            String userUri, String graphUri, String baseUrl) {
         UrlBuilder.ParamMap params = new UrlBuilder.ParamMap();
-        params.put(PARAM_OFFSET, String.valueOf(offset+limit));
+        params.put(PARAM_OFFSET, String.valueOf(offset + limit));
         params.put(PARAM_LIMIT, String.valueOf(limit));
         params.put(PARAM_START_DATE, String.valueOf(startDate));
         params.put(PARAM_END_DATE, endDate);
@@ -319,7 +326,7 @@ public class AuditController extends FreemarkerHttpServlet {
         params.put(PARAM_GRAPH, graphUri);
         return UrlBuilder.getUrl(baseUrl, params);
     }
-    
+
     private long dateToTimeStamp(Date date) {
         return date.getTime() / 1000;
     }

@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.audit.AuditResults;
  * Interface for storing and retrieving Audit entries
  */
 public interface AuditDAO {
-    
+
     /**
      * Write the dataset to stroage
      *
@@ -24,9 +24,9 @@ public interface AuditDAO {
      *
      * @param userUri
      * @param offset
-     * @param startDate 
+     * @param startDate
      * @param limit
-     * @param graphUri 
+     * @param graphUri
      * @param order true = ASC, false = DESC
      * @return
      */
@@ -34,6 +34,7 @@ public interface AuditDAO {
 
     List<String> getGraphs();
 
-    AuditResults find(long offset, int limit, long startDate, long endDate, String userUri, String graphUri, boolean order);
+    AuditResults find(long offset, int limit, long startDate, long endDate, String userUri, String graphUri,
+            boolean order);
 
 }
