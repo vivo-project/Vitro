@@ -6,83 +6,85 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
 
 public class SortConfiguration {
 
-	private String id = "";
-	private String field = "";
-	private boolean multilingual = false;
-	private boolean ascOrder = false;
-	private boolean selected = false;
-	private String label = "";
-	private int order = 0;
-	public SortConfiguration(String id, String label, String field) {
-		this.id = id;
-		this.setLabel(label);
-		this.field = field;
-	}
+    private String id = "";
+    private String field = "";
+    private boolean multilingual = false;
+    private boolean ascOrder = false;
+    private boolean selected = false;
+    private String label = "";
+    private int order = 0;
 
-	public String getId() {
-		return id;
-	}
+    public SortConfiguration(String id, String label, String field) {
+        this.id = id;
+        this.setLabel(label);
+        this.field = field;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	public String getField() {
-		return field;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setField(String field) {
-		this.field = field;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public boolean isMultilingual() {
-		return multilingual;
-	}
+    public String getField() {
+        return field;
+    }
 
-	public void setMultilingual(boolean multilingual) {
-		this.multilingual = multilingual;
-	}
+    public void setField(String field) {
+        this.field = field;
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public boolean isMultilingual() {
+        return multilingual;
+    }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+    public void setMultilingual(boolean multilingual) {
+        this.multilingual = multilingual;
+    }
 
-	public String getField(Locale locale) {
-		String languageTag = locale.toLanguageTag();
-		if (multilingual) {
-			return languageTag + field;
-		}
-		return field;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public Order getSortOrder() {
-		if (ascOrder) {
-			return Order.ASC;
-		}
-		return Order.DESC;
-	}
-	public void setAscOrder(boolean ascOrder) {
-		this.ascOrder = ascOrder;
-	}
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-	public boolean isSelected() {
-		return selected;
-	}
+    public String getField(Locale locale) {
+        String languageTag = locale.toLanguageTag();
+        if (multilingual) {
+            return languageTag + field;
+        }
+        return field;
+    }
 
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
+    public Order getSortOrder() {
+        if (ascOrder) {
+            return Order.ASC;
+        }
+        return Order.DESC;
+    }
 
-	public int getOrder() {
-		return order;
-	}
+    public void setAscOrder(boolean ascOrder) {
+        this.ascOrder = ascOrder;
+    }
 
-	public void setOrder(int order) {
-		this.order = order;
-	}
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
 
 }
