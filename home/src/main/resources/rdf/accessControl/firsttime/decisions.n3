@@ -11,5 +11,5 @@
 ai:Deny rdf:type ao:Decision;
          ao:id "DENY" .
 
-ai:Allow rdf:type ao:Decison;
+ai:Allow rdf:type ao:Decision;
          ao:id "ALLOW" .
