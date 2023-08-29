@@ -157,10 +157,7 @@ public class JSONConverter {
 	public static void readParam(DataStore dataStore, ReadContext ctx, String name, Parameter param, Procedure procedure) throws ConversionException {
 		String paramPath = getReadPath(name, param, procedure);
 		JsonNode node = ctx.read(paramPath, JsonNode.class);
-		Data data = new Data(param);
-		data.setRawString(node.asText());
-		data.earlyInitialization();
-		dataStore.addData(name, data);
+		readParam(dataStore, name, param, node);
 	}
 	
     public static void readOptionalParam(DataStore dataStore, ReadContext ctx, String name, Parameter param,
@@ -169,16 +166,24 @@ public class JSONConverter {
         try {
             JsonNode node = ctx.read(paramPath, JsonNode.class);
             if (node != null && !node.isMissingNode() && !node.isNull()) {
-                Data data = new Data(param);
-                data.setRawString(node.asText());
-                data.earlyInitialization();
-                dataStore.addData(name, data);    
+                readParam(dataStore, name, param, node);    
             }
         } catch (Exception e) {
             log.debug(e,e);
         }
     }
 
+    private static void readParam(DataStore dataStore, String name, Parameter param, JsonNode node) {
+        Data data = new Data(param);
+        if (node.isContainerNode()) {
+            data.setRawString(node.toString());
+        } else {
+            data.setRawString(node.asText());
+        }
+        data.earlyInitialization();
+        dataStore.addData(name, data);
+    }
+    
 	private static JsonNode injectResourceId(String jsonString, DataStore dataStore, Procedure procedure)
 			throws ConversionException {
 		final String resourceId = dataStore.getResourceId();
