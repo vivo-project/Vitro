@@ -14,19 +14,19 @@
 @base <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration> .
 
 local:orgAdministersGrantContext a :ConfigContext ;
-    :hasConfiguration local:orgAdministersGrantConfig ;
-    :configContextFor <http://purl.obolibrary.org/obo/RO_0000053> ;
-    .
+        :hasConfiguration local:orgAdministersGrantConfig ;
+        :configContextFor <http://purl.obolibrary.org/obo/RO_0000053> ;
+        .
 
 local:orgAdministersGrantConfig a :ObjectPropertyDisplayConfig ;
-    vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
-    vitro:hiddenFromPublishBelowRoleLevelAnnot role:dbAdmin ;
-    vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:selfEditor ;
-    .
+        vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
+        vitro:hiddenFromPublishBelowRoleLevelAnnot role:dbAdmin ;
+        vitro:prohibitedFromUpdateBelowRoleLevelAnnot role:selfEditor ;
+        .
 
 <http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/fp985> a :ConfigContext ;
-        :configContextFor vivo:abbreviation ;
         :hasConfiguration <http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/fp396> ;
+        :configContextFor vivo:abbreviation ;
         .
 
 <http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/fp396> a :ObjectPropertyDisplayConfig ;
