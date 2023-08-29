@@ -32,9 +32,6 @@ ai:SubjectNotMatch rdf:type ao:AttributeType ;
 ai:ObjectNotMatch rdf:type ao:AttributeType ;
          ao:id "OBJECT_NOT_MATCH" .
          
-ai:SubjectNotMatch rdf:type ao:AttributeType ;
-         ao:id "SUBJECT_NOT_MATCH" .
-         
 ai:RelatesToSubjectProfile rdf:type ao:AttributeType ;
          ao:id "RELATES_TO_SUBJECT_PROFILE" .
          
