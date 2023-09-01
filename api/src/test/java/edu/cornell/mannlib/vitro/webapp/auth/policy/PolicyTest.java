@@ -40,7 +40,7 @@ public class PolicyTest {
     public static final String SUBJECT_TYPES = USER_ACCOUNTS_HOME_EVERYTIME + "subject_types.n3";
     public static final String OBJECT_TYPES = USER_ACCOUNTS_HOME_EVERYTIME + "object_types.n3";
     public static final String ATTRIBUTE_TYPES_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "attribute_types.n3";
-    public static final String TEST_TYPES_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "test_types.n3";
+    public static final String OPERATORS_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "operators.n3";
     public static final String TEST_VALUES_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "test_values.n3";
     public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_EVERYTIME + "decisions.n3";
 
@@ -284,7 +284,7 @@ public class PolicyTest {
         load(SUBJECT_TYPES);
         load(OBJECT_TYPES);
         load(ATTRIBUTE_TYPES_PATH);
-        load(TEST_TYPES_PATH);
+        load(OPERATORS_PATH);
         load(TEST_VALUES_PATH);
         load(TEST_DECISIONS);
         RDFServiceModel rdfService = new RDFServiceModel(configurationDataSet);
