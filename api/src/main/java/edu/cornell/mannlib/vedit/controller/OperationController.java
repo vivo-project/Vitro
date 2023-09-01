@@ -135,14 +135,14 @@ public class OperationController extends BaseEditController {
             // If contains restrictions
             if (request.getParameter("_permissions") != null) {
                 // Get the namespace that we are editing
-                String entityUri = request.getParameter("_permissionsEntityURI");
+                String entityUri = request.getParameter(ENTITY_URI_ATTRIBUTE_NAME);
                 if (StringUtils.isEmpty(entityUri)) {
                     // If we don't have a namespace set, we are creating a new entity so use that namespace
                     if (!StringUtils.isEmpty(request.getParameter("Namespace")) && !StringUtils.isEmpty(request.getParameter("LocalName"))) {
                         entityUri = "" + request.getParameter("Namespace") + request.getParameter("LocalName");    
                     }
                 }
-                String entityType = request.getParameter("_permissionsEntityType");
+                String entityType = request.getParameter(ENTITY_TYPE_ATTRIBUTE_NAME);
                 List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(request).getWebappDaoFactory());
                 List<String> roleUris = new ArrayList<>();
                 for (PermissionSet permissionSet : permissionSets) {
