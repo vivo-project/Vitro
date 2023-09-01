@@ -125,10 +125,6 @@ ao:operation rdf:type owl:ObjectProperty ;
 ao:rule rdf:type owl:ObjectProperty ;
           rdfs:domain ao:Policy ;
           rdfs:range ao:Rule .
-
-ao:object rdf:type owl:ObjectProperty ;
-          rdfs:domain ao:Rule ;
-          rdfs:range ao:object .
           
 ao:keyComponent rdf:type owl:ObjectProperty .
           
