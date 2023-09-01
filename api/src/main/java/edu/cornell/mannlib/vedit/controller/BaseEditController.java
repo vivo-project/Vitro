@@ -38,7 +38,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class BaseEditController extends VitroHttpServlet {
 
-	public static final boolean FORCE_NEW = true; // when you know you're starting a new edit process
+	public static final String ENTITY_URI_ATTRIBUTE_NAME = "_permissionsEntityURI";
+    public static final String ENTITY_TYPE_ATTRIBUTE_NAME = "_permissionsEntityType";
+
+    public static final boolean FORCE_NEW = true; // when you know you're starting a new edit process
 
     public static final String JSP_PREFIX = "/templates/edit/specific/";
 
@@ -205,7 +208,7 @@ public class BaseEditController extends VitroHttpServlet {
 
     protected static void addAccessAttributes(HttpServletRequest req, String entityURI, AccessObjectType aot) {
         // Add the permissionsEntityURI (if we are creating a new property, this will be empty)
-        req.setAttribute("_permissionsEntityURI", entityURI);
+        req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, entityURI);
 
         // Get the available permission sets
         List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());

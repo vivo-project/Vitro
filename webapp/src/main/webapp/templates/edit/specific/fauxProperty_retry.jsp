@@ -4,6 +4,8 @@
 <%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<jsp:directive.page import="edu.cornell.mannlib.vedit.controller.BaseEditController"/>
+
 <tr class="editformcell">
     <td valign="top" colspan="2">
         <b>Base property</b><br/>
@@ -63,8 +65,8 @@
 <!-- Permissions -->
 <c:if test="${!empty roles}">
     <input id="_permissions" type="hidden" name="_permissions" value="enabled" />
-    <input id="_permissionsEntityURI" type="hidden" name="_permissionsEntityURI" value="${_permissionsEntityURI}" />
-    <input id="_permissionsEntityType" type="hidden" name="_permissionsEntityType" value="${_faux_property_type}" />
+    <input id="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" value="${_permissionsEntityURI}" />
+    <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="${_faux_property_type}" />
     <tr class="editformcell">
         <td valign="top" colspan="5">
             <b>Display</b> permissions for this property<br/>
