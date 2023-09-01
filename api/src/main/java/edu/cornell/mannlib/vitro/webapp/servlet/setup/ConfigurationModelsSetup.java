@@ -41,7 +41,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			setupModel(ctx, DISPLAY_TBOX, "displayTbox");
 			setupModel(ctx, DISPLAY_DISPLAY, "displayDisplay");
 			setupModel(ctx, USER_ACCOUNTS, "auth");
-            setupModel(ctx, ACCESS_CONTROL, "accessControl");
+			setupModel(ctx, ACCESS_CONTROL, "accessControl");
 			setupModel(ctx, INTERFACE_I18N, "interface-i18n");
 			ss.info(this, "Set up the display models and the user accounts model.");
 		} catch (Exception e) {
