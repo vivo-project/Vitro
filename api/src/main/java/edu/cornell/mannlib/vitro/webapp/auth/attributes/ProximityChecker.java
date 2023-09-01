@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.Model;
 public class ProximityChecker {
     private static final Log log = LogFactory.getLog(ProximityChecker.class);
 
-    public static boolean isAanyRelated(Model ontModel, List<String> resourceUris, List<String> personUris,
+    public static boolean isAnyRelated(Model ontModel, List<String> resourceUris, List<String> personUris,
             String query) {
         for (String personUri : personUris) {
             List<String> connectedResourceUris = getRelatedUris(ontModel, personUri, query);

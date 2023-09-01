@@ -62,7 +62,7 @@ public class AttributeValueTester {
             }
         }
         List<String> resourceUris = Arrays.asList(ao.getResourceUris());
-        return ProximityChecker.isAanyRelated(m, resourceUris, personUris, queryTemplate);
+        return ProximityChecker.isAnyRelated(m, resourceUris, personUris, queryTemplate);
     }
 
     private static boolean contains(Attribute attr, String... inputValues) {
