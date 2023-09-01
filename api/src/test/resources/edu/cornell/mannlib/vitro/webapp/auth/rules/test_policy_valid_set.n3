@@ -20,13 +20,13 @@ ai:ValidRule rdf:type ao:Rule ;
           ao:attribute ai:ValidAttribute2 .
           
 ai:ValidAttribute1 rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:valueSet3 ;
          ao:setValue ai:valueSet1 .
          
 ai:ValidAttribute2 rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:valueSet4 ;
          ao:setValue ai:valueSet2 .

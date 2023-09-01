@@ -40,12 +40,12 @@ ai:AllowAdminUpdateAddEditorDropDataPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:AdminUpdateDataPropertyStatementAttribute .
          
 ai:AdminUpdateDataPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:AdminUpdateDataPropertyTestData .
 
 ai:AdminUpdateDataPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminUpdateDataPropertyTestData .
          

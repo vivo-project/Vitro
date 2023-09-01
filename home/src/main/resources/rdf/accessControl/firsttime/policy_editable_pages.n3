@@ -30,17 +30,17 @@ ai:AllowEditRelatedPagesRule rdf:type ao:Rule;
           ao:attribute ai:SomePredicateAttribute .
          
 ai:SomePredicateAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:StatementPredicateUri ;
          ao:value ai:SomeUriTestData .
          
 ai:SomeObjectUriAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:StatementObjectUri ;
          ao:value ai:SomeUriTestData .
          
 ai:StatementObjectUriContainsSelfEditorResourceAttribute rdf:type ao:Attribute ;
-         ao:test ai:SparqlSelectQueryContains ;
+         ao:operator ai:SparqlSelectQueryContains ;
          ao:type ai:StatementSubjectUri ;
          ao:value ai:PersonProfileProximityToResourceUri .
 

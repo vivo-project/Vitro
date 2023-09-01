@@ -40,12 +40,12 @@ ai:AllowPublicUpdateObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:PublicUpdateObjectPropertyStatementAttribute .
          
 ai:PublicUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:PublicUpdateObjectPropertyTestData .
 
 ai:PublicUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:PublicUpdateObjectPropertyTestData .
          

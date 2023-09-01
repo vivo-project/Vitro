@@ -33,7 +33,7 @@ ai:AllowEditorPublishClassRule rdf:type ao:Rule;
           ao:attribute ai:EditorPublishClassAttribute .
          
 ai:EditorPublishClassAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorPublishClassTestData .
          

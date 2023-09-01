@@ -57,32 +57,32 @@ ai:RestrictDataPropertyStatementsWithNotModifiablePredicate rdf:type ao:Rule ;
 
 ### Not modifiable property statement attributes
 ai:PropertyStatementPredicateUriStartWithProhibitedNameSpaceAttribute rdf:type ao:Attribute ;
-         ao:test ai:StartsWith ;
+         ao:operator ai:StartsWith ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:ProhibitedNamespaceTestData .
 
 ai:PropertyStatementPredicateUriEqualsToProhibitedExceptions rdf:type ao:Attribute ;
-         ao:test ai:NotOneOf ;
+         ao:operator ai:NotOneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:ProhibitedNamespaceExceptionsTestData .
          
 ai:PropertyStatementSubjectUriStartWithProhibitedNameSpaceAttribute rdf:type ao:Attribute ;
-         ao:test ai:StartsWith ;
+         ao:operator ai:StartsWith ;
          ao:type ai:StatementSubjectUri ;
          ao:setValue ai:ProhibitedNamespaceTestData .
 
 ai:PropertyStatementSubjectUriEqualsToProhibitedExceptions rdf:type ao:Attribute ;
-         ao:test ai:NotOneOf ;
+         ao:operator ai:NotOneOf ;
          ao:type ai:StatementSubjectUri ;
          ao:setValue ai:ProhibitedNamespaceExceptionsTestData .         
          
 ai:PropertyStatementObjectUriStartWithProhibitedNameSpaceAttribute rdf:type ao:Attribute ;
-         ao:test ai:StartsWith ;
+         ao:operator ai:StartsWith ;
          ao:type ai:StatementObjectUri ;
          ao:setValue ai:ProhibitedNamespaceTestData .
 
 ai:PropertyStatementObjectUriEqualsToProhibitedExceptions rdf:type ao:Attribute ;
-         ao:test ai:NotOneOf ;
+         ao:operator ai:NotOneOf ;
          ao:type ai:StatementObjectUri ;
          ao:setValue ai:ProhibitedNamespaceExceptionsTestData .  
          

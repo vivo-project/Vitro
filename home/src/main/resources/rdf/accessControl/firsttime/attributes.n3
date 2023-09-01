@@ -12,37 +12,37 @@
 ### Subject attributes
 
 ai:IsRootUserAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:SubjectType ;
          ao:value ai:RootUserSubject .
 
 ai:SubjectRoleEqualsAdminRoleAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:SubjectRole ;
          ao:value auth:ADMIN .
          
 ai:SubjectRoleEqualsCuratorRoleAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:SubjectRole ;
          ao:value auth:CURATOR .
 
 ai:SubjectRoleEqualsEditorRoleAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:SubjectRole ;
          ao:value auth:EDITOR .
 
 ai:SubjectRoleEqualsSelfEditorRoleAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:SubjectRole ;
          ao:value auth:SELF_EDITOR .
 
 ai:SubjectRoleEqualsPublicRoleAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:SubjectRole ;
          ao:value auth:PUBLIC .
          
 ai:SubjectRoleOneOfEditorsAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:SubjectRole ;
          ao:value auth:ADMIN ;
          ao:value auth:CURATOR ;
@@ -52,37 +52,37 @@ ai:SubjectRoleOneOfEditorsAttribute rdf:type ao:Attribute ;
 ### Operation attributes
 
 ai:DisplayOperationAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:DisplayOperation .
          
 ai:PublishOperationAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:PublishOperation .
          
 ai:UpdateOperationAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:UpdateOperation .
          
 ai:EditOperationAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:EditOperation .
          
 ai:DropOperationAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:DropOperation .
          
 ai:AddOperationAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:AddOperation .
          
 ai:UpdateAddEditOrDropOperationsAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:Operation ;
          ao:value ai:UpdateOperation ;
          ao:value ai:AddOperation ;
@@ -93,57 +93,57 @@ ai:UpdateAddEditOrDropOperationsAttribute rdf:type ao:Attribute ;
 ### Object attributes
 
 ai:ObjectPropertyTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:ObjectPropertyAccesObject .
 
 ai:DataPropertyTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:DataPropertyAccesObject .
 
 ai:ObjectPropertyStatementTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:ObjectPropertyStatementAccesObject .
          
 ai:DataPropertyStatementTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:DataPropertyStatementAccesObject .
 
 ai:FauxObjectPropertyStatementTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:FauxObjectPropertyStatementAccesObject .
          
 ai:FauxDataPropertyStatementTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:FauxDataPropertyStatementAccesObject .
 
 ai:NamedObjectTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:NamedObject .
          
 ai:ClassTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:Class .
          
 ai:FauxObjectPropertyTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:FauxObjectPropertyAccesObject .
 
 ai:FauxDataPropertyTypeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:AccessObjectType ;
          ao:value ai:FauxDataPropertyAccesObject .
 
 ai:SelfEditorRelatedResourcesAttribute rdf:type ao:Attribute ;
-         ao:test ai:SparqlSelectQueryContains ;
+         ao:operator ai:SparqlSelectQueryContains ;
          ao:type ai:StatementSubjectUri ;
          ao:value ai:PersonProfileProximityToResourceUri .
          

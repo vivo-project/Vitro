@@ -40,12 +40,12 @@ ai:AllowEditorUpdateObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:EditorUpdateObjectPropertyStatementAttribute .
          
 ai:EditorUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:EditorUpdateObjectPropertyTestData .
 
 ai:EditorUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorUpdateObjectPropertyTestData .
          

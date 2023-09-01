@@ -41,12 +41,12 @@ ai:AllowSelfEditorUpdateObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:SelfEditorUpdateObjectPropertyStatementAttribute .
          
 ai:SelfEditorUpdateObjectPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:SelfEditorUpdateObjectPropertyTestData .
 
 ai:SelfEditorUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorUpdateObjectPropertyTestData .
          

@@ -40,8 +40,8 @@ ao:PolicyKey rdf:type owl:Class ;
 ao:Attribute rdf:type owl:Class ;
      rdfs:label "Access rule attribute"@en-US .
      
-ao:Test rdf:type owl:Class ;
-     rdfs:label "Test type"@en-US .
+ao:Operator rdf:type owl:Class ;
+     rdfs:label "Operator"@en-US .
 
 ao:Operation rdf:type owl:Class ;
      rdfs:label "Operation"@en-US .
@@ -125,6 +125,10 @@ ao:operation rdf:type owl:ObjectProperty ;
 ao:rule rdf:type owl:ObjectProperty ;
           rdfs:domain ao:Policy ;
           rdfs:range ao:Rule .
+          
+ao:test rdf:type owl:ObjectProperty ;
+          rdfs:domain ao:Attribute ;
+          rdfs:range ao:Operator .
           
 ao:keyComponent rdf:type owl:ObjectProperty .
           

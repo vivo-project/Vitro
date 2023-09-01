@@ -40,12 +40,12 @@ ai:AllowEditorUpdateFauxObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:EditorUpdateFauxObjectPropertyStatementAttribute .
          
 ai:EditorUpdateFauxObjectPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:EditorUpdateFauxObjectPropertyTestData .
 
 ai:EditorUpdateFauxObjectPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorUpdateFauxObjectPropertyTestData .
          

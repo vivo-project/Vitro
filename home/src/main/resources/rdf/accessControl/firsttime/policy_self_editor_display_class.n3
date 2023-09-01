@@ -33,7 +33,7 @@ ai:AllowSelfEditorDisplayClassRule rdf:type ao:Rule;
           ao:attribute ai:SelfEditorDisplayClassAttribute .
          
 ai:SelfEditorDisplayClassAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorDisplayClassTestData .
          

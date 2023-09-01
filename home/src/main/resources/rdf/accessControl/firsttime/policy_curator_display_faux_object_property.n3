@@ -40,12 +40,12 @@ ai:AllowCuratorDisplayFauxObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:CuratorDisplayFauxObjectPropertyStatementAttribute .
          
 ai:CuratorDisplayFauxObjectPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:CuratorDisplayFauxObjectPropertyTestData .
          
 ai:CuratorDisplayFauxObjectPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:CuratorDisplayFauxObjectPropertyTestData .
          
