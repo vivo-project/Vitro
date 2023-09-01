@@ -16,10 +16,10 @@ public class BasicPolicyDecision implements PolicyDecision{
     String StackTrace;
     DecisionResult decisionResult;
 
-    public BasicPolicyDecision( DecisionResult authorized, String message) {
+    public BasicPolicyDecision( DecisionResult decisionResult, String message) {
         super();
         this.message = message;
-        this.decisionResult = authorized;
+        this.decisionResult = decisionResult;
     }
 
     public DecisionResult getDecisionResult() {
