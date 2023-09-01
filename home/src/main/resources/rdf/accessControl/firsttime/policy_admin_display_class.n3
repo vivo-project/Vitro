@@ -33,7 +33,7 @@ ai:AllowAdminDisplayClassRule rdf:type ao:Rule;
           ao:attribute ai:AdminDisplayClassAttribute .
          
 ai:AdminDisplayClassAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminDisplayClassTestData .
          

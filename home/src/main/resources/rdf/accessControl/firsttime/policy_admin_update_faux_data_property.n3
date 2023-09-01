@@ -40,12 +40,12 @@ ai:AllowAdminUpdateEditAddDropFauxDataPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:AdminUpdateFauxDataPropertyStatementAttribute .
 
 ai:AdminUpdateFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:AdminUpdateFauxDataPropertyTestData .
 
 ai:AdminUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminUpdateFauxDataPropertyTestData .
          

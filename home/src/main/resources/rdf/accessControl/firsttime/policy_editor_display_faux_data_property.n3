@@ -40,12 +40,12 @@ ai:AllowEditorDisplayFauxDataPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:EditorDisplayFauxDataPropertyStatementAttribute .
          
 ai:EditorDisplayFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:EditorDisplayFauxDataPropertyTestData .
          
 ai:EditorDisplayFauxDataPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorDisplayFauxDataPropertyTestData .
          

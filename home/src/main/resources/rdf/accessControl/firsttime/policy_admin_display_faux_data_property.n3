@@ -40,12 +40,12 @@ ai:AllowAdminDisplayFauxDataPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:AdminDisplayFauxDataPropertyStatementAttribute .
          
 ai:AdminDisplayFauxDataPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:AdminDisplayFauxDataPropertyTestData .
          
 ai:AdminDisplayFauxDataPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminDisplayFauxDataPropertyTestData .
          

@@ -33,7 +33,7 @@ ai:AllowPublicUpdateClassRule rdf:type ao:Rule;
           ao:attribute ai:PublicUpdateClassAttribute .
          
 ai:PublicUpdateClassAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:PublicUpdateClassTestData .
          

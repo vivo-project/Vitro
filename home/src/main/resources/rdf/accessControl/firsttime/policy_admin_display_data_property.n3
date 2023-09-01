@@ -40,12 +40,12 @@ ai:AllowAdminDisplayDataPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:AdminDisplayDataPropertyStatementAttribute .
          
 ai:AdminDisplayDataPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:AdminDisplayDataPropertyTestData .
 
 ai:AdminDisplayDataPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:AdminDisplayDataPropertyTestData .
 

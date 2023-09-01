@@ -31,11 +31,11 @@ ai:RestrictDropHomeMenuItems rdf:type ao:Rule ;
           ao:attribute ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
           
 ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:StatementPredicateUri ;
          ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
 
 ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:StatementObjectUri ;
          ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

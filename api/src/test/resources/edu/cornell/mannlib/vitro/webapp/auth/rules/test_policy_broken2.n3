@@ -19,11 +19,11 @@ ai:BrokenTestRule rdf:type ao:Rule ;
           ao:attribute ai:BrokenTestAttribute .
           
 ai:BrokenTestAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:value ai:PublishOperation .
          
 ai:ValidTestAttribute rdf:type ao:Attribute ;
-         ao:test ai:Equals ;
+         ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:PublishOperation .
 

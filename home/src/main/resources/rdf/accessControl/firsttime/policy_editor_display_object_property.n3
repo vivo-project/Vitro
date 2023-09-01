@@ -40,12 +40,12 @@ ai:AllowEditorDisplayObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:EditorDisplayObjectPropertyStatementAttribute .
          
 ai:EditorDisplayObjectPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:EditorDisplayObjectPropertyTestData .
 
 ai:EditorDisplayObjectPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorDisplayObjectPropertyTestData .
          

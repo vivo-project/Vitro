@@ -40,12 +40,12 @@ ai:AllowPublicDisplayObjectPropertyStatementRule rdf:type ao:Rule;
           ao:attribute ai:PublicDisplayObjectPropertyStatementAttribute .
          
 ai:PublicDisplayObjectPropertyStatementAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:StatementPredicateUri ;
          ao:setValue ai:PublicDisplayObjectPropertyTestData .
 
 ai:PublicDisplayObjectPropertyAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:PublicDisplayObjectPropertyTestData .
          

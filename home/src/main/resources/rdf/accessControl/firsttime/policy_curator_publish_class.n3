@@ -33,7 +33,7 @@ ai:AllowCuratorPublishClassRule rdf:type ao:Rule;
           ao:attribute ai:CuratorPublishClassAttribute .
          
 ai:CuratorPublishClassAttribute rdf:type ao:Attribute ;
-         ao:test ai:OneOf ;
+         ao:operator ai:OneOf ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:CuratorPublishClassTestData .
          

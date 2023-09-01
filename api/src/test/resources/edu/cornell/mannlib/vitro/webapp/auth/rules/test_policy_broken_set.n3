@@ -20,12 +20,12 @@ ai:BrokenRule rdf:type ao:Rule ;
           ao:attribute ai:BrokenSetAttribute2 .
           
 ai:BrokenSetAttribute1 rdf:type ao:Attribute ;
-         ao:test ai:NotOneOf ;
+         ao:operator ai:NotOneOf ;
          ao:type ai:ObjectUri ;
          ao:setValue ai:valueSet1 .
          
 ai:BrokenSetAttribute2 rdf:type ao:Attribute ;
-         ao:test ai:NotOneOf ;
+         ao:operator ai:NotOneOf ;
          ao:type ai:ObjectUri ;
          ao:setValue ai:valueSet2 .
 
