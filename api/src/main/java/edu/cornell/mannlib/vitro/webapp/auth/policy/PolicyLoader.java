@@ -453,11 +453,9 @@ public class PolicyLoader {
     }
 
     private long getPriority(String uri) {
-        // debug("SPARQL Query to get policy uris from the graph:\n %s",
-        // POLICY_URIS_QUERY);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(PRIORITY_QUERY);
         pss.setIri(POLICY, uri);
-        // debug("Get priority query:\n %s", pss.toString());
+        debug("Get priority for uri %s query:\n %s", uri, pss.toString());
         long[] priority = new long[1];
         try {
             rdfService.sparqlSelectQuery(pss.toString(), new ResultSetConsumer() {
