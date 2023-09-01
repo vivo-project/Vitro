@@ -35,7 +35,7 @@ public class ModelAccessFactoryStub extends ModelAccessFactory {
 
 		contextMA = new ContextModelAccessStub();
 		requestMA = new RequestModelAccessStub();
-        ModelAccess.setInstance(contextMA);
+		ModelAccess.setInstance(contextMA);
 	}
 
 	@Override

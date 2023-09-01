@@ -216,8 +216,8 @@ public class IndividualRdfAssembler {
 				String objectUri = stmt.getObject().asResource().getURI();
 				 /** We don't need to know range and domain because publishing never involves faux properties. */
 				Property prop = new Property(predicateUri);
-		        prop.setDomainVClassURI("?SOME_URI");
-		        prop.setRangeVClassURI("?SOME_URI");
+				prop.setDomainVClassURI("?SOME_URI");
+				prop.setRangeVClassURI("?SOME_URI");
 				AccessObject pops = new ObjectPropertyStatementAccessObject(o, subjectUri, prop, objectUri);
 				if (!PolicyHelper.isAuthorizedForActions(vreq, pops, AccessOperation.PUBLISH)) {
 					log.debug("not authorized: " + pops);
