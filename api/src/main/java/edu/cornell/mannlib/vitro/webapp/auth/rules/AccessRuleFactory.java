@@ -23,7 +23,7 @@ public class AccessRuleFactory {
         ar.addAttribute(AttributeFactory.createAttribute(qs));
         if (qs.contains("decision_id") && qs.get("decision_id").isLiteral()) {
             String decisionId = qs.getLiteral("decision_id").getString();
-            if (decisionId.equals("DENY")) {
+            if (RuleDecision.DENY.toString().equals(decisionId)) {
                 ar.setAllowMatched(false);
             }
         }
