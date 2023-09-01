@@ -9,7 +9,7 @@ import javax.servlet.ServletContextListener;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasPermissionSetFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProfileOrIsBlacklistedFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProfileFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProxyEditingRightsFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsRootUserFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsUserFactory;
@@ -33,7 +33,7 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 		    PolicyLoader.getInstance().loadPolicies();
 			factory(new IsUserFactory());
 			factory(new IsRootUserFactory());
-			factory(new HasProfileOrIsBlacklistedFactory());
+			factory(new HasProfileFactory());
 			factory(new HasPermissionSetFactory());
 			factory(new HasProxyEditingRightsFactory());
 		} catch (Exception e) {
