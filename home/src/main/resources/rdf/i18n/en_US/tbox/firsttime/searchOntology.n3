@@ -15,7 +15,6 @@ search:SearchField rdfs:label "Field"@en-US .
 search:order rdfs:label "order"@en-US .
 search:userInput rdfs:label "user input"@en-US .
 search:FilterValue rdfs:label "FilterValue"@en-US .
-search:Statement rdfs:label "Search statement"@en-US .
 search:from rdfs:label "Minimum range value"@en-US .
 search:to rdfs:label "Maximum range value"@en-US .
 search:description rdfs:label "description"@en-US .

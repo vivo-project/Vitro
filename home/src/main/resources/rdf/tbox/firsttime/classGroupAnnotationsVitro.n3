@@ -44,12 +44,6 @@ search:FilterValue
 		vitro:hiddenFromPublishBelowRoleLevelAnnot <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
 		vitro:prohibitedFromUpdateBelowRoleLevelAnnot <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
 
-search:Statement 
-        vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupsearchsettings> ;
-        vitro:hiddenFromDisplayBelowRoleLevelAnnot     <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
-        vitro:hiddenFromPublishBelowRoleLevelAnnot     <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
-        vitro:prohibitedFromUpdateBelowRoleLevelAnnot  <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> .
-
 search:Filter
         vitro:inClassGroup <http://vivoweb.org/ontology#vitroClassGroupsearchsettings> ;
         vitro:hiddenFromDisplayBelowRoleLevelAnnot     <http://vitro.mannlib.cornell.edu/ns/vitro/role#public> ;
