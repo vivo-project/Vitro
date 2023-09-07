@@ -47,6 +47,8 @@ search:isAscending  a                 owl:DatatypeProperty , owl:FunctionalPrope
 search:RangeFilter  a                 owl:Class ;
         rdfs:subClassOf               search:Filter .
 
+search:PublicParameter  a             owl:Class .
+
 search:indexField  a                  owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:string .
@@ -75,45 +77,45 @@ search:isUriValues  a                 owl:DatatypeProperty , owl:FunctionalPrope
 search:SearchField  a                 owl:Class .
 
 search:order  a                       owl:FunctionalProperty , owl:DatatypeProperty ;
-        rdfs:domain                   [ a            owl:Class ;
-                                        owl:unionOf  ( search:FilterValue search:Filter search:FilterGroup )
-                                      ] ;
+        rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:integer .
 
 search:userInput  a                   owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:FilterValue  a                 owl:Class .
+search:FilterValue  a                 owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
 
 search:from  a                        owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:RangeFilter ;
         rdfs:range                    xsd:string .
 
-search:FilterGroup  a                 owl:Class .
+search:FilterGroup  a                 owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
 
 search:userInputRegex
         a                             owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:Filter  a                      owl:Class .
+search:Filter  a                      owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
 
 search:sortField  a                   owl:FunctionalProperty , owl:ObjectProperty ;
         rdfs:domain                   search:Sort ;
         rdfs:range                    search:SearchField .
 
 search:id  a                          owl:DatatypeProperty , owl:FunctionalProperty ;
-        rdfs:domain                   [ a            owl:Class ;
-                                        owl:unionOf  ( search:Sort search:FilterValue search:Filter search:FilterGroup )
-                                      ] ;
+        rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:string .
 
 search:facetResults  a                owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:Sort  a                        owl:Class .
+search:Sort  a                        owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
 
 search:to  a                          owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:RangeFilter ;
@@ -125,9 +127,7 @@ search:hasKnownValue  a                owl:ObjectProperty ;
 
 
 search:public  a                      owl:DatatypeProperty , owl:FunctionalProperty ;
-        rdfs:domain                   [ a            owl:Class ;
-                                        owl:unionOf  ( search:Filter search:FilterGroup search:FilterValue )
-                                      ] ;
+        rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:boolean .
 
 
