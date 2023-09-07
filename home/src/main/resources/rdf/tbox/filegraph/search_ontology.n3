@@ -36,6 +36,25 @@
         a                          owl:Ontology ;
         vitro:ontologyPrefixAnnot  "search" .
 
+search:PublicParameter  a             owl:Class .
+
+search:SearchField  a                 owl:Class .
+
+search:FilterValue  a                 owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
+
+search:Sort  a                        owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
+
+search:RangeFilter  a                 owl:Class ;
+        rdfs:subClassOf               search:Filter .
+
+search:FilterGroup  a                 owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
+
+search:Filter  a                      owl:Class ;
+        rdfs:subClassOf               search:PublicParameter .
+
 search:multivalued  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:boolean .
@@ -43,11 +62,6 @@ search:multivalued  a                 owl:DatatypeProperty , owl:FunctionalPrope
 search:isAscending  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Sort ;
         rdfs:range                    xsd:boolean .
-
-search:RangeFilter  a                 owl:Class ;
-        rdfs:subClassOf               search:Filter .
-
-search:PublicParameter  a             owl:Class .
 
 search:indexField  a                  owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:SearchField ;
@@ -74,8 +88,6 @@ search:isUriValues  a                 owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:SearchField  a                 owl:Class .
-
 search:order  a                       owl:FunctionalProperty , owl:DatatypeProperty ;
         rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:integer .
@@ -84,23 +96,14 @@ search:userInput  a                   owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:FilterValue  a                 owl:Class ;
-        rdfs:subClassOf               search:PublicParameter .
-
 search:from  a                        owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:RangeFilter ;
         rdfs:range                    xsd:string .
-
-search:FilterGroup  a                 owl:Class ;
-        rdfs:subClassOf               search:PublicParameter .
 
 search:userInputRegex
         a                             owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
-
-search:Filter  a                      owl:Class ;
-        rdfs:subClassOf               search:PublicParameter .
 
 search:sortField  a                   owl:FunctionalProperty , owl:ObjectProperty ;
         rdfs:domain                   search:Sort ;
@@ -114,9 +117,6 @@ search:facetResults  a                owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:Sort  a                        owl:Class ;
-        rdfs:subClassOf               search:PublicParameter .
-
 search:to  a                          owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:RangeFilter ;
         rdfs:range                    xsd:string .
@@ -125,11 +125,9 @@ search:hasKnownValue  a                owl:ObjectProperty ;
         rdfs:domain                    search:Filter ;
         rdfs:range                     search:FilterValue .
 
-
 search:public  a                      owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:boolean .
-
 
 search:defaultPublic
         a                   <http://www.w3.org/2002/07/owl#DatatypeProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> ;
