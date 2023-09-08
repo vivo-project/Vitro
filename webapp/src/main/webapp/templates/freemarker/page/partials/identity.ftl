@@ -26,14 +26,14 @@
             <li role="listitem"><a href="${urls.index}" title="${i18n().view_content_index}">${i18n().index}</a></li>
     </ul>
 </nav>
-    <section id="search" role="region">
-      <fieldset>
-      <legend>${i18n().search_form}</legend>
-         <form id="search-form" action="${urls.base}/search" name="search" role="search" accept-charset="UTF-8" method="GET">
-           <div id="search-field">
-             <input type="text" name="querytext" class="search-vitro" value="${querytext!}" autocapitalize="off" />
-             <input type="submit" value="${i18n().search_button}" class="submit">
-           </div>
-         </form>
-       </fieldset>
-    </section>
+<section id="search" role="region">
+    <fieldset>
+        <legend>${i18n().search_form}</legend>
+        <form id="search-form" action="${urls.search}" name="search" role="search" accept-charset="UTF-8" method="GET">
+            <div id="search-field">
+                <input type="text" name="querytext" class="search-vitro" value="${querytext!}" autocapitalize="off" />
+                <input type="submit" value="${i18n().search_button}" class="submit">
+            </div>
+        </form>
+    </fieldset>
+</section>
