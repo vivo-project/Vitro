@@ -58,11 +58,11 @@ $(document).ready(function(){
                if ($(this).text() == i18nStrings.allCapitalized) {
                   //Selected filter feedback
                   $('.search-filter-selected').text('');
-                  $('input[name="classgroup"]').val('');
+                  $('input[name="filters_classgroup"]').val('');
                } else {
 
                      $('.search-filter-selected').text($(this).text()).fadeIn('slow');
-                     $('input[name="classgroup"]').val($(this).children("a").attr("title"));
+                     $('input[name="filters_classgroup"]').val("classgroup:" +  $(this).children("a").attr("title"));
                }
 
                //Hide filter select list
