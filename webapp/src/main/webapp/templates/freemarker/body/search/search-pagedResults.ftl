@@ -218,11 +218,13 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 				<ul class="nav nav-tabs">
 					<#assign assignedActive = false>
 					<#list group.filters as filterId>
-						<#assign f = filters[filterId]>
-						<#if ( user.loggedIn || f.public ) && !f.hidden >
-							<@searchFormFilterTab f assignedActive emptySearch/>  
-							<#if !assignedActive && (f.selected || emptySearch )>
-								<#assign assignedActive = true>
+						<#if filters[filterId]??>
+							<#assign f = filters[filterId]>
+							<#if ( user.loggedIn || f.public ) && !f.hidden >
+								<@searchFormFilterTab f assignedActive emptySearch/>  
+								<#if !assignedActive && (f.selected || emptySearch )>
+									<#assign assignedActive = true>
+								</#if>
 							</#if>
 						</#if>
 					</#list>
@@ -231,11 +233,13 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 			<div id="search-filter-group-tab-content-${group.id}" class="tab-content">
 				<#assign assignedActive = false>
 				<#list group.filters as filterId>
-					<#assign f = filters[filterId]>
-					<#if ( user.loggedIn || f.public ) && !f.hidden >
-						<@printFilterValues f assignedActive emptySearch/>  
-						<#if !assignedActive && ( f.selected || emptySearch )>
-							<#assign assignedActive = true>
+					<#if filters[filterId]??>
+						<#assign f = filters[filterId]>
+						<#if ( user.loggedIn || f.public ) && !f.hidden >
+							<@printFilterValues f assignedActive emptySearch/>  
+							<#if !assignedActive && ( f.selected || emptySearch )>
+								<#assign assignedActive = true>
+							</#if>
 						</#if>
 					</#if>
 				</#list>
