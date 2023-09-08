@@ -16,7 +16,6 @@
             <div id="navAndSearch" class="block">
                 <#include "menu.ftl">
                 <#include "search.ftl">
-                </#if>
             </div> <!-- navAndSearch -->
 
             <#include "breadcrumbs.ftl">
