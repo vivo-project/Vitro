@@ -442,7 +442,7 @@ public class SearchFiltering {
 
     private static void addInputFilter(SearchQuery query, SearchFilter searchFilter) {
         if (StringUtils.isBlank(searchFilter.getInputText())
-                || ExtendedSearchController.PARAM_QUERY_TEXT.equals(searchFilter.getId())) {
+                || PagedSearchController.PARAM_QUERY_TEXT.equals(searchFilter.getId())) {
             return;
         }
         String searchText = searchFilter.getInputText();
@@ -455,8 +455,8 @@ public class SearchFiltering {
     }
 
     private static String getFilterInputText(VitroRequest vreq, String name) {
-        if (ExtendedSearchController.PARAM_QUERY_TEXT.equals(name)) {
-            return ExtendedSearchController.getQueryText(vreq);
+        if (PagedSearchController.PARAM_QUERY_TEXT.equals(name)) {
+            return PagedSearchController.getQueryText(vreq);
         }
         String[] values = vreq.getParameterValues(SearchFiltering.FILTER_INPUT_PREFIX + name);
         if (values != null && values.length > 0) {
@@ -567,7 +567,7 @@ public class SearchFiltering {
             String paramFilterName = paramNames.nextElement();
             if (!StringUtils.isBlank(paramFilterName) && (paramFilterName.startsWith(FILTERS)
                     || paramFilterName.startsWith(FILTER_RANGE) || paramFilterName.startsWith(FILTER_INPUT_PREFIX)
-                    || paramFilterName.startsWith(ExtendedSearchController.PARAM_QUERY_SORT_BY))) {
+                    || paramFilterName.startsWith(PagedSearchController.PARAM_QUERY_SORT_BY))) {
                 String[] values = vreq.getParameterValues(paramFilterName);
                 if (values.length > 0) {
                     pagingLinkParams.put(paramFilterName, values[0]);
