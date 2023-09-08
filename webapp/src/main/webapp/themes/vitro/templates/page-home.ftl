@@ -38,7 +38,7 @@
                             <div id="search-home-field">
                                 <input type="text" name="querytext" class="search-homepage" value="${querytext!}" autocapitalize="off" />
                                 <input type="submit" value="${i18n().search_button}" class="search" />
-                                <input type="hidden" name="classgroup" class="search-homepage" value="" autocapitalize="off" />
+                                <input type="hidden" name="filter_classgroup" class="search-homepage" value="" autocapitalize="off" />
                             </div>
 
                             <a class="filter-search filter-default" href="#" title="${i18n().filter_search}"><span class="displace">${i18n().filter_search}</span></a>
@@ -65,7 +65,7 @@
             // to return to the home page from the search results. Not in vitroUtils.js because that
             // gets loaded on every page.
             $(document).ready(function(){
-                $('input[name="classgroup"]').val("");
+                $('input[name="filter_classgroup"]').val("");
             });
         </script>
     </body>
