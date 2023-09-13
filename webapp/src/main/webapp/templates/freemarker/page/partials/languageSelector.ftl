@@ -85,7 +85,7 @@ window.onload = parseLanguageFromPageURL;
 
 var languageLinks = document.querySelectorAll('a[href*="selectLocale?selection="]');
 languageLinks.forEach(function(link) {
-    var langValue = link.getAttribute('href').split('selectLocale?selection=')[1];
+    var langValue = link.getAttribute('href').split('selectLocale?selection=')[1].split('&')[0];
     link.addEventListener('click', function(event) {
         handleLanguageLinkClick(event, langValue);
     });
