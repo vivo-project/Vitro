@@ -47,19 +47,24 @@ function getSelectedLanguageHref() {
     return "#";
 }
 
+var langParamRegex = /lang=([^&]+)/;
+
+function checkForLangParameter() {
+    let currentURL = window.location.href;
+    return currentURL.match(langParamRegex);
+}
+
 function parseLanguageFromPageURL() {
-    var currentURL = window.location.href;
-    var langParamRegex = /lang=([^&]+)/;
-    var match = currentURL.match(langParamRegex);
+    let match = checkForLangParameter();
 
     if (match) {
-        var langValue = match[1];
+        let langValue = match[1];
 
         if(getSelectedLanguageHref().endsWith(langValue)) {
             return;
         }
 
-        var languageLinks = document.querySelectorAll('a[href*="selectLocale?selection=' + langValue + '"]');
+        let languageLinks = document.querySelectorAll('a[href*="selectLocale?selection=' + langValue + '"]');
         if (languageLinks.length > 0) {
             languageLinks[0].click();
         }
@@ -67,12 +72,11 @@ function parseLanguageFromPageURL() {
 }
 
 function updateLangParamIfExists(langValue) {
-    var currentURL = window.location.href;
-    var langParamRegex = /lang=([^&]+)/;
-    var match = currentURL.match(langParamRegex);
+    let match = checkForLangParameter();
 
     if (match) {
-        var updatedURL = currentURL.replace(langParamRegex, 'lang=' + langValue);
+        let currentURL = window.location.href;
+        let updatedURL = currentURL.replace(langParamRegex, 'lang=' + langValue);
         window.history.replaceState({}, document.title, updatedURL);
     }
 }
