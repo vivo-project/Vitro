@@ -54,14 +54,12 @@ function parseLanguageFromPageURL() {
 
     if (match) {
         var langValue = match[1];
-        console.log(langValue);
 
         if(getSelectedLanguageHref().endsWith(langValue)) {
             return;
         }
 
         var languageLinks = document.querySelectorAll('a[href*="selectLocale?selection=' + langValue + '"]');
-        console.log(languageLinks);
         if (languageLinks.length > 0) {
             languageLinks[0].click();
         }
