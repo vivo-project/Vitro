@@ -1,0 +1,63 @@
+@prefix :      <https://vivoweb.org/ontology/vitro-search-individual/> .
+@prefix vitro-search: <https://vivoweb.org/ontology/vitro-search#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+:filter_group_search_filters  a    vitro-search:FilterGroup ;
+        vitro-search:contains      :filter_category , :filter_type , :filter_querytext ;
+        vitro-search:id            "main" ;
+        vitro-search:order         1 ;
+        vitro-search:public        true .
+
+:filter_type  a                    vitro-search:Filter ;
+        vitro-search:facetResults  true ;
+        vitro-search:filterField   :field_type ;
+        vitro-search:id            "type" ;
+        vitro-search:isUriValues   true ;
+        vitro-search:order         30 ;
+        vitro-search:public        false .
+
+:filter_category
+        a                          vitro-search:Filter ;
+        vitro-search:facetResults  true ;
+        vitro-search:filterField   :field_category ;
+        vitro-search:id            "category" ;
+        vitro-search:isUriValues   true ;
+        vitro-search:public        true .
+
+:filter_querytext
+        a                          vitro-search:Filter ;
+        vitro-search:order         1 ;
+        vitro-search:filterField   :field_querytext ;
+        vitro-search:id            "querytext" ;
+        vitro-search:public        true .
+
+:sort_title_desc  a                vitro-search:Sort ;
+        vitro-search:order         20 ;
+        vitro-search:sortField     :field_label_sort ;
+        vitro-search:isAscending   false ;
+        vitro-search:id            "titledesc" .
+
+:sort_title_asc  a                vitro-search:Sort ;
+        vitro-search:sortField     :field_label_sort ;
+        vitro-search:isAscending   true ;
+        vitro-search:order         30 ;
+        vitro-search:id            "titleasc" .
+
+:field_label_sort
+        a                          vitro-search:SearchField ;
+        vitro-search:isLanguageSpecific true ;
+        vitro-search:indexField    "_label_sort" .
+
+:field_category
+        a                          vitro-search:SearchField ;
+        vitro-search:indexField    "classgroup" .
+
+:field_type  a                    vitro-search:SearchField ;
+        vitro-search:indexField   "type" ;
+        vitro-search:isLanguageSpecific true ;
+        vitro-search:multivalued  true .
+
+:field_querytext
+        a                          vitro-search:SearchField ;
+        vitro-search:indexField    "querytext" .
