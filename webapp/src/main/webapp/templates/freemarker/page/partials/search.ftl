@@ -3,7 +3,7 @@
 <div id="searchBlock">
     <form id="searchForm" action="${urls.search}" accept-charset="UTF-8" method="GET">
         <label for="search">${i18n().search_button}</label>
-        <input type="text" name="querytext" id="search" class="search-form-item" value="${querytext!}" size="20" autocapitalize="off" />
+        <input type="text" name="querytext" id="filter_input_querytext" class="search-form-item" value="${querytext!}" size="20" autocapitalize="off" />
         <input class="search-form-submit" name="submit" type="submit"  value="${i18n().search_button}" />
     </form>
 </div> <!-- end searchBlock -->

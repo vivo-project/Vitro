@@ -94,10 +94,10 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 			    $(this)[0].setPointerCapture(e.pointerId);
 			});
 			$(".noUi-handle").on("mouseup", function (e) {
-				$('#extended-search-form').submit();
+				$('#search-form').submit();
 			});
 			$(".noUi-handle").on("pointerup", function (e) {
-				$('#extended-search-form').submit();
+				$('#search-form').submit();
 			});
 		};
 			
