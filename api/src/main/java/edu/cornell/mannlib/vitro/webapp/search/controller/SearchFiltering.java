@@ -43,7 +43,7 @@ public class SearchFiltering {
     private static final String FILTER_INPUT_PREFIX = "filter_input_";
     private static final String FILTERS = "filters";
 
-    private static final String FILTER_QUERY = "" 
+    private static final String FILTER_QUERY = ""
             + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n"
             + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n"
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#>\n"
@@ -113,7 +113,7 @@ public class SearchFiltering {
 
     private static final String LABEL_QUERY = ""
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-            + "SELECT ?label\n" 
+            + "SELECT ?label\n"
             + "WHERE {\n"
             + "    ?uri rdfs:label ?label .\n"
             + "} LIMIT 1";
@@ -212,7 +212,7 @@ public class SearchFiltering {
 
         return requestFilters;
     }
-    
+
     public static Map<String, SearchFilter> readFilterConfigurations(VitroRequest vreq) {
         long startTime = System.nanoTime();
 
@@ -270,7 +270,7 @@ public class SearchFiltering {
         }
         return sortFilters(filtersByField);
     }
-    
+
     public static Map<String, SearchFilter> sortFilters(Map<String, SearchFilter> filters) {
         List<Entry<String, SearchFilter>> list = new LinkedList<>(filters.entrySet());
         list.sort(new FilterComparator());
@@ -431,7 +431,7 @@ public class SearchFiltering {
 
         return filter;
     }
-    
+
     private static void addRangeFilter(SearchQuery query, SearchFilter searchFilter) {
         String rangeText = searchFilter.getRangeText();
         if (StringUtils.isBlank(rangeText)) {
@@ -473,7 +473,8 @@ public class SearchFiltering {
         return "";
     }
 
-    private static void setSelectedFilters(Map<String, SearchFilter> filtersByField, Map<String, List<String>> requestFilters) {
+    private static void setSelectedFilters(Map<String, SearchFilter> filtersByField,
+            Map<String, List<String>> requestFilters) {
         for (SearchFilter filter : filtersByField.values()) {
             if (requestFilters.containsKey(filter.getId())) {
                 List<String> requestValues = requestFilters.get(filter.getId());
