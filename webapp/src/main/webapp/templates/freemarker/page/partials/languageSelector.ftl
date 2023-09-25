@@ -29,46 +29,11 @@ var i18nStringsLangMenu = {
     selectLanguage: "${i18n().select_a_language?js_string}"
 };
 
-function getSelectedLanguageHref() {
-    var languageMenu = document.getElementById("language-menu");
-    if (languageMenu) {
-        var listItems = languageMenu.querySelectorAll("li");
-
-        for (var i = 0; i < listItems.length; i++) {
-            if (listItems[i].getAttribute("status") === "selected") {
-                var selectedLanguageAnchor = listItems[i].querySelector("a");
-                if (selectedLanguageAnchor) {
-                    var selectedLanguageHref = selectedLanguageAnchor.getAttribute("href");
-                    return selectedLanguageHref;
-                }
-            }
-        }
-    }
-    return "#";
-}
-
 var langParamRegex = /lang=([^&]+)/;
 
 function checkForLangParameter() {
     let currentURL = window.location.href;
     return currentURL.match(langParamRegex);
-}
-
-function parseLanguageFromPageURL() {
-    let match = checkForLangParameter();
-
-    if (match) {
-        let langValue = match[1];
-
-        if(getSelectedLanguageHref().endsWith(langValue)) {
-            return;
-        }
-
-        let languageLinks = document.querySelectorAll('a[href*="selectLocale?selection=' + langValue + '"]');
-        if (languageLinks.length > 0) {
-            languageLinks[0].click();
-        }
-    }
 }
 
 function updateLangParamIfExists(langValue) {
@@ -84,8 +49,6 @@ function updateLangParamIfExists(langValue) {
 function handleLanguageLinkClick(event, langValue) {
     updateLangParamIfExists(langValue);
 }
-
-window.onload = parseLanguageFromPageURL;
 
 var languageLinks = document.querySelectorAll('a[href*="selectLocale?selection="]');
 languageLinks.forEach(function(link) {
