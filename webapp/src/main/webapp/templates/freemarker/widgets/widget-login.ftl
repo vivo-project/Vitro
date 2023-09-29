@@ -73,6 +73,33 @@
             </div>
         </form>
 
+        <form id="forgotPasswordForm" action="/vivo/forgot-password" method="POST" style="margin-top: 10px;">
+            <input type="email" id="email" name="email" style="display: none;" required>
+            <button type="submit" class="forgot-password">${i18n().password_reset_label}</button>
+        </form>
+
+        <script>
+        // JavaScript to synchronize email login fields
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginNameInput = document.getElementById('loginName');
+            const emailInput = document.getElementById('email');
+
+            loginNameInput.addEventListener('input', function() {
+                emailInput.value = loginNameInput.value;
+            });
+        });
+        </script>
+
+        <style>
+            .forgot-password {
+                background: none;
+                border: none;
+                color: blue;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+        </style>
+
     </section><!-- #log-in -->
 </#macro>
 
