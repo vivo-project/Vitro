@@ -254,30 +254,6 @@ uil-data:reset_password_note.Vitro
         uil:hasKey      "reset_password_note" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:password_reset_email_sent.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Password recovery email sent to "@en-US ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_email_sent" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:password_reset_email_non_existing.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Email you have provided is not associated with any user account."@en-US ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_email_non_existing" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:password_reset_label.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "I forgot my password"@en-US ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_label" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:startup_status.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
