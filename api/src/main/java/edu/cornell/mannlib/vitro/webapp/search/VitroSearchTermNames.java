@@ -76,7 +76,7 @@ public class VitroSearchTermNames {
 	
 	/** Multilingual label field suffix */
 	public static final String LABEL_DISPLAY_SUFFIX = "_label_display";
-	
-	/** Date range field suffix */
+
+    /** Date range field suffix */
     public static final String DATE_RANGE_SUFFIX = "_drsim";
 }

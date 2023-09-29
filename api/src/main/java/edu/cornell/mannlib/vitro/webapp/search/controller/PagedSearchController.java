@@ -208,9 +208,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
             long hitCount = docs.getNumFound();
             log.debug("Number of hits = " + hitCount);
-            // if ( hitCount < 1 ) {
-            // return doNoHits(queryText,format, vreq);
-            // }
 
             List<Individual> individuals = new ArrayList<Individual>(docs.size());
             for (SearchResultDocument doc : docs) {
