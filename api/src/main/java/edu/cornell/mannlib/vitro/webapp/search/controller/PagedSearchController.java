@@ -61,6 +61,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     static final Log log = LogFactory.getLog(PagedSearchController.class);
 
     protected static final int DEFAULT_HITS_PER_PAGE = 30;
+    private static final int DEFAULT_DOCUMENTS_NUMBER = 500;
     private static Set<Integer> hitsPerPageOptions =
             Stream.of(10, 30, 50).collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -70,6 +71,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     private static final String PARAM_CSV_REQUEST = "csv";
     private static final String PARAM_START_INDEX = "startIndex";
     private static final String PARAM_HITS_PER_PAGE = "hitsPerPage";
+    private static final String PARAM_DOCUMENTS_NUMBER = "documentsNumber";
     public static final String PARAM_QUERY_TEXT = "querytext";
     public static final String PARAM_QUERY_SORT_BY = "sort";
 
@@ -159,7 +161,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
             int startIndex = getStartIndex(vreq);
             int hitsPerPage = getHitsPerPage(vreq);
-
+            int documentsToReturn = hitsPerPage;
+            if (!wasHtmlRequested) {
+                documentsToReturn = getDocumentsNumber(vreq);    
+            }
             String queryText = getQueryText(vreq);
             log.debug("Query text is \"" + queryText + "\"");
             if (log.isDebugEnabled()) {
@@ -174,7 +179,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 log.debug(getSpentTime(startTime) + "ms spent before get query configurations.");
             }
             SearchQuery query =
-                    getQuery(queryText, hitsPerPage, startIndex, vreq, filterConfigurationsByField, sortConfigurations);
+                    getQuery(queryText, documentsToReturn, startIndex, vreq, filterConfigurationsByField, sortConfigurations);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent after get query configurations.");
             }
@@ -382,6 +387,20 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
         log.debug("hitsPerPage is " + hitsPerPage);
         return hitsPerPage;
+    }
+    
+    private int getDocumentsNumber(VitroRequest vreq) {
+        int documentsNumber = DEFAULT_DOCUMENTS_NUMBER;
+        try {
+            documentsNumber = Integer.parseInt(vreq.getParameter(PARAM_DOCUMENTS_NUMBER));
+        } catch (Throwable e) {
+            documentsNumber = DEFAULT_DOCUMENTS_NUMBER;
+        }
+        if (documentsNumber > DEFAULT_MAX_HIT_COUNT) {
+            return DEFAULT_MAX_HIT_COUNT;
+        }
+        log.debug("documents number is " + documentsNumber);
+        return documentsNumber;
     }
 
     private int getStartIndex(VitroRequest vreq) {
