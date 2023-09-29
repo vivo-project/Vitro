@@ -44,8 +44,6 @@ public class SearchFiltering {
     private static final String FILTERS = "filters";
 
     private static final String FILTER_QUERY = ""
-            + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n"
-            + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>\n"
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#>\n"
             + "PREFIX gesah:    <http://ontology.tib.eu/gesah/>\n"
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
@@ -57,7 +55,7 @@ public class SearchFiltering {
             + "    ?filter rdf:type search:Filter .\n"
             + "    ?filter rdfs:label ?filter_label .\n"
             + "    ?filter search:id ?filter_id .\n"
-            + "    ?filter <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> ?filter_type .\n"
+            + "    ?filter a ?filter_type .\n"
             + "    ?filter search:filterField ?field .\n"
             + "    ?field search:indexField ?field_name .\n"
             + "    OPTIONAL {?filter search:hasKnownValue ?value . \n"
@@ -217,7 +215,7 @@ public class SearchFiltering {
         long startTime = System.nanoTime();
 
         Map<String, SearchFilter> filtersByField = new LinkedHashMap<>();
-        Model model = ModelAccess.on(vreq).getOntModelSelector().getABoxModel();
+        Model model = ModelAccess.on(vreq).getOntModelSelector().getDisplayModel();
         model.enterCriticalSection(Lock.READ);
         try {
             Query facetQuery = QueryFactory.create(FILTER_QUERY);
@@ -294,7 +292,7 @@ public class SearchFiltering {
     public static List<SearchFilterGroup> readFilterGroupsConfigurations(VitroRequest vreq,
             Map<String, SearchFilter> filtersById) {
         Map<String, SearchFilterGroup> groups = new LinkedHashMap<>();
-        Model model = ModelAccess.on(vreq).getOntModelSelector().getABoxModel();
+        Model model = ModelAccess.on(vreq).getOntModelSelector().getDisplayModel();
         model.enterCriticalSection(Lock.READ);
         try {
             Query facetQuery = QueryFactory.create(FILTER_GROUPS_QUERY);
@@ -334,7 +332,7 @@ public class SearchFiltering {
 
     public static Map<String, SortConfiguration> getSortConfigurations(VitroRequest vreq) {
         Map<String, SortConfiguration> sortConfigurations = new LinkedHashMap<>();
-        Model model = ModelAccess.on(vreq).getOntModelSelector().getABoxModel();
+        Model model = ModelAccess.on(vreq).getOntModelSelector().getDisplayModel();
         model.enterCriticalSection(Lock.READ);
         try {
             Query facetQuery = QueryFactory.create(SORT_QUERY);
