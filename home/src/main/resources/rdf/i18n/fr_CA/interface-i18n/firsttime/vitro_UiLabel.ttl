@@ -254,6 +254,46 @@ uil-data:reset_password_note.Vitro
         uil:hasKey      "reset_password_note" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:password_reset_email_sent.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "E-mail de récupération de mot de passe envoyé à "@fr-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_email_sent" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_email_non_existing.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "L'e-mail que vous avez fourni n'est associé à aucun compte utilisateur."@fr-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_email_non_existing" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_too_many_requests.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Vous pourrez envoyer la prochaine demande le "@fr-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_too_many_requests" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_too_many_requests_at_time.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       " à "@fr-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_too_many_requests_at_time" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_label.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "J'ai oublié mon mot de passe"@fr-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_label" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:startup_status.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
