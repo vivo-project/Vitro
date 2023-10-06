@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,10 +38,6 @@ public class ForgotPassword extends VitroHttpServlet {
 
     private static final Log log = LogFactory.getLog(ForgotPassword.class.getName());
 
-    private static final Map<String, LocalDateTime> requestHistory = new HashMap<>();
-
-    private static final Map<String, Integer> requestFrequency = new HashMap<>();
-
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -61,24 +56,20 @@ public class ForgotPassword extends VitroHttpServlet {
             return;
         }
 
-        clearOrInitializeHistoryRequestData(userAccount);
-
-        Integer numberOfSuccessiveRequests = requestFrequency.get(email);
-        LocalDateTime momentOfFirstRequest = requestHistory.get(email);
-        LocalDateTime nextRequestAvailableAt = momentOfFirstRequest.plusMinutes(numberOfSuccessiveRequests * 10);
-        if (nextRequestAvailableAt.isAfter(LocalDateTime.now())) {
-            String[] dateTimeTokens = nextRequestAvailableAt.toString().split("T");
-            String dateString = dateTimeTokens[0];
-            String timeString = dateTimeTokens[1].split("\\.")[0];
+        PasswordChangeRequestSpamMitigationResponse mitigationResponse =
+            PasswordChangeRequestSpamMitigation.isPasswordResetRequestable(userAccount);
+        if (!mitigationResponse.getCanBeRequested()) {
             out.println(
-                "<h1>" + i18n.text("password_reset_too_many_requests") + dateString +
-                    i18n.text("password_reset_too_many_requests_at_time") + timeString + "</h1>");
+                "<h1>" + i18n.text("password_reset_too_many_requests") +
+                    mitigationResponse.getNextRequestAvailableAtDate() +
+                    i18n.text("password_reset_too_many_requests_at_time") +
+                    mitigationResponse.getNextRequestAvailableAtTime() + "</h1>");
             return;
         }
 
         requestPasswordChange(userAccount, userAccountsDao);
         notifyUser(userAccount, i18n, vreq);
-        requestFrequency.computeIfPresent(email, (key, value) -> ++value);
+        PasswordChangeRequestSpamMitigation.requestSuccessfullyHandledAndUserIsNotified(userAccount.getEmailAddress());
 
         out.println("<h1>" + i18n.text("password_reset_email_sent") + email + "</h1>");
     }
@@ -117,17 +108,7 @@ public class ForgotPassword extends VitroHttpServlet {
     private void requestPasswordChange(UserAccount userAccount, UserAccountsDao userAccountsDao) {
         userAccount.setPasswordLinkExpires(figureExpirationDate().getTime());
         userAccount.generateEmailKey();
-        userAccount.setPasswordChangeRequired(true);
         userAccountsDao.updateUserAccount(userAccount);
-    }
-
-    private void clearOrInitializeHistoryRequestData(UserAccount userAccount) {
-        if (userAccount.isPasswordChangeRequired()) {
-            requestHistory.putIfAbsent(userAccount.getEmailAddress(), LocalDateTime.now());
-        } else {
-            requestHistory.put(userAccount.getEmailAddress(), LocalDateTime.now());
-            requestFrequency.put(userAccount.getEmailAddress(), 0);
-        }
     }
 
     private UserAccount getAccountForInternalAuth(String emailAddress, HttpServletRequest request) {
