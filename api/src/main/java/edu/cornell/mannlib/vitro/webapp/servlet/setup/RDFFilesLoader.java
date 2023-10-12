@@ -52,22 +52,23 @@ public class RDFFilesLoader {
 	private static final String EVERY_TIME = "everytime";
 
 	/**
-	 * Path filter that ignores hidden files and markdown files.
+	 * Path filter that ignores sub-directories, hidden files and markdown
+	 * files.
 	 */
-	private static final DirectoryStream.Filter<Path> RDF_FILE_FILTER = new DirectoryStream.Filter<Path>() {
-		@Override
-		public boolean accept(Path p) throws IOException {
-			if (Files.isHidden(p)) {
-				return false;
-			}
-
-			if (p.toString().endsWith(".md")) {
-				return false;
-			}
-
-			return true;
-		}
-	};
+	private static final DirectoryStream.Filter<Path> RDF_FILE_FILTER = path -> {
+        if (Files.isHidden(path)) {
+            return false;
+        }
+        if (Files.isDirectory(path)) {
+            log.warn("RDF files in subdirectories are not loaded. Directory '"
+                + path + "' ignored.");
+            return false;
+        }
+        if (path.toString().endsWith(".md")) {
+            return false;
+        }
+        return true;
+    };
 
 	/**
 	 * Load the "first time" files if we say it is the first time.
@@ -169,36 +170,59 @@ public class RDFFilesLoader {
 
 	/**
 	 * Find the paths to RDF files in this directory. Hidden
-	 * files, markdown, and non-enabled language files are ignored.
+	 * files, markdown, and non-enabled language files (as well as subdirectories for non-everytime files)
+	 * are ignored.
 	 */
-	private static Set<Path> getPaths(String parentDir, String... strings) {
-		Path dir = Paths.get(parentDir, strings);
+	private static Set<Path> getPaths(String parentDir, String... subDirectories) {
+		Path dir = Paths.get(parentDir, subDirectories);
 
 		Set<Path> paths = new TreeSet<>();
 		if (Files.isDirectory(dir)) {
-			try {
-				Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
-					@Override
-					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-						if (RDF_FILE_FILTER.accept(file)) {
-							paths.add(file);
-						}
-						return FileVisitResult.CONTINUE;
-					}
-
-					@Override
-					public FileVisitResult visitFileFailed(Path file, IOException exc) {
-						return FileVisitResult.CONTINUE;
-					}
-				});
-			} catch (IOException e) {
-				log.warn("Failed to read directory '" + dir + "'", e);
+			if(dir.endsWith(EVERY_TIME)) {
+				loadFilesWithTreeWalker(paths, dir);
+				log.debug("Loading using tree walker: '" + dir + "': " + paths);
+			}
+			else {
+				loadFilesWithDirectoryStream(paths, dir);
+				log.debug("Loading using directory stream: '" + dir + "': " + paths);
 			}
 		} else {
 			log.debug("Directory '" + dir + "' doesn't exist.");
 		}
 		log.debug("Paths from '" + dir + "': " + paths);
 		return paths;
+	}
+
+	private static void loadFilesWithDirectoryStream(Set<Path> paths, Path dir) {
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir,
+			RDF_FILE_FILTER)) {
+			for (Path p : stream) {
+				paths.add(p);
+			}
+		} catch (IOException e) {
+			log.warn("Failed to read directory '" + dir + "'", e);
+		}
+	}
+
+	private static void loadFilesWithTreeWalker(Set<Path> paths, Path dir) {
+		try {
+			Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					if (RDF_FILE_FILTER.accept(file)) {
+						paths.add(file);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFileFailed(Path file, IOException exc) {
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			log.warn("Failed to read everytime directory '" + dir + "'", e);
+		}
 	}
 
 	private static void readOntologyFileIntoModel(Path p, Model model) {
