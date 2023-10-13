@@ -52,6 +52,7 @@ public class LoginWidget extends Widget {
     private static enum TemplateVariable {
         LOGIN_NAME("loginName"),
         FORM_ACTION("formAction"),
+        FORGOT_PASSWORD("forgotPassword"),
         INFO_MESSAGE("infoMessage"),
         ERROR_MESSAGE("errorMessage"),
         EXTERNAL_AUTH_NAME("externalAuthName"),
@@ -134,6 +135,7 @@ public class LoginWidget extends Widget {
         WidgetTemplateValues values = new WidgetTemplateValues(Macro.LOGIN.toString());
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
+        values.put(TemplateVariable.FORGOT_PASSWORD.toString(), getForgotPasswordUrl(request));
 
 		boolean showExternalAuth = StringUtils.isNotBlank(
 				ConfigurationProperties.getBean(request).getProperty(
@@ -230,6 +232,12 @@ public class LoginWidget extends Widget {
         String contextPath = request.getContextPath();
         String urlParams = "?cancel=true";
         return contextPath + "/authenticate" + urlParams;
+    }
+
+    /** What's the password recovery URL for this servlet? */
+    private String getForgotPasswordUrl(HttpServletRequest request) {
+        String contextPath = request.getContextPath();
+        return contextPath + "/forgot-password";
     }
 
 }

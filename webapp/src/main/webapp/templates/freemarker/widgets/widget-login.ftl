@@ -73,7 +73,7 @@
             </div>
         </form>
 
-        <form id="forgotPasswordForm" action="/vivo/forgot-password" method="POST" style="margin-top: 10px;">
+        <form id="forgotPasswordForm" action="${forgotPassword}" method="POST" style="margin-top: 10px;">
             <input type="email" id="email" name="email" style="display: none;" required>
             <button type="submit" class="forgot-password">${i18n().password_reset_label}</button>
         </form>
