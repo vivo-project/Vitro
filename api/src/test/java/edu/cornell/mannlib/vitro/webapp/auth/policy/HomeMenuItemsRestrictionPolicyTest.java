@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
 
-    public static final String MENU_ITEMS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "policy_menu_items_editing.n3";
+    public static final String MENU_ITEMS_POLICY_PATH = PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + "policy_menu_items_editing.n3";
 
     @Test
     public void testHomeMenuItemsRestrictionPolicy() {

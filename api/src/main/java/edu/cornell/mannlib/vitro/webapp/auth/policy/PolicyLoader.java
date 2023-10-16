@@ -66,7 +66,6 @@ public class PolicyLoader {
             + "SELECT DISTINCT ?" + PRIORITY + " \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?" + POLICY  + " rdf:type ao:Policy .\n"
             + "    OPTIONAL {?" + POLICY + " ao:priority ?set_priority" + " . }\n"
             + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n"
             + "  }\n"
@@ -131,38 +130,41 @@ public class PolicyLoader {
             + "SELECT DISTINCT ?rules ?rule ?attribute ?testId ?typeId ?value ?lit_value ?decision_id ?dataSetUri \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "?policy rdf:type ao:Policy .\n"
-            + "?policy ao:rules ?rules . \n"
-            + "?rules rdf:type ao:Rules . \n"
-            + "?rules ao:rule ?rule . \n"
-            + "?rule ao:attribute ?attribute . \n"
-            + "?attribute rdf:type ao:Attribute .\n"
-            + "OPTIONAL {\n"
-            + "  ?attribute ao:operator ?attributeTest .\n"
-            + "  OPTIONAL {\n"
-            + "    ?attributeTest ao:id ?testId . \n"
-            + "  }\n"
-            + "}"
-            + "OPTIONAL {\n"
-            + "  ?attribute ao:type ?attributeType . \n"
-            + "  OPTIONAL {\n"
-            + "    ?attributeType ao:id ?typeId . \n"
-            + "  }\n"
-            + "}\n"
-            + "OPTIONAL {\n"
-            + "   ?rule ao:decision ?decision . \n"
-            + "   ?decision ao:id ?decision_id . \n"
-            + "}\n"
-            + "OPTIONAL {\n"
-            + "   ?attribute ao:setValue ?testData . \n"
-            + "   ?dataSet ao:testData ?testData . \n"
-            + "   ?testData ao:dataValue ?value . \n"
-            + "   OPTIONAL {?value ao:id ?lit_value . }\n"
-            + "}\n"
-            + "OPTIONAL {\n"
-            + "   ?attribute ao:value ?value . \n"
-            + "   OPTIONAL {?value ao:id ?lit_value . }\n"
-            + "}\n" + "BIND(?dataSet as ?dataSetUri)\n"
+            + "    ?policy a ao:PolicyTemplate .\n"
+            + "    ?policy ao:rules ?rules .\n"
+            + "    ?rules rdf:type ao:Rules .\n"
+            + "    ?rules ao:rule ?rule .\n"
+            + "    ?rule ao:attribute ?attribute .\n"
+            + "    ?attribute rdf:type ao:Attribute .\n"
+            + "    OPTIONAL {\n"
+            + "      ?attribute ao:operator ?attributeTest .\n"
+            + "      OPTIONAL {\n"
+            + "        ?attributeTest ao:id ?testId .\n"
+            + "      }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?attribute ao:type ?attributeType .\n"
+            + "      OPTIONAL {\n"
+            + "        ?attributeType ao:id ?typeId .\n"
+            + "      }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "       ?rule ao:decision ?decision .\n"
+            + "       ?decision ao:id ?decision_id .\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "       ?attribute ao:templateValue ?attributeValueSet .\n"
+            + "       ?attributeValueSet a ao:AttributeValueSet .\n"
+            + "       ?attributeValueSet ao:attributeValue ?attributeValue .\n"
+            + "       ?attributeValue ao:dataValue ?value .\n"
+            + "       ?dataSet ao:dataSetValues ?attributeValue .\n"
+            + "       OPTIONAL {?value ao:id ?lit_value . }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "       ?attribute ao:value ?value .\n"
+            + "       OPTIONAL {?value ao:id ?lit_value . }\n"
+            + "    }\n" 
+            + "    BIND(?dataSet as ?dataSetUri)\n"
             + "  }\n"
             + "} ORDER BY ?rule ?attribute";
 
@@ -264,7 +266,8 @@ public class PolicyLoader {
 
         return policyUris;
     }
-
+    
+    @Deprecated
     public DynamicPolicy loadPolicy(String uri) {
         List<String> dataSetNames = getDataSetNames(uri);
         Set<AccessRule> rules = new HashSet<>();
@@ -284,6 +287,31 @@ public class PolicyLoader {
             return null;
         }
         DynamicPolicy policy = new DynamicPolicy(uri, priority);
+        policy.addRules(rules);
+        return policy;
+    }
+    
+    public DynamicPolicy loadPolicyWithDataSet(String uri, String dataSetUri) {
+        Set<AccessRule> rules = new HashSet<>();
+        long priority = getPriority(uri);
+        try {
+            if (dataSetUri == null) {
+                loadRulesWithoutDataSet(uri, rules);
+            } else {
+                loadRulesForDataSet(uri, rules, dataSetUri);
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+            return null;
+        }
+        if (rules.isEmpty()) {
+            return null;
+        }
+        String policyUri = uri;
+        if (dataSetUri != null) {
+            policyUri += "+" + dataSetUri;
+        }
+        DynamicPolicy policy = new DynamicPolicy(policyUri, priority);
         policy.addRules(rules);
         return policy;
     }

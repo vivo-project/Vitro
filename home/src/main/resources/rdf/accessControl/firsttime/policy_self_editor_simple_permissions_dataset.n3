@@ -9,7 +9,7 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 
-ai:SelfEditorSimplePermissionsTestData 
+ai:SelfEditorSimplePermissionValueContainer
         # permissions for ANY logged-in user.
         ao:dataValue simplePermission:DoFrontEndEditing ;
         ao:dataValue simplePermission:EditOwnAccount ;
