@@ -13,6 +13,9 @@
 
 #### Classes
 
+ao:PolicyTemplate rdf:type owl:Class ;
+     rdfs:label "Access rule policy template"@en-US .
+
 ao:Policy rdf:type owl:Class ;
      rdfs:label "Access rule policy"@en-US .
 

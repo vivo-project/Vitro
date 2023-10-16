@@ -23,7 +23,7 @@ public class NonModifiableStatementsPolicyTest extends PolicyTest {
 
     @Test
     public void testNonModifiableStatementsPolicy() {
-        load(USER_ACCOUNTS_HOME_EVERYTIME + NOT_MODIFIABLE_STATEMENTS_POLICY_PATH + EXT);
+        load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + NOT_MODIFIABLE_STATEMENTS_POLICY_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + NOT_MODIFIABLE_STATEMENTS_POLICY_PATH + DATASET + EXT);
 
         String policyUri =

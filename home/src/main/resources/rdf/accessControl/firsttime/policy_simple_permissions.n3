@@ -1,0 +1,138 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+
+ai:SimplePermissionTemplatePolicy a ao:PolicyTemplate ;
+    ao:priority 1000 ;
+    ao:policyDataSets ai:SimplePermissionDataSets ;
+    ao:rules ai:SimplePermissionRuleSet .
+
+ai:SimplePermissionDataSets a ao:PolicyDataSets ;
+    ao:policyDataSetTemplate ai:SimplePermissionDataSetTemplate ;
+    ao:policyDataSet ai:PublicSimplePermissionDataSet ;
+    ao:policyDataSet ai:SelfEditorSimplePermissionDataSet ;
+    ao:policyDataSet ai:EditorSimplePermissionDataSet ;
+    ao:policyDataSet ai:CuratorSimplePermissionDataSet ;
+    ao:policyDataSet ai:AdminSimplePermissionDataSet .
+
+ai:SimplePermissionDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetKeyTemplate ai:SimplePermissionDataSetKeyTemplate ;
+    ao:testDataTemplate ai:SimplePermissionRoleTestDataTemplate ;
+    ao:testDataTemplate ai:SimplePermissionTypesTestDataTemplate .  
+
+ai:SimplePermissionDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+ai:SimplePermissionRoleTestDataTemplate a ao:TestDataTemplate ;
+    ao:usedInAttributeValueSet ai:SimplePermissionRoleValueSet;
+    ao:dataValueTemplate ai:SubjectRole .
+
+ai:SimplePermissionTypesTestDataTemplate a ao:TestDataTemplate ;
+    ao:usedInAttributeValueSet ai:SimplePermissionTypeValueSet;
+    ao:dataValueTemplate ai:NamedObject .
+
+ai:PublicSimplePermissionDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey ai:PublicSimplePermissionDataSetKey ;
+    ao:dataSetValues ai:PublicRoleValueContainer ;
+    ao:dataSetValues ai:PublicSimplePermissionValueContainer .
+
+ai:PublicSimplePermissionDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponent auth:PUBLIC .
+
+ai:SelfEditorSimplePermissionDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey ai:SelfEditorSimplePermissionDataSetKey ;
+    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
+    ao:dataSetValues ai:SelfEditorSimplePermissionValueContainer .
+
+ai:SelfEditorSimplePermissionDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponent auth:SELF_EDITOR .
+
+ai:EditorSimplePermissionDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey ai:EditorSimplePermissionDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:EditorSimplePermissionValueContainer .
+
+ai:EditorSimplePermissionDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponent auth:EDITOR .
+
+ai:CuratorSimplePermissionDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey ai:CuratorSimplePermissionDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:CuratorSimplePermissionValueContainer .
+
+ai:CuratorSimplePermissionDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponent auth:CURATOR .
+
+ai:AdminSimplePermissionDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey ai:AdminSimplePermissionDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:AdminSimplePermissionValueContainer .
+
+ai:AdminSimplePermissionDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponent auth:ADMIN .
+
+ai:SimplePermissionRuleSet a ao:Rules ;
+    ao:rule ai:AllowSimplePermission .
+      
+ai:AllowSimplePermission a ao:Rule;
+    ao:attribute ai:NamedObjectTypeAttribute ;
+    ao:attribute ai:PermissionNameAllowed ;
+    ao:attribute ai:SubjectRoleEqualsRoleAttribute .
+      
+ai:PermissionNameAllowed a ao:Attribute ;
+    ao:operator ai:OneOf ;
+    ao:type ai:AccessObjectUri ;
+    ao:templateValue ai:SimplePermissionTypeValueSet .
+
+ai:SimplePermissionTypeValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:PublicSimplePermissionValueContainer ;
+    ao:attributeValue ai:SelfEditorSimplePermissionValueContainer ;
+    ao:attributeValue ai:EditorSimplePermissionValueContainer ;
+    ao:attributeValue ai:CuratorSimplePermissionValueContainer ;
+    ao:attributeValue ai:AdminSimplePermissionValueContainer .
+
+ai:PublicSimplePermissionValueContainer a ao:ValueContainer .
+ai:SelfEditorSimplePermissionValueContainer a ao:ValueContainer .
+ai:EditorSimplePermissionValueContainer a ao:ValueContainer .
+ai:CuratorSimplePermissionValueContainer a ao:ValueContainer .
+ai:AdminSimplePermissionValueContainer a ao:ValueContainer .
+
+ai:SubjectRoleEqualsRoleAttribute a ao:Attribute ;
+    ao:operator ai:Equals ;
+    ao:type ai:SubjectRole ;
+    ao:templateValue ai:SimplePermissionRoleValueSet .
+
+ai:SimplePermissionRoleValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:PublicRoleValueContainer ;
+    ao:attributeValue ai:SelfEditorRoleValueContainer ;
+    ao:attributeValue ai:EditorRoleValueContainer ;
+    ao:attributeValue ai:CuratorRoleValueContainer ;
+    ao:attributeValue ai:AdminRoleValueContainer .
+
+ai:PublicRoleValueContainer a ao:ValueContainer ;
+    ao:dataValue auth:PUBLIC .
+
+ai:SelfEditorRoleValueContainer a ao:ValueContainer ;
+    ao:dataValue auth:SELF_EDITOR .
+
+ai:EditorRoleValueContainer a ao:ValueContainer ;
+    ao:dataValue auth:EDITOR .
+
+ai:CuratorRoleValueContainer a ao:ValueContainer ;
+    ao:dataValue auth:CURATOR .
+
+ai:AdminRoleValueContainer a ao:ValueContainer ;
+    ao:dataValue auth:ADMIN .

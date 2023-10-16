@@ -25,179 +25,177 @@ import org.junit.Before;
 public class PolicyTest {
     public static final String USER_ACCOUNTS_HOME_FIRSTTIME = "../home/src/main/resources/rdf/accessControl/firsttime/";
 
-    public static final String USER_ACCOUNTS_HOME_EVERYTIME = USER_ACCOUNTS_HOME_FIRSTTIME;
-
     protected static final String ROLE_ADMIN_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN";
     protected static final String ROLE_EDITOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR";
     protected static final String ROLE_SELF_EDITOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR";
     protected static final String ROLE_CURATOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR";
     protected static final String ROLE_PUBLIC_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
 
-    public static final String ONTOLOGY_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "ontology.n3";
-    public static final String ATTRIBUTES_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "attributes.n3";
-    public static final String OPERATIONS_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "operations.n3";
-    public static final String OPERATION_GROUPS = USER_ACCOUNTS_HOME_EVERYTIME + "operation_groups.n3";
-    public static final String SUBJECT_TYPES = USER_ACCOUNTS_HOME_EVERYTIME + "subject_types.n3";
-    public static final String OBJECT_TYPES = USER_ACCOUNTS_HOME_EVERYTIME + "object_types.n3";
-    public static final String ATTRIBUTE_TYPES_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "attribute_types.n3";
-    public static final String OPERATORS_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "operators.n3";
-    public static final String TEST_VALUES_PATH = USER_ACCOUNTS_HOME_EVERYTIME + "test_values.n3";
-    public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_EVERYTIME + "decisions.n3";
+    public static final String ONTOLOGY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "ontology.n3";
+    public static final String ATTRIBUTES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "attributes.n3";
+    public static final String OPERATIONS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operations.n3";
+    public static final String OPERATION_GROUPS = USER_ACCOUNTS_HOME_FIRSTTIME + "operation_groups.n3";
+    public static final String SUBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "subject_types.n3";
+    public static final String OBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "object_types.n3";
+    public static final String ATTRIBUTE_TYPES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "attribute_types.n3";
+    public static final String OPERATORS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operators.n3";
+    public static final String TEST_VALUES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "test_values.n3";
+    public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_FIRSTTIME + "decisions.n3";
 
-    public static final String ADMIN_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_display_object_property.n3";
-    public static final String ADMIN_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_display_data_property.n3";
-    public static final String ADMIN_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_display_class.n3";
 
-    public static final String CURATOR_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_display_object_property.n3";
-    public static final String CURATOR_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_display_data_property.n3";
-    public static final String CURATOR_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_display_class.n3";
 
-    public static final String PUBLIC_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_display_object_property.n3";
-    public static final String PUBLIC_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_display_data_property.n3";
-    public static final String PUBLIC_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_display_class.n3";
 
-    public static final String SELF_EDITOR_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_display_object_property.n3";
-    public static final String SELF_EDITOR_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_display_data_property.n3";
-    public static final String SELF_EDITOR_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_display_class.n3";
 
-    public static final String EDITOR_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_DISPLAY_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_display_object_property.n3";
-    public static final String EDITOR_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_DISPLAY_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_display_data_property.n3";
-    public static final String EDITOR_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_DISPLAY_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_display_class.n3";
     // Update
-    public static final String ADMIN_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_update_object_property.n3";
-    public static final String ADMIN_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_update_data_property.n3";
-    public static final String ADMIN_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_update_class.n3";
 
-    public static final String CURATOR_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_update_object_property.n3";
-    public static final String CURATOR_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_update_data_property.n3";
-    public static final String CURATOR_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_update_class.n3";
 
-    public static final String PUBLIC_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_update_object_property.n3";
-    public static final String PUBLIC_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_update_data_property.n3";
-    public static final String PUBLIC_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_update_class.n3";
 
-    public static final String SELF_EDITOR_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_update_object_property.n3";
-    public static final String SELF_EDITOR_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_update_data_property.n3";
-    public static final String SELF_EDITOR_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_update_class.n3";
 
-    public static final String EDITOR_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_UPDATE_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_update_object_property.n3";
-    public static final String EDITOR_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_UPDATE_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_update_data_property.n3";
-    public static final String EDITOR_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_UPDATE_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_update_class.n3";
     // Publish
-    public static final String ADMIN_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_publish_object_property.n3";
-    public static final String ADMIN_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_publish_data_property.n3";
-    public static final String ADMIN_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_publish_class.n3";
 
-    public static final String CURATOR_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_publish_object_property.n3";
-    public static final String CURATOR_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_publish_data_property.n3";
-    public static final String CURATOR_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_publish_class.n3";
 
-    public static final String SELF_EDITOR_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_publish_object_property.n3";
-    public static final String SELF_EDITOR_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_publish_data_property.n3";
-    public static final String SELF_EDITOR_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_publish_class.n3";
 
-    public static final String EDITOR_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_PUBLISH_OBJ_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_publish_object_property.n3";
-    public static final String EDITOR_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_PUBLISH_DATA_PROP_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_publish_data_property.n3";
-    public static final String EDITOR_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_PUBLISH_CLASS_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_publish_class.n3";
 
-    public static final String ADMIN_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_display_faux_object_property.n3";
-    public static final String CURATOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_display_faux_object_property.n3";
-    public static final String EDITOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_display_faux_object_property.n3";
-    public static final String SELF_EDITOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_display_faux_object_property.n3";
-    public static final String PUBLIC_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_display_faux_object_property.n3";
 
-    public static final String ADMIN_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_publish_faux_object_property.n3";
-    public static final String CURATOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_publish_faux_object_property.n3";
-    public static final String EDITOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_publish_faux_object_property.n3";
-    public static final String SELF_EDITOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_publish_faux_object_property.n3";
 
-    public static final String ADMIN_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_update_faux_object_property.n3";
-    public static final String CURATOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_update_faux_object_property.n3";
-    public static final String EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_update_faux_object_property.n3";
-    public static final String SELF_EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_update_faux_object_property.n3";
 
-    public static final String ADMIN_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_display_faux_data_property.n3";
-    public static final String CURATOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_display_faux_data_property.n3";
-    public static final String EDITOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_display_faux_data_property.n3";
-    public static final String SELF_EDITOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_display_faux_data_property.n3";
-    public static final String PUBLIC_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String PUBLIC_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_public_display_faux_data_property.n3";
 
-    public static final String ADMIN_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_publish_faux_data_property.n3";
-    public static final String CURATOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_publish_faux_data_property.n3";
-    public static final String EDITOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_publish_faux_data_property.n3";
-    public static final String SELF_EDITOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_publish_faux_data_property.n3";
 
-    public static final String ADMIN_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String ADMIN_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_admin_update_faux_data_property.n3";
-    public static final String CURATOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String CURATOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_curator_update_faux_data_property.n3";
-    public static final String EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_editor_update_faux_data_property.n3";
-    public static final String SELF_EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_EVERYTIME
+    public static final String SELF_EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME
             + "policy_self_editor_update_faux_data_property.n3";
 
     protected static final String RESOURCES_PREFIX = "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/rules/";
