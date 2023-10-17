@@ -47,14 +47,14 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 	private String makeDeleteUrl() {
         // Determine whether the statement can be deleted
 		DataPropertyStatement dps = makeStatement();
-        AccessObject action;
+        AccessObject ao;
         if (isFaux()) {
-            action = new FauxDataPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, literalValue.getLexicalForm());
+            ao = new FauxDataPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, literalValue.getLexicalForm());
         } else {
-            action = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), dps);
+            ao = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), dps);
         }
         
-        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action, AccessOperation.DROP) ) {
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DROP) ) {
             return "";
         }
         
