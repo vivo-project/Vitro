@@ -32,12 +32,12 @@ public class PolicyTest {
     protected static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
 
     public static final String ONTOLOGY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "ontology.n3";
-    public static final String ATTRIBUTES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "attributes.n3";
+    public static final String CHECKS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "checks.n3";
     public static final String OPERATIONS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operations.n3";
     public static final String OPERATION_GROUPS = USER_ACCOUNTS_HOME_FIRSTTIME + "operation_groups.n3";
     public static final String SUBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "subject_types.n3";
     public static final String OBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "object_types.n3";
-    public static final String ATTRIBUTE_TYPES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "attribute_types.n3";
+    public static final String CHECK_TYPES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "check_types.n3";
     public static final String OPERATORS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operators.n3";
     public static final String TEST_VALUES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "test_values.n3";
     public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_FIRSTTIME + "decisions.n3";
@@ -69,12 +69,12 @@ public class PolicyTest {
         accessControlModel = ModelFactory.createDefaultModel();
         configurationDataSet = DatasetFactory.createTxnMem();
         configurationDataSet.addNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
-        load(ATTRIBUTES_PATH);
+        load(CHECKS_PATH);
         load(OPERATIONS_PATH);
         load(OPERATION_GROUPS);
         load(SUBJECT_TYPES);
         load(OBJECT_TYPES);
-        load(ATTRIBUTE_TYPES_PATH);
+        load(CHECK_TYPES_PATH);
         load(OPERATORS_PATH);
         load(TEST_VALUES_PATH);
         load(TEST_DECISIONS);

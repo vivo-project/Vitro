@@ -21,8 +21,8 @@ import org.apache.commons.logging.LogFactory;
 
 public class AccessRuleImpl implements AccessRule {
     private static final Log log = LogFactory.getLog(AccessRuleImpl.class);
-    protected Map<String, Check> attributeMap = new HashMap<>();
-    protected List<Check> attributes = new ArrayList<Check>();
+    protected Map<String, Check> checksMap = new HashMap<>();
+    protected List<Check> checks = new ArrayList<Check>();
     private static final Comparator<Check> comparator = getAttributeComparator();
 
     private boolean allowMatched = true;
@@ -45,14 +45,14 @@ public class AccessRuleImpl implements AccessRule {
     }
 
     public List<Check> getChecks() {
-        return attributes;
+        return checks;
     }
 
     public boolean match(AuthorizationRequest ar) {
-        for (Check attribute : attributes) {
-            if (!attribute.check(ar)) {
+        for (Check check : checks) {
+            if (!check.check(ar)) {
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Attribute %s didn't match", attribute.getUri()));
+                    log.debug(String.format("Check %s didn't match", check.getUri()));
                 }
                 return false;
             }
@@ -61,12 +61,12 @@ public class AccessRuleImpl implements AccessRule {
     }
 
     public void addCheck(Check attr) {
-        if (attributeMap.containsKey(attr.getUri())) {
-            log.error(String.format("attribute %s already exists in the rule", attr.getUri()));
+        if (checksMap.containsKey(attr.getUri())) {
+            log.error(String.format("Check %s already exists in the rule", attr.getUri()));
         }
-        attributes.add(attr);
-        Collections.sort(attributes, comparator);
-        attributeMap.put(attr.getUri(), attr);
+        checks.add(attr);
+        Collections.sort(checks, comparator);
+        checksMap.put(attr.getUri(), attr);
     }
 
     @Override
@@ -94,11 +94,11 @@ public class AccessRuleImpl implements AccessRule {
     }
 
     public Set<String> getCheckUris() {
-        return attributeMap.keySet();
+        return checksMap.keySet();
     }
 
     public boolean containsCheckUri(String uri) {
-        return attributeMap.containsKey(uri);
+        return checksMap.containsKey(uri);
     }
 
     public Set<Check> getChecksByType(Attribute type) {
@@ -106,11 +106,11 @@ public class AccessRuleImpl implements AccessRule {
     }
 
     public long getChecksCount() {
-        return attributes.size();
+        return checks.size();
     }
 
     public Check getCheck(String uri) {
-        return attributeMap.get(uri);
+        return checksMap.get(uri);
     }
 
     private static Comparator<Check> getAttributeComparator() {
