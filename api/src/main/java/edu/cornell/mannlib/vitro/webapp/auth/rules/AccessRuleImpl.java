@@ -44,7 +44,7 @@ public class AccessRuleImpl implements AccessRule {
         this.ruleUri = ruleUri;
     }
 
-    public List<Check> getAttributes() {
+    public List<Check> getChecks() {
         return attributes;
     }
 
@@ -60,7 +60,7 @@ public class AccessRuleImpl implements AccessRule {
         return true;
     }
 
-    public void addAttribute(Check attr) {
+    public void addCheck(Check attr) {
         if (attributeMap.containsKey(attr.getUri())) {
             log.error(String.format("attribute %s already exists in the rule", attr.getUri()));
         }
@@ -81,35 +81,35 @@ public class AccessRuleImpl implements AccessRule {
 
         return new EqualsBuilder()
                 .append(getRuleUri(), compared.getRuleUri())
-                .append(getAttributes(), compared.getAttributes())
+                .append(getChecks(), compared.getChecks())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(15, 101)
-                .append(getAttributes())
+                .append(getChecks())
                 .append(getRuleUri())
                 .toHashCode();
     }
 
-    public Set<String> getAttributeUris() {
+    public Set<String> getCheckUris() {
         return attributeMap.keySet();
     }
 
-    public boolean containsAttributeUri(String uri) {
+    public boolean containsCheckUri(String uri) {
         return attributeMap.containsKey(uri);
     }
 
-    public Set<Check> getAttributesByType(Attribute type) {
-        return getAttributes().stream().filter(a -> a.getAttributeType().equals(type)).collect(Collectors.toSet());
+    public Set<Check> getChecksByType(Attribute type) {
+        return getChecks().stream().filter(a -> a.getAttributeType().equals(type)).collect(Collectors.toSet());
     }
 
-    public long getAttributesCount() {
+    public long getChecksCount() {
         return attributes.size();
     }
 
-    public Check getAttribute(String uri) {
+    public Check getCheck(String uri) {
         return attributeMap.get(uri);
     }
 

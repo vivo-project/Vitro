@@ -1,6 +1,7 @@
 <%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
-<%  /***********************************************
+<%
+/***********************************************
      A JSP for displaying a simple message.
      This JSP is intened to be wraped by basicPage.jsp
 
@@ -10,13 +11,13 @@
      bdc34 2009-02-03 created
      **********************************************/
 
-     if (request.getAttribute("msg") == null ){
+     if (request.getCheck("msg") == null ){
          throw new JspException(
-                 "bodyMsg.jsp expects that request parameter 'msg' be set to"
-                 + " the message for the page.\n"
+         "bodyMsg.jsp expects that request parameter 'msg' be set to"
+         + " the message for the page.\n"
           );
      }
    // only get the msg from the attributes, because of cross site exploits,
    // never from the parameters.
-   out.print( (String)request.getAttribute("msg") );
+   out.print( (String)request.getCheck("msg") );
 %>

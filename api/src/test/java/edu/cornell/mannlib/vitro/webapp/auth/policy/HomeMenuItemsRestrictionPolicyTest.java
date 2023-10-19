@@ -26,7 +26,7 @@ public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
         assertTrue(policy.getRules().size() > 0);
         final AccessRule rule = policy.getRules().iterator().next();
         assertEquals(false, rule.isAllowMatched());
-        assertEquals(4, rule.getAttributesCount());
+        assertEquals(4, rule.getChecksCount());
 
         AccessObject ao = new ObjectPropertyStatementAccessObject(null, null,
                 new Property("http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem"),

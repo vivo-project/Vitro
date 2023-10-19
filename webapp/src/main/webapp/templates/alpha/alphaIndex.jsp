@@ -32,7 +32,9 @@
          </c:if>
     </c:forEach>
 
-    <%  if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)request.getAttribute("alpha"))) {  %>
+    <%
+    if( request.getCheck("alpha") != null && ! "all".equalsIgnoreCase((String)request.getCheck("alpha"))) {
+    %>
         <a href='<c:url value=".${requestScope.servlet}?&amp;alpha=all&amp;${requestScope.controllerParam}"/>'>all </a>
         <c:if test='${not empty requestScope.count }'>
             (${requestScope.count} that start with ${requestScope.alpha })

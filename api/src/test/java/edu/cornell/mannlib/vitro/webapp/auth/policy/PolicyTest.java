@@ -96,15 +96,15 @@ public class PolicyTest {
         }
         assertEquals(ruleCount, ruleMap.size());
         for (AccessRule ar : ruleMap.values()) {
-            if (!attrCount.contains(ar.getAttributes().size())) {
-                log.error(String.format("Attribute count %s doesn't match for policy %s", ar.getAttributes().size(),
+            if (!attrCount.contains(ar.getChecks().size())) {
+                log.error(String.format("Attribute count %s doesn't match for policy %s", ar.getChecks().size(),
                         policy.getUri()));
-                for (String att : ar.getAttributeUris()) {
+                for (String att : ar.getCheckUris()) {
                     log.error(String.format("Attribute uri %s", att));
                 }
             }
-            assertTrue(attrCount.contains(ar.getAttributes().size()));
-            for (Check att : ar.getAttributes()) {
+            assertTrue(attrCount.contains(ar.getChecks().size()));
+            for (Check att : ar.getChecks()) {
                 assertTrue(att.getValues().size() > 0);
             }
         }
