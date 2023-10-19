@@ -114,33 +114,33 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rules ?rule ?attribute ?testId ?typeId ?value ?lit_value ?decision_id \n" + "WHERE {\n"
+            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id \n" + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "?policy rdf:type ao:Policy .\n"
             + "?policy ao:rules ?rules . \n"
             + "?rules ao:rule ?rule . \n"
-            + "?rule ao:check ?attribute .\n"
+            + "?rule ao:check ?check .\n"
             + "OPTIONAL {\n"
-            + "  ?attribute ao:operator ?attributeTest .\n"
+            + "  ?check ao:operator ?checkTest .\n"
             + "  OPTIONAL {\n"
-            + "    ?attributeTest ao:id ?testId . \n"
+            + "    ?checkTest ao:id ?testId . \n"
             + "  }\n"
             + "}"
             + "OPTIONAL {\n"
-            + "  ?attribute ao:type ?attributeType . \n"
+            + "  ?check ao:type ?checkType . \n"
             + "  OPTIONAL {\n"
-            + "    ?attributeType ao:id ?typeId . \n"
+            + "    ?checkType ao:id ?typeId . \n"
             + "  }\n"
             + "}\n"
             + "OPTIONAL {\n"
             + "   ?rule ao:decision ?decision . \n"
             + "   ?decision ao:id ?decision_id . \n"
             + "}\n"
-            + "?attribute ao:value ?value . \n"
+            + "?check ao:value ?value . \n"
             + "OPTIONAL {?value ao:id ?lit_value . }\n"
             + "  }\n"
             + "BIND(?policy as ?policyUri)\n"
-            + "} ORDER BY ?rule ?attribute";
+            + "} ORDER BY ?rule ?check";
 
     private static final String DATASET_RULES_QUERY = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "prefix owl: <http://www.w3.org/2002/07/owl#>\n"
@@ -149,7 +149,7 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rules ?rule ?attribute ?testId ?typeId ?value ?lit_value ?decision_id ?dataSetUri \n"
+            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id ?dataSetUri \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policy a ao:PolicyTemplate .\n"
@@ -158,18 +158,18 @@ public class PolicyLoader {
             + "    ?policyDataSets ao:policyDataSet ?dataSet .\n"
             + "    ?rules rdf:type ao:Rules .\n"
             + "    ?rules ao:rule ?rule .\n"
-            + "    ?rule ao:check ?attribute .\n"
-            + "    ?attribute rdf:type ao:Check .\n"
+            + "    ?rule ao:check ?check .\n"
+            + "    ?check rdf:type ao:Check .\n"
             + "    OPTIONAL {\n"
-            + "      ?attribute ao:operator ?attributeTest .\n"
+            + "      ?check ao:operator ?checkTest .\n"
             + "      OPTIONAL {\n"
-            + "        ?attributeTest ao:id ?testId .\n"
+            + "        ?checkTest ao:id ?testId .\n"
             + "      }\n"
             + "    }\n"
             + "    OPTIONAL {\n"
-            + "      ?attribute ao:type ?attributeType .\n"
+            + "      ?check ao:type ?checkType .\n"
             + "      OPTIONAL {\n"
-            + "        ?attributeType ao:id ?typeId .\n"
+            + "        ?checkType ao:id ?typeId .\n"
             + "      }\n"
             + "    }\n"
             + "    OPTIONAL {\n"
@@ -177,7 +177,7 @@ public class PolicyLoader {
             + "       ?decision ao:id ?decision_id .\n"
             + "    }\n"
             + "    OPTIONAL {\n"
-            + "       ?attribute ao:templateValue ?attributeValueSet .\n"
+            + "       ?check ao:templateValue ?attributeValueSet .\n"
             + "       ?attributeValueSet a ao:AttributeValueSet .\n"
             + "       ?attributeValueSet ao:attributeValue ?attributeValue .\n"
             + "       ?attributeValue ao:dataValue ?value .\n"
@@ -185,13 +185,13 @@ public class PolicyLoader {
             + "       OPTIONAL {?value ao:id ?lit_value . }\n"
             + "    }\n"
             + "    OPTIONAL {\n"
-            + "       ?attribute ao:value ?value .\n"
+            + "       ?check ao:value ?value .\n"
             + "       OPTIONAL {?value ao:id ?lit_value . }\n"
             + "    }\n" 
             + "    BIND(?dataSet as ?dataSetUri)\n"
             + "    BIND(?policy as ?policyUri)\n"
             + "  }\n"
-            + "} ORDER BY ?rule ?attribute";
+            + "} ORDER BY ?rule ?check";
 
     private static final String policyKeyTemplatePrefix =
               "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -244,7 +244,7 @@ public class PolicyLoader {
     public static final String RULE = "rule";
     public static final String LITERAL_VALUE = "lit_value";
     public static final String ATTR_VALUE = "value";
-    public static final String CHECK = "attribute";
+    public static final String CHECK = "check";
     public static final String TEST_ID = "testId";
     public static final String TYPE_ID = "typeId";
     private static PolicyLoader INSTANCE;
@@ -679,7 +679,7 @@ public class PolicyLoader {
         if (ar == null) {
             return;
         }
-        String checkUri = qs.getResource("attribute").getURI();
+        String checkUri = qs.getResource("check").getURI();
         if (ar.containsCheckUri(checkUri)) {
             CheckFactory.extendAttribute(ar.getCheck(checkUri), qs);
             return;
@@ -706,21 +706,21 @@ public class PolicyLoader {
             return true;
         }
         String rule = qs.get("rule").asResource().getLocalName();
-        if (!qs.contains("attribute") || !qs.get("attribute").isResource()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain attribute uri", policy));
+        if (!qs.contains("check") || !qs.get("check").isResource()) {
+            log.error(String.format("Query solution for policy <%s> doesn't contain check uri", policy));
             return true;
         }
-        String attribute = qs.get("attribute").asResource().getLocalName();
+        String check = qs.get("check").asResource().getLocalName();
         if (!qs.contains("value")) {
-            log.error(String.format("Query solution for policy <%s> rule %s attribute %s doesn't contain value", policy, rule, attribute));
+            log.error(String.format("Query solution for policy <%s> rule %s check %s doesn't contain value", policy, rule, check));
             return true;
         }
         if (!qs.contains("typeId") || !qs.get("typeId").isLiteral()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain attribute type id", policy));
+            log.error(String.format("Query solution for policy <%s> doesn't contain check type id", policy));
             return true;
         }
         if (!qs.contains("testId") || !qs.get("testId").isLiteral()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain attribute test id", policy));
+            log.error(String.format("Query solution for policy <%s> doesn't contain check test id", policy));
             return true;
         }
         return false;
