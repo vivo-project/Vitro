@@ -12,8 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import arq.query;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
@@ -359,7 +359,7 @@ public class PolicyLoader {
         return priority[0];
     }
 
-    public Set<String> getDataSetValues(OperationGroup og, AccessObjectType aot, String role) {
+    public Set<String> getDataSetValues(AccessOperation og, AccessObjectType aot, String role) {
         Set<String> values = new HashSet<>();
         long expectedSize = 3;
         String queryText = getPolicyTestValuesByKeyQuery(new String[] { role },
@@ -424,7 +424,7 @@ public class PolicyLoader {
         return uri[0];
     }
 
-    public String getEntityPolicyTestDataValue(OperationGroup og, AccessObjectType aot, String role) {
+    public String getEntityPolicyTestDataValue(AccessOperation og, AccessObjectType aot, String role) {
         String[] valueUri = new String[1];
         long expectedSize = 3;
         final String queryText = getPolicyTestValuesByKeyQuery(new String[] { role },
@@ -452,7 +452,7 @@ public class PolicyLoader {
         return valueUri[0];
     }
 
-    public void modifyPolicyDataSetValue(String entityUri, OperationGroup og, AccessObjectType aot, String role,
+    public void modifyPolicyDataSetValue(String entityUri, AccessOperation og, AccessObjectType aot, String role,
             boolean isAdd) {
         String queryText = getPolicyDataSetValueStatementByKeyQuery(entityUri, new String[] { role },
                 new String[] { og.toString(), aot.toString() });
@@ -732,11 +732,11 @@ public class PolicyLoader {
         }
     }
 
-    public void addEntityToPolicyDataSet(String entityUri, AccessObjectType aot, OperationGroup og, String role) {
+    public void addEntityToPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation og, String role) {
         modifyPolicyDataSetValue(entityUri, og, aot, role, true);
     }
 
-    public void removeEntityFromPolicyDataSet(String entityUri, AccessObjectType aot, OperationGroup og, String role) {
+    public void removeEntityFromPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation og, String role) {
         modifyPolicyDataSetValue(entityUri, og, aot, role, false);
     }
 
@@ -747,7 +747,7 @@ public class PolicyLoader {
         return cs;
     }
 
-    public String getDataSetUriByKey(OperationGroup og, AccessObjectType aot, String role) {
+    public String getDataSetUriByKey(AccessOperation og, AccessObjectType aot, String role) {
         long expectedSize = 3;
         final String queryText = getPolicyTestValuesByKeyQuery(new String[] { role },
                 new String[] { og.toString(), aot.toString() });

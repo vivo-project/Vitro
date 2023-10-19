@@ -92,7 +92,7 @@ public class AuthMigrator implements ServletContextListener {
             Map<OperationGroup, Set<String>> groupMap = configs.get(entityUri);
             for (OperationGroup og : groupMap.keySet()) {
                 Set<String> rolesToAdd = groupMap.get(og);
-                EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToAdd, additions);
+               // EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToAdd, additions);
                 Set<String> rolesToRemove = new HashSet<>(ALL_ROLES);
                 rolesToRemove.removeAll(rolesToAdd);
                 // Don't remove public publish and update data sets, as there are no public policies for that operation
@@ -100,7 +100,7 @@ public class AuthMigrator implements ServletContextListener {
                 if (OperationGroup.PUBLISH_GROUP.equals(og) || OperationGroup.UPDATE_GROUP.equals(og)) {
                     rolesToRemove.remove(ROLE_PUBLIC_URI);
                 }
-                EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToRemove, removals);
+               // EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToRemove, removals);
                 log.debug(
                         String.format("Updated entity %s dataset for operation group %s access object type %s roles %s",
                                 entityUri, og, aot, rolesToAdd));

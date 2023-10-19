@@ -142,8 +142,4 @@ ai:FauxDataPropertyTypeAttribute rdf:type ao:Attribute ;
          ao:type ai:AccessObjectType ;
          ao:value ai:FauxDataPropertyAccesObject .
 
-ai:SelfEditorRelatedResourcesAttribute rdf:type ao:Attribute ;
-         ao:operator ai:SparqlSelectQueryContains ;
-         ao:type ai:StatementSubjectUri ;
-         ao:value ai:PersonProfileProximityToResourceUri .
          

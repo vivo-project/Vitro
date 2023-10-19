@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -29,7 +29,7 @@ public class EntityPolicyController {
      * @param selectedRoles - list of roles to assign
      * @param allRoles - list of all available roles
      */
-    public static void updateEntityPolicyDataSet(String entityUri, AccessObjectType aot, OperationGroup og,
+    public static void updateEntityPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation og,
             List<String> selectedRoles, List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {
             return;
@@ -58,7 +58,7 @@ public class EntityPolicyController {
         }
     }
 
-    public static List<String> getGrantedRoles(String entityUri, OperationGroup og, AccessObjectType aot,
+    public static List<String> getGrantedRoles(String entityUri, AccessOperation og, AccessObjectType aot,
             List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {
             return Collections.emptyList();
@@ -72,15 +72,15 @@ public class EntityPolicyController {
         return grantedRoles;
     }
 
-    public static void getDataValueStatements(String entityUri, AccessObjectType aot, OperationGroup og,
+    public static void getDataValueStatements(String entityUri, AccessObjectType aot, AccessOperation ao,
             Set<String> selectedRoles, StringBuilder sb) {
         if (StringUtils.isBlank(entityUri)) {
             return;
         }
         for (String role : selectedRoles) {
-            String testDataUri = getPolicyTestDataUri(aot, og, role);
+            String testDataUri = getPolicyTestDataUri(aot, ao, role);
             if (testDataUri == null) {
-                log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", og, aot, role));
+                log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
                 continue;
             }
             sb.append("<").append(testDataUri)
@@ -103,12 +103,12 @@ public class EntityPolicyController {
         log.debug("Nothing to do " + newObj);
     }
 
-    private static boolean isUriInTestDataset(String entityUri, OperationGroup og, AccessObjectType aot, String role) {
+    private static boolean isUriInTestDataset(String entityUri, AccessOperation og, AccessObjectType aot, String role) {
         Set<String> values = PolicyLoader.getInstance().getDataSetValues(og, aot, role);
         return values.contains(entityUri);
     }
 
-    private static String getPolicyTestDataUri(AccessObjectType aot, OperationGroup og, String role) {
+    private static String getPolicyTestDataUri(AccessObjectType aot, AccessOperation og, String role) {
         String key = aot.toString() + "." + og.toString() + "." + role;
         if (policyKeyToDataValueMap.containsKey(key)) {
             return policyKeyToDataValueMap.get(key);

@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public enum AccessOperation {
     EXECUTE,
     PUBLISH,
@@ -9,5 +12,10 @@ public enum AccessOperation {
     DISPLAY,
     ADD,
     DROP,
-    EDIT
+    EDIT;
+
+    public static Set<AccessOperation> getUserInterfaceSet() {
+        return EnumSet.of(AccessOperation.DISPLAY, AccessOperation.ADD, AccessOperation.DROP, AccessOperation.EDIT,
+                AccessOperation.PUBLISH);
+    }
 }

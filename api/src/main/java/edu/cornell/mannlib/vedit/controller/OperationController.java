@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
@@ -149,8 +150,8 @@ public class OperationController extends BaseEditController {
                     roleUris.add(permissionSet.getUri());
                 }  
                 // Get the granted permissions from the request object
-                for (OperationGroup og : OperationGroup.values()) {
-                    String operationGroupName = og.toString().toLowerCase().split("_")[0];
+                for (AccessOperation ao : AccessOperation.getUserInterfaceSet()) {
+                    String operationGroupName = ao.toString().toLowerCase().split("_")[0];
                     String[] selectedRoles = request.getParameterValues(operationGroupName + "Roles");
                     if(StringUtils.isBlank(entityUri)) {
                         log.error("EntityUri is blank");
@@ -160,7 +161,7 @@ public class OperationController extends BaseEditController {
                         if (selectedRoles == null) {
                             selectedRoles = new String[0];
                         }
-                        EntityPolicyController.updateEntityPolicyDataSet(entityUri, AccessObjectType.valueOf(entityType), og, Arrays.asList(selectedRoles), roleUris);
+                        EntityPolicyController.updateEntityPolicyDataSet(entityUri, AccessObjectType.valueOf(entityType), ao, Arrays.asList(selectedRoles), roleUris);
                     }
                 }
             }

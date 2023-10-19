@@ -7,7 +7,7 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-match-allowed-class/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/access-allowed-class/> .
 
 :PolicyTemplate a ao:PolicyTemplate ;
     ao:rules :RuleSet ;
@@ -44,7 +44,7 @@
 :PublicDisplayClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:PUBLIC ;
-    ao:keyComponent ai:DisplayOperationGroup .
+    ao:keyComponent ai:DisplayOperation .
 
 ### Self editor display class uri data sets
 
@@ -58,7 +58,7 @@
 :SelfEditorDisplayClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:DisplayOperationGroup .
+    ao:keyComponent ai:DisplayOperation .
 
 ### Editor display class uri data sets
 
@@ -72,7 +72,7 @@
 :EditorDisplayClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:EDITOR ;
-    ao:keyComponent ai:DisplayOperationGroup .
+    ao:keyComponent ai:DisplayOperation .
 
 ### Curator display class uri data sets
 
@@ -86,7 +86,7 @@
 :CuratorDisplayClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:CURATOR ;
-    ao:keyComponent ai:DisplayOperationGroup .
+    ao:keyComponent ai:DisplayOperation .
 
 ### Admin display class uri data sets
 
@@ -100,7 +100,7 @@
 :AdminDisplayClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:ADMIN ;
-    ao:keyComponent ai:DisplayOperationGroup .
+    ao:keyComponent ai:DisplayOperation .
 
 ### Public update class uri data sets
 
@@ -114,7 +114,7 @@
 :PublicUpdateClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:PUBLIC ;
-    ao:keyComponent ai:UpdateOperationGroup .
+    ao:keyComponent ai:UpdateOperation .
 
 ### Self editor update class uri data sets
 
@@ -128,7 +128,7 @@
 :SelfEditorUpdateClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:UpdateOperationGroup .
+    ao:keyComponent ai:UpdateOperation .
 
 ### Editor update class uri data sets
 
@@ -142,7 +142,7 @@
 :EditorUpdateClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:EDITOR ;
-    ao:keyComponent ai:UpdateOperationGroup .
+    ao:keyComponent ai:UpdateOperation .
 
 ### Curator update class uri data sets
 
@@ -156,7 +156,7 @@
 :CuratorUpdateClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:CURATOR ;
-    ao:keyComponent ai:UpdateOperationGroup .
+    ao:keyComponent ai:UpdateOperation .
 
 ### Admin update class uri data sets
 
@@ -170,7 +170,7 @@
 :AdminUpdateClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:ADMIN ;
-    ao:keyComponent ai:UpdateOperationGroup .
+    ao:keyComponent ai:UpdateOperation .
 
 ### Self editor publish class uri data sets
 
@@ -184,7 +184,7 @@
 :SelfEditorPublishClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:PublishOperationGroup .
+    ao:keyComponent ai:PublishOperation .
 
 ### Editor publish class uri data sets
 
@@ -198,7 +198,7 @@
 :EditorPublishClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:EDITOR ;
-    ao:keyComponent ai:PublishOperationGroup .
+    ao:keyComponent ai:PublishOperation .
 
 ### Curator publish class uri data sets
 
@@ -212,7 +212,7 @@
 :CuratorPublishClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:CURATOR ;
-    ao:keyComponent ai:PublishOperationGroup .
+    ao:keyComponent ai:PublishOperation .
 
 ### Admin publish class uri data sets
 
@@ -226,7 +226,7 @@
 :AdminPublishClassUriDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:Class ;
     ao:keyComponent auth:ADMIN ;
-    ao:keyComponent ai:PublishOperationGroup .
+    ao:keyComponent ai:PublishOperation .
 
 ### Rules
 
