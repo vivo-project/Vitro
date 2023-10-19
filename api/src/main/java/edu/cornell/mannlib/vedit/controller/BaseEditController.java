@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 
 public class BaseEditController extends VitroHttpServlet {
 
@@ -218,15 +219,15 @@ public class BaseEditController extends VitroHttpServlet {
         }  
         req.setAttribute("roles", permissionSets);
         // If the namespace is empty (e.e. we are creating a new record)
-        for (OperationGroup og : OperationGroup.values()){
-            String groupName = og.toString().toLowerCase().split("_")[0];
+        for (AccessOperation ao : AccessOperation.getUserInterfaceSet()){
+            String groupName = ao.toString().toLowerCase().split("_")[0];
             final String attributeName = groupName + "Roles";
             if (StringUtils.isEmpty(entityURI)) {
                 // predefined values
                 req.setAttribute(attributeName, roleUris);
             } else {
                 // Get the permission sets that are granted permission for this entity
-                req.setAttribute(attributeName, EntityPolicyController.getGrantedRoles(entityURI, og, aot, roleUris));
+                req.setAttribute(attributeName, EntityPolicyController.getGrantedRoles(entityURI, ao, aot, roleUris));
             }
         }
         

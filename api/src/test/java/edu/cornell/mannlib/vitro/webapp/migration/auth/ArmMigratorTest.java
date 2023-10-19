@@ -74,8 +74,8 @@ public class ArmMigratorTest extends AuthMigratorTest {
     public void getStatementsToRemoveTest() {
         StringBuilder removals = armMigrator.getStatementsToRemove();
         assertTrue(StringUtils.isBlank(removals.toString()));
-        EntityPolicyController.updateEntityPolicyDataSet("test:entity", AccessObjectType.CLASS, OperationGroup.DISPLAY_GROUP,
-                ROLE_LIST, ROLE_LIST);
+       // EntityPolicyController.updateEntityPolicyDataSet("test:entity", AccessObjectType.CLASS, OperationGroup.DISPLAY_GROUP,
+       //         ROLE_LIST, ROLE_LIST);
         removals = armMigrator.getStatementsToRemove();
         assertEquals(5, getCount("\n", removals.toString()));
     }

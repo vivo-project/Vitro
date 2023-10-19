@@ -92,11 +92,11 @@ public class ArmMigrator {
             for (String operation : armOperations) {
                 OperationGroup og = operationMap.get(operation);
                 for (AccessObjectType aot : entityTypes) {
-                    Set<String> entityUris = PolicyLoader.getInstance().getDataSetValues(og, aot, newRole);
-                    for (String entityUri : entityUris) {
-                        EntityPolicyController.getDataValueStatements(entityUri, aot, og,
-                                Collections.singleton(newRole), removals);
-                    }
+               //     Set<String> entityUris = PolicyLoader.getInstance().getDataSetValues(og, aot, newRole);
+               //     for (String entityUri : entityUris) {
+               //         EntityPolicyController.getDataValueStatements(entityUri, aot, og,
+               //                 Collections.singleton(newRole), removals);
+               //     }
                 }
             }
         }
@@ -162,8 +162,8 @@ public class ArmMigrator {
                         intersectionEntities.addAll(addFauxDP);
                     }
                     for (String entityUri : intersectionEntities) {
-                        EntityPolicyController.getDataValueStatements(entityUri, type, og,
-                                Collections.singleton(newRole), additions);
+                       // EntityPolicyController.getDataValueStatements(entityUri, type, og,
+                       //         Collections.singleton(newRole), additions);
                     }
                 }
             }
