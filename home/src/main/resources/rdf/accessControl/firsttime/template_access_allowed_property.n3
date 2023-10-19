@@ -1143,12 +1143,12 @@
     ao:rule :AllowMatchingProperty .
 
 :AllowMatchingProperty a ao:Rule;
-    ao:attribute :SubjectRoleEqualsDataSetRoleAttribute ;
-    ao:attribute :OperationEqualsDataSetOperation ;
-    ao:attribute :AccessObjectTypeEqualsDataSetValue ;
-    ao:attribute :AccessObjectUriContainsInDataSet .
+    ao:check :SubjectRoleEqualsDataSetRoleAttribute ;
+    ao:check :OperationEqualsDataSetOperation ;
+    ao:check :AccessObjectTypeEqualsDataSetValue ;
+    ao:check :AccessObjectUriContainsInDataSet .
 
-:AccessObjectTypeEqualsDataSetValue rdf:type ao:Attribute ;
+:AccessObjectTypeEqualsDataSetValue rdf:type ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .
@@ -1161,13 +1161,13 @@
     .
 
 :AllowMatchingPropertyStatement a ao:Rule;
-    ao:attribute :SubjectRoleEqualsDataSetRoleAttribute ;
-    ao:attribute :OperationEqualsDataSetOperation ;
-    ao:attribute :AccessObjectTypeStatementEquals ;
-    ao:attribute :StatementPredicateEquals ;
+    ao:check :SubjectRoleEqualsDataSetRoleAttribute ;
+    ao:check :OperationEqualsDataSetOperation ;
+    ao:check :AccessObjectTypeStatementEquals ;
+    ao:check :StatementPredicateEquals ;
     .
 
-:AccessObjectTypeStatementEquals rdf:type ao:Attribute ;
+:AccessObjectTypeStatementEquals rdf:type ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:AccessObjectType ;
     ao:templateValue :StatementAccessObjectTypeValueSet .
@@ -1179,7 +1179,7 @@
     ao:attributeValue ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     .
 
-:OperationEqualsDataSetOperation a ao:Attribute ;
+:OperationEqualsDataSetOperation a ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:Operation ;
     ao:templateValue :OperationValueSet .
@@ -1192,7 +1192,7 @@
     ao:attributeValue ai:DropOperationValueContainer ;
     .
 
-:SubjectRoleEqualsDataSetRoleAttribute a ao:Attribute ;
+:SubjectRoleEqualsDataSetRoleAttribute a ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:SubjectRole ;
     ao:templateValue :RoleValueSet .
@@ -1203,12 +1203,12 @@
     ao:attributeValue ai:CuratorRoleValueContainer ;
     ao:attributeValue ai:AdminRoleValueContainer .
 
-:StatementPredicateEquals a ao:Attribute ;
+:StatementPredicateEquals a ao:Check ;
     ao:operator ai:OneOf ;
     ao:type ai:StatementPredicateUri ;
     ao:templateValue :AllowedPropertyUriValueSet .
 
-:AccessObjectUriContainsInDataSet a ao:Attribute ;
+:AccessObjectUriContainsInDataSet a ao:Check ;
     ao:operator ai:OneOf ;
     ao:type ai:AccessObjectUri ;
     ao:templateValue :AllowedPropertyUriValueSet .

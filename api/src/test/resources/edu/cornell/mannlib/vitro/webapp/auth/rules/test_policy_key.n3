@@ -16,9 +16,9 @@ ai:KeyTestRuleSet rdf:type ao:Rules ;
           ao:rule ai:KeyTestRule .
           
 ai:KeyTestRule rdf:type ao:Rule ;
-          ao:attribute ai:KeyTestAttribute .
+          ao:check ai:KeyTestAttribute .
           
-ai:KeyTestAttribute rdf:type ao:Attribute ;
+ai:KeyTestAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:PublishOperation .

@@ -16,10 +16,10 @@ ai:ValidRuleSet rdf:type ao:Rules ;
       ao:rule ai:ValidRule .
       
 ai:ValidRule rdf:type ao:Rule ;
-      ao:attribute ai:ValidAttribute1 ;
-      ao:attribute ai:ValidAttribute2 .
+      ao:check ai:ValidAttribute1 ;
+      ao:check ai:ValidAttribute2 .
       
-ai:ValidAttribute1 rdf:type ao:Attribute ;
+ai:ValidAttribute1 rdf:type ao:Check ;
      ao:operator ai:Equals ;
      ao:type ai:AccessObjectUri ;
      ao:templateValue ai:AttributeValueSet1 ;
@@ -30,7 +30,7 @@ ai:AttributeValueSet1 a ao:AttributeValueSet  ;
      ao:attributeValue ai:valueSet3 ;
      .
      
-ai:ValidAttribute2 rdf:type ao:Attribute ;
+ai:ValidAttribute2 rdf:type ao:Check ;
      ao:operator ai:Equals ;
      ao:type ai:AccessObjectUri ;
      ao:templateValue ai:AttributeValueSet2 ;

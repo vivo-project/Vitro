@@ -2,28 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
-import java.util.Set;
-
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-
-public interface Attribute {
-
-    public void setUri(String uri);
-
-    public String getUri();
-
-    public boolean match(AuthorizationRequest ar);
-
-    public AttributeType getAttributeType();
-
-    public TestType getTestType();
-
-    Set<String> getValues();
-
-    public void addValue(String value);
-
-    public void setTestType(TestType valueOf);
-
-    public long getComputationalCost();
-
+public enum Attribute {
+    OPERATION,
+    SUBJECT_ROLE_URI,
+    SUBJECT_TYPE,
+    ACCESS_OBJECT_URI,
+    ACCESS_OBJECT_TYPE,
+    STATEMENT_OBJECT_URI,
+    STATEMENT_PREDICATE_URI,
+    STATEMENT_SUBJECT_URI,
 }

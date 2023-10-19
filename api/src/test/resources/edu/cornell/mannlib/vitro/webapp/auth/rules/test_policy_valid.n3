@@ -15,9 +15,9 @@ ai:ValidRuleSet rdf:type ao:Rules ;
           ao:rule ai:ValidRule .
           
 ai:ValidRule rdf:type ao:Rule ;
-          ao:attribute ai:ValidAttribute .
+          ao:check ai:ValidAttribute .
           
-ai:ValidAttribute rdf:type ao:Attribute ;
+ai:ValidAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:PublishOperation .

@@ -16,5 +16,5 @@ ai:RootRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowRootUserRule .
           
 ai:AllowRootUserRule rdf:type ao:Rule;
-          ao:attribute ai:IsRootUserAttribute .
+          ao:check ai:IsRootUserAttribute .
 

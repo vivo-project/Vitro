@@ -151,12 +151,12 @@
     ao:rule :AllowMatchingProperty .
 
 :AllowMatchingProperty a ao:Rule;
-    ao:attribute :SubjectRoleCheck ;
-    ao:attribute :OperationCheck ;
-    ao:attribute :AccessObjectTypeCheck ;
-    ao:attribute :AccessObjectUriCheck .
+    ao:check :SubjectRoleCheck ;
+    ao:check :OperationCheck ;
+    ao:check :AccessObjectTypeCheck ;
+    ao:check :AccessObjectUriCheck .
 
-:AccessObjectTypeCheck rdf:type ao:Attribute ;
+:AccessObjectTypeCheck rdf:type ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .
@@ -169,13 +169,13 @@
     .
 
 :AllowMatchingPropertyStatement a ao:Rule;
-    ao:attribute :SubjectRoleCheck ;
-    ao:attribute :OperationCheck ;
-    ao:attribute :AccessObjectStatementTypeCheck ;
-    ao:attribute :StatementPredicateCheck ;
+    ao:check :SubjectRoleCheck ;
+    ao:check :OperationCheck ;
+    ao:check :AccessObjectStatementTypeCheck ;
+    ao:check :StatementPredicateCheck ;
     .
 
-:AccessObjectStatementTypeCheck rdf:type ao:Attribute ;
+:AccessObjectStatementTypeCheck rdf:type ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:AccessObjectType ;
     ao:templateValue :StatementAccessObjectTypeValueSet .
@@ -187,7 +187,7 @@
     ao:attributeValue ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     .
 
-:OperationCheck a ao:Attribute ;
+:OperationCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:Operation ;
     ao:templateValue :OperationValueSet .
@@ -197,7 +197,7 @@
     ao:attributeValue ai:PublishOperationValueContainer ;
     .
 
-:SubjectRoleCheck a ao:Attribute ;
+:SubjectRoleCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:SubjectRole ;
     ao:templateValue :RoleValueSet .
@@ -205,12 +205,12 @@
 :RoleValueSet a ao:AttributeValueSet ;
     ao:attributeValue ai:SelfEditorRoleValueContainer .
 
-:StatementPredicateCheck a ao:Attribute ;
+:StatementPredicateCheck a ao:Check ;
     ao:operator ai:OneOf ;
     ao:type ai:StatementPredicateUri ;
     ao:templateValue :AllowedPropertyUriValueSet .
 
-:AccessObjectUriCheck a ao:Attribute ;
+:AccessObjectUriCheck a ao:Check ;
     ao:operator ai:OneOf ;
     ao:type ai:AccessObjectUri ;
     ao:templateValue :AllowedPropertyUriValueSet .

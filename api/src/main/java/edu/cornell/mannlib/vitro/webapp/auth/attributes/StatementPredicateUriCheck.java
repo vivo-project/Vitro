@@ -7,19 +7,19 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class StatementPredicateUriAttribute extends AbstractAttribute {
+public class StatementPredicateUriCheck extends AbstractCheck {
 
-    private static final Log log = LogFactory.getLog(StatementPredicateUriAttribute.class);
+    private static final Log log = LogFactory.getLog(StatementPredicateUriCheck.class);
 
-    public StatementPredicateUriAttribute(String uri, String value) {
+    public StatementPredicateUriCheck(String uri, String value) {
         super(uri, value);
     }
 
     @Override
-    public boolean match(AuthorizationRequest ar) {
+    public boolean check(AuthorizationRequest ar) {
         AccessObject ao = ar.getAccessObject();
         final String inputValue = ao.getStatementPredicateUri();
-        if (AttributeValueTester.test(this, ar, inputValue)) {
+        if (AttributeValueChecker.test(this, ar, inputValue)) {
             log.debug("Attribute value match requested statement predicate uri '" + inputValue + "'");
             return true;
         }
@@ -28,8 +28,8 @@ public class StatementPredicateUriAttribute extends AbstractAttribute {
     }
 
     @Override
-    public AttributeType getAttributeType() {
-        return AttributeType.STATEMENT_PREDICATE_URI;
+    public Attribute getAttributeType() {
+        return Attribute.STATEMENT_PREDICATE_URI;
     }
 
 }

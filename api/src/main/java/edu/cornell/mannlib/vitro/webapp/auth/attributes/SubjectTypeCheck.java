@@ -8,19 +8,19 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SubjectTypeAttribute extends AbstractAttribute {
+public class SubjectTypeCheck extends AbstractCheck {
 
-    private static final Log log = LogFactory.getLog(SubjectTypeAttribute.class);
+    private static final Log log = LogFactory.getLog(SubjectTypeCheck.class);
 
-    public SubjectTypeAttribute(String uri, String value) {
+    public SubjectTypeCheck(String uri, String value) {
         super(uri, value);
     }
 
     @Override
-    public boolean match(AuthorizationRequest ar) {
+    public boolean check(AuthorizationRequest ar) {
         IdentifierBundle ac_subject = ar.getIds();
         String inputValue = IsRootUser.isRootUser(ac_subject) ? "ROOT_USER" : "";
-        if (AttributeValueTester.test(this, ar, inputValue)) {
+        if (AttributeValueChecker.test(this, ar, inputValue)) {
             log.debug("Attribute subject type match requested object type '");
             return true;
         } else {
@@ -30,7 +30,7 @@ public class SubjectTypeAttribute extends AbstractAttribute {
     }
 
     @Override
-    public AttributeType getAttributeType() {
-        return AttributeType.SUBJECT_TYPE;
+    public Attribute getAttributeType() {
+        return Attribute.SUBJECT_TYPE;
     }
 }

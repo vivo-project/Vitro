@@ -234,12 +234,12 @@
     ao:rule :AllowMatchingClass .
 
 :AllowMatchingClass a ao:Rule;
-    ao:attribute :SubjectRoleCheck ;
-    ao:attribute :OperationCheck ;
-    ao:attribute :AccessObjectTypeCheck ;
-    ao:attribute :AccessObjectUriCheck .
+    ao:check :SubjectRoleCheck ;
+    ao:check :OperationCheck ;
+    ao:check :AccessObjectTypeCheck ;
+    ao:check :AccessObjectUriCheck .
 
-:AccessObjectTypeCheck rdf:type ao:Attribute ;
+:AccessObjectTypeCheck rdf:type ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .
@@ -248,7 +248,7 @@
     ao:attributeValue ai:ClassAccesObjectValueContainer ;
     .
 
-:OperationCheck a ao:Attribute ;
+:OperationCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:Operation ;
     ao:templateValue :OperationValueSet .
@@ -259,7 +259,7 @@
     ao:attributeValue ai:UpdateOperationValueContainer ;
     .
 
-:SubjectRoleCheck a ao:Attribute ;
+:SubjectRoleCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:SubjectRole ;
     ao:templateValue :RoleValueSet .
@@ -271,7 +271,7 @@
     ao:attributeValue ai:CuratorRoleValueContainer ;
     ao:attributeValue ai:AdminRoleValueContainer .
 
-:AccessObjectUriCheck a ao:Attribute ;
+:AccessObjectUriCheck a ao:Check ;
     ao:operator ai:OneOf ;
     ao:type ai:AccessObjectUri ;
     ao:templateValue :AllowedClassUriValueSet .

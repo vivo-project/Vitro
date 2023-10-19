@@ -13,11 +13,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
 
-public class AttributeValueTester {
-    private static final Log log = LogFactory.getLog(AttributeValueTester.class);
+public class AttributeValueChecker {
+    private static final Log log = LogFactory.getLog(AttributeValueChecker.class);
 
-    static boolean test(Attribute attr, AuthorizationRequest ar, String... values) {
-        TestType testType = attr.getTestType();
+    static boolean test(Check attr, AuthorizationRequest ar, String... values) {
+        CheckType testType = attr.getType();
         switch (testType) {
             case EQUALS:
                 return equals(attr, values);
@@ -36,7 +36,7 @@ public class AttributeValueTester {
         }
     }
 
-    private static boolean sparqlQueryContains(Attribute attr, AuthorizationRequest ar, String[] inputValues) {
+    private static boolean sparqlQueryContains(Check attr, AuthorizationRequest ar, String[] inputValues) {
         Set<String> values = attr.getValues();
         final int valuesSize = values.size();
         if (valuesSize != 1) {
@@ -67,7 +67,7 @@ public class AttributeValueTester {
         return ProximityChecker.isAnyRelated(m, resourceUris, personUris, queryTemplate);
     }
 
-    private static boolean contains(Attribute attr, String... inputValues) {
+    private static boolean contains(Check attr, String... inputValues) {
         final Set<String> values = attr.getValues();
         for (String inputValue : inputValues) {
             if (values.contains(inputValue)) {
@@ -77,7 +77,7 @@ public class AttributeValueTester {
         return false;
     }
 
-    private static boolean equals(Attribute attr, String... inputValues) {
+    private static boolean equals(Check attr, String... inputValues) {
         Set<String> values = attr.getValues();
         final int valuesSize = values.size();
         if (valuesSize != 1) {
@@ -92,7 +92,7 @@ public class AttributeValueTester {
         return false;
     }
 
-    private static boolean startsWith(Attribute attr, String... inputValues) {
+    private static boolean startsWith(Check attr, String... inputValues) {
         Set<String> values = attr.getValues();
         final int valuesSize = values.size();
         if (valuesSize != 1) {

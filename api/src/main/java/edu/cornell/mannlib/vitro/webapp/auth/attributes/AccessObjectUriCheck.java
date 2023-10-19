@@ -7,19 +7,19 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class AccessObjectUriAttribute extends AbstractAttribute {
+public class AccessObjectUriCheck extends AbstractCheck {
 
-    private static final Log log = LogFactory.getLog(AccessObjectUriAttribute.class);
+    private static final Log log = LogFactory.getLog(AccessObjectUriCheck.class);
 
-    public AccessObjectUriAttribute(String uri, String objectUri) {
+    public AccessObjectUriCheck(String uri, String objectUri) {
         super(uri, objectUri);
     }
 
     @Override
-    public boolean match(AuthorizationRequest ar) {
+    public boolean check(AuthorizationRequest ar) {
         AccessObject ao = ar.getAccessObject();
         final String inputValue = ao.getUri();
-        if (AttributeValueTester.test(this, ar, inputValue)) {
+        if (AttributeValueChecker.test(this, ar, inputValue)) {
             log.debug("Attribute match requested '" + inputValue + "'");
             return true;
         }
@@ -28,8 +28,8 @@ public class AccessObjectUriAttribute extends AbstractAttribute {
     }
 
     @Override
-    public AttributeType getAttributeType() {
-        return AttributeType.ACCESS_OBJECT_URI;
+    public Attribute getAttributeType() {
+        return Attribute.ACCESS_OBJECT_URI;
     }
 
 }

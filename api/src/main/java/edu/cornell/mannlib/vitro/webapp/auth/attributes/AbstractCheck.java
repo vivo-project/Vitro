@@ -8,15 +8,15 @@ import java.util.Set;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public abstract class AbstractAttribute implements Attribute {
+public abstract class AbstractCheck implements Check {
 
     private Set<String> values = new HashSet<>();
     private String uri;
     private long computationalCost;
 
-    private TestType testType = TestType.EQUALS;
+    private CheckType testType = CheckType.EQUALS;
 
-    public AbstractAttribute(String uri, String value) {
+    public AbstractCheck(String uri, String value) {
         this.uri = uri;
         values.add(value);
     }
@@ -29,11 +29,11 @@ public abstract class AbstractAttribute implements Attribute {
         this.uri = uri;
     }
 
-    public TestType getTestType() {
+    public CheckType getType() {
         return testType;
     }
 
-    public void setTestType(TestType testType) {
+    public void setType(CheckType testType) {
         this.testType = testType;
         adjustComputationCost(testType);
     }
@@ -50,13 +50,13 @@ public abstract class AbstractAttribute implements Attribute {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof AbstractAttribute)) {
+        if (!(object instanceof AbstractCheck)) {
             return false;
         }
         if (object == this) {
             return true;
         }
-        AbstractAttribute compared = (AbstractAttribute) object;
+        AbstractCheck compared = (AbstractCheck) object;
 
         return new EqualsBuilder()
                 .append(getUri(), compared.getUri())
@@ -76,7 +76,7 @@ public abstract class AbstractAttribute implements Attribute {
         return computationalCost;
     }
 
-    private void adjustComputationCost(TestType testType) {
+    private void adjustComputationCost(CheckType testType) {
         switch (testType) {
             case ONE_OF:
                 computationalCost += 100;
