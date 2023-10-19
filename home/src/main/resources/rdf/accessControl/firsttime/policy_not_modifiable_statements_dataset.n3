@@ -8,20 +8,20 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:ProhibitedNamespaceExceptionsTestData 
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#moniker> ;
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime> ;
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ;
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Link> ;
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ;
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ;
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkAnchor> ;
-        ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkURL> ;
-        .
-        
-ai:ProhibitedNamespaceTestData
-        ao:dataValue  ai:prohibitedNamespacePrefix ; 
-        .
-        
+ai:ProhibitedNamespaceExceptionsValueContainer
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#moniker> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Link> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkAnchor> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkURL> ;
+    .
+
+ai:ProhibitedNamespaceValueContainer
+    ao:dataValue  ai:prohibitedNamespacePrefix ; 
+    .
+
 ai:prohibitedNamespacePrefix rdf:type ao:TestValue ;
-        ao:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;
+    ao:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;

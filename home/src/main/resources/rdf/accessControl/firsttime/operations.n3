@@ -9,23 +9,43 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 ai:DisplayOperation rdf:type ao:Operation ;
-         ao:id "DISPLAY" .
-         
+    ao:id "DISPLAY" .
+    
 ai:UpdateOperation rdf:type ao:Operation ;
-         ao:id "UPDATE" .
-         
+    ao:id "UPDATE" .
+    
 ai:PublishOperation rdf:type ao:Operation ;
-         ao:id "PUBLISH" .         
+    ao:id "PUBLISH" .    
 
 ai:AddOperation rdf:type ao:Operation ;
-         ao:id "ADD" .
-         
+    ao:id "ADD" .
+    
 ai:DropOperation rdf:type ao:Operation ;
-         ao:id "DROP" .
+    ao:id "DROP" .
 
 ai:EditOperation rdf:type ao:Operation ;
-         ao:id "EDIT" .
+    ao:id "EDIT" .
 
 ai:ExecuteOperation rdf:type ao:Operation ;
-         ao:id "EXECUTE" .
+    ao:id "EXECUTE" .
 
+ai:DisplayOperationValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:DisplayOperation .
+
+ai:UpdateOperationValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:UpdateOperation .
+
+ai:PublishOperationValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:PublishOperation .
+
+ai:AddOperationValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:AddOperation .
+
+ai:DropOperationValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:DropOperation .
+
+ai:EditOperationValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:EditOperation .
+
+ai:ExecuteOperationValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:ExecuteOperation .

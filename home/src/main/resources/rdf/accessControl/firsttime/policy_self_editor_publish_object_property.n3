@@ -16,10 +16,10 @@ ai:SelfEditorPublishObjectPropertyRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowSelfEditorPublishObjectPropertyStatementRule ;
           ao:rule ai:AllowSelfEditorPublishObjectPropertyRule .
 
-ai:SelfEditorPublishObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:SelfEditorPublishObjectPropertyDataset .
+ai:SelfEditorPublishObjectPropertyTestDatasets rdf:type ao:PolicyDataSets ;
+          ao:policyDataSet ai:SelfEditorPublishObjectPropertyDataset .
 
-ai:SelfEditorPublishObjectPropertyDataset rdf:type ao:TestDataSet ;
+ai:SelfEditorPublishObjectPropertyDataset rdf:type ao:PolicyDataSet ;
           ao:testData ai:SelfEditorPublishObjectPropertyTestData .
           
 ai:SelfEditorPublishObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
@@ -49,5 +49,5 @@ ai:SelfEditorPublishObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorPublishObjectPropertyTestData .
          
-ai:SelfEditorPublishObjectPropertyTestData rdf:type ao:TestData ;
+ai:SelfEditorPublishObjectPropertyTestData rdf:type ao:ValueContainer ;
    .

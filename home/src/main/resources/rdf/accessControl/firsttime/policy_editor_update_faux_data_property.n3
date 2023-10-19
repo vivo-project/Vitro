@@ -16,10 +16,10 @@ ai:EditorUpdateFauxDataPropertyRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowEditorUpdateFauxDataPropertyStatementRule ;
           ao:rule ai:AllowEditorUpdateFauxDataPropertyRule .
 
-ai:EditorUpdateFauxDataPropertyTestDatasets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:EditorUpdateFauxDataPropertyDataset .
+ai:EditorUpdateFauxDataPropertyTestDatasets rdf:type ao:PolicyDataSets ;
+          ao:policyDataSet ai:EditorUpdateFauxDataPropertyDataset .
 
-ai:EditorUpdateFauxDataPropertyDataset rdf:type ao:TestDataSet ;
+ai:EditorUpdateFauxDataPropertyDataset rdf:type ao:PolicyDataSet ;
           ao:testData ai:EditorUpdateFauxDataPropertyTestData .
           
 ai:EditorUpdateFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
@@ -49,5 +49,5 @@ ai:EditorUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorUpdateFauxDataPropertyTestData .
          
-ai:EditorUpdateFauxDataPropertyTestData rdf:type ao:TestData ;
+ai:EditorUpdateFauxDataPropertyTestData rdf:type ao:ValueContainer ;
        .

@@ -16,10 +16,10 @@ ai:SelfEditorDisplayFauxDataPropertyRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowSelfEditorDisplayFauxDataPropertyStatementRule ;
           ao:rule ai:AllowSelfEditorDisplayFauxDataPropertyRule .
 
-ai:SelfEditorDisplayFauxDataPropertyTestDatasets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:SelfEditorDisplayFauxDataPropertyDataset .
+ai:SelfEditorDisplayFauxDataPropertyTestDatasets rdf:type ao:PolicyDataSets ;
+          ao:policyDataSet ai:SelfEditorDisplayFauxDataPropertyDataset .
 
-ai:SelfEditorDisplayFauxDataPropertyDataset rdf:type ao:TestDataSet ;
+ai:SelfEditorDisplayFauxDataPropertyDataset rdf:type ao:PolicyDataSet ;
           ao:testData ai:SelfEditorDisplayFauxDataPropertyTestData .
           
 ai:SelfEditorDisplayFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
@@ -49,5 +49,5 @@ ai:SelfEditorDisplayFauxDataPropertyAttribute rdf:type ao:Attribute ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorDisplayFauxDataPropertyTestData .
          
-ai:SelfEditorDisplayFauxDataPropertyTestData rdf:type ao:TestData ;
+ai:SelfEditorDisplayFauxDataPropertyTestData rdf:type ao:ValueContainer ;
        .

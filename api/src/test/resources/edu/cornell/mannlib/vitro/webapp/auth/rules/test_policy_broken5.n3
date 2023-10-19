@@ -9,7 +9,7 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 ai:BrokenTestSetPolicy rdf:type ao:Policy ;
-          ao:testDatasets ai:testDataSets ;
+          ao:policyDataSets ai:testDataSets ;
           ao:rules ai:BrokenRuleSet .
 
 ai:BrokenRuleSet rdf:type ao:Rules ;
@@ -29,13 +29,13 @@ ai:BrokenAttribute2 rdf:type ao:Attribute ;
          ao:type ai:ObjectUri ;
          ao:setValue ai:valueSet2 .
 
-ai:testDataSets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:testDataSet1 .
+ai:testDataSets rdf:type ao:PolicyDataSets ;
+          ao:policyDataSet ai:testDataSet1 .
 
-ai:testDataSet1 rdf:type ao:TestDataSet ;
-          ao:testData ai:valueSet1 .
+ai:testDataSet1 rdf:type ao:PolicyDataSet ;
+          ao:dataSetValues ai:valueSet1 .
 
-ai:valueSet1 rdf:type ao:TestData ;
+ai:valueSet1 rdf:type ao:ValueContainer ;
         ao:dataValue <test:value1> ;
         ao:dataValue <test:value2> ;
         .        

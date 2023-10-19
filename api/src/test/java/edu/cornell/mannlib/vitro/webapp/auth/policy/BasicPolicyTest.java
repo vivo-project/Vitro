@@ -13,11 +13,11 @@ import org.junit.Test;
 
 public class BasicPolicyTest extends PolicyTest {
 
-    public static final String BROKEN_POLICY_BROKEN_TEST = RESOURCES_PREFIX + "test_policy_broken1.n3";
-    public static final String BROKEN_POLICY_BROKEN_TYPE = RESOURCES_PREFIX + "test_policy_broken2.n3";
-    public static final String BROKEN_POLICY_BROKEN_TEST_ID = RESOURCES_PREFIX + "test_policy_broken3.n3";
-    public static final String BROKEN_POLICY_BROKEN_TYPE_ID = RESOURCES_PREFIX + "test_policy_broken4.n3";
-    public static final String BROKEN_POLICY_BROKEN_ATTRIBUTE_VALUES = RESOURCES_PREFIX + "test_policy_broken5.n3";
+    public static final String BROKEN_POLICY_BROKEN_TEST = RESOURCES_RULES_PREFIX + "test_policy_broken1.n3";
+    public static final String BROKEN_POLICY_BROKEN_TYPE = RESOURCES_RULES_PREFIX + "test_policy_broken2.n3";
+    public static final String BROKEN_POLICY_BROKEN_TEST_ID = RESOURCES_RULES_PREFIX + "test_policy_broken3.n3";
+    public static final String BROKEN_POLICY_BROKEN_TYPE_ID = RESOURCES_RULES_PREFIX + "test_policy_broken4.n3";
+    public static final String BROKEN_POLICY_BROKEN_ATTRIBUTE_VALUES = RESOURCES_RULES_PREFIX + "test_policy_broken5.n3";
 
     @Test
     public void testGetPolicyUris() {
@@ -32,8 +32,8 @@ public class BasicPolicyTest extends PolicyTest {
     }
 
     @Test
-    public void testValidPolicyWithSet() {
-        load(VALID_POLICY_WITH_SET);
+    public void testValidPolicyTemplate() {
+        load(VALID_POLICY_TEMPLATE);
         DynamicPolicy policy = loader
                 .loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/ValidTestSetPolicy");
         countRulesAndAttributes(policy, 2, Collections.singleton(2));
@@ -80,8 +80,8 @@ public class BasicPolicyTest extends PolicyTest {
     }
 
     @Test
-    public void testBrokenSet() {
-        load(BROKEN_POLICY_WITH_SET);
+    public void testBrokenPolicyTemplate() {
+        load(BROKEN_POLICY_TEMPLATE);
         DynamicPolicy policy = loader
                 .loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy");
         assertTrue(policy == null);

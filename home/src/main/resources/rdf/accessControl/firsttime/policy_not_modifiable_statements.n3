@@ -8,97 +8,103 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:NotModifiableStatementsPolicy rdf:type ao:Policy ;
-          ao:priority 8000 ;
-          ao:testDatasets ai:NotModifiableStatementsPolicyDataSets ;
-          ao:rules ai:NotModifiableStatementsRuleSet .
+ai:NotModifiableStatementsPolicy a ao:PolicyTemplate ;
+    ao:priority 8000 ;
+    ao:policyDataSets ai:NotModifiableStatementsPolicyDataSets ;
+    ao:rules ai:NotModifiableStatementsRuleSet .
 
-ai:NotModifiableStatementsRuleSet rdf:type ao:Rules ;
-          ao:rule ai:RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
-          
-          ao:rule ai:RestrictObjectPropertyStatementsWithNotModifiableSubject ;
-          
-          ao:rule ai:RestrictObjectPropertyStatementsWithNotModifiableObject ;
-          
-          ao:rule ai:RestrictDataPropertyStatementsWithNotModifiableSubject ;
-          
-          ao:rule ai:RestrictDataPropertyStatementsWithNotModifiablePredicate ;
-          .
+ai:NotModifiableStatementsRuleSet a ao:Rules ;
+    ao:rule ai:RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
+    
+    ao:rule ai:RestrictObjectPropertyStatementsWithNotModifiableSubject ;
+    
+    ao:rule ai:RestrictObjectPropertyStatementsWithNotModifiableObject ;
+    
+    ao:rule ai:RestrictDataPropertyStatementsWithNotModifiableSubject ;
+    
+    ao:rule ai:RestrictDataPropertyStatementsWithNotModifiablePredicate ;
+    .
 
-ai:RestrictObjectPropertyStatementsWithNotModifiableSubject rdf:type ao:Rule ;
-          ao:decision ai:Deny ;
-          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
-          ao:attribute ai:PropertyStatementSubjectUriStartWithProhibitedNameSpaceAttribute ;
-          ao:attribute ai:PropertyStatementSubjectUriEqualsToProhibitedExceptions .
+ai:RestrictObjectPropertyStatementsWithNotModifiableSubject a ao:Rule ;
+    ao:decision ai:Deny ;
+    ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+    ao:attribute ai:PropertyStatementSubjectUriStartWithProhibitedNameSpaceAttribute ;
+    ao:attribute ai:PropertyStatementSubjectUriEqualsToProhibitedExceptions .
 
-ai:RestrictObjectPropertyStatementsWithNotModifiablePredicate rdf:type ao:Rule ;
-          ao:decision ai:Deny ;
-          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
-          ao:attribute ai:PropertyStatementPredicateUriStartWithProhibitedNameSpaceAttribute ;
-          ao:attribute ai:PropertyStatementPredicateUriEqualsToProhibitedExceptions .
+ai:RestrictObjectPropertyStatementsWithNotModifiablePredicate a ao:Rule ;
+    ao:decision ai:Deny ;
+    ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+    ao:attribute ai:PropertyStatementPredicateUriStartWithProhibitedNameSpaceAttribute ;
+    ao:attribute ai:PropertyStatementPredicateUriEqualsToProhibitedExceptions .
 
-ai:RestrictObjectPropertyStatementsWithNotModifiableObject rdf:type ao:Rule ;
-          ao:decision ai:Deny ;
-          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
-          ao:attribute ai:PropertyStatementObjectUriStartWithProhibitedNameSpaceAttribute ;
-          ao:attribute ai:PropertyStatementObjectUriEqualsToProhibitedExceptions .
+ai:RestrictObjectPropertyStatementsWithNotModifiableObject a ao:Rule ;
+    ao:decision ai:Deny ;
+    ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
+    ao:attribute ai:PropertyStatementObjectUriStartWithProhibitedNameSpaceAttribute ;
+    ao:attribute ai:PropertyStatementObjectUriEqualsToProhibitedExceptions .
 
-ai:RestrictDataPropertyStatementsWithNotModifiableSubject rdf:type ao:Rule ;
-          ao:decision ai:Deny ;
-          ao:attribute ai:DataPropertyStatementTypeAttribute ;
-          ao:attribute ai:PropertyStatementSubjectUriStartWithProhibitedNameSpaceAttribute ;
-          ao:attribute ai:PropertyStatementSubjectUriEqualsToProhibitedExceptions .
+ai:RestrictDataPropertyStatementsWithNotModifiableSubject a ao:Rule ;
+    ao:decision ai:Deny ;
+    ao:attribute ai:DataPropertyStatementTypeAttribute ;
+    ao:attribute ai:PropertyStatementSubjectUriStartWithProhibitedNameSpaceAttribute ;
+    ao:attribute ai:PropertyStatementSubjectUriEqualsToProhibitedExceptions .
 
-ai:RestrictDataPropertyStatementsWithNotModifiablePredicate rdf:type ao:Rule ;
-          ao:decision ai:Deny ;
-          ao:attribute ai:DataPropertyStatementTypeAttribute ;
-          ao:attribute ai:PropertyStatementPredicateUriStartWithProhibitedNameSpaceAttribute ;
-          ao:attribute ai:PropertyStatementPredicateUriEqualsToProhibitedExceptions .
+ai:RestrictDataPropertyStatementsWithNotModifiablePredicate a ao:Rule ;
+    ao:decision ai:Deny ;
+    ao:attribute ai:DataPropertyStatementTypeAttribute ;
+    ao:attribute ai:PropertyStatementPredicateUriStartWithProhibitedNameSpaceAttribute ;
+    ao:attribute ai:PropertyStatementPredicateUriEqualsToProhibitedExceptions .
 
 ### Not modifiable property statement attributes
-ai:PropertyStatementPredicateUriStartWithProhibitedNameSpaceAttribute rdf:type ao:Attribute ;
-         ao:operator ai:StartsWith ;
-         ao:type ai:StatementPredicateUri ;
-         ao:setValue ai:ProhibitedNamespaceTestData .
+ai:PropertyStatementPredicateUriStartWithProhibitedNameSpaceAttribute a ao:Attribute ;
+    ao:operator ai:StartsWith ;
+    ao:type ai:StatementPredicateUri ;
+    ao:templateValue ai:ProhibitedNamespaceValueSet .
 
-ai:PropertyStatementPredicateUriEqualsToProhibitedExceptions rdf:type ao:Attribute ;
-         ao:operator ai:NotOneOf ;
-         ao:type ai:StatementPredicateUri ;
-         ao:setValue ai:ProhibitedNamespaceExceptionsTestData .
-         
-ai:PropertyStatementSubjectUriStartWithProhibitedNameSpaceAttribute rdf:type ao:Attribute ;
-         ao:operator ai:StartsWith ;
-         ao:type ai:StatementSubjectUri ;
-         ao:setValue ai:ProhibitedNamespaceTestData .
+ai:PropertyStatementPredicateUriEqualsToProhibitedExceptions a ao:Attribute ;
+    ao:operator ai:NotOneOf ;
+    ao:type ai:StatementPredicateUri ;
+    ao:templateValue ai:ProhibitedNamespaceExceptionsValueSet .
+    
+ai:PropertyStatementSubjectUriStartWithProhibitedNameSpaceAttribute a ao:Attribute ;
+    ao:operator ai:StartsWith ;
+    ao:type ai:StatementSubjectUri ;
+    ao:templateValue ai:ProhibitedNamespaceValueSet .
 
-ai:PropertyStatementSubjectUriEqualsToProhibitedExceptions rdf:type ao:Attribute ;
-         ao:operator ai:NotOneOf ;
-         ao:type ai:StatementSubjectUri ;
-         ao:setValue ai:ProhibitedNamespaceExceptionsTestData .         
-         
-ai:PropertyStatementObjectUriStartWithProhibitedNameSpaceAttribute rdf:type ao:Attribute ;
-         ao:operator ai:StartsWith ;
-         ao:type ai:StatementObjectUri ;
-         ao:setValue ai:ProhibitedNamespaceTestData .
+ai:PropertyStatementSubjectUriEqualsToProhibitedExceptions a ao:Attribute ;
+    ao:operator ai:NotOneOf ;
+    ao:type ai:StatementSubjectUri ;
+    ao:templateValue ai:ProhibitedNamespaceExceptionsValueSet .    
+    
+ai:PropertyStatementObjectUriStartWithProhibitedNameSpaceAttribute a ao:Attribute ;
+    ao:operator ai:StartsWith ;
+    ao:type ai:StatementObjectUri ;
+    ao:templateValue ai:ProhibitedNamespaceValueSet .
 
-ai:PropertyStatementObjectUriEqualsToProhibitedExceptions rdf:type ao:Attribute ;
-         ao:operator ai:NotOneOf ;
-         ao:type ai:StatementObjectUri ;
-         ao:setValue ai:ProhibitedNamespaceExceptionsTestData .  
-         
-### Not modifiable data property statement attributes         
+ai:PropertyStatementObjectUriEqualsToProhibitedExceptions a ao:Attribute ;
+    ao:operator ai:NotOneOf ;
+    ao:type ai:StatementObjectUri ;
+    ao:templateValue ai:ProhibitedNamespaceExceptionsValueSet .  
+    
+### Not modifiable data property statement attributes    
 
 ###DataSets
-ai:NotModifiableStatementsPolicyDataSets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:NotModifiableStatementsPolicyDataSet .
+ai:NotModifiableStatementsPolicyDataSets a ao:PolicyDataSets ;
+    ao:policyDataSet ai:NotModifiableStatementsPolicyDataSet .
 
-ai:NotModifiableStatementsPolicyDataSet rdf:type ao:TestDataSet ;
-          ao:testData ai:ProhibitedNamespaceExceptionsTestData ;
-          ao:testData ai:ProhibitedNamespaceTestData .
-         
-ai:ProhibitedNamespaceExceptionsTestData rdf:type ao:TestData ;
-        .
-        
-ai:ProhibitedNamespaceTestData rdf:type ao:TestData ;
-        .
-        
+ai:NotModifiableStatementsPolicyDataSet a ao:PolicyDataSet ;
+    ao:dataSetValues ai:ProhibitedNamespaceExceptionsValueContainer ;
+    ao:dataSetValues ai:ProhibitedNamespaceValueContainer .
+
+ai:ProhibitedNamespaceValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:ProhibitedNamespaceValueContainer .
+
+ai:ProhibitedNamespaceExceptionsValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:ProhibitedNamespaceExceptionsValueContainer .
+
+ai:ProhibitedNamespaceExceptionsValueContainer a ao:ValueContainer ;
+    .
+    
+ai:ProhibitedNamespaceValueContainer a ao:ValueContainer ;
+    .
+    
