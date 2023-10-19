@@ -7,14 +7,20 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/root-user/> .
 
 ai:RootUserPolicy rdf:type ao:Policy ;
-          ao:priority 10000 ;
-          ao:rules ai:RootRuleSet .
+    ao:priority 10000 ;
+    ao:rules ai:RootRuleSet .
 
 ai:RootRuleSet rdf:type ao:Rules ;
-          ao:rule ai:AllowRootUserRule .
-          
+    ao:rule ai:AllowRootUserRule .
+
 ai:AllowRootUserRule rdf:type ao:Rule;
-          ao:check ai:IsRootUserAttribute .
+    ao:check :IsRootUserCheck .
+
+:IsRootUserCheck rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:type ai:SubjectType ;
+    ao:value ai:RootUserSubject .
 
