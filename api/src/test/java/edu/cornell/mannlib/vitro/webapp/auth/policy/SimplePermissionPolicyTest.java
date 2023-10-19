@@ -31,7 +31,7 @@ public class SimplePermissionPolicyTest extends PolicyTest {
         assertEquals(1, policy.getRules().size());
         final AccessRule rule = policy.getRules().iterator().next();
         assertEquals(true, rule.isAllowMatched());
-        assertEquals(3, rule.getAttributesCount());
+        assertEquals(3, rule.getChecksCount());
 
         SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "SeeSiteAdminPage");
         ar.setRoleUris(Arrays.asList(CURATOR));
@@ -51,7 +51,7 @@ public class SimplePermissionPolicyTest extends PolicyTest {
         assertEquals(1, policy.getRules().size());
         final AccessRule rule = policy.getRules().iterator().next();
         assertEquals(true, rule.isAllowMatched());
-        assertEquals(3, rule.getAttributesCount());
+        assertEquals(3, rule.getChecksCount());
 
         SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "EditOntology");
         ar.setRoleUris(Arrays.asList(EDITOR));
@@ -71,7 +71,7 @@ public class SimplePermissionPolicyTest extends PolicyTest {
         assertEquals(1, policy.getRules().size());
         final AccessRule rule = policy.getRules().iterator().next();
         assertEquals(true, rule.isAllowMatched());
-        assertEquals(3, rule.getAttributesCount());
+        assertEquals(3, rule.getChecksCount());
 
         SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "DoBackEndEditing");
         ar.setRoleUris(Arrays.asList(SELF_EDITOR));
@@ -91,7 +91,7 @@ public class SimplePermissionPolicyTest extends PolicyTest {
         assertEquals(1, policy.getRules().size());
         final AccessRule rule = policy.getRules().iterator().next();
         assertEquals(true, rule.isAllowMatched());
-        assertEquals(3, rule.getAttributesCount());
+        assertEquals(3, rule.getChecksCount());
 
         SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "DoFrontEndEditing");
         ar.setRoleUris(Arrays.asList(PUBLIC));
@@ -111,7 +111,7 @@ public class SimplePermissionPolicyTest extends PolicyTest {
         assertEquals(1, policy.getRules().size());
         final AccessRule rule = policy.getRules().iterator().next();
         assertEquals(true, rule.isAllowMatched());
-        assertEquals(3, rule.getAttributesCount());
+        assertEquals(3, rule.getChecksCount());
 
         SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "QueryFullModel");
         ar.setRoleUris(Arrays.asList(""));

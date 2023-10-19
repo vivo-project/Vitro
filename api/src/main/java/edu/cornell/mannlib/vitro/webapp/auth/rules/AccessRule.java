@@ -19,19 +19,19 @@ public interface AccessRule {
 
     public void setRuleUri(String ruleUri);
 
-    public List<Check> getAttributes();
+    public List<Check> getChecks();
 
     public boolean match(AuthorizationRequest ar);
 
-    public void addAttribute(Check attr);
+    public void addCheck(Check attr);
 
-    public Set<String> getAttributeUris();
+    public Set<String> getCheckUris();
 
-    public boolean containsAttributeUri(String uri);
+    public boolean containsCheckUri(String uri);
 
-    public Set<Check> getAttributesByType(Attribute type);
+    public Set<Check> getChecksByType(Attribute type);
 
-    public long getAttributesCount();
+    public long getChecksCount();
 
-    public Check getAttribute(String uri);
+    public Check getCheck(String uri);
 }

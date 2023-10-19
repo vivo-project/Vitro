@@ -20,7 +20,7 @@ public class AccessRuleFactory {
         }
 
         ar.setRuleUri(ruleUri);
-        ar.addAttribute(CheckFactory.createCheck(qs));
+        ar.addCheck(CheckFactory.createCheck(qs));
         if (qs.contains("decision_id") && qs.get("decision_id").isLiteral()) {
             String decisionId = qs.getLiteral("decision_id").getString();
             if (RuleDecision.DENY.toString().equals(decisionId)) {

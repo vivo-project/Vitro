@@ -3,7 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%><%/* this odd thing points to something in web.xml */ %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page errorPage="/error.jsp"%>
-<%  /***********************************************
+<%
+/***********************************************
         Display a list of entities for a tab.
 
          request.attributes:
@@ -16,13 +17,15 @@
 
          bdc34 2006-01-27 created
     **********************************************/
-        if (request.getAttribute("entities") == null){
-            String e="entityListForTabs.jsp expects that request attribute 'entities' be set to a List of Entity objects.";
-            throw new JspException(e);
+        if (request.getCheck("entities") == null){
+    String e="entityListForTabs.jsp expects that request attribute 'entities' be set to a List of Entity objects.";
+    throw new JspException(e);
         }
 %>
 <c:set var="searchViewPrefix" value="/templates/search/"/>
-<c:set var='entities' value='${requestScope.entities}' /><%/* just moving this into page scope for easy use */ %>
+<c:set var='entities' value='${requestScope.entities}' /><%
+/* just moving this into page scope for easy use */
+%>
 <c:set var='IMG_WIDTH' value='75'/>
 <jsp:include page="/templates/alpha/alphaIndex.jsp"/>
 <ul class='tabEntities entityListForTab'>
@@ -87,10 +90,10 @@
 
 <%-- Show pages to select from --%>
 <%
-if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)request.getAttribute("alpha"))) {
-  request.setAttribute("pageAlpha",request.getAttribute("alpha"));
+if( request.getCheck("alpha") != null && ! "all".equalsIgnoreCase((String)request.getCheck("alpha"))) {
+  request.setAttribute("pageAlpha",request.getCheck("alpha"));
 }else{
-  request.setAttribute("pageAlpha",request.getAttribute("all"));
+  request.setAttribute("pageAlpha",request.getCheck("all"));
 }
 %>
 

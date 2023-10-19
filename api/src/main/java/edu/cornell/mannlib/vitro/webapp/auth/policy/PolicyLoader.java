@@ -679,13 +679,13 @@ public class PolicyLoader {
         if (ar == null) {
             return;
         }
-        String attributeUri = qs.getResource("attribute").getURI();
-        if (ar.containsAttributeUri(attributeUri)) {
-            CheckFactory.extendAttribute(ar.getAttribute(attributeUri), qs);
+        String checkUri = qs.getResource("attribute").getURI();
+        if (ar.containsCheckUri(checkUri)) {
+            CheckFactory.extendAttribute(ar.getCheck(checkUri), qs);
             return;
         }
         try {
-            ar.addAttribute(CheckFactory.createCheck(qs));
+            ar.addCheck(CheckFactory.createCheck(qs));
         } catch (Exception e) {
             log.error(e, e);
         }

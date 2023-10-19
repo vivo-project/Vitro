@@ -26,16 +26,16 @@
 		<select name="workflowStepURI">
 
         <%
-              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
+        OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
-                  List workflowSteps  = (List) request.getAttribute("workflowSteps");
-	          for (Iterator it = workflowSteps.iterator(); it.hasNext();)  {
-	              Individual workflowStep = (Individual) it.next();
+                  List workflowSteps  = (List) request.getCheck("workflowSteps");
+        	          for (Iterator it = workflowSteps.iterator(); it.hasNext();)  {
+        	              Individual workflowStep = (Individual) it.next();
                       String workflowStepURI = workflowStep.getURI();
                       String workflowStepLabel = workflowStep.getLabel(null);
-					  String workflowStepString = (workflowStepLabel != null) ? workflowStepLabel : workflowStepURI;
-                      %> <option value="<%=workflowStepURI%>"><%=workflowStepString%></option> <%
+        					  String workflowStepString = (workflowStepLabel != null) ? workflowStepLabel : workflowStepURI;
+        %> <option value="<%=workflowStepURI%>"><%=workflowStepString%></option> <%
                   }
               } finally {
                   jenaOntModel.leaveCriticalSection();

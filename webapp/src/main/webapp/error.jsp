@@ -8,9 +8,9 @@
 <%@page import="org.apache.commons.logging.Log"%>
 <%@page import="org.apache.commons.logging.LogFactory"%>
 <%
-   // We have seen that this page can throw its own error.
+// We have seen that this page can throw its own error.
    // Before it does so, be sure that we have written the original error to the log.
-    Object c = request.getAttribute("javax.servlet.jsp.jspException");
+    Object c = request.getCheck("javax.servlet.jsp.jspException");
     if (c instanceof Throwable) {
       Throwable cause = (Throwable) c;
       Log log = LogFactory.getLog(this.getClass());
@@ -18,15 +18,15 @@
     }
 
 
-            VitroRequest vreq = new VitroRequest(request);
-            ApplicationBean appBean = vreq.getAppBean();
-            String themeDir = appBean.getThemeDir();
+    VitroRequest vreq = new VitroRequest(request);
+    ApplicationBean appBean = vreq.getAppBean();
+    String themeDir = appBean.getThemeDir();
 
-            request.setAttribute("bodyJsp", "/errorbody.jsp");
-            request.setAttribute("title", "Error");
-            request.setAttribute("css", "");
-            request.setAttribute("themeDir", themeDir);
-            %>
+    request.setAttribute("bodyJsp", "/errorbody.jsp");
+    request.setAttribute("title", "Error");
+    request.setAttribute("css", "");
+    request.setAttribute("themeDir", themeDir);
+%>
 
 
     <jsp:include page="/templates/page/doctype.jsp"/>

@@ -24,15 +24,15 @@
         <select name="workflowURI">
 
         <%
-              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
+        OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
-                  List savedQueries = (List) request.getAttribute("workflows");
-	          for (Iterator it = savedQueries.iterator(); it.hasNext();)  {
-	              Individual savedQuery = (Individual) it.next();
+                  List savedQueries = (List) request.getCheck("workflows");
+        	          for (Iterator it = savedQueries.iterator(); it.hasNext();)  {
+        	              Individual savedQuery = (Individual) it.next();
                       String queryURI = savedQuery.getURI();
                       String queryLabel = savedQuery.getLabel(null);
-                      %> <option value="<%=queryURI%>"><%=queryLabel%></option> <%
+        %> <option value="<%=queryURI%>"><%=queryLabel%></option> <%
                   }
               } finally {
                   jenaOntModel.leaveCriticalSection();

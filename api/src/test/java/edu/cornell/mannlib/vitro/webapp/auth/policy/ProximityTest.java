@@ -30,7 +30,7 @@ public class ProximityTest extends PolicyTest {
         assertTrue(policy.getRules().size() == 1);
         AccessRule rule = policy.getRules().iterator().next();
         assertEquals(true, rule.isAllowMatched());
-        assertEquals(1, rule.getAttributesCount());
+        assertEquals(1, rule.getChecksCount());
 
         Model targetModel = ModelFactory.createDefaultModel();
         try {

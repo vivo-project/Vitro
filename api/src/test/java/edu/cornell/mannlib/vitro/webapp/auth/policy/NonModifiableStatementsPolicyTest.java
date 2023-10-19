@@ -35,7 +35,7 @@ public class NonModifiableStatementsPolicyTest extends PolicyTest {
         AccessRule rule = policy.getRules().iterator().next();
         assertEquals(false, rule.isAllowMatched());
         for (AccessRule irule : policy.getRules()) {
-            assertEquals(3, irule.getAttributesCount());
+            assertEquals(3, irule.getChecksCount());
         }
 
         AccessObject ao = new ObjectPropertyStatementAccessObject(null, VALID, null, null);

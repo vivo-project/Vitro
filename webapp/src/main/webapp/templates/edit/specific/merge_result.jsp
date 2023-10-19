@@ -6,5 +6,7 @@
 <h2><a href="ingest">Ingest Home</a></h2>
 
 <h3>Merge Individuals</h3>
-<%String result = (String) request.getAttribute("result");%>
+<%
+String result = (String) request.getCheck("result");
+%>
 <p><b><%=result%></b></p>

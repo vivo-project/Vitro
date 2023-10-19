@@ -18,8 +18,8 @@
 	</td>
 	<td valign="bottom" align="center">
 		<form action="editForm" method="get">
-			<input type="submit" class="form-button" value="Edit Namespace <%=request.getAttribute("firstvalue")%>"/>
-			<input name="id" type = "hidden" value="<%=request.getAttribute("firstvalue")%>" />
+			<input type="submit" class="form-button" value="Edit Namespace <%=request.getCheck("firstvalue")%>"/>
+			<input name="id" type = "hidden" value="<%=request.getCheck("firstvalue")%>" />
 			<input type="hidden" name="controller" value="Namespace"/>
 		</form>
 	</td>
