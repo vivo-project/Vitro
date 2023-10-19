@@ -5,45 +5,45 @@ package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import org.apache.jena.query.QuerySolution;
 
-public class AttributeFactory {
+public class CheckFactory {
 
-    public static Attribute createAttribute(QuerySolution qs) {
+    public static Check createCheck(QuerySolution qs) {
         String typeId = qs.getLiteral(PolicyLoader.TYPE_ID).getString();
-        String attributeUri = qs.getResource(PolicyLoader.ATTRIBUTE).getURI();
-        AttributeType type = AttributeType.valueOf(typeId);
+        String checkUri = qs.getResource(PolicyLoader.CHECK).getURI();
+        Attribute type = Attribute.valueOf(typeId);
         String testId = qs.getLiteral("testId").getString();
         String value = getValue(qs);
 
-        Attribute at = null;
+        Check at = null;
         switch (type) {
             case SUBJECT_ROLE_URI:
-                at = new SubjectRoleAttribute(attributeUri, value);
+                at = new SubjectRoleCheck(checkUri, value);
                 break;
             case OPERATION:
-                at = new OperationAttribute(attributeUri, value);
+                at = new OperationCheck(checkUri, value);
                 break;
             case ACCESS_OBJECT_URI:
-                at = new AccessObjectUriAttribute(attributeUri, value);
+                at = new AccessObjectUriCheck(checkUri, value);
                 break;
             case ACCESS_OBJECT_TYPE:
-                at = new AccessObjectTypeAttribute(attributeUri, value);
+                at = new AccessObjectTypeCheck(checkUri, value);
                 break;
             case SUBJECT_TYPE:
-                at = new SubjectTypeAttribute(attributeUri, value);
+                at = new SubjectTypeCheck(checkUri, value);
                 break;
             case STATEMENT_PREDICATE_URI:
-                at = new StatementPredicateUriAttribute(attributeUri, value);
+                at = new StatementPredicateUriCheck(checkUri, value);
                 break;
             case STATEMENT_SUBJECT_URI:
-                at = new StatementSubjectUriAttribute(attributeUri, value);
+                at = new StatementSubjectUriCheck(checkUri, value);
                 break;
             case STATEMENT_OBJECT_URI:
-                at = new StatementObjectUriAttribute(attributeUri, value);
+                at = new StatementObjectUriCheck(checkUri, value);
                 break;
             default:
                 at = null;
         }
-        at.setTestType(TestType.valueOf(testId));
+        at.setType(CheckType.valueOf(testId));
         return at;
     }
 
@@ -57,10 +57,10 @@ public class AttributeFactory {
         }
     }
 
-    public static void extendAttribute(Attribute attribute, QuerySolution qs) throws Exception {
+    public static void extendAttribute(Check check, QuerySolution qs) throws Exception {
         String testId = qs.getLiteral("testId").getString();
-        if (TestType.ONE_OF.toString().equals(testId) || TestType.NOT_ONE_OF.toString().equals(testId)) {
-            attribute.addValue(getValue(qs));
+        if (CheckType.ONE_OF.toString().equals(testId) || CheckType.NOT_ONE_OF.toString().equals(testId)) {
+            check.addValue(getValue(qs));
             return;
         }
         throw new Exception();

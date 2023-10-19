@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.rules;
 import java.util.List;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Check;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeType;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 public interface AccessRule {
@@ -19,19 +19,19 @@ public interface AccessRule {
 
     public void setRuleUri(String ruleUri);
 
-    public List<Attribute> getAttributes();
+    public List<Check> getAttributes();
 
     public boolean match(AuthorizationRequest ar);
 
-    public void addAttribute(Attribute attr);
+    public void addAttribute(Check attr);
 
     public Set<String> getAttributeUris();
 
     public boolean containsAttributeUri(String uri);
 
-    public Set<Attribute> getAttributesByType(AttributeType type);
+    public Set<Check> getAttributesByType(Attribute type);
 
     public long getAttributesCount();
 
-    public Attribute getAttribute(String uri);
+    public Check getAttribute(String uri);
 }

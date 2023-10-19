@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
-public enum TestType {
+public enum CheckType {
     EQUALS,
     NOT_EQUALS,
     ONE_OF,

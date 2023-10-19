@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Check;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
@@ -104,7 +104,7 @@ public class PolicyTest {
                 }
             }
             assertTrue(attrCount.contains(ar.getAttributes().size()));
-            for (Attribute att : ar.getAttributes()) {
+            for (Check att : ar.getAttributes()) {
                 assertTrue(att.getValues().size() > 0);
             }
         }

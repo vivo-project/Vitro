@@ -89,11 +89,11 @@
     ao:rule :AllowSimplePermission .
       
 :AllowSimplePermission a ao:Rule;
-    ao:attribute ai:NamedObjectTypeAttribute ;
-    ao:attribute :PermissionNameAllowed ;
-    ao:attribute :SubjectRoleEqualsDataSetRole .
+    ao:check ai:NamedObjectTypeAttribute ;
+    ao:check :PermissionNameAllowed ;
+    ao:check :SubjectRoleEqualsDataSetRole .
       
-:PermissionNameAllowed a ao:Attribute ;
+:PermissionNameAllowed a ao:Check ;
     ao:operator ai:OneOf ;
     ao:type ai:AccessObjectUri ;
     ao:templateValue :TypeValueSet .
@@ -116,7 +116,7 @@ ai:CuratorSimplePermissionValueContainer a ao:ValueContainer ;
 ai:AdminSimplePermissionValueContainer a ao:ValueContainer ;
     ao:containerType ai:NamedObject .
 
-:SubjectRoleEqualsDataSetRole a ao:Attribute ;
+:SubjectRoleEqualsDataSetRole a ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:SubjectRole ;
     ao:templateValue :RoleValueSet .

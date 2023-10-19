@@ -15,31 +15,31 @@ ai:EditIndividualPagesRuleSet rdf:type ao:Rules ;
     ao:rule ai:AllowEditIndividualPagesRule .
 
 ai:AllowEditIndividualPagesRule rdf:type ao:Rule;
-    ao:attribute ai:SubjectRoleOneOfEditorsAttribute ;
-    ao:attribute ai:AddOperationAttribute ;
-    ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
-    ao:attribute ai:SomeObjectUriAttribute ;
-    ao:attribute ai:SomePredicateAttribute .
+    ao:check ai:SubjectRoleOneOfEditorsAttribute ;
+    ao:check ai:AddOperationAttribute ;
+    ao:check ai:ObjectPropertyStatementTypeAttribute ;
+    ao:check ai:SomeObjectUriAttribute ;
+    ao:check ai:SomePredicateAttribute .
 
 ai:AllowEditRelatedPagesRule rdf:type ao:Rule;
-    ao:attribute ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
-    ao:attribute ai:StatementObjectUriContainsSelfEditorResourceAttribute;
-    ao:attribute ai:AddOperationAttribute ;
-    ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
-    ao:attribute ai:SomeObjectUriAttribute ;
-    ao:attribute ai:SomePredicateAttribute .
+    ao:check ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+    ao:check ai:StatementObjectUriContainsSelfEditorResourceAttribute;
+    ao:check ai:AddOperationAttribute ;
+    ao:check ai:ObjectPropertyStatementTypeAttribute ;
+    ao:check ai:SomeObjectUriAttribute ;
+    ao:check ai:SomePredicateAttribute .
 
-ai:SomePredicateAttribute rdf:type ao:Attribute ;
+ai:SomePredicateAttribute rdf:type ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:StatementPredicateUri ;
     ao:value ai:SomeUriTestData .
 
-ai:SomeObjectUriAttribute rdf:type ao:Attribute ;
+ai:SomeObjectUriAttribute rdf:type ao:Check ;
     ao:operator ai:Equals ;
     ao:type ai:StatementObjectUri ;
     ao:value ai:SomeUriTestData .
 
-ai:StatementObjectUriContainsSelfEditorResourceAttribute rdf:type ao:Attribute ;
+ai:StatementObjectUriContainsSelfEditorResourceAttribute rdf:type ao:Check ;
     ao:operator ai:SparqlSelectQueryContains ;
     ao:type ai:StatementSubjectUri ;
     ao:value ai:PersonProfileProximityToResourceUri .

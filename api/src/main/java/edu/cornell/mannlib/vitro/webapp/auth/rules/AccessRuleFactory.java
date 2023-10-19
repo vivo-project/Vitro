@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.rules;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.CheckFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +20,7 @@ public class AccessRuleFactory {
         }
 
         ar.setRuleUri(ruleUri);
-        ar.addAttribute(AttributeFactory.createAttribute(qs));
+        ar.addAttribute(CheckFactory.createCheck(qs));
         if (qs.contains("decision_id") && qs.get("decision_id").isLiteral()) {
             String decisionId = qs.getLiteral("decision_id").getString();
             if (RuleDecision.DENY.toString().equals(decisionId)) {

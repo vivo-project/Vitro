@@ -16,16 +16,16 @@ ai:BrokenRuleSet rdf:type ao:Rules ;
     ao:rule ai:BrokenRule .
     
 ai:BrokenRule rdf:type ao:Rule ;
-    ao:attribute ai:BrokenSetAttribute1 ;
-    ao:attribute ai:BrokenSetAttribute2 .
+    ao:check ai:BrokenSetAttribute1 ;
+    ao:check ai:BrokenSetAttribute2 .
     
-ai:BrokenSetAttribute1 rdf:type ao:Attribute ;
+ai:BrokenSetAttribute1 rdf:type ao:Check ;
     ao:operator ai:NotOneOf ;
     ao:type ai:ObjectUri ;
     ao:templateValue ai:AttributeValueSet1 ;
     .
     
-ai:BrokenSetAttribute2 rdf:type ao:Attribute ;
+ai:BrokenSetAttribute2 rdf:type ao:Check ;
     ao:operator ai:NotOneOf ;
     ao:type ai:ObjectUri ;
     ao:templateValue ai:AttributeValueSet2 .

@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Check;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeType;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -21,9 +21,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class AccessRuleImpl implements AccessRule {
     private static final Log log = LogFactory.getLog(AccessRuleImpl.class);
-    protected Map<String, Attribute> attributeMap = new HashMap<>();
-    protected List<Attribute> attributes = new ArrayList<Attribute>();
-    private static final Comparator<Attribute> comparator = getAttributeComparator();
+    protected Map<String, Check> attributeMap = new HashMap<>();
+    protected List<Check> attributes = new ArrayList<Check>();
+    private static final Comparator<Check> comparator = getAttributeComparator();
 
     private boolean allowMatched = true;
     private String ruleUri;
@@ -44,13 +44,13 @@ public class AccessRuleImpl implements AccessRule {
         this.ruleUri = ruleUri;
     }
 
-    public List<Attribute> getAttributes() {
+    public List<Check> getAttributes() {
         return attributes;
     }
 
     public boolean match(AuthorizationRequest ar) {
-        for (Attribute attribute : attributes) {
-            if (!attribute.match(ar)) {
+        for (Check attribute : attributes) {
+            if (!attribute.check(ar)) {
                 if (log.isDebugEnabled()) {
                     log.debug(String.format("Attribute %s didn't match", attribute.getUri()));
                 }
@@ -60,7 +60,7 @@ public class AccessRuleImpl implements AccessRule {
         return true;
     }
 
-    public void addAttribute(Attribute attr) {
+    public void addAttribute(Check attr) {
         if (attributeMap.containsKey(attr.getUri())) {
             log.error(String.format("attribute %s already exists in the rule", attr.getUri()));
         }
@@ -101,7 +101,7 @@ public class AccessRuleImpl implements AccessRule {
         return attributeMap.containsKey(uri);
     }
 
-    public Set<Attribute> getAttributesByType(AttributeType type) {
+    public Set<Check> getAttributesByType(Attribute type) {
         return getAttributes().stream().filter(a -> a.getAttributeType().equals(type)).collect(Collectors.toSet());
     }
 
@@ -109,14 +109,14 @@ public class AccessRuleImpl implements AccessRule {
         return attributes.size();
     }
 
-    public Attribute getAttribute(String uri) {
+    public Check getAttribute(String uri) {
         return attributeMap.get(uri);
     }
 
-    private static Comparator<Attribute> getAttributeComparator() {
-        return new Comparator<Attribute>() {
+    private static Comparator<Check> getAttributeComparator() {
+        return new Comparator<Check>() {
             @Override
-            public int compare(Attribute latt, Attribute ratt) {
+            public int compare(Check latt, Check ratt) {
                 if (latt.getComputationalCost() > ratt.getComputationalCost()) {
                     return -1;
                 } else if (latt.getComputationalCost() < ratt.getComputationalCost()) {

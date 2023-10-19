@@ -7,19 +7,19 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class StatementSubjectUriAttribute extends AbstractAttribute {
+public class StatementSubjectUriCheck extends AbstractCheck {
 
-    private static final Log log = LogFactory.getLog(StatementSubjectUriAttribute.class);
+    private static final Log log = LogFactory.getLog(StatementSubjectUriCheck.class);
 
-    public StatementSubjectUriAttribute(String uri, String value) {
+    public StatementSubjectUriCheck(String uri, String value) {
         super(uri, value);
     }
 
     @Override
-    public boolean match(AuthorizationRequest ar) {
+    public boolean check(AuthorizationRequest ar) {
         AccessObject ao = ar.getAccessObject();
         final String inputValue = ao.getStatementSubject();
-        if (AttributeValueTester.test(this, ar, inputValue)) {
+        if (AttributeValueChecker.test(this, ar, inputValue)) {
             log.debug("Attribute value match requested statement subject uri '" + inputValue + "'");
             return true;
         }
@@ -28,8 +28,8 @@ public class StatementSubjectUriAttribute extends AbstractAttribute {
     }
 
     @Override
-    public AttributeType getAttributeType() {
-        return AttributeType.STATEMENT_SUBJECT_URI;
+    public Attribute getAttributeType() {
+        return Attribute.STATEMENT_SUBJECT_URI;
     }
 
 }

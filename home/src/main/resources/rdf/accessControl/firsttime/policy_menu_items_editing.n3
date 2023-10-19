@@ -18,24 +18,24 @@ ai:RestrictHomeMenuItemsEditingRuleSet rdf:type ao:Rules ;
           
 ai:RestrictEditHomeMenuItems rdf:type ao:Rule ;
           ao:decision ai:Deny ;
-          ao:attribute ai:EditOperationAttribute ;
-          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
-          ao:attribute ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
-          ao:attribute ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
+          ao:check ai:EditOperationAttribute ;
+          ao:check ai:ObjectPropertyStatementTypeAttribute ;
+          ao:check ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
+          ao:check ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
           
 ai:RestrictDropHomeMenuItems rdf:type ao:Rule ;
           ao:decision ai:Deny ;
-          ao:attribute ai:DropOperationAttribute ;
-          ao:attribute ai:ObjectPropertyStatementTypeAttribute ;
-          ao:attribute ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
-          ao:attribute ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
+          ao:check ai:DropOperationAttribute ;
+          ao:check ai:ObjectPropertyStatementTypeAttribute ;
+          ao:check ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
+          ao:check ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
           
-ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute rdf:type ao:Attribute ;
+ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
          ao:type ai:StatementPredicateUri ;
          ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
 
-ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute rdf:type ao:Attribute ;
+ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
          ao:type ai:StatementObjectUri ;
          ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

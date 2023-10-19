@@ -15,14 +15,14 @@ ai:BrokenTestPolicyRuleSet rdf:type ao:Rules ;
           ao:rule ai:BrokenTestRule .
           
 ai:BrokenTestRule rdf:type ao:Rule ;
-          ao:attribute ai:ValidTestAttribute ;
-          ao:attribute ai:BrokenTestAttribute .
+          ao:check ai:ValidTestAttribute ;
+          ao:check ai:BrokenTestAttribute .
           
-ai:BrokenTestAttribute rdf:type ao:Attribute ;
+ai:BrokenTestAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
          ao:value ai:PublishOperation .
          
-ai:ValidTestAttribute rdf:type ao:Attribute ;
+ai:ValidTestAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
          ao:type ai:Operation ;
          ao:value ai:PublishOperation .

@@ -15,9 +15,9 @@ ai:ProximityRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowPersonEditOwnPublication .
           
 ai:AllowPersonEditOwnPublication rdf:type ao:Rule ;
-          ao:attribute ai:PublicationInProximityAttribute .
+          ao:check ai:PublicationInProximityAttribute .
           
-ai:PublicationInProximityAttribute rdf:type ao:Attribute ;
+ai:PublicationInProximityAttribute rdf:type ao:Check ;
          ao:operator ai:SparqlSelectQueryContains ;
          ao:type ai:StatementSubjectUri ;
          ao:value ai:PublicationProximityToPerson .

@@ -8,18 +8,18 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SubjectRoleAttribute extends AbstractAttribute {
+public class SubjectRoleCheck extends AbstractCheck {
 
-    private static final Log log = LogFactory.getLog(SubjectRoleAttribute.class);
+    private static final Log log = LogFactory.getLog(SubjectRoleCheck.class);
 
-    public SubjectRoleAttribute(String uri, String roleValue) {
+    public SubjectRoleCheck(String uri, String roleValue) {
         super(uri, roleValue);
     }
 
     @Override
-    public boolean match(AuthorizationRequest ar) {
+    public boolean check(AuthorizationRequest ar) {
         final List<String> inputValues = ar.getRoleUris();
-        if (AttributeValueTester.test(this, ar, inputValues.toArray(new String[0]))) {
+        if (AttributeValueChecker.test(this, ar, inputValues.toArray(new String[0]))) {
             log.debug("Attribute match requested '" + inputValues + "'");
             return true;
         }
@@ -28,8 +28,8 @@ public class SubjectRoleAttribute extends AbstractAttribute {
     }
 
     @Override
-    public AttributeType getAttributeType() {
-        return AttributeType.SUBJECT_ROLE_URI;
+    public Attribute getAttributeType() {
+        return Attribute.SUBJECT_ROLE_URI;
     }
 
 }

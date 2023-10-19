@@ -14,7 +14,7 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.CheckFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRuleFactory;
@@ -119,7 +119,7 @@ public class PolicyLoader {
             + "?policy rdf:type ao:Policy .\n"
             + "?policy ao:rules ?rules . \n"
             + "?rules ao:rule ?rule . \n"
-            + "?rule ao:attribute ?attribute .\n"
+            + "?rule ao:check ?attribute .\n"
             + "OPTIONAL {\n"
             + "  ?attribute ao:operator ?attributeTest .\n"
             + "  OPTIONAL {\n"
@@ -158,8 +158,8 @@ public class PolicyLoader {
             + "    ?policyDataSets ao:policyDataSet ?dataSet .\n"
             + "    ?rules rdf:type ao:Rules .\n"
             + "    ?rules ao:rule ?rule .\n"
-            + "    ?rule ao:attribute ?attribute .\n"
-            + "    ?attribute rdf:type ao:Attribute .\n"
+            + "    ?rule ao:check ?attribute .\n"
+            + "    ?attribute rdf:type ao:Check .\n"
             + "    OPTIONAL {\n"
             + "      ?attribute ao:operator ?attributeTest .\n"
             + "      OPTIONAL {\n"
@@ -244,7 +244,7 @@ public class PolicyLoader {
     public static final String RULE = "rule";
     public static final String LITERAL_VALUE = "lit_value";
     public static final String ATTR_VALUE = "value";
-    public static final String ATTRIBUTE = "attribute";
+    public static final String CHECK = "attribute";
     public static final String TEST_ID = "testId";
     public static final String TYPE_ID = "typeId";
     private static PolicyLoader INSTANCE;
@@ -681,11 +681,11 @@ public class PolicyLoader {
         }
         String attributeUri = qs.getResource("attribute").getURI();
         if (ar.containsAttributeUri(attributeUri)) {
-            AttributeFactory.extendAttribute(ar.getAttribute(attributeUri), qs);
+            CheckFactory.extendAttribute(ar.getAttribute(attributeUri), qs);
             return;
         }
         try {
-            ar.addAttribute(AttributeFactory.createAttribute(qs));
+            ar.addAttribute(CheckFactory.createCheck(qs));
         } catch (Exception e) {
             log.error(e, e);
         }

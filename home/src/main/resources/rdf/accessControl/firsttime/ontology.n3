@@ -37,7 +37,7 @@ ao:Rules a owl:Class ;
 ao:PolicyKey a owl:Class ;
      rdfs:label "Policy key"@en-US .
 
-ao:Attribute a owl:Class ;
+ao:Check a owl:Class ;
      rdfs:label "Access rule attribute"@en-US .
      
 ao:Operator a owl:Class ;
@@ -68,7 +68,7 @@ ao:Decision a owl:Class ;
 
 ao:attributeName a owl:DatatypeProperty ,
             owl:FunctionalProperty ;
-            rdfs:domain ao:Attribute ;
+            rdfs:domain ao:Check ;
             rdfs:range xsd:string ;
             rdfs:label "Attribute name"@en-US .
 
@@ -90,9 +90,9 @@ ao:priority a owl:DatatypeProperty ,
             
 #### Object properties
 
-ao:attribute a owl:ObjectProperty ;
+ao:check a owl:ObjectProperty ;
           rdfs:domain ao:Rule ;
-          rdfs:range ao:Attribute .
+          rdfs:range ao:Check .
           
 ao:decision a owl:ObjectProperty ;
           rdfs:domain ao:Rule ;
@@ -116,10 +116,10 @@ ao:containerType a owl:ObjectProperty ;
 ao:uri a owl:ObjectProperty .
 
 ao:value a owl:ObjectProperty ;
-          rdfs:domain ao:Attribute .
+          rdfs:domain ao:Check .
           
 ao:setValue a owl:ObjectProperty ;
-          rdfs:domain ao:Attribute .          
+          rdfs:domain ao:Check .          
     
 ao:operation a owl:ObjectProperty ;
           rdfs:domain ao:Rule ;
@@ -130,7 +130,7 @@ ao:rule a owl:ObjectProperty ;
           rdfs:range ao:Rule .
           
 ao:test a owl:ObjectProperty ;
-          rdfs:domain ao:Attribute ;
+          rdfs:domain ao:Check ;
           rdfs:range ao:Operator .
           
 ao:keyComponent a owl:ObjectProperty .
