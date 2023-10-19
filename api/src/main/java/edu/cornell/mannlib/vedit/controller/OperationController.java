@@ -160,7 +160,7 @@ public class OperationController extends BaseEditController {
                         if (selectedRoles == null) {
                             selectedRoles = new String[0];
                         }
-                        EntityPolicyController.updateEntityPolicy(entityUri, AccessObjectType.valueOf(entityType), og, Arrays.asList(selectedRoles), roleUris);
+                        EntityPolicyController.updateEntityPolicyDataSet(entityUri, AccessObjectType.valueOf(entityType), og, Arrays.asList(selectedRoles), roleUris);
                     }
                 }
             }

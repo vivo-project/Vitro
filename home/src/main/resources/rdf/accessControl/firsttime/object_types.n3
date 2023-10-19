@@ -37,3 +37,32 @@ ai:Class rdf:type ao:ObjectType ;
      
 ai:NamedObject rdf:type ao:ObjectType ;
      ao:id "NAMED_OBJECT" .
+
+#Object type value containers
+
+ai:ObjectPropertyAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:ObjectPropertyAccesObject .
+
+ai:DataPropertyAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:DataPropertyAccesObject .
+
+ai:FauxObjectPropertyAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxObjectPropertyAccesObject .
+
+ai:FauxDataPropertyAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxDataPropertyAccesObject .
+
+ai:ObjectPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:ObjectPropertyStatementAccesObject .
+
+ai:DataPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:DataPropertyStatementAccesObject .
+
+ai:FauxObjectPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxObjectPropertyStatementAccesObject .
+
+ai:FauxDataPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxDataPropertyStatementAccesObject .
+
+ai:ClassAccesObjectValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:Class .

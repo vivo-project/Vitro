@@ -29,7 +29,7 @@ public class EntityPolicyController {
      * @param selectedRoles - list of roles to assign
      * @param allRoles - list of all available roles
      */
-    public static void updateEntityPolicy(String entityUri, AccessObjectType aot, OperationGroup og,
+    public static void updateEntityPolicyDataSet(String entityUri, AccessObjectType aot, OperationGroup og,
             List<String> selectedRoles, List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {
             return;
@@ -39,19 +39,20 @@ public class EntityPolicyController {
             boolean isInDataSet = isUriInTestDataset(entityUri, og, aot, role);
             boolean isSelected = selectedSet.contains(role);
             final PolicyLoader loader = PolicyLoader.getInstance();
-            final String policyUri = loader.getPolicyUriByKey(og, aot, role);
-            if (policyUri == null) {
+            final String dataSetUri = loader.getDataSetUriByKey(og, aot, role);
+
+            if (dataSetUri == null) {
                 log.debug(
                         String.format("Policy wasn't found by key:\n%s\n%s\n%s", og.toString(), aot.toString(), role));
                 continue;
             }
             if (isSelected && !isInDataSet) {
                 loader.addEntityToPolicyDataSet(entityUri, aot, og, role);
-                DynamicPolicy policy = loader.loadPolicy(policyUri);
+                DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
                 PolicyStore.getInstance().add(policy);
             } else if (!isSelected && isInDataSet) {
                 loader.removeEntityFromPolicyDataSet(entityUri, aot, og, role);
-                DynamicPolicy policy = loader.loadPolicy(policyUri);
+                DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
                 PolicyStore.getInstance().add(policy);
             }
         }
@@ -103,7 +104,7 @@ public class EntityPolicyController {
     }
 
     private static boolean isUriInTestDataset(String entityUri, OperationGroup og, AccessObjectType aot, String role) {
-        Set<String> values = PolicyLoader.getInstance().getPolicyDataSetValues(og, aot, role);
+        Set<String> values = PolicyLoader.getInstance().getDataSetValues(og, aot, role);
         return values.contains(entityUri);
     }
 

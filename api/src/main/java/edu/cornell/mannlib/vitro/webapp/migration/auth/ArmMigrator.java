@@ -92,7 +92,7 @@ public class ArmMigrator {
             for (String operation : armOperations) {
                 OperationGroup og = operationMap.get(operation);
                 for (AccessObjectType aot : entityTypes) {
-                    Set<String> entityUris = PolicyLoader.getInstance().getPolicyDataSetValues(og, aot, newRole);
+                    Set<String> entityUris = PolicyLoader.getInstance().getDataSetValues(og, aot, newRole);
                     for (String entityUri : entityUris) {
                         EntityPolicyController.getDataValueStatements(entityUri, aot, og,
                                 Collections.singleton(newRole), removals);

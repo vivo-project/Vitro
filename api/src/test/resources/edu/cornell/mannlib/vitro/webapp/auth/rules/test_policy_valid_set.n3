@@ -8,53 +8,63 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:ValidTestSetPolicy rdf:type ao:Policy ;
-          ao:testDatasets ai:testDataSets1 ;
-          ao:rules ai:ValidRuleSet .
+ai:ValidTestSetPolicy rdf:type ao:PolicyTemplate ;
+      ao:policyDataSets ai:testDataSets1 ;
+      ao:rules ai:ValidRuleSet .
 
 ai:ValidRuleSet rdf:type ao:Rules ;
-          ao:rule ai:ValidRule .
-          
+      ao:rule ai:ValidRule .
+      
 ai:ValidRule rdf:type ao:Rule ;
-          ao:attribute ai:ValidAttribute1 ;
-          ao:attribute ai:ValidAttribute2 .
-          
+      ao:attribute ai:ValidAttribute1 ;
+      ao:attribute ai:ValidAttribute2 .
+      
 ai:ValidAttribute1 rdf:type ao:Attribute ;
-         ao:operator ai:Equals ;
-         ao:type ai:AccessObjectUri ;
-         ao:setValue ai:valueSet3 ;
-         ao:setValue ai:valueSet1 .
-         
+     ao:operator ai:Equals ;
+     ao:type ai:AccessObjectUri ;
+     ao:templateValue ai:AttributeValueSet1 ;
+     .
+
+ai:AttributeValueSet1 a ao:AttributeValueSet  ;
+     ao:attributeValue ai:valueSet1 ;
+     ao:attributeValue ai:valueSet3 ;
+     .
+     
 ai:ValidAttribute2 rdf:type ao:Attribute ;
-         ao:operator ai:Equals ;
-         ao:type ai:AccessObjectUri ;
-         ao:setValue ai:valueSet4 ;
-         ao:setValue ai:valueSet2 .
+     ao:operator ai:Equals ;
+     ao:type ai:AccessObjectUri ;
+     ao:templateValue ai:AttributeValueSet2 ;
+     .
 
-ai:testDataSets1 rdf:type ao:TestDatasets ;
-         ao:testDataset ai:testDataSet2 ;
-         ao:testDataset ai:testDataSet1 .
+ai:AttributeValueSet2 a ao:AttributeValueSet  ;
+     ao:attributeValue ai:valueSet4 ;
+     ao:attributeValue ai:valueSet2 ;
+     .
 
-ai:testDataSet1 rdf:type ao:TestDataSet ;
-         ao:testData ai:valueSet2 ;
-         ao:testData ai:valueSet1 .
-         
-ai:testDataSet2 rdf:type ao:TestDataSet ;
-         ao:testData ai:valueSet3 ;
-         ao:testData ai:valueSet4 .
+ai:testDataSets1 rdf:type ao:PolicyDataSets ;
+     ao:policyDataSet ai:testDataSet2 ;
+     ao:policyDataSet ai:testDataSet1 .
 
-ai:valueSet1 rdf:type ao:TestData ;
-         ao:dataValue <test:value1> ;
-         .
-        
-ai:valueSet2 rdf:type ao:TestData ;
-         ao:dataValue <test:value2> ;
-         .
-         
-ai:valueSet3 rdf:type ao:TestData ;
-         ao:dataValue <test:value3> ;
-         .
-        
-ai:valueSet4 rdf:type ao:TestData ;
-         ao:dataValue <test:value4> ;
-         .
+ai:testDataSet1 rdf:type ao:PolicyDataSet ;
+     ao:dataSetValues ai:valueSet2 ;
+     ao:dataSetValues ai:valueSet1 .
+     
+ai:testDataSet2 rdf:type ao:PolicyDataSet ;
+     ao:dataSetValues ai:valueSet3 ;
+     ao:dataSetValues ai:valueSet4 .
+
+ai:valueSet1 rdf:type ao:ValueContainer ;
+     ao:dataValue <test:value1> ;
+     .
+    
+ai:valueSet2 rdf:type ao:ValueContainer ;
+     ao:dataValue <test:value2> ;
+     .
+     
+ai:valueSet3 rdf:type ao:ValueContainer ;
+     ao:dataValue <test:value3> ;
+     .
+    
+ai:valueSet4 rdf:type ao:ValueContainer ;
+     ao:dataValue <test:value4> ;
+     .

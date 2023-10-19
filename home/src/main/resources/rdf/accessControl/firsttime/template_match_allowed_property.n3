@@ -1,0 +1,590 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-match-allowed-property/> .
+
+:PolicyTemplate a ao:PolicyTemplate ;
+    ao:rules :RuleSet ;
+    ao:policyDataSets :DataSets .
+
+:DataSets a ao:PolicyDataSets ;
+    ao:policyDataSet :PublicDisplayObjectPropertyDataSet ;
+    ao:policyDataSet :EditorDisplayObjectPropertyDataSet ;
+    ao:policyDataSet :CuratorDisplayObjectPropertyDataSet ;
+    ao:policyDataSet :AdminDisplayObjectPropertyDataSet ;
+    ao:policyDataSet :PublicDisplayDataPropertyDataSet ;
+    ao:policyDataSet :EditorDisplayDataPropertyDataSet ;
+    ao:policyDataSet :CuratorDisplayDataPropertyDataSet ;
+    ao:policyDataSet :AdminDisplayDataPropertyDataSet ;
+    ao:policyDataSet :PublicDisplayFauxObjectPropertyDataSet ;
+    ao:policyDataSet :EditorDisplayFauxObjectPropertyDataSet ;
+    ao:policyDataSet :CuratorDisplayFauxObjectPropertyDataSet ;
+    ao:policyDataSet :AdminDisplayFauxObjectPropertyDataSet ;
+    ao:policyDataSet :PublicDisplayFauxDataPropertyDataSet ;
+    ao:policyDataSet :EditorDisplayFauxDataPropertyDataSet ;
+    ao:policyDataSet :CuratorDisplayFauxDataPropertyDataSet ;
+    ao:policyDataSet :AdminDisplayFauxDataPropertyDataSet ;
+
+    ao:policyDataSet :EditorPublishObjectPropertyDataSet ;
+    ao:policyDataSet :CuratorPublishObjectPropertyDataSet ;
+    ao:policyDataSet :AdminPublishObjectPropertyDataSet ;
+    ao:policyDataSet :EditorPublishDataPropertyDataSet ;
+    ao:policyDataSet :CuratorPublishDataPropertyDataSet ;
+    ao:policyDataSet :AdminPublishDataPropertyDataSet ;
+    ao:policyDataSet :EditorPublishFauxObjectPropertyDataSet ;
+    ao:policyDataSet :CuratorPublishFauxObjectPropertyDataSet ;
+    ao:policyDataSet :AdminPublishFauxObjectPropertyDataSet ;
+    ao:policyDataSet :EditorPublishFauxDataPropertyDataSet ;
+    ao:policyDataSet :CuratorPublishFauxDataPropertyDataSet ;
+    ao:policyDataSet :AdminPublishFauxDataPropertyDataSet ;
+    .
+
+### Display object property data sets
+
+:PublicDisplayObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :PublicDisplayObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:PublicRoleValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:PublicDisplayObjectPropertyValueContainer .
+    
+:PublicDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent auth:PUBLIC ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:EditorDisplayObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorDisplayObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:EditorDisplayObjectPropertyValueContainer .
+    
+:EditorDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:CuratorDisplayObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorDisplayObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:CuratorDisplayObjectPropertyValueContainer .
+    
+:CuratorDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:AdminDisplayObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminDisplayObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:AdminDisplayObjectPropertyValueContainer .
+    
+:AdminDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+### Display data property data sets
+
+:PublicDisplayDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :PublicDisplayDataPropertyDataSetKey ;
+    ao:dataSetValues ai:PublicRoleValueContainer ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:PublicDisplayDataPropertyValueContainer .
+    
+:PublicDisplayDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent auth:PUBLIC ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:EditorDisplayDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorDisplayDataPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:EditorDisplayDataPropertyValueContainer .
+    
+:EditorDisplayDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:CuratorDisplayDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorDisplayDataPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:CuratorDisplayDataPropertyValueContainer .
+    
+:CuratorDisplayDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:AdminDisplayDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminDisplayDataPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:AdminDisplayDataPropertyValueContainer .
+    
+:AdminDisplayDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+### Display faux object property data sets
+
+:PublicDisplayFauxObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :PublicDisplayFauxObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:PublicRoleValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:PublicDisplayFauxObjectPropertyValueContainer .
+    
+:PublicDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent auth:PUBLIC ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:EditorDisplayFauxObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorDisplayFauxObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:EditorDisplayFauxObjectPropertyValueContainer .
+    
+:EditorDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:CuratorDisplayFauxObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorDisplayFauxObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:CuratorDisplayFauxObjectPropertyValueContainer .
+    
+:CuratorDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:AdminDisplayFauxObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminDisplayFauxObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:AdminDisplayFauxObjectPropertyValueContainer .
+    
+:AdminDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+### Display faux data property data sets
+
+:PublicDisplayFauxDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :PublicDisplayFauxDataPropertyDataSetKey ;
+    ao:dataSetValues ai:PublicRoleValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:PublicDisplayFauxDataPropertyValueContainer .
+    
+:PublicDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent auth:PUBLIC ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:EditorDisplayFauxDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorDisplayFauxDataPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:EditorDisplayFauxDataPropertyValueContainer .
+    
+:EditorDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:CuratorDisplayFauxDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorDisplayFauxDataPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:CuratorDisplayFauxDataPropertyValueContainer .
+    
+:CuratorDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+:AdminDisplayFauxDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminDisplayFauxDataPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValues ai:AdminDisplayFauxDataPropertyValueContainer .
+    
+:AdminDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:DisplayOperationGroup .
+
+### Publish object property data sets
+
+:EditorPublishObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorPublishObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:EditorPublishObjectPropertyValueContainer .
+    
+:EditorPublishObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:CuratorPublishObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorPublishObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:CuratorPublishObjectPropertyValueContainer .
+    
+:CuratorPublishObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:AdminPublishObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminPublishObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:AdminPublishObjectPropertyValueContainer .
+    
+:AdminPublishObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+### Publish data property data sets
+
+:EditorPublishDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorPublishDataPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:EditorPublishDataPropertyValueContainer .
+    
+:EditorPublishDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:CuratorPublishDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorPublishDataPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:CuratorPublishDataPropertyValueContainer .
+    
+:CuratorPublishDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:AdminPublishDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminPublishDataPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:AdminPublishDataPropertyValueContainer .
+    
+:AdminPublishDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+### Publish faux object property data sets
+
+:EditorPublishFauxObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorPublishFauxObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:EditorPublishFauxObjectPropertyValueContainer .
+    
+:EditorPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:CuratorPublishFauxObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorPublishFauxObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:CuratorPublishFauxObjectPropertyValueContainer .
+    
+:CuratorPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:AdminPublishFauxObjectPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminPublishFauxObjectPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:AdminPublishFauxObjectPropertyValueContainer .
+    
+:AdminPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+### Publish faux data property data sets
+
+:EditorPublishFauxDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorPublishFauxDataPropertyDataSetKey ;
+    ao:dataSetValues ai:EditorRoleValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:EditorPublishFauxDataPropertyValueContainer .
+    
+:EditorPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent auth:EDITOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:CuratorPublishFauxDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorPublishFauxDataPropertyDataSetKey ;
+    ao:dataSetValues ai:CuratorRoleValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:CuratorPublishFauxDataPropertyValueContainer .
+    
+:CuratorPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent auth:CURATOR ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+:AdminPublishFauxDataPropertyDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminPublishFauxDataPropertyDataSetKey ;
+    ao:dataSetValues ai:AdminRoleValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValues ai:AdminPublishFauxDataPropertyValueContainer .
+    
+:AdminPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent auth:ADMIN ;
+    ao:keyComponent ai:PublishOperationGroup .
+
+### Rules
+
+:RuleSet a ao:Rules ;
+    ao:rule :AllowMatchingPropertyStatement ;
+    ao:rule :AllowMatchingProperty .
+
+:AllowMatchingProperty a ao:Rule;
+    ao:attribute :SubjectRoleEqualsDataSetRoleAttribute ;
+    ao:attribute :OperationEqualsDataSetOperation ;
+    ao:attribute :AccessObjectTypeEqualsDataSetValue ;
+    ao:attribute :AccessObjectUriContainsInDataSet .
+
+:AccessObjectTypeEqualsDataSetValue rdf:type ao:Attribute ;
+    ao:operator ai:Equals ;
+    ao:type ai:AccessObjectType ;
+    ao:templateValue :AccessObjectTypeValueSet .
+
+:AccessObjectTypeValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:attributeValue ai:DataPropertyAccesObjectValueContainer ;
+    ao:attributeValue ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:attributeValue ai:FauxDataPropertyAccesObjectValueContainer ;
+    .
+
+:AllowMatchingPropertyStatement a ao:Rule;
+    ao:attribute :SubjectRoleEqualsDataSetRoleAttribute ;
+    ao:attribute :OperationEqualsDataSetOperation ;
+    ao:attribute :AccessObjectTypeStatementEquals ;
+    ao:attribute :StatementPredicateEquals ;
+    .
+
+:AccessObjectTypeStatementEquals rdf:type ao:Attribute ;
+    ao:operator ai:Equals ;
+    ao:type ai:AccessObjectType ;
+    ao:templateValue :StatementAccessObjectTypeValueSet .
+
+:StatementAccessObjectTypeValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:attributeValue ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:attributeValue ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:attributeValue ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    .
+
+:OperationEqualsDataSetOperation a ao:Attribute ;
+    ao:operator ai:Equals ;
+    ao:type ai:Operation ;
+    ao:templateValue :OperationValueSet .
+
+:OperationValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:DisplayOperationValueContainer ;
+    ao:attributeValue ai:PublishOperationValueContainer ;
+    .
+
+:SubjectRoleEqualsDataSetRoleAttribute a ao:Attribute ;
+    ao:operator ai:Equals ;
+    ao:type ai:SubjectRole ;
+    ao:templateValue :RoleValueSet .
+
+:RoleValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:PublicRoleValueContainer ;
+    ao:attributeValue ai:EditorRoleValueContainer ;
+    ao:attributeValue ai:CuratorRoleValueContainer ;
+    ao:attributeValue ai:AdminRoleValueContainer .
+
+:StatementPredicateEquals a ao:Attribute ;
+    ao:operator ai:OneOf ;
+    ao:type ai:StatementPredicateUri ;
+    ao:templateValue :AllowedPropertyUriValueSet .
+
+:AccessObjectUriContainsInDataSet a ao:Attribute ;
+    ao:operator ai:OneOf ;
+    ao:type ai:AccessObjectUri ;
+    ao:templateValue :AllowedPropertyUriValueSet .
+
+:AllowedPropertyUriValueSet a ao:AttributeValueSet ;
+    ao:attributeValue ai:PublicDisplayObjectPropertyValueContainer ;
+    ao:attributeValue ai:EditorDisplayObjectPropertyValueContainer ;
+    ao:attributeValue ai:CuratorDisplayObjectPropertyValueContainer ;
+    ao:attributeValue ai:AdminDisplayObjectPropertyValueContainer ;
+    ao:attributeValue ai:PublicDisplayDataPropertyValueContainer ;
+    ao:attributeValue ai:EditorDisplayDataPropertyValueContainer ;
+    ao:attributeValue ai:CuratorDisplayDataPropertyValueContainer ;
+    ao:attributeValue ai:AdminDisplayDataPropertyValueContainer ;
+    ao:attributeValue ai:PublicDisplayFauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:EditorDisplayFauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:CuratorDisplayFauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:AdminDisplayFauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:PublicDisplayFauxDataPropertyValueContainer ;   
+    ao:attributeValue ai:EditorDisplayFauxDataPropertyValueContainer ;
+    ao:attributeValue ai:CuratorDisplayFauxDataPropertyValueContainer ;
+    ao:attributeValue ai:AdminDisplayFauxDataPropertyValueContainer ;
+
+    ao:attributeValue ai:EditorPublishObjectPropertyValueContainer ;
+    ao:attributeValue ai:CuratorPublishObjectPropertyValueContainer ;
+    ao:attributeValue ai:AdminPublishObjectPropertyValueContainer ;
+    ao:attributeValue ai:EditorPublishDataPropertyValueContainer ;
+    ao:attributeValue ai:CuratorPublishDataPropertyValueContainer ;
+    ao:attributeValue ai:AdminPublishDataPropertyValueContainer ;
+    ao:attributeValue ai:EditorPublishFauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:CuratorPublishFauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:AdminPublishFauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:EditorPublishFauxDataPropertyValueContainer ;
+    ao:attributeValue ai:CuratorPublishFauxDataPropertyValueContainer ;
+    ao:attributeValue ai:AdminPublishFauxDataPropertyValueContainer ;
+    .
+
+ai:PublicDisplayObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:ObjectPropertyAccesObject .
+ai:EditorDisplayObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:ObjectPropertyAccesObject .
+ai:CuratorDisplayObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:ObjectPropertyAccesObject .
+ai:AdminDisplayObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:ObjectPropertyAccesObject .
+ai:PublicDisplayDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:DataPropertyAccesObject .
+ai:EditorDisplayDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:DataPropertyAccesObject .
+ai:CuratorDisplayDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:DataPropertyAccesObject .
+ai:AdminDisplayDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:DataPropertyAccesObject .
+ai:PublicDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxObjectPropertyAccesObject .
+ai:EditorDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxObjectPropertyAccesObject .
+ai:CuratorDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxObjectPropertyAccesObject .
+ai:AdminDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxObjectPropertyAccesObject .
+ai:PublicDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxDataPropertyAccesObject .
+ai:EditorDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxDataPropertyAccesObject .
+ai:CuratorDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxDataPropertyAccesObject .
+ai:AdminDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxDataPropertyAccesObject .
+
+ai:EditorPublishObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:ObjectPropertyAccesObject .
+ai:CuratorPublishObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:ObjectPropertyAccesObject .
+ai:AdminPublishObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:ObjectPropertyAccesObject .
+ai:EditorPublishDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:DataPropertyAccesObject .
+ai:CuratorPublishDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:DataPropertyAccesObject .
+ai:AdminPublishDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:DataPropertyAccesObject .
+ai:EditorPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxObjectPropertyAccesObject .
+ai:CuratorPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxObjectPropertyAccesObject .
+ai:AdminPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxObjectPropertyAccesObject .
+ai:EditorPublishFauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxDataPropertyAccesObject .
+ai:CuratorPublishFauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxDataPropertyAccesObject .
+ai:AdminPublishFauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:containerType ai:FauxDataPropertyAccesObject .

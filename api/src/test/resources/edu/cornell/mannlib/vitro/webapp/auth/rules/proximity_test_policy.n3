@@ -22,7 +22,7 @@ ai:PublicationInProximityAttribute rdf:type ao:Attribute ;
          ao:type ai:StatementSubjectUri ;
          ao:value ai:PublicationProximityToPerson .
 
-ai:PublicationProximityToPerson rdf:type ao:TestData ;
+ai:PublicationProximityToPerson rdf:type ao:ValueContainer ;
         ao:id """
         SELECT ?resourceUri WHERE {
                   ?personUri <test:has_publication> ?resourceUri .

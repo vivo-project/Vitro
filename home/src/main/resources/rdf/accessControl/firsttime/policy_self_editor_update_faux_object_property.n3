@@ -16,10 +16,10 @@ ai:SelfEditorUpdateFauxObjectPropertyRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowSelfEditorUpdateFauxObjectPropertyStatementRule ;
           ao:rule ai:AllowSelfEditorUpdateFauxObjectPropertyRule .
 
-ai:SelfEditorUpdateFauxObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:SelfEditorUpdateFauxObjectPropertyDataset .
+ai:SelfEditorUpdateFauxObjectPropertyTestDatasets rdf:type ao:PolicyDataSets ;
+          ao:policyDataSet ai:SelfEditorUpdateFauxObjectPropertyDataset .
 
-ai:SelfEditorUpdateFauxObjectPropertyDataset rdf:type ao:TestDataSet ;
+ai:SelfEditorUpdateFauxObjectPropertyDataset rdf:type ao:PolicyDataSet ;
           ao:testData ai:SelfEditorUpdateFauxObjectPropertyTestData .
           
 ai:SelfEditorUpdateFauxObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
@@ -50,6 +50,6 @@ ai:SelfEditorUpdateFauxObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:SelfEditorUpdateFauxObjectPropertyTestData .
          
-ai:SelfEditorUpdateFauxObjectPropertyTestData rdf:type ao:TestData ;
+ai:SelfEditorUpdateFauxObjectPropertyTestData rdf:type ao:ValueContainer ;
        .
        

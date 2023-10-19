@@ -18,8 +18,8 @@ import org.junit.Test;
 
 public class ProximityTest extends PolicyTest {
 
-    private static final String PROXIMITY_POLICY_PATH = RESOURCES_PREFIX + "proximity_test_policy.n3";
-    private static final String PROXIMITY_DATA_PATH = RESOURCES_PREFIX + "proximity_test_data.n3";
+    private static final String PROXIMITY_POLICY_PATH = RESOURCES_RULES_PREFIX + "proximity_test_policy.n3";
+    private static final String PROXIMITY_DATA_PATH = RESOURCES_RULES_PREFIX + "proximity_test_data.n3";
 
     @Test
     public void testProximityPolicy() {

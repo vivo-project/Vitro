@@ -16,10 +16,10 @@ ai:CuratorUpdateFauxDataPropertyRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowCuratorUpdateFauxDataPropertyStatementRule ;
           ao:rule ai:AllowCuratorUpdateFauxDataPropertyRule .
 
-ai:CuratorUpdateFauxDataPropertyTestDatasets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:CuratorUpdateFauxDataPropertyDataset .
+ai:CuratorUpdateFauxDataPropertyTestDatasets rdf:type ao:PolicyDataSets ;
+          ao:policyDataSet ai:CuratorUpdateFauxDataPropertyDataset .
 
-ai:CuratorUpdateFauxDataPropertyDataset rdf:type ao:TestDataSet ;
+ai:CuratorUpdateFauxDataPropertyDataset rdf:type ao:PolicyDataSet ;
           ao:testData ai:CuratorUpdateFauxDataPropertyTestData .
           
 ai:CuratorUpdateFauxDataPropertyPolicyKey rdf:type ao:PolicyKey ;
@@ -49,5 +49,5 @@ ai:CuratorUpdateFauxDataPropertyAttribute rdf:type ao:Attribute ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:CuratorUpdateFauxDataPropertyTestData .
          
-ai:CuratorUpdateFauxDataPropertyTestData rdf:type ao:TestData ;
+ai:CuratorUpdateFauxDataPropertyTestData rdf:type ao:ValueContainer ;
       .

@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.CLASS;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.DATA_PROPERTY;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.FAUX_DATA_PROPERTY;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.FAUX_OBJECT_PROPERTY;
@@ -22,238 +21,100 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-
 @RunWith(Parameterized.class)
 public class EntityPolicyTests extends PolicyTest {
+    private static final String TEMPLATE_SIMPLE_MATCH_PROPERTY = "template/simple-match-allowed-property/PolicyTemplate";
+    private static final String TEMPLATE_SIMPLE_MATCH_CLASS = "template/simple-match-allowed-class/PolicyTemplate";
+
+    private static final String TEMPLATE_MATCH_ALLOWED_DATASET =
+            RESOURCES_PREFIX + "policy_template_match_allowed_dataset.n3";
+    private static final String TEMPLATE_PROPERTY_PREFIX =
+            "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-match-allowed-property/";
+    private static final String TEMPLATE_CLASS_PREFIX =
+            "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-match-allowed-class/";
+
     @org.junit.runners.Parameterized.Parameter(0)
-    public String filePath;
+    public String policyFilePath;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public String uri;
+    public String testDataSetPath;
 
     @org.junit.runners.Parameterized.Parameter(2)
-    public OperationGroup group;
+    public String uri;
 
     @org.junit.runners.Parameterized.Parameter(3)
-    public AccessObjectType type;
+    public String dataSetUri;
 
     @org.junit.runners.Parameterized.Parameter(4)
-    public String roleUri;
+    public OperationGroup group;
 
     @org.junit.runners.Parameterized.Parameter(5)
-    public int rulesCount;
+    public AccessObjectType type;
 
     @org.junit.runners.Parameterized.Parameter(6)
+    public String roleUri;
+
+    @org.junit.runners.Parameterized.Parameter(7)
+    public int rulesCount;
+
+    @org.junit.runners.Parameterized.Parameter(8)
     public Set<Integer> attrCount;
 
     @Test
     public void testPolicy() {
-        load(filePath);
+        load(policyFilePath);
+        load(testDataSetPath);
         String policyUri = PREFIX + uri;
-        EntityPolicyController.updateEntityPolicy("test:entity", type, group, Arrays.asList(roleUri), ROLE_LIST);
-        DynamicPolicy policy = loader.loadPolicy(policyUri);
+        EntityPolicyController.updateEntityPolicyDataSet("test:entity", type, group, Arrays.asList(roleUri), ROLE_LIST);
+        DynamicPolicy policy = null;
+        if (dataSetUri != null) {
+            policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
+        } else {
+            policy = loader.loadPolicy(policyUri);
+        }
         countRulesAndAttributes(policy, rulesCount, attrCount);
-        Set<String> values = loader.getPolicyDataSetValues(group, type, roleUri);
+        Set<String> values = loader.getDataSetValues(group, type, roleUri);
         assertFalse(values.isEmpty());
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-            { EDITOR_DISPLAY_CLASS_POLICY_PATH, "EditorDisplayClassPolicy", DISPLAY_GROUP,
-                CLASS, ROLE_EDITOR_URI, 1, Collections.singleton(4) },
-            { EDITOR_DISPLAY_DATA_PROP_POLICY_PATH, "EditorDisplayDataPropertyPolicy", DISPLAY_GROUP,
-                DATA_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
-            { EDITOR_DISPLAY_OBJ_PROP_POLICY_PATH, "EditorDisplayObjectPropertyPolicy",
-                DISPLAY_GROUP, OBJECT_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
+                { SELF_EDITOR_DISPLAY_DATA_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorDisplayDataPropertyPolicy", null, DISPLAY_GROUP, DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
+                { SELF_EDITOR_DISPLAY_OBJ_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorDisplayObjectPropertyPolicy", null, DISPLAY_GROUP, OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
+                { SELF_EDITOR_PUBLISH_DATA_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorPublishDataPropertyPolicy", null, PUBLISH_GROUP, DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
+                { SELF_EDITOR_PUBLISH_OBJ_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorPublishObjectPropertyPolicy", null, PUBLISH_GROUP, OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
 
-            { SELF_EDITOR_DISPLAY_CLASS_POLICY_PATH, "SelfEditorDisplayClassPolicy", DISPLAY_GROUP,
-                CLASS, ROLE_SELF_EDITOR_URI, 1, Collections.singleton(4) },
-            { SELF_EDITOR_DISPLAY_DATA_PROP_POLICY_PATH, "SelfEditorDisplayDataPropertyPolicy",
-                DISPLAY_GROUP, DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_DISPLAY_OBJ_PROP_POLICY_PATH, "SelfEditorDisplayObjectPropertyPolicy",
-                DISPLAY_GROUP, OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
+                { EDITOR_UPDATE_DATA_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "EditorUpdateDataPropertyPolicy", null, UPDATE_GROUP, DATA_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
+                { EDITOR_UPDATE_OBJ_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "EditorUpdateObjectPropertyPolicy", null, UPDATE_GROUP, OBJECT_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
 
-            { PUBLIC_DISPLAY_CLASS_POLICY_PATH, "PublicDisplayClassPolicy", DISPLAY_GROUP,
-                CLASS, ROLE_PUBLIC_URI, 1, Collections.singleton(4) },
-            { PUBLIC_DISPLAY_DATA_PROP_POLICY_PATH, "PublicDisplayDataPropertyPolicy", DISPLAY_GROUP,
-                DATA_PROPERTY, ROLE_PUBLIC_URI, 2, Collections.singleton(4) },
-            { PUBLIC_DISPLAY_OBJ_PROP_POLICY_PATH, "PublicDisplayObjectPropertyPolicy",
-                DISPLAY_GROUP, OBJECT_PROPERTY, ROLE_PUBLIC_URI, 2,
-                Collections.singleton(4) },
+                { SELF_EDITOR_UPDATE_DATA_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorUpdateDataPropertyPolicy", null, UPDATE_GROUP, DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2, new HashSet<>(Arrays.asList(4, 5)) },
+                { SELF_EDITOR_UPDATE_OBJ_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorUpdateObjectPropertyPolicy", null, UPDATE_GROUP, OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2, new HashSet<>(Arrays.asList(4, 5)) },
 
-            { CURATOR_DISPLAY_CLASS_POLICY_PATH, "CuratorDisplayClassPolicy", DISPLAY_GROUP,
-                CLASS, ROLE_CURATOR_URI, 1, Collections.singleton(4) },
-            { CURATOR_DISPLAY_DATA_PROP_POLICY_PATH, "CuratorDisplayDataPropertyPolicy",
-                DISPLAY_GROUP, DATA_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_DISPLAY_OBJ_PROP_POLICY_PATH, "CuratorDisplayObjectPropertyPolicy",
-                DISPLAY_GROUP, OBJECT_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
+                { PUBLIC_UPDATE_DATA_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "PublicUpdateDataPropertyPolicy", null, UPDATE_GROUP, DATA_PROPERTY, ROLE_PUBLIC_URI, 2, Collections.singleton(4) },
+                { PUBLIC_UPDATE_OBJ_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "PublicUpdateObjectPropertyPolicy", null, UPDATE_GROUP, OBJECT_PROPERTY, ROLE_PUBLIC_URI, 2, Collections.singleton(4) },
 
-            { ADMIN_DISPLAY_CLASS_POLICY_PATH, "AdminDisplayClassPolicy", DISPLAY_GROUP,
-                CLASS, ROLE_ADMIN_URI, 1, Collections.singleton(4) },
-            { ADMIN_DISPLAY_DATA_PROP_POLICY_PATH, "AdminDisplayDataPropertyPolicy", DISPLAY_GROUP,
-                DATA_PROPERTY, ROLE_ADMIN_URI, 1, Collections.singleton(4) },
-            { ADMIN_DISPLAY_OBJ_PROP_POLICY_PATH, "AdminDisplayObjectPropertyPolicy", DISPLAY_GROUP,
-                OBJECT_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
+                { CURATOR_UPDATE_DATA_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "CuratorUpdateDataPropertyPolicy", null, UPDATE_GROUP, DATA_PROPERTY, ROLE_CURATOR_URI, 2, Collections.singleton(4) },
+                { CURATOR_UPDATE_OBJ_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "CuratorUpdateObjectPropertyPolicy", null, UPDATE_GROUP, OBJECT_PROPERTY, ROLE_CURATOR_URI, 2, Collections.singleton(4) },
 
-            { EDITOR_PUBLISH_CLASS_POLICY_PATH, "EditorPublishClassPolicy", PUBLISH_GROUP,
-                CLASS, ROLE_EDITOR_URI, 1, Collections.singleton(4) },
-            { EDITOR_PUBLISH_DATA_PROP_POLICY_PATH, "EditorPublishDataPropertyPolicy", PUBLISH_GROUP,
-                DATA_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
-            { EDITOR_PUBLISH_OBJ_PROP_POLICY_PATH, "EditorPublishObjectPropertyPolicy",
-                PUBLISH_GROUP, OBJECT_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
+                { ADMIN_UPDATE_DATA_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "AdminUpdateDataPropertyPolicy", null, UPDATE_GROUP, DATA_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
+                { ADMIN_UPDATE_OBJ_PROP_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "AdminUpdateObjectPropertyPolicy", null, UPDATE_GROUP, OBJECT_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
+                
+                { SELF_EDITOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorDisplayFauxObjectPropertyPolicy", null, DISPLAY_GROUP, FAUX_OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
+                { SELF_EDITOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, TEMPLATE_SIMPLE_MATCH_PROPERTY, TEMPLATE_PROPERTY_PREFIX + "SelfEditorPublishFauxObjectPropertyDataSet", PUBLISH_GROUP, FAUX_OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
 
-            { SELF_EDITOR_PUBLISH_CLASS_POLICY_PATH, "SelfEditorPublishClassPolicy", PUBLISH_GROUP,
-                CLASS, ROLE_SELF_EDITOR_URI, 1, Collections.singleton(4) },
-            { SELF_EDITOR_PUBLISH_DATA_PROP_POLICY_PATH, "SelfEditorPublishDataPropertyPolicy",
-                PUBLISH_GROUP, DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_PUBLISH_OBJ_PROP_POLICY_PATH, "SelfEditorPublishObjectPropertyPolicy",
-                PUBLISH_GROUP, OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
+                { ADMIN_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "AdminUpdateFauxObjectPropertyPolicy", null, UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
+                { CURATOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "CuratorUpdateFauxObjectPropertyPolicy", null, UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_CURATOR_URI, 2, Collections.singleton(4) },
+                { EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "EditorUpdateFauxObjectPropertyPolicy", null, UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
+                { SELF_EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorUpdateFauxObjectPropertyPolicy", null, UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2, new HashSet<>(Arrays.asList(4, 5)) },
 
-            { CURATOR_PUBLISH_CLASS_POLICY_PATH, "CuratorPublishClassPolicy", PUBLISH_GROUP,
-                CLASS, ROLE_CURATOR_URI, 1, Collections.singleton(4) },
-            { CURATOR_PUBLISH_DATA_PROP_POLICY_PATH, "CuratorPublishDataPropertyPolicy",
-                PUBLISH_GROUP, DATA_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_PUBLISH_OBJ_PROP_POLICY_PATH, "CuratorPublishObjectPropertyPolicy",
-                PUBLISH_GROUP, OBJECT_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
+                { SELF_EDITOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorDisplayFauxDataPropertyPolicy", null, DISPLAY_GROUP, FAUX_DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
+                { SELF_EDITOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorPublishFauxDataPropertyPolicy", null, PUBLISH_GROUP, FAUX_DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2, Collections.singleton(4) },
 
-            { ADMIN_PUBLISH_CLASS_POLICY_PATH, "AdminPublishClassPolicy", PUBLISH_GROUP,
-                CLASS, ROLE_ADMIN_URI, 1, Collections.singleton(4) },
-            { ADMIN_PUBLISH_DATA_PROP_POLICY_PATH, "AdminPublishDataPropertyPolicy", PUBLISH_GROUP,
-                DATA_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
-            { ADMIN_PUBLISH_OBJ_PROP_POLICY_PATH, "AdminPublishObjectPropertyPolicy", PUBLISH_GROUP,
-                OBJECT_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
-
-            { EDITOR_UPDATE_CLASS_POLICY_PATH, "EditorUpdateClassPolicy", UPDATE_GROUP,
-                CLASS, ROLE_EDITOR_URI, 1, Collections.singleton(4) },
-            { EDITOR_UPDATE_DATA_PROP_POLICY_PATH, "EditorUpdateDataPropertyPolicy", UPDATE_GROUP,
-                DATA_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
-            { EDITOR_UPDATE_OBJ_PROP_POLICY_PATH, "EditorUpdateObjectPropertyPolicy", UPDATE_GROUP,
-                OBJECT_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
-
-            { SELF_EDITOR_UPDATE_CLASS_POLICY_PATH, "SelfEditorUpdateClassPolicy", UPDATE_GROUP,
-                CLASS, ROLE_SELF_EDITOR_URI, 1, Collections.singleton(4) },
-            { SELF_EDITOR_UPDATE_DATA_PROP_POLICY_PATH, "SelfEditorUpdateDataPropertyPolicy",
-                UPDATE_GROUP, DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                new HashSet<>(Arrays.asList(4, 5)) },
-            { SELF_EDITOR_UPDATE_OBJ_PROP_POLICY_PATH, "SelfEditorUpdateObjectPropertyPolicy",
-                UPDATE_GROUP, OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                new HashSet<>(Arrays.asList(4, 5)) },
-
-            { PUBLIC_UPDATE_CLASS_POLICY_PATH, "PublicUpdateClassPolicy", UPDATE_GROUP,
-                CLASS, ROLE_PUBLIC_URI, 1, Collections.singleton(4) },
-            { PUBLIC_UPDATE_DATA_PROP_POLICY_PATH, "PublicUpdateDataPropertyPolicy", UPDATE_GROUP,
-                DATA_PROPERTY, ROLE_PUBLIC_URI, 2, Collections.singleton(4) },
-            { PUBLIC_UPDATE_OBJ_PROP_POLICY_PATH, "PublicUpdateObjectPropertyPolicy", UPDATE_GROUP,
-                OBJECT_PROPERTY, ROLE_PUBLIC_URI, 2, Collections.singleton(4) },
-
-            { CURATOR_UPDATE_CLASS_POLICY_PATH, "CuratorUpdateClassPolicy", UPDATE_GROUP,
-                CLASS, ROLE_CURATOR_URI, 1, Collections.singleton(4) },
-            { CURATOR_UPDATE_DATA_PROP_POLICY_PATH, "CuratorUpdateDataPropertyPolicy", UPDATE_GROUP,
-                DATA_PROPERTY, ROLE_CURATOR_URI, 2, Collections.singleton(4) },
-            { CURATOR_UPDATE_OBJ_PROP_POLICY_PATH, "CuratorUpdateObjectPropertyPolicy", UPDATE_GROUP,
-                OBJECT_PROPERTY, ROLE_CURATOR_URI, 2, Collections.singleton(4) },
-
-            { ADMIN_UPDATE_CLASS_POLICY_PATH, "AdminUpdateClassPolicy", UPDATE_GROUP,
-                CLASS, ROLE_ADMIN_URI, 1, Collections.singleton(4) },
-            { ADMIN_UPDATE_DATA_PROP_POLICY_PATH, "AdminUpdateDataPropertyPolicy", UPDATE_GROUP,
-                DATA_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
-            { ADMIN_UPDATE_OBJ_PROP_POLICY_PATH, "AdminUpdateObjectPropertyPolicy", UPDATE_GROUP,
-                OBJECT_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
-
-            { ADMIN_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH, "AdminDisplayFauxObjectPropertyPolicy",
-                DISPLAY_GROUP, FAUX_OBJECT_PROPERTY, ROLE_ADMIN_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH, "CuratorDisplayFauxObjectPropertyPolicy",
-                DISPLAY_GROUP, FAUX_OBJECT_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { EDITOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH, "EditorDisplayFauxObjectPropertyPolicy",
-                DISPLAY_GROUP, FAUX_OBJECT_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH, "SelfEditorDisplayFauxObjectPropertyPolicy",
-                DISPLAY_GROUP, FAUX_OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { PUBLIC_DISPLAY_FAUX_OBJECT_PROPERTY_POLICY_PATH, "PublicDisplayFauxObjectPropertyPolicy",
-                DISPLAY_GROUP, FAUX_OBJECT_PROPERTY, ROLE_PUBLIC_URI, 2,
-                Collections.singleton(4) },
-
-            { ADMIN_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH, "AdminPublishFauxObjectPropertyPolicy",
-                PUBLISH_GROUP, FAUX_OBJECT_PROPERTY, ROLE_ADMIN_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH, "CuratorPublishFauxObjectPropertyPolicy",
-                PUBLISH_GROUP, FAUX_OBJECT_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { EDITOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH, "EditorPublishFauxObjectPropertyPolicy",
-                PUBLISH_GROUP, FAUX_OBJECT_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_PUBLISH_FAUX_OBJECT_PROPERTY_POLICY_PATH, "SelfEditorPublishFauxObjectPropertyPolicy",
-                PUBLISH_GROUP, FAUX_OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
-
-            { ADMIN_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, "AdminUpdateFauxObjectPropertyPolicy",
-                UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_ADMIN_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, "CuratorUpdateFauxObjectPropertyPolicy",
-                UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, "EditorUpdateFauxObjectPropertyPolicy",
-                UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_UPDATE_FAUX_OBJECT_PROPERTY_POLICY_PATH, "SelfEditorUpdateFauxObjectPropertyPolicy",
-                UPDATE_GROUP, FAUX_OBJECT_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                new HashSet<>(Arrays.asList(4, 5)) },
-
-            { ADMIN_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH, "AdminDisplayFauxDataPropertyPolicy",
-                DISPLAY_GROUP, FAUX_DATA_PROPERTY, ROLE_ADMIN_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH, "CuratorDisplayFauxDataPropertyPolicy",
-                DISPLAY_GROUP, FAUX_DATA_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { EDITOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH, "EditorDisplayFauxDataPropertyPolicy",
-                DISPLAY_GROUP, FAUX_DATA_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH, "SelfEditorDisplayFauxDataPropertyPolicy",
-                DISPLAY_GROUP, FAUX_DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { PUBLIC_DISPLAY_FAUX_DATA_PROPERTY_POLICY_PATH, "PublicDisplayFauxDataPropertyPolicy",
-                DISPLAY_GROUP, FAUX_DATA_PROPERTY, ROLE_PUBLIC_URI, 2,
-                Collections.singleton(4) },
-
-            { ADMIN_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH, "AdminPublishFauxDataPropertyPolicy",
-                PUBLISH_GROUP, FAUX_DATA_PROPERTY, ROLE_ADMIN_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH, "CuratorPublishFauxDataPropertyPolicy",
-                PUBLISH_GROUP, FAUX_DATA_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { EDITOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH, "EditorPublishFauxDataPropertyPolicy",
-                PUBLISH_GROUP, FAUX_DATA_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_PUBLISH_FAUX_DATA_PROPERTY_POLICY_PATH, "SelfEditorPublishFauxDataPropertyPolicy",
-                PUBLISH_GROUP, FAUX_DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                Collections.singleton(4) },
-
-            { ADMIN_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, "AdminUpdateFauxDataPropertyPolicy",
-                UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_ADMIN_URI, 2,
-                Collections.singleton(4) },
-            { CURATOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, "CuratorUpdateFauxDataPropertyPolicy",
-                UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_CURATOR_URI, 2,
-                Collections.singleton(4) },
-            { EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, "EditorUpdateFauxDataPropertyPolicy",
-                UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_EDITOR_URI, 2,
-                Collections.singleton(4) },
-            { SELF_EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, "SelfEditorUpdateFauxDataPropertyPolicy",
-                UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2,
-                new HashSet<>(Arrays.asList(4, 5)) },
+                { ADMIN_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "AdminUpdateFauxDataPropertyPolicy", null, UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_ADMIN_URI, 2, Collections.singleton(4) },
+                { CURATOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "CuratorUpdateFauxDataPropertyPolicy", null, UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_CURATOR_URI, 2, Collections.singleton(4) },
+                { EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "EditorUpdateFauxDataPropertyPolicy", null, UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_EDITOR_URI, 2, Collections.singleton(4) },
+                { SELF_EDITOR_UPDATE_FAUX_DATA_PROPERTY_POLICY_PATH, TEMPLATE_MATCH_ALLOWED_DATASET, "SelfEditorUpdateFauxDataPropertyPolicy", null, UPDATE_GROUP, FAUX_DATA_PROPERTY, ROLE_SELF_EDITOR_URI, 2, new HashSet<>(Arrays.asList(4, 5)) },
 
         });
     }

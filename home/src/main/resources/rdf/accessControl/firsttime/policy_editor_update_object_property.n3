@@ -16,10 +16,10 @@ ai:EditorUpdateObjectPropertyRuleSet rdf:type ao:Rules ;
           ao:rule ai:AllowEditorUpdateObjectPropertyStatementRule ;
           ao:rule ai:AllowEditorUpdateObjectPropertyRule .
 
-ai:EditorUpdateObjectPropertyTestDatasets rdf:type ao:TestDatasets ;
-          ao:testDataset ai:EditorUpdateObjectPropertyDataset .
+ai:EditorUpdateObjectPropertyTestDatasets rdf:type ao:PolicyDataSets ;
+          ao:policyDataSet ai:EditorUpdateObjectPropertyDataset .
 
-ai:EditorUpdateObjectPropertyDataset rdf:type ao:TestDataSet ;
+ai:EditorUpdateObjectPropertyDataset rdf:type ao:PolicyDataSet ;
           ao:testData ai:EditorUpdateObjectPropertyTestData .
           
 ai:EditorUpdateObjectPropertyPolicyKey rdf:type ao:PolicyKey ;
@@ -49,5 +49,5 @@ ai:EditorUpdateObjectPropertyAttribute rdf:type ao:Attribute ;
          ao:type ai:AccessObjectUri ;
          ao:setValue ai:EditorUpdateObjectPropertyTestData .
          
-ai:EditorUpdateObjectPropertyTestData rdf:type ao:TestData ;
+ai:EditorUpdateObjectPropertyTestData rdf:type ao:ValueContainer ;
        .
