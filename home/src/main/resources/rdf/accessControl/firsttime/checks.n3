@@ -9,46 +9,6 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 ###########################################################################
-### Subject attributes
-
-ai:IsRootUserAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:SubjectType ;
-         ao:value ai:RootUserSubject .
-
-ai:SubjectRoleEqualsAdminRoleAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:SubjectRole ;
-         ao:value auth:ADMIN .
-         
-ai:SubjectRoleEqualsCuratorRoleAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:SubjectRole ;
-         ao:value auth:CURATOR .
-
-ai:SubjectRoleEqualsEditorRoleAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:SubjectRole ;
-         ao:value auth:EDITOR .
-
-ai:SubjectRoleEqualsSelfEditorRoleAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:SubjectRole ;
-         ao:value auth:SELF_EDITOR .
-
-ai:SubjectRoleEqualsPublicRoleAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:SubjectRole ;
-         ao:value auth:PUBLIC .
-         
-ai:SubjectRoleOneOfEditorsAttribute rdf:type ao:Check ;
-         ao:operator ai:OneOf ;
-         ao:type ai:SubjectRole ;
-         ao:value auth:ADMIN ;
-         ao:value auth:CURATOR ;
-         ao:value auth:EDITOR .
-
-###########################################################################
 ### Operation attributes
 
 ai:DisplayOperationAttribute rdf:type ao:Check ;

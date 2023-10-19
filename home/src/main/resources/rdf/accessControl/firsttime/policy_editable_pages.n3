@@ -6,6 +6,7 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/edit-individual-pages/> .
 
 ai:EditIndividualPagesPolicy rdf:type ao:Policy ;
     ao:rules ai:EditIndividualPagesRuleSet .
@@ -15,14 +16,26 @@ ai:EditIndividualPagesRuleSet rdf:type ao:Rules ;
     ao:rule ai:AllowEditIndividualPagesRule .
 
 ai:AllowEditIndividualPagesRule rdf:type ao:Rule;
-    ao:check ai:SubjectRoleOneOfEditorsAttribute ;
+    ao:check :SubjectRoleOneOfEditorsCheck ;
     ao:check ai:AddOperationAttribute ;
     ao:check ai:ObjectPropertyStatementTypeAttribute ;
     ao:check ai:SomeObjectUriAttribute ;
     ao:check ai:SomePredicateAttribute .
 
+:SubjectRoleOneOfEditorsCheck rdf:type ao:Check ;
+    ao:operator ai:OneOf ;
+    ao:type ai:SubjectRole ;
+    ao:value auth:ADMIN ;
+    ao:value auth:CURATOR ;
+    ao:value auth:EDITOR .
+
+:SubjectRoleEqualsSelfEditorCheck rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:type ai:SubjectRole ;
+    ao:value auth:SELF_EDITOR .
+
 ai:AllowEditRelatedPagesRule rdf:type ao:Rule;
-    ao:check ai:SubjectRoleEqualsSelfEditorRoleAttribute ;
+    ao:check :SubjectRoleEqualsSelfEditorCheck ;
     ao:check ai:StatementObjectUriContainsSelfEditorResourceAttribute;
     ao:check ai:AddOperationAttribute ;
     ao:check ai:ObjectPropertyStatementTypeAttribute ;
