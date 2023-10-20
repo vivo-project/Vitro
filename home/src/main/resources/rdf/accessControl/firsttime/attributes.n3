@@ -8,38 +8,29 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:Subject a ao:AttributeType ;
+ai:Subject a ao:Attribute ;
     ao:id "SUBJECT" .
 
-ai:SubjectRole a ao:AttributeType ;
+ai:SubjectRole a ao:Attribute ;
     ao:id "SUBJECT_ROLE_URI" .
 
-ai:SubjectType a ao:AttributeType ;
+ai:SubjectType a ao:Attribute ;
     ao:id "SUBJECT_TYPE" .
 
-ai:AccessObjectUri a ao:AttributeType ;
+ai:AccessObjectUri a ao:Attribute ;
     ao:id "ACCESS_OBJECT_URI" .
 
-ai:AccessObjectType a ao:AttributeType ;
+ai:AccessObjectType a ao:Attribute ;
     ao:id "ACCESS_OBJECT_TYPE" .
 
-ai:Operation a ao:AttributeType ;
+ai:Operation a ao:Attribute ;
     ao:id "OPERATION" .
 
-ai:SubjectNotMatch a ao:AttributeType ;
-    ao:id "SUBJECT_NOT_MATCH" .
-
-ai:ObjectNotMatch a ao:AttributeType ;
-    ao:id "OBJECT_NOT_MATCH" .
-
-ai:RelatesToSubjectProfile a ao:AttributeType ;
-    ao:id "RELATES_TO_SUBJECT_PROFILE" .
-
-ai:StatementPredicateUri a ao:AttributeType ;
+ai:StatementPredicateUri a ao:Attribute ;
     ao:id "STATEMENT_PREDICATE_URI" .
 
-ai:StatementSubjectUri a ao:AttributeType ;
+ai:StatementSubjectUri a ao:Attribute ;
     ao:id "STATEMENT_SUBJECT_URI" .
 
-ai:StatementObjectUri a ao:AttributeType ;
+ai:StatementObjectUri a ao:Attribute ;
     ao:id "STATEMENT_OBJECT_URI" .
