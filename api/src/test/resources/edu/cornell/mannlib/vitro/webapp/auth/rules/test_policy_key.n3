@@ -26,4 +26,4 @@ ai:KeyTestAttribute rdf:type ao:Check ;
 ai:PolicyKeyTest rdf:type ao:PolicyKey ;
           ao:keyComponent ai:ObjectPropertyAccesObject ;
           ao:keyComponent auth:ADMIN ;
-          ao:keyComponent ai:DisplayOperationGroup .
+          ao:keyComponent ai:DisplayOperation .

@@ -33,21 +33,21 @@ public class PolicyTest {
 
     public static final String ONTOLOGY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "ontology.n3";
     public static final String OPERATIONS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operations.n3";
-    public static final String OPERATION_GROUPS = USER_ACCOUNTS_HOME_FIRSTTIME + "operation_groups.n3";
     public static final String SUBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "subject_types.n3";
     public static final String OBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "object_types.n3";
     public static final String ATTRIBUTES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "attributes.n3";
     public static final String OPERATORS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operators.n3";
-    public static final String TEST_VALUES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "test_values.n3";
+    public static final String PROFILE_PROXIMITY_QUERY = USER_ACCOUNTS_HOME_FIRSTTIME + "profile_proximity_query.n3";
     public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_FIRSTTIME + "decisions.n3";
-    
+    public static final String ROLES = USER_ACCOUNTS_HOME_FIRSTTIME + "roles.n3";
+
     protected static final String RESOURCES_RULES_PREFIX = "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/rules/";
     protected static final String RESOURCES_PREFIX = "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/";
 
     public static final String VALID_POLICY = RESOURCES_RULES_PREFIX + "test_policy_valid.n3";
     public static final String VALID_POLICY_TEMPLATE = RESOURCES_RULES_PREFIX + "test_policy_valid_set.n3";
     public static final String BROKEN_POLICY_TEMPLATE = RESOURCES_RULES_PREFIX + "test_policy_broken_set.n3";
-    public static final String POLICY_KEY_TEST = RESOURCES_RULES_PREFIX + "test_policy_key.n3";
+    //TODO:Implement public static final String POLICY_KEY_TEST = RESOURCES_RULES_PREFIX + "test_policy_key.n3";
 
     protected static final List<String> ROLE_LIST = Arrays.asList(ADMIN, CURATOR, EDITOR,
             SELF_EDITOR, PUBLIC);
@@ -69,12 +69,12 @@ public class PolicyTest {
         configurationDataSet = DatasetFactory.createTxnMem();
         configurationDataSet.addNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
         load(OPERATIONS_PATH);
-        load(OPERATION_GROUPS);
+        load(ROLES);
         load(SUBJECT_TYPES);
         load(OBJECT_TYPES);
         load(ATTRIBUTES_PATH);
         load(OPERATORS_PATH);
-        load(TEST_VALUES_PATH);
+        load(PROFILE_PROXIMITY_QUERY);
         load(TEST_DECISIONS);
         RDFServiceModel rdfService = new RDFServiceModel(configurationDataSet);
 
