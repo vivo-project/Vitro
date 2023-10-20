@@ -80,13 +80,11 @@ ai:PersonProfileProximityToResourceUri rdf:type ao:ValueContainer ;
     }
     """ .
 
-
 ai:SomeUriTestData rdf:type ao:ValueContainer ;
-        ao:id "?SOME_URI" .
+    ao:id "?SOME_URI" .
 
 ai:SomeLiteralTestData rdf:type ao:ValueContainer ;
-        ao:id "?SOME_LITERAL" .
-
+    ao:id "?SOME_LITERAL" .
 
 #Role value containers 
 

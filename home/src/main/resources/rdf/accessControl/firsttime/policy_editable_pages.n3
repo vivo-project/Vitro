@@ -8,52 +8,62 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/edit-individual-pages/> .
 
-ai:EditIndividualPagesPolicy rdf:type ao:Policy ;
-    ao:rules ai:EditIndividualPagesRuleSet .
+:Policy rdf:type ao:Policy ;
+    ao:rules :RuleSet .
 
-ai:EditIndividualPagesRuleSet rdf:type ao:Rules ;
-    ao:rule ai:AllowEditRelatedPagesRule ;
-    ao:rule ai:AllowEditIndividualPagesRule .
+:RuleSet rdf:type ao:Rules ;
+    ao:rule :AllowEditRelatedPagesRule ;
+    ao:rule :AllowEditIndividualPagesRule .
 
-ai:AllowEditIndividualPagesRule rdf:type ao:Rule;
+:AllowEditIndividualPagesRule rdf:type ao:Rule;
     ao:check :SubjectRoleOneOfEditorsCheck ;
-    ao:check ai:AddOperationAttribute ;
-    ao:check ai:ObjectPropertyStatementTypeAttribute ;
-    ao:check ai:SomeObjectUriAttribute ;
-    ao:check ai:SomePredicateAttribute .
+    ao:check :IsAddOperation ;
+    ao:check :IsObjectPropertyStatement ;
+    ao:check :ObjectUriIsSomeUri ;
+    ao:check :PredicateIsSomePredicate .
 
 :SubjectRoleOneOfEditorsCheck rdf:type ao:Check ;
     ao:operator ai:OneOf ;
-    ao:type ai:SubjectRole ;
+    ao:attribute ai:SubjectRole ;
     ao:value auth:ADMIN ;
     ao:value auth:CURATOR ;
     ao:value auth:EDITOR .
 
-:SubjectRoleEqualsSelfEditorCheck rdf:type ao:Check ;
+:SubjectRoleIsSelfEditor rdf:type ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:SubjectRole ;
+    ao:attribute ai:SubjectRole ;
     ao:value auth:SELF_EDITOR .
 
-ai:AllowEditRelatedPagesRule rdf:type ao:Rule;
-    ao:check :SubjectRoleEqualsSelfEditorCheck ;
-    ao:check ai:StatementObjectUriContainsSelfEditorResourceAttribute;
-    ao:check ai:AddOperationAttribute ;
-    ao:check ai:ObjectPropertyStatementTypeAttribute ;
-    ao:check ai:SomeObjectUriAttribute ;
-    ao:check ai:SomePredicateAttribute .
-
-ai:SomePredicateAttribute rdf:type ao:Check ;
+:IsAddOperation rdf:type ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:StatementPredicateUri ;
+    ao:attribute ai:Operation ;
+    ao:value ai:AddOperation .
+
+:AllowEditRelatedPagesRule rdf:type ao:Rule;
+    ao:check :SubjectRoleIsSelfEditor ;
+    ao:check :SubjectUriIsProfileRelatedResource ;
+    ao:check :IsAddOperation ;
+    ao:check :IsObjectPropertyStatement ;
+    ao:check :ObjectUriIsSomeUri ;
+    ao:check :PredicateIsSomePredicate .
+
+:PredicateIsSomePredicate rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:StatementPredicateUri ;
     ao:value ai:SomeUriTestData .
 
-ai:SomeObjectUriAttribute rdf:type ao:Check ;
+:ObjectUriIsSomeUri rdf:type ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:StatementObjectUri ;
+    ao:attribute ai:StatementObjectUri ;
     ao:value ai:SomeUriTestData .
 
-ai:StatementObjectUriContainsSelfEditorResourceAttribute rdf:type ao:Check ;
+:SubjectUriIsProfileRelatedResource rdf:type ao:Check ;
     ao:operator ai:SparqlSelectQueryContains ;
-    ao:type ai:StatementSubjectUri ;
+    ao:attribute ai:StatementSubjectUri ;
     ao:value ai:PersonProfileProximityToResourceUri .
+
+:IsObjectPropertyStatement rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:AccessObjectType ;
+    ao:value ai:ObjectPropertyStatementAccesObject .
 

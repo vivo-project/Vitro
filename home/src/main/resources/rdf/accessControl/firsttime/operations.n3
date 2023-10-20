@@ -10,16 +10,16 @@
 
 ai:DisplayOperation rdf:type ao:Operation ;
     ao:id "DISPLAY" .
-    
+
 ai:UpdateOperation rdf:type ao:Operation ;
     ao:id "UPDATE" .
-    
+
 ai:PublishOperation rdf:type ao:Operation ;
     ao:id "PUBLISH" .    
 
 ai:AddOperation rdf:type ao:Operation ;
     ao:id "ADD" .
-    
+
 ai:DropOperation rdf:type ao:Operation ;
     ao:id "DROP" .
 

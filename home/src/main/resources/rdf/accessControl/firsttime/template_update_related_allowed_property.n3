@@ -40,7 +40,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorAddObjectPropertyValueContainer .
-    
+
 :SelfEditorAddObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -55,7 +55,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorAddDataPropertyValueContainer .
-    
+
 :SelfEditorAddDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -70,7 +70,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorAddFauxObjectPropertyValueContainer .
-    
+
 :SelfEditorAddFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -85,7 +85,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorAddFauxDataPropertyValueContainer .
-    
+
 :SelfEditorAddFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -100,7 +100,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDropObjectPropertyValueContainer .
-    
+
 :SelfEditorDropObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -115,7 +115,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDropDataPropertyValueContainer .
-    
+
 :SelfEditorDropDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -130,7 +130,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDropFauxObjectPropertyValueContainer .
-    
+
 :SelfEditorDropFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -145,7 +145,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDropFauxDataPropertyValueContainer .
-    
+
 :SelfEditorDropFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -160,7 +160,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorEditObjectPropertyValueContainer .
-    
+
 :SelfEditorEditObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -175,7 +175,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorEditDataPropertyValueContainer .
-    
+
 :SelfEditorEditDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -190,7 +190,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorEditFauxObjectPropertyValueContainer .
-    
+
 :SelfEditorEditFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -205,7 +205,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorEditFauxDataPropertyValueContainer .
-    
+
 :SelfEditorEditFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:SELF_EDITOR ;
@@ -225,7 +225,7 @@
 
 :AccessObjectTypeCheck rdf:type ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:AccessObjectType ;
+    ao:attribute ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .
 
 :AccessObjectTypeValueSet a ao:AttributeValueSet ;
@@ -245,12 +245,12 @@
 
 :RelationCheck rdf:type ao:Check ;
     ao:operator ai:SparqlSelectQueryContains ;
-    ao:type ai:StatementSubjectUri ;
+    ao:attribute ai:StatementSubjectUri ;
     ao:value ai:PersonProfileProximityToResourceUri .
 
 :AccessObjectStatementTypeCheck rdf:type ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:AccessObjectType ;
+    ao:attribute ai:AccessObjectType ;
     ao:templateValue :StatementAccessObjectTypeValueSet .
 
 :StatementAccessObjectTypeValueSet a ao:AttributeValueSet ;
@@ -262,7 +262,7 @@
 
 :OperationCheck a ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:Operation ;
+    ao:attribute ai:Operation ;
     ao:templateValue :OperationValueSet .
 
 :OperationValueSet a ao:AttributeValueSet ;
@@ -273,7 +273,7 @@
 
 :SubjectRoleCheck a ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:SubjectRole ;
+    ao:attribute ai:SubjectRole ;
     ao:templateValue :RoleValueSet .
 
 :RoleValueSet a ao:AttributeValueSet ;
@@ -281,12 +281,12 @@
 
 :StatementPredicateCheck a ao:Check ;
     ao:operator ai:OneOf ;
-    ao:type ai:StatementPredicateUri ;
+    ao:attribute ai:StatementPredicateUri ;
     ao:templateValue :AllowedPropertyUriValueSet .
 
 :AccessObjectUriCheck a ao:Check ;
     ao:operator ai:OneOf ;
-    ao:type ai:AccessObjectUri ;
+    ao:attribute ai:AccessObjectUri ;
     ao:templateValue :AllowedPropertyUriValueSet .
 
 :AllowedPropertyUriValueSet a ao:AttributeValueSet ;

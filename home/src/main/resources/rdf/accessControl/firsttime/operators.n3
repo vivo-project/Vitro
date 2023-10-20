@@ -9,19 +9,19 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 ai:Equals rdf:type ao:Operator;
-         ao:id "EQUALS" .
+    ao:id "EQUALS" .
 
 ai:NotEquals rdf:type ao:Operator;
-         ao:id "NOT_EQUALS" .
-         
+    ao:id "NOT_EQUALS" .
+
 ai:OneOf rdf:type ao:Operator;
-         ao:id "ONE_OF" .
-         
+    ao:id "ONE_OF" .
+
 ai:NotOneOf rdf:type ao:Operator;
-         ao:id "NOT_ONE_OF" .
-         
+    ao:id "NOT_ONE_OF" .
+
 ai:StartsWith rdf:type ao:Operator;
-         ao:id "STARTS_WITH" .
-         
+    ao:id "STARTS_WITH" .
+
 ai:SparqlSelectQueryContains rdf:type ao:Operator;
-         ao:id "SPARQL_SELECT_QUERY_CONTAINS" .
+    ao:id "SPARQL_SELECT_QUERY_CONTAINS" .

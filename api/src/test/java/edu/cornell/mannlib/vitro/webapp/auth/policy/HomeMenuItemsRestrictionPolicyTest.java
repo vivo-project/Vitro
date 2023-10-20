@@ -19,7 +19,7 @@ public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
     @Test
     public void testHomeMenuItemsRestrictionPolicy() {
         load(MENU_ITEMS_POLICY_PATH);
-        String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/RestrictHomeMenuItemsEditingPolicy";
+        String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/Policy";
         DynamicPolicy policy = loader.loadPolicy(policyUri);
         assertTrue(policy != null);
         assertEquals(9000, policy.getPriority());

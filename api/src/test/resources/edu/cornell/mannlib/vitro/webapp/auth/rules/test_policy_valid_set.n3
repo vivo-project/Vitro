@@ -21,7 +21,7 @@ ai:ValidRule rdf:type ao:Rule ;
       
 ai:ValidAttribute1 rdf:type ao:Check ;
      ao:operator ai:Equals ;
-     ao:type ai:AccessObjectUri ;
+     ao:attribute ai:AccessObjectUri ;
      ao:templateValue ai:AttributeValueSet1 ;
      .
 
@@ -32,7 +32,7 @@ ai:AttributeValueSet1 a ao:AttributeValueSet  ;
      
 ai:ValidAttribute2 rdf:type ao:Check ;
      ao:operator ai:Equals ;
-     ao:type ai:AccessObjectUri ;
+     ao:attribute ai:AccessObjectUri ;
      ao:templateValue ai:AttributeValueSet2 ;
      .
 

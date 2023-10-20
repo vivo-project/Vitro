@@ -10,7 +10,7 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 
 ai:PublicSimplePermissionValueContainer  
-        # permissions for ANY user, even if they are not logged in.
-        ao:dataValue simplePermission:QueryFullModel ;
-        ao:dataValue simplePermission:PageViewablePublic ;
-        .
+    # permissions for ANY user, even if they are not logged in.
+    ao:dataValue simplePermission:QueryFullModel ;
+    ao:dataValue simplePermission:PageViewablePublic ;
+    .

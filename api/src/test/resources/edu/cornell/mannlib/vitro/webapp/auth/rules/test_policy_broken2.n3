@@ -24,6 +24,6 @@ ai:BrokenTestAttribute rdf:type ao:Check ;
          
 ai:ValidTestAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
-         ao:type ai:Operation ;
+         ao:attribute ai:Operation ;
          ao:value ai:PublishOperation .
 

@@ -7,35 +7,51 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/> .
 
-ai:RestrictHomeMenuItemsEditingPolicy rdf:type ao:Policy ;
-          ao:priority 9000 ;
-          ao:rules ai:RestrictHomeMenuItemsEditingRuleSet .
+:Policy rdf:type ao:Policy ;
+    ao:priority 9000 ;
+    ao:rules :RuleSet .
 
-ai:RestrictHomeMenuItemsEditingRuleSet rdf:type ao:Rules ;
-          ao:rule ai:RestrictEditHomeMenuItems ;
-          ao:rule ai:RestrictDropHomeMenuItems .
-          
-ai:RestrictEditHomeMenuItems rdf:type ao:Rule ;
-          ao:decision ai:Deny ;
-          ao:check ai:EditOperationAttribute ;
-          ao:check ai:ObjectPropertyStatementTypeAttribute ;
-          ao:check ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
-          ao:check ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
-          
-ai:RestrictDropHomeMenuItems rdf:type ao:Rule ;
-          ao:decision ai:Deny ;
-          ao:check ai:DropOperationAttribute ;
-          ao:check ai:ObjectPropertyStatementTypeAttribute ;
-          ao:check ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute ;
-          ao:check ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute .
-          
-ai:ObjectPropertyStatementPredicateUriEqualsToHasHomeAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:StatementPredicateUri ;
-         ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
+:RuleSet rdf:type ao:Rules ;
+    ao:rule :RestrictEdit ;
+    ao:rule :RestrictDrop .
 
-ai:ObjectPropertyStatementObjectUriEqualsToHomeMenuItemAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:type ai:StatementObjectUri ;
-         ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .
+:RestrictEdit rdf:type ao:Rule ;
+    ao:decision ai:Deny ;
+    ao:check :IsEditOperationCheck ;
+    ao:check :IsObjectPropertyStatement ;
+    ao:check :PredicateUriEqualsHomeMenuItem ;
+    ao:check :ObjectUriEqualsHasElement .
+
+:RestrictDrop rdf:type ao:Rule ;
+    ao:decision ai:Deny ;
+    ao:check :IsDropOperationCheck ;
+    ao:check :IsObjectPropertyStatement ;
+    ao:check :PredicateUriEqualsHomeMenuItem ;
+    ao:check :ObjectUriEqualsHasElement .
+
+:IsEditOperationCheck rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:Operation ;
+    ao:value ai:EditOperation .
+
+:IsDropOperationCheck rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:Operation ;
+    ao:value ai:DropOperation .
+
+:IsObjectPropertyStatement rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:AccessObjectType ;
+    ao:value ai:ObjectPropertyStatementAccesObject .
+
+:PredicateUriEqualsHomeMenuItem rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:StatementPredicateUri ;
+    ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
+
+:ObjectUriEqualsHasElement rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:StatementObjectUri ;
+    ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

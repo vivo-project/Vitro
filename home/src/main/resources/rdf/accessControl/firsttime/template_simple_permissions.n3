@@ -87,16 +87,21 @@
 
 :RuleSet a ao:Rules ;
     ao:rule :AllowSimplePermission .
-      
+
 :AllowSimplePermission a ao:Rule;
-    ao:check ai:NamedObjectTypeAttribute ;
+    ao:check :IsSimplePermission ;
     ao:check :PermissionNameAllowed ;
     ao:check :SubjectRoleEqualsDataSetRole .
-      
+
 :PermissionNameAllowed a ao:Check ;
     ao:operator ai:OneOf ;
-    ao:type ai:AccessObjectUri ;
+    ao:attribute ai:AccessObjectUri ;
     ao:templateValue :TypeValueSet .
+
+:IsSimplePermission rdf:type ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:AccessObjectType ;
+    ao:value ai:NamedObject .
 
 :TypeValueSet a ao:AttributeValueSet ;
     ao:attributeValue ai:PublicSimplePermissionValueContainer ;
@@ -118,7 +123,7 @@ ai:AdminSimplePermissionValueContainer a ao:ValueContainer ;
 
 :SubjectRoleEqualsDataSetRole a ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:SubjectRole ;
+    ao:attribute ai:SubjectRole ;
     ao:templateValue :RoleValueSet .
 
 :RoleValueSet a ao:AttributeValueSet ;

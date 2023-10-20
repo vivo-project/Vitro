@@ -7,36 +7,36 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-   
+
 ai:ObjectPropertyAccesObject rdf:type ao:ObjectType ;
-     ao:id "OBJECT_PROPERTY" .
+    ao:id "OBJECT_PROPERTY" .
 
 ai:DataPropertyAccesObject rdf:type ao:ObjectType ;
-     ao:id "DATA_PROPERTY" .
-     
+    ao:id "DATA_PROPERTY" .
+
 ai:FauxDataPropertyAccesObject rdf:type ao:ObjectType ;
-     ao:id "FAUX_DATA_PROPERTY" .
+    ao:id "FAUX_DATA_PROPERTY" .
 
 ai:FauxObjectPropertyAccesObject rdf:type ao:ObjectType ;
-     ao:id "FAUX_OBJECT_PROPERTY" .
+    ao:id "FAUX_OBJECT_PROPERTY" .
 
 ai:ObjectPropertyStatementAccesObject rdf:type ao:ObjectType ;
-     ao:id "OBJECT_PROPERTY_STATEMENT" .
+    ao:id "OBJECT_PROPERTY_STATEMENT" .
 
 ai:DataPropertyStatementAccesObject rdf:type ao:ObjectType ;
-     ao:id "DATA_PROPERTY_STATEMENT" .
+    ao:id "DATA_PROPERTY_STATEMENT" .
 
 ai:FauxObjectPropertyStatementAccesObject rdf:type ao:ObjectType ;
-     ao:id "FAUX_OBJECT_PROPERTY_STATEMENT" .
+    ao:id "FAUX_OBJECT_PROPERTY_STATEMENT" .
 
 ai:FauxDataPropertyStatementAccesObject rdf:type ao:ObjectType ;
-     ao:id "FAUX_DATA_PROPERTY_STATEMENT" .
+    ao:id "FAUX_DATA_PROPERTY_STATEMENT" .
 
 ai:Class rdf:type ao:ObjectType ;
-     ao:id "CLASS" .
-     
+    ao:id "CLASS" .
+
 ai:NamedObject rdf:type ao:ObjectType ;
-     ao:id "NAMED_OBJECT" .
+    ao:id "NAMED_OBJECT" .
 
 #Object type value containers
 

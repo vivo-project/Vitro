@@ -116,7 +116,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:PublicDropFauxDataPropertyValueContainer .
-    
+
 :PublicDropFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -129,7 +129,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:EditorDropFauxDataPropertyValueContainer .
-    
+
 :EditorDropFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -142,7 +142,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:CuratorDropFauxDataPropertyValueContainer .
-    
+
 :CuratorDropFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -155,7 +155,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:AdminDropFauxDataPropertyValueContainer .
-    
+
 :AdminDropFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -170,7 +170,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:PublicAddFauxDataPropertyValueContainer .
-    
+
 :PublicAddFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -183,7 +183,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:EditorAddFauxDataPropertyValueContainer .
-    
+
 :EditorAddFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -196,7 +196,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:CuratorAddFauxDataPropertyValueContainer .
-    
+
 :CuratorAddFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -209,7 +209,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:AdminAddFauxDataPropertyValueContainer .
-    
+
 :AdminAddFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -224,7 +224,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:PublicEditFauxDataPropertyValueContainer .
-    
+
 :PublicEditFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -237,7 +237,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:EditorEditFauxDataPropertyValueContainer .
-    
+
 :EditorEditFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -250,7 +250,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:CuratorEditFauxDataPropertyValueContainer .
-    
+
 :CuratorEditFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -263,7 +263,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:AdminEditFauxDataPropertyValueContainer .
-    
+
 :AdminEditFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -278,7 +278,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:PublicDropFauxObjectPropertyValueContainer .
-    
+
 :PublicDropFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -291,7 +291,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:EditorDropFauxObjectPropertyValueContainer .
-    
+
 :EditorDropFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -304,7 +304,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:CuratorDropFauxObjectPropertyValueContainer .
-    
+
 :CuratorDropFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -317,7 +317,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:AdminDropFauxObjectPropertyValueContainer .
-    
+
 :AdminDropFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -332,7 +332,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:PublicAddFauxObjectPropertyValueContainer .
-    
+
 :PublicAddFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -345,7 +345,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:EditorAddFauxObjectPropertyValueContainer .
-    
+
 :EditorAddFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -358,7 +358,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:CuratorAddFauxObjectPropertyValueContainer .
-    
+
 :CuratorAddFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -371,7 +371,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:AdminAddFauxObjectPropertyValueContainer .
-    
+
 :AdminAddFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -386,7 +386,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:PublicEditFauxObjectPropertyValueContainer .
-    
+
 :PublicEditFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -399,7 +399,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:EditorEditFauxObjectPropertyValueContainer .
-    
+
 :EditorEditFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -412,7 +412,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:CuratorEditFauxObjectPropertyValueContainer .
-    
+
 :CuratorEditFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -425,7 +425,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:AdminEditFauxObjectPropertyValueContainer .
-    
+
 :AdminEditFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -440,7 +440,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:PublicDropDataPropertyValueContainer .
-    
+
 :PublicDropDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -453,7 +453,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:EditorDropDataPropertyValueContainer .
-    
+
 :EditorDropDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -466,7 +466,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:CuratorDropDataPropertyValueContainer .
-    
+
 :CuratorDropDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -479,7 +479,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:AdminDropDataPropertyValueContainer .
-    
+
 :AdminDropDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -494,7 +494,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:PublicAddDataPropertyValueContainer .
-    
+
 :PublicAddDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -507,7 +507,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:EditorAddDataPropertyValueContainer .
-    
+
 :EditorAddDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -520,7 +520,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:CuratorAddDataPropertyValueContainer .
-    
+
 :CuratorAddDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -533,7 +533,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:AdminAddDataPropertyValueContainer .
-    
+
 :AdminAddDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -548,7 +548,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:PublicEditDataPropertyValueContainer .
-    
+
 :PublicEditDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -561,7 +561,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:EditorEditDataPropertyValueContainer .
-    
+
 :EditorEditDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -574,7 +574,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:CuratorEditDataPropertyValueContainer .
-    
+
 :CuratorEditDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -587,7 +587,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:AdminEditDataPropertyValueContainer .
-    
+
 :AdminEditDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -602,7 +602,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:PublicDropObjectPropertyValueContainer .
-    
+
 :PublicDropObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -615,7 +615,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:EditorDropObjectPropertyValueContainer .
-    
+
 :EditorDropObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -628,7 +628,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:CuratorDropObjectPropertyValueContainer .
-    
+
 :CuratorDropObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -641,7 +641,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DropOperationValueContainer ;
     ao:dataSetValues ai:AdminDropObjectPropertyValueContainer .
-    
+
 :AdminDropObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -656,7 +656,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:PublicAddObjectPropertyValueContainer .
-    
+
 :PublicAddObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -669,7 +669,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:EditorAddObjectPropertyValueContainer .
-    
+
 :EditorAddObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -682,7 +682,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:CuratorAddObjectPropertyValueContainer .
-    
+
 :CuratorAddObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -695,7 +695,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:AddOperationValueContainer ;
     ao:dataSetValues ai:AdminAddObjectPropertyValueContainer .
-    
+
 :AdminAddObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -710,7 +710,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:PublicEditObjectPropertyValueContainer .
-    
+
 :PublicEditObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -723,7 +723,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:EditorEditObjectPropertyValueContainer .
-    
+
 :EditorEditObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -736,7 +736,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:CuratorEditObjectPropertyValueContainer .
-    
+
 :CuratorEditObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -749,7 +749,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:EditOperationValueContainer ;
     ao:dataSetValues ai:AdminEditObjectPropertyValueContainer .
-    
+
 :AdminEditObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -765,7 +765,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:PublicDisplayObjectPropertyValueContainer .
-    
+
 :PublicDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -778,7 +778,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:EditorDisplayObjectPropertyValueContainer .
-    
+
 :EditorDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -791,7 +791,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:CuratorDisplayObjectPropertyValueContainer .
-    
+
 :CuratorDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -804,7 +804,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:AdminDisplayObjectPropertyValueContainer .
-    
+
 :AdminDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -819,7 +819,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:PublicDisplayDataPropertyValueContainer .
-    
+
 :PublicDisplayDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -832,7 +832,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:EditorDisplayDataPropertyValueContainer .
-    
+
 :EditorDisplayDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -845,7 +845,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:CuratorDisplayDataPropertyValueContainer .
-    
+
 :CuratorDisplayDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -858,7 +858,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:AdminDisplayDataPropertyValueContainer .
-    
+
 :AdminDisplayDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -873,7 +873,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:PublicDisplayFauxObjectPropertyValueContainer .
-    
+
 :PublicDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -886,7 +886,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:EditorDisplayFauxObjectPropertyValueContainer .
-    
+
 :EditorDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -899,7 +899,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:CuratorDisplayFauxObjectPropertyValueContainer .
-    
+
 :CuratorDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -912,7 +912,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:AdminDisplayFauxObjectPropertyValueContainer .
-    
+
 :AdminDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -927,7 +927,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:PublicDisplayFauxDataPropertyValueContainer .
-    
+
 :PublicDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:PUBLIC ;
@@ -940,7 +940,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:EditorDisplayFauxDataPropertyValueContainer .
-    
+
 :EditorDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -953,7 +953,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:CuratorDisplayFauxDataPropertyValueContainer .
-    
+
 :CuratorDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -966,7 +966,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:AdminDisplayFauxDataPropertyValueContainer .
-    
+
 :AdminDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -981,7 +981,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:EditorPublishObjectPropertyValueContainer .
-    
+
 :EditorPublishObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -994,7 +994,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:CuratorPublishObjectPropertyValueContainer .
-    
+
 :CuratorPublishObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -1007,7 +1007,7 @@
     ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:AdminPublishObjectPropertyValueContainer .
-    
+
 :AdminPublishObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:ObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -1022,7 +1022,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:EditorPublishDataPropertyValueContainer .
-    
+
 :EditorPublishDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -1035,7 +1035,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:CuratorPublishDataPropertyValueContainer .
-    
+
 :CuratorPublishDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -1048,7 +1048,7 @@
     ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:AdminPublishDataPropertyValueContainer .
-    
+
 :AdminPublishDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:DataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -1063,7 +1063,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:EditorPublishFauxObjectPropertyValueContainer .
-    
+
 :EditorPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -1076,7 +1076,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:CuratorPublishFauxObjectPropertyValueContainer .
-    
+
 :CuratorPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -1089,7 +1089,7 @@
     ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:AdminPublishFauxObjectPropertyValueContainer .
-    
+
 :AdminPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxObjectPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -1104,7 +1104,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:EditorPublishFauxDataPropertyValueContainer .
-    
+
 :EditorPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:EDITOR ;
@@ -1117,7 +1117,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:CuratorPublishFauxDataPropertyValueContainer .
-    
+
 :CuratorPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:CURATOR ;
@@ -1130,7 +1130,7 @@
     ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:AdminPublishFauxDataPropertyValueContainer .
-    
+
 :AdminPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:FauxDataPropertyAccesObject ;
     ao:keyComponent auth:ADMIN ;
@@ -1150,7 +1150,7 @@
 
 :AccessObjectTypeEqualsDataSetValue rdf:type ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:AccessObjectType ;
+    ao:attribute ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .
 
 :AccessObjectTypeValueSet a ao:AttributeValueSet ;
@@ -1169,7 +1169,7 @@
 
 :AccessObjectTypeStatementEquals rdf:type ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:AccessObjectType ;
+    ao:attribute ai:AccessObjectType ;
     ao:templateValue :StatementAccessObjectTypeValueSet .
 
 :StatementAccessObjectTypeValueSet a ao:AttributeValueSet ;
@@ -1181,7 +1181,7 @@
 
 :OperationEqualsDataSetOperation a ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:Operation ;
+    ao:attribute ai:Operation ;
     ao:templateValue :OperationValueSet .
 
 :OperationValueSet a ao:AttributeValueSet ;
@@ -1194,7 +1194,7 @@
 
 :SubjectRoleEqualsDataSetRoleAttribute a ao:Check ;
     ao:operator ai:Equals ;
-    ao:type ai:SubjectRole ;
+    ao:attribute ai:SubjectRole ;
     ao:templateValue :RoleValueSet .
 
 :RoleValueSet a ao:AttributeValueSet ;
@@ -1205,12 +1205,12 @@
 
 :StatementPredicateEquals a ao:Check ;
     ao:operator ai:OneOf ;
-    ao:type ai:StatementPredicateUri ;
+    ao:attribute ai:StatementPredicateUri ;
     ao:templateValue :AllowedPropertyUriValueSet .
 
 :AccessObjectUriContainsInDataSet a ao:Check ;
     ao:operator ai:OneOf ;
-    ao:type ai:AccessObjectUri ;
+    ao:attribute ai:AccessObjectUri ;
     ao:templateValue :AllowedPropertyUriValueSet .
 
 :AllowedPropertyUriValueSet a ao:AttributeValueSet ;

@@ -20,7 +20,7 @@ ai:KeyTestRule rdf:type ao:Rule ;
           
 ai:KeyTestAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
-         ao:type ai:Operation ;
+         ao:attribute ai:Operation ;
          ao:value ai:PublishOperation .
 
 ai:PolicyKeyTest rdf:type ao:PolicyKey ;
