@@ -9,7 +9,7 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 ai:Deny rdf:type ao:Decision;
-         ao:id "DENY" .
+    ao:id "DENY" .
 
 ai:Allow rdf:type ao:Decision;
-         ao:id "ALLOW" .
+    ao:id "ALLOW" .

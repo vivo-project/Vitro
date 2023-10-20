@@ -10,51 +10,51 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 
 ai:AdminSimplePermissionValueContainer
-        ao:dataValue simplePermission:AccessSpecialDataModels ;
-        ao:dataValue simplePermission:EnableDeveloperPanel ;
-        ao:dataValue simplePermission:LoginDuringMaintenance ;
-        ao:dataValue simplePermission:ManageMenus ;
-        ao:dataValue simplePermission:ManageProxies ;
-        ao:dataValue simplePermission:ManageSearchIndex ;
-        ao:dataValue simplePermission:ManageUserAccounts ;
-        ao:dataValue simplePermission:RefreshVisualizationCache ;
-        ao:dataValue simplePermission:SeeConfiguration ;
-        ao:dataValue simplePermission:SeeStartupStatus ;
-        ao:dataValue simplePermission:UseAdvancedDataToolsPages ;
-        ao:dataValue simplePermission:UseMiscellaneousAdminPages ;
-        ao:dataValue simplePermission:UseSparqlQueryPage ;
-        ao:dataValue simplePermission:PageViewableAdmin ;
+    ao:dataValue simplePermission:AccessSpecialDataModels ;
+    ao:dataValue simplePermission:EnableDeveloperPanel ;
+    ao:dataValue simplePermission:LoginDuringMaintenance ;
+    ao:dataValue simplePermission:ManageMenus ;
+    ao:dataValue simplePermission:ManageProxies ;
+    ao:dataValue simplePermission:ManageSearchIndex ;
+    ao:dataValue simplePermission:ManageUserAccounts ;
+    ao:dataValue simplePermission:RefreshVisualizationCache ;
+    ao:dataValue simplePermission:SeeConfiguration ;
+    ao:dataValue simplePermission:SeeStartupStatus ;
+    ao:dataValue simplePermission:UseAdvancedDataToolsPages ;
+    ao:dataValue simplePermission:UseMiscellaneousAdminPages ;
+    ao:dataValue simplePermission:UseSparqlQueryPage ;
+    ao:dataValue simplePermission:PageViewableAdmin ;
 
-        # Uncomment the following permission line to enable the SPARQL update API.
-        # Before enabling, be sure that the URL api/sparqlUpdate is secured by HTTPS,
-        # so passwords will not be sent in clear text.
-        #ao:dataValue simplePermission:UseSparqlUpdateApi ;
+    # Uncomment the following permission line to enable the SPARQL update API.
+    # Before enabling, be sure that the URL api/sparqlUpdate is secured by HTTPS,
+    # so passwords will not be sent in clear text.
+    #ao:dataValue simplePermission:UseSparqlUpdateApi ;
 
-        # permissions for CURATOR and above.
-        ao:dataValue simplePermission:EditOntology ;
-        ao:dataValue simplePermission:EditSiteInformation ;
-        ao:dataValue simplePermission:SeeVerbosePropertyInformation ;
-        ao:dataValue simplePermission:UseMiscellaneousCuratorPages ;
-        ao:dataValue simplePermission:PageViewableCurator ;
+    # permissions for CURATOR and above.
+    ao:dataValue simplePermission:EditOntology ;
+    ao:dataValue simplePermission:EditSiteInformation ;
+    ao:dataValue simplePermission:SeeVerbosePropertyInformation ;
+    ao:dataValue simplePermission:UseMiscellaneousCuratorPages ;
+    ao:dataValue simplePermission:PageViewableCurator ;
 
-        # permissions for EDITOR and above.
-        ao:dataValue simplePermission:DoBackEndEditing ;
-        ao:dataValue simplePermission:SeeIndividualEditingPanel ;
-        ao:dataValue simplePermission:SeeRevisionInfo ;
-        ao:dataValue simplePermission:SeeSiteAdminPage ;
-        ao:dataValue simplePermission:UseIndividualControlPanel ;
-        ao:dataValue simplePermission:PageViewableEditor ;
+    # permissions for EDITOR and above.
+    ao:dataValue simplePermission:DoBackEndEditing ;
+    ao:dataValue simplePermission:SeeIndividualEditingPanel ;
+    ao:dataValue simplePermission:SeeRevisionInfo ;
+    ao:dataValue simplePermission:SeeSiteAdminPage ;
+    ao:dataValue simplePermission:UseIndividualControlPanel ;
+    ao:dataValue simplePermission:PageViewableEditor ;
 
-        # permissions for ANY logged-in user.
-        ao:dataValue simplePermission:DoFrontEndEditing ;
-        ao:dataValue simplePermission:EditOwnAccount ;
-        ao:dataValue simplePermission:ManageOwnProxies ;
-        ao:dataValue simplePermission:QueryUserAccountsModel ;
-        ao:dataValue simplePermission:UseBasicAjaxControllers ;
-        ao:dataValue simplePermission:UseMiscellaneousPages ;
-        ao:dataValue simplePermission:PageViewableLoggedIn ;
+    # permissions for ANY logged-in user.
+    ao:dataValue simplePermission:DoFrontEndEditing ;
+    ao:dataValue simplePermission:EditOwnAccount ;
+    ao:dataValue simplePermission:ManageOwnProxies ;
+    ao:dataValue simplePermission:QueryUserAccountsModel ;
+    ao:dataValue simplePermission:UseBasicAjaxControllers ;
+    ao:dataValue simplePermission:UseMiscellaneousPages ;
+    ao:dataValue simplePermission:PageViewableLoggedIn ;
 
-        # permissions for ANY user, even if they are not logged in.
-        ao:dataValue simplePermission:QueryFullModel ;
-        ao:dataValue simplePermission:PageViewablePublic ;
-        .
+    # permissions for ANY user, even if they are not logged in.
+    ao:dataValue simplePermission:QueryFullModel ;
+    ao:dataValue simplePermission:PageViewablePublic ;
+    .

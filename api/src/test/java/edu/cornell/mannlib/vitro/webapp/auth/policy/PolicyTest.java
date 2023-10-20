@@ -32,7 +32,6 @@ public class PolicyTest {
     protected static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
 
     public static final String ONTOLOGY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "ontology.n3";
-    public static final String CHECKS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "checks.n3";
     public static final String OPERATIONS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operations.n3";
     public static final String OPERATION_GROUPS = USER_ACCOUNTS_HOME_FIRSTTIME + "operation_groups.n3";
     public static final String SUBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "subject_types.n3";
@@ -69,7 +68,6 @@ public class PolicyTest {
         accessControlModel = ModelFactory.createDefaultModel();
         configurationDataSet = DatasetFactory.createTxnMem();
         configurationDataSet.addNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
-        load(CHECKS_PATH);
         load(OPERATIONS_PATH);
         load(OPERATION_GROUPS);
         load(SUBJECT_TYPES);

@@ -19,6 +19,6 @@ ai:ValidRule rdf:type ao:Rule ;
           
 ai:ValidAttribute rdf:type ao:Check ;
          ao:operator ai:Equals ;
-         ao:type ai:Operation ;
+         ao:attribute ai:Operation ;
          ao:value ai:PublishOperation .
 

@@ -14,128 +14,128 @@
 #### Classes
 
 ao:PolicyTemplate a owl:Class ;
-     rdfs:label "Access rule policy template"@en-US .
+    rdfs:label "Access rule policy template"@en-US .
 
 ao:Policy a owl:Class ;
-     rdfs:label "Access rule policy"@en-US .
+    rdfs:label "Access rule policy"@en-US .
 
 ao:PolicyDataSet a owl:Class ;
-     rdfs:label "Test datasets"@en-US .
-     
+    rdfs:label "Test datasets"@en-US .
+
 ao:ValueContainer a owl:Class ;
-     rdfs:label "Test data"@en-US .
-     
+    rdfs:label "Test data"@en-US .
+
 ao:TestValue a owl:Class ;
-     rdfs:label "Test value"@en-US .
+    rdfs:label "Test value"@en-US .
 
 ao:Rule a owl:Class ;
-     rdfs:label "Access rule"@en-US .
-     
+    rdfs:label "Access rule"@en-US .
+
 ao:Rules a owl:Class ;
-     rdfs:label "Access rule set"@en-US .
-     
+    rdfs:label "Access rule set"@en-US .
+
 ao:PolicyKey a owl:Class ;
-     rdfs:label "Policy key"@en-US .
+    rdfs:label "Policy key"@en-US .
 
 ao:Check a owl:Class ;
-     rdfs:label "Access rule attribute"@en-US .
-     
+    rdfs:label "Access rule attribute"@en-US .
+
 ao:Operator a owl:Class ;
-     rdfs:label "Operator"@en-US .
+    rdfs:label "Operator"@en-US .
 
 ao:Operation a owl:Class ;
-     rdfs:label "Operation"@en-US .
+    rdfs:label "Operation"@en-US .
 
 ao:OperationGroup a owl:Class ;
-     rdfs:label "Operation group"@en-US .
+    rdfs:label "Operation group"@en-US .
 
 ao:ObjectType a owl:Class ;
-     rdfs:label "Object type"@en-US .
-     
+    rdfs:label "Object type"@en-US .
+
 ao:SubjectType a owl:Class ;
-     rdfs:label "Subject type"@en-US .
+    rdfs:label "Subject type"@en-US .
 
 ao:AccesObject a owl:Class ;
-     rdfs:label "Access object"@en-US .
+    rdfs:label "Access object"@en-US .
 
 ao:AttributeType a owl:Class ;
-     rdfs:label "Attribute type"@en-US .
-     
+    rdfs:label "Attribute type"@en-US .
+
 ao:Decision a owl:Class ;
-     rdfs:label "Decision"@en-US .
-     
+    rdfs:label "Decision"@en-US .
+
 #### Data properties
 
 ao:attributeName a owl:DatatypeProperty ,
-            owl:FunctionalProperty ;
-            rdfs:domain ao:Check ;
-            rdfs:range xsd:string ;
-            rdfs:label "Attribute name"@en-US .
+    owl:FunctionalProperty ;
+    rdfs:domain ao:Check ;
+    rdfs:range xsd:string ;
+    rdfs:label "Attribute name"@en-US .
 
 ao:id a owl:DatatypeProperty ,
-            owl:FunctionalProperty ;
-            rdfs:domain ao:AttributeType ;
-            rdfs:range xsd:string ;
-            rdfs:label "id"@en-US .
+    owl:FunctionalProperty ;
+    rdfs:domain ao:AttributeType ;
+    rdfs:range xsd:string ;
+    rdfs:label "id"@en-US .
 
 ao:stringValue a owl:DatatypeProperty ,
-            owl:FunctionalProperty ;
-            rdfs:range xsd:string ;
-            rdfs:label "id"@en-US .            
+    owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "id"@en-US .    
 
 ao:priority a owl:DatatypeProperty ,
-            owl:FunctionalProperty ;
-            rdfs:range xsd:integer ;
-            rdfs:label "priority"@en-US . 
-            
+    owl:FunctionalProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "priority"@en-US . 
+
 #### Object properties
 
 ao:check a owl:ObjectProperty ;
-          rdfs:domain ao:Rule ;
-          rdfs:range ao:Check .
-          
+    rdfs:domain ao:Rule ;
+    rdfs:range ao:Check .
+
 ao:decision a owl:ObjectProperty ;
-          rdfs:domain ao:Rule ;
-          rdfs:range ao:Decision .          
-          
+    rdfs:domain ao:Rule ;
+    rdfs:range ao:Decision .    
+
 ao:rules a owl:ObjectProperty ;
-          rdfs:domain ao:Policy ;
-          rdfs:range ao:Rules .
+    rdfs:domain ao:Policy ;
+    rdfs:range ao:Rules .
 
 ao:policyDataSets a owl:ObjectProperty ;
-          rdfs:domain ao:Policy ;
-          rdfs:range ao:PolicyDataSet .
+    rdfs:domain ao:Policy ;
+    rdfs:range ao:PolicyDataSet .
 
 ao:testData a owl:ObjectProperty ;
-          rdfs:domain ao:PolicyDataSet ;
-          rdfs:range ao:ValueContainer .
+    rdfs:domain ao:PolicyDataSet ;
+    rdfs:range ao:ValueContainer .
 
 ao:containerType a owl:ObjectProperty ;
-          rdfs:domain ao:ValueContainer .
+    rdfs:domain ao:ValueContainer .
 
 ao:uri a owl:ObjectProperty .
 
 ao:value a owl:ObjectProperty ;
-          rdfs:domain ao:Check .
-          
+    rdfs:domain ao:Check .
+
 ao:setValue a owl:ObjectProperty ;
-          rdfs:domain ao:Check .          
-    
+    rdfs:domain ao:Check .    
+
 ao:operation a owl:ObjectProperty ;
-          rdfs:domain ao:Rule ;
-          rdfs:range ao:Operation .
-          
+    rdfs:domain ao:Rule ;
+    rdfs:range ao:Operation .
+
 ao:rule a owl:ObjectProperty ;
-          rdfs:domain ao:Policy ;
-          rdfs:range ao:Rule .
-          
+    rdfs:domain ao:Policy ;
+    rdfs:range ao:Rule .
+
 ao:test a owl:ObjectProperty ;
-          rdfs:domain ao:Check ;
-          rdfs:range ao:Operator .
-          
+    rdfs:domain ao:Check ;
+    rdfs:range ao:Operator .
+
 ao:keyComponent a owl:ObjectProperty .
-          
+
 ao:policyKey a owl:ObjectProperty ;
-          rdfs:domain ao:Policy ;
-          rdfs:range ao:PolicyKey .            
+    rdfs:domain ao:Policy ;
+    rdfs:range ao:PolicyKey .    
 

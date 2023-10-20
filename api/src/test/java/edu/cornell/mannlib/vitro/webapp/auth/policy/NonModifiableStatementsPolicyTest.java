@@ -27,7 +27,7 @@ public class NonModifiableStatementsPolicyTest extends PolicyTest {
         load(USER_ACCOUNTS_HOME_FIRSTTIME + NOT_MODIFIABLE_STATEMENTS_POLICY_PATH + DATASET + EXT);
 
         String policyUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/NotModifiableStatementsPolicy";
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/non-modifiable-statements/PolicyTemplate";
         DynamicPolicy policy = loader.loadPolicy(policyUri);
         assertTrue(policy != null);
         assertEquals(8000, policy.getPriority());

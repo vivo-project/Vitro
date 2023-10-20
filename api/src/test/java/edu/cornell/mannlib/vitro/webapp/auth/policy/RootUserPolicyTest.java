@@ -14,7 +14,7 @@ public class RootUserPolicyTest extends PolicyTest {
     @Test
     public void testLoadRootUserPolicy() {
         load(ROOT_POLICY_PATH);
-        String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/RootUserPolicy";
+        String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/root-user/Policy";
         DynamicPolicy policy = loader.loadPolicy(policyUri);
         assertTrue(policy != null);
         assertEquals(10000, policy.getPriority());

@@ -21,13 +21,13 @@ ai:BrokenRule rdf:type ao:Rule ;
     
 ai:BrokenSetAttribute1 rdf:type ao:Check ;
     ao:operator ai:NotOneOf ;
-    ao:type ai:ObjectUri ;
+    ao:attribute ai:ObjectUri ;
     ao:templateValue ai:AttributeValueSet1 ;
     .
     
 ai:BrokenSetAttribute2 rdf:type ao:Check ;
     ao:operator ai:NotOneOf ;
-    ao:type ai:ObjectUri ;
+    ao:attribute ai:ObjectUri ;
     ao:templateValue ai:AttributeValueSet2 .
 
 ai:testDataSets rdf:type ao:PolicyDataSets ;
