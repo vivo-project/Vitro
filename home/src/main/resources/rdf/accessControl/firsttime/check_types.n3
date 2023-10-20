@@ -8,38 +8,38 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:Subject rdf:type ao:AttributeType ;
+ai:Subject a ao:AttributeType ;
     ao:id "SUBJECT" .
 
-ai:SubjectRole rdf:type ao:AttributeType ;
+ai:SubjectRole a ao:AttributeType ;
     ao:id "SUBJECT_ROLE_URI" .
 
-ai:SubjectType rdf:type ao:AttributeType ;
+ai:SubjectType a ao:AttributeType ;
     ao:id "SUBJECT_TYPE" .
 
-ai:AccessObjectUri rdf:type ao:AttributeType ;
+ai:AccessObjectUri a ao:AttributeType ;
     ao:id "ACCESS_OBJECT_URI" .
 
-ai:AccessObjectType rdf:type ao:AttributeType ;
+ai:AccessObjectType a ao:AttributeType ;
     ao:id "ACCESS_OBJECT_TYPE" .
 
-ai:Operation rdf:type ao:AttributeType ;
+ai:Operation a ao:AttributeType ;
     ao:id "OPERATION" .
 
-ai:SubjectNotMatch rdf:type ao:AttributeType ;
+ai:SubjectNotMatch a ao:AttributeType ;
     ao:id "SUBJECT_NOT_MATCH" .
 
-ai:ObjectNotMatch rdf:type ao:AttributeType ;
+ai:ObjectNotMatch a ao:AttributeType ;
     ao:id "OBJECT_NOT_MATCH" .
 
-ai:RelatesToSubjectProfile rdf:type ao:AttributeType ;
+ai:RelatesToSubjectProfile a ao:AttributeType ;
     ao:id "RELATES_TO_SUBJECT_PROFILE" .
 
-ai:StatementPredicateUri rdf:type ao:AttributeType ;
+ai:StatementPredicateUri a ao:AttributeType ;
     ao:id "STATEMENT_PREDICATE_URI" .
 
-ai:StatementSubjectUri rdf:type ao:AttributeType ;
+ai:StatementSubjectUri a ao:AttributeType ;
     ao:id "STATEMENT_SUBJECT_URI" .
 
-ai:StatementObjectUri rdf:type ao:AttributeType ;
+ai:StatementObjectUri a ao:AttributeType ;
     ao:id "STATEMENT_OBJECT_URI" .

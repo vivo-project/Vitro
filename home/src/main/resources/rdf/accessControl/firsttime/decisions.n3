@@ -8,8 +8,8 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:Deny rdf:type ao:Decision;
+ai:Deny a ao:Decision;
     ao:id "DENY" .
 
-ai:Allow rdf:type ao:Decision;
+ai:Allow a ao:Decision;
     ao:id "ALLOW" .

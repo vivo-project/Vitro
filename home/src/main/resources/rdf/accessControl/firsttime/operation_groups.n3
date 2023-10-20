@@ -8,11 +8,11 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:DisplayOperationGroup rdf:type ao:OperationGroup ;
+ai:DisplayOperationGroup a ao:OperationGroup ;
     ao:id "DISPLAY_GROUP" .
 
-ai:UpdateOperationGroup rdf:type ao:OperationGroup ;
+ai:UpdateOperationGroup a ao:OperationGroup ;
     ao:id "UPDATE_GROUP" .
 
-ai:PublishOperationGroup rdf:type ao:OperationGroup ;
+ai:PublishOperationGroup a ao:OperationGroup ;
     ao:id "PUBLISH_GROUP" .    

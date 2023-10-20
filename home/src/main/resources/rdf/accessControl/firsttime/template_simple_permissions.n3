@@ -98,7 +98,7 @@
     ao:attribute ai:AccessObjectUri ;
     ao:templateValue :TypeValueSet .
 
-:IsSimplePermission rdf:type ao:Check ;
+:IsSimplePermission a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:value ai:NamedObject .

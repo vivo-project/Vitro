@@ -9,49 +9,49 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/> .
 
-:Policy rdf:type ao:Policy ;
+:Policy a ao:Policy ;
     ao:priority 9000 ;
     ao:rules :RuleSet .
 
-:RuleSet rdf:type ao:Rules ;
+:RuleSet a ao:Rules ;
     ao:rule :RestrictEdit ;
     ao:rule :RestrictDrop .
 
-:RestrictEdit rdf:type ao:Rule ;
+:RestrictEdit a ao:Rule ;
     ao:decision ai:Deny ;
     ao:check :IsEditOperationCheck ;
     ao:check :IsObjectPropertyStatement ;
     ao:check :PredicateUriEqualsHomeMenuItem ;
     ao:check :ObjectUriEqualsHasElement .
 
-:RestrictDrop rdf:type ao:Rule ;
+:RestrictDrop a ao:Rule ;
     ao:decision ai:Deny ;
     ao:check :IsDropOperationCheck ;
     ao:check :IsObjectPropertyStatement ;
     ao:check :PredicateUriEqualsHomeMenuItem ;
     ao:check :ObjectUriEqualsHasElement .
 
-:IsEditOperationCheck rdf:type ao:Check ;
+:IsEditOperationCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:Operation ;
     ao:value ai:EditOperation .
 
-:IsDropOperationCheck rdf:type ao:Check ;
+:IsDropOperationCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:Operation ;
     ao:value ai:DropOperation .
 
-:IsObjectPropertyStatement rdf:type ao:Check ;
+:IsObjectPropertyStatement a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:value ai:ObjectPropertyStatementAccesObject .
 
-:PredicateUriEqualsHomeMenuItem rdf:type ao:Check ;
+:PredicateUriEqualsHomeMenuItem a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:StatementPredicateUri ;
     ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
 
-:ObjectUriEqualsHasElement rdf:type ao:Check ;
+:ObjectUriEqualsHasElement a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:StatementObjectUri ;
     ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

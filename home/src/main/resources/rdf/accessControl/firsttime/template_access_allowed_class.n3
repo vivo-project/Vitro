@@ -239,7 +239,7 @@
     ao:check :AccessObjectTypeCheck ;
     ao:check :AccessObjectUriCheck .
 
-:AccessObjectTypeCheck rdf:type ao:Check ;
+:AccessObjectTypeCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .

@@ -8,25 +8,25 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:DisplayOperation rdf:type ao:Operation ;
+ai:DisplayOperation a ao:Operation ;
     ao:id "DISPLAY" .
 
-ai:UpdateOperation rdf:type ao:Operation ;
+ai:UpdateOperation a ao:Operation ;
     ao:id "UPDATE" .
 
-ai:PublishOperation rdf:type ao:Operation ;
+ai:PublishOperation a ao:Operation ;
     ao:id "PUBLISH" .    
 
-ai:AddOperation rdf:type ao:Operation ;
+ai:AddOperation a ao:Operation ;
     ao:id "ADD" .
 
-ai:DropOperation rdf:type ao:Operation ;
+ai:DropOperation a ao:Operation ;
     ao:id "DROP" .
 
-ai:EditOperation rdf:type ao:Operation ;
+ai:EditOperation a ao:Operation ;
     ao:id "EDIT" .
 
-ai:ExecuteOperation rdf:type ao:Operation ;
+ai:ExecuteOperation a ao:Operation ;
     ao:id "EXECUTE" .
 
 ai:DisplayOperationValueContainer a ao:ValueContainer ;
