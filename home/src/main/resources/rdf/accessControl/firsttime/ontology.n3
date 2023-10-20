@@ -38,7 +38,7 @@ ao:PolicyKey a owl:Class ;
     rdfs:label "Policy key"@en-US .
 
 ao:Check a owl:Class ;
-    rdfs:label "Access rule attribute"@en-US .
+    rdfs:label "Access rule check"@en-US .
 
 ao:Operator a owl:Class ;
     rdfs:label "Operator"@en-US .
@@ -58,8 +58,8 @@ ao:SubjectType a owl:Class ;
 ao:AccesObject a owl:Class ;
     rdfs:label "Access object"@en-US .
 
-ao:AttributeType a owl:Class ;
-    rdfs:label "Attribute type"@en-US .
+ao:Attribute a owl:Class ;
+    rdfs:label "Attribute"@en-US .
 
 ao:Decision a owl:Class ;
     rdfs:label "Decision"@en-US .
@@ -74,7 +74,7 @@ ao:attributeName a owl:DatatypeProperty ,
 
 ao:id a owl:DatatypeProperty ,
     owl:FunctionalProperty ;
-    rdfs:domain ao:AttributeType ;
+    rdfs:domain ao:Attribute ;
     rdfs:range xsd:string ;
     rdfs:label "id"@en-US .
 
