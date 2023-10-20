@@ -50,12 +50,12 @@
 :PredicateIsSomePredicate a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:StatementPredicateUri ;
-    ao:value ai:SomeUriTestData .
+    ao:value :SomeUri .
 
 :ObjectUriIsSomeUri a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:StatementObjectUri ;
-    ao:value ai:SomeUriTestData .
+    ao:value :SomeUri .
 
 :SubjectUriIsProfileRelatedResource a ao:Check ;
     ao:operator ai:SparqlSelectQueryContains ;
@@ -67,3 +67,9 @@
     ao:attribute ai:AccessObjectType ;
     ao:value ai:ObjectPropertyStatementAccesObject .
 
+
+:SomeUri a ao:ValueContainer ;
+    ao:id "?SOME_URI" .
+
+:SomeLiteral a ao:ValueContainer ;
+    ao:id "?SOME_LITERAL" .

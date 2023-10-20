@@ -80,25 +80,3 @@ ai:PersonProfileProximityToResourceUri a ao:ValueContainer ;
     }
     """ .
 
-ai:SomeUriTestData a ao:ValueContainer ;
-    ao:id "?SOME_URI" .
-
-ai:SomeLiteralTestData a ao:ValueContainer ;
-    ao:id "?SOME_LITERAL" .
-
-#Role value containers 
-
-ai:PublicRoleValueContainer a ao:ValueContainer ;
-    ao:dataValue auth:PUBLIC .
-
-ai:SelfEditorRoleValueContainer a ao:ValueContainer ;
-    ao:dataValue auth:SELF_EDITOR .
-
-ai:EditorRoleValueContainer a ao:ValueContainer ;
-    ao:dataValue auth:EDITOR .
-
-ai:CuratorRoleValueContainer a ao:ValueContainer ;
-    ao:dataValue auth:CURATOR .
-
-ai:AdminRoleValueContainer a ao:ValueContainer ;
-    ao:dataValue auth:ADMIN .
