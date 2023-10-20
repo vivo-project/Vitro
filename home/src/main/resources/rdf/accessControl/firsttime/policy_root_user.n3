@@ -9,17 +9,17 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/root-user/> .
 
-:Policy rdf:type ao:Policy ;
+:Policy a ao:Policy ;
     ao:priority 10000 ;
     ao:rules :RuleSet .
 
-:RuleSet rdf:type ao:Rules ;
+:RuleSet a ao:Rules ;
     ao:rule :AllowRootUserRule .
 
-:AllowRootUserRule rdf:type ao:Rule;
+:AllowRootUserRule a ao:Rule;
     ao:check :IsRootUserCheck .
 
-:IsRootUserCheck rdf:type ao:Check ;
+:IsRootUserCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:SubjectType ;
     ao:value ai:RootUserSubject .

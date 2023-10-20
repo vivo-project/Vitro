@@ -23,5 +23,5 @@ ai:ProhibitedNamespaceValueContainer
     ao:dataValue  ai:prohibitedNamespacePrefix ; 
     .
 
-ai:prohibitedNamespacePrefix rdf:type ao:TestValue ;
+ai:prohibitedNamespacePrefix a ao:TestValue ;
     ao:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;

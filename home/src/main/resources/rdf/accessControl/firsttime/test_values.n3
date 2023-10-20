@@ -8,7 +8,7 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:PersonProfileProximityToResourceUri rdf:type ao:ValueContainer ;
+ai:PersonProfileProximityToResourceUri a ao:ValueContainer ;
     ao:id """
     SELECT ?resourceUri WHERE {
         {
@@ -80,10 +80,10 @@ ai:PersonProfileProximityToResourceUri rdf:type ao:ValueContainer ;
     }
     """ .
 
-ai:SomeUriTestData rdf:type ao:ValueContainer ;
+ai:SomeUriTestData a ao:ValueContainer ;
     ao:id "?SOME_URI" .
 
-ai:SomeLiteralTestData rdf:type ao:ValueContainer ;
+ai:SomeLiteralTestData a ao:ValueContainer ;
     ao:id "?SOME_LITERAL" .
 
 #Role value containers 

@@ -8,5 +8,5 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:RootUserSubject rdf:type ao:SubjectType ;
+ai:RootUserSubject a ao:SubjectType ;
      ao:id "ROOT_USER" .

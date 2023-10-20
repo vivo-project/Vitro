@@ -52,12 +52,12 @@
     ao:check :PredicateUriStartWithProhibitedNamespace ;
     ao:check :PredicateNotANamespaceException .
 
-:IsObjectPropertyStatement rdf:type ao:Check ;
+:IsObjectPropertyStatement a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:value ai:ObjectPropertyStatementAccesObject .
 
-:IsDataPropertyStatement rdf:type ao:Check ;
+:IsDataPropertyStatement a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:value ai:DataPropertyStatementAccesObject .

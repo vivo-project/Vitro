@@ -223,7 +223,7 @@
     ao:check :AccessObjectTypeCheck ;
     ao:check :AccessObjectUriCheck .
 
-:AccessObjectTypeCheck rdf:type ao:Check ;
+:AccessObjectTypeCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .
@@ -243,12 +243,12 @@
     ao:check :RelationCheck ;
     .
 
-:RelationCheck rdf:type ao:Check ;
+:RelationCheck a ao:Check ;
     ao:operator ai:SparqlSelectQueryContains ;
     ao:attribute ai:StatementSubjectUri ;
     ao:value ai:PersonProfileProximityToResourceUri .
 
-:AccessObjectStatementTypeCheck rdf:type ao:Check ;
+:AccessObjectStatementTypeCheck a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:templateValue :StatementAccessObjectTypeValueSet .

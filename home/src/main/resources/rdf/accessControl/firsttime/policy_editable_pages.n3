@@ -8,38 +8,38 @@
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/edit-individual-pages/> .
 
-:Policy rdf:type ao:Policy ;
+:Policy a ao:Policy ;
     ao:rules :RuleSet .
 
-:RuleSet rdf:type ao:Rules ;
+:RuleSet a ao:Rules ;
     ao:rule :AllowEditRelatedPagesRule ;
     ao:rule :AllowEditIndividualPagesRule .
 
-:AllowEditIndividualPagesRule rdf:type ao:Rule;
+:AllowEditIndividualPagesRule a ao:Rule;
     ao:check :SubjectRoleOneOfEditorsCheck ;
     ao:check :IsAddOperation ;
     ao:check :IsObjectPropertyStatement ;
     ao:check :ObjectUriIsSomeUri ;
     ao:check :PredicateIsSomePredicate .
 
-:SubjectRoleOneOfEditorsCheck rdf:type ao:Check ;
+:SubjectRoleOneOfEditorsCheck a ao:Check ;
     ao:operator ai:OneOf ;
     ao:attribute ai:SubjectRole ;
     ao:value auth:ADMIN ;
     ao:value auth:CURATOR ;
     ao:value auth:EDITOR .
 
-:SubjectRoleIsSelfEditor rdf:type ao:Check ;
+:SubjectRoleIsSelfEditor a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:SubjectRole ;
     ao:value auth:SELF_EDITOR .
 
-:IsAddOperation rdf:type ao:Check ;
+:IsAddOperation a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:Operation ;
     ao:value ai:AddOperation .
 
-:AllowEditRelatedPagesRule rdf:type ao:Rule;
+:AllowEditRelatedPagesRule a ao:Rule;
     ao:check :SubjectRoleIsSelfEditor ;
     ao:check :SubjectUriIsProfileRelatedResource ;
     ao:check :IsAddOperation ;
@@ -47,22 +47,22 @@
     ao:check :ObjectUriIsSomeUri ;
     ao:check :PredicateIsSomePredicate .
 
-:PredicateIsSomePredicate rdf:type ao:Check ;
+:PredicateIsSomePredicate a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:StatementPredicateUri ;
     ao:value ai:SomeUriTestData .
 
-:ObjectUriIsSomeUri rdf:type ao:Check ;
+:ObjectUriIsSomeUri a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:StatementObjectUri ;
     ao:value ai:SomeUriTestData .
 
-:SubjectUriIsProfileRelatedResource rdf:type ao:Check ;
+:SubjectUriIsProfileRelatedResource a ao:Check ;
     ao:operator ai:SparqlSelectQueryContains ;
     ao:attribute ai:StatementSubjectUri ;
     ao:value ai:PersonProfileProximityToResourceUri .
 
-:IsObjectPropertyStatement rdf:type ao:Check ;
+:IsObjectPropertyStatement a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:value ai:ObjectPropertyStatementAccesObject .

@@ -1148,7 +1148,7 @@
     ao:check :AccessObjectTypeEqualsDataSetValue ;
     ao:check :AccessObjectUriContainsInDataSet .
 
-:AccessObjectTypeEqualsDataSetValue rdf:type ao:Check ;
+:AccessObjectTypeEqualsDataSetValue a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:templateValue :AccessObjectTypeValueSet .
@@ -1167,7 +1167,7 @@
     ao:check :StatementPredicateEquals ;
     .
 
-:AccessObjectTypeStatementEquals rdf:type ao:Check ;
+:AccessObjectTypeStatementEquals a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
     ao:templateValue :StatementAccessObjectTypeValueSet .
