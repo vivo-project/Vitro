@@ -64,6 +64,18 @@ ao:Attribute a owl:Class ;
 ao:Decision a owl:Class ;
     rdfs:label "Decision"@en-US .
 
+ao:DataSetTemplate a owl:Class ;
+    rdfs:label "Data set template"@en-US .
+
+ao:DataSetTemplateKey a owl:Class ;
+    rdfs:label "Data set template key"@en-US .
+
+ao:DataSetKeyTemplate a owl:Class ;
+    rdfs:label "Data set key template"@en-US .
+
+ao:ValueContainerTemplate a owl:Class ;
+    rdfs:label "Value container template"@en-US .
+
 #### Data properties
 
 ao:attributeName a owl:DatatypeProperty ,
@@ -89,6 +101,29 @@ ao:priority a owl:DatatypeProperty ,
     rdfs:label "priority"@en-US . 
 
 #### Object properties
+
+ao:dataSetValues a owl:ObjectProperty .
+
+ao:defaultValue a owl:ObjectProperty ;
+    rdfs:domain ao:ValueContainerTemplate .
+
+ao:containerTypeTemplate a owl:ObjectProperty ;
+    rdfs:domain ao:ValueContainerTemplate .
+
+ao:relatedValueSet a owl:ObjectProperty ;
+    rdfs:domain ao:ValueContainerTemplate ;
+    rdfs:range ao:AttributeValueSet .
+
+ao:dataSetTemplateKey a owl:ObjectProperty ;
+    rdfs:domain ao:DataSetTemplate ;
+    rdfs:range ao:DataSetTemplateKey .
+
+ao:dataSetValueTemplate a owl:ObjectProperty ;
+    rdfs:domain ao:DataSetTemplate ;
+    rdfs:range ao:ValueContainerTemplate .
+
+ao:templateKey a owl:ObjectProperty ;
+    rdfs:domain ao:DataSetTemplateKey .
 
 ao:check a owl:ObjectProperty ;
     rdfs:domain ao:Rule ;

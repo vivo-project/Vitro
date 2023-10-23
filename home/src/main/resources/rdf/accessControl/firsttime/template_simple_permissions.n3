@@ -16,72 +16,83 @@
     ao:rules :RuleSet .
 
 :DataSets a ao:PolicyDataSets ;
-    ao:policyDataSetTemplate :DataSetTemplate ;
-    ao:policyDataSet :PublicSimplePermissionDataSet ;
-    ao:policyDataSet :SelfEditorSimplePermissionDataSet ;
-    ao:policyDataSet :EditorSimplePermissionDataSet ;
-    ao:policyDataSet :CuratorSimplePermissionDataSet ;
-    ao:policyDataSet :AdminSimplePermissionDataSet .
+    ao:policyDataSetTemplate :RoleDataSetTemplate ;
+    ao:policyDataSet :PublicDataSet ;
+    ao:policyDataSet :SelfEditorDataSet ;
+    ao:policyDataSet :EditorDataSet ;
+    ao:policyDataSet :CuratorDataSet ;
+    ao:policyDataSet :AdminDataSet .
 
-:DataSetTemplate a ao:DataSetTemplate ;
-    ao:dataSetKeyTemplate :DataSetKeyTemplate ;
-    ao:testDataTemplate :RoleTestDataTemplate ;
-    ao:testDataTemplate :TypesTestDataTemplate .  
+#Role data set template
 
-:DataSetKeyTemplate a ao:DataSetKeyTemplate ;
+:RoleDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDataSetKeyTemplate ;
+    ao:dataSetValueTemplate :RoleValueContainerTemplate ;
+    ao:dataSetValueTemplate :RolePermissionValueContainerTemplate .  
+
+:RoleDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDataSetKeyTemplate a ao:DataSetKeyTemplate ;
     ao:keyComponent ai:NamedObject ;
     ao:keyComponentTemplate ai:SubjectRole .
 
-:RoleTestDataTemplate a ao:TestDataTemplate ;
-    ao:usedInAttributeValueSet :RoleValueSet;
-    ao:dataValueTemplate ai:SubjectRole .
+:RoleValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
 
-:TypesTestDataTemplate a ao:TestDataTemplate ;
-    ao:usedInAttributeValueSet :TypeValueSet;
-    ao:dataValueTemplate ai:NamedObject .
+:RolePermissionValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :TypeValueSet;
+    ao:defaultValue simplePermission:PageViewablePublic;
+    ao:defaultValue simplePermission:QueryFullModel ;
+    ao:containerTypeTemplate ai:NamedObject .
 
-:PublicSimplePermissionDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :PublicSimplePermissionDataSetKey ;
+
+#Data sets
+
+:PublicDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :PublicDataSetKey ;
     ao:dataSetValues ai:PublicRoleValueContainer ;
     ao:dataSetValues ai:PublicSimplePermissionValueContainer .
 
-:PublicSimplePermissionDataSetKey a ao:DataSetKey ;
+:PublicDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
     ao:keyComponent auth:PUBLIC .
 
-:SelfEditorSimplePermissionDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorSimplePermissionDataSetKey ;
+:SelfEditorDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :SelfEditorDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
     ao:dataSetValues ai:SelfEditorSimplePermissionValueContainer .
 
-:SelfEditorSimplePermissionDataSetKey a ao:DataSetKey ;
+:SelfEditorDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
     ao:keyComponent auth:SELF_EDITOR .
 
-:EditorSimplePermissionDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :EditorSimplePermissionDataSetKey ;
+:EditorDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :EditorDataSetKey ;
     ao:dataSetValues ai:EditorRoleValueContainer ;
     ao:dataSetValues ai:EditorSimplePermissionValueContainer .
 
-:EditorSimplePermissionDataSetKey a ao:DataSetKey ;
+:EditorDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
     ao:keyComponent auth:EDITOR .
 
-:CuratorSimplePermissionDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :CuratorSimplePermissionDataSetKey ;
+:CuratorDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :CuratorDataSetKey ;
     ao:dataSetValues ai:CuratorRoleValueContainer ;
     ao:dataSetValues ai:CuratorSimplePermissionValueContainer .
 
-:CuratorSimplePermissionDataSetKey a ao:DataSetKey ;
+:CuratorDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
     ao:keyComponent auth:CURATOR .
 
-:AdminSimplePermissionDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :AdminSimplePermissionDataSetKey  ;
+:AdminDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :AdminDataSetKey  ;
     ao:dataSetValues ai:AdminRoleValueContainer ;
     ao:dataSetValues ai:AdminSimplePermissionValueContainer .
 
-:AdminSimplePermissionDataSetKey  a ao:DataSetKey ;
+:AdminDataSetKey  a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
     ao:keyComponent auth:ADMIN .
 
@@ -90,8 +101,14 @@
 
 :AllowSimplePermission a ao:Rule;
     ao:check :IsSimplePermission ;
+    ao:check :IsExecuteOperation ;
     ao:check :PermissionNameAllowed ;
     ao:check :SubjectRoleEqualsDataSetRole .
+
+:IsExecuteOperation a ao:Check ;
+    ao:operator ai:Equals ;
+    ao:attribute ai:Operation ;
+    ao:value ai:ExecuteOperation .
 
 :PermissionNameAllowed a ao:Check ;
     ao:operator ai:OneOf ;

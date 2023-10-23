@@ -7,9 +7,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
@@ -240,6 +242,87 @@ public class PolicyLoader {
 
     private static final String policyStatementByKeyTemplateSuffix = "}}";
 
+    public static final String DATA_SET_TEMPLATES_QUERY = ""
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
+            + "SELECT ?dataSetTemplate ?dataSets ( COUNT(?key) AS ?keySize )\n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?dataSets ao:policyDataSetTemplate ?dataSetTemplate .\n"
+            + "    ?dataSetTemplate ao:dataSetTemplateKey ?dataSetTemplateKey .\n"
+            + "    ?dataSetTemplateKey ao:templateKey ai:SubjectRole .\n"
+            + "    ?dataSetTemplateKey ao:templateKey ?key .\n"
+            + "  }\n"
+            + "}\n"
+            + "GROUP BY ?dataSetTemplate ?dataSets"; 
+
+    public static final String DATA_SET_KEY_TEMPLATE_QUERY = ""
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
+            + "SELECT ?keyComponent \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?dataSetTemplate ao:dataSetKeyTemplate ?dataSetKeyTemplate .\n"
+            + "    ?dataSetKeyTemplate ao:keyComponent ?keyComponent .\n"
+            + "  }\n"
+            + "}\n"; 
+    
+    public static final String DATA_SET_KEY_TEMPLATES_TEMPLATE_QUERY = ""
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
+            + "SELECT ?keyComponentTemplate \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?dataSetTemplate ao:dataSetKeyTemplate ?dataSetKeyTemplate .\n"
+            + "    ?dataSetKeyTemplate ao:keyComponentTemplate ?keyComponentTemplate .\n"
+            + "  }\n"
+            + "}\n"; 
+    
+    public static final String DATA_SET_VALUE_TEMPLATE_QUERY = ""
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
+            + "SELECT ?valueContainer \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?dataSetTemplate ao:dataSetValues ?valueContainer .\n"
+            + "  }\n"
+            + "}\n"; 
+    
+    
+    public static final String DATA_SET_VALUE_CONTAINER_TEMPLATES_TEMPLATE_QUERY = ""
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
+            + "SELECT ?valueContainerTemplate \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?dataSetTemplate ao:dataSetValueTemplate ?valueContainerTemplate .\n"
+            + "  }\n"
+            + "}\n";
+    
+    public static final String CONSTRUCT_VALUE_CONTAINER_QUERY = ""
+            + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "CONSTRUCT {\n"
+            + "  ?relatedAttributeValueSet ao:attributeValue ?valueContainer .\n"
+            + "  ?valueContainer a ao:ValueContainer .\n"
+            + "  ?valueContainer ao:containerType ?containerType .\n"
+            + "  ?valueContainer ao:dataValue ?newRoleUri .\n"
+            + "  ?valueContainer ao:dataValue ?dataValue ."
+            + "}\n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?valueContainerTemplateUri ao:relatedValueSet ?relatedAttributeValueSet .\n"
+            + "    ?valueContainerTemplateUri ao:containerTypeTemplate ?containerType .\n"
+            + "    OPTIONAL {\n"
+            + "      ?valueContainerTemplateUri ao:defaultValue ?dataValue .\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      FILTER ( str(?containerType) = 'https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole' )\n"
+            + "      BIND(?role as ?newRoleUri)\n"
+            + "    }"
+            + "  }"
+            + "}\n";
+    
     private RDFService rdfService;
     public static final String RULE = "rule";
     public static final String LITERAL_VALUE = "lit_value";
@@ -470,10 +553,10 @@ public class PolicyLoader {
             log.error("statements to add/delete are empty");
             return;
         }
-        updateUserAccountsModel(m, isAdd);
+        updateAccessControlModel(m, isAdd);
     }
 
-    private void updateUserAccountsModel(Model data, boolean isAdd) {
+    void updateAccessControlModel(Model data, boolean isAdd) {
         StringWriter sw = new StringWriter();
         data.write(sw, "TTL");
         updateAccessControlModel(sw.toString(), isAdd);
@@ -498,7 +581,7 @@ public class PolicyLoader {
     }
 
     private String modelToString(String ruleData, boolean isAdd) {
-        String message = (isAdd ? "Adding to" : "Removing from") + " user accounts model \n" + ruleData;
+        String message = (isAdd ? "Adding to" : "Removing from") + " access control model \n" + ruleData;
         return message;
     }
 
@@ -524,7 +607,7 @@ public class PolicyLoader {
         }
         int i = 0;
         for (String id : ids) {
-            query.append(String.format("  ?dataSetKeyUri ao:keyComponent ?uri%d .\n ?uri%d ao:id \"%s\" . \n", i, i, id));
+            query.append(String.format("  ?dataSetKeyUri ao:keyComponent ?uri%d .\n  ?uri%d ao:id \"%s\" . \n", i, i, id));
             i++;
         }
         query.append(policyKeyTemplateSuffix);
@@ -728,7 +811,7 @@ public class PolicyLoader {
 
     private static void debug(String template, Object... objects) {
         if (log.isDebugEnabled()) {
-            log.debug(String.format(template, objects));
+            log.error(String.format(template, objects));
         }
     }
 
@@ -747,10 +830,9 @@ public class PolicyLoader {
         return cs;
     }
 
-    public String getDataSetUriByKey(AccessOperation og, AccessObjectType aot, String role) {
-        long expectedSize = 3;
-        final String queryText = getPolicyTestValuesByKeyQuery(new String[] { role },
-                new String[] { og.toString(), aot.toString() });
+    public String getDataSetUriByKey(String[] uris, String[] ids) {
+        long expectedSize = uris.length + ids.length;
+        final String queryText = getPolicyTestValuesByKeyQuery(uris, ids);
         debug("SPARQL Query to get policy data set values:\n %s", queryText);
         String[] uri = new String[1];
         try {
@@ -773,4 +855,137 @@ public class PolicyLoader {
         }
         return uri[0];
     }
+
+    public Map<String,String> getRoleDataSetTemplates() {
+        Map<String,String> dataSetTemplates = new HashMap<>();
+        long expectedSize = 1;
+        final String queryText = DATA_SET_TEMPLATES_QUERY;
+        debug("SPARQL Query to get data set templates:\n %s", queryText);
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    if (!qs.contains("keySize") || !qs.get("keySize").isLiteral()) {
+                        return;
+                    }
+                    long keySize = qs.getLiteral("keySize").getLong();
+                    if (expectedSize != keySize) {
+                        return;
+                    }
+                    if (!qs.contains("dataSetTemplate") || !qs.get("dataSetTemplate").isResource()) {
+                       return;
+                    }
+                    if (!qs.contains("dataSets") || !qs.get("dataSets").isResource()) {
+                        return;
+                     }
+                    dataSetTemplates.put(
+                            qs.getResource("dataSetTemplate").getURI(),
+                            qs.getResource("dataSets").getURI());
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return dataSetTemplates;
+    }
+
+    public List<String> getDataSetKeysFromTemplate(String templateUri) {
+        List<String> dataSetKeys = new LinkedList<>();
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(DATA_SET_KEY_TEMPLATE_QUERY);
+        pss.setIri("dataSetTemplate", templateUri);
+        final String queryText = pss.toString();
+        debug("SPARQL Query to get data set templates:\n %s", queryText);
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    if (qs.contains("keyComponent") && qs.get("keyComponent").isResource()) {
+                        dataSetKeys.add(qs.getResource("keyComponent").getURI());
+                    }
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return dataSetKeys;
+    }
+
+    public List<String> getDataSetKeyTemplatesFromTemplate(String templateUri) {
+        List<String> dataSetDraftKeys = new LinkedList<>();
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(DATA_SET_KEY_TEMPLATES_TEMPLATE_QUERY);
+        pss.setIri("dataSetTemplate", templateUri);
+        final String queryText = pss.toString();
+        debug("SPARQL Query to get data set templates:\n %s", queryText);
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    if (qs.contains("keyComponentTemplate") && qs.get("keyComponentTemplate").isResource()) {
+                        dataSetDraftKeys.add(qs.getResource("keyComponentTemplate").getURI());
+                    }
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return dataSetDraftKeys;
+    }
+
+    public List<String> getDataSetValuesFromTemplate(String templateUri) {
+        List<String> valueContainers = new LinkedList<>();
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(DATA_SET_VALUE_TEMPLATE_QUERY);
+        pss.setIri("dataSetTemplate", templateUri);
+        final String queryText = pss.toString();
+        debug("SPARQL Query to get data set values from data set template:\n %s", queryText);
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    if (qs.contains("valueContainer") && qs.get("valueContainer").isResource()) {
+                        valueContainers.add(qs.getResource("valueContainer").getURI());
+                    }
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return valueContainers;
+    }
+
+    public List<String> getDataSetValueTemplatesFromTemplate(String templateUri) {
+        List<String> valueContainerTemplates = new LinkedList<>();
+        ParameterizedSparqlString pss =
+                new ParameterizedSparqlString(DATA_SET_VALUE_CONTAINER_TEMPLATES_TEMPLATE_QUERY);
+        pss.setIri("dataSetTemplate", templateUri);
+        final String queryText = pss.toString();
+        debug("SPARQL Query to get data set value container templates from data set template:\n %s", queryText);
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    if (qs.contains("valueContainerTemplate") && qs.get("valueContainerTemplate").isResource()) {
+                        valueContainerTemplates.add(qs.getResource("valueContainerTemplate").getURI());
+                    }
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return valueContainerTemplates;
+    }
+
+    public void constructValueContainer(String valueContainerTemplateUri, String valueContainer, String role,
+            Model dataSetModel) {
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(CONSTRUCT_VALUE_CONTAINER_QUERY);
+        pss.setIri("valueContainerTemplateUri", valueContainerTemplateUri);
+        pss.setIri("valueContainer", valueContainer);
+        pss.setIri("role", role);
+        debug("SPARQL Construct Query to create value container \n %s", pss.toString());
+        try {
+            rdfService.sparqlConstructQuery(pss.toString(), dataSetModel);
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+    }
+    
 }

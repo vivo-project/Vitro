@@ -29,7 +29,7 @@ public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
     public String dataSetUri;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public AccessOperation group;
+    public AccessOperation ao;
 
     @org.junit.runners.Parameterized.Parameter(2)
     public AccessObjectType type;
@@ -46,11 +46,11 @@ public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
     @Test
     public void testPolicy() {
         load(POLICY_TEMPLATE_MATCH_CLASS_PATH);
-        EntityPolicyController.updateEntityPolicyDataSet("test:entity", type, group, Arrays.asList(roleUri), ROLE_LIST);
+        EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), ROLE_LIST);
         DynamicPolicy policy = null;
         policy = loader.loadPolicyFromTemplateDataSet(TEMPLATE_CLASS_PREFIX + dataSetUri);
         countRulesAndAttributes(policy, rulesCount, attrCount);
-        Set<String> values = loader.getDataSetValues(group, type, roleUri);
+        Set<String> values = loader.getDataSetValues(ao, type, roleUri);
         assertFalse(values.isEmpty());
     }
 
