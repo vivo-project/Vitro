@@ -30,6 +30,7 @@ public class PolicyTest {
     protected static final String SELF_EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR";
     protected static final String CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR";
     protected static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
+    protected static final String CUSTOM = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CUSTOM";
 
     public static final String ONTOLOGY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "ontology.n3";
     public static final String OPERATIONS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operations.n3";

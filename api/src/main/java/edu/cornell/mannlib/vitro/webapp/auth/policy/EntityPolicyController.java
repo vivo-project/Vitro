@@ -29,7 +29,7 @@ public class EntityPolicyController {
      * @param selectedRoles - list of roles to assign
      * @param allRoles - list of all available roles
      */
-    public static void updateEntityPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation og,
+    public static void updateEntityDataSet(String entityUri, AccessObjectType aot, AccessOperation og,
             List<String> selectedRoles, List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {
             return;
@@ -39,7 +39,8 @@ public class EntityPolicyController {
             boolean isInDataSet = isUriInTestDataset(entityUri, og, aot, role);
             boolean isSelected = selectedSet.contains(role);
             final PolicyLoader loader = PolicyLoader.getInstance();
-            final String dataSetUri = loader.getDataSetUriByKey(og, aot, role);
+            final String dataSetUri =
+                    loader.getDataSetUriByKey(new String[] { role }, new String[] { og.toString(), aot.toString() });
 
             if (dataSetUri == null) {
                 log.debug(

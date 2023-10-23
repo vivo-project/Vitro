@@ -48,7 +48,7 @@ public class UpdateRelatedAllowedPropertiesPolicyTemplateTest extends PolicyTest
     @Test
     public void testPolicy() {
         load(POLICY_TEMPLATE_PATH);
-        EntityPolicyController.updateEntityPolicyDataSet("test:entity", type, group, Arrays.asList(roleUri), ROLE_LIST);
+        EntityPolicyController.updateEntityDataSet("test:entity", type, group, Arrays.asList(roleUri), ROLE_LIST);
         DynamicPolicy policy = null;
         policy = loader.loadPolicyFromTemplateDataSet(TEMPLATE_PROPERTY_PREFIX + "SelfEditor" + dataSetUri + "DataSet");
         countRulesAndAttributes(policy, rulesCount, attrCount);

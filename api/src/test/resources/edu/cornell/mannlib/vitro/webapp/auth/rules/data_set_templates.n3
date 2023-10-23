@@ -1,0 +1,82 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/test-data-set-templates/> .
+
+:PolicyTemplate a ao:PolicyTemplate ;
+    ao:policyDataSets :DataSets ;
+    ao:rules :RuleSet .
+
+:DataSets a ao:PolicyDataSets ;
+    ao:policyDataSetTemplate :RoleDataSetTemplate1 ;
+    ao:policyDataSetTemplate :RoleDataSetTemplate2 ;
+    ao:policyDataSet :PublicDataSet .
+
+#Role data set templates
+
+
+:RoleDataSetTemplate1 a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDataSetTemplateKey1 ;
+    ao:dataSetKeyTemplate :RoleDataSetKeyTemplate1 ;
+    ao:dataSetValues ai:PublicRoleValueContainer ;
+    ao:dataSetValueTemplate :RoleValueContainerTemplate1 ;
+    ao:dataSetValueTemplate :RolePermissionValueContainerTemplate1 .  
+
+:RoleDataSetTemplateKey1 a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDataSetKeyTemplate1 a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleValueContainerTemplate1 a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RolePermissionValueContainerTemplate1 a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :TypeValueSet;
+    ao:defaultValue simplePermission:PageViewablePublic;
+    ao:defaultValue simplePermission:QueryFullModel ;
+    ao:containerTypeTemplate ai:NamedObject .
+
+
+:RoleDataSetTemplate2 a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDataSetTemplateKey2 ;
+    ao:dataSetKeyTemplate :RoleDataSetKeyTemplate2 ;
+    ao:dataSetValueTemplate :RoleValueContainerTemplate2 ;
+    ao:dataSetValueTemplate :RolePermissionValueContainerTemplate2 .  
+
+:RoleDataSetTemplateKey2 a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDataSetKeyTemplate2 a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleValueContainerTemplate2 a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RolePermissionValueContainerTemplate2 a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :TypeValueSet;
+    ao:containerTypeTemplate ai:NamedObject .
+
+:PublicDataSet a ao:PolicyDataSet ;
+    ao:dataSetKey :PublicDataSetKey ;
+    ao:dataSetValues ai:PublicRoleValueContainer ;
+    ao:dataSetValues ai:PublicSimplePermissionValueContainer .
+
+:PublicDataSetKey a ao:DataSetKey ;
+    ao:keyComponent ai:NamedObject ;
+    ao:keyComponent auth:PUBLIC .
+
+ai:PublicSimplePermissionValueContainer a ao:ValueContainer ;
+    ao:containerType ai:NamedObject .

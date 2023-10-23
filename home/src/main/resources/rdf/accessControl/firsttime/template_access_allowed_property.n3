@@ -23,10 +23,12 @@
     ao:policyDataSet :EditorDisplayDataPropertyDataSet ;
     ao:policyDataSet :CuratorDisplayDataPropertyDataSet ;
     ao:policyDataSet :AdminDisplayDataPropertyDataSet ;
+
     ao:policyDataSet :PublicDisplayFauxObjectPropertyDataSet ;
     ao:policyDataSet :EditorDisplayFauxObjectPropertyDataSet ;
     ao:policyDataSet :CuratorDisplayFauxObjectPropertyDataSet ;
     ao:policyDataSet :AdminDisplayFauxObjectPropertyDataSet ;
+
     ao:policyDataSet :PublicDisplayFauxDataPropertyDataSet ;
     ao:policyDataSet :EditorDisplayFauxDataPropertyDataSet ;
     ao:policyDataSet :CuratorDisplayFauxDataPropertyDataSet ;
@@ -35,12 +37,15 @@
     ao:policyDataSet :EditorPublishObjectPropertyDataSet ;
     ao:policyDataSet :CuratorPublishObjectPropertyDataSet ;
     ao:policyDataSet :AdminPublishObjectPropertyDataSet ;
+
     ao:policyDataSet :EditorPublishDataPropertyDataSet ;
     ao:policyDataSet :CuratorPublishDataPropertyDataSet ;
     ao:policyDataSet :AdminPublishDataPropertyDataSet ;
+
     ao:policyDataSet :EditorPublishFauxObjectPropertyDataSet ;
     ao:policyDataSet :CuratorPublishFauxObjectPropertyDataSet ;
     ao:policyDataSet :AdminPublishFauxObjectPropertyDataSet ;
+
     ao:policyDataSet :EditorPublishFauxDataPropertyDataSet ;
     ao:policyDataSet :CuratorPublishFauxDataPropertyDataSet ;
     ao:policyDataSet :AdminPublishFauxDataPropertyDataSet ;
@@ -104,7 +109,595 @@
     ao:policyDataSet :EditorDropFauxDataPropertyDataSet ;
     ao:policyDataSet :CuratorDropFauxDataPropertyDataSet ;
     ao:policyDataSet :AdminDropFauxDataPropertyDataSet ;
+
+    ao:policyDataSetTemplate :RoleDisplayObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RolePublishObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleAddObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleDropObjectPropertyDataSetTemplate ;
+
+    ao:policyDataSetTemplate :RoleEditObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleDisplayDataPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RolePublishDataPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleAddDataPropertyDataSetTemplate ;
+
+    ao:policyDataSetTemplate :RoleDropDataPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleEditDataPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleDisplayFauxObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RolePublishFauxObjectPropertyDataSetTemplate ;
+
+    ao:policyDataSetTemplate :RoleAddFauxObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleDropFauxObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleEditFauxObjectPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleDisplayFauxDataPropertyDataSetTemplate ;
+
+    ao:policyDataSetTemplate :RolePublishFauxDataPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleAddFauxDataPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleDropFauxDataPropertyDataSetTemplate ;
+    ao:policyDataSetTemplate :RoleEditFauxDataPropertyDataSetTemplate ;
     .
+
+
+
+#Role DisplayObjectProperty data set template
+
+:RoleDisplayObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDisplayObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDisplayObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDisplayObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDisplayObjectPropertyEntityValueContainerTemplate .  
+
+:RoleDisplayObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDisplayObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent ai:DisplayOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDisplayObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDisplayObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:ObjectPropertyAccesObject .
+
+#Role PublishObjectProperty data set template
+
+:RolePublishObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RolePublishObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RolePublishObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValueTemplate :RolePublishObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RolePublishObjectPropertyEntityValueContainerTemplate .  
+
+:RolePublishObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RolePublishObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent ai:PublishOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RolePublishObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RolePublishObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:ObjectPropertyAccesObject .
+
+#Role AddObjectProperty data set template
+
+:RoleAddObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleAddObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleAddObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:AddOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleAddObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleAddObjectPropertyEntityValueContainerTemplate .  
+
+:RoleAddObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleAddObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent ai:AddOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleAddObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleAddObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:ObjectPropertyAccesObject .
+
+#Role DropObjectProperty data set template
+
+:RoleDropObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDropObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDropObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DropOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDropObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDropObjectPropertyEntityValueContainerTemplate .  
+
+:RoleDropObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDropObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent ai:DropOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDropObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDropObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:ObjectPropertyAccesObject .
+
+#Role EditObjectProperty data set template
+
+:RoleEditObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleEditObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleEditObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:EditOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleEditObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleEditObjectPropertyEntityValueContainerTemplate .  
+
+:RoleEditObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleEditObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent ai:EditOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleEditObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleEditObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:ObjectPropertyAccesObject .
+
+#Role DisplayDataProperty data set template
+
+:RoleDisplayDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDisplayDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDisplayDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDisplayDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDisplayDataPropertyEntityValueContainerTemplate .  
+
+:RoleDisplayDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDisplayDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent ai:DisplayOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDisplayDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDisplayDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:DataPropertyAccesObject .
+
+#Role PublishDataProperty data set template
+
+:RolePublishDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RolePublishDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RolePublishDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValueTemplate :RolePublishDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RolePublishDataPropertyEntityValueContainerTemplate .  
+
+:RolePublishDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RolePublishDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent ai:PublishOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RolePublishDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RolePublishDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:DataPropertyAccesObject .
+
+#Role AddDataProperty data set template
+
+:RoleAddDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleAddDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleAddDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:AddOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleAddDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleAddDataPropertyEntityValueContainerTemplate .  
+
+:RoleAddDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleAddDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent ai:AddOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleAddDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleAddDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:DataPropertyAccesObject .
+
+#Role DropDataProperty data set template
+
+:RoleDropDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDropDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDropDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DropOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDropDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDropDataPropertyEntityValueContainerTemplate .  
+
+:RoleDropDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDropDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent ai:DropOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDropDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDropDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:DataPropertyAccesObject .
+
+#Role EditDataProperty data set template
+
+:RoleEditDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleEditDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleEditDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:EditOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleEditDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleEditDataPropertyEntityValueContainerTemplate .  
+
+:RoleEditDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleEditDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent ai:EditOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleEditDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleEditDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:DataPropertyAccesObject .
+
+#Role DisplayFauxObjectProperty data set template
+
+:RoleDisplayFauxObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDisplayFauxObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDisplayFauxObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDisplayFauxObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDisplayFauxObjectPropertyEntityValueContainerTemplate .  
+
+:RoleDisplayFauxObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDisplayFauxObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent ai:DisplayOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDisplayFauxObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDisplayFauxObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxObjectPropertyAccesObject .
+
+#Role PublishFauxObjectProperty data set template
+
+:RolePublishFauxObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RolePublishFauxObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RolePublishFauxObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValueTemplate :RolePublishFauxObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RolePublishFauxObjectPropertyEntityValueContainerTemplate .  
+
+:RolePublishFauxObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RolePublishFauxObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent ai:PublishOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RolePublishFauxObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RolePublishFauxObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxObjectPropertyAccesObject .
+
+#Role AddFauxObjectProperty data set template
+
+:RoleAddFauxObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleAddFauxObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleAddFauxObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:AddOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleAddFauxObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleAddFauxObjectPropertyEntityValueContainerTemplate .  
+
+:RoleAddFauxObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleAddFauxObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent ai:AddOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleAddFauxObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleAddFauxObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxObjectPropertyAccesObject .
+
+#Role DropFauxObjectProperty data set template
+
+:RoleDropFauxObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDropFauxObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDropFauxObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DropOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDropFauxObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDropFauxObjectPropertyEntityValueContainerTemplate .  
+
+:RoleDropFauxObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDropFauxObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent ai:DropOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDropFauxObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDropFauxObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxObjectPropertyAccesObject .
+
+#Role EditFauxObjectProperty data set template
+
+:RoleEditFauxObjectPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleEditFauxObjectPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleEditFauxObjectPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:EditOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleEditFauxObjectPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleEditFauxObjectPropertyEntityValueContainerTemplate .  
+
+:RoleEditFauxObjectPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleEditFauxObjectPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent ai:EditOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleEditFauxObjectPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleEditFauxObjectPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxObjectPropertyAccesObject .
+
+#Role DisplayFauxDataProperty data set template
+
+:RoleDisplayFauxDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDisplayFauxDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDisplayFauxDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DisplayOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDisplayFauxDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDisplayFauxDataPropertyEntityValueContainerTemplate .  
+
+:RoleDisplayFauxDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDisplayFauxDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent ai:DisplayOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDisplayFauxDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDisplayFauxDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxDataPropertyAccesObject .
+
+#Role PublishFauxDataProperty data set template
+
+:RolePublishFauxDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RolePublishFauxDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RolePublishFauxDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:PublishOperationValueContainer ;
+    ao:dataSetValueTemplate :RolePublishFauxDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RolePublishFauxDataPropertyEntityValueContainerTemplate .  
+
+:RolePublishFauxDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RolePublishFauxDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent ai:PublishOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RolePublishFauxDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RolePublishFauxDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxDataPropertyAccesObject .
+
+#Role AddFauxDataProperty data set template
+
+:RoleAddFauxDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleAddFauxDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleAddFauxDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:AddOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleAddFauxDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleAddFauxDataPropertyEntityValueContainerTemplate .  
+
+:RoleAddFauxDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleAddFauxDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent ai:AddOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleAddFauxDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleAddFauxDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxDataPropertyAccesObject .
+
+#Role DropFauxDataProperty data set template
+
+:RoleDropFauxDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleDropFauxDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleDropFauxDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DropOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleDropFauxDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleDropFauxDataPropertyEntityValueContainerTemplate .  
+
+:RoleDropFauxDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleDropFauxDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent ai:DropOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleDropFauxDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleDropFauxDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxDataPropertyAccesObject .
+
+#Role EditFauxDataProperty data set template
+
+:RoleEditFauxDataPropertyDataSetTemplate a ao:DataSetTemplate ;
+    ao:dataSetTemplateKey :RoleEditFauxDataPropertyDataSetTemplateKey ;
+    ao:dataSetKeyTemplate :RoleEditFauxDataPropertyDataSetKeyTemplate ;
+    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:EditOperationValueContainer ;
+    ao:dataSetValueTemplate :RoleEditFauxDataPropertyValueContainerTemplate ;
+    ao:dataSetValueTemplate :RoleEditFauxDataPropertyEntityValueContainerTemplate .  
+
+:RoleEditFauxDataPropertyDataSetTemplateKey a ao:DataSetTemplateKey ;
+    ao:templateKey ai:SubjectRole .
+
+:RoleEditFauxDataPropertyDataSetKeyTemplate a ao:DataSetKeyTemplate ;
+    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent ai:EditOperation ;
+    ao:keyComponentTemplate ai:SubjectRole .
+
+:RoleEditFauxDataPropertyValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :RoleValueSet;
+    ao:containerTypeTemplate ai:SubjectRole .
+
+:RoleEditFauxDataPropertyEntityValueContainerTemplate a ao:ValueContainerTemplate ;
+    ao:relatedValueSet :AllowedPropertyUriValueSet ;
+#    ao:defaultValue ai:defaultUri ;
+    ao:containerTypeTemplate ai:FauxDataPropertyAccesObject .
+
 
 
 ### Drop faux data property data sets
@@ -1229,6 +1822,7 @@
     ao:attributeValue ai:EditorDisplayFauxObjectPropertyValueContainer ;
     ao:attributeValue ai:CuratorDisplayFauxObjectPropertyValueContainer ;
     ao:attributeValue ai:AdminDisplayFauxObjectPropertyValueContainer ;
+
     ao:attributeValue ai:PublicDisplayFauxDataPropertyValueContainer ;   
     ao:attributeValue ai:EditorDisplayFauxDataPropertyValueContainer ;
     ao:attributeValue ai:CuratorDisplayFauxDataPropertyValueContainer ;
@@ -1237,12 +1831,15 @@
     ao:attributeValue ai:EditorPublishObjectPropertyValueContainer ;
     ao:attributeValue ai:CuratorPublishObjectPropertyValueContainer ;
     ao:attributeValue ai:AdminPublishObjectPropertyValueContainer ;
+
     ao:attributeValue ai:EditorPublishDataPropertyValueContainer ;
     ao:attributeValue ai:CuratorPublishDataPropertyValueContainer ;
     ao:attributeValue ai:AdminPublishDataPropertyValueContainer ;
+
     ao:attributeValue ai:EditorPublishFauxObjectPropertyValueContainer ;
     ao:attributeValue ai:CuratorPublishFauxObjectPropertyValueContainer ;
     ao:attributeValue ai:AdminPublishFauxObjectPropertyValueContainer ;
+
     ao:attributeValue ai:EditorPublishFauxDataPropertyValueContainer ;
     ao:attributeValue ai:CuratorPublishFauxDataPropertyValueContainer ;
     ao:attributeValue ai:AdminPublishFauxDataPropertyValueContainer ;
@@ -1434,6 +2031,7 @@ ai:CuratorDisplayDataPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:DataPropertyAccesObject .
 ai:AdminDisplayDataPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:DataPropertyAccesObject .
+
 ai:PublicDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxObjectPropertyAccesObject .
 ai:EditorDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
@@ -1442,6 +2040,7 @@ ai:CuratorDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxObjectPropertyAccesObject .
 ai:AdminDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxObjectPropertyAccesObject .
+
 ai:PublicDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxDataPropertyAccesObject .
 ai:EditorDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
@@ -1457,18 +2056,21 @@ ai:CuratorPublishObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:ObjectPropertyAccesObject .
 ai:AdminPublishObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:ObjectPropertyAccesObject .
+
 ai:EditorPublishDataPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:DataPropertyAccesObject .
 ai:CuratorPublishDataPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:DataPropertyAccesObject .
 ai:AdminPublishDataPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:DataPropertyAccesObject .
+
 ai:EditorPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxObjectPropertyAccesObject .
 ai:CuratorPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxObjectPropertyAccesObject .
 ai:AdminPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxObjectPropertyAccesObject .
+
 ai:EditorPublishFauxDataPropertyValueContainer a ao:ValueContainer ;
     ao:containerType ai:FauxDataPropertyAccesObject .
 ai:CuratorPublishFauxDataPropertyValueContainer a ao:ValueContainer ;

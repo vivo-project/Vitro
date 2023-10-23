@@ -226,7 +226,7 @@ public class BaseEditController extends VitroHttpServlet {
                 // predefined values
                 req.setAttribute(attributeName, roleUris);
             } else {
-                // Get the permission sets that are granted permission for this entity
+                // Get the permission sets that grant permission for this entity
                 req.setAttribute(attributeName, EntityPolicyController.getGrantedRoles(entityURI, ao, aot, roleUris));
             }
         }
