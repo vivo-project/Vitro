@@ -10,6 +10,6 @@
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Rename Resource</h2>
 
 <%
-String result = (String) request.getCheck("result");
+String result = (String) request.getAttribute("result");
 %>
 <p><b><%=result%></b></p>

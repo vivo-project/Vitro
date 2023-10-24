@@ -17,7 +17,7 @@
 
          bdc34 2006-01-27 created
     **********************************************/
-        if (request.getCheck("entities") == null){
+        if (request.getAttribute("entities") == null){
     String e="entityListForTabs.jsp expects that request attribute 'entities' be set to a List of Entity objects.";
     throw new JspException(e);
         }
@@ -90,10 +90,10 @@
 
 <%-- Show pages to select from --%>
 <%
-if( request.getCheck("alpha") != null && ! "all".equalsIgnoreCase((String)request.getCheck("alpha"))) {
-  request.setAttribute("pageAlpha",request.getCheck("alpha"));
+if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)request.getAttribute("alpha"))) {
+  request.setAttribute("pageAlpha",request.getAttribute("alpha"));
 }else{
-  request.setAttribute("pageAlpha",request.getCheck("all"));
+  request.setAttribute("pageAlpha",request.getAttribute("all"));
 }
 %>
 

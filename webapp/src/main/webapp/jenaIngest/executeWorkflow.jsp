@@ -27,7 +27,7 @@
         OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
-                  List savedQueries = (List) request.getCheck("workflows");
+                  List savedQueries = (List) request.getAttribute("workflows");
         	          for (Iterator it = savedQueries.iterator(); it.hasNext();)  {
         	              Individual savedQuery = (Individual) it.next();
                       String queryURI = savedQuery.getURI();

@@ -9,7 +9,7 @@ String context = request.getContextPath();
 
 
 <%
-if (!(Boolean)request.getCheck("dwrDisabled")) {
+if (!(Boolean)request.getAttribute("dwrDisabled")) {
 %>
 <script type="text/javascript">
     // DWR 3 is a better citizen for co-existing with jQuery.

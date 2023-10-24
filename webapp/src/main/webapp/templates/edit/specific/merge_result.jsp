@@ -7,6 +7,6 @@
 
 <h3>Merge Individuals</h3>
 <%
-String result = (String) request.getCheck("result");
+String result = (String) request.getAttribute("result");
 %>
 <p><b><%=result%></b></p>

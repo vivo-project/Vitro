@@ -6,7 +6,7 @@
 <%
 // This is here as a safety net. We should have gotten the values in identity.jsp,
     // since it's the first jsp we hit.
-    String footer = (String) request.getCheck("ftl_footer");
+    String footer = (String) request.getAttribute("ftl_footer");
     if (footer == null) {
         FreemarkerHttpServlet.getFreemarkerComponentsForJsp(request);
     }

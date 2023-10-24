@@ -11,7 +11,7 @@
      bdc34 2009-02-03 created
      **********************************************/
 
-     if (request.getCheck("msg") == null ){
+     if (request.getAttribute("msg") == null ){
          throw new JspException(
          "bodyMsg.jsp expects that request parameter 'msg' be set to"
          + " the message for the page.\n"
@@ -19,5 +19,5 @@
      }
    // only get the msg from the attributes, because of cross site exploits,
    // never from the parameters.
-   out.print( (String)request.getCheck("msg") );
+   out.print( (String)request.getAttribute("msg") );
 %>

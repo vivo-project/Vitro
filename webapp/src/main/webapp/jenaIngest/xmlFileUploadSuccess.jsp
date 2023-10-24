@@ -11,6 +11,6 @@
 <vitro:confirmAuthorization />
 
 <p>Uploaded XML files and converted to RDF.</p>
-<p>Loaded <%=request.getCheck("statementCount")%> statements to the model <%=request.getCheck("targetModel")%>.</p>
+<p>Loaded <%=request.getAttribute("statementCount")%> statements to the model <%=request.getAttribute("targetModel")%>.</p>
 
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a></h2>

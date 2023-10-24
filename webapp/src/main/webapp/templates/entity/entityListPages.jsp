@@ -5,10 +5,10 @@
 
 <%-- Show pages to select from --%>
 <%
-if( request.getCheck("alpha") != null && ! "all".equalsIgnoreCase((String)request.getCheck("alpha"))) {
-  request.setAttribute("pageAlpha",request.getCheck("alpha"));
+if( request.getAttribute("alpha") != null && ! "all".equalsIgnoreCase((String)request.getAttribute("alpha"))) {
+  request.setAttribute("pageAlpha",request.getAttribute("alpha"));
 }else{
-  request.setAttribute("pageAlpha",request.getCheck("all"));
+  request.setAttribute("pageAlpha",request.getAttribute("all"));
 }
 %>
 

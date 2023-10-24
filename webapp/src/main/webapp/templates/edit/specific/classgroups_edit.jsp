@@ -14,7 +14,7 @@
 			<input type="submit" class="form-button" value="display this class group's record"/>
 			<input type="hidden" name="queryspec" value="private_classgroup"/>
 			<input type="hidden" name="header" value="titleonly"/>
-			<input type="hidden" name="linkwhere" value="classgroups.id=<%=request.getCheck("firstvalue")%>"/>
+			<input type="hidden" name="linkwhere" value="classgroups.id=<%=request.getAttribute("firstvalue")%>"/>
 		</form>
 		<form action="fetch" method="get">
 			<input type="submit" class="form-button" value="see all class groups"/>
@@ -24,8 +24,8 @@
 	</td>
 	<td valign="bottom" align="center">
 		<form action="editForm" method="get">
-			<input name="id" type = "hidden" value="<%=request.getCheck("firstvalue")%>" />
-			<input type="submit" class="form-button" value="edit class group <%=request.getCheck("firstvalue")%>"/>
+			<input name="id" type = "hidden" value="<%=request.getAttribute("firstvalue")%>" />
+			<input type="submit" class="form-button" value="edit class group <%=request.getAttribute("firstvalue")%>"/>
 			<input type="hidden" name="controller" value="Classgroup"/>
 		</form>
 	</td>
@@ -36,7 +36,7 @@
 		</form>
 		<form action="editForm" method="get">
 			<input type="hidden" name="controller" value="Vclass"/>
-			<input type="hidden" name="GroupId" value="<%=request.getCheck("firstvalue")%>"/>
+			<input type="hidden" name="GroupId" value="<%=request.getAttribute("firstvalue")%>"/>
 			<input type="submit" class="form-button" value="add new class to this group"/>
 		</form>
 	</td>

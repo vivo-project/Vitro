@@ -4,13 +4,13 @@
 <%@ page import="edu.cornell.mannlib.vedit.beans.ButtonForm" %>
 
 <%
-if (request.getCheck("title") != null) {
+if (request.getAttribute("title") != null) {
 %>
-    <h2><%=request.getCheck("title")%></h2><%
+    <h2><%=request.getAttribute("title")%></h2><%
     }
     %>
 <%
-if (request.getCheck("title") == "Tabs") {
+if (request.getAttribute("title") == "Tabs") {
 %>
     <div id="flash-message" role="alert">Tabs have been deprecated with the 1.2 release and is no longer recommended for production VIVO instances. All development relating to tabs has ceased, and it will not be distributed in future releases.
     </div><%
@@ -23,19 +23,19 @@ if (request.getCheck("title") == "Tabs") {
 
 
 <%
-if (request.getCheck("horizontalJspAddButtonUrl") != null) {
+if (request.getAttribute("horizontalJspAddButtonUrl") != null) {
 %>
   <td>
-    <form action="<%=request.getCheck("horizontalJspAddButtonUrl")%>" method="get"><input type="submit" class="form-button" value="<%=request.getCheck("horizontalJspAddButtonText")%>"/>
+    <form action="<%=request.getAttribute("horizontalJspAddButtonUrl")%>" method="get"><input type="submit" class="form-button" value="<%=request.getAttribute("horizontalJspAddButtonText")%>"/>
 <%
-if (request.getCheck("horizontalJspAddButtonControllerParam") != null) {
+if (request.getAttribute("horizontalJspAddButtonControllerParam") != null) {
 %>
-        <input type="hidden" name="controller" value="<%=request.getCheck("horizontalJspAddButtonControllerParam")%>"/>
+        <input type="hidden" name="controller" value="<%=request.getAttribute("horizontalJspAddButtonControllerParam")%>"/>
 <%
 }
-    if (request.getCheck("home") != null) {
+    if (request.getAttribute("home") != null) {
 %>
-        <input type="hidden" name="home" value="<%=request.getCheck("home")%>"/>
+        <input type="hidden" name="home" value="<%=request.getAttribute("home")%>"/>
 <%
 }
 %>
@@ -43,7 +43,7 @@ if (request.getCheck("horizontalJspAddButtonControllerParam") != null) {
   </td>
 <%
 }
-List <ButtonForm> topButtons = (List)request.getCheck("topButtons");
+List <ButtonForm> topButtons = (List)request.getAttribute("topButtons");
 if (topButtons!=null) {
     Iterator iter = topButtons.iterator();
     while (iter.hasNext()){
@@ -79,14 +79,14 @@ HashMap<String,String> params=b.getParams();
 int columns = 0;
     boolean havePostQueryData = false;
 
-    String editFormStr = (String)request.getCheck("editform");
-    String minEditRoleStr = (String)request.getCheck("min_edit_role");
+    String editFormStr = (String)request.getAttribute("editform");
+    String minEditRoleStr = (String)request.getAttribute("min_edit_role");
 
     String firstValue = "null", secondValue = "null";
-    Integer columnCount = (Integer)request.getCheck("columncount");
+    Integer columnCount = (Integer)request.getAttribute("columncount");
     columns = columnCount.intValue();
 
-    String clickSortStr = (String)request.getCheck("clicksort");
+    String clickSortStr = (String)request.getAttribute("clicksort");
 
     if ( columns > 0 && results.size() > 0) {    // avoid divide by zero error in next statement
         /* start enclosing table cell that holds all results */
@@ -96,9 +96,9 @@ int columns = 0;
 String suppressStr = null;
         boolean isPostQHeaderRow = false;
 
-        if ( ( suppressStr = (String)request.getCheck("suppressquery")) == null ) { // only inserted into request if true
+        if ( ( suppressStr = (String)request.getAttribute("suppressquery")) == null ) { // only inserted into request if true
 %>
-<i><b><%=(results.size() - columns) / columns%></b> rows of results were retrieved in <b><%=columns%></b> columns for query "<%=request.getCheck("querystring")%>".</i>
+<i><b><%=(results.size() - columns) / columns%></b> rows of results were retrieved in <b><%=columns%></b> columns for query "<%=request.getAttribute("querystring")%>".</i>
 <br/>
 <%
 }
@@ -259,13 +259,13 @@ havePostQueryData = false;
 %>
 <%
 if ( editFormStr != null  && minEditRoleStr != null ) {
-    String loginStatus =(String)session.getCheck("loginStatus");
+    String loginStatus =(String)session.getAttribute("loginStatus");
     if ( loginStatus != null &&  "authenticated".equals(loginStatus) ) {
         String currentRemoteAddrStr = request.getRemoteAddr();
-        String storedRemoteAddr = (String)session.getCheck("loginRemoteAddr");
+        String storedRemoteAddr = (String)session.getAttribute("loginRemoteAddr");
         if ( storedRemoteAddr != null && currentRemoteAddrStr.equals( storedRemoteAddr ) ) {
     int minEditRole = Integer.parseInt(  minEditRoleStr );
-    String authorizedRoleStr = (String)session.getCheck("loginRole");
+    String authorizedRoleStr = (String)session.getAttribute("loginRole");
     if ( authorizedRoleStr != null ) {
         int authorizedRole = Integer.parseInt( authorizedRoleStr );
         if ( authorizedRole >= minEditRole ) {

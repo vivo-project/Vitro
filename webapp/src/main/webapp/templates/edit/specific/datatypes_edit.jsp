@@ -18,7 +18,7 @@
 	</td>
 	<td valign="bottom" align="center">
 		<form action="datatype_retry" method="get">
-			<input type="hidden" name="id" value="<%=request.getCheck("firstvalue")%>"/>
+			<input type="hidden" name="id" value="<%=request.getAttribute("firstvalue")%>"/>
 			<input type="submit" class="form-button" value="Edit This Datatype"/>
 		</form>
 	</td>

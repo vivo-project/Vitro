@@ -29,7 +29,7 @@
         OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
-                  List workflowSteps  = (List) request.getCheck("workflowSteps");
+                  List workflowSteps  = (List) request.getAttribute("workflowSteps");
         	          for (Iterator it = workflowSteps.iterator(); it.hasNext();)  {
         	              Individual workflowStep = (Individual) it.next();
                       String workflowStepURI = workflowStep.getURI();

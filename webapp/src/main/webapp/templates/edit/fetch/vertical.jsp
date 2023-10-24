@@ -4,15 +4,15 @@
 <%@ page import="java.util.*,java.lang.String.*" %>
 
 <%
-if (request.getCheck("title") != null) {
+if (request.getAttribute("title") != null) {
 %>
-  <h2><%=request.getCheck("title")%></h2>
+  <h2><%=request.getAttribute("title")%></h2>
 <%
 }
 %>
 
 <%
-String headerStr = (String)request.getCheck("header");
+String headerStr = (String)request.getAttribute("header");
 if ( headerStr == null || (!headerStr.equalsIgnoreCase("noheader")) ) {
 %>
 <%
@@ -22,20 +22,20 @@ if ( headerStr == null || (!headerStr.equalsIgnoreCase("noheader")) ) {
 <%
 int rows = 0;
 
-String minEditRoleStr = (String)request.getCheck("min_edit_role");
+String minEditRoleStr = (String)request.getAttribute("min_edit_role");
 
 String firstValue = "null";
-Integer columnCount = (Integer)request.getCheck("columncount");
+Integer columnCount = (Integer)request.getAttribute("columncount");
 rows = columnCount.intValue();
 
-String clickSortStr = (String)request.getCheck("clicksort");
+String clickSortStr = (String)request.getAttribute("clicksort");
 
 if ( rows > 0  && results.size() > rows ) { // avoid divide by zero error in next statement
     String suppressStr = null;
     int columns = results.size() / rows;
-    if ( ( suppressStr = (String)request.getCheck("suppressquery")) == null ) { // only inserted into request if true
+    if ( ( suppressStr = (String)request.getAttribute("suppressquery")) == null ) { // only inserted into request if true
 %>
-        <p><i><b><%=columns - 1%></b> results were retrieved in <b><%=rows%></b> rows for query "<%=request.getCheck("querystring")%>".</i></p>
+        <p><i><b><%=columns - 1%></b> results were retrieved in <b><%=rows%></b> rows for query "<%=request.getAttribute("querystring")%>".</i></p>
 <%
 }
     if ( clickSortStr != null && clickSortStr.equals("true")) {
@@ -134,7 +134,7 @@ String[] resultsArray = new String[results.size()]; // see Core Java Vol. 1 p.21
 } else {
     System.out.println("No results reported when " + rows + " rows and a result array size of " + results.size());
 %>
-    No results retrieved for query "<%=request.getCheck("querystring")%>".
+    No results retrieved for query "<%=request.getAttribute("querystring")%>".
 <%  Iterator errorIter = results.iterator();
     while ( errorIter.hasNext()) {
         String errorResult = (String)errorIter.next(); %>
