@@ -51,7 +51,7 @@
 	OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
 	      jenaOntModel.enterCriticalSection(Lock.READ);
 	      try {
-	          List savedQueries = (List) request.getCheck("savedQueries");
+	          List savedQueries = (List) request.getAttribute("savedQueries");
 		          for (Iterator it = savedQueries.iterator(); it.hasNext();)  {
 		              Individual savedQuery = (Individual) it.next();
 	              String queryURI = savedQuery.getURI();
@@ -78,7 +78,7 @@ PREFIX xsd:   &lt;http://www.w3.org/2001/XMLSchema#&gt;
 PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
 PREFIX swrl:  &lt;http://www.w3.org/2003/11/swrl#&gt;
 PREFIX swrlb: &lt;http://www.w3.org/2003/11/swrlb#&gt;<%
-    List prefixes = (List)request.getCheck("prefixList");
+    List prefixes = (List)request.getAttribute("prefixList");
     if(prefixes != null){
     	Iterator prefixItr = prefixes.iterator();
     	Integer count = 0;

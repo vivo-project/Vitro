@@ -30,7 +30,7 @@ URIs exactly of the form created through the GUI interface.</p>
 <p>Current namespace of resources
 <select name=oldNamespace>
 <%
-List namespaces = (List)request.getCheck("namespaceList");
+List namespaces = (List)request.getAttribute("namespaceList");
 if(namespaces != null) {
 	Iterator namespaceItr = namespaces.iterator();
 	Integer count = 0;

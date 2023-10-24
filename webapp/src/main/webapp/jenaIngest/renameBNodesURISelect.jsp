@@ -59,7 +59,7 @@ function disableProperties(){
 
 
     <%
-    Map<String,LinkedList<String>> propertyMap = (Map) request.getCheck("propertyMap");
+    Map<String,LinkedList<String>> propertyMap = (Map) request.getAttribute("propertyMap");
            Set<Entry<String,LinkedList<String>>> set = propertyMap.entrySet();
            Iterator<Entry<String,LinkedList<String>>> itr = set.iterator();
            Entry<String, LinkedList<String>> entry = null;
