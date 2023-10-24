@@ -7,7 +7,7 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/access-allowed-property/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/related-allowed-property/> .
 
 :PolicyTemplate a ao:PolicyTemplate ;
     ao:rules :RuleSet ;

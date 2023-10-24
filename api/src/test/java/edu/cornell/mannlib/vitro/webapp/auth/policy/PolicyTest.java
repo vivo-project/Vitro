@@ -42,23 +42,35 @@ public class PolicyTest {
     public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_FIRSTTIME + "decisions.n3";
     public static final String ROLES = USER_ACCOUNTS_HOME_FIRSTTIME + "roles.n3";
 
-    protected static final String RESOURCES_RULES_PREFIX = "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/rules/";
+    protected static final String RESOURCES_RULES_PREFIX =
+            "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/rules/";
     protected static final String RESOURCES_PREFIX = "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/";
 
     public static final String VALID_POLICY = RESOURCES_RULES_PREFIX + "test_policy_valid.n3";
     public static final String VALID_POLICY_TEMPLATE = RESOURCES_RULES_PREFIX + "test_policy_valid_set.n3";
     public static final String BROKEN_POLICY_TEMPLATE = RESOURCES_RULES_PREFIX + "test_policy_broken_set.n3";
-    //TODO:Implement public static final String POLICY_KEY_TEST = RESOURCES_RULES_PREFIX + "test_policy_key.n3";
+    // TODO:Implement public static final String POLICY_KEY_TEST = RESOURCES_RULES_PREFIX + "test_policy_key.n3";
 
-    protected static final List<String> ROLE_LIST = Arrays.asList(ADMIN, CURATOR, EDITOR,
-            SELF_EDITOR, PUBLIC);
+    public static final String TEMPLATE_CLASS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "template_access_allowed_class.n3";
+
+    public static final String TEMPLATE_PROPERTIES_PATH =
+            USER_ACCOUNTS_HOME_FIRSTTIME + "template_access_allowed_property.n3";
+
+    public static final String TEMPLATE_RELATED_PROPERTIES_PATH =
+            USER_ACCOUNTS_HOME_FIRSTTIME + "template_access_related_allowed_property.n3";
+
+    public static final String TEMPLATE_RELATED_UPDATE_PATH =
+            USER_ACCOUNTS_HOME_FIRSTTIME + "template_update_related_allowed_property.n3";
+    
+    protected static final List<String> ROLE_LIST = Arrays.asList(ADMIN, CURATOR, EDITOR, SELF_EDITOR, PUBLIC);
     public static final String PREFIX = "https://vivoweb.org/ontology/vitro-application/auth/individual/";
     public static final String DATASET = "_dataset";
     public static final String EXT = ".n3";
 
     private static final Log log = LogFactory.getLog(PolicyTest.class);
 
-    protected static final List<String> entityPolicies = Arrays.asList();
+    protected static final List<String> entityPolicies =
+            Arrays.asList(TEMPLATE_CLASS_PATH, TEMPLATE_PROPERTIES_PATH, TEMPLATE_RELATED_PROPERTIES_PATH, TEMPLATE_RELATED_UPDATE_PATH);
 
     protected Model accessControlModel;
     protected PolicyLoader loader;

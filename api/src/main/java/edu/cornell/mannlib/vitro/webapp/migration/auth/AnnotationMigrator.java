@@ -13,9 +13,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -67,19 +71,19 @@ public class AnnotationMigrator {
         log.info(String.format("Found %s faux object property annotation configurations", fopConfigs.size()));
         Map<String, Map<OperationGroup, Set<String>>> fdpConfigs = getFauxDataPropertyAnnotations(dpConfigs.keySet());
         log.info(String.format("Found %s faux data property annotation configurations", fdpConfigs.size()));
-        Long[] valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.OBJECT_PROPERTY, opConfigs);
+        Long[] valueCounts = updatePolicyDatasets(AccessObjectType.OBJECT_PROPERTY, opConfigs);
         log.info(String.format("Updated object property datasets. Added %d values, removed %d values", valueCounts[0],
                 valueCounts[1]));
-        valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.DATA_PROPERTY, dpConfigs);
+        valueCounts = updatePolicyDatasets(AccessObjectType.DATA_PROPERTY, dpConfigs);
         log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0],
                 valueCounts[1]));
-        valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.CLASS, classConfigs);
+        valueCounts = updatePolicyDatasets(AccessObjectType.CLASS, classConfigs);
         log.info(String.format("Updated class property datasets, added %d values, removed %d values", valueCounts[0],
                 valueCounts[1]));
-        valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.FAUX_OBJECT_PROPERTY, fopConfigs);
+        valueCounts = updatePolicyDatasets(AccessObjectType.FAUX_OBJECT_PROPERTY, fopConfigs);
         log.info(String.format("Updated faux object property datasets, added %d values, removed %d values",
                 valueCounts[0], valueCounts[1]));
-        valueCounts = AuthMigrator.updatePolicyDatasets(AccessObjectType.FAUX_DATA_PROPERTY, fdpConfigs);
+        valueCounts = updatePolicyDatasets(AccessObjectType.FAUX_DATA_PROPERTY, fdpConfigs);
         log.info(String.format("Updated data property datasets, added %d values, removed %d values", valueCounts[0],
                 valueCounts[1]));
         PolicyLoader.getInstance().loadPolicies();
@@ -171,9 +175,38 @@ public class AnnotationMigrator {
         configs.put(uri, config);
     }
 
+    private static Long[] updatePolicyDatasets(AccessObjectType aot,
+            Map<String, Map<OperationGroup, Set<String>>> configs) {
+        StringBuilder additions = new StringBuilder();
+        StringBuilder removals = new StringBuilder();
+        for (String entityUri : configs.keySet()) {
+            Map<OperationGroup, Set<String>> groupMap = configs.get(entityUri);
+            for (OperationGroup og : groupMap.keySet()) {
+                for (AccessOperation ao : OperationGroup.getOperations(og)) {
+                    Set<String> rolesToAdd = groupMap.get(og);
+                    EntityPolicyController.getDataValueStatements(entityUri, aot, ao, rolesToAdd, additions);
+                    Set<String> rolesToRemove = new HashSet<>(ALL_ROLES);
+                    rolesToRemove.removeAll(rolesToAdd);
+                    // Don't remove public publish and update data sets, as there are no public policies for that
+                    // operation
+                    // groups
+                    if (OperationGroup.PUBLISH_GROUP.equals(og) || OperationGroup.UPDATE_GROUP.equals(og)) {
+                        rolesToRemove.remove(ROLE_PUBLIC_URI);
+                    }
+                    EntityPolicyController.getDataValueStatements(entityUri, aot, ao, rolesToRemove, removals);
+                    log.debug(String.format(
+                            "Updated entity %s dataset for operation group %s access object type %s roles %s",
+                            entityUri, og, aot, rolesToAdd));
+                }
+            }
+        }
+        PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
+        PolicyLoader.getInstance().updateAccessControlModel(removals.toString(), false);
+        return new Long[] { getLineCount(additions.toString()), getLineCount(removals.toString()) };
+    }
+
     private static String getAnnotationQuery(String typeSpecificPatterns) {
-        return ""
-                + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
+        return "" + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
                 + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
                 + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" + "SELECT ?base ?uri ?update ?display ?publish\n"
                 + "WHERE {\n" + typeSpecificPatterns
@@ -191,5 +224,14 @@ public class AnnotationMigrator {
             + "  ?context <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasConfiguration> ?uri .\n"
             + "  ?uri rdf:type <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyDisplayConfig> .\n"
             + "} GRAPH <" + ModelNames.DISPLAY + ">";
+
+    private static long getLineCount(String lines) {
+        Matcher matcher = Pattern.compile("\n").matcher(lines);
+        long i = 0;
+        while (matcher.find()) {
+            i++;
+        }
+        return i;
+    }
 
 }

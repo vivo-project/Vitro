@@ -4,18 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -85,32 +79,6 @@ public class AuthMigrator implements ServletContextListener {
         annotationMigrator.migrateConfiguration();
     }
 
-    static Long[] updatePolicyDatasets(AccessObjectType aot, Map<String, Map<OperationGroup, Set<String>>> configs) {
-        StringBuilder additions = new StringBuilder();
-        StringBuilder removals = new StringBuilder();
-        for (String entityUri : configs.keySet()) {
-            Map<OperationGroup, Set<String>> groupMap = configs.get(entityUri);
-            for (OperationGroup og : groupMap.keySet()) {
-                Set<String> rolesToAdd = groupMap.get(og);
-               // EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToAdd, additions);
-                Set<String> rolesToRemove = new HashSet<>(ALL_ROLES);
-                rolesToRemove.removeAll(rolesToAdd);
-                // Don't remove public publish and update data sets, as there are no public policies for that operation
-                // groups
-                if (OperationGroup.PUBLISH_GROUP.equals(og) || OperationGroup.UPDATE_GROUP.equals(og)) {
-                    rolesToRemove.remove(ROLE_PUBLIC_URI);
-                }
-               // EntityPolicyController.getDataValueStatements(entityUri, aot, og, rolesToRemove, removals);
-                log.debug(
-                        String.format("Updated entity %s dataset for operation group %s access object type %s roles %s",
-                                entityUri, og, aot, rolesToAdd));
-            }
-        }
-        PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
-        PolicyLoader.getInstance().updateAccessControlModel(removals.toString(), false);
-        return new Long[] { getLineCount(additions.toString()), getLineCount(removals.toString()) };
-    }
-
     private boolean isMigrationRequired() {
         if (getVersion() == 0L) {
             return true;
@@ -172,14 +140,5 @@ public class AuthMigrator implements ServletContextListener {
 
     private long secondsSince(long startTime) {
         return (System.currentTimeMillis() - startTime) / 1000;
-    }
-
-    private static long getLineCount(String lines) {
-        Matcher matcher = Pattern.compile("\n").matcher(lines);
-        long i = 0;
-        while (matcher.find()) {
-            i++;
-        }
-        return i;
     }
 }

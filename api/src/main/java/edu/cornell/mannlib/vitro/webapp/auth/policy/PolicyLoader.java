@@ -17,7 +17,6 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.CheckFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRuleFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
@@ -204,21 +203,21 @@ public class PolicyLoader {
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?"
-            + POLICY + " ?dataSet ?testData ?value ?valueId ( COUNT(?key) AS ?keySize ) \n"
+            + POLICY + " ?dataSet ?testData ?value ?valueId ?valueContainer ( COUNT(?key) AS ?keySize ) \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "  ?" + POLICY + " ao:policyDataSets ?policyDataSets .\n"
             + "  ?policyDataSets ao:policyDataSet ?dataSet .\n"
             + "  ?dataSet ao:dataSetKey ?dataSetKeyUri .\n"
-            + "  ?dataSet ao:dataSetValues ?dataSetValues .\n"
-            + "  ?dataSetValues ao:containerType ?containerType .\n"
+            + "  ?dataSet ao:dataSetValues ?valueContainer .\n"
+            + "  ?valueContainer ao:containerType ?containerType .\n"
             + "  ?containerType ao:id ?containerId .\n"
-            + "  OPTIONAL { ?dataSetValues ao:dataValue ?value .\n"
+            + "  OPTIONAL { ?valueContainer ao:dataValue ?value .\n"
             + "    OPTIONAL { ?value ao:id ?valueId . }\n"
             + "  }\n"
             + "  ?dataSetKeyUri ao:keyComponent ?key .\n";
 
-    private static final String policyKeyTemplateSuffix = "}} GROUP BY ?" + POLICY + " ?dataSet ?value ?valueId ?testData";
+    private static final String policyKeyTemplateSuffix = "}} GROUP BY ?" + POLICY + " ?dataSet ?value ?valueId ?testData ?valueContainer";
 
     private static final String policyStatementByKeyTemplatePrefix =
               "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -442,11 +441,11 @@ public class PolicyLoader {
         return priority[0];
     }
 
-    public Set<String> getDataSetValues(AccessOperation og, AccessObjectType aot, String role) {
+    public Set<String> getDataSetValues(AccessOperation ao, AccessObjectType aot, String role) {
         Set<String> values = new HashSet<>();
         long expectedSize = 3;
-        String queryText = getPolicyTestValuesByKeyQuery(new String[] { role },
-                new String[] { og.toString(), aot.toString() });
+        String queryText = getDataSetByKeyQuery(new String[] { role },
+                new String[] { ao.toString(), aot.toString() });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("containerId", aot.toString());
         queryText = pss.toString();
@@ -480,25 +479,28 @@ public class PolicyLoader {
         return values;
     }
 
-    public String getPolicyUriByDataSetKey(OperationGroup og, AccessObjectType aot, String role) {
+    public String getEntityValueContainerUri(AccessOperation ao, AccessObjectType aot, String role) {
         long expectedSize = 3;
-        final String queryText = getPolicyTestValuesByKeyQuery(new String[] { role },
-                new String[] { og.toString(), aot.toString() });
-        debug("SPARQL Query to get policy data set values:\n %s", queryText);
+        String queryText = getDataSetByKeyQuery(new String[] { role }, new String[] { ao.toString(), aot.toString() });
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
+        pss.setLiteral("containerId", aot.toString());
+        queryText = pss.toString();
+        debug("SPARQL Query to get entity value container uri:\n %s", queryText);
         String[] uri = new String[1];
         try {
             rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
-                    if (!qs.contains(POLICY) || !qs.get(POLICY).isResource() || !qs.contains("keySize")
+                    if (!qs.contains("dataSet") || !qs.get("dataSet").isResource() || !qs.contains("keySize")
                             || !qs.get("keySize").isLiteral()) {
                         return;
                     }
                     long keySize = qs.getLiteral("keySize").getLong();
                     if (expectedSize != keySize) {
+                        log.error("wrong key size. Expected " + expectedSize + ". Actual " + keySize );
                         return;
                     }
-                    uri[0] = qs.getResource(POLICY).getURI();
+                    uri[0] = qs.getResource("valueContainer").getURI();
                 }
             });
         } catch (RDFServiceException e) {
@@ -507,38 +509,10 @@ public class PolicyLoader {
         return uri[0];
     }
 
-    public String getEntityPolicyTestDataValue(AccessOperation og, AccessObjectType aot, String role) {
-        String[] valueUri = new String[1];
-        long expectedSize = 3;
-        final String queryText = getPolicyTestValuesByKeyQuery(new String[] { role },
-                new String[] { og.toString(), aot.toString() });
-        debug("SPARQL Query to get policy data set value:\n %s", queryText);
-        try {
-            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
-                @Override
-                protected void processQuerySolution(QuerySolution qs) {
-                    if (!qs.contains(POLICY) || !qs.contains("keySize") || !qs.get("keySize").isLiteral()) {
-                        return;
-                    }
-                    long keySize = qs.getLiteral("keySize").getLong();
-                    if (expectedSize != keySize) {
-                        return;
-                    }
-                    if (qs.contains("testData") && qs.get("testData").isResource()) {
-                        valueUri[0] = qs.getResource("testData").getURI();
-                    }
-                }
-            });
-        } catch (RDFServiceException e) {
-            log.error(e, e);
-        }
-        return valueUri[0];
-    }
-
-    public void modifyPolicyDataSetValue(String entityUri, AccessOperation og, AccessObjectType aot, String role,
+    public void modifyPolicyDataSetValue(String entityUri, AccessOperation ao, AccessObjectType aot, String role,
             boolean isAdd) {
         String queryText = getPolicyDataSetValueStatementByKeyQuery(entityUri, new String[] { role },
-                new String[] { og.toString(), aot.toString() });
+                new String[] { ao.toString(), aot.toString() });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("containerType", aot.toString());
         queryText = pss.toString();
@@ -600,7 +574,7 @@ public class PolicyLoader {
         return query.toString();
     }
 
-    private static String getPolicyTestValuesByKeyQuery(String[] uris, String[] ids) {
+    private static String getDataSetByKeyQuery(String[] uris, String[] ids) {
         StringBuilder query = new StringBuilder(policyKeyTemplatePrefix);
         for (String uri : uris) {
             query.append(String.format("  ?dataSetKeyUri ao:keyComponent <%s> . \n", uri));
@@ -811,7 +785,7 @@ public class PolicyLoader {
 
     private static void debug(String template, Object... objects) {
         if (log.isDebugEnabled()) {
-            log.error(String.format(template, objects));
+            log.debug(String.format(template, objects));
         }
     }
 
@@ -832,7 +806,7 @@ public class PolicyLoader {
 
     public String getDataSetUriByKey(String[] uris, String[] ids) {
         long expectedSize = uris.length + ids.length;
-        final String queryText = getPolicyTestValuesByKeyQuery(uris, ids);
+        final String queryText = getDataSetByKeyQuery(uris, ids);
         debug("SPARQL Query to get policy data set values:\n %s", queryText);
         String[] uri = new String[1];
         try {

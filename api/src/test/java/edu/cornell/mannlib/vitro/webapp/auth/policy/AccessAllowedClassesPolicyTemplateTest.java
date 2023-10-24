@@ -22,9 +22,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
 
-    public static final String POLICY_TEMPLATE_MATCH_CLASS_PATH =
-            USER_ACCOUNTS_HOME_FIRSTTIME + "template_access_allowed_class.n3";
-
     @org.junit.runners.Parameterized.Parameter(0)
     public AccessOperation ao;
 
@@ -42,7 +39,7 @@ public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
 
     @Test
     public void testPolicy() {
-        load(POLICY_TEMPLATE_MATCH_CLASS_PATH);
+        load(TEMPLATE_CLASS_PATH);
         List<String> roles = new ArrayList<>();
         roles.addAll(ROLE_LIST);
         if (roleUri.equals(CUSTOM)) {
