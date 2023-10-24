@@ -21,9 +21,9 @@ public class PolicyLoaderTest extends PolicyTest {
         Map<String, String> templates = PolicyLoader.getInstance().getRoleDataSetTemplates();
         assertEquals(2, templates.size());
         assertTrue(templates.containsKey(PREFIX + "RoleDataSetTemplate1"));
-        assertEquals(PREFIX + "DataSets" , templates.get(PREFIX + "RoleDataSetTemplate1"));
+        assertEquals(PREFIX + "DataSets", templates.get(PREFIX + "RoleDataSetTemplate1"));
         assertTrue(templates.containsKey(PREFIX + "RoleDataSetTemplate2"));
-        assertEquals(PREFIX + "DataSets" , templates.get(PREFIX + "RoleDataSetTemplate2"));
+        assertEquals(PREFIX + "DataSets", templates.get(PREFIX + "RoleDataSetTemplate2"));
     }
 
     @Test
@@ -38,7 +38,8 @@ public class PolicyLoaderTest extends PolicyTest {
     @Test
     public void getRoleDataSetDraftKeyTemplateTest() {
         load(DATA_SET);
-        List<String> keys = PolicyLoader.getInstance().getDataSetKeyTemplatesFromTemplate(PREFIX + "RoleDataSetTemplate1");
+        List<String> keys =
+                PolicyLoader.getInstance().getDataSetKeyTemplatesFromTemplate(PREFIX + "RoleDataSetTemplate1");
         assertEquals(1, keys.size());
         assertTrue(keys.contains("https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole"));
     }
@@ -51,12 +52,13 @@ public class PolicyLoaderTest extends PolicyTest {
                 new String[] { AccessObjectType.NAMED_OBJECT.toString() });
         assertEquals(PREFIX + "PublicDataSet", uri);
     }
-    
+
     @Test
     public void getRoleDataSetValuesTemplateTest() {
         load(DATA_SET);
         List<String> values = PolicyLoader.getInstance().getDataSetValuesFromTemplate(PREFIX + "RoleDataSetTemplate1");
         assertEquals(1, values.size());
-        assertEquals(values.get(0), "https://vivoweb.org/ontology/vitro-application/auth/individual/PublicRoleValueContainer");
+        assertEquals(values.get(0),
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/PublicRoleValueContainer");
     }
 }

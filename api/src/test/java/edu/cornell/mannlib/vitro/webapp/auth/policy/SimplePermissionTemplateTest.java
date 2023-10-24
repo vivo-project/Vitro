@@ -25,7 +25,8 @@ public class SimplePermissionTemplateTest extends PolicyTest {
     public void testAdminSimplePermissionPolicy() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + ADMIN_SIMPLE_PERMISSIONS_PATH + EXT);
-        String dataSetUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/AdminDataSet";
+        String dataSetUri =
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/AdminDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -45,7 +46,8 @@ public class SimplePermissionTemplateTest extends PolicyTest {
     public void testCuratorSimplePermissionPolicy() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + CURATOR_SIMPLE_PERMISSIONS_PATH + EXT);
-        String dataSetUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/CuratorDataSet";
+        String dataSetUri =
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/CuratorDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -65,7 +67,8 @@ public class SimplePermissionTemplateTest extends PolicyTest {
     public void testEditorSimplePermissionPolicy() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + EDITOR_SIMPLE_PERMISSIONS_PATH + EXT);
-        String dataSetUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/EditorDataSet";
+        String dataSetUri =
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/EditorDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -85,7 +88,8 @@ public class SimplePermissionTemplateTest extends PolicyTest {
     public void testSelfEditorSimplePermissionPolicy() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + SELF_EDITOR_SIMPLE_PERMISSIONS_PATH + EXT);
-        String dataSetUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/SelfEditorDataSet";
+        String dataSetUri =
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/SelfEditorDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -105,7 +109,8 @@ public class SimplePermissionTemplateTest extends PolicyTest {
     public void testPublicSimplePermissionPolicy() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + PUBLIC_SIMPLE_PERMISSIONS_PATH + EXT);
-        String dataSetUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/PublicDataSet";
+        String dataSetUri =
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/PublicDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -120,15 +125,16 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         ar.setRoleUris(Arrays.asList(PUBLIC));
         assertEquals(DecisionResult.AUTHORIZED, policy.decide(ar).getDecisionResult());
     }
-    
+
     @Test
     public void testCustomRole() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
-        
-        //Create custom data set
+
+        // Create custom data set
         PolicyTemplateController.createRoleDataSets(CUSTOM);
-        //Get data set uri by key: role uri and named object
-        String dataSetUri = loader.getDataSetUriByKey(new String[] { CUSTOM }, new String[] { AccessObjectType.NAMED_OBJECT.toString() });
+        // Get data set uri by key: role uri and named object
+        String dataSetUri = loader.getDataSetUriByKey(new String[] { CUSTOM },
+                new String[] { AccessObjectType.NAMED_OBJECT.toString() });
 
         assertTrue(dataSetUri != null);
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);

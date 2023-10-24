@@ -26,7 +26,7 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class AccessAllowedPropertiesPolicyTemplateTest extends PolicyTest {
-    
+
     @org.junit.runners.Parameterized.Parameter(0)
     public AccessOperation ao;
 
@@ -53,7 +53,8 @@ public class AccessAllowedPropertiesPolicyTemplateTest extends PolicyTest {
         }
         EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), roles);
         DynamicPolicy policy = null;
-        String dataSet = loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
+        String dataSet =
+                loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
         policy = loader.loadPolicyFromTemplateDataSet(dataSet);
         countRulesAndAttributes(policy, rulesCount, attrCount);
         Set<String> values = loader.getDataSetValues(ao, type, roleUri);
@@ -87,7 +88,7 @@ public class AccessAllowedPropertiesPolicyTemplateTest extends PolicyTest {
                 { DISPLAY, FAUX_DATA_PROPERTY, EDITOR, 2, num(4) },
                 { DISPLAY, FAUX_DATA_PROPERTY, PUBLIC, 2, num(4) },
                 { DISPLAY, FAUX_DATA_PROPERTY, CUSTOM, 2, num(4) },
-                
+
                 { PUBLISH, OBJECT_PROPERTY, ADMIN, 2, num(4) },
                 { PUBLISH, OBJECT_PROPERTY, CURATOR, 2, num(4) },
                 { PUBLISH, OBJECT_PROPERTY, EDITOR, 2, num(4) },
@@ -107,7 +108,7 @@ public class AccessAllowedPropertiesPolicyTemplateTest extends PolicyTest {
                 { PUBLISH, FAUX_DATA_PROPERTY, CURATOR, 2, num(4) },
                 { PUBLISH, FAUX_DATA_PROPERTY, EDITOR, 2, num(4) },
                 { PUBLISH, FAUX_DATA_PROPERTY, CUSTOM, 2, num(4) },
-                
+
                 { EDIT, OBJECT_PROPERTY, ADMIN, 2, num(4) },
                 { EDIT, OBJECT_PROPERTY, CURATOR, 2, num(4) },
                 { EDIT, OBJECT_PROPERTY, EDITOR, 2, num(4) },
@@ -119,7 +120,7 @@ public class AccessAllowedPropertiesPolicyTemplateTest extends PolicyTest {
                 { ADD, OBJECT_PROPERTY, EDITOR, 2, num(4) },
                 { ADD, OBJECT_PROPERTY, PUBLIC, 2, num(4) },
                 { ADD, OBJECT_PROPERTY, CUSTOM, 2, num(4) },
-                
+
                 { DROP, OBJECT_PROPERTY, ADMIN, 2, num(4) },
                 { DROP, OBJECT_PROPERTY, CURATOR, 2, num(4) },
                 { DROP, OBJECT_PROPERTY, EDITOR, 2, num(4) },
@@ -149,25 +150,25 @@ public class AccessAllowedPropertiesPolicyTemplateTest extends PolicyTest {
                 { EDIT, FAUX_OBJECT_PROPERTY, EDITOR, 2, num(4) },
                 { EDIT, FAUX_OBJECT_PROPERTY, PUBLIC, 2, num(4) },
                 { EDIT, FAUX_OBJECT_PROPERTY, CUSTOM, 2, num(4) },
-                
+
                 { ADD, FAUX_OBJECT_PROPERTY, ADMIN, 2, num(4) },
                 { ADD, FAUX_OBJECT_PROPERTY, CURATOR, 2, num(4) },
                 { ADD, FAUX_OBJECT_PROPERTY, EDITOR, 2, num(4) },
                 { ADD, FAUX_OBJECT_PROPERTY, PUBLIC, 2, num(4) },
                 { ADD, FAUX_OBJECT_PROPERTY, CUSTOM, 2, num(4) },
-                
+
                 { DROP, FAUX_OBJECT_PROPERTY, ADMIN, 2, num(4) },
                 { DROP, FAUX_OBJECT_PROPERTY, CURATOR, 2, num(4) },
                 { DROP, FAUX_OBJECT_PROPERTY, EDITOR, 2, num(4) },
                 { DROP, FAUX_OBJECT_PROPERTY, PUBLIC, 2, num(4) },
                 { DROP, FAUX_OBJECT_PROPERTY, CUSTOM, 2, num(4) },
-                
+
                 { EDIT, FAUX_DATA_PROPERTY, ADMIN, 2, num(4) },
                 { EDIT, FAUX_DATA_PROPERTY, CURATOR, 2, num(4) },
                 { EDIT, FAUX_DATA_PROPERTY, EDITOR, 2, num(4) },
                 { EDIT, FAUX_DATA_PROPERTY, PUBLIC, 2, num(4) },
                 { EDIT, FAUX_DATA_PROPERTY, CUSTOM, 2, num(4) },
-                
+
                 { ADD, FAUX_DATA_PROPERTY, ADMIN, 2, num(4) },
                 { ADD, FAUX_DATA_PROPERTY, CURATOR, 2, num(4) },
                 { ADD, FAUX_DATA_PROPERTY, EDITOR, 2, num(4) },

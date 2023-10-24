@@ -14,12 +14,14 @@ import org.junit.Test;
 
 public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
 
-    public static final String MENU_ITEMS_POLICY_PATH = PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + "policy_menu_items_editing.n3";
+    public static final String MENU_ITEMS_POLICY_PATH =
+            PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + "policy_menu_items_editing.n3";
 
     @Test
     public void testHomeMenuItemsRestrictionPolicy() {
         load(MENU_ITEMS_POLICY_PATH);
-        String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/Policy";
+        String policyUri =
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/Policy";
         DynamicPolicy policy = loader.loadPolicy(policyUri);
         assertTrue(policy != null);
         assertEquals(9000, policy.getPriority());

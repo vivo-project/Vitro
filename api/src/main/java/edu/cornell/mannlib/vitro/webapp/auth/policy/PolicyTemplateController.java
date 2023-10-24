@@ -44,33 +44,25 @@ public class PolicyTemplateController {
         }
         Model dataSetModel = VitroModelFactory.createModel();
         // Add ?dataSets ao:policyDataSet dataSetUri .
-        dataSetModel.add(new StatementImpl(
-                dataSetModel.createResource(dataSetsUri),
-                dataSetModel.createProperty(PREFIX_AO + "policyDataSet"),
-                dataSetModel.createResource(dataSetUri)));
-        
-        dataSetModel.add(new StatementImpl(
-                dataSetModel.createResource(dataSetUri),
+        dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetsUri),
+                dataSetModel.createProperty(PREFIX_AO + "policyDataSet"), dataSetModel.createResource(dataSetUri)));
+
+        dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                 dataSetModel.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                 dataSetModel.createResource(PREFIX_AO + "PolicyDataSet")));
-        
-        dataSetModel.add(new StatementImpl(
-                dataSetModel.createResource(dataSetUri),
-                dataSetModel.createProperty(PREFIX_AO + "dataSetKey"),
-                dataSetModel.createResource(dataSetKeyUri)));
-        
+
+        dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
+                dataSetModel.createProperty(PREFIX_AO + "dataSetKey"), dataSetModel.createResource(dataSetKeyUri)));
+
         for (String key : keys) {
-            dataSetModel.add(new StatementImpl(
-                    dataSetModel.createResource(dataSetKeyUri),
-                    dataSetModel.createProperty(PREFIX_AO + "keyComponent"),
-                    dataSetModel.createResource(key)));
+            dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetKeyUri),
+                    dataSetModel.createProperty(PREFIX_AO + "keyComponent"), dataSetModel.createResource(key)));
         }
-        
+
         List<String> valueContainerUris = policyLoader.getDataSetValuesFromTemplate(dataSetTemplateUri);
         for (String valueContainerUri : valueContainerUris) {
             // Add ?dataSetUri ao:dataSetValues ?valueContainerUri .
-            dataSetModel.add(new StatementImpl(
-                    dataSetModel.createResource(dataSetUri),
+            dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                     dataSetModel.createProperty(PREFIX_AO + "dataSetValues"),
                     dataSetModel.createResource(valueContainerUri)));
         }
@@ -79,11 +71,10 @@ public class PolicyTemplateController {
 
         for (String valueContainerTemplateUri : valueContainerTemplateUris) {
             String valueContainerUri = getUriFromTemplate(valueContainerTemplateUri, role);
-            dataSetModel.add(new StatementImpl(
-                    dataSetModel.createResource(dataSetUri),
+            dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                     dataSetModel.createProperty(PREFIX_AO + "dataSetValues"),
                     dataSetModel.createResource(valueContainerUri)));
-            
+
             policyLoader.constructValueContainer(valueContainerTemplateUri, valueContainerUri, roleUri, dataSetModel);
             // TODO: Check uri doesn't exists in access control graph
             // If value container template is subject role, then role uri should be added to the container

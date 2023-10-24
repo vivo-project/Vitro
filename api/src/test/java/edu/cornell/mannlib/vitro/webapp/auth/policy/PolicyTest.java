@@ -61,7 +61,7 @@ public class PolicyTest {
 
     public static final String TEMPLATE_RELATED_UPDATE_PATH =
             USER_ACCOUNTS_HOME_FIRSTTIME + "template_update_related_allowed_property.n3";
-    
+
     protected static final List<String> ROLE_LIST = Arrays.asList(ADMIN, CURATOR, EDITOR, SELF_EDITOR, PUBLIC);
     public static final String PREFIX = "https://vivoweb.org/ontology/vitro-application/auth/individual/";
     public static final String DATASET = "_dataset";
@@ -69,8 +69,8 @@ public class PolicyTest {
 
     private static final Log log = LogFactory.getLog(PolicyTest.class);
 
-    protected static final List<String> entityPolicies =
-            Arrays.asList(TEMPLATE_CLASS_PATH, TEMPLATE_PROPERTIES_PATH, TEMPLATE_RELATED_PROPERTIES_PATH, TEMPLATE_RELATED_UPDATE_PATH);
+    protected static final List<String> entityPolicies = Arrays.asList(TEMPLATE_CLASS_PATH, TEMPLATE_PROPERTIES_PATH,
+            TEMPLATE_RELATED_PROPERTIES_PATH, TEMPLATE_RELATED_UPDATE_PATH);
 
     protected Model accessControlModel;
     protected PolicyLoader loader;

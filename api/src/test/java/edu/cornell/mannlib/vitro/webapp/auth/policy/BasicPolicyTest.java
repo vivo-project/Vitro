@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -18,7 +16,8 @@ public class BasicPolicyTest extends PolicyTest {
     public static final String BROKEN_POLICY_BROKEN_TYPE = RESOURCES_RULES_PREFIX + "test_policy_broken2.n3";
     public static final String BROKEN_POLICY_BROKEN_TEST_ID = RESOURCES_RULES_PREFIX + "test_policy_broken3.n3";
     public static final String BROKEN_POLICY_BROKEN_TYPE_ID = RESOURCES_RULES_PREFIX + "test_policy_broken4.n3";
-    public static final String BROKEN_POLICY_BROKEN_ATTRIBUTE_VALUES = RESOURCES_RULES_PREFIX + "test_policy_broken5.n3";
+    public static final String BROKEN_POLICY_BROKEN_ATTRIBUTE_VALUES =
+            RESOURCES_RULES_PREFIX + "test_policy_broken5.n3";
 
     @Test
     public void testGetPolicyUris() {
@@ -35,8 +34,8 @@ public class BasicPolicyTest extends PolicyTest {
     @Test
     public void testValidPolicyTemplate() {
         load(VALID_POLICY_TEMPLATE);
-        DynamicPolicy policy = loader
-                .loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/ValidTestSetPolicy");
+        DynamicPolicy policy =
+                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/ValidTestSetPolicy");
         countRulesAndAttributes(policy, 2, Collections.singleton(2));
     }
 
@@ -51,8 +50,8 @@ public class BasicPolicyTest extends PolicyTest {
     @Test
     public void testBrokenTypeId() {
         load(BROKEN_POLICY_BROKEN_TYPE_ID);
-        DynamicPolicy policy = loader
-                .loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyTypeId");
+        DynamicPolicy policy =
+                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyTypeId");
         assertTrue(policy == null);
     }
 
@@ -67,24 +66,24 @@ public class BasicPolicyTest extends PolicyTest {
     @Test
     public void testBrokenType() {
         load(BROKEN_POLICY_BROKEN_TYPE);
-        DynamicPolicy policy = loader
-                .loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyType");
+        DynamicPolicy policy =
+                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyType");
         assertTrue(policy == null);
     }
 
     @Test
     public void testBrokenAttributeValue() {
         load(BROKEN_POLICY_BROKEN_ATTRIBUTE_VALUES);
-        DynamicPolicy policy = loader
-                .loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy");
+        DynamicPolicy policy =
+                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy");
         assertTrue(policy == null);
     }
 
     @Test
     public void testBrokenPolicyTemplate() {
         load(BROKEN_POLICY_TEMPLATE);
-        DynamicPolicy policy = loader
-                .loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy");
+        DynamicPolicy policy =
+                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy");
         assertTrue(policy == null);
     }
 

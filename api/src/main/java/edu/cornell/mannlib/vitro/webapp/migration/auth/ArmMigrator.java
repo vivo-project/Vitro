@@ -167,7 +167,7 @@ public class ArmMigrator {
                     for (AccessOperation ao : OperationGroup.getOperations(og)) {
                         for (String entityUri : intersectionEntities) {
                             EntityPolicyController.getDataValueStatements(entityUri, type, ao,
-                            Collections.singleton(newRole), additions);
+                                    Collections.singleton(newRole), additions);
                         }
                     }
                 }
