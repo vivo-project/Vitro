@@ -13,7 +13,7 @@
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Merge Individuals</h2>
 
 <%
-MergeResult resultObj = (MergeResult) request.getAttribute("result");
+    MergeResult resultObj = (MergeResult) request.getAttribute("result");
     String result = resultObj.getResultText();
 %>
 

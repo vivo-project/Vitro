@@ -6,13 +6,13 @@
 <%@ page import="edu.cornell.mannlib.vedit.beans.ButtonForm" %>
 
 <%
-if (request.getAttribute("title") != null) {
-%>
+if (request.getAttribute("title") != null) { %>
     <h2><%=request.getAttribute("title")%></h2><%
-    }
+}
 
-    ArrayList<String> logResults = (ArrayList<String>)request.getAttribute("results");
-    %>
+ArrayList<String> logResults = (ArrayList<String>)request.getAttribute("results");
+
+%>
 
 <div class="editingForm">
 	<table style="margin-bottom:1.5ex;">
