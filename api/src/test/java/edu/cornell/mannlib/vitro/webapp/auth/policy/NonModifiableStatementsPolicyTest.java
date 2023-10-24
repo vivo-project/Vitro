@@ -19,12 +19,11 @@ public class NonModifiableStatementsPolicyTest extends PolicyTest {
 
     private static final String VALID = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Valid";
     private static final String MOD_TIME = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime";
-    public static final String NOT_MODIFIABLE_STATEMENTS_POLICY_PATH = "policy_not_modifiable_statements";
+    public static final String NOT_MODIFIABLE_STATEMENTS_POLICY_PATH = "template_not_modifiable_statements";
 
     @Test
     public void testNonModifiableStatementsPolicy() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + NOT_MODIFIABLE_STATEMENTS_POLICY_PATH + EXT);
-        load(USER_ACCOUNTS_HOME_FIRSTTIME + NOT_MODIFIABLE_STATEMENTS_POLICY_PATH + DATASET + EXT);
 
         String policyUri =
                 "https://vivoweb.org/ontology/vitro-application/auth/individual/template/non-modifiable-statements/PolicyTemplate";

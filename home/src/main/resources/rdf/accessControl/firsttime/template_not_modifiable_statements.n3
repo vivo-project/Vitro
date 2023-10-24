@@ -66,52 +66,70 @@
 :PredicateUriStartWithProhibitedNamespace a ao:Check ;
     ao:operator ai:StartsWith ;
     ao:attribute ai:StatementPredicateUri ;
-    ao:templateValue ai:ProhibitedNamespaceValueSet .
+    ao:templateValue :ProhibitedNamespaceValueSet .
 
 :PredicateNotANamespaceException a ao:Check ;
     ao:operator ai:NotOneOf ;
     ao:attribute ai:StatementPredicateUri ;
-    ao:templateValue ai:ProhibitedNamespaceExceptionsValueSet .
+    ao:templateValue :ProhibitedNamespaceExceptionsValueSet .
 
 :SubjectUriStartWithProhibitedNamespace a ao:Check ;
     ao:operator ai:StartsWith ;
     ao:attribute ai:StatementSubjectUri ;
-    ao:templateValue ai:ProhibitedNamespaceValueSet .
+    ao:templateValue :ProhibitedNamespaceValueSet .
 
 :StatementSubjectNotOneOfProhibitedExceptions a ao:Check ;
     ao:operator ai:NotOneOf ;
     ao:attribute ai:StatementSubjectUri ;
-    ao:templateValue ai:ProhibitedNamespaceExceptionsValueSet .    
+    ao:templateValue :ProhibitedNamespaceExceptionsValueSet .    
 
 :StatementObjectUriStartsWithProhibitedNameSpace a ao:Check ;
     ao:operator ai:StartsWith ;
     ao:attribute ai:StatementObjectUri ;
-    ao:templateValue ai:ProhibitedNamespaceValueSet .
+    ao:templateValue :ProhibitedNamespaceValueSet .
 
 :ObjectUriNotOneOfProhibitedExceptions a ao:Check ;
     ao:operator ai:NotOneOf ;
     ao:attribute ai:StatementObjectUri ;
-    ao:templateValue ai:ProhibitedNamespaceExceptionsValueSet .  
+    ao:templateValue :ProhibitedNamespaceExceptionsValueSet .  
 
 ### Not modifiable data property statement attributes    
 
 ###DataSets
 :DataSets a ao:PolicyDataSets ;
-    ao:policyDataSet ai:NotModifiableStatementsPolicyDataSet .
+    ao:policyDataSet :NotModifiableStatementsPolicyDataSet .
 
-ai:NotModifiableStatementsPolicyDataSet a ao:PolicyDataSet ;
-    ao:dataSetValues ai:ProhibitedNamespaceExceptionsValueContainer ;
-    ao:dataSetValues ai:ProhibitedNamespaceValueContainer .
+:NotModifiableStatementsPolicyDataSet a ao:PolicyDataSet ;
+    ao:dataSetValues :ProhibitedNamespaceExceptionsValueContainer ;
+    ao:dataSetValues :ProhibitedNamespaceValueContainer .
 
-ai:ProhibitedNamespaceValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ProhibitedNamespaceValueContainer .
+:ProhibitedNamespaceValueSet a ao:AttributeValueSet ;
+    ao:attributeValue :ProhibitedNamespaceValueContainer .
 
-ai:ProhibitedNamespaceExceptionsValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ProhibitedNamespaceExceptionsValueContainer .
+:ProhibitedNamespaceExceptionsValueSet a ao:AttributeValueSet ;
+    ao:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
 
-ai:ProhibitedNamespaceExceptionsValueContainer a ao:ValueContainer ;
+:ProhibitedNamespaceExceptionsValueContainer a ao:ValueContainer ;
     .
 
-ai:ProhibitedNamespaceValueContainer a ao:ValueContainer ;
+:ProhibitedNamespaceValueContainer a ao:ValueContainer ;
     .
+
+:ProhibitedNamespaceExceptionsValueContainer
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#moniker> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Link> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkAnchor> ;
+    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkURL> ;
+    .
+
+:ProhibitedNamespaceValueContainer
+    ao:dataValue  :prohibitedNamespacePrefix ; 
+    .
+
+:prohibitedNamespacePrefix a ao:TestValue ;
+    ao:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;
     
