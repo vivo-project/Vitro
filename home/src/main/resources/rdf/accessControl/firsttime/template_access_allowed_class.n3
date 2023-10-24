@@ -41,7 +41,7 @@
 :RoleDisplayClassDataSetTemplate a ao:DataSetTemplate ;
     ao:dataSetTemplateKey :RoleDisplayClassDataSetTemplateKey ;
     ao:dataSetKeyTemplate :RoleDisplayClassDataSetKeyTemplate ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValueTemplate :RoleDisplayClassRoleValueContainerTemplate ;
     ao:dataSetValueTemplate :RoleDisplayClassValueContainerTemplate .  
@@ -68,7 +68,7 @@
 :RoleUpdateClassDataSetTemplate a ao:DataSetTemplate ;
     ao:dataSetTemplateKey :RoleUpdateClassDataSetTemplateKey ;
     ao:dataSetKeyTemplate :RoleUpdateClassDataSetKeyTemplate ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:UpdateOperationValueContainer ;
     ao:dataSetValueTemplate :RoleUpdateClassRoleValueContainerTemplate ;
     ao:dataSetValueTemplate :RoleUpdateClassValueContainerTemplate .  
@@ -95,7 +95,7 @@
 :RolePublishClassDataSetTemplate a ao:DataSetTemplate ;
     ao:dataSetTemplateKey :RolePublishClassDataSetTemplateKey ;
     ao:dataSetKeyTemplate :RolePublishClassDataSetKeyTemplate ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValueTemplate :RolePublishClassRoleValueContainerTemplate ;
     ao:dataSetValueTemplate :RolePublishClassValueContainerTemplate .  
@@ -122,7 +122,7 @@
 :PublicDisplayClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :PublicDisplayClassDataSetKey ;
     ao:dataSetValues ai:PublicRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:PublicDisplayClassValueContainer .
 
@@ -136,7 +136,7 @@
 :SelfEditorDisplayClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorDisplayClassDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDisplayClassValueContainer .
 
@@ -150,7 +150,7 @@
 :EditorDisplayClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :EditorDisplayClassDataSetKey ;
     ao:dataSetValues ai:EditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:EditorDisplayClassValueContainer .
 
@@ -164,7 +164,7 @@
 :CuratorDisplayClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :CuratorDisplayClassDataSetKey ;
     ao:dataSetValues ai:CuratorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:CuratorDisplayClassValueContainer .
 
@@ -178,7 +178,7 @@
 :AdminDisplayClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :AdminDisplayClassDataSetKey ;
     ao:dataSetValues ai:AdminRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:AdminDisplayClassValueContainer .
 
@@ -192,7 +192,7 @@
 :PublicUpdateClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :PublicUpdateClassDataSetKey ;
     ao:dataSetValues ai:PublicRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:UpdateOperationValueContainer ;
     ao:dataSetValues ai:PublicUpdateClassValueContainer .
 
@@ -206,7 +206,7 @@
 :SelfEditorUpdateClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorUpdateClassDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:UpdateOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorUpdateClassValueContainer .
 
@@ -220,7 +220,7 @@
 :EditorUpdateClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :EditorUpdateClassDataSetKey ;
     ao:dataSetValues ai:EditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:UpdateOperationValueContainer ;
     ao:dataSetValues ai:EditorUpdateClassValueContainer .
 
@@ -234,7 +234,7 @@
 :CuratorUpdateClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :CuratorUpdateClassDataSetKey ;
     ao:dataSetValues ai:CuratorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:UpdateOperationValueContainer ;
     ao:dataSetValues ai:CuratorUpdateClassValueContainer .
 
@@ -248,7 +248,7 @@
 :AdminUpdateClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :AdminUpdateClassDataSetKey ;
     ao:dataSetValues ai:AdminRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:UpdateOperationValueContainer ;
     ao:dataSetValues ai:AdminUpdateClassValueContainer .
 
@@ -262,7 +262,7 @@
 :SelfEditorPublishClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorPublishClassDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorPublishClassValueContainer .
 
@@ -276,7 +276,7 @@
 :EditorPublishClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :EditorPublishClassDataSetKey ;
     ao:dataSetValues ai:EditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:EditorPublishClassValueContainer .
 
@@ -290,7 +290,7 @@
 :CuratorPublishClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :CuratorPublishClassDataSetKey ;
     ao:dataSetValues ai:CuratorRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:CuratorPublishClassValueContainer .
 
@@ -304,7 +304,7 @@
 :AdminPublishClassDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :AdminPublishClassDataSetKey ;
     ao:dataSetValues ai:AdminRoleValueContainer ;
-    ao:dataSetValues ai:ClassAccesObjectValueContainer ;
+    ao:dataSetValues ai:ClassValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:AdminPublishClassValueContainer .
 
@@ -330,7 +330,7 @@
     ao:templateValue :AccessObjectTypeValueSet .
 
 :AccessObjectTypeValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ClassAccesObjectValueContainer ;
+    ao:attributeValue ai:ClassValueContainer ;
     .
 
 :OperationCheck a ao:Check ;

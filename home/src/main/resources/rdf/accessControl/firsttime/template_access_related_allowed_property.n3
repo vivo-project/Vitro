@@ -29,13 +29,13 @@
 :SelfEditorDisplayObjectPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorDisplayObjectPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDisplayObjectPropertyValueContainer .
 
 :SelfEditorDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent ai:ObjectProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:DisplayOperation .
 
@@ -44,13 +44,13 @@
 :SelfEditorDisplayDataPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorDisplayDataPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDisplayDataPropertyValueContainer .
 
 :SelfEditorDisplayDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent ai:DataProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:DisplayOperation .
 
@@ -59,13 +59,13 @@
 :SelfEditorDisplayFauxObjectPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorDisplayFauxObjectPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDisplayFauxObjectPropertyValueContainer .
 
 :SelfEditorDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent ai:FauxObjectProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:DisplayOperation .
 
@@ -74,13 +74,13 @@
 :SelfEditorDisplayFauxDataPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorDisplayFauxDataPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementValueContainer ;
     ao:dataSetValues ai:DisplayOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorDisplayFauxDataPropertyValueContainer .
 
 :SelfEditorDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent ai:FauxDataProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:DisplayOperation .
 
@@ -89,13 +89,13 @@
 :SelfEditorPublishObjectPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorPublishObjectPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyValueContainer ;
+    ao:dataSetValues ai:ObjectPropertyStatementValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorPublishObjectPropertyValueContainer .
 
 :SelfEditorPublishObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:ObjectPropertyAccesObject ;
+    ao:keyComponent ai:ObjectProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:PublishOperation .
 
@@ -104,13 +104,13 @@
 :SelfEditorPublishDataPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorPublishDataPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:DataPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:DataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:DataPropertyValueContainer ;
+    ao:dataSetValues ai:DataPropertyStatementValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorPublishDataPropertyValueContainer .
 
 :SelfEditorPublishDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:DataPropertyAccesObject ;
+    ao:keyComponent ai:DataProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:PublishOperation .
 
@@ -119,13 +119,13 @@
 :SelfEditorPublishFauxObjectPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorPublishFauxObjectPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyValueContainer ;
+    ao:dataSetValues ai:FauxObjectPropertyStatementValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorPublishFauxObjectPropertyValueContainer .
 
 :SelfEditorPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxObjectPropertyAccesObject ;
+    ao:keyComponent ai:FauxObjectProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:PublishOperation .
 
@@ -134,13 +134,13 @@
 :SelfEditorPublishFauxDataPropertyDataSet a ao:PolicyDataSet ;
     ao:dataSetKey :SelfEditorPublishFauxDataPropertyDataSetKey ;
     ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyAccesObjectValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyValueContainer ;
+    ao:dataSetValues ai:FauxDataPropertyStatementValueContainer ;
     ao:dataSetValues ai:PublishOperationValueContainer ;
     ao:dataSetValues ai:SelfEditorPublishFauxDataPropertyValueContainer .
 
 :SelfEditorPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxDataPropertyAccesObject ;
+    ao:keyComponent ai:FauxDataProperty ;
     ao:keyComponent auth:SELF_EDITOR ;
     ao:keyComponent ai:PublishOperation .
 
@@ -162,10 +162,10 @@
     ao:templateValue :AccessObjectTypeValueSet .
 
 :AccessObjectTypeValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ObjectPropertyAccesObjectValueContainer ;
-    ao:attributeValue ai:DataPropertyAccesObjectValueContainer ;
-    ao:attributeValue ai:FauxObjectPropertyAccesObjectValueContainer ;
-    ao:attributeValue ai:FauxDataPropertyAccesObjectValueContainer ;
+    ao:attributeValue ai:ObjectPropertyValueContainer ;
+    ao:attributeValue ai:DataPropertyValueContainer ;
+    ao:attributeValue ai:FauxObjectPropertyValueContainer ;
+    ao:attributeValue ai:FauxDataPropertyValueContainer ;
     .
 
 :AllowMatchingPropertyStatement a ao:Rule;
@@ -181,10 +181,10 @@
     ao:templateValue :StatementAccessObjectTypeValueSet .
 
 :StatementAccessObjectTypeValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ObjectPropertyStatementAccesObjectValueContainer ;
-    ao:attributeValue ai:DataPropertyStatementAccesObjectValueContainer ;
-    ao:attributeValue ai:FauxObjectPropertyStatementAccesObjectValueContainer ;
-    ao:attributeValue ai:FauxDataPropertyStatementAccesObjectValueContainer ;
+    ao:attributeValue ai:ObjectPropertyStatementValueContainer ;
+    ao:attributeValue ai:DataPropertyStatementValueContainer ;
+    ao:attributeValue ai:FauxObjectPropertyStatementValueContainer ;
+    ao:attributeValue ai:FauxDataPropertyStatementValueContainer ;
     .
 
 :OperationCheck a ao:Check ;
@@ -227,19 +227,19 @@
     .
 
 ai:SelfEditorDisplayObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:ObjectPropertyAccesObject .
+    ao:containerType ai:ObjectProperty .
 ai:SelfEditorDisplayDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:DataPropertyAccesObject .
+    ao:containerType ai:DataProperty .
 ai:SelfEditorDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxObjectPropertyAccesObject .
+    ao:containerType ai:FauxObjectProperty .
 ai:SelfEditorDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxDataPropertyAccesObject .
+    ao:containerType ai:FauxDataProperty .
 
 ai:SelfEditorPublishObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:ObjectPropertyAccesObject .
+    ao:containerType ai:ObjectProperty .
 ai:SelfEditorPublishDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:DataPropertyAccesObject .
+    ao:containerType ai:DataProperty .
 ai:SelfEditorPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxObjectPropertyAccesObject .
+    ao:containerType ai:FauxObjectProperty .
 ai:SelfEditorPublishFauxDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxDataPropertyAccesObject .
+    ao:containerType ai:FauxDataProperty .
