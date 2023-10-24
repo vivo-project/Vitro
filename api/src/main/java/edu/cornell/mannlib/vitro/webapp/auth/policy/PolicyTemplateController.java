@@ -51,6 +51,11 @@ public class PolicyTemplateController {
         
         dataSetModel.add(new StatementImpl(
                 dataSetModel.createResource(dataSetUri),
+                dataSetModel.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                dataSetModel.createResource(PREFIX_AO + "PolicyDataSet")));
+        
+        dataSetModel.add(new StatementImpl(
+                dataSetModel.createResource(dataSetUri),
                 dataSetModel.createProperty(PREFIX_AO + "dataSetKey"),
                 dataSetModel.createResource(dataSetKeyUri)));
         

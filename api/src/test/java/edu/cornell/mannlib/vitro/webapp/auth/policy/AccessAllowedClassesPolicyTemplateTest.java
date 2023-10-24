@@ -6,9 +6,11 @@ import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.P
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.UPDATE;
 import static org.junit.Assert.assertFalse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
@@ -19,36 +21,39 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
-    private static final String TEMPLATE_CLASS_PREFIX =
-            "https://vivoweb.org/ontology/vitro-application/auth/individual/template/access-allowed-class/";
 
     public static final String POLICY_TEMPLATE_MATCH_CLASS_PATH =
             USER_ACCOUNTS_HOME_FIRSTTIME + "template_access_allowed_class.n3";
 
     @org.junit.runners.Parameterized.Parameter(0)
-    public String dataSetUri;
-
-    @org.junit.runners.Parameterized.Parameter(1)
     public AccessOperation ao;
 
-    @org.junit.runners.Parameterized.Parameter(2)
+    @org.junit.runners.Parameterized.Parameter(1)
     public AccessObjectType type;
 
-    @org.junit.runners.Parameterized.Parameter(3)
+    @org.junit.runners.Parameterized.Parameter(2)
     public String roleUri;
 
-    @org.junit.runners.Parameterized.Parameter(4)
+    @org.junit.runners.Parameterized.Parameter(3)
     public int rulesCount;
 
-    @org.junit.runners.Parameterized.Parameter(5)
+    @org.junit.runners.Parameterized.Parameter(4)
     public Set<Integer> attrCount;
 
     @Test
     public void testPolicy() {
         load(POLICY_TEMPLATE_MATCH_CLASS_PATH);
-        EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), ROLE_LIST);
+        List<String> roles = new ArrayList<>();
+        roles.addAll(ROLE_LIST);
+        if (roleUri.equals(CUSTOM)) {
+            PolicyTemplateController.createRoleDataSets(CUSTOM);
+            roles.add(CUSTOM);
+        }
+        EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), roles);
         DynamicPolicy policy = null;
-        policy = loader.loadPolicyFromTemplateDataSet(TEMPLATE_CLASS_PREFIX + dataSetUri);
+        String dataSet = loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
+
+        policy = loader.loadPolicyFromTemplateDataSet(dataSet);
         countRulesAndAttributes(policy, rulesCount, attrCount);
         Set<String> values = loader.getDataSetValues(ao, type, roleUri);
         assertFalse(values.isEmpty());
@@ -57,20 +62,26 @@ public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "EditorDisplayClassUriDataSet", DISPLAY, CLASS, EDITOR, 1, Collections.singleton(4) },
-                { "PublicDisplayClassUriDataSet", DISPLAY, CLASS, PUBLIC, 1, Collections.singleton(4) },
-                { "EditorUpdateClassUriDataSet", UPDATE, CLASS, EDITOR, 1, Collections.singleton(4) },
-                { "SelfEditorDisplayClassUriDataSet", DISPLAY, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
-                { "CuratorDisplayClassUriDataSet", DISPLAY, CLASS, CURATOR, 1, Collections.singleton(4) },
-                { "AdminDisplayClassUriDataSet", DISPLAY, CLASS, ADMIN, 1, Collections.singleton(4) },
-                { "EditorPublishClassUriDataSet", PUBLISH, CLASS, EDITOR, 1, Collections.singleton(4) },
-                { "SelfEditorPublishClassUriDataSet", PUBLISH, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
-                { "CuratorPublishClassUriDataSet", PUBLISH, CLASS, CURATOR, 1, Collections.singleton(4) },
-                { "AdminPublishClassUriDataSet", PUBLISH, CLASS, ADMIN, 1, Collections.singleton(4) },
-                { "SelfEditorUpdateClassUriDataSet", UPDATE, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
-                { "PublicUpdateClassUriDataSet", UPDATE, CLASS, PUBLIC, 1, Collections.singleton(4) },
-                { "CuratorUpdateClassUriDataSet", UPDATE, CLASS, CURATOR, 1, Collections.singleton(4) },
-                { "AdminUpdateClassUriDataSet", UPDATE, CLASS, ADMIN, 1, Collections.singleton(4) }, });
+                { DISPLAY, CLASS, PUBLIC, 1, Collections.singleton(4) },
+                { DISPLAY, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
+                { DISPLAY, CLASS, EDITOR, 1, Collections.singleton(4) },
+                { DISPLAY, CLASS, CURATOR, 1, Collections.singleton(4) },
+                { DISPLAY, CLASS, ADMIN, 1, Collections.singleton(4) },
+                { DISPLAY, CLASS, CUSTOM, 1, Collections.singleton(4) },
+
+                { PUBLISH, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
+                { PUBLISH, CLASS, EDITOR, 1, Collections.singleton(4) },
+                { PUBLISH, CLASS, CURATOR, 1, Collections.singleton(4) },
+                { PUBLISH, CLASS, ADMIN, 1, Collections.singleton(4) },
+                { PUBLISH, CLASS, CUSTOM, 1, Collections.singleton(4) },
+
+                { UPDATE, CLASS, PUBLIC, 1, Collections.singleton(4) },
+                { UPDATE, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
+                { UPDATE, CLASS, EDITOR, 1, Collections.singleton(4) },
+                { UPDATE, CLASS, CURATOR, 1, Collections.singleton(4) },
+                { UPDATE, CLASS, ADMIN, 1, Collections.singleton(4) },
+                { UPDATE, CLASS, CUSTOM, 1, Collections.singleton(4) },});
+        
     }
 
 }
