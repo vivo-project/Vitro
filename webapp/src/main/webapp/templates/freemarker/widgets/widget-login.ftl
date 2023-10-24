@@ -83,6 +83,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const loginNameInput = document.getElementById('loginName');
             const emailInput = document.getElementById('email');
+            emailInput.value = loginNameInput.value;
 
             loginNameInput.addEventListener('input', function() {
                 emailInput.value = loginNameInput.value;
