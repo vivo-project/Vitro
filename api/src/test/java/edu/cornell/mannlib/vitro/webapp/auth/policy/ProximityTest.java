@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
@@ -25,7 +26,9 @@ public class ProximityTest extends PolicyTest {
     public void testProximityPolicy() {
         load(PROXIMITY_POLICY_PATH);
         String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/ProximityTestPolicy";
-        DynamicPolicy policy = loader.loadPolicy(policyUri);
+        Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
+        assertEquals(1, policies.size());
+        DynamicPolicy policy = policies.iterator().next();
         assertTrue(policy != null);
         assertTrue(policy.getRules().size() == 1);
         AccessRule rule = policy.getRules().iterator().next();

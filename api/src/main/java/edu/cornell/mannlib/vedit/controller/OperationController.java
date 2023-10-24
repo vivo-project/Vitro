@@ -150,7 +150,8 @@ public class OperationController extends BaseEditController {
                     roleUris.add(permissionSet.getUri());
                 }  
                 // Get the granted permissions from the request object
-                for (AccessOperation ao : AccessOperation.getUserInterfaceSet()) {
+                List<AccessOperation> operations = AccessOperation.getUserInterfaceList();
+                for (AccessOperation ao : operations) {
                     String operationGroupName = ao.toString().toLowerCase().split("_")[0];
                     String[] selectedRoles = request.getParameterValues(operationGroupName + "Roles");
                     if(StringUtils.isBlank(entityUri)) {

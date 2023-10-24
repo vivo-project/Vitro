@@ -17,4 +17,6 @@ public interface Policies {
     public long size();
 
     public void clear();
+
+    void remove(String policyUri);
 }

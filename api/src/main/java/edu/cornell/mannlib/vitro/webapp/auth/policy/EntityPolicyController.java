@@ -47,14 +47,17 @@ public class EntityPolicyController {
                         String.format("Policy wasn't found by key:\n%s\n%s\n%s", ao.toString(), aot.toString(), role));
                 continue;
             }
+            PolicyStore policyStore = PolicyStore.getInstance();
             if (isSelected && !isInDataSet) {
                 loader.addEntityToPolicyDataSet(entityUri, aot, ao, role);
+                policyStore.remove(dataSetUri);
                 DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
-                PolicyStore.getInstance().add(policy);
+                policyStore.add(policy);
             } else if (!isSelected && isInDataSet) {
                 loader.removeEntityFromPolicyDataSet(entityUri, aot, ao, role);
+                policyStore.remove(dataSetUri);
                 DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
-                PolicyStore.getInstance().add(policy);
+                policyStore.add(policy);
             }
         }
     }

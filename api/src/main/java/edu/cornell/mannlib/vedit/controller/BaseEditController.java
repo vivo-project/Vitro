@@ -16,26 +16,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
-import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BaseEditController extends VitroHttpServlet {
 
@@ -219,9 +218,12 @@ public class BaseEditController extends VitroHttpServlet {
         }  
         req.setAttribute("roles", permissionSets);
         // If the namespace is empty (e.e. we are creating a new record)
-        for (AccessOperation ao : AccessOperation.getUserInterfaceSet()){
-            String groupName = ao.toString().toLowerCase().split("_")[0];
-            final String attributeName = groupName + "Roles";
+        List<AccessOperation> operations = AccessOperation.getUserInterfaceList();
+        req.setAttribute("operations", operations);
+
+        for (AccessOperation ao : operations){
+            String operationName = ao.toString().toLowerCase().split("_")[0];
+            final String attributeName = operationName + "Roles";
             if (StringUtils.isEmpty(entityURI)) {
                 // predefined values
                 req.setAttribute(attributeName, roleUris);

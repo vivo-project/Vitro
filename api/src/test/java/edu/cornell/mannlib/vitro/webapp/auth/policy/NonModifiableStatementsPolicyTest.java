@@ -4,7 +4,8 @@ import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.D
 import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
 import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
@@ -27,8 +28,9 @@ public class NonModifiableStatementsPolicyTest extends PolicyTest {
 
         String policyUri =
                 "https://vivoweb.org/ontology/vitro-application/auth/individual/template/non-modifiable-statements/PolicyTemplate";
-        DynamicPolicy policy = loader.loadPolicy(policyUri);
-        assertTrue(policy != null);
+        Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
+        assertEquals(1, policies.size());
+        DynamicPolicy policy = policies.iterator().next();
         assertEquals(8000, policy.getPriority());
         assertEquals(5, policy.getRules().size());
         AccessRule rule = policy.getRules().iterator().next();
