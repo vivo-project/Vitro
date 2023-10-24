@@ -48,7 +48,8 @@ public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
         }
         EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), roles);
         DynamicPolicy policy = null;
-        String dataSet = loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
+        String dataSet =
+                loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
 
         policy = loader.loadPolicyFromTemplateDataSet(dataSet);
         countRulesAndAttributes(policy, rulesCount, attrCount);
@@ -59,26 +60,26 @@ public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { DISPLAY, CLASS, PUBLIC, 1, Collections.singleton(4) },
-                { DISPLAY, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
-                { DISPLAY, CLASS, EDITOR, 1, Collections.singleton(4) },
-                { DISPLAY, CLASS, CURATOR, 1, Collections.singleton(4) },
-                { DISPLAY, CLASS, ADMIN, 1, Collections.singleton(4) },
-                { DISPLAY, CLASS, CUSTOM, 1, Collections.singleton(4) },
+            { DISPLAY, CLASS, PUBLIC, 1, Collections.singleton(4) },
+            { DISPLAY, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
+            { DISPLAY, CLASS, EDITOR, 1, Collections.singleton(4) },
+            { DISPLAY, CLASS, CURATOR, 1, Collections.singleton(4) },
+            { DISPLAY, CLASS, ADMIN, 1, Collections.singleton(4) },
+            { DISPLAY, CLASS, CUSTOM, 1, Collections.singleton(4) },
 
-                { PUBLISH, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
-                { PUBLISH, CLASS, EDITOR, 1, Collections.singleton(4) },
-                { PUBLISH, CLASS, CURATOR, 1, Collections.singleton(4) },
-                { PUBLISH, CLASS, ADMIN, 1, Collections.singleton(4) },
-                { PUBLISH, CLASS, CUSTOM, 1, Collections.singleton(4) },
+            { PUBLISH, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
+            { PUBLISH, CLASS, EDITOR, 1, Collections.singleton(4) },
+            { PUBLISH, CLASS, CURATOR, 1, Collections.singleton(4) },
+            { PUBLISH, CLASS, ADMIN, 1, Collections.singleton(4) },
+            { PUBLISH, CLASS, CUSTOM, 1, Collections.singleton(4) },
 
-                { UPDATE, CLASS, PUBLIC, 1, Collections.singleton(4) },
-                { UPDATE, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
-                { UPDATE, CLASS, EDITOR, 1, Collections.singleton(4) },
-                { UPDATE, CLASS, CURATOR, 1, Collections.singleton(4) },
-                { UPDATE, CLASS, ADMIN, 1, Collections.singleton(4) },
-                { UPDATE, CLASS, CUSTOM, 1, Collections.singleton(4) },});
-        
+            { UPDATE, CLASS, PUBLIC, 1, Collections.singleton(4) },
+            { UPDATE, CLASS, SELF_EDITOR, 1, Collections.singleton(4) },
+            { UPDATE, CLASS, EDITOR, 1, Collections.singleton(4) },
+            { UPDATE, CLASS, CURATOR, 1, Collections.singleton(4) },
+            { UPDATE, CLASS, ADMIN, 1, Collections.singleton(4) },
+            { UPDATE, CLASS, CUSTOM, 1, Collections.singleton(4) }, });
+
     }
 
 }

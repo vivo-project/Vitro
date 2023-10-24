@@ -72,7 +72,7 @@ public class PolicyLoader {
             + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n"
             + "  }\n"
             + "} ORDER BY ?" + PRIORITY;
-    
+
 
     private static final String DATASET_PRIORITY_QUERY = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "prefix owl: <http://www.w3.org/2002/07/owl#>\n"
@@ -115,7 +115,8 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id \n" + "WHERE {\n"
+            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id \n"
+            + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "?policy rdf:type ao:Policy .\n"
             + "?policy ao:rules ?rules . \n"
@@ -150,7 +151,8 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id ?dataSetUri \n"
+            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id"
+            + " ?dataSetUri \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policy a ao:PolicyTemplate .\n"
@@ -188,7 +190,7 @@ public class PolicyLoader {
             + "    OPTIONAL {\n"
             + "       ?check ao:value ?value .\n"
             + "       OPTIONAL {?value ao:id ?lit_value . }\n"
-            + "    }\n" 
+            + "    }\n"
             + "    BIND(?dataSet as ?dataSetUri)\n"
             + "    BIND(?policy as ?policyUri)\n"
             + "  }\n"
@@ -217,7 +219,8 @@ public class PolicyLoader {
             + "  }\n"
             + "  ?dataSetKeyUri ao:keyComponent ?key .\n";
 
-    private static final String policyKeyTemplateSuffix = "}} GROUP BY ?" + POLICY + " ?dataSet ?value ?valueId ?testData ?valueContainer";
+    private static final String policyKeyTemplateSuffix =
+            "}} GROUP BY ?" + POLICY + " ?dataSet ?value ?valueId ?testData ?valueContainer";
 
     private static final String policyStatementByKeyTemplatePrefix =
               "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
@@ -253,7 +256,7 @@ public class PolicyLoader {
             + "    ?dataSetTemplateKey ao:templateKey ?key .\n"
             + "  }\n"
             + "}\n"
-            + "GROUP BY ?dataSetTemplate ?dataSets"; 
+            + "GROUP BY ?dataSetTemplate ?dataSets";
 
     public static final String DATA_SET_KEY_TEMPLATE_QUERY = ""
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
@@ -264,8 +267,8 @@ public class PolicyLoader {
             + "    ?dataSetTemplate ao:dataSetKeyTemplate ?dataSetKeyTemplate .\n"
             + "    ?dataSetKeyTemplate ao:keyComponent ?keyComponent .\n"
             + "  }\n"
-            + "}\n"; 
-    
+            + "}\n";
+
     public static final String DATA_SET_KEY_TEMPLATES_TEMPLATE_QUERY = ""
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
@@ -275,8 +278,8 @@ public class PolicyLoader {
             + "    ?dataSetTemplate ao:dataSetKeyTemplate ?dataSetKeyTemplate .\n"
             + "    ?dataSetKeyTemplate ao:keyComponentTemplate ?keyComponentTemplate .\n"
             + "  }\n"
-            + "}\n"; 
-    
+            + "}\n";
+
     public static final String DATA_SET_VALUE_TEMPLATE_QUERY = ""
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
@@ -285,9 +288,8 @@ public class PolicyLoader {
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?dataSetTemplate ao:dataSetValues ?valueContainer .\n"
             + "  }\n"
-            + "}\n"; 
-    
-    
+            + "}\n";
+
     public static final String DATA_SET_VALUE_CONTAINER_TEMPLATES_TEMPLATE_QUERY = ""
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
@@ -297,7 +299,7 @@ public class PolicyLoader {
             + "    ?dataSetTemplate ao:dataSetValueTemplate ?valueContainerTemplate .\n"
             + "  }\n"
             + "}\n";
-    
+
     public static final String CONSTRUCT_VALUE_CONTAINER_QUERY = ""
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
@@ -321,7 +323,7 @@ public class PolicyLoader {
             + "    }"
             + "  }"
             + "}\n";
-    
+
     private RDFService rdfService;
     public static final String RULE = "rule";
     public static final String LITERAL_VALUE = "lit_value";
@@ -377,7 +379,7 @@ public class PolicyLoader {
 
         return policyUris;
     }
-    
+
     @Deprecated
     public DynamicPolicy loadPolicy(String uri) {
         List<String> dataSetNames = getDataSetNames(uri);
@@ -401,7 +403,7 @@ public class PolicyLoader {
         policy.addRules(rules);
         return policy;
     }
-    
+
     public DynamicPolicy loadPolicyFromTemplateDataSet(String dataSetUri) {
         Set<AccessRule> rules = new HashSet<>();
         long priority = getPriorityFromDataSet(dataSetUri);
@@ -581,7 +583,8 @@ public class PolicyLoader {
         }
         int i = 0;
         for (String id : ids) {
-            query.append(String.format("  ?dataSetKeyUri ao:keyComponent ?uri%d .\n  ?uri%d ao:id \"%s\" . \n", i, i, id));
+            query.append(
+                    String.format("  ?dataSetKeyUri ao:keyComponent ?uri%d .\n  ?uri%d ao:id \"%s\" . \n", i, i, id));
             i++;
         }
         query.append(policyKeyTemplateSuffix);
@@ -769,7 +772,8 @@ public class PolicyLoader {
         }
         String check = qs.get("check").asResource().getLocalName();
         if (!qs.contains("value")) {
-            log.error(String.format("Query solution for policy <%s> rule %s check %s doesn't contain value", policy, rule, check));
+            log.error(String.format("Query solution for policy <%s> rule %s check %s doesn't contain value", policy,
+                    rule, check));
             return true;
         }
         if (!qs.contains("typeId") || !qs.get("typeId").isLiteral()) {
@@ -830,8 +834,8 @@ public class PolicyLoader {
         return uri[0];
     }
 
-    public Map<String,String> getRoleDataSetTemplates() {
-        Map<String,String> dataSetTemplates = new HashMap<>();
+    public Map<String, String> getRoleDataSetTemplates() {
+        Map<String, String> dataSetTemplates = new HashMap<>();
         long expectedSize = 1;
         final String queryText = DATA_SET_TEMPLATES_QUERY;
         debug("SPARQL Query to get data set templates:\n %s", queryText);
@@ -847,13 +851,12 @@ public class PolicyLoader {
                         return;
                     }
                     if (!qs.contains("dataSetTemplate") || !qs.get("dataSetTemplate").isResource()) {
-                       return;
+                        return;
                     }
                     if (!qs.contains("dataSets") || !qs.get("dataSets").isResource()) {
                         return;
-                     }
-                    dataSetTemplates.put(
-                            qs.getResource("dataSetTemplate").getURI(),
+                    }
+                    dataSetTemplates.put(qs.getResource("dataSetTemplate").getURI(),
                             qs.getResource("dataSets").getURI());
                 }
             });
@@ -961,5 +964,5 @@ public class PolicyLoader {
             log.error(e, e);
         }
     }
-    
+
 }
