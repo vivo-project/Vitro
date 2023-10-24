@@ -24,49 +24,49 @@ public class EntityPolicyController {
 
     /**
      * @param entityUri - entity uniform resource identifier
-     * @param aot - Access object type
-     * @param og - operation group
+     * @param aot - access object type
+     * @param ao - access operation
      * @param selectedRoles - list of roles to assign
      * @param allRoles - list of all available roles
      */
-    public static void updateEntityDataSet(String entityUri, AccessObjectType aot, AccessOperation og,
+    public static void updateEntityDataSet(String entityUri, AccessObjectType aot, AccessOperation ao,
             List<String> selectedRoles, List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {
             return;
         }
         Set<String> selectedSet = new HashSet<>(selectedRoles);
         for (String role : allRoles) {
-            boolean isInDataSet = isUriInTestDataset(entityUri, og, aot, role);
+            boolean isInDataSet = isUriInTestDataset(entityUri, ao, aot, role);
             boolean isSelected = selectedSet.contains(role);
             final PolicyLoader loader = PolicyLoader.getInstance();
             final String dataSetUri =
-                    loader.getDataSetUriByKey(new String[] { role }, new String[] { og.toString(), aot.toString() });
+                    loader.getDataSetUriByKey(new String[] { role }, new String[] { ao.toString(), aot.toString() });
 
             if (dataSetUri == null) {
                 log.debug(
-                        String.format("Policy wasn't found by key:\n%s\n%s\n%s", og.toString(), aot.toString(), role));
+                        String.format("Policy wasn't found by key:\n%s\n%s\n%s", ao.toString(), aot.toString(), role));
                 continue;
             }
             if (isSelected && !isInDataSet) {
-                loader.addEntityToPolicyDataSet(entityUri, aot, og, role);
+                loader.addEntityToPolicyDataSet(entityUri, aot, ao, role);
                 DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
                 PolicyStore.getInstance().add(policy);
             } else if (!isSelected && isInDataSet) {
-                loader.removeEntityFromPolicyDataSet(entityUri, aot, og, role);
+                loader.removeEntityFromPolicyDataSet(entityUri, aot, ao, role);
                 DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
                 PolicyStore.getInstance().add(policy);
             }
         }
     }
 
-    public static List<String> getGrantedRoles(String entityUri, AccessOperation og, AccessObjectType aot,
+    public static List<String> getGrantedRoles(String entityUri, AccessOperation ao, AccessObjectType aot,
             List<String> allRoles) {
         if (StringUtils.isBlank(entityUri)) {
             return Collections.emptyList();
         }
         List<String> grantedRoles = new LinkedList<>();
         for (String role : allRoles) {
-            if (isUriInTestDataset(entityUri, og, aot, role)) {
+            if (isUriInTestDataset(entityUri, ao, aot, role)) {
                 grantedRoles.add(role);
             }
         }
@@ -79,12 +79,12 @@ public class EntityPolicyController {
             return;
         }
         for (String role : selectedRoles) {
-            String testDataUri = getPolicyTestDataUri(aot, ao, role);
-            if (testDataUri == null) {
-                log.error(String.format("Policy test data wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
+            String valueContainerUri = getValueContainerUri(aot, ao, role);
+            if (valueContainerUri == null) {
+                log.error(String.format("Policy value container wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
                 continue;
             }
-            sb.append("<").append(testDataUri)
+            sb.append("<").append(valueContainerUri)
                     .append("> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <")
                     .append(entityUri).append("> .\n");
         }
@@ -109,12 +109,12 @@ public class EntityPolicyController {
         return values.contains(entityUri);
     }
 
-    private static String getPolicyTestDataUri(AccessObjectType aot, AccessOperation og, String role) {
-        String key = aot.toString() + "." + og.toString() + "." + role;
+    private static String getValueContainerUri(AccessObjectType aot, AccessOperation ao, String role) {
+        String key = aot.toString() + "." + ao.toString() + "." + role;
         if (policyKeyToDataValueMap.containsKey(key)) {
             return policyKeyToDataValueMap.get(key);
         }
-        String uri = PolicyLoader.getInstance().getEntityPolicyTestDataValue(og, aot, role);
+        String uri = PolicyLoader.getInstance().getEntityValueContainerUri(ao, aot, role);
         policyKeyToDataValueMap.put(key, uri);
         return uri;
     }

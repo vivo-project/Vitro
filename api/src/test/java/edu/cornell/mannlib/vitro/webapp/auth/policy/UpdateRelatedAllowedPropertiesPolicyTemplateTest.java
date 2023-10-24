@@ -23,9 +23,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class UpdateRelatedAllowedPropertiesPolicyTemplateTest extends PolicyTest {
 
-    public static final String POLICY_TEMPLATE_PATH =
-            USER_ACCOUNTS_HOME_FIRSTTIME + "template_update_related_allowed_property.n3";
-
     @org.junit.runners.Parameterized.Parameter(0)
     public AccessOperation ao;
 
@@ -43,7 +40,7 @@ public class UpdateRelatedAllowedPropertiesPolicyTemplateTest extends PolicyTest
 
     @Test
     public void testPolicy() {
-        load(POLICY_TEMPLATE_PATH);
+        load(TEMPLATE_RELATED_UPDATE_PATH);
         EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), ROLE_LIST);
         DynamicPolicy policy = null;
         String dataSet = loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });

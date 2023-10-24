@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
@@ -36,12 +37,12 @@ public class ArmMigrator {
     protected static final String ARM_SELF_EDITOR = "SELF_EDITOR";
     protected static final String ARM_PUBLIC = "PUBLIC";
 
-    protected static final List<String> armRoles = Arrays.asList(ARM_ADMIN, ARM_CURATOR, ARM_EDITOR, ARM_SELF_EDITOR,
-            ARM_PUBLIC);
+    protected static final List<String> armRoles =
+            Arrays.asList(ARM_ADMIN, ARM_CURATOR, ARM_EDITOR, ARM_SELF_EDITOR, ARM_PUBLIC);
     protected static final List<String> armOperations = Arrays.asList(DISPLAY, UPDATE, PUBLISH);
-    protected static final List<AccessObjectType> entityTypes = Arrays.asList(AccessObjectType.CLASS,
-            AccessObjectType.OBJECT_PROPERTY, AccessObjectType.DATA_PROPERTY, AccessObjectType.FAUX_OBJECT_PROPERTY,
-            AccessObjectType.FAUX_DATA_PROPERTY);
+    protected static final List<AccessObjectType> entityTypes =
+            Arrays.asList(AccessObjectType.CLASS, AccessObjectType.OBJECT_PROPERTY, AccessObjectType.DATA_PROPERTY,
+                    AccessObjectType.FAUX_OBJECT_PROPERTY, AccessObjectType.FAUX_DATA_PROPERTY);
 
     private RDFService contentRdfService;
     private RDFService configurationRdfService;
@@ -91,12 +92,14 @@ public class ArmMigrator {
             String newRole = roleMap.get(role);
             for (String operation : armOperations) {
                 OperationGroup og = operationMap.get(operation);
-                for (AccessObjectType aot : entityTypes) {
-               //     Set<String> entityUris = PolicyLoader.getInstance().getDataSetValues(og, aot, newRole);
-               //     for (String entityUri : entityUris) {
-               //         EntityPolicyController.getDataValueStatements(entityUri, aot, og,
-               //                 Collections.singleton(newRole), removals);
-               //     }
+                for (AccessOperation ao : OperationGroup.getOperations(og)) {
+                    for (AccessObjectType aot : entityTypes) {
+                        Set<String> entityUris = PolicyLoader.getInstance().getDataSetValues(ao, aot, newRole);
+                        for (String entityUri : entityUris) {
+                            EntityPolicyController.getDataValueStatements(entityUri, aot, ao,
+                                    Collections.singleton(newRole), removals);
+                        }
+                    }
                 }
             }
         }
@@ -161,9 +164,11 @@ public class ArmMigrator {
                     if (AccessObjectType.FAUX_DATA_PROPERTY.equals(type)) {
                         intersectionEntities.addAll(addFauxDP);
                     }
-                    for (String entityUri : intersectionEntities) {
-                       // EntityPolicyController.getDataValueStatements(entityUri, type, og,
-                       //         Collections.singleton(newRole), additions);
+                    for (AccessOperation ao : OperationGroup.getOperations(og)) {
+                        for (String entityUri : intersectionEntities) {
+                            EntityPolicyController.getDataValueStatements(entityUri, type, ao,
+                            Collections.singleton(newRole), additions);
+                        }
                     }
                 }
             }

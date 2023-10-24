@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,21 +90,20 @@ public class BasicPolicyTest extends PolicyTest {
 
     @Test
     public void testDuplicateTriplesInPolicies() {
-        Model m = ModelFactory.createDefaultModel();
-        Map<String, Long> pathToSizeMap = new HashMap<>();
+        Model m1 = ModelFactory.createDefaultModel();
+        Model m2 = ModelFactory.createDefaultModel();
         for (String entityPolicyPath : entityPolicies) {
-            load(m, entityPolicyPath);
-            pathToSizeMap.put(entityPolicyPath, m.size());
-            m.removeAll();
-        }
-        long cumulativeSize = 0;
-        for (String entityPolicyPath : entityPolicies) {
-            load(m, entityPolicyPath);
-            cumulativeSize += pathToSizeMap.get(entityPolicyPath);
-            if (cumulativeSize != m.size()) {
+            load(m2, entityPolicyPath);
+            Model intersection = m1.intersection(m2);
+            if (intersection.size() != 0) {
+                StringWriter sw = new StringWriter();
+                m1.write(sw, "TTL");
                 System.out.println(entityPolicyPath);
+                System.out.println(sw.toString());
             }
-            assertEquals(cumulativeSize, m.size());
+            assertEquals(0, intersection.size());
+            load(m1, entityPolicyPath);
+            m2.removeAll();
         }
     }
 }

@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
@@ -72,10 +72,10 @@ public class ArmMigratorTest extends AuthMigratorTest {
 
     @Test
     public void getStatementsToRemoveTest() {
-        StringBuilder removals = armMigrator.getStatementsToRemove();
+        StringBuilder removals = armMigrator.getStatementsToRemove(); 
         assertTrue(StringUtils.isBlank(removals.toString()));
-       // EntityPolicyController.updateEntityPolicyDataSet("test:entity", AccessObjectType.CLASS, OperationGroup.DISPLAY_GROUP,
-       //         ROLE_LIST, ROLE_LIST);
+        EntityPolicyController.updateEntityDataSet("test:entity", AccessObjectType.CLASS,
+                AccessOperation.DISPLAY, ROLE_LIST, ROLE_LIST);
         removals = armMigrator.getStatementsToRemove();
         assertEquals(5, getCount("\n", removals.toString()));
     }
@@ -87,7 +87,7 @@ public class ArmMigratorTest extends AuthMigratorTest {
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, OBJECT_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_SELF_EDITOR, ArmMigrator.DISPLAY, CLASS_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, CLASS_URI);
-        addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
+        //addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
         addArmStatement(ArmMigrator.ARM_ADMIN, ArmMigrator.DISPLAY, DATA_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, DATA_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, DATA_PROPERTY_URI);
@@ -102,13 +102,13 @@ public class ArmMigratorTest extends AuthMigratorTest {
         armMigrator.collectAdditions(entityTypeMap, additions);
         String stringResult = additions.toString();
         assertFalse(stringResult.isEmpty());
-        assertEquals(18, getCount("\n", stringResult));
-        assertEquals(18, getCount(dataValue, stringResult));
-        assertEquals(3, getCount(OBJECT_PROPERTY_URI, stringResult));
-        assertEquals(3, getCount(CLASS_URI, stringResult));
-        assertEquals(3, getCount(DATA_PROPERTY_URI, stringResult));
-        assertEquals(5, getCount(FAUX_DATA_PROPERTY_URI, stringResult));
-        assertEquals(4, getCount(FAUX_OBJECT_PROPERTY_URI, stringResult));
+        assertEquals(27, getCount("\n", stringResult));
+        assertEquals(27, getCount(dataValue, stringResult));
+        assertEquals(5, getCount(OBJECT_PROPERTY_URI, stringResult));
+        assertEquals(2, getCount(CLASS_URI, stringResult));
+        assertEquals(5, getCount(DATA_PROPERTY_URI, stringResult));
+        assertEquals(9, getCount(FAUX_DATA_PROPERTY_URI, stringResult));
+        assertEquals(6, getCount(FAUX_OBJECT_PROPERTY_URI, stringResult));
     }
 
     private static long getCount(String pattern, String lines) {
