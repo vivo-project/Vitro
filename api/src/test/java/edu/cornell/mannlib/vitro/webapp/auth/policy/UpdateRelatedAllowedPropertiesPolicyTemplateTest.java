@@ -22,37 +22,35 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class UpdateRelatedAllowedPropertiesPolicyTemplateTest extends PolicyTest {
-    private static final String TEMPLATE_PROPERTY_PREFIX =
-            "https://vivoweb.org/ontology/vitro-application/auth/individual/template/update-related-allowed-property/";
 
     public static final String POLICY_TEMPLATE_PATH =
             USER_ACCOUNTS_HOME_FIRSTTIME + "template_update_related_allowed_property.n3";
+
     @org.junit.runners.Parameterized.Parameter(0)
-    public String dataSetUri;
+    public AccessOperation ao;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public AccessOperation group;
-
-    @org.junit.runners.Parameterized.Parameter(2)
     public AccessObjectType type;
 
-    @org.junit.runners.Parameterized.Parameter(3)
+    @org.junit.runners.Parameterized.Parameter(2)
     public String roleUri;
 
-    @org.junit.runners.Parameterized.Parameter(4)
+    @org.junit.runners.Parameterized.Parameter(3)
     public int rulesCount;
 
-    @org.junit.runners.Parameterized.Parameter(5)
+    @org.junit.runners.Parameterized.Parameter(4)
     public Set<Integer> attrCount;
 
     @Test
     public void testPolicy() {
         load(POLICY_TEMPLATE_PATH);
-        EntityPolicyController.updateEntityDataSet("test:entity", type, group, Arrays.asList(roleUri), ROLE_LIST);
+        EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), ROLE_LIST);
         DynamicPolicy policy = null;
-        policy = loader.loadPolicyFromTemplateDataSet(TEMPLATE_PROPERTY_PREFIX + "SelfEditor" + dataSetUri + "DataSet");
+        String dataSet = loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
+
+        policy = loader.loadPolicyFromTemplateDataSet(dataSet);
         countRulesAndAttributes(policy, rulesCount, attrCount);
-        Set<String> values = loader.getDataSetValues(group, type, roleUri);
+        Set<String> values = loader.getDataSetValues(ao, type, roleUri);
         assertFalse(values.isEmpty());
     }
 
@@ -60,20 +58,20 @@ public class UpdateRelatedAllowedPropertiesPolicyTemplateTest extends PolicyTest
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
 
-                { "AddObjectProperty", ADD, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "AddDataProperty", ADD, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "AddFauxObjectProperty", ADD, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "AddFauxDataProperty", ADD, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { ADD, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { ADD, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { ADD, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { ADD, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
 
-                { "DropObjectProperty", DROP, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "DropDataProperty", DROP, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "DropFauxObjectProperty", DROP, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "DropFauxDataProperty", DROP, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { DROP, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { DROP, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { DROP, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { DROP, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
 
-                { "EditObjectProperty", EDIT, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "EditDataProperty", EDIT, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "EditFauxObjectProperty", EDIT, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { "EditFauxDataProperty", EDIT, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) }, });
+                { EDIT, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { EDIT, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { EDIT, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { EDIT, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) }, });
 
     }
 
