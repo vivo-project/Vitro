@@ -29,14 +29,13 @@ URIs exactly of the form created through the GUI interface.</p>
 <input type="hidden" name="action" value="permanentURI" />
 <p>Current namespace of resources
 <select name=oldNamespace>
-<%
-List namespaces = (List)request.getAttribute("namespaceList");
+<%List namespaces = (List)request.getAttribute("namespaceList");
 if(namespaces != null) {
 	Iterator namespaceItr = namespaces.iterator();
 	Integer count = 0;
 	while (namespaceItr.hasNext()){
 		String namespaceText = (String) namespaceItr.next();
-%>
+		%>
         <option value="<%=namespaceText%>"><%=namespaceText%></option>
 <%  }
 }%>
