@@ -3,6 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Set;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
@@ -22,8 +24,9 @@ public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
         load(MENU_ITEMS_POLICY_PATH);
         String policyUri =
                 "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/Policy";
-        DynamicPolicy policy = loader.loadPolicy(policyUri);
-        assertTrue(policy != null);
+        Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
+        assertEquals(1, policies.size());
+        DynamicPolicy policy = policies.iterator().next();
         assertEquals(9000, policy.getPriority());
         assertTrue(policy.getRules().size() > 0);
         final AccessRule rule = policy.getRules().iterator().next();

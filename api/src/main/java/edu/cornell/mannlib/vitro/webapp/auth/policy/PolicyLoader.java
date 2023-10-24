@@ -48,15 +48,14 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?" + POLICY + " ?" + PRIORITY + " \n"
+            + "SELECT DISTINCT ?policy \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?" + POLICY + " rdf:type ao:Policy .\n"
-            + "    OPTIONAL {?" + POLICY + " ao:priority ?set_priority"
-            + " . }\n"
-            + "    BIND(COALESCE(?set_priority, 0 ) as ?" + PRIORITY + " ) .\n"
+            + "    { ?policy a ao:Policy . }\n"
+            + "      UNION \n"
+            + "    { ?policy a ao:PolicyTemplate . }\n"
             + "  }\n"
-            + "} ORDER BY ?" + PRIORITY;
+            + "}";
 
     private static final String PRIORITY_QUERY = "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "prefix owl: <http://www.w3.org/2002/07/owl#>\n"
@@ -349,11 +348,10 @@ public class PolicyLoader {
         List<String> policyUris = getPolicyUris();
         for (String uri : policyUris) {
             debug("Loading policy %s", uri);
-            DynamicPolicy policy = loadPolicy(uri);
-            if (policy != null) {
-                log.debug("Loaded policy " + uri);
-                // take policy priority into account
+            Set<DynamicPolicy> policies = loadPolicies(uri);
+            for (DynamicPolicy policy : policies) {
                 PolicyStore.getInstance().add(policy);
+                log.info("Loaded policy " + policy.getUri());
             }
         }
     }
@@ -380,28 +378,33 @@ public class PolicyLoader {
         return policyUris;
     }
 
-    @Deprecated
-    public DynamicPolicy loadPolicy(String uri) {
+    public Set<DynamicPolicy> loadPolicies(String uri) {
+        Set<DynamicPolicy> policies = new HashSet<>();
         List<String> dataSetNames = getDataSetNames(uri);
-        Set<AccessRule> rules = new HashSet<>();
-        long priority = getPriority(uri);
-        try {
-            if (dataSetNames.isEmpty()) {
+        if (dataSetNames.isEmpty()) {
+            Set<AccessRule> rules = new HashSet<>();
+            try {
                 loadRulesWithoutDataSet(uri, rules);
-            } else {
-                for (String dataSetName : dataSetNames) {
-                    loadRulesForDataSet(rules, dataSetName);
+            } catch (Exception e) {
+                log.info(String.format("Policy '%s' failed to load ", uri));
+                log.debug(e, e);
+            }
+            if (!rules.isEmpty()) {
+                long priority = getPriority(uri);
+                DynamicPolicy policy = new DynamicPolicy(uri, priority);
+                policy.addRules(rules);
+                policies.add(policy);
+            }
+        } else {
+            for (String dataSetName : dataSetNames) {
+                DynamicPolicy policy = loadPolicyFromTemplateDataSet(dataSetName);
+                if (policy != null) {
+                    policies.add(policy);
                 }
             }
-        } catch (Exception e) {
-            return null;
         }
-        if (rules.isEmpty()) {
-            return null;
-        }
-        DynamicPolicy policy = new DynamicPolicy(uri, priority);
-        policy.addRules(rules);
-        return policy;
+
+        return policies;
     }
 
     public DynamicPolicy loadPolicyFromTemplateDataSet(String dataSetUri) {
@@ -410,7 +413,8 @@ public class PolicyLoader {
         try {
             loadRulesForDataSet(rules, dataSetUri);
         } catch (Exception e) {
-            log.error(e, e);
+            log.info(String.format("Policy template dataset '%s' failed to load ", dataSetUri));
+            log.debug(e, e);
             return null;
         }
         if (rules.isEmpty()) {
@@ -753,35 +757,35 @@ public class PolicyLoader {
 
     private static boolean isInvalidPolicySolution(QuerySolution qs) {
         if (!qs.contains("policyUri") || !qs.get("policyUri").isResource()) {
-            log.error("Query solution doesn't contain policy uri");
+            log.debug("Query solution doesn't contain policy uri");
             return true;
         }
         String policy = qs.get("policyUri").asResource().getURI();
         if (!qs.contains("rules") || !qs.get("rules").isResource()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain rules uri", policy));
+            log.debug(String.format("Query solution for policy <%s> doesn't contain rules uri", policy));
             return true;
         }
         if (!qs.contains("rule") || !qs.get("rule").isResource()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain rule uri", policy));
+            log.debug(String.format("Query solution for policy <%s> doesn't contain rule uri", policy));
             return true;
         }
         String rule = qs.get("rule").asResource().getLocalName();
         if (!qs.contains("check") || !qs.get("check").isResource()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain check uri", policy));
+            log.debug(String.format("Query solution for policy <%s> doesn't contain check uri", policy));
             return true;
         }
         String check = qs.get("check").asResource().getLocalName();
         if (!qs.contains("value")) {
-            log.error(String.format("Query solution for policy <%s> rule %s check %s doesn't contain value", policy,
+            log.debug(String.format("Query solution for policy <%s> rule %s check %s doesn't contain value", policy,
                     rule, check));
             return true;
         }
         if (!qs.contains("typeId") || !qs.get("typeId").isLiteral()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain check type id", policy));
+            log.debug(String.format("Query solution for policy <%s> doesn't contain check type id", policy));
             return true;
         }
         if (!qs.contains("testId") || !qs.get("testId").isLiteral()) {
-            log.error(String.format("Query solution for policy <%s> doesn't contain check test id", policy));
+            log.debug(String.format("Query solution for policy <%s> doesn't contain check test id", policy));
             return true;
         }
         return false;

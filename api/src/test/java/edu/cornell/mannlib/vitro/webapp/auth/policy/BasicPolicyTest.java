@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
 import java.util.Collections;
+import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -34,57 +35,61 @@ public class BasicPolicyTest extends PolicyTest {
     @Test
     public void testValidPolicyTemplate() {
         load(VALID_POLICY_TEMPLATE);
-        DynamicPolicy policy =
-                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/ValidTestSetPolicy");
-        countRulesAndAttributes(policy, 2, Collections.singleton(2));
+        String uri = "https://vivoweb.org/ontology/vitro-application/auth/individual/ValidTestSetPolicy";
+        Set<DynamicPolicy> policies = loader.loadPolicies(uri);
+        assertEquals(2, policies.size());
+        DynamicPolicy policy = policies.iterator().next();
+        countRulesAndAttributes(policy, 1, Collections.singleton(2));
+        policy = policies.iterator().next();
+        countRulesAndAttributes(policy, 1, Collections.singleton(2));
     }
 
     @Test
     public void testBrokenTestId() {
         load(BROKEN_POLICY_BROKEN_TEST_ID);
-        DynamicPolicy policy = loader.loadPolicy(
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyBrokenTestTypeId");
-        assertTrue(policy == null);
+        String uri = "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyBrokenTestTypeId";
+        Set<DynamicPolicy> policies = loader.loadPolicies(uri);
+        assertEquals(0, policies.size());
     }
 
     @Test
     public void testBrokenTypeId() {
         load(BROKEN_POLICY_BROKEN_TYPE_ID);
-        DynamicPolicy policy =
-                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyTypeId");
-        assertTrue(policy == null);
+        String uri = "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyTypeId";
+        Set<DynamicPolicy> policies = loader.loadPolicies(uri);
+        assertEquals(0, policies.size());
     }
 
     @Test
     public void testBrokenTest() {
         load(BROKEN_POLICY_BROKEN_TEST);
-        DynamicPolicy policy = loader.loadPolicy(
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyBrokenTestType");
-        assertTrue(policy == null);
+        String uri = "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyBrokenTestType";
+        Set<DynamicPolicy> policies = loader.loadPolicies(uri);
+        assertEquals(0, policies.size());
     }
 
     @Test
     public void testBrokenType() {
         load(BROKEN_POLICY_BROKEN_TYPE);
-        DynamicPolicy policy =
-                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyType");
-        assertTrue(policy == null);
+        String uri = "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenPolicyType";
+        Set<DynamicPolicy> policies = loader.loadPolicies(uri);
+        assertEquals(0, policies.size());
     }
 
     @Test
     public void testBrokenAttributeValue() {
         load(BROKEN_POLICY_BROKEN_ATTRIBUTE_VALUES);
-        DynamicPolicy policy =
-                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy");
-        assertTrue(policy == null);
+        String uri = "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy";
+        Set<DynamicPolicy> policies = loader.loadPolicies(uri);
+        assertEquals(0, policies.size());
     }
 
     @Test
     public void testBrokenPolicyTemplate() {
         load(BROKEN_POLICY_TEMPLATE);
-        DynamicPolicy policy =
-                loader.loadPolicy("https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy");
-        assertTrue(policy == null);
+        String uri = "https://vivoweb.org/ontology/vitro-application/auth/individual/BrokenTestSetPolicy";
+        Set<DynamicPolicy> policies = loader.loadPolicies(uri);
+        assertEquals(0, policies.size());
     }
 
     @Test

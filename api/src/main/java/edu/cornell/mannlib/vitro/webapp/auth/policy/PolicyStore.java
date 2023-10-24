@@ -5,10 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
 import org.apache.commons.logging.Log;
@@ -28,12 +29,21 @@ public class PolicyStore implements Policies {
         return INSTANCE;
     }
 
-    protected List<Policy> policyList = Collections.synchronizedList(new ArrayList<Policy>());
-    protected Map<String, Policy> policyMap = Collections.synchronizedMap(new LinkedHashMap<String, Policy>());
+    protected List<Policy> policyList = new CopyOnWriteArrayList<>();
+    protected Map<String, Policy> policyMap = new ConcurrentHashMap<>();
 
     @Override
     public boolean contains(Policy policy) {
         return policyList.contains(policy);
+    }
+
+    @Override
+    public synchronized void remove(String policyUri) {
+        Policy oldPolicy = policyMap.get(policyUri);
+        if (oldPolicy != null) {
+            policyList.remove(oldPolicy);
+        }
+        policyMap.remove(policyUri);
     }
 
     @Override

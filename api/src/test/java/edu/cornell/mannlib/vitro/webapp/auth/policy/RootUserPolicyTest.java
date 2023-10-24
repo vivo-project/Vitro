@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -15,7 +16,9 @@ public class RootUserPolicyTest extends PolicyTest {
     public void testLoadRootUserPolicy() {
         load(ROOT_POLICY_PATH);
         String policyUri = "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/root-user/Policy";
-        DynamicPolicy policy = loader.loadPolicy(policyUri);
+        Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
+        assertEquals(1, policies.size());
+        DynamicPolicy policy = policies.iterator().next();
         assertTrue(policy != null);
         assertEquals(10000, policy.getPriority());
         countRulesAndAttributes(policy, 1, Collections.singleton(1));
