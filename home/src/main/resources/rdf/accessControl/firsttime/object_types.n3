@@ -8,28 +8,28 @@
 @prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:ObjectPropertyAccesObject a ao:ObjectType ;
+ai:ObjectProperty a ao:ObjectType ;
     ao:id "OBJECT_PROPERTY" .
 
-ai:DataPropertyAccesObject a ao:ObjectType ;
+ai:DataProperty a ao:ObjectType ;
     ao:id "DATA_PROPERTY" .
 
-ai:FauxDataPropertyAccesObject a ao:ObjectType ;
+ai:FauxDataProperty a ao:ObjectType ;
     ao:id "FAUX_DATA_PROPERTY" .
 
-ai:FauxObjectPropertyAccesObject a ao:ObjectType ;
+ai:FauxObjectProperty a ao:ObjectType ;
     ao:id "FAUX_OBJECT_PROPERTY" .
 
-ai:ObjectPropertyStatementAccesObject a ao:ObjectType ;
+ai:ObjectPropertyStatement a ao:ObjectType ;
     ao:id "OBJECT_PROPERTY_STATEMENT" .
 
-ai:DataPropertyStatementAccesObject a ao:ObjectType ;
+ai:DataPropertyStatement a ao:ObjectType ;
     ao:id "DATA_PROPERTY_STATEMENT" .
 
-ai:FauxObjectPropertyStatementAccesObject a ao:ObjectType ;
+ai:FauxObjectPropertyStatement a ao:ObjectType ;
     ao:id "FAUX_OBJECT_PROPERTY_STATEMENT" .
 
-ai:FauxDataPropertyStatementAccesObject a ao:ObjectType ;
+ai:FauxDataPropertyStatement a ao:ObjectType ;
     ao:id "FAUX_DATA_PROPERTY_STATEMENT" .
 
 ai:Class a ao:ObjectType ;
@@ -40,29 +40,29 @@ ai:NamedObject a ao:ObjectType ;
 
 #Object type value containers
 
-ai:ObjectPropertyAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:ObjectPropertyAccesObject .
+ai:ObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:ObjectProperty .
 
-ai:DataPropertyAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:DataPropertyAccesObject .
+ai:DataPropertyValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:DataProperty .
 
-ai:FauxObjectPropertyAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxObjectPropertyAccesObject .
+ai:FauxObjectPropertyValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxObjectProperty .
 
-ai:FauxDataPropertyAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxDataPropertyAccesObject .
+ai:FauxDataPropertyValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxDataProperty .
 
-ai:ObjectPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:ObjectPropertyStatementAccesObject .
+ai:ObjectPropertyStatementValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:ObjectPropertyStatement .
 
-ai:DataPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:DataPropertyStatementAccesObject .
+ai:DataPropertyStatementValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:DataPropertyStatement .
 
-ai:FauxObjectPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxObjectPropertyStatementAccesObject .
+ai:FauxObjectPropertyStatementValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxObjectPropertyStatement .
 
-ai:FauxDataPropertyStatementAccesObjectValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxDataPropertyStatementAccesObject .
+ai:FauxDataPropertyStatementValueContainer a ao:ValueContainer ;
+    ao:dataValue ai:FauxDataPropertyStatement .
 
-ai:ClassAccesObjectValueContainer a ao:ValueContainer ;
+ai:ClassValueContainer a ao:ValueContainer ;
     ao:dataValue ai:Class .

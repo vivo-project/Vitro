@@ -55,12 +55,12 @@
 :IsObjectPropertyStatement a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
-    ao:value ai:ObjectPropertyStatementAccesObject .
+    ao:value ai:ObjectPropertyStatement .
 
 :IsDataPropertyStatement a ao:Check ;
     ao:operator ai:Equals ;
     ao:attribute ai:AccessObjectType ;
-    ao:value ai:DataPropertyStatementAccesObject .
+    ao:value ai:DataPropertyStatement .
 
 ### Not modifiable property statement attributes
 :PredicateUriStartWithProhibitedNamespace a ao:Check ;
