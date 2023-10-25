@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyTemplateController;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -36,9 +37,8 @@ public class ArmMigrator {
     protected static final String ARM_EDITOR = "EDITOR";
     protected static final String ARM_SELF_EDITOR = "SELF_EDITOR";
     protected static final String ARM_PUBLIC = "PUBLIC";
+    protected static final String ARM_CUSTOM = "CUSTOM";
 
-    protected static final List<String> armRoles =
-            Arrays.asList(ARM_ADMIN, ARM_CURATOR, ARM_EDITOR, ARM_SELF_EDITOR, ARM_PUBLIC);
     protected static final List<String> armOperations = Arrays.asList(DISPLAY, UPDATE, PUBLISH);
     protected static final List<AccessObjectType> entityTypes =
             Arrays.asList(AccessObjectType.CLASS, AccessObjectType.OBJECT_PROPERTY, AccessObjectType.DATA_PROPERTY,
@@ -47,9 +47,23 @@ public class ArmMigrator {
     private RDFService contentRdfService;
     private RDFService configurationRdfService;
 
-    private String VALUE_QUERY = "" + "SELECT ?uri \n" + "WHERE {\n" + "  GRAPH <" + ModelNames.USER_ACCOUNTS + "> {\n"
-            + "  ?permission <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#forEntity> ?uri . \n" + "  }\n"
+    private String VALUE_QUERY = "" 
+            + "SELECT ?uri \n" 
+            + "WHERE {\n" 
+            + "  GRAPH <" + ModelNames.USER_ACCOUNTS + "> {\n"
+            + "  ?permission <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#forEntity> ?uri . \n" 
+            + "  }\n"
             + "}";
+
+    private String PERMISSION_SETS_QUERY = "" 
+            + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
+            + "SELECT ?uri \n" 
+            + "WHERE {\n" 
+            + "  GRAPH <" + ModelNames.USER_ACCOUNTS + "> {\n"
+            + "    ?uri a auth:PermissionSet . \n" 
+            + "  }\n"
+            + "}";
+
 
     private static Map<String, String> roleMap;
     private static Map<String, OperationGroup> operationMap;
@@ -61,18 +75,33 @@ public class ArmMigrator {
         operationMap.put(DISPLAY, OperationGroup.DISPLAY_GROUP);
         operationMap.put(UPDATE, OperationGroup.UPDATE_GROUP);
         operationMap.put(PUBLISH, OperationGroup.PUBLISH_GROUP);
+        
         roleMap = new HashMap<>();
         roleMap.put(ARM_ADMIN, AuthMigrator.ROLE_ADMIN_URI);
         roleMap.put(ARM_CURATOR, AuthMigrator.ROLE_CURATOR_URI);
         roleMap.put(ARM_EDITOR, AuthMigrator.ROLE_EDITOR_URI);
         roleMap.put(ARM_SELF_EDITOR, AuthMigrator.ROLE_SELF_EDITOR_URI);
         roleMap.put(ARM_PUBLIC, AuthMigrator.ROLE_PUBLIC_URI);
+        Set<String> actualRoles = getPermissionSets();
+        for (String role : actualRoles) {
+            if(!roleMap.values().contains(role)) {
+                String roleName = getRoleName(role);
+                log.info(String.format("Custom role %s found.", roleName));
+                roleMap.put(roleName, role);
+                PolicyTemplateController.createRoleDataSets(role);
+                log.info(String.format("Created policy data sets for custom role %s.", roleName));
+            }
+        }
     }
 
     public static String getArmPermissionSubject(String operation, String role) {
         return "java:edu.cornell.mannlib.vitro.webapp.auth.permissions.Entity" + operation + "Permission#" + role;
     }
 
+    private static String getRoleName(String roleUri) {
+        return roleUri.substring(roleUri.lastIndexOf('#') + 1);
+    }
+    
     public void migrateConfiguration() {
         cleanEntityDataSetValues();
         Map<AccessObjectType, Set<String>> entityTypeMap = getEntityMap();
@@ -88,7 +117,7 @@ public class ArmMigrator {
 
     protected StringBuilder getStatementsToRemove() {
         StringBuilder removals = new StringBuilder();
-        for (String role : armRoles) {
+        for (String role : roleMap.keySet()) {
             String newRole = roleMap.get(role);
             for (String operation : armOperations) {
                 OperationGroup og = operationMap.get(operation);
@@ -128,7 +157,7 @@ public class ArmMigrator {
 
     protected void collectAdditions(Map<AccessObjectType, Set<String>> entityTypeMap, StringBuilder additions) {
 
-        for (String role : armRoles) {
+        for (String role : roleMap.keySet()) {
             String newRole = roleMap.get(role);
             for (String operation : armOperations) {
                 String permissionUri = getArmPermissionSubject(operation, role);
@@ -272,8 +301,11 @@ public class ArmMigrator {
 
     private boolean containsAdminDisplayPermission() {
         boolean result = false;
-        String query = "" + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" + "ASK WHERE {\n"
-                + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n" + "       <"
+        String query = "" 
+                + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" 
+                + "ASK WHERE {\n"
+                + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n" 
+                + "       <"
                 + getArmPermissionSubject(DISPLAY, ARM_ADMIN) + "> ?p ?o .\n" + "  }\n" + "}";
         try {
             result = configurationRdfService.sparqlAskQuery(query);
@@ -281,5 +313,21 @@ public class ArmMigrator {
             log.error(e, e);
         }
         return result;
+    }
+    
+    private Set<String> getPermissionSets() {
+        Set<String> permissionSets = new HashSet<>();
+        String queryText = PERMISSION_SETS_QUERY;
+        try {
+            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(queryText, configurationRdfService);
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                String entity = qs.getResource("uri").getURI();
+                permissionSets.add(entity);
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }
+        return permissionSets;
     }
 }

@@ -61,20 +61,26 @@ public class AuthMigrator implements ServletContextListener {
 
     protected void convertAuthorizationConfiguration() {
         if (isArmConfiguration()) {
-            convertArmConfiguration();
+            migrateArmConfiguration();
         } else {
-            convertAnnotationConfiguation();
+            migrateAnnotationConfiguation();
         }
+        migrateSimplePermissions();
         removeVersion(getVersion());
         setVersion(1L);
     }
 
-    private void convertArmConfiguration() {
+    private void migrateSimplePermissions() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void migrateArmConfiguration() {
         ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService);
         armMigrator.migrateConfiguration();
     }
 
-    private void convertAnnotationConfiguation() {
+    private void migrateAnnotationConfiguation() {
         AnnotationMigrator annotationMigrator = new AnnotationMigrator(contentRdfService, configurationRdfService);
         annotationMigrator.migrateConfiguration();
     }
