@@ -94,7 +94,7 @@ public class ArmMigratorTest extends AuthMigratorTest {
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, OBJECT_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_SELF_EDITOR, ArmMigrator.DISPLAY, CLASS_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, CLASS_URI);
-        
+
         addArmStatement(ArmMigrator.ARM_ADMIN, ArmMigrator.DISPLAY, DATA_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, DATA_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, DATA_PROPERTY_URI);
@@ -111,7 +111,7 @@ public class ArmMigratorTest extends AuthMigratorTest {
         // TODO Class UPDATE permissions migration.
         // addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
         // addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
-        
+
         Map<AccessObjectType, Set<String>> entityTypeMap = armMigrator.getEntityMap();
         StringBuilder additions = new StringBuilder();
         armMigrator.collectAdditions(entityTypeMap, additions);
