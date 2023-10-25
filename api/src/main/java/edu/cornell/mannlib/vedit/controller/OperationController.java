@@ -150,7 +150,8 @@ public class OperationController extends BaseEditController {
                     roleUris.add(permissionSet.getUri());
                 }  
                 // Get the granted permissions from the request object
-                List<AccessOperation> operations = AccessOperation.getUserInterfaceList();
+                AccessObjectType aot = AccessObjectType.valueOf(entityType);
+                List<AccessOperation> operations = AccessOperation.getOperations(aot);
                 for (AccessOperation ao : operations) {
                     String operationGroupName = ao.toString().toLowerCase().split("_")[0];
                     String[] selectedRoles = request.getParameterValues(operationGroupName + "Roles");
@@ -162,7 +163,7 @@ public class OperationController extends BaseEditController {
                         if (selectedRoles == null) {
                             selectedRoles = new String[0];
                         }
-                        EntityPolicyController.updateEntityDataSet(entityUri, AccessObjectType.valueOf(entityType), ao, Arrays.asList(selectedRoles), roleUris);
+                        EntityPolicyController.updateEntityDataSet(entityUri, aot, ao, Arrays.asList(selectedRoles), roleUris);
                     }
                 }
             }

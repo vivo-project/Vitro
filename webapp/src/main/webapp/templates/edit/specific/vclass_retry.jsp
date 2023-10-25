@@ -88,43 +88,29 @@
 </tr>
 <tr><td colspan="4"><hr class="formDivider"/></td></tr>
 <!-- Permissions -->
-<c:if test="${!empty roles}">
+<c:if test="${!empty operationsToRoles}">
     <input id="_permissions" type="hidden" name="_permissions" value="enabled" />
     <input id="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" value="${_permissionsEntityURI}" />
     <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="CLASS" />
-    <tr class="editformcell">
-        <td valign="top" colspan="4">
-            <b>Display</b> permissions for this property<br/>
-            <c:forEach var="role" items="${roles}">
-                <input id="display${role.label}" type="checkbox" name="displayRoles" value="${role.uri}" ${fn:contains(displayRoles, role.uri)?'checked':''} />
-                <label class="inline" for="display${role.label}"> ${role.label}</label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </c:forEach>
-        </td>
-    </tr>
-    <tr><td colspan="4"><hr class="formDivider"/></td></tr>
-    <tr class="editformcell">
-        <td valign="top" colspan="4">
-            <b>Update</b> permissions for this property<br/>
-            <c:forEach var="role" items="${roles}">
-                <input id="update${role.label}" type="checkbox" name="updateRoles" value="${role.uri}" ${fn:contains(updateRoles, role.uri)?'checked':''} ${role.isForPublic()?'disabled':''} />
-                <label class="inline" for="update${role.label}"> ${role.label}</label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </c:forEach>
-        </td>
-    </tr>
-    <tr><td colspan="4"><hr class="formDivider"/></td></tr>
-    <tr class="editformcell">
-        <td valign="top" colspan="4">
-            <b>Publish</b> permissions for this property<br/>
-            <c:forEach var="role" items="${roles}">
-                <input id="publish${role.label}" type="checkbox" name="publishRoles" value="${role.uri}" ${fn:contains(publishRoles, role.uri)?'checked':''}  />
-                <label class="inline" for="publish${role.label}"> ${role.label}</label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </c:forEach>
-        </td>
-    </tr>
-    <tr><td colspan="4"><hr class="formDivider"/></td></tr>
+	<c:forEach var="entry" items="${operationsToRoles}">
+		<tr class="editformcell">
+			<td valign="top" colspan="5"><b>${entry.key}</b> permissions for this property<br /> 
+				<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
+				<c:forEach var="role" items="${entry.value}">
+					<input id="${operationLowercase}${role.label}"
+						type="checkbox" name="${operationLowercase}Roles"
+						value="${role.uri}" ${role.granted?'checked':''}
+						${role.enabled?'':'disabled'} />
+					<label class="inline" for="${operationLowercase}${role.label}">${role.label}</label>
+				</c:forEach>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5">
+				<hr class="formDivider" />
+			</td>
+		</tr>
+	</c:forEach>
 </c:if>
 <!-- Permissions End -->
 <tr class="editformcell">
