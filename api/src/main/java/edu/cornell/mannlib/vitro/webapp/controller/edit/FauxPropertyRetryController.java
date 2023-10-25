@@ -89,7 +89,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 		} catch (Exception e) {
 			log.error("Could not forward to view.");
 			log.error(e.getMessage());
-			log.error(e.getStackTrace());
+			log.error(e, e);
 		}
 
 	}

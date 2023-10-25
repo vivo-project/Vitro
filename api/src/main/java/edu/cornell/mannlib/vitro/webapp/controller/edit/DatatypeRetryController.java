@@ -97,10 +97,9 @@ public class DatatypeRetryController extends BaseEditController {
         try {
             JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
-            log.error("VclassRetryContro" +
-                    "ller could not forward to view.");
+            log.error("VclassRetryController could not forward to view.");
             log.error(e.getMessage());
-            log.error(e.getStackTrace());
+            log.error(e, e);
         }
 
     }

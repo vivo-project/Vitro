@@ -100,7 +100,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 	        } catch (Exception e) {
 	            log.error(this.getClass().getName()+" could not forward to view.");
 	            log.error(e.getMessage());
-	            log.error(e.getStackTrace());
+	            log.error(e, e);
 	        }
 
 	}
