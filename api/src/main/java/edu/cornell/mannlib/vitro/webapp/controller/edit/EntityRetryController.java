@@ -303,7 +303,7 @@ public class EntityRetryController extends BaseEditController {
         } catch (Exception e) {
             log.error("EntityRetryController could not forward to view.");
             log.error(e.getMessage());
-            log.error(e.getStackTrace());
+            log.error(e, e);
         }
 
     }
