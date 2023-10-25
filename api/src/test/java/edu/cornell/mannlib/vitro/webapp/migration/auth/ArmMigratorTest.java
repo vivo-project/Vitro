@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyTest;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +42,7 @@ public class ArmMigratorTest extends AuthMigratorTest {
     public void initArmMigration() {
         userAccountsModel = ModelFactory.createDefaultModel();
         configurationDataSet.addNamedModel(ModelNames.USER_ACCOUNTS, userAccountsModel);
+        addUserAccountsStatement(PolicyTest.CUSTOM, VitroVocabulary.PERMISSIONSET, VitroVocabulary.RDF_TYPE);
         armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet));
     }
 
@@ -53,8 +56,12 @@ public class ArmMigratorTest extends AuthMigratorTest {
     private void addArmStatement(String role, String operation, String uri) {
         String persmissionUri = ArmMigrator.getArmPermissionSubject(operation, role);
         String objectUri = uri;
-        Statement statement = new StatementImpl(new ResourceImpl(persmissionUri), new PropertyImpl(propertyUri),
-                new ResourceImpl(objectUri));
+        addUserAccountsStatement(persmissionUri, objectUri, propertyUri);
+    }
+
+    private void addUserAccountsStatement(String subjUri, String objUri, String pUri) {
+        Statement statement =
+                new StatementImpl(new ResourceImpl(subjUri), new PropertyImpl(pUri), new ResourceImpl(objUri));
         userAccountsModel.add(statement);
         configurationDataSet.replaceNamedModel(ModelNames.USER_ACCOUNTS, userAccountsModel);
     }
@@ -87,7 +94,7 @@ public class ArmMigratorTest extends AuthMigratorTest {
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, OBJECT_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_SELF_EDITOR, ArmMigrator.DISPLAY, CLASS_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, CLASS_URI);
-        //addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
+        
         addArmStatement(ArmMigrator.ARM_ADMIN, ArmMigrator.DISPLAY, DATA_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, DATA_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, DATA_PROPERTY_URI);
@@ -97,18 +104,26 @@ public class ArmMigratorTest extends AuthMigratorTest {
         addArmStatement(ArmMigrator.ARM_PUBLIC, ArmMigrator.DISPLAY, FAUX_OBJECT_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, FAUX_OBJECT_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, FAUX_OBJECT_PROPERTY_URI);
+        addArmStatement(ArmMigrator.ARM_CUSTOM, ArmMigrator.DISPLAY, OBJECT_PROPERTY_URI);
+        addArmStatement(ArmMigrator.ARM_CUSTOM, ArmMigrator.UPDATE, FAUX_DATA_PROPERTY_URI);
+        addArmStatement(ArmMigrator.ARM_CUSTOM, ArmMigrator.DISPLAY, CLASS_URI);
+
+        // TODO Class UPDATE permissions migration.
+        // addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
+        // addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
+        
         Map<AccessObjectType, Set<String>> entityTypeMap = armMigrator.getEntityMap();
         StringBuilder additions = new StringBuilder();
         armMigrator.collectAdditions(entityTypeMap, additions);
         String stringResult = additions.toString();
         assertFalse(stringResult.isEmpty());
-        assertEquals(27, getCount("\n", stringResult));
-        assertEquals(27, getCount(dataValue, stringResult));
-        assertEquals(5, getCount(OBJECT_PROPERTY_URI, stringResult));
-        assertEquals(2, getCount(CLASS_URI, stringResult));
+        assertEquals(33, getCount("\n", stringResult));
+        assertEquals(33, getCount(dataValue, stringResult));
+        assertEquals(6, getCount(OBJECT_PROPERTY_URI, stringResult));
+        assertEquals(3, getCount(CLASS_URI, stringResult));
         assertEquals(5, getCount(DATA_PROPERTY_URI, stringResult));
-        assertEquals(9, getCount(FAUX_DATA_PROPERTY_URI, stringResult));
-        assertEquals(6, getCount(FAUX_OBJECT_PROPERTY_URI, stringResult));
+        assertEquals(12, getCount(FAUX_DATA_PROPERTY_URI, stringResult));
+        assertEquals(7, getCount(FAUX_OBJECT_PROPERTY_URI, stringResult));
     }
 
     private static long getCount(String pattern, String lines) {
