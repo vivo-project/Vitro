@@ -14,8 +14,14 @@ public enum AccessOperation {
     DROP,
     EDIT;
 
-    public static List<AccessOperation> getUserInterfaceList() {
-        return Arrays.asList(AccessOperation.DISPLAY, AccessOperation.PUBLISH, AccessOperation.ADD,
-                AccessOperation.DROP, AccessOperation.EDIT);
+    public static List<AccessOperation> getOperations(AccessObjectType aot) {
+        if (aot.equals(AccessObjectType.DATA_PROPERTY)
+                || aot.equals(AccessObjectType.OBJECT_PROPERTY)
+                || aot.equals(AccessObjectType.FAUX_DATA_PROPERTY)
+                || aot.equals(AccessObjectType.FAUX_OBJECT_PROPERTY)) {
+            return Arrays.asList(AccessOperation.DISPLAY, AccessOperation.PUBLISH, AccessOperation.ADD,
+                    AccessOperation.DROP, AccessOperation.EDIT);
+        }
+        return Arrays.asList(AccessOperation.DISPLAY, AccessOperation.PUBLISH, AccessOperation.UPDATE);
     }
 }
