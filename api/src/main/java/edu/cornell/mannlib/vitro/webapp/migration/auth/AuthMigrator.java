@@ -72,7 +72,7 @@ public class AuthMigrator implements ServletContextListener {
 
     private void migrateSimplePermissions() {
         // TODO Auto-generated method stub
-        
+
     }
 
     private void migrateArmConfiguration() {

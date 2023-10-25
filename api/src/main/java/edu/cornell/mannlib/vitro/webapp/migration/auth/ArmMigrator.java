@@ -47,23 +47,22 @@ public class ArmMigrator {
     private RDFService contentRdfService;
     private RDFService configurationRdfService;
 
-    private String VALUE_QUERY = "" 
-            + "SELECT ?uri \n" 
-            + "WHERE {\n" 
+    private String VALUE_QUERY = ""
+            + "SELECT ?uri \n"
+            + "WHERE {\n"
             + "  GRAPH <" + ModelNames.USER_ACCOUNTS + "> {\n"
-            + "  ?permission <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#forEntity> ?uri . \n" 
+            + "  ?permission <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#forEntity> ?uri . \n"
             + "  }\n"
             + "}";
 
-    private String PERMISSION_SETS_QUERY = "" 
+    private String PERMISSION_SETS_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
-            + "SELECT ?uri \n" 
-            + "WHERE {\n" 
+            + "SELECT ?uri \n"
+            + "WHERE {\n"
             + "  GRAPH <" + ModelNames.USER_ACCOUNTS + "> {\n"
-            + "    ?uri a auth:PermissionSet . \n" 
+            + "    ?uri a auth:PermissionSet . \n"
             + "  }\n"
             + "}";
-
 
     private static Map<String, String> roleMap;
     private static Map<String, OperationGroup> operationMap;
@@ -75,7 +74,7 @@ public class ArmMigrator {
         operationMap.put(DISPLAY, OperationGroup.DISPLAY_GROUP);
         operationMap.put(UPDATE, OperationGroup.UPDATE_GROUP);
         operationMap.put(PUBLISH, OperationGroup.PUBLISH_GROUP);
-        
+
         roleMap = new HashMap<>();
         roleMap.put(ARM_ADMIN, AuthMigrator.ROLE_ADMIN_URI);
         roleMap.put(ARM_CURATOR, AuthMigrator.ROLE_CURATOR_URI);
@@ -84,7 +83,7 @@ public class ArmMigrator {
         roleMap.put(ARM_PUBLIC, AuthMigrator.ROLE_PUBLIC_URI);
         Set<String> actualRoles = getPermissionSets();
         for (String role : actualRoles) {
-            if(!roleMap.values().contains(role)) {
+            if (!roleMap.values().contains(role)) {
                 String roleName = getRoleName(role);
                 log.info(String.format("Custom role %s found.", roleName));
                 roleMap.put(roleName, role);
@@ -101,7 +100,7 @@ public class ArmMigrator {
     private static String getRoleName(String roleUri) {
         return roleUri.substring(roleUri.lastIndexOf('#') + 1);
     }
-    
+
     public void migrateConfiguration() {
         cleanEntityDataSetValues();
         Map<AccessObjectType, Set<String>> entityTypeMap = getEntityMap();
@@ -301,10 +300,10 @@ public class ArmMigrator {
 
     private boolean containsAdminDisplayPermission() {
         boolean result = false;
-        String query = "" 
-                + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" 
+        String query = ""
+                + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
                 + "ASK WHERE {\n"
-                + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n" 
+                + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n"
                 + "       <"
                 + getArmPermissionSubject(DISPLAY, ARM_ADMIN) + "> ?p ?o .\n" + "  }\n" + "}";
         try {
@@ -314,7 +313,7 @@ public class ArmMigrator {
         }
         return result;
     }
-    
+
     private Set<String> getPermissionSets() {
         Set<String> permissionSets = new HashSet<>();
         String queryText = PERMISSION_SETS_QUERY;
