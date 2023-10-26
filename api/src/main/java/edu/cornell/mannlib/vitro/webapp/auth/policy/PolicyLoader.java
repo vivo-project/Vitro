@@ -382,7 +382,7 @@ public class PolicyLoader {
         Set<DynamicPolicy> policies = new HashSet<>();
         List<String> dataSetNames = getDataSetNames(uri);
         if (dataSetNames.isEmpty()) {
-            Set<AccessRule> rules = new HashSet<>();
+            Map<String, AccessRule> rules = new HashMap<>();
             try {
                 loadRulesWithoutDataSet(uri, rules);
             } catch (Exception e) {
@@ -392,7 +392,7 @@ public class PolicyLoader {
             if (!rules.isEmpty()) {
                 long priority = getPriority(uri);
                 DynamicPolicy policy = new DynamicPolicy(uri, priority);
-                policy.addRules(rules);
+                policy.addRules(rules.values());
                 policies.add(policy);
             }
         } else {
@@ -408,7 +408,7 @@ public class PolicyLoader {
     }
 
     public DynamicPolicy loadPolicyFromTemplateDataSet(String dataSetUri) {
-        Set<AccessRule> rules = new HashSet<>();
+        Map<String, AccessRule> rules = new HashMap<>();
         long priority = getPriorityFromDataSet(dataSetUri);
         try {
             loadRulesForDataSet(rules, dataSetUri);
@@ -421,7 +421,7 @@ public class PolicyLoader {
             return null;
         }
         DynamicPolicy policy = new DynamicPolicy(dataSetUri, priority);
-        policy.addRules(rules);
+        policy.addRules(rules.values());
         return policy;
     }
 
@@ -617,11 +617,10 @@ public class PolicyLoader {
         return priority[0];
     }
 
-    private void loadRulesWithoutDataSet(String policyUri, Set<AccessRule> rules) throws Exception {
+    private void loadRulesWithoutDataSet(String policyUri, Map<String, AccessRule> rules) throws Exception {
         ParameterizedSparqlString pss = new ParameterizedSparqlString(NO_DATASET_RULES_QUERY);
         pss.setIri(POLICY, policyUri);
         debug(pss.toString());
-        AccessRule rule[] = new AccessRule[1];
         Exception ex[] = new Exception[1];
         try {
             rdfService.sparqlSelectQuery(pss.toString(), new ResultSetConsumer() {
@@ -631,13 +630,12 @@ public class PolicyLoader {
                         if (isInvalidPolicySolution(qs)) {
                             throw new Exception();
                         }
-                        if (isRuleContinues(rule[0], qs)) {
-                            populateRule(rule[0], qs);
+                        if (isRuleContinues(rules, qs)) {
+                            String ruleUri = qs.getResource("rule").getURI();
+                            populateRule(rules.get(ruleUri), qs);
                         } else {
-                            if (rule[0] != null) {
-                                rules.add(rule[0]);
-                            }
-                            rule[0] = AccessRuleFactory.createRule(qs);
+                            AccessRule rule = AccessRuleFactory.createRule(qs);
+                            rules.put(rule.getRuleUri(), rule);
                         }
                     } catch (Exception e) {
                         ex[0] = e;
@@ -648,21 +646,20 @@ public class PolicyLoader {
             log.error(e, e);
         }
         if (ex[0] != null) {
+            rules.clear();
             throw ex[0];
         }
-        if (rule[0] != null) {
-            rules.add(rule[0]);
-            debug("\nLoaded %s rules for %s policy", rules.size(), policyUri);
+        if (!rules.isEmpty()) {
+            debug("Loaded %s rules for %s policy\n", rules.size(), policyUri);
         } else {
-            debug("\nNo rules loaded from the user accounts model for %s policy.", policyUri);
+            debug("No rules loaded from the user accounts model for %s policy.\n", policyUri);
         }
     }
 
-    private void loadRulesForDataSet(Set<AccessRule> rules, String dataSetUri) throws Exception {
+    private void loadRulesForDataSet(Map<String, AccessRule> rules, String dataSetUri) throws Exception {
         ParameterizedSparqlString pss = new ParameterizedSparqlString(DATASET_RULES_QUERY);
         pss.setIri("dataSet", dataSetUri);
         debug(pss.toString());
-        AccessRule rule[] = new AccessRule[1];
         Exception ex[] = new Exception[1];
         try {
             rdfService.sparqlSelectQuery(pss.toString(), new ResultSetConsumer() {
@@ -672,13 +669,12 @@ public class PolicyLoader {
                         if (isInvalidPolicySolution(qs)) {
                             throw new Exception();
                         }
-                        if (isRuleContinues(rule[0], qs)) {
-                            populateRule(rule[0], qs);
+                        if (isRuleContinues(rules, qs)) {
+                            String ruleUri = qs.getResource("rule").getURI();
+                            populateRule(rules.get(ruleUri), qs);
                         } else {
-                            if (rule[0] != null) {
-                                rules.add(rule[0]);
-                            }
-                            rule[0] = AccessRuleFactory.createRule(qs);
+                            AccessRule rule = AccessRuleFactory.createRule(qs);
+                            rules.put(rule.getRuleUri(), rule);
                         }
                     } catch (Exception e) {
                         ex[0] = e;
@@ -689,13 +685,13 @@ public class PolicyLoader {
             log.error(e, e);
         }
         if (ex[0] != null) {
+            rules.clear();
             throw ex[0];
         }
-        if (rule[0] != null) {
-            rules.add(rule[0]);
-            debug("\nLoaded %s rules for %s dataset", rules.size(), dataSetUri);
+        if (!rules.isEmpty()) {
+            debug("Loaded %s rules for %s dataset\n", rules.size(), dataSetUri);
         } else {
-            debug("\nNo rules loaded from access control model for %s dataset.", dataSetUri);
+            debug("No rules loaded from access control model for %s dataset.\n", dataSetUri);
         }
     }
 
@@ -728,15 +724,12 @@ public class PolicyLoader {
         debug(json);
     }
 
-    private static boolean isRuleContinues(AccessRule rule, QuerySolution qs) {
-        if (rule == null) {
+    private static boolean isRuleContinues(Map<String, AccessRule> rules, QuerySolution qs) {
+        if (rules == null) {
             return false;
         }
         String ruleUri = qs.getResource("rule").getURI();
-        if (qs.contains("dataSetUri")) {
-            ruleUri += "." + qs.getResource("dataSetUri").getURI();
-        }
-        return rule.getRuleUri().equals(ruleUri);
+        return rules.containsKey(ruleUri);
     }
 
     private static void populateRule(AccessRule ar, QuerySolution qs) throws Exception {

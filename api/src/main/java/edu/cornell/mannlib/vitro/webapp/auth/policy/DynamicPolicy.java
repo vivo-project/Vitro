@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,8 +38,8 @@ public class DynamicPolicy implements Policy {
         return rules;
     }
 
-    public void addRules(Set<AccessRule> addition) {
-        rules.addAll(addition);
+    public void addRules(Collection<AccessRule> collection) {
+        rules.addAll(collection);
     }
 
     public DynamicPolicy(String uri, long priority) {
@@ -52,19 +54,26 @@ public class DynamicPolicy implements Policy {
             return defaultDecision("whatToAuth was null");
         }
         for (AccessRule rule : getFilteredRules(ar)) {
+            String policyUri = getUri(uri);
+            String ruleUri = getUri(rule.getRuleUri());
             if (rule.match(ar)) {
                 if (rule.isAllowMatched()) {
-                    log.debug("Access rule " + rule.getRuleUri() + " approves request " + whatToAuth);
-                    String message = "Dynamic policy '" + uri + "' rule '" + rule.getRuleUri() + "' approved " + ar;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Policy '" + policyUri + "' rule '" + ruleUri + "' approved request " + whatToAuth);
+                    }
+                    String message = "Policy '" + policyUri + "' rule '" + ruleUri + "' approved " + ar;
                     return new BasicPolicyDecision(DecisionResult.AUTHORIZED, message);
                 } else {
-                    log.debug("Access rule " + rule.getRuleUri() + " rejects request " + whatToAuth);
-                    String message = "Dynamic policy '" + uri + "' rule '" + rule.getRuleUri() + "' rejected " + ar;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Policy '" + policyUri + "' rule " + ruleUri + " rejected request " + whatToAuth);
+                    }
+                    String message = "Policy '" + policyUri + "' rule '" + ruleUri + "' rejected request" + ar;
                     return new BasicPolicyDecision(DecisionResult.UNAUTHORIZED, message);
                 }
             } else {
-                log.trace("Dynamic policy '" + uri + "' rule '" + rule.getRuleUri() + "' doesn't match the request "
-                        + ar);
+                if (log.isDebugEnabled()) {
+                    log.debug("Policy '" + policyUri + "' rule '" + ruleUri + "' didn't match request " + ar);
+                }
             }
         }
 
@@ -77,5 +86,12 @@ public class DynamicPolicy implements Policy {
 
     private PolicyDecision defaultDecision(String message) {
         return new BasicPolicyDecision(DecisionResult.INCONCLUSIVE, message);
+    }
+
+    private static String getUri(String uri) {
+        if (uri.startsWith(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX)) {
+            return "ai:" + uri.substring(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX.length());
+        }
+        return uri;
     }
 }
