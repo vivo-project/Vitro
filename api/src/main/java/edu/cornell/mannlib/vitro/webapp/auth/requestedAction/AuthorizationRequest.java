@@ -75,4 +75,18 @@ public abstract class AuthorizationRequest {
     public AuthorizationRequest and(AuthorizationRequest second) {
         return new AndAuthorizationRequest(this, second);
     }
+    
+    @Override
+    public String toString() {
+        String result = "";
+        if (!getRoleUris().isEmpty()) {
+            result += String.format("User with roles '%s' ", getRoleUris().toString());
+        }
+        if (!getEditorUris().isEmpty()) {
+            result += String.format(" profile uris '%s' ", getEditorUris().toString());
+        }
+        result += String.format(" requested '%s' ", getAccessOperation());
+        result += String.format(" on '%s' ", getAccessObject());
+        return result;
+    }
 }
