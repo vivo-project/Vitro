@@ -124,6 +124,11 @@ public class VitroVocabulary {
     // reusing displayRank property above
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
 
+    // =============== Vitro Access control vocabulary =================================
+    
+    public static final String AUTH_INDIVIDUAL_PREFIX = "https://vivoweb.org/ontology/vitro-application/auth/individual/";
+    public static final String AUTH_VOCABULARY_PREFIX = "https://vivoweb.org/ontology/vitro-application/auth/vocabulary/";
+    
     // =============== Vitro User vocabulary =================================
 
     // TODO JB This should go away when the new method of associating UserAccounts with Individuals is in place.

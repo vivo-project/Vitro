@@ -15,10 +15,6 @@ public class AccessRuleFactory {
     public static AccessRule createRule(QuerySolution qs) {
         AccessRule ar = new AccessRuleImpl();
         String ruleUri = qs.getResource(PolicyLoader.RULE).getURI();
-        if (qs.contains("dataSetUri")) {
-            ruleUri += "." + qs.getResource("dataSetUri").getURI();
-        }
-
         ar.setRuleUri(ruleUri);
         ar.addCheck(CheckFactory.createCheck(qs));
         if (qs.contains("decision_id") && qs.get("decision_id").isLiteral()) {
