@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.rdf.model.Model;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
@@ -33,17 +33,18 @@ public class ArmMigratorTest extends AuthMigratorTest {
     private static final String DATA_PROPERTY_URI = "http://vivoweb.org/ontology/core#abbreviation";
     private static final String CLASS_URI = "http://xmlns.com/foaf/0.1/Organization";
     private static final String OBJECT_PROPERTY_URI = "http://purl.obolibrary.org/obo/RO_0000053";
-    private Model userAccountsModel;
+    private OntModel userAccountsModel;
     private ArmMigrator armMigrator;
     private String propertyUri = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#forEntity";
     private String dataValue = "https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue";
 
     @Before
     public void initArmMigration() {
-        userAccountsModel = ModelFactory.createDefaultModel();
+        userAccountsModel = ModelFactory.createOntologyModel();
         configurationDataSet.addNamedModel(ModelNames.USER_ACCOUNTS, userAccountsModel);
         addUserAccountsStatement(PolicyTest.CUSTOM, VitroVocabulary.PERMISSIONSET, VitroVocabulary.RDF_TYPE);
-        armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet));
+        armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet),
+                userAccountsModel);
     }
 
     @Test

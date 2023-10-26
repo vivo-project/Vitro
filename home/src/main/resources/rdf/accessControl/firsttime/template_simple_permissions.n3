@@ -36,6 +36,7 @@
 
 :RoleDataSetKeyTemplate a ao:DataSetKeyTemplate ;
     ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
     ao:keyComponentTemplate ai:SubjectRole .
 
 :RoleValueContainerTemplate a ao:ValueContainerTemplate ;
@@ -58,6 +59,7 @@
 
 :PublicDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
     ao:keyComponent auth:PUBLIC .
 
 :SelfEditorDataSet a ao:PolicyDataSet ;
@@ -67,6 +69,7 @@
 
 :SelfEditorDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
     ao:keyComponent auth:SELF_EDITOR .
 
 :EditorDataSet a ao:PolicyDataSet ;
@@ -76,6 +79,7 @@
 
 :EditorDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
     ao:keyComponent auth:EDITOR .
 
 :CuratorDataSet a ao:PolicyDataSet ;
@@ -85,6 +89,7 @@
 
 :CuratorDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
     ao:keyComponent auth:CURATOR .
 
 :AdminDataSet a ao:PolicyDataSet ;
@@ -94,6 +99,7 @@
 
 :AdminDataSetKey  a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
     ao:keyComponent auth:ADMIN .
 
 :RuleSet a ao:Rules ;

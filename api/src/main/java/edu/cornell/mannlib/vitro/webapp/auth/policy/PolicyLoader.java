@@ -797,12 +797,12 @@ public class PolicyLoader {
         }
     }
 
-    public void addEntityToPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation og, String role) {
-        modifyPolicyDataSetValue(entityUri, og, aot, role, true);
+    public void addEntityToPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
+        modifyPolicyDataSetValue(entityUri, ao, aot, role, true);
     }
 
-    public void removeEntityFromPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation og, String role) {
-        modifyPolicyDataSetValue(entityUri, og, aot, role, false);
+    public void removeEntityFromPolicyDataSet(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
+        modifyPolicyDataSetValue(entityUri, ao, aot, role, false);
     }
 
     private ChangeSet makeChangeSet() {

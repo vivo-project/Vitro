@@ -107,8 +107,8 @@ public class EntityPolicyController {
         log.debug("Nothing to do " + newObj);
     }
 
-    private static boolean isUriInTestDataset(String entityUri, AccessOperation og, AccessObjectType aot, String role) {
-        Set<String> values = PolicyLoader.getInstance().getDataSetValues(og, aot, role);
+    private static boolean isUriInTestDataset(String entityUri, AccessOperation ao, AccessObjectType aot, String role) {
+        Set<String> values = PolicyLoader.getInstance().getDataSetValues(ao, aot, role);
         return values.contains(entityUri);
     }
 

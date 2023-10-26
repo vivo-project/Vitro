@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -34,13 +35,37 @@ public class AuthMigrator implements ServletContextListener {
     protected static final Set<String> ALL_ROLES = new HashSet<String>(
             Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI, ROLE_PUBLIC_URI));
 
+    private static final String SET_VERSION_TEMPLATE = ""
+            + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
+            + "@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .\n"
+            + "<https://vivoweb.org/ontology/vitro-application/auth/individual/Configuration> "
+            + "rdf:type ao:Configuration ;\n"
+            + "ao:version ?version .";
+
+    private static final String REMOVE_VERSION_TEMPLATE = ""
+            + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
+            + "<https://vivoweb.org/ontology/vitro-application/auth/individual/Configuration> "
+            + "<https://vivoweb.org/ontology/vitro-application/auth/vocabulary/version> ?version .";
+
+    private static String VERSION_QUERY = ""
+            + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "SELECT ?version \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "       ?configuration rdf:type ao:Configuration .\n"
+            + "       ?configuration ao:version ?version .\n"
+            + "  }\n"
+            + "}";
+
     private RDFService contentRdfService;
     private RDFService configurationRdfService;
+    private ContextModelAccess modelAccess;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         long begin = System.currentTimeMillis();
-        ContextModelAccess modelAccess = ModelAccess.getInstance();
+        modelAccess = ModelAccess.getInstance();
         initialize(modelAccess.getRDFService(WhichService.CONTENT),
                 modelAccess.getRDFService(WhichService.CONFIGURATION));
         if (!isMigrationRequired()) {
@@ -71,12 +96,14 @@ public class AuthMigrator implements ServletContextListener {
     }
 
     private void migrateSimplePermissions() {
-        // TODO Auto-generated method stub
-
+        OntModel userAccountsModel = modelAccess.getOntModelSelector().getUserAccountsModel();
+        SimplePermissionMigrator spm = new SimplePermissionMigrator(userAccountsModel);
+        spm.migrateConfiguration();
     }
 
     private void migrateArmConfiguration() {
-        ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService);
+        OntModel userAccountsModel = modelAccess.getOntModelSelector().getUserAccountsModel();
+        ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService, userAccountsModel);
         armMigrator.migrateConfiguration();
     }
 
@@ -93,20 +120,16 @@ public class AuthMigrator implements ServletContextListener {
     }
 
     private boolean isArmConfiguration() {
-        ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService);
+        OntModel userAccountsModel = modelAccess.getOntModelSelector().getUserAccountsModel();
+        ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService, userAccountsModel);
         return armMigrator.isArmConfiguation();
     }
 
     protected long getVersion() {
         long version = 0L;
-        String query = "" + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-                + "SELECT ?version \n" + "WHERE {\n"
-                + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-                + "       ?configuration rdf:type ao:Configuration .\n"
-                + "       ?configuration ao:version ?version .\n" + "  }\n" + "}";
+
         try {
-            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(query, configurationRdfService);
+            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(VERSION_QUERY, configurationRdfService);
             while (rs.hasNext()) {
                 QuerySolution qs = rs.next();
                 if (!qs.contains("version") || !qs.get("version").isLiteral()) {
@@ -121,20 +144,13 @@ public class AuthMigrator implements ServletContextListener {
     }
 
     protected void removeVersion(long version) {
-        String template = "" + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
-                + "<https://vivoweb.org/ontology/vitro-application/auth/individual/Configuration> "
-                + "<https://vivoweb.org/ontology/vitro-application/auth/vocabulary/version> " + "?version .";
-        ParameterizedSparqlString pss = new ParameterizedSparqlString(template);
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(REMOVE_VERSION_TEMPLATE);
         pss.setLiteral("version", version);
         PolicyLoader.getInstance().updateAccessControlModel(pss.toString(), false);
     }
 
     protected void setVersion(long version) {
-        String template = "" + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
-                + "@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .\n"
-                + "<https://vivoweb.org/ontology/vitro-application/auth/individual/Configuration> "
-                + "rdf:type ao:Configuration ;\n" + "ao:version ?version .";
-        ParameterizedSparqlString pss = new ParameterizedSparqlString(template);
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(SET_VERSION_TEMPLATE);
         pss.setLiteral("version", version);
         PolicyLoader.getInstance().updateAccessControlModel(pss.toString(), true);
     }
