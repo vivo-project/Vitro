@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
@@ -134,7 +135,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         PolicyTemplateController.createRoleDataSets(CUSTOM);
         // Get data set uri by key: role uri and named object
         String dataSetUri = loader.getDataSetUriByKey(new String[] { CUSTOM },
-                new String[] { AccessObjectType.NAMED_OBJECT.toString() });
+                new String[] { AccessObjectType.NAMED_OBJECT.toString(), AccessOperation.EXECUTE.toString() });
 
         assertTrue(dataSetUri != null);
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);

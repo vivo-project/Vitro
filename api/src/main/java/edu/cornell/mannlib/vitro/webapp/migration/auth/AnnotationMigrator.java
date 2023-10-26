@@ -206,10 +206,13 @@ public class AnnotationMigrator {
     }
 
     private static String getAnnotationQuery(String typeSpecificPatterns) {
-        return "" + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
+        return ""
+                + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
                 + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" + "SELECT ?base ?uri ?update ?display ?publish\n"
-                + "WHERE {\n" + typeSpecificPatterns
+                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n"
+                + "SELECT ?base ?uri ?update ?display ?publish\n"
+                + "WHERE {\n"
+                + typeSpecificPatterns
                 + "{OPTIONAL { ?uri vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayAssigned . }\n"
                 + "BIND (COALESCE(?displayAssigned, <http://vitro.mannlib.cornell.edu/ns/vitro/role#public>) AS ?display)\n"
                 + "OPTIONAL { ?uri vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateAssigned . }\n"

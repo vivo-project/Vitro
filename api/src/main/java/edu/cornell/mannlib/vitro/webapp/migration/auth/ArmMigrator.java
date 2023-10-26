@@ -16,11 +16,13 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyTemplateController;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 
@@ -46,30 +48,28 @@ public class ArmMigrator {
 
     private RDFService contentRdfService;
     private RDFService configurationRdfService;
+    private OntModel userAccountsModel;
 
     private String VALUE_QUERY = ""
             + "SELECT ?uri \n"
             + "WHERE {\n"
-            + "  GRAPH <" + ModelNames.USER_ACCOUNTS + "> {\n"
             + "  ?permission <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#forEntity> ?uri . \n"
-            + "  }\n"
             + "}";
 
     private String PERMISSION_SETS_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "SELECT ?uri \n"
             + "WHERE {\n"
-            + "  GRAPH <" + ModelNames.USER_ACCOUNTS + "> {\n"
             + "    ?uri a auth:PermissionSet . \n"
-            + "  }\n"
             + "}";
 
     private static Map<String, String> roleMap;
     private static Map<String, OperationGroup> operationMap;
 
-    public ArmMigrator(RDFService contentRdfService, RDFService configurationRdfService) {
+    public ArmMigrator(RDFService contentRdfService, RDFService configurationRdfService, OntModel userAccountsModel) {
         this.contentRdfService = contentRdfService;
         this.configurationRdfService = configurationRdfService;
+        this.userAccountsModel = userAccountsModel;
         operationMap = new HashMap<>();
         operationMap.put(DISPLAY, OperationGroup.DISPLAY_GROUP);
         operationMap.put(UPDATE, OperationGroup.UPDATE_GROUP);
@@ -263,9 +263,12 @@ public class ArmMigrator {
     }
 
     private static String getQuery(String typePatterns) {
-        return "" + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
+        return ""
+                + "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
                 + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n" + "SELECT ?base ?uri \n" + "WHERE {\n"
+                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> \n"
+                + "SELECT ?base ?uri \n"
+                + "WHERE {\n"
                 + typePatterns + "} \n";
     }
 
@@ -281,15 +284,21 @@ public class ArmMigrator {
         ParameterizedSparqlString pss = new ParameterizedSparqlString(VALUE_QUERY);
         pss.setIri("permission", permissionUri);
         String queryText = pss.toString();
+        userAccountsModel.enterCriticalSection(false);
         try {
-            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(queryText, configurationRdfService);
-            while (rs.hasNext()) {
-                QuerySolution qs = rs.next();
-                String entity = qs.getResource("uri").getURI();
-                entities.add(entity);
+            QueryExecution qexec = QueryExecutionFactory.create(queryText, userAccountsModel);
+            try {
+                ResultSet results = qexec.execSelect();
+                while (results.hasNext()) {
+                    QuerySolution qs = results.next();
+                    String entity = qs.getResource("uri").getURI();
+                    entities.add(entity);
+                }
+            } finally {
+                qexec.close();
             }
-        } catch (Exception e) {
-            log.error(e, e);
+        } finally {
+            userAccountsModel.leaveCriticalSection();
         }
         return entities;
     }
@@ -300,16 +309,21 @@ public class ArmMigrator {
 
     private boolean containsAdminDisplayPermission() {
         boolean result = false;
-        String query = ""
+        String queryText = ""
                 + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
                 + "ASK WHERE {\n"
-                + "  GRAPH <http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts> {\n"
-                + "       <"
-                + getArmPermissionSubject(DISPLAY, ARM_ADMIN) + "> ?p ?o .\n" + "  }\n" + "}";
+                + "    <"
+                + getArmPermissionSubject(DISPLAY, ARM_ADMIN) + "> ?p ?o .\n" + "}";
+        userAccountsModel.enterCriticalSection(false);
         try {
-            result = configurationRdfService.sparqlAskQuery(query);
-        } catch (RDFServiceException e) {
-            log.error(e, e);
+            QueryExecution qexec = QueryExecutionFactory.create(queryText, userAccountsModel);
+            try {
+                result = qexec.execAsk();
+            } finally {
+                qexec.close();
+            }
+        } finally {
+            userAccountsModel.leaveCriticalSection();
         }
         return result;
     }
@@ -317,15 +331,21 @@ public class ArmMigrator {
     private Set<String> getPermissionSets() {
         Set<String> permissionSets = new HashSet<>();
         String queryText = PERMISSION_SETS_QUERY;
+        userAccountsModel.enterCriticalSection(false);
         try {
-            ResultSet rs = RDFServiceUtils.sparqlSelectQuery(queryText, configurationRdfService);
-            while (rs.hasNext()) {
-                QuerySolution qs = rs.next();
-                String entity = qs.getResource("uri").getURI();
-                permissionSets.add(entity);
+            QueryExecution qexec = QueryExecutionFactory.create(queryText, userAccountsModel);
+            try {
+                ResultSet results = qexec.execSelect();
+                while (results.hasNext()) {
+                    QuerySolution qs = results.next();
+                    String entity = qs.getResource("uri").getURI();
+                    permissionSets.add(entity);
+                }
+            } finally {
+                qexec.close();
             }
-        } catch (Exception e) {
-            log.error(e, e);
+        } finally {
+            userAccountsModel.leaveCriticalSection();
         }
         return permissionSets;
     }

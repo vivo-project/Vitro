@@ -65,10 +65,16 @@ public class SimplePermission {
     
     
     public SimpleAuthorizationRequest ACTION;
+    private String uri;
+    
+    public String getUri() {
+        return uri;
+    }
+
     public static final String NS = "java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#";
 
     private SimplePermission(String uri) {
-        uri = SimplePermission.NS + uri;
+        this.uri = SimplePermission.NS + uri;
         AccessObjectImpl ao = new AccessObjectImpl(uri, AccessObjectType.NAMED_OBJECT);
         this.ACTION = new SimpleAuthorizationRequest(ao, AccessOperation.EXECUTE);
     }
