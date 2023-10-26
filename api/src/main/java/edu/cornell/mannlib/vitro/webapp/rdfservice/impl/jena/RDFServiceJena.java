@@ -7,14 +7,27 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +37,6 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
@@ -33,11 +45,16 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sdb.SDB;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.Quad;
@@ -66,7 +83,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     protected volatile boolean rebuildGraphURICache = true;
     protected volatile boolean isRebuildGraphURICacheRunning = false;
-    protected final List<String> graphURIs = Collections.synchronizedList(new ArrayList<>());
+    protected final List<String> graphURIs = new CopyOnWriteArrayList<String>();
 
     @Override
 	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
@@ -138,8 +155,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		byte[] changeBytes = new byte[0];
 		try {
 			modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
-			changeBytes = StreamUtils
-					.getBytes(modelChange.getSerializedModel());
+			changeBytes = IOUtils.toByteArray(modelChange.getSerializedModel());
 			modelChange.getSerializedModel().reset();
 		} catch (IOException e) {
 			// leave it empty.
