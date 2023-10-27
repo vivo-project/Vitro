@@ -21,4 +21,8 @@ public interface Policy {
     public default long getPriority() {
         return 0;
     }
+
+    public default String getShortUri() {
+        return "";
+    }
 }

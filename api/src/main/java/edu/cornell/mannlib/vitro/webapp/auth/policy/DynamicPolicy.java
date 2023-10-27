@@ -25,6 +25,11 @@ public class DynamicPolicy implements Policy {
     public String getUri() {
         return uri;
     }
+    
+    @Override
+    public String getShortUri() {
+        return shortenUri(uri);
+    }
 
     private long priority;
 
@@ -54,8 +59,8 @@ public class DynamicPolicy implements Policy {
             return defaultDecision("whatToAuth was null");
         }
         for (AccessRule rule : getFilteredRules(ar)) {
-            String policyUri = getUri(uri);
-            String ruleUri = getUri(rule.getRuleUri());
+            String policyUri = shortenUri(uri);
+            String ruleUri = shortenUri(rule.getRuleUri());
             if (rule.match(ar)) {
                 if (rule.isAllowMatched()) {
                     if (log.isDebugEnabled()) {
@@ -88,7 +93,7 @@ public class DynamicPolicy implements Policy {
         return new BasicPolicyDecision(DecisionResult.INCONCLUSIVE, message);
     }
 
-    private static String getUri(String uri) {
+    private static String shortenUri(String uri) {
         if (uri.startsWith(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX)) {
             return "ai:" + uri.substring(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX.length());
         }

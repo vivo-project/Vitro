@@ -53,7 +53,7 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 		body.put("currentUser", LoginStatusBean.getCurrentUser(vreq));
 		body.put("associatedIndividuals", getAssociatedIndividuals(vreq));
 		body.put("factories", ActiveIdentifierBundleFactories.getFactoryNames());
-		body.put("policies", PolicyStore.getInstance().getUris());
+		body.put("policies", PolicyStore.getInstance().getShortUris());
 		body.put("matchingProperty", getMatchingProperty(vreq));
 		body.put("authenticator", Authenticator.getInstance(vreq));
 

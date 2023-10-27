@@ -66,10 +66,10 @@ public class PolicyStore implements Policies {
         policyMap.clear();
     }
 
-    public List<String> getUris() {
+    public List<String> getShortUris() {
         List<String> uris = new LinkedList<>();
         for (Policy policy : policyList) {
-            uris.add(policy.getUri());
+            uris.add(policy.getShortUri());
         }
         return uris;
     }
