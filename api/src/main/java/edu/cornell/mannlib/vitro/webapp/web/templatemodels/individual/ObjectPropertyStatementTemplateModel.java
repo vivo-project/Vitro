@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -50,10 +51,13 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	if (property.isDeleteLinkSuppressed()) {
     		return "";
     	}
-
+    	AccessObject ao;
         // Determine whether the statement can be deleted
-		AccessObject ao = new ObjectPropertyStatementAccessObject(
-				vreq.getJenaOntModel(), subjectUri, property, objectUri);
+    	if (isFaux()) {
+            ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, objectUri);
+        } else {
+            ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, objectUri);
+        }
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DROP) ) {
             return "";
         }
@@ -109,7 +113,12 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	}
 
        // Determine whether the statement can be edited
-        AccessObject ao =  new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, objectUri);
+    	AccessObject ao;
+        if (isFaux()) {
+            ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, objectUri);
+        } else {
+            ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, objectUri);
+        }
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.EDIT) ) {
             return "";
         }
