@@ -16,9 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
@@ -30,48 +32,48 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 @WebServlet(name = "forgot-password", urlPatterns = {"/forgot-password"})
-public class ForgotPassword extends VitroHttpServlet {
+public class ForgotPassword extends FreemarkerHttpServlet {
 
     private static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
 
     private static final int DAYS_TO_USE_PASSWORD_LINK = 5;
 
+    private static final String TEMPLATE_NAME = "userAccounts-resetPasswordRequest.ftl";
+
     private static final Log log = LogFactory.getLog(ForgotPassword.class.getName());
 
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        PrintWriter out = setupResponsePrintWriter(response);
-        log.info("Password reset requested from client: " + request.getRemoteAddr());
-
-        VitroRequest vreq = new VitroRequest(request);
+    protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
+        Map<String, Object> dataContext = new HashMap<String, Object>();
         UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
         I18nBundle i18n = I18n.bundle(vreq);
 
-        String email = request.getParameter("email");
+        String email = vreq.getParameter("email");
 
-        UserAccount userAccount = getAccountForInternalAuth(email, request);
+        UserAccount userAccount = getAccountForInternalAuth(email, vreq);
         if (userAccount == null) {
-            out.println("<h1>" + i18n.text("password_reset_email_non_existing") + "</h1>");
-            return;
+            dataContext.put("message", i18n.text("password_reset_email_non_existing"));
+            return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
         }
 
         PasswordChangeRequestSpamMitigationResponse mitigationResponse =
             PasswordChangeRequestSpamMitigation.isPasswordResetRequestable(userAccount);
         if (!mitigationResponse.getCanBeRequested()) {
-            out.println(
+            dataContext.put("message",
                 "<h1>" + i18n.text("password_reset_too_many_requests") +
                     mitigationResponse.getNextRequestAvailableAtDate() +
                     i18n.text("password_reset_too_many_requests_at_time") +
                     mitigationResponse.getNextRequestAvailableAtTime() + "</h1>");
-            return;
+            return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
         }
 
         requestPasswordChange(userAccount, userAccountsDao);
         notifyUser(userAccount, i18n, vreq);
         PasswordChangeRequestSpamMitigation.requestSuccessfullyHandledAndUserIsNotified(userAccount.getEmailAddress());
 
-        out.println("<h1>" + i18n.text("password_reset_email_sent") + email + "</h1>");
+        dataContext.put("message", "<h1>" + i18n.text("password_reset_email_sent") + email + "</h1>");
+        return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
     }
 
     private void notifyUser(UserAccount userAccount, I18nBundle i18n,
