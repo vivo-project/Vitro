@@ -52,7 +52,7 @@ public class AccessRuleImpl implements AccessRule {
         for (Check check : checks) {
             if (!check.check(ar)) {
                 if (log.isDebugEnabled()) {
-                    log.debug(String.format("Check %s didn't match", check.getUri()));
+                    log.debug(String.format("Check %s didn't match request %s", check.getUri(), ar));
                 }
                 return false;
             }
