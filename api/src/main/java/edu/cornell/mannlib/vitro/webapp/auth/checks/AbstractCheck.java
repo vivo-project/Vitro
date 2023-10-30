@@ -1,24 +1,22 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.attributes;
+package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class AbstractCheck implements Check {
 
-    private Set<String> values = new HashSet<>();
+    private AttributeValueContainer values;
     private String uri;
     private long computationalCost;
 
     private CheckType testType = CheckType.EQUALS;
 
-    public AbstractCheck(String uri, String value) {
+    public AbstractCheck(String uri, AttributeValueContainer values) {
         this.uri = uri;
-        values.add(value);
+        this.values = values;
     }
 
     public String getUri() {
@@ -44,7 +42,7 @@ public abstract class AbstractCheck implements Check {
     }
 
     @Override
-    public Set<String> getValues() {
+    public AttributeValueContainer getValues() {
         return values;
     }
 

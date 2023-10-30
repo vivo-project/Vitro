@@ -1,11 +1,11 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.attributes;
+package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -37,13 +37,12 @@ public class AttributeValueChecker {
     }
 
     private static boolean sparqlQueryContains(Check attr, AuthorizationRequest ar, String[] inputValues) {
-        Set<String> values = attr.getValues();
-        final int valuesSize = values.size();
-        if (valuesSize != 1) {
-            log.error("SparqlQueryContins value != 1");
+        AttributeValueContainer values = attr.getValues();
+        if (!values.containsSingleValue()) {
+            log.error("SparqlQueryContains more than  one value");
             return false;
         }
-        String queryTemplate = values.iterator().next();
+        String queryTemplate = values.getSingleValue();
         if (StringUtils.isBlank(queryTemplate)) {
             log.error("SparqlQueryContins template is empty");
             return false;
@@ -68,7 +67,7 @@ public class AttributeValueChecker {
     }
 
     private static boolean contains(Check attr, String... inputValues) {
-        final Set<String> values = attr.getValues();
+        AttributeValueContainer values = attr.getValues();
         for (String inputValue : inputValues) {
             if (values.contains(inputValue)) {
                 return true;
@@ -78,14 +77,12 @@ public class AttributeValueChecker {
     }
 
     private static boolean equals(Check attr, String... inputValues) {
-        Set<String> values = attr.getValues();
-        final int valuesSize = values.size();
-        if (valuesSize != 1) {
+        AttributeValueContainer values = attr.getValues();
+        if (!values.containsSingleValue()) {
             return false;
         }
-        String value = values.iterator().next();
         for (String inputValue : inputValues) {
-            if (value.equals(inputValue)) {
+            if (values.contains(inputValue)) {
                 return true;
             }
         }
@@ -93,12 +90,11 @@ public class AttributeValueChecker {
     }
 
     private static boolean startsWith(Check attr, String... inputValues) {
-        Set<String> values = attr.getValues();
-        final int valuesSize = values.size();
-        if (valuesSize != 1) {
+        AttributeValueContainer values = attr.getValues();
+        if (!values.containsSingleValue()) {
             return false;
         }
-        String value = values.iterator().next();
+        String value = values.getSingleValue();
         for (String inputValue : inputValues) {
             if (inputValue != null && inputValue.startsWith(value)) {
                 return true;

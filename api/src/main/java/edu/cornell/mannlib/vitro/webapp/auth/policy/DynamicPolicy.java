@@ -25,7 +25,7 @@ public class DynamicPolicy implements Policy {
     public String getUri() {
         return uri;
     }
-    
+
     @Override
     public String getShortUri() {
         return shortenUri(uri);
@@ -64,13 +64,13 @@ public class DynamicPolicy implements Policy {
             if (rule.match(ar)) {
                 if (rule.isAllowMatched()) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Policy '" + policyUri + "' rule '" + ruleUri + "' approved request " + whatToAuth);
+                        log.debug("Policy '" + policyUri + "' rule '" + ruleUri + "' approved request " + ar);
                     }
                     String message = "Policy '" + policyUri + "' rule '" + ruleUri + "' approved " + ar;
                     return new BasicPolicyDecision(DecisionResult.AUTHORIZED, message);
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("Policy '" + policyUri + "' rule " + ruleUri + " rejected request " + whatToAuth);
+                        log.debug("Policy '" + policyUri + "' rule " + ruleUri + " rejected request " + ar);
                     }
                     String message = "Policy '" + policyUri + "' rule '" + ruleUri + "' rejected request" + ar;
                     return new BasicPolicyDecision(DecisionResult.UNAUTHORIZED, message);

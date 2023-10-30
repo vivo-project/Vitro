@@ -10,6 +10,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.D
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.EDIT;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.PUBLISH;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,12 +52,13 @@ public class AccessAllowedPropertiesPolicyTemplateTest extends PolicyTest {
             PolicyTemplateController.createRoleDataSets(CUSTOM);
             roles.add(CUSTOM);
         }
-        EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), roles);
+        EntityPolicyController.grantAccess("test:entity", type, ao, roleUri);
         DynamicPolicy policy = null;
         String dataSet =
                 loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
         policy = loader.loadPolicyFromTemplateDataSet(dataSet);
         countRulesAndAttributes(policy, rulesCount, attrCount);
+        assertTrue(EntityPolicyController.isGranted("test:entity", type, ao, roleUri));
         Set<String> values = loader.getDataSetValues(ao, type, roleUri);
         assertFalse(values.isEmpty());
     }

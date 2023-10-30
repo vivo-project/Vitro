@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.Check;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValuesRegistry;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.Check;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
@@ -20,16 +21,20 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 
 public class PolicyTest {
     public static final String USER_ACCOUNTS_HOME_FIRSTTIME = "../home/src/main/resources/rdf/accessControl/firsttime/";
 
-    protected static final String ADMIN = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN";
-    protected static final String EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR";
-    protected static final String SELF_EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR";
-    protected static final String CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR";
-    protected static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
+    public static final String ADMIN = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN";
+    public static final String EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR";
+    public static final String SELF_EDITOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR";
+    public static final String CURATOR = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR";
+    public static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
     protected static final String CUSTOM = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CUSTOM";
 
     public static final String ONTOLOGY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "ontology.n3";
@@ -41,10 +46,8 @@ public class PolicyTest {
     public static final String PROFILE_PROXIMITY_QUERY = USER_ACCOUNTS_HOME_FIRSTTIME + "profile_proximity_query.n3";
     public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_FIRSTTIME + "decisions.n3";
     public static final String ROLES = USER_ACCOUNTS_HOME_FIRSTTIME + "roles.n3";
-
-    protected static final String RESOURCES_RULES_PREFIX =
-            "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/rules/";
     protected static final String RESOURCES_PREFIX = "src/test/resources/edu/cornell/mannlib/vitro/webapp/auth/";
+    protected static final String RESOURCES_RULES_PREFIX = RESOURCES_PREFIX + "rules/";
 
     public static final String VALID_POLICY = RESOURCES_RULES_PREFIX + "test_policy_valid.n3";
     public static final String VALID_POLICY_TEMPLATE = RESOURCES_RULES_PREFIX + "test_policy_valid_set.n3";
@@ -90,9 +93,16 @@ public class PolicyTest {
         load(PROFILE_PROXIMITY_QUERY);
         load(TEST_DECISIONS);
         RDFServiceModel rdfService = new RDFServiceModel(configurationDataSet);
-
+        AttributeValuesRegistry.getInstance().clear();
         PolicyLoader.initialize(rdfService);
         loader = PolicyLoader.getInstance();
+        Logger logger = LogManager.getLogger(PolicyLoader.class);
+        logger.setLevel(Level.ERROR);
+    }
+
+    @After
+    public void finish() {
+        AttributeValuesRegistry.getInstance().clear();
     }
 
     protected void countRulesAndAttributes(DynamicPolicy policy, int ruleCount, Set<Integer> attrCount) {
@@ -116,7 +126,7 @@ public class PolicyTest {
             }
             assertTrue(attrCount.contains(ar.getChecks().size()));
             for (Check att : ar.getChecks()) {
-                assertTrue(att.getValues().size() > 0);
+                assertTrue(!att.getValues().isEmpty());
             }
         }
     }

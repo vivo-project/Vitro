@@ -46,11 +46,10 @@ public class AccessAllowedClassesPolicyTemplateTest extends PolicyTest {
             PolicyTemplateController.createRoleDataSets(CUSTOM);
             roles.add(CUSTOM);
         }
-        EntityPolicyController.updateEntityDataSet("test:entity", type, ao, Arrays.asList(roleUri), roles);
+        EntityPolicyController.grantAccess("test:entity", type, ao, roleUri);
         DynamicPolicy policy = null;
         String dataSet =
                 loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
-
         policy = loader.loadPolicyFromTemplateDataSet(dataSet);
         countRulesAndAttributes(policy, rulesCount, attrCount);
         Set<String> values = loader.getDataSetValues(ao, type, roleUri);

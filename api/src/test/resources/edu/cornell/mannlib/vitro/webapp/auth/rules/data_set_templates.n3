@@ -76,6 +76,7 @@
 
 :PublicDataSetKey a ao:DataSetKey ;
     ao:keyComponent ai:NamedObject ;
+    ao:keyComponent ai:ExecuteOperation ;
     ao:keyComponent auth:PUBLIC .
 
 ai:PublicSimplePermissionValueContainer a ao:ValueContainer ;

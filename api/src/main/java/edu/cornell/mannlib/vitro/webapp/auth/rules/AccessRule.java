@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.Check;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.Check;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 public interface AccessRule {

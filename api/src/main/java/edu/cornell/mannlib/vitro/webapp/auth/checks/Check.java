@@ -1,9 +1,9 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.attributes;
+package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
-import java.util.Set;
-
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 public interface Check {
@@ -18,7 +18,7 @@ public interface Check {
 
     public CheckType getType();
 
-    Set<String> getValues();
+    public AttributeValueContainer getValues();
 
     public void addValue(String value);
 

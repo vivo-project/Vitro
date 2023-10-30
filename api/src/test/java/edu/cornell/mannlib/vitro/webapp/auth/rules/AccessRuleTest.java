@@ -1,12 +1,16 @@
 package edu.cornell.mannlib.vitro.webapp.auth.rules;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.EQUALS;
+import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.ONE_OF;
+import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.SPARQL_SELECT_QUERY_CONTAINS;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectUriCheck;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.Check;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.CheckType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainerImpl;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.AccessObjectUriCheck;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.Check;
 import org.junit.Test;
 
 public class AccessRuleTest {
@@ -14,12 +18,12 @@ public class AccessRuleTest {
     @Test
     public void testAttributeOrderByComputationalCost() {
         AccessRule rule = new AccessRuleImpl();
-        Check cheapAttribute = new AccessObjectUriCheck("test:cheapAttributeUri", "test:objectUri");
-        cheapAttribute.setType(CheckType.EQUALS);
-        Check affordableAttribute = new AccessObjectUriCheck("test:affordableAttributeUri", "test:objectUri");
-        cheapAttribute.setType(CheckType.ONE_OF);
-        Check expensiveAttribute = new AccessObjectUriCheck("test:expensiveAttributeUri", "test:objectUri");
-        cheapAttribute.setType(CheckType.SPARQL_SELECT_QUERY_CONTAINS);
+        Check cheapAttribute = uriCheck("test:cheapAttributeUri", value("test:objectUri"));
+        cheapAttribute.setType(EQUALS);
+        Check affordableAttribute = uriCheck("test:affordableAttributeUri", value("test:objectUri"));
+        cheapAttribute.setType(ONE_OF);
+        Check expensiveAttribute = uriCheck("test:expensiveAttributeUri", value("test:objectUri"));
+        cheapAttribute.setType(SPARQL_SELECT_QUERY_CONTAINS);
         rule.addCheck(affordableAttribute);
         rule.addCheck(expensiveAttribute);
         rule.addCheck(cheapAttribute);
@@ -27,5 +31,13 @@ public class AccessRuleTest {
         assertEquals(cheapAttribute.getUri(), list.get(0).getUri());
         assertEquals(affordableAttribute.getUri(), list.get(1).getUri());
         assertEquals(expensiveAttribute.getUri(), list.get(2).getUri());
+    }
+
+    private AttributeValueContainer value(String value) {
+        return new AttributeValueContainerImpl(value);
+    }
+
+    private Check uriCheck(String uri, AttributeValueContainer avc) {
+        return new AccessObjectUriCheck(uri, avc);
     }
 }

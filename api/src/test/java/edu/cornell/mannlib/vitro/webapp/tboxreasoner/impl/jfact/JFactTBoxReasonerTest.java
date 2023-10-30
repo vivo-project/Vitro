@@ -7,11 +7,17 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-
+import org.semanticweb.owlapi.util.SAXParsers;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.migration.auth.AnnotationMigrator;
+import edu.cornell.mannlib.vitro.webapp.migration.auth.ArmMigrator;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.BasicTBoxReasonerDriver;
 
@@ -48,7 +54,18 @@ public class JFactTBoxReasonerTest {
 	 * Test that axioms containing blank nodes can be removed from the reasoner
 	 *  even if the internal blank node IDs are different from when first added.
 	 */
-	@Test
+
+    @Before
+    public void init() {
+        LogManager.getLogger(SAXParsers.class).setLevel(Level.ERROR);
+    }
+
+    @After
+    public void finish() {
+        LogManager.getLogger(SAXParsers.class).setLevel(Level.INFO);
+    }
+
+    @Test
 	public void testRemoveAxiomsWithBlankNodes() {
 		OntModel tboxAssertions = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		OntModel tboxInferences = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
@@ -84,6 +101,7 @@ public class JFactTBoxReasonerTest {
 				"http://vivo.mydomain.edu/individual/class_b"), null, (RDFNode) null));
 		Assert.assertFalse(tboxUnion.contains(tboxUnion.getResource(
 				"http://vivo.mydomain.edu/individual/class_c"), null, (RDFNode) null));
+		
 	}
 	
 	private void waitForTBoxReasoning(BasicTBoxReasonerDriver driver) {

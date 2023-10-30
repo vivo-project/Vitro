@@ -1,50 +1,54 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.attributes;
+package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.ValueContainerFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import org.apache.jena.query.QuerySolution;
 
 public class CheckFactory {
 
-    public static Check createCheck(QuerySolution qs) {
+    public static Check createCheck(QuerySolution qs, AttributeValueKey dataSetKey) {
         String typeId = qs.getLiteral(PolicyLoader.TYPE_ID).getString();
         String checkUri = qs.getResource(PolicyLoader.CHECK).getURI();
         Attribute type = Attribute.valueOf(typeId);
         String testId = qs.getLiteral("testId").getString();
         String value = getValue(qs);
-
-        Check at = null;
+        AttributeValueContainer container = ValueContainerFactory.create(value, qs, dataSetKey);
+        Check check = null;
         switch (type) {
             case SUBJECT_ROLE_URI:
-                at = new SubjectRoleCheck(checkUri, value);
+                check = new SubjectRoleCheck(checkUri, container);
                 break;
             case OPERATION:
-                at = new OperationCheck(checkUri, value);
+                check = new OperationCheck(checkUri, container);
                 break;
             case ACCESS_OBJECT_URI:
-                at = new AccessObjectUriCheck(checkUri, value);
+                check = new AccessObjectUriCheck(checkUri, container);
                 break;
             case ACCESS_OBJECT_TYPE:
-                at = new AccessObjectTypeCheck(checkUri, value);
+                check = new AccessObjectTypeCheck(checkUri, container);
                 break;
             case SUBJECT_TYPE:
-                at = new SubjectTypeCheck(checkUri, value);
+                check = new SubjectTypeCheck(checkUri, container);
                 break;
             case STATEMENT_PREDICATE_URI:
-                at = new StatementPredicateUriCheck(checkUri, value);
+                check = new StatementPredicateUriCheck(checkUri, container);
                 break;
             case STATEMENT_SUBJECT_URI:
-                at = new StatementSubjectUriCheck(checkUri, value);
+                check = new StatementSubjectUriCheck(checkUri, container);
                 break;
             case STATEMENT_OBJECT_URI:
-                at = new StatementObjectUriCheck(checkUri, value);
+                check = new StatementObjectUriCheck(checkUri, container);
                 break;
             default:
-                at = null;
+                check = null;
         }
-        at.setType(CheckType.valueOf(testId));
-        return at;
+        check.setType(CheckType.valueOf(testId));
+        return check;
     }
 
     private static String getValue(QuerySolution qs) {
@@ -56,6 +60,7 @@ public class CheckFactory {
             return value;
         }
     }
+
 
     public static void extendAttribute(Check check, QuerySolution qs) throws Exception {
         String testId = qs.getLiteral("testId").getString();
