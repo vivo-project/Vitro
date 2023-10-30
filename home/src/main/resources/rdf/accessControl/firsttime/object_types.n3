@@ -1,68 +1,63 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:ObjectProperty a ao:ObjectType ;
-    ao:id "OBJECT_PROPERTY" .
+access-individual:ObjectProperty a access:ObjectType ;
+    access:id "OBJECT_PROPERTY" .
 
-ai:DataProperty a ao:ObjectType ;
-    ao:id "DATA_PROPERTY" .
+access-individual:DataProperty a access:ObjectType ;
+    access:id "DATA_PROPERTY" .
 
-ai:FauxDataProperty a ao:ObjectType ;
-    ao:id "FAUX_DATA_PROPERTY" .
+access-individual:FauxDataProperty a access:ObjectType ;
+    access:id "FAUX_DATA_PROPERTY" .
 
-ai:FauxObjectProperty a ao:ObjectType ;
-    ao:id "FAUX_OBJECT_PROPERTY" .
+access-individual:FauxObjectProperty a access:ObjectType ;
+    access:id "FAUX_OBJECT_PROPERTY" .
 
-ai:ObjectPropertyStatement a ao:ObjectType ;
-    ao:id "OBJECT_PROPERTY_STATEMENT" .
+access-individual:ObjectPropertyStatement a access:ObjectType ;
+    access:id "OBJECT_PROPERTY_STATEMENT" .
 
-ai:DataPropertyStatement a ao:ObjectType ;
-    ao:id "DATA_PROPERTY_STATEMENT" .
+access-individual:DataPropertyStatement a access:ObjectType ;
+    access:id "DATA_PROPERTY_STATEMENT" .
 
-ai:FauxObjectPropertyStatement a ao:ObjectType ;
-    ao:id "FAUX_OBJECT_PROPERTY_STATEMENT" .
+access-individual:FauxObjectPropertyStatement a access:ObjectType ;
+    access:id "FAUX_OBJECT_PROPERTY_STATEMENT" .
 
-ai:FauxDataPropertyStatement a ao:ObjectType ;
-    ao:id "FAUX_DATA_PROPERTY_STATEMENT" .
+access-individual:FauxDataPropertyStatement a access:ObjectType ;
+    access:id "FAUX_DATA_PROPERTY_STATEMENT" .
 
-ai:Class a ao:ObjectType ;
-    ao:id "CLASS" .
+access-individual:Class a access:ObjectType ;
+    access:id "CLASS" .
 
-ai:NamedObject a ao:ObjectType ;
-    ao:id "NAMED_OBJECT" .
+access-individual:NamedObject a access:ObjectType ;
+    access:id "NAMED_OBJECT" .
 
 #Object type value containers
 
-ai:ObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:ObjectProperty .
+access-individual:ObjectPropertyValueContainer a access:ValueContainer ;
+    access:value access-individual:ObjectProperty .
 
-ai:DataPropertyValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:DataProperty .
+access-individual:DataPropertyValueContainer a access:ValueContainer ;
+    access:value access-individual:DataProperty .
 
-ai:FauxObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxObjectProperty .
+access-individual:FauxObjectPropertyValueContainer a access:ValueContainer ;
+    access:value access-individual:FauxObjectProperty .
 
-ai:FauxDataPropertyValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxDataProperty .
+access-individual:FauxDataPropertyValueContainer a access:ValueContainer ;
+    access:value access-individual:FauxDataProperty .
 
-ai:ObjectPropertyStatementValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:ObjectPropertyStatement .
+access-individual:ObjectPropertyStatementValueContainer a access:ValueContainer ;
+    access:value access-individual:ObjectPropertyStatement .
 
-ai:DataPropertyStatementValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:DataPropertyStatement .
+access-individual:DataPropertyStatementValueContainer a access:ValueContainer ;
+    access:value access-individual:DataPropertyStatement .
 
-ai:FauxObjectPropertyStatementValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxObjectPropertyStatement .
+access-individual:FauxObjectPropertyStatementValueContainer a access:ValueContainer ;
+    access:value access-individual:FauxObjectPropertyStatement .
 
-ai:FauxDataPropertyStatementValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:FauxDataPropertyStatement .
+access-individual:FauxDataPropertyStatementValueContainer a access:ValueContainer ;
+    access:value access-individual:FauxDataPropertyStatement .
 
-ai:ClassValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:Class .
+access-individual:ClassValueContainer a access:ValueContainer ;
+    access:value access-individual:Class .

@@ -36,7 +36,7 @@ public class ArmMigratorTest extends AuthMigratorTest {
     private OntModel userAccountsModel;
     private ArmMigrator armMigrator;
     private String propertyUri = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#forEntity";
-    private String dataValue = "https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue";
+    private String value = "https://vivoweb.org/ontology/vitro-application/auth/vocabulary/value";
 
     @Before
     public void initArmMigration() {
@@ -119,7 +119,7 @@ public class ArmMigratorTest extends AuthMigratorTest {
         String stringResult = additions.toString();
         assertFalse(stringResult.isEmpty());
         assertEquals(33, getCount("\n", stringResult));
-        assertEquals(33, getCount(dataValue, stringResult));
+        assertEquals(33, getCount(value, stringResult));
         assertEquals(6, getCount(OBJECT_PROPERTY_URI, stringResult));
         assertEquals(3, getCount(CLASS_URI, stringResult));
         assertEquals(5, getCount(DATA_PROPERTY_URI, stringResult));

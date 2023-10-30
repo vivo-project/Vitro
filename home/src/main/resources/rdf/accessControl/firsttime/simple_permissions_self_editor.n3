@@ -1,25 +1,20 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
 
-ai:SelfEditorSimplePermissionValueContainer
+:SelfEditorSimplePermissionValueContainer
     # permissions for ANY logged-in user.
-    ao:dataValue simplePermission:DoFrontEndEditing ;
-    ao:dataValue simplePermission:EditOwnAccount ;
-    ao:dataValue simplePermission:ManageOwnProxies ;
-    ao:dataValue simplePermission:QueryUserAccountsModel ;
-    ao:dataValue simplePermission:UseBasicAjaxControllers ;
-    ao:dataValue simplePermission:UseMiscellaneousPages ;
-    ao:dataValue simplePermission:PageViewableLoggedIn ;
+    access:value simplePermission:DoFrontEndEditing ;
+    access:value simplePermission:EditOwnAccount ;
+    access:value simplePermission:ManageOwnProxies ;
+    access:value simplePermission:QueryUserAccountsModel ;
+    access:value simplePermission:UseBasicAjaxControllers ;
+    access:value simplePermission:UseMiscellaneousPages ;
+    access:value simplePermission:PageViewableLoggedIn ;
 
     # permissions for ANY user, even if they are not logged in.
-    ao:dataValue simplePermission:QueryFullModel ;
-	ao:dataValue simplePermission:PageViewablePublic ;
+    access:value simplePermission:QueryFullModel ;
+	access:value simplePermission:PageViewablePublic ;
     .

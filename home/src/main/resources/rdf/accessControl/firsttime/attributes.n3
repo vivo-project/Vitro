@@ -1,36 +1,31 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:Subject a ao:Attribute ;
-    ao:id "SUBJECT" .
+access-individual:Subject a access:Attribute ;
+    access:id "SUBJECT" .
 
-ai:SubjectRole a ao:Attribute ;
-    ao:id "SUBJECT_ROLE_URI" .
+access-individual:SubjectRole a access:Attribute ;
+    access:id "SUBJECT_ROLE_URI" .
 
-ai:SubjectType a ao:Attribute ;
-    ao:id "SUBJECT_TYPE" .
+access-individual:SubjectType a access:Attribute ;
+    access:id "SUBJECT_TYPE" .
 
-ai:AccessObjectUri a ao:Attribute ;
-    ao:id "ACCESS_OBJECT_URI" .
+access-individual:AccessObjectUri a access:Attribute ;
+    access:id "ACCESS_OBJECT_URI" .
 
-ai:AccessObjectType a ao:Attribute ;
-    ao:id "ACCESS_OBJECT_TYPE" .
+access-individual:AccessObjectType a access:Attribute ;
+    access:id "ACCESS_OBJECT_TYPE" .
 
-ai:Operation a ao:Attribute ;
-    ao:id "OPERATION" .
+access-individual:Operation a access:Attribute ;
+    access:id "OPERATION" .
 
-ai:StatementPredicateUri a ao:Attribute ;
-    ao:id "STATEMENT_PREDICATE_URI" .
+access-individual:StatementPredicateUri a access:Attribute ;
+    access:id "STATEMENT_PREDICATE_URI" .
 
-ai:StatementSubjectUri a ao:Attribute ;
-    ao:id "STATEMENT_SUBJECT_URI" .
+access-individual:StatementSubjectUri a access:Attribute ;
+    access:id "STATEMENT_SUBJECT_URI" .
 
-ai:StatementObjectUri a ao:Attribute ;
-    ao:id "STATEMENT_OBJECT_URI" .
+access-individual:StatementObjectUri a access:Attribute ;
+    access:id "STATEMENT_OBJECT_URI" .

@@ -5,79 +5,79 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/test-data-set-templates/> .
 
-:PolicyTemplate a ao:PolicyTemplate ;
-    ao:policyDataSets :DataSets ;
-    ao:rules :RuleSet .
+:PolicyTemplate a access:PolicyTemplate ;
+    access:policyDataSets :DataSets ;
+    access:rules :RuleSet .
 
-:DataSets a ao:PolicyDataSets ;
-    ao:policyDataSetTemplate :RoleDataSetTemplate1 ;
-    ao:policyDataSetTemplate :RoleDataSetTemplate2 ;
-    ao:policyDataSet :PublicDataSet .
+:DataSets a access:PolicyDataSets ;
+    access:policyDataSetTemplate :RoleDataSetTemplate1 ;
+    access:policyDataSetTemplate :RoleDataSetTemplate2 ;
+    access:policyDataSet :PublicDataSet .
 
 #Role data set templates
 
 
-:RoleDataSetTemplate1 a ao:DataSetTemplate ;
-    ao:dataSetTemplateKey :RoleDataSetTemplateKey1 ;
-    ao:dataSetKeyTemplate :RoleDataSetKeyTemplate1 ;
-    ao:dataSetValues ai:PublicRoleValueContainer ;
-    ao:dataSetValueTemplate :RoleValueContainerTemplate1 ;
-    ao:dataSetValueTemplate :RolePermissionValueContainerTemplate1 .  
+:RoleDataSetTemplate1 a access:DataSetTemplate ;
+    access:dataSetTemplateKey :RoleDataSetTemplateKey1 ;
+    access:dataSetKeyTemplate :RoleDataSetKeyTemplate1 ;
+    access:dataSetValues access-individual:PublicRoleValueContainer ;
+    access:dataSetValueTemplate :RoleValueContainerTemplate1 ;
+    access:dataSetValueTemplate :RolePermissionValueContainerTemplate1 .  
 
-:RoleDataSetTemplateKey1 a ao:DataSetTemplateKey ;
-    ao:templateKey ai:SubjectRole .
+:RoleDataSetTemplateKey1 a access:DataSetTemplateKey ;
+    access:templateKey access-individual:SubjectRole .
 
-:RoleDataSetKeyTemplate1 a ao:DataSetKeyTemplate ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponentTemplate ai:SubjectRole .
+:RoleDataSetKeyTemplate1 a access:DataSetKeyTemplate ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleValueContainerTemplate1 a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :RoleValueSet;
-    ao:containerTypeTemplate ai:SubjectRole .
+:RoleValueContainerTemplate1 a access:ValueContainerTemplate ;
+    access:relatedValueSet :RoleValueSet;
+    access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePermissionValueContainerTemplate1 a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :TypeValueSet;
-    ao:defaultValue simplePermission:PageViewablePublic;
-    ao:defaultValue simplePermission:QueryFullModel ;
-    ao:containerTypeTemplate ai:NamedObject .
+:RolePermissionValueContainerTemplate1 a access:ValueContainerTemplate ;
+    access:relatedValueSet :TypeValueSet;
+    access:defaultValue simplePermission:PageViewablePublic;
+    access:defaultValue simplePermission:QueryFullModel ;
+    access:containerTypeTemplate access-individual:NamedObject .
 
 
-:RoleDataSetTemplate2 a ao:DataSetTemplate ;
-    ao:dataSetTemplateKey :RoleDataSetTemplateKey2 ;
-    ao:dataSetKeyTemplate :RoleDataSetKeyTemplate2 ;
-    ao:dataSetValueTemplate :RoleValueContainerTemplate2 ;
-    ao:dataSetValueTemplate :RolePermissionValueContainerTemplate2 .  
+:RoleDataSetTemplate2 a access:DataSetTemplate ;
+    access:dataSetTemplateKey :RoleDataSetTemplateKey2 ;
+    access:dataSetKeyTemplate :RoleDataSetKeyTemplate2 ;
+    access:dataSetValueTemplate :RoleValueContainerTemplate2 ;
+    access:dataSetValueTemplate :RolePermissionValueContainerTemplate2 .  
 
-:RoleDataSetTemplateKey2 a ao:DataSetTemplateKey ;
-    ao:templateKey ai:SubjectRole .
+:RoleDataSetTemplateKey2 a access:DataSetTemplateKey ;
+    access:templateKey access-individual:SubjectRole .
 
-:RoleDataSetKeyTemplate2 a ao:DataSetKeyTemplate ;
-    ao:keyComponent ai:ObjectPropertyAccesObject ;
-    ao:keyComponentTemplate ai:SubjectRole .
+:RoleDataSetKeyTemplate2 a access:DataSetKeyTemplate ;
+    access:keyComponent access-individual:ObjectPropertyAccesObject ;
+    access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleValueContainerTemplate2 a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :RoleValueSet;
-    ao:containerTypeTemplate ai:SubjectRole .
+:RoleValueContainerTemplate2 a access:ValueContainerTemplate ;
+    access:relatedValueSet :RoleValueSet;
+    access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePermissionValueContainerTemplate2 a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :TypeValueSet;
-    ao:containerTypeTemplate ai:NamedObject .
+:RolePermissionValueContainerTemplate2 a access:ValueContainerTemplate ;
+    access:relatedValueSet :TypeValueSet;
+    access:containerTypeTemplate access-individual:NamedObject .
 
-:PublicDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :PublicDataSetKey ;
-    ao:dataSetValues ai:PublicRoleValueContainer ;
-    ao:dataSetValues ai:PublicSimplePermissionValueContainer .
+:PublicDataSet a access:PolicyDataSet ;
+    access:dataSetKey :PublicDataSetKey ;
+    access:dataSetValues access-individual:PublicRoleValueContainer ;
+    access:dataSetValues access-individual:PublicSimplePermissionValueContainer .
 
-:PublicDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponent auth:PUBLIC .
+:PublicDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponent auth:PUBLIC .
 
-ai:PublicSimplePermissionValueContainer a ao:ValueContainer ;
-    ao:containerType ai:NamedObject .
+access-individual:PublicSimplePermissionValueContainer a access:ValueContainer ;
+    access:containerType access-individual:NamedObject .

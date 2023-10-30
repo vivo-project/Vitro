@@ -1,245 +1,240 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/related-allowed-property/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/related-allowed-property/> .
 
-:PolicyTemplate a ao:PolicyTemplate ;
-    ao:rules :RuleSet ;
-    ao:policyDataSets :DataSets .
+:PolicyTemplate a access:PolicyTemplate ;
+    access:rules :RuleSet ;
+    access:policyDataSets :DataSets .
 
-:DataSets a ao:PolicyDataSets ;
-    ao:policyDataSet :SelfEditorDisplayObjectPropertyDataSet ;
-    ao:policyDataSet :SelfEditorDisplayDataPropertyDataSet ;
-    ao:policyDataSet :SelfEditorDisplayFauxObjectPropertyDataSet ;
-    ao:policyDataSet :SelfEditorDisplayFauxDataPropertyDataSet ;
-    ao:policyDataSet :SelfEditorPublishObjectPropertyDataSet ;
-    ao:policyDataSet :SelfEditorPublishDataPropertyDataSet ;
-    ao:policyDataSet :SelfEditorPublishFauxObjectPropertyDataSet ;
-    ao:policyDataSet :SelfEditorPublishFauxDataPropertyDataSet ;
+:DataSets a access:PolicyDataSets ;
+    access:policyDataSet :SelfEditorDisplayObjectPropertyDataSet ;
+    access:policyDataSet :SelfEditorDisplayDataPropertyDataSet ;
+    access:policyDataSet :SelfEditorDisplayFauxObjectPropertyDataSet ;
+    access:policyDataSet :SelfEditorDisplayFauxDataPropertyDataSet ;
+    access:policyDataSet :SelfEditorPublishObjectPropertyDataSet ;
+    access:policyDataSet :SelfEditorPublishDataPropertyDataSet ;
+    access:policyDataSet :SelfEditorPublishFauxObjectPropertyDataSet ;
+    access:policyDataSet :SelfEditorPublishFauxDataPropertyDataSet ;
     .
 
 ### Display object property data sets
 
-:SelfEditorDisplayObjectPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorDisplayObjectPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyStatementValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorDisplayObjectPropertyValueContainer .
+:SelfEditorDisplayObjectPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorDisplayObjectPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:ObjectPropertyValueContainer ;
+    access:dataSetValues access-individual:ObjectPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :SelfEditorDisplayObjectPropertyValueContainer .
 
-:SelfEditorDisplayObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:ObjectProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:DisplayOperation .
+:SelfEditorDisplayObjectPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:ObjectProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Display data property data sets
 
-:SelfEditorDisplayDataPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorDisplayDataPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:DataPropertyValueContainer ;
-    ao:dataSetValues ai:DataPropertyStatementValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorDisplayDataPropertyValueContainer .
+:SelfEditorDisplayDataPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorDisplayDataPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:DataPropertyValueContainer ;
+    access:dataSetValues access-individual:DataPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :SelfEditorDisplayDataPropertyValueContainer .
 
-:SelfEditorDisplayDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:DataProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:DisplayOperation .
+:SelfEditorDisplayDataPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:DataProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Display faux object property data sets
 
-:SelfEditorDisplayFauxObjectPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorDisplayFauxObjectPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyStatementValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorDisplayFauxObjectPropertyValueContainer .
+:SelfEditorDisplayFauxObjectPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorDisplayFauxObjectPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:FauxObjectPropertyValueContainer ;
+    access:dataSetValues access-individual:FauxObjectPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :SelfEditorDisplayFauxObjectPropertyValueContainer .
 
-:SelfEditorDisplayFauxObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxObjectProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:DisplayOperation .
+:SelfEditorDisplayFauxObjectPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:FauxObjectProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Display faux data property data sets
 
-:SelfEditorDisplayFauxDataPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorDisplayFauxDataPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyStatementValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorDisplayFauxDataPropertyValueContainer .
+:SelfEditorDisplayFauxDataPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorDisplayFauxDataPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:FauxDataPropertyValueContainer ;
+    access:dataSetValues access-individual:FauxDataPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :SelfEditorDisplayFauxDataPropertyValueContainer .
 
-:SelfEditorDisplayFauxDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxDataProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:DisplayOperation .
+:SelfEditorDisplayFauxDataPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:FauxDataProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Publish object property data sets
 
-:SelfEditorPublishObjectPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorPublishObjectPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyValueContainer ;
-    ao:dataSetValues ai:ObjectPropertyStatementValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorPublishObjectPropertyValueContainer .
+:SelfEditorPublishObjectPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorPublishObjectPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:ObjectPropertyValueContainer ;
+    access:dataSetValues access-individual:ObjectPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :SelfEditorPublishObjectPropertyValueContainer .
 
-:SelfEditorPublishObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:ObjectProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:PublishOperation .
+:SelfEditorPublishObjectPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:ObjectProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Publish data property data sets
 
-:SelfEditorPublishDataPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorPublishDataPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:DataPropertyValueContainer ;
-    ao:dataSetValues ai:DataPropertyStatementValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorPublishDataPropertyValueContainer .
+:SelfEditorPublishDataPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorPublishDataPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:DataPropertyValueContainer ;
+    access:dataSetValues access-individual:DataPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :SelfEditorPublishDataPropertyValueContainer .
 
-:SelfEditorPublishDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:DataProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:PublishOperation .
+:SelfEditorPublishDataPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:DataProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Publish faux object property data sets
 
-:SelfEditorPublishFauxObjectPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorPublishFauxObjectPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyValueContainer ;
-    ao:dataSetValues ai:FauxObjectPropertyStatementValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorPublishFauxObjectPropertyValueContainer .
+:SelfEditorPublishFauxObjectPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorPublishFauxObjectPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:FauxObjectPropertyValueContainer ;
+    access:dataSetValues access-individual:FauxObjectPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :SelfEditorPublishFauxObjectPropertyValueContainer .
 
-:SelfEditorPublishFauxObjectPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxObjectProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:PublishOperation .
+:SelfEditorPublishFauxObjectPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:FauxObjectProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Publish faux data property data sets
 
-:SelfEditorPublishFauxDataPropertyDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorPublishFauxDataPropertyDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyValueContainer ;
-    ao:dataSetValues ai:FauxDataPropertyStatementValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorPublishFauxDataPropertyValueContainer .
+:SelfEditorPublishFauxDataPropertyDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorPublishFauxDataPropertyDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:FauxDataPropertyValueContainer ;
+    access:dataSetValues access-individual:FauxDataPropertyStatementValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :SelfEditorPublishFauxDataPropertyValueContainer .
 
-:SelfEditorPublishFauxDataPropertyDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:FauxDataProperty ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:PublishOperation .
+:SelfEditorPublishFauxDataPropertyDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:FauxDataProperty ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Rules
 
-:RuleSet a ao:Rules ;
-    ao:rule :AllowMatchingPropertyStatement ;
-    ao:rule :AllowMatchingProperty .
+:RuleSet a access:Rules ;
+    access:rule :AllowMatchingPropertyStatement ;
+    access:rule :AllowMatchingProperty .
 
-:AllowMatchingProperty a ao:Rule;
-    ao:check :SubjectRoleCheck ;
-    ao:check :OperationCheck ;
-    ao:check :AccessObjectTypeCheck ;
-    ao:check :AccessObjectUriCheck .
+:AllowMatchingProperty a access:Rule;
+    access:check :SubjectRoleCheck ;
+    access:check :OperationCheck ;
+    access:check :AccessObjectTypeCheck ;
+    access:check :AccessObjectUriCheck .
 
-:AccessObjectTypeCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:templateValue :AccessObjectTypeValueSet .
+:AccessObjectTypeCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:values :AccessObjectTypeValueSet .
 
-:AccessObjectTypeValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ObjectPropertyValueContainer ;
-    ao:attributeValue ai:DataPropertyValueContainer ;
-    ao:attributeValue ai:FauxObjectPropertyValueContainer ;
-    ao:attributeValue ai:FauxDataPropertyValueContainer ;
+:AccessObjectTypeValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:ObjectPropertyValueContainer ;
+    access:attributeValue access-individual:DataPropertyValueContainer ;
+    access:attributeValue access-individual:FauxObjectPropertyValueContainer ;
+    access:attributeValue access-individual:FauxDataPropertyValueContainer ;
     .
 
-:AllowMatchingPropertyStatement a ao:Rule;
-    ao:check :SubjectRoleCheck ;
-    ao:check :OperationCheck ;
-    ao:check :AccessObjectStatementTypeCheck ;
-    ao:check :StatementPredicateCheck ;
+:AllowMatchingPropertyStatement a access:Rule;
+    access:check :SubjectRoleCheck ;
+    access:check :OperationCheck ;
+    access:check :AccessObjectStatementTypeCheck ;
+    access:check :StatementPredicateCheck ;
     .
 
-:AccessObjectStatementTypeCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:templateValue :StatementAccessObjectTypeValueSet .
+:AccessObjectStatementTypeCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:values :StatementAccessObjectTypeValueSet .
 
-:StatementAccessObjectTypeValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ObjectPropertyStatementValueContainer ;
-    ao:attributeValue ai:DataPropertyStatementValueContainer ;
-    ao:attributeValue ai:FauxObjectPropertyStatementValueContainer ;
-    ao:attributeValue ai:FauxDataPropertyStatementValueContainer ;
+:StatementAccessObjectTypeValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:ObjectPropertyStatementValueContainer ;
+    access:attributeValue access-individual:DataPropertyStatementValueContainer ;
+    access:attributeValue access-individual:FauxObjectPropertyStatementValueContainer ;
+    access:attributeValue access-individual:FauxDataPropertyStatementValueContainer ;
     .
 
-:OperationCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:Operation ;
-    ao:templateValue :OperationValueSet .
+:OperationCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:values :OperationValueSet .
 
-:OperationValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:DisplayOperationValueContainer ;
-    ao:attributeValue ai:PublishOperationValueContainer ;
+:OperationValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:DisplayOperationValueContainer ;
+    access:attributeValue access-individual:PublishOperationValueContainer ;
     .
 
-:SubjectRoleCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:SubjectRole ;
-    ao:templateValue :RoleValueSet .
+:SubjectRoleCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:SubjectRole ;
+    access:values :RoleValueSet .
 
-:RoleValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:SelfEditorRoleValueContainer .
+:RoleValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:SelfEditorRoleValueContainer .
 
-:StatementPredicateCheck a ao:Check ;
-    ao:operator ai:OneOf ;
-    ao:attribute ai:StatementPredicateUri ;
-    ao:templateValue :AllowedPropertyUriValueSet .
+:StatementPredicateCheck a access:Check ;
+    access:operator access-individual:OneOf ;
+    access:attribute access-individual:StatementPredicateUri ;
+    access:values :AllowedPropertyUriValueSet .
 
-:AccessObjectUriCheck a ao:Check ;
-    ao:operator ai:OneOf ;
-    ao:attribute ai:AccessObjectUri ;
-    ao:templateValue :AllowedPropertyUriValueSet .
+:AccessObjectUriCheck a access:Check ;
+    access:operator access-individual:OneOf ;
+    access:attribute access-individual:AccessObjectUri ;
+    access:values :AllowedPropertyUriValueSet .
 
-:AllowedPropertyUriValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:SelfEditorDisplayObjectPropertyValueContainer ;
-    ao:attributeValue ai:SelfEditorDisplayDataPropertyValueContainer ;
-    ao:attributeValue ai:SelfEditorDisplayFauxObjectPropertyValueContainer ;
-    ao:attributeValue ai:SelfEditorDisplayFauxDataPropertyValueContainer ;
-    ao:attributeValue ai:SelfEditorPublishObjectPropertyValueContainer ;
-    ao:attributeValue ai:SelfEditorPublishDataPropertyValueContainer ;
-    ao:attributeValue ai:SelfEditorPublishFauxObjectPropertyValueContainer ;
-    ao:attributeValue ai:SelfEditorPublishFauxDataPropertyValueContainer ;
+:AllowedPropertyUriValueSet a access:AttributeValueSet ;
+    access:attributeValue :SelfEditorDisplayObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorDisplayDataPropertyValueContainer ;
+    access:attributeValue :SelfEditorDisplayFauxObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorDisplayFauxDataPropertyValueContainer ;
+    access:attributeValue :SelfEditorPublishObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorPublishDataPropertyValueContainer ;
+    access:attributeValue :SelfEditorPublishFauxObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorPublishFauxDataPropertyValueContainer ;
     .
 
-ai:SelfEditorDisplayObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:ObjectProperty .
-ai:SelfEditorDisplayDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:DataProperty .
-ai:SelfEditorDisplayFauxObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxObjectProperty .
-ai:SelfEditorDisplayFauxDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxDataProperty .
-
-ai:SelfEditorPublishObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:ObjectProperty .
-ai:SelfEditorPublishDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:DataProperty .
-ai:SelfEditorPublishFauxObjectPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxObjectProperty .
-ai:SelfEditorPublishFauxDataPropertyValueContainer a ao:ValueContainer ;
-    ao:containerType ai:FauxDataProperty .
+:SelfEditorDisplayObjectPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:ObjectProperty .
+:SelfEditorDisplayDataPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:DataProperty .
+:SelfEditorDisplayFauxObjectPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:FauxObjectProperty .
+:SelfEditorDisplayFauxDataPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:FauxDataProperty .
+:SelfEditorPublishObjectPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:ObjectProperty .
+:SelfEditorPublishDataPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:DataProperty .
+:SelfEditorPublishFauxObjectPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:FauxObjectProperty .
+:SelfEditorPublishFauxDataPropertyValueContainer a access:ValueContainer ;
+    access:containerType access-individual:FauxDataProperty .

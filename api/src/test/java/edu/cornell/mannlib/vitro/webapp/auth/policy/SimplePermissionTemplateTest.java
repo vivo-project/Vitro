@@ -27,7 +27,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + ADMIN_SIMPLE_PERMISSIONS_PATH + EXT);
         String dataSetUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/AdminDataSet";
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/AdminDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -48,7 +48,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + CURATOR_SIMPLE_PERMISSIONS_PATH + EXT);
         String dataSetUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/CuratorDataSet";
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/CuratorDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -69,7 +69,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + EDITOR_SIMPLE_PERMISSIONS_PATH + EXT);
         String dataSetUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/EditorDataSet";
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/EditorDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -90,7 +90,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + SELF_EDITOR_SIMPLE_PERMISSIONS_PATH + EXT);
         String dataSetUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/SelfEditorDataSet";
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/SelfEditorDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());
@@ -111,7 +111,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
         load(USER_ACCOUNTS_HOME_FIRSTTIME + PUBLIC_SIMPLE_PERMISSIONS_PATH + EXT);
         String dataSetUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/PublicDataSet";
+                "https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/PublicDataSet";
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(1000, policy.getPriority());

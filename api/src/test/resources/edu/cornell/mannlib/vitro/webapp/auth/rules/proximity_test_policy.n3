@@ -5,25 +5,25 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:ProximityTestPolicy rdf:type ao:Policy ;
-          ao:rules ai:ProximityRuleSet .
+access-individual:ProximityTestPolicy rdf:type access:Policy ;
+          access:rules access-individual:ProximityRuleSet .
 
-ai:ProximityRuleSet rdf:type ao:Rules ;
-          ao:rule ai:AllowPersonEditOwnPublication .
+access-individual:ProximityRuleSet rdf:type access:Rules ;
+          access:rule access-individual:AllowPersonEditOwnPublication .
           
-ai:AllowPersonEditOwnPublication rdf:type ao:Rule ;
-          ao:check ai:PublicationInProximityAttribute .
+access-individual:AllowPersonEditOwnPublication rdf:type access:Rule ;
+          access:check access-individual:PublicationInProximityAttribute .
           
-ai:PublicationInProximityAttribute rdf:type ao:Check ;
-         ao:operator ai:SparqlSelectQueryContains ;
-         ao:attribute ai:StatementSubjectUri ;
-         ao:value ai:PublicationProximityToPerson .
+access-individual:PublicationInProximityAttribute rdf:type access:Check ;
+         access:operator access-individual:SparqlSelectQueryContains ;
+         access:attribute access-individual:StatementSubjectUri ;
+         access:singleValue access-individual:PublicationProximityToPerson .
 
-ai:PublicationProximityToPerson rdf:type ao:ValueContainer ;
-        ao:id """
+access-individual:PublicationProximityToPerson rdf:type access:ValueContainer ;
+        access:id """
         SELECT ?resourceUri WHERE {
                   ?personUri <test:has_publication> ?resourceUri .
         }

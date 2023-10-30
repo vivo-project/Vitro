@@ -37,10 +37,10 @@ public class AuthMigrator implements ServletContextListener {
 
     private static final String SET_VERSION_TEMPLATE = ""
             + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
-            + "@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .\n"
+            + "@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .\n"
             + "<https://vivoweb.org/ontology/vitro-application/auth/individual/Configuration> "
-            + "rdf:type ao:Configuration ;\n"
-            + "ao:version ?version .";
+            + "rdf:type access:Configuration ;\n"
+            + "access:version ?version .";
 
     private static final String REMOVE_VERSION_TEMPLATE = ""
             + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
@@ -49,12 +49,12 @@ public class AuthMigrator implements ServletContextListener {
 
     private static String VERSION_QUERY = ""
             + "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT ?version \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "       ?configuration rdf:type ao:Configuration .\n"
-            + "       ?configuration ao:version ?version .\n"
+            + "       ?configuration rdf:type access:Configuration .\n"
+            + "       ?configuration access:version ?version .\n"
             + "  }\n"
             + "}";
 

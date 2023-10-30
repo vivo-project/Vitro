@@ -1,51 +1,46 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:DisplayOperation a ao:Operation ;
-    ao:id "DISPLAY" .
+access-individual:DisplayOperation a access:Operation ;
+    access:id "DISPLAY" .
 
-ai:UpdateOperation a ao:Operation ;
-    ao:id "UPDATE" .
+access-individual:UpdateOperation a access:Operation ;
+    access:id "UPDATE" .
 
-ai:PublishOperation a ao:Operation ;
-    ao:id "PUBLISH" .    
+access-individual:PublishOperation a access:Operation ;
+    access:id "PUBLISH" .    
 
-ai:AddOperation a ao:Operation ;
-    ao:id "ADD" .
+access-individual:AddOperation a access:Operation ;
+    access:id "ADD" .
 
-ai:DropOperation a ao:Operation ;
-    ao:id "DROP" .
+access-individual:DropOperation a access:Operation ;
+    access:id "DROP" .
 
-ai:EditOperation a ao:Operation ;
-    ao:id "EDIT" .
+access-individual:EditOperation a access:Operation ;
+    access:id "EDIT" .
 
-ai:ExecuteOperation a ao:Operation ;
-    ao:id "EXECUTE" .
+access-individual:ExecuteOperation a access:Operation ;
+    access:id "EXECUTE" .
 
-ai:DisplayOperationValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:DisplayOperation .
+access-individual:DisplayOperationValueContainer a access:ValueContainer ;
+    access:value access-individual:DisplayOperation .
 
-ai:UpdateOperationValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:UpdateOperation .
+access-individual:UpdateOperationValueContainer a access:ValueContainer ;
+    access:value access-individual:UpdateOperation .
 
-ai:PublishOperationValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:PublishOperation .
+access-individual:PublishOperationValueContainer a access:ValueContainer ;
+    access:value access-individual:PublishOperation .
 
-ai:AddOperationValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:AddOperation .
+access-individual:AddOperationValueContainer a access:ValueContainer ;
+    access:value access-individual:AddOperation .
 
-ai:DropOperationValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:DropOperation .
+access-individual:DropOperationValueContainer a access:ValueContainer ;
+    access:value access-individual:DropOperation .
 
-ai:EditOperationValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:EditOperation .
+access-individual:EditOperationValueContainer a access:ValueContainer ;
+    access:value access-individual:EditOperation .
 
-ai:ExecuteOperationValueContainer a ao:ValueContainer ;
-    ao:dataValue ai:ExecuteOperation .
+access-individual:ExecuteOperationValueContainer a access:ValueContainer ;
+    access:value access-individual:ExecuteOperation .

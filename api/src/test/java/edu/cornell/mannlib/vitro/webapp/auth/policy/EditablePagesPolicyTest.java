@@ -18,7 +18,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
     @Test
     public void testLoadEditablePagesPolicy() {
         load(EDITABLE_PAGES_POLICY_PATH);
-        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "policy/edit-individual-pages/Policy";
+        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "edit-individual-pages/Policy";
         Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
         assertEquals(1, policies.size());
         DynamicPolicy policy = policies.iterator().next();
