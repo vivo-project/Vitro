@@ -1,7 +1,9 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.attributes;
+package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -12,8 +14,8 @@ public class SubjectTypeCheck extends AbstractCheck {
 
     private static final Log log = LogFactory.getLog(SubjectTypeCheck.class);
 
-    public SubjectTypeCheck(String uri, String value) {
-        super(uri, value);
+    public SubjectTypeCheck(String uri, AttributeValueContainer values) {
+        super(uri, values);
     }
 
     @Override

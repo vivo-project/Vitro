@@ -20,9 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.QueryResultsMapCache;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.ProximityChecker;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.ProximityChecker;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.QueryResultsMapCache;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;

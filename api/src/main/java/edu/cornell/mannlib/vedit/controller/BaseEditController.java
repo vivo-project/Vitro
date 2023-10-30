@@ -235,28 +235,27 @@ public class BaseEditController extends VitroHttpServlet {
             for (RoleInfo role : roles) {
                 RoleInfo roleCopy = role.clone();
                 roleInfos.add(roleCopy);
-                if (operation.equals(AccessOperation.ADD) || operation.equals(AccessOperation.DROP)
-                        || operation.equals(AccessOperation.EDIT) || operation.equals(AccessOperation.PUBLISH)
-                        || operation.equals(AccessOperation.UPDATE)) {
+                if (isPublicForbiddenOperation(operation)) {
                     if (roleCopy.isPublic) {
                         roleCopy.setEnabled(false);
                         roleCopy.setGranted(false);
                     }
                 }
             }
-            // If we are creating a new record
             if (!StringUtils.isEmpty(entityURI)) {
-                Set<String> grantedRoles = new HashSet<String>(
-                        EntityPolicyController.getGrantedRoles(entityURI, operation, aot, roleUris));
                 for (RoleInfo roleInfo : roleInfos) {
-                    if (!grantedRoles.contains(roleInfo.getUri())) {
-                        roleInfo.setGranted(false);
+                    if (roleInfo.isEnabled()) {
+                        roleInfo.setGranted(
+                                EntityPolicyController.isGranted(entityURI, aot, operation, roleInfo.getUri()));
                     }
                 }
             }
         }
         req.setAttribute("operationsToRoles", operationsToRoles);
+    }
 
+    static boolean isPublicForbiddenOperation(AccessOperation operation) {
+        return operation.equals(AccessOperation.PUBLISH);
     }
 
     public static class RoleInfo {

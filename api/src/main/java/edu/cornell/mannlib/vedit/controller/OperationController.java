@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
+import edu.cornell.mannlib.vedit.controller.BaseEditController.RoleInfo;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.listener.EditPreProcessor;
@@ -145,25 +148,27 @@ public class OperationController extends BaseEditController {
                 }
                 String entityType = request.getParameter(ENTITY_TYPE_ATTRIBUTE_NAME);
                 List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(request).getWebappDaoFactory());
-                List<String> roleUris = new ArrayList<>();
+                Set<RoleInfo> roles = new HashSet<>();
                 for (PermissionSet permissionSet : permissionSets) {
-                    roleUris.add(permissionSet.getUri());
+                    roles.add(new RoleInfo(permissionSet));
                 }  
-                // Get the granted permissions from the request object
-                AccessObjectType aot = AccessObjectType.valueOf(entityType);
-                List<AccessOperation> operations = AccessOperation.getOperations(aot);
-                for (AccessOperation ao : operations) {
-                    String operationGroupName = ao.toString().toLowerCase().split("_")[0];
-                    String[] selectedRoles = request.getParameterValues(operationGroupName + "Roles");
-                    if(StringUtils.isBlank(entityUri)) {
-                        log.error("EntityUri is blank");
-                    } else if (StringUtils.isBlank(entityType) || !EnumUtils.isValidEnum(AccessObjectType.class, entityType)) {
-                        log.error("EntityType is not valid " + entityType);
-                    } else {
-                        if (selectedRoles == null) {
-                            selectedRoles = new String[0];
+                AccessObjectType aot = getAccessObjectType(entityUri, entityType);
+                if (aot != null) {
+                    List<AccessOperation> operations = AccessOperation.getOperations(aot);
+                    for (AccessOperation ao : operations) {
+                        String operationGroupName = ao.toString().toLowerCase().split("_")[0];
+                        Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
+                        for (RoleInfo role : roles) {
+                            if (role.isPublic() && isPublicForbiddenOperation(ao)) {
+                                continue;
+                            }
+                            if (selectedRoles.contains(role.getUri())) {
+                                EntityPolicyController.grantAccess(entityUri, aot, ao, role.getUri());    
+                            } else {
+                                EntityPolicyController.revokeAccess(entityUri, aot, ao, role.getUri());
+                            }
+                            
                         }
-                        EntityPolicyController.updateEntityDataSet(entityUri, aot, ao, Arrays.asList(selectedRoles), roleUris);
                     }
                 }
             }
@@ -223,6 +228,27 @@ public class OperationController extends BaseEditController {
             	log.error(this.getClass().getName() + " IOError on redirect: ", ioe);
             }
         }
+    }
+
+    private Set<String> getSelectedRoles(HttpServletRequest request, String operationGroupName) {
+        String[] selectedRoles = request.getParameterValues(operationGroupName + "Roles");
+        if (selectedRoles == null) {
+            selectedRoles = new String[0];
+        }
+        return new HashSet<String>(Arrays.asList(selectedRoles));
+    }
+
+    private AccessObjectType getAccessObjectType(String entityUri, String entityType) {
+        AccessObjectType aot = null;
+        // Get the granted permissions from the request object
+        if(StringUtils.isBlank(entityUri)) {
+            log.error("EntityUri is blank");
+        } else if (StringUtils.isBlank(entityType) || !EnumUtils.isValidEnum(AccessObjectType.class, entityType)) {
+            log.error("EntityType is not valid " + entityType);
+        } else {
+            aot = AccessObjectType.valueOf(entityType);
+        }
+        return aot;
     }
 
     private void retry(HttpServletRequest request,

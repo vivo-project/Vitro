@@ -21,8 +21,8 @@ public class AnnotationMigratorTest extends AuthMigratorTest {
 
     @Test
     public void testGetAnnotationConfigs() {
-        AnnotationMigrator annotationMigrator = new AnnotationMigrator(new RDFServiceModel(contentModel),
-                new RDFServiceModel(configurationDataSet));
+        AnnotationMigrator annotationMigrator =
+                new AnnotationMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet));
         Map<String, Map<OperationGroup, Set<String>>> configs = annotationMigrator.getObjectPropertyAnnotations();
         Set<String> ops = configs.keySet();
         assertEquals(1, configs.size());
@@ -39,8 +39,8 @@ public class AnnotationMigratorTest extends AuthMigratorTest {
 
     @Test
     public void testConvertAnnotationConfiguration() {
-        AnnotationMigrator annotationMigrator = new AnnotationMigrator(new RDFServiceModel(contentModel),
-                new RDFServiceModel(configurationDataSet));
+        AnnotationMigrator annotationMigrator =
+                new AnnotationMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet));
         Model tmpModel = ModelFactory.createDefaultModel();
         tmpModel.add(configurationDataSet.getNamedModel(ModelNames.ACCESS_CONTROL));
         long initialSize = accessControlModel.size();

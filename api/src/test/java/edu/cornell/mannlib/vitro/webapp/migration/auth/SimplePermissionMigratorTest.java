@@ -22,9 +22,11 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-
 
 public class SimplePermissionMigratorTest extends AuthMigratorTest {
 
@@ -43,6 +45,8 @@ public class SimplePermissionMigratorTest extends AuthMigratorTest {
         configurationDataSet.addNamedModel(ModelNames.USER_ACCOUNTS, userAccountsModel);
         spm = new SimplePermissionMigrator(userAccountsModel);
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + TEMPLATE_PATH + EXT);
+        Logger logger = LogManager.getLogger(SimplePermissionMigrator.class);
+        logger.setLevel(Level.ERROR);
     }
 
     private void addUserAccountsStatement(String subjUri, String pUri, String objUri) {

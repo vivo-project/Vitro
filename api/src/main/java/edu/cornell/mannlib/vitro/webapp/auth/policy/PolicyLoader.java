@@ -16,7 +16,9 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.CheckFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.CheckFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRuleFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
@@ -35,6 +37,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.tika.utils.StringUtils;
 
 public class PolicyLoader {
 
@@ -150,8 +153,8 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
             + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id"
-            + " ?dataSetUri \n"
+            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id "
+            + " ?dataSetUri ?attributeValue ?containerType \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policy a ao:PolicyTemplate .\n"
@@ -175,20 +178,24 @@ public class PolicyLoader {
             + "      }\n"
             + "    }\n"
             + "    OPTIONAL {\n"
-            + "       ?rule ao:decision ?decision .\n"
-            + "       ?decision ao:id ?decision_id .\n"
+            + "      ?rule ao:decision ?decision .\n"
+            + "      ?decision ao:id ?decision_id .\n"
             + "    }\n"
             + "    OPTIONAL {\n"
-            + "       ?check ao:templateValue ?attributeValueSet .\n"
-            + "       ?attributeValueSet a ao:AttributeValueSet .\n"
-            + "       ?attributeValueSet ao:attributeValue ?attributeValue .\n"
-            + "       ?attributeValue ao:dataValue ?value .\n"
-            + "       ?dataSet ao:dataSetValues ?attributeValue .\n"
-            + "       OPTIONAL {?value ao:id ?lit_value . }\n"
+            + "      ?check ao:templateValue ?attributeValueSet .\n"
+            + "      ?attributeValueSet a ao:AttributeValueSet .\n"
+            + "      ?attributeValueSet ao:attributeValue ?attributeValue .\n"
+            + "      ?attributeValue ao:dataValue ?value .\n"
+            + "      ?dataSet ao:dataSetValues ?attributeValue .\n"
+            + "      OPTIONAL {\n"
+            + "        ?attributeValue ao:containerType ?containerTypeUri .\n"
+            + "        ?containerTypeUri ao:id ?containerType ."
+            + "      }\n"
+            + "      OPTIONAL {?value ao:id ?lit_value . }\n"
             + "    }\n"
             + "    OPTIONAL {\n"
-            + "       ?check ao:value ?value .\n"
-            + "       OPTIONAL {?value ao:id ?lit_value . }\n"
+            + "      ?check ao:value ?value .\n"
+            + "      OPTIONAL {?value ao:id ?lit_value . }\n"
             + "    }\n"
             + "    BIND(?dataSet as ?dataSetUri)\n"
             + "    BIND(?policy as ?policyUri)\n"
@@ -265,6 +272,27 @@ public class PolicyLoader {
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?dataSetTemplate ao:dataSetKeyTemplate ?dataSetKeyTemplate .\n"
             + "    ?dataSetKeyTemplate ao:keyComponent ?keyComponent .\n"
+            + "  }\n"
+            + "}\n";
+
+    public static final String DATA_SET_KEY_QUERY = ""
+            + "prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "SELECT ?keyComponent ?id ?type \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?dataSet ao:dataSetKey ?dataSetKey ."
+            + "    ?dataSetKey ao:keyComponent ?keyComponent .\n"
+            + "    OPTIONAL {\n"
+            + "      ?keyComponent ao:id ?id .\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?keyComponent a ao:ObjectType .\n"
+            + "      BIND('ACCESS_OBJECT_TYPE' as ?type)\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?keyComponent a ao:Operation .\n"
+            + "      BIND('OPERATION' as ?type)\n"
+            + "    }\n"
             + "  }\n"
             + "}\n";
 
@@ -413,7 +441,7 @@ public class PolicyLoader {
         try {
             loadRulesForDataSet(rules, dataSetUri);
         } catch (Exception e) {
-            log.info(String.format("Policy template dataset '%s' failed to load ", dataSetUri));
+            log.debug(String.format("Policy template dataset '%s' failed to load ", dataSetUri));
             log.debug(e, e);
             return null;
         }
@@ -530,7 +558,7 @@ public class PolicyLoader {
             log.error(e, e);
         }
         if (m.isEmpty()) {
-            log.error("statements to add/delete are empty");
+            log.debug("statements to add/delete are empty");
             return;
         }
         updateAccessControlModel(m, isAdd);
@@ -543,6 +571,11 @@ public class PolicyLoader {
     }
 
     public void updateAccessControlModel(String data, boolean isAdd) {
+        if (StringUtils.isBlank(data)) {
+            log.debug("String to update is empty");
+            return;
+        }
+
         try {
             ChangeSet changeSet = makeChangeSet();
             InputStream in = new ByteArrayInputStream(data.getBytes());
@@ -632,7 +665,7 @@ public class PolicyLoader {
                         }
                         if (isRuleContinues(rules, qs)) {
                             String ruleUri = qs.getResource("rule").getURI();
-                            populateRule(rules.get(ruleUri), qs);
+                            populateRule(rules.get(ruleUri), qs, null);
                         } else {
                             AccessRule rule = AccessRuleFactory.createRule(qs);
                             rules.put(rule.getRuleUri(), rule);
@@ -657,6 +690,7 @@ public class PolicyLoader {
     }
 
     private void loadRulesForDataSet(Map<String, AccessRule> rules, String dataSetUri) throws Exception {
+        AttributeValueKey dataSetKey = getDataSetKey(dataSetUri);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(DATASET_RULES_QUERY);
         pss.setIri("dataSet", dataSetUri);
         debug(pss.toString());
@@ -671,9 +705,9 @@ public class PolicyLoader {
                         }
                         if (isRuleContinues(rules, qs)) {
                             String ruleUri = qs.getResource("rule").getURI();
-                            populateRule(rules.get(ruleUri), qs);
+                            populateRule(rules.get(ruleUri), qs, dataSetKey);
                         } else {
-                            AccessRule rule = AccessRuleFactory.createRule(qs);
+                            AccessRule rule = AccessRuleFactory.createRule(qs, dataSetKey);
                             rules.put(rule.getRuleUri(), rule);
                         }
                     } catch (Exception e) {
@@ -732,7 +766,7 @@ public class PolicyLoader {
         return rules.containsKey(ruleUri);
     }
 
-    private static void populateRule(AccessRule ar, QuerySolution qs) throws Exception {
+    private static void populateRule(AccessRule ar, QuerySolution qs, AttributeValueKey dataSetKey) throws Exception {
         if (ar == null) {
             return;
         }
@@ -742,7 +776,7 @@ public class PolicyLoader {
             return;
         }
         try {
-            ar.addCheck(CheckFactory.createCheck(qs));
+            ar.addCheck(CheckFactory.createCheck(qs, dataSetKey));
         } catch (Exception e) {
             log.error(e, e);
         }
@@ -829,6 +863,40 @@ public class PolicyLoader {
             log.error(e, e);
         }
         return uri[0];
+    }
+
+    public AttributeValueKey getDataSetKey(String dataSetUri) {
+        AttributeValueKey compositeKey = new AttributeValueKey();
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(DATA_SET_KEY_QUERY);
+        pss.setIri("dataSet", dataSetUri);
+        final String queryText = pss.toString();
+        debug("SPARQL Query to get data set key:\n %s", queryText);
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    String keyComponent = qs.getResource("keyComponent").getURI();
+                    if (qs.contains("id") && qs.get("id").isLiteral()) {
+                        String id = qs.getLiteral("id").getString();
+                        if (qs.contains("type") && qs.get("type").isLiteral()) {
+                            String type = qs.getLiteral("type").getString();
+                            if (Attribute.OPERATION.toString().equals(type)) {
+                                compositeKey.setOperation(AccessOperation.valueOf(id));
+                            }
+                            if (Attribute.ACCESS_OBJECT_TYPE.toString().equals(type)) {
+                                compositeKey.setObjectType(AccessObjectType.valueOf(id));
+                            }
+                        }
+                    } else {
+                        //assume keyComponent is a role
+                        compositeKey.setRole(keyComponent);
+                    }
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return compositeKey;
     }
 
     public Map<String, String> getRoleDataSetTemplates() {

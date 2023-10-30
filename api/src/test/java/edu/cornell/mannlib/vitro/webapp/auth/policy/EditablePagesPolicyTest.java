@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import org.junit.Test;
 
 public class EditablePagesPolicyTest extends PolicyTest {
@@ -17,8 +18,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
     @Test
     public void testLoadEditablePagesPolicy() {
         load(EDITABLE_PAGES_POLICY_PATH);
-        String policyUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/edit-individual-pages/Policy";
+        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "policy/edit-individual-pages/Policy";
         Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
         assertEquals(1, policies.size());
         DynamicPolicy policy = policies.iterator().next();

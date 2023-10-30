@@ -1,9 +1,11 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.attributes;
+package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,8 +14,8 @@ public class SubjectRoleCheck extends AbstractCheck {
 
     private static final Log log = LogFactory.getLog(SubjectRoleCheck.class);
 
-    public SubjectRoleCheck(String uri, String roleValue) {
-        super(uri, roleValue);
+    public SubjectRoleCheck(String uri, AttributeValueContainer values) {
+        super(uri, values);
     }
 
     @Override

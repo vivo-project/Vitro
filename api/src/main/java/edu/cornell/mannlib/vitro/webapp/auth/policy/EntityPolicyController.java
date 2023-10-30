@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_VOCABULARY_PREFIX;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,11 +14,14 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValues;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValuesRegistry;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 public class EntityPolicyController {
 
     private static final Log log = LogFactory.getLog(EntityPolicyController.class);
@@ -27,39 +32,96 @@ public class EntityPolicyController {
      * @param aot - access object type
      * @param ao - access operation
      * @param selectedRoles - list of roles to assign
-     * @param allRoles - list of all available roles
+     * @param roles - list of all available roles
      */
     public static void updateEntityDataSet(String entityUri, AccessObjectType aot, AccessOperation ao,
-            List<String> selectedRoles, List<String> allRoles) {
+            List<String> selectedRoles, List<String> roles) {
         if (StringUtils.isBlank(entityUri)) {
             return;
         }
         Set<String> selectedSet = new HashSet<>(selectedRoles);
-        for (String role : allRoles) {
-            boolean isInDataSet = isUriInTestDataset(entityUri, ao, aot, role);
-            boolean isSelected = selectedSet.contains(role);
-            final PolicyLoader loader = PolicyLoader.getInstance();
-            final String dataSetUri =
-                    loader.getDataSetUriByKey(new String[] { role }, new String[] { ao.toString(), aot.toString() });
-
-            if (dataSetUri == null) {
-                log.debug(
-                        String.format("Policy wasn't found by key:\n%s\n%s\n%s", ao.toString(), aot.toString(), role));
-                continue;
-            }
-            PolicyStore policyStore = PolicyStore.getInstance();
-            if (isSelected && !isInDataSet) {
-                loader.addEntityToPolicyDataSet(entityUri, aot, ao, role);
-                policyStore.remove(dataSetUri);
-                DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
-                policyStore.add(policy);
-            } else if (!isSelected && isInDataSet) {
-                loader.removeEntityFromPolicyDataSet(entityUri, aot, ao, role);
-                policyStore.remove(dataSetUri);
-                DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
-                policyStore.add(policy);
+        for (String role : roles) {
+            if (selectedSet.contains(role)) {
+                grantAccess(entityUri, aot, ao, role);
+            } else {
+                revokeAccess(entityUri, aot, ao, role);
             }
         }
+    }
+
+    private static AttributeValues getRegistry() {
+        return AttributeValuesRegistry.getInstance();
+    }
+
+    public static void revokeAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
+        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
+        AttributeValueContainer container = getRegistry().get(key);
+        if (container != null) {
+            if (container.contains(entityUri)) {
+                container.remove(entityUri);
+                String toRemove = getValueStatementString(entityUri, container.getContainerUri());
+                getLoader().updateAccessControlModel(toRemove, false);
+            }
+        } else {
+            reduceInactiveValueContainer(entityUri, aot, ao, role);
+        }
+    }
+
+    private static PolicyLoader getLoader() {
+        return PolicyLoader.getInstance();
+    }
+
+    private static void reduceInactiveValueContainer(String entityUri, AccessObjectType aot, AccessOperation ao,
+            String role) {
+        StringBuilder removals = new StringBuilder();
+        getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), removals);
+        getLoader().updateAccessControlModel(removals.toString(), false);
+    }
+
+    public static void grantAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
+        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
+        AttributeValueContainer container = getRegistry().get(key);
+        if (container != null) {
+            if (!container.contains(entityUri)) {
+                container.add(entityUri);
+                String toAdd = getValueStatementString(entityUri, container.getContainerUri());
+                getLoader().updateAccessControlModel(toAdd, true);
+            }
+        } else {
+            extendInactiveValueContainer(entityUri, aot, ao, role);
+            loadPolicy(aot, ao, role);
+        }
+    }
+
+    private static void loadPolicy(AccessObjectType aot, AccessOperation ao, String role) {
+        String dataSetUri =
+                getLoader().getDataSetUriByKey(new String[] { role }, new String[] { ao.toString(), aot.toString() });
+        if (dataSetUri != null) {
+            DynamicPolicy policy = getLoader().loadPolicyFromTemplateDataSet(dataSetUri);
+            if (policy != null) {
+                PolicyStore.getInstance().add(policy);
+            }
+        }
+    }
+
+    private static void extendInactiveValueContainer(String entityUri, AccessObjectType aot, AccessOperation ao,
+            String role) {
+        StringBuilder additions = new StringBuilder();
+        getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), additions);
+        getLoader().updateAccessControlModel(additions.toString(), true);
+    }
+
+    public static boolean isGranted(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
+        if (StringUtils.isBlank(entityUri)) {
+            return false;
+        }
+        AttributeValues registry = getRegistry();
+        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
+        AttributeValueContainer container = registry.get(key);
+        if (container == null) {
+            return false;
+        }
+        return container.contains(entityUri);
     }
 
     public static List<String> getGrantedRoles(String entityUri, AccessOperation ao, AccessObjectType aot,
@@ -84,13 +146,15 @@ public class EntityPolicyController {
         for (String role : selectedRoles) {
             String valueContainerUri = getValueContainerUri(aot, ao, role);
             if (valueContainerUri == null) {
-                log.error(String.format("Policy value container wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
+                log.debug(String.format("Policy value container wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
                 continue;
             }
-            sb.append("<").append(valueContainerUri)
-                    .append("> <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/dataValue> <")
-                    .append(entityUri).append("> .\n");
+            sb.append(getValueStatementString(entityUri, valueContainerUri));
         }
+    }
+
+    private static String getValueStatementString(String entityUri, String valueContainerUri) {
+        return "<" + valueContainerUri + "> <" + AUTH_VOCABULARY_PREFIX + "dataValue> <" + entityUri + "> .\n";
     }
 
     public static void deletedEntityEvent(Property oldObj) {
@@ -108,7 +172,7 @@ public class EntityPolicyController {
     }
 
     private static boolean isUriInTestDataset(String entityUri, AccessOperation ao, AccessObjectType aot, String role) {
-        Set<String> values = PolicyLoader.getInstance().getDataSetValues(ao, aot, role);
+        Set<String> values = getLoader().getDataSetValues(ao, aot, role);
         return values.contains(entityUri);
     }
 
@@ -117,7 +181,7 @@ public class EntityPolicyController {
         if (policyKeyToDataValueMap.containsKey(key)) {
             return policyKeyToDataValueMap.get(key);
         }
-        String uri = PolicyLoader.getInstance().getEntityValueContainerUri(ao, aot, role);
+        String uri = getLoader().getEntityValueContainerUri(ao, aot, role);
         policyKeyToDataValueMap.put(key, uri);
         return uri;
     }

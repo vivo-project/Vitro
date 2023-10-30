@@ -1,12 +1,15 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.NAMED_OBJECT;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.EXECUTE;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_INDIVIDUAL_PREFIX;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
 import org.junit.Test;
 
 public class PolicyLoaderTest extends PolicyTest {
@@ -31,8 +34,8 @@ public class PolicyLoaderTest extends PolicyTest {
         load(DATA_SET);
         List<String> keys = PolicyLoader.getInstance().getDataSetKeysFromTemplate(PREFIX + "RoleDataSetTemplate1");
         assertEquals(2, keys.size());
-        assertTrue(keys.contains("https://vivoweb.org/ontology/vitro-application/auth/individual/NamedObject"));
-        assertTrue(keys.contains("https://vivoweb.org/ontology/vitro-application/auth/individual/ExecuteOperation"));
+        assertTrue(keys.contains(AUTH_INDIVIDUAL_PREFIX + "NamedObject"));
+        assertTrue(keys.contains(AUTH_INDIVIDUAL_PREFIX + "ExecuteOperation"));
     }
 
     @Test
@@ -41,15 +44,14 @@ public class PolicyLoaderTest extends PolicyTest {
         List<String> keys =
                 PolicyLoader.getInstance().getDataSetKeyTemplatesFromTemplate(PREFIX + "RoleDataSetTemplate1");
         assertEquals(1, keys.size());
-        assertTrue(keys.contains("https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole"));
+        assertTrue(keys.contains(AUTH_INDIVIDUAL_PREFIX + "SubjectRole"));
     }
 
     @Test
     public void getDataSetUriByKeyTest() {
         load(DATA_SET);
-        String uri = PolicyLoader.getInstance().getDataSetUriByKey(
-                new String[] { "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC" },
-                new String[] { AccessObjectType.NAMED_OBJECT.toString() });
+        String uri = PolicyLoader.getInstance().getDataSetUriByKey(new String[] { PUBLIC },
+                new String[] { NAMED_OBJECT.toString(), EXECUTE.toString() });
         assertEquals(PREFIX + "PublicDataSet", uri);
     }
 
@@ -58,7 +60,18 @@ public class PolicyLoaderTest extends PolicyTest {
         load(DATA_SET);
         List<String> values = PolicyLoader.getInstance().getDataSetValuesFromTemplate(PREFIX + "RoleDataSetTemplate1");
         assertEquals(1, values.size());
-        assertEquals(values.get(0),
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/PublicRoleValueContainer");
+        assertEquals(values.get(0), AUTH_INDIVIDUAL_PREFIX + "PublicRoleValueContainer");
+    }
+
+    @Test
+    public void getDataSetKeyTest() {
+        load(DATA_SET);
+        AttributeValueKey expectedKey = new AttributeValueKey();
+        expectedKey.setOperation(EXECUTE);
+        expectedKey.setRole(PUBLIC);
+        expectedKey.setObjectType(NAMED_OBJECT);
+        AttributeValueKey compositeKey = PolicyLoader.getInstance().getDataSetKey(PREFIX + "PublicDataSet");
+        assertEquals(expectedKey, compositeKey);
+
     }
 }

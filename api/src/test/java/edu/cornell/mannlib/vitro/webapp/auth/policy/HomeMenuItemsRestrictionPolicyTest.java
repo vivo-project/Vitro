@@ -12,6 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import org.junit.Test;
 
 public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
@@ -22,8 +23,7 @@ public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
     @Test
     public void testHomeMenuItemsRestrictionPolicy() {
         load(MENU_ITEMS_POLICY_PATH);
-        String policyUri =
-                "https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/Policy";
+        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "policy/restrict-home-menu-items-editing/Policy";
         Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
         assertEquals(1, policies.size());
         DynamicPolicy policy = policies.iterator().next();
