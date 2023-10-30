@@ -5,38 +5,38 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:BrokenTestSetPolicy rdf:type ao:Policy ;
-          ao:policyDataSets ai:testDataSets ;
-          ao:rules ai:BrokenRuleSet .
+access-individual:BrokenTestSetPolicy rdf:type access:Policy ;
+          access:policyDataSets access-individual:testDataSets ;
+          access:rules access-individual:BrokenRuleSet .
 
-ai:BrokenRuleSet rdf:type ao:Rules ;
-          ao:rule ai:BrokenRule .
+access-individual:BrokenRuleSet rdf:type access:Rules ;
+          access:rule access-individual:BrokenRule .
           
-ai:BrokenRule rdf:type ao:Rule ;
-          ao:check ai:BrokenAttribute1 ;
-          ao:check ai:BrokenAttribute2 .
+access-individual:BrokenRule rdf:type access:Rule ;
+          access:check access-individual:BrokenAttribute1 ;
+          access:check access-individual:BrokenAttribute2 .
           
-ai:BrokenAttribute1 rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:attribute ai:ObjectUri ;
-         ao:setValue ai:valueSet1 .
+access-individual:BrokenAttribute1 rdf:type access:Check ;
+         access:operator access-individual:Equals ;
+         access:attribute access-individual:ObjectUri ;
+         access:setValue access-individual:valueSet1 .
          
-ai:BrokenAttribute2 rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:attribute ai:ObjectUri ;
-         ao:setValue ai:valueSet2 .
+access-individual:BrokenAttribute2 rdf:type access:Check ;
+         access:operator access-individual:Equals ;
+         access:attribute access-individual:ObjectUri ;
+         access:setValue access-individual:valueSet2 .
 
-ai:testDataSets rdf:type ao:PolicyDataSets ;
-          ao:policyDataSet ai:testDataSet1 .
+access-individual:testDataSets rdf:type access:PolicyDataSets ;
+          access:policyDataSet access-individual:testDataSet1 .
 
-ai:testDataSet1 rdf:type ao:PolicyDataSet ;
-          ao:dataSetValues ai:valueSet1 .
+access-individual:testDataSet1 rdf:type access:PolicyDataSet ;
+          access:dataSetValues access-individual:valueSet1 .
 
-ai:valueSet1 rdf:type ao:ValueContainer ;
-        ao:dataValue <test:value1> ;
-        ao:dataValue <test:value2> ;
+access-individual:valueSet1 rdf:type access:ValueContainer ;
+        access:value <test:value1> ;
+        access:value <test:value2> ;
         .        
 

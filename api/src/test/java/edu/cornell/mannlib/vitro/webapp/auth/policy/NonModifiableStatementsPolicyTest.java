@@ -28,7 +28,7 @@ public class NonModifiableStatementsPolicyTest extends PolicyTest {
     public void testNonModifiableStatementsPolicy() {
         load(PolicyTest.USER_ACCOUNTS_HOME_FIRSTTIME + NOT_MODIFIABLE_STATEMENTS_POLICY_PATH + EXT);
 
-        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "template/non-modifiable-statements/PolicyTemplate";
+        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "non-modifiable-statements/PolicyTemplate";
         Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
         assertEquals(1, policies.size());
         DynamicPolicy policy = policies.iterator().next();

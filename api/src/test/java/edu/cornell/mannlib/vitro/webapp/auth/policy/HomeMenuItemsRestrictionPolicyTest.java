@@ -23,7 +23,7 @@ public class HomeMenuItemsRestrictionPolicyTest extends PolicyTest {
     @Test
     public void testHomeMenuItemsRestrictionPolicy() {
         load(MENU_ITEMS_POLICY_PATH);
-        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "policy/restrict-home-menu-items-editing/Policy";
+        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "restrict-home-menu-items-editing/Policy";
         Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
         assertEquals(1, policies.size());
         DynamicPolicy policy = policies.iterator().next();

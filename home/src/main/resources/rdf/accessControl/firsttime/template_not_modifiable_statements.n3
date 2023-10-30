@@ -1,135 +1,129 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/non-modifiable-statements/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/non-modifiable-statements/> .
 
-:PolicyTemplate a ao:PolicyTemplate ;
-    ao:priority 8000 ;
-    ao:policyDataSets :DataSets ;
-    ao:rules :RuleSet .
+:PolicyTemplate a access:PolicyTemplate ;
+    access:priority 8000 ;
+    access:policyDataSets :DataSets ;
+    access:rules :RuleSet .
 
-:RuleSet a ao:Rules ;
-    ao:rule :RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
-    ao:rule :RestrictObjectPropertyStatementsWithNotModifiableSubject ;
-    ao:rule :RestrictObjectPropertyStatementsWithNotModifiableObject ;
-    ao:rule :RestrictDataPropertyStatementsWithNotModifiableSubject ;
-    ao:rule :RestrictDataPropertyStatementsWithNotModifiablePredicate ;
+:RuleSet a access:Rules ;
+    access:rule :RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
+    access:rule :RestrictObjectPropertyStatementsWithNotModifiableSubject ;
+    access:rule :RestrictObjectPropertyStatementsWithNotModifiableObject ;
+    access:rule :RestrictDataPropertyStatementsWithNotModifiableSubject ;
+    access:rule :RestrictDataPropertyStatementsWithNotModifiablePredicate ;
     .
 
-:RestrictObjectPropertyStatementsWithNotModifiableSubject a ao:Rule ;
-    ao:decision ai:Deny ;
-    ao:check :IsObjectPropertyStatement ;
-    ao:check :SubjectUriStartWithProhibitedNamespace ;
-    ao:check :StatementSubjectNotOneOfProhibitedExceptions .
+:RestrictObjectPropertyStatementsWithNotModifiableSubject a access:Rule ;
+    access:decision access-individual:Deny ;
+    access:check :IsObjectPropertyStatement ;
+    access:check :SubjectUriStartWithProhibitedNamespace ;
+    access:check :StatementSubjectNotOneOfProhibitedExceptions .
 
-:RestrictObjectPropertyStatementsWithNotModifiablePredicate a ao:Rule ;
-    ao:decision ai:Deny ;
-    ao:check :IsObjectPropertyStatement ;
-    ao:check :PredicateUriStartWithProhibitedNamespace ;
-    ao:check :PredicateNotANamespaceException .
+:RestrictObjectPropertyStatementsWithNotModifiablePredicate a access:Rule ;
+    access:decision access-individual:Deny ;
+    access:check :IsObjectPropertyStatement ;
+    access:check :PredicateUriStartWithProhibitedNamespace ;
+    access:check :PredicateNotANamespaceException .
 
-:RestrictObjectPropertyStatementsWithNotModifiableObject a ao:Rule ;
-    ao:decision ai:Deny ;
-    ao:check :IsObjectPropertyStatement ;
-    ao:check :StatementObjectUriStartsWithProhibitedNameSpace ;
-    ao:check :ObjectUriNotOneOfProhibitedExceptions .
+:RestrictObjectPropertyStatementsWithNotModifiableObject a access:Rule ;
+    access:decision access-individual:Deny ;
+    access:check :IsObjectPropertyStatement ;
+    access:check :StatementObjectUriStartsWithProhibitedNameSpace ;
+    access:check :ObjectUriNotOneOfProhibitedExceptions .
 
-:RestrictDataPropertyStatementsWithNotModifiableSubject a ao:Rule ;
-    ao:decision ai:Deny ;
-    ao:check :IsDataPropertyStatement ;
-    ao:check :SubjectUriStartWithProhibitedNamespace ;
-    ao:check :StatementSubjectNotOneOfProhibitedExceptions .
+:RestrictDataPropertyStatementsWithNotModifiableSubject a access:Rule ;
+    access:decision access-individual:Deny ;
+    access:check :IsDataPropertyStatement ;
+    access:check :SubjectUriStartWithProhibitedNamespace ;
+    access:check :StatementSubjectNotOneOfProhibitedExceptions .
 
-:RestrictDataPropertyStatementsWithNotModifiablePredicate a ao:Rule ;
-    ao:decision ai:Deny ;
-    ao:check :IsDataPropertyStatement ;
-    ao:check :PredicateUriStartWithProhibitedNamespace ;
-    ao:check :PredicateNotANamespaceException .
+:RestrictDataPropertyStatementsWithNotModifiablePredicate a access:Rule ;
+    access:decision access-individual:Deny ;
+    access:check :IsDataPropertyStatement ;
+    access:check :PredicateUriStartWithProhibitedNamespace ;
+    access:check :PredicateNotANamespaceException .
 
-:IsObjectPropertyStatement a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:value ai:ObjectPropertyStatement .
+:IsObjectPropertyStatement a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:singleValue access-individual:ObjectPropertyStatement .
 
-:IsDataPropertyStatement a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:value ai:DataPropertyStatement .
+:IsDataPropertyStatement a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:singleValue access-individual:DataPropertyStatement .
 
 ### Not modifiable property statement attributes
-:PredicateUriStartWithProhibitedNamespace a ao:Check ;
-    ao:operator ai:StartsWith ;
-    ao:attribute ai:StatementPredicateUri ;
-    ao:templateValue :ProhibitedNamespaceValueSet .
+:PredicateUriStartWithProhibitedNamespace a access:Check ;
+    access:operator access-individual:StartsWith ;
+    access:attribute access-individual:StatementPredicateUri ;
+    access:values :ProhibitedNamespaceValueSet .
 
-:PredicateNotANamespaceException a ao:Check ;
-    ao:operator ai:NotOneOf ;
-    ao:attribute ai:StatementPredicateUri ;
-    ao:templateValue :ProhibitedNamespaceExceptionsValueSet .
+:PredicateNotANamespaceException a access:Check ;
+    access:operator access-individual:NotOneOf ;
+    access:attribute access-individual:StatementPredicateUri ;
+    access:values :ProhibitedNamespaceExceptionsValueSet .
 
-:SubjectUriStartWithProhibitedNamespace a ao:Check ;
-    ao:operator ai:StartsWith ;
-    ao:attribute ai:StatementSubjectUri ;
-    ao:templateValue :ProhibitedNamespaceValueSet .
+:SubjectUriStartWithProhibitedNamespace a access:Check ;
+    access:operator access-individual:StartsWith ;
+    access:attribute access-individual:StatementSubjectUri ;
+    access:values :ProhibitedNamespaceValueSet .
 
-:StatementSubjectNotOneOfProhibitedExceptions a ao:Check ;
-    ao:operator ai:NotOneOf ;
-    ao:attribute ai:StatementSubjectUri ;
-    ao:templateValue :ProhibitedNamespaceExceptionsValueSet .    
+:StatementSubjectNotOneOfProhibitedExceptions a access:Check ;
+    access:operator access-individual:NotOneOf ;
+    access:attribute access-individual:StatementSubjectUri ;
+    access:values :ProhibitedNamespaceExceptionsValueSet .    
 
-:StatementObjectUriStartsWithProhibitedNameSpace a ao:Check ;
-    ao:operator ai:StartsWith ;
-    ao:attribute ai:StatementObjectUri ;
-    ao:templateValue :ProhibitedNamespaceValueSet .
+:StatementObjectUriStartsWithProhibitedNameSpace a access:Check ;
+    access:operator access-individual:StartsWith ;
+    access:attribute access-individual:StatementObjectUri ;
+    access:values :ProhibitedNamespaceValueSet .
 
-:ObjectUriNotOneOfProhibitedExceptions a ao:Check ;
-    ao:operator ai:NotOneOf ;
-    ao:attribute ai:StatementObjectUri ;
-    ao:templateValue :ProhibitedNamespaceExceptionsValueSet .  
-
-### Not modifiable data property statement attributes    
+:ObjectUriNotOneOfProhibitedExceptions a access:Check ;
+    access:operator access-individual:NotOneOf ;
+    access:attribute access-individual:StatementObjectUri ;
+    access:values :ProhibitedNamespaceExceptionsValueSet .  
 
 ###DataSets
-:DataSets a ao:PolicyDataSets ;
-    ao:policyDataSet :NotModifiableStatementsPolicyDataSet .
 
-:NotModifiableStatementsPolicyDataSet a ao:PolicyDataSet ;
-    ao:dataSetValues :ProhibitedNamespaceExceptionsValueContainer ;
-    ao:dataSetValues :ProhibitedNamespaceValueContainer .
+:DataSets a access:PolicyDataSets ;
+    access:policyDataSet :NotModifiableStatementsPolicyDataSet .
 
-:ProhibitedNamespaceValueSet a ao:AttributeValueSet ;
-    ao:attributeValue :ProhibitedNamespaceValueContainer .
+:NotModifiableStatementsPolicyDataSet a access:PolicyDataSet ;
+    access:dataSetValues :ProhibitedNamespaceExceptionsValueContainer ;
+    access:dataSetValues :ProhibitedNamespaceValueContainer .
 
-:ProhibitedNamespaceExceptionsValueSet a ao:AttributeValueSet ;
-    ao:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
+:ProhibitedNamespaceValueSet a access:AttributeValueSet ;
+    access:attributeValue :ProhibitedNamespaceValueContainer .
 
-:ProhibitedNamespaceExceptionsValueContainer a ao:ValueContainer ;
+:ProhibitedNamespaceExceptionsValueSet a access:AttributeValueSet ;
+    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
+
+:ProhibitedNamespaceExceptionsValueContainer a access:ValueContainer ;
     .
 
-:ProhibitedNamespaceValueContainer a ao:ValueContainer ;
+:ProhibitedNamespaceValueContainer a access:ValueContainer ;
     .
 
 :ProhibitedNamespaceExceptionsValueContainer
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#moniker> ;
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime> ;
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ;
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Link> ;
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ;
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ;
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkAnchor> ;
-    ao:dataValue <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkURL> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#moniker> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Link> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#primaryLink> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkAnchor> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkURL> ;
     .
 
 :ProhibitedNamespaceValueContainer
-    ao:dataValue  :prohibitedNamespacePrefix ; 
+    access:value  :prohibitedNamespacePrefix ; 
     .
 
-:prohibitedNamespacePrefix a ao:TestValue ;
-    ao:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;
+:prohibitedNamespacePrefix a access:AttributeValue ;
+    access:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;
     

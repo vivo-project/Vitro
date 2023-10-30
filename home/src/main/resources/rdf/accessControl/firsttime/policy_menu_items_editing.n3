@@ -1,57 +1,52 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/restrict-home-menu-items-editing/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/restrict-home-menu-items-editing/> .
 
-:Policy a ao:Policy ;
-    ao:priority 9000 ;
-    ao:rules :RuleSet .
+:Policy a access:Policy ;
+    access:priority 9000 ;
+    access:rules :RuleSet .
 
-:RuleSet a ao:Rules ;
-    ao:rule :RestrictEdit ;
-    ao:rule :RestrictDrop .
+:RuleSet a access:Rules ;
+    access:rule :RestrictEdit ;
+    access:rule :RestrictDrop .
 
-:RestrictEdit a ao:Rule ;
-    ao:decision ai:Deny ;
-    ao:check :IsEditOperationCheck ;
-    ao:check :IsObjectPropertyStatement ;
-    ao:check :PredicateUriEqualsHomeMenuItem ;
-    ao:check :ObjectUriEqualsHasElement .
+:RestrictEdit a access:Rule ;
+    access:decision access-individual:Deny ;
+    access:check :IsEditOperationCheck ;
+    access:check :IsObjectPropertyStatement ;
+    access:check :PredicateUriEqualsHomeMenuItem ;
+    access:check :ObjectUriEqualsHasElement .
 
-:RestrictDrop a ao:Rule ;
-    ao:decision ai:Deny ;
-    ao:check :IsDropOperationCheck ;
-    ao:check :IsObjectPropertyStatement ;
-    ao:check :PredicateUriEqualsHomeMenuItem ;
-    ao:check :ObjectUriEqualsHasElement .
+:RestrictDrop a access:Rule ;
+    access:decision access-individual:Deny ;
+    access:check :IsDropOperationCheck ;
+    access:check :IsObjectPropertyStatement ;
+    access:check :PredicateUriEqualsHomeMenuItem ;
+    access:check :ObjectUriEqualsHasElement .
 
-:IsEditOperationCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:Operation ;
-    ao:value ai:EditOperation .
+:IsEditOperationCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:singleValue access-individual:EditOperation .
 
-:IsDropOperationCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:Operation ;
-    ao:value ai:DropOperation .
+:IsDropOperationCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:singleValue access-individual:DropOperation .
 
-:IsObjectPropertyStatement a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:value ai:ObjectPropertyStatement .
+:IsObjectPropertyStatement a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:singleValue access-individual:ObjectPropertyStatement .
 
-:PredicateUriEqualsHomeMenuItem a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:StatementPredicateUri ;
-    ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
+:PredicateUriEqualsHomeMenuItem a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:StatementPredicateUri ;
+    access:singleValue <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
 
-:ObjectUriEqualsHasElement a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:StatementObjectUri ;
-    ao:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .
+:ObjectUriEqualsHasElement a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:StatementObjectUri ;
+    access:singleValue <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

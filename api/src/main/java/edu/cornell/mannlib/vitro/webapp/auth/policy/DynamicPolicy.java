@@ -95,7 +95,7 @@ public class DynamicPolicy implements Policy {
 
     private static String shortenUri(String uri) {
         if (uri.startsWith(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX)) {
-            return "ai:" + uri.substring(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX.length());
+            return "access-individual:" + uri.substring(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX.length());
         }
         return uri;
     }

@@ -1,75 +1,71 @@
 # $This file is distributed under the terms of the license in LICENSE$
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/policy/edit-individual-pages/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-individual-pages/> .
 
-:Policy a ao:Policy ;
-    ao:rules :RuleSet .
+:Policy a access:Policy ;
+    access:rules :RuleSet .
 
-:RuleSet a ao:Rules ;
-    ao:rule :AllowEditRelatedPagesRule ;
-    ao:rule :AllowEditIndividualPagesRule .
+:RuleSet a access:Rules ;
+    access:rule :AllowEditRelatedPagesRule ;
+    access:rule :AllowEditIndividualPagesRule .
 
-:AllowEditIndividualPagesRule a ao:Rule;
-    ao:check :SubjectRoleOneOfEditorsCheck ;
-    ao:check :IsAddOperation ;
-    ao:check :IsObjectPropertyStatement ;
-    ao:check :ObjectUriIsSomeUri ;
-    ao:check :PredicateIsSomePredicate .
+:AllowEditIndividualPagesRule a access:Rule;
+    access:check :SubjectRoleOneOfEditorsCheck ;
+    access:check :IsAddOperation ;
+    access:check :IsObjectPropertyStatement ;
+    access:check :ObjectUriIsSomeUri ;
+    access:check :PredicateIsSomePredicate .
 
-:SubjectRoleOneOfEditorsCheck a ao:Check ;
-    ao:operator ai:OneOf ;
-    ao:attribute ai:SubjectRole ;
-    ao:value auth:ADMIN ;
-    ao:value auth:CURATOR ;
-    ao:value auth:EDITOR .
+:SubjectRoleOneOfEditorsCheck a access:Check ;
+    access:operator access-individual:OneOf ;
+    access:attribute access-individual:SubjectRole ;
+    access:singleValue auth:ADMIN ;
+    access:singleValue auth:CURATOR ;
+    access:singleValue auth:EDITOR .
 
-:SubjectRoleIsSelfEditor a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:SubjectRole ;
-    ao:value auth:SELF_EDITOR .
+:SubjectRoleIsSelfEditor a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:SubjectRole ;
+    access:singleValue auth:SELF_EDITOR .
 
-:IsAddOperation a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:Operation ;
-    ao:value ai:AddOperation .
+:IsAddOperation a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:singleValue access-individual:AddOperation .
 
-:AllowEditRelatedPagesRule a ao:Rule;
-    ao:check :SubjectRoleIsSelfEditor ;
-    ao:check :SubjectUriIsProfileRelatedResource ;
-    ao:check :IsAddOperation ;
-    ao:check :IsObjectPropertyStatement ;
-    ao:check :ObjectUriIsSomeUri ;
-    ao:check :PredicateIsSomePredicate .
+:AllowEditRelatedPagesRule a access:Rule;
+    access:check :SubjectRoleIsSelfEditor ;
+    access:check :SubjectUriIsProfileRelatedResource ;
+    access:check :IsAddOperation ;
+    access:check :IsObjectPropertyStatement ;
+    access:check :ObjectUriIsSomeUri ;
+    access:check :PredicateIsSomePredicate .
 
-:PredicateIsSomePredicate a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:StatementPredicateUri ;
-    ao:value :SomeUri .
+:PredicateIsSomePredicate a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:StatementPredicateUri ;
+    access:singleValue :SomeUri .
 
-:ObjectUriIsSomeUri a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:StatementObjectUri ;
-    ao:value :SomeUri .
+:ObjectUriIsSomeUri a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:StatementObjectUri ;
+    access:singleValue :SomeUri .
 
-:SubjectUriIsProfileRelatedResource a ao:Check ;
-    ao:operator ai:SparqlSelectQueryContains ;
-    ao:attribute ai:StatementSubjectUri ;
-    ao:value ai:PersonProfileProximityToResourceUri .
+:SubjectUriIsProfileRelatedResource a access:Check ;
+    access:operator access-individual:SparqlSelectQueryContains ;
+    access:attribute access-individual:StatementSubjectUri ;
+    access:singleValue access-individual:PersonProfileProximityToResourceUri .
 
-:IsObjectPropertyStatement a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:value ai:ObjectPropertyStatement .
+:IsObjectPropertyStatement a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:singleValue access-individual:ObjectPropertyStatement .
 
+:SomeUri a access:AttributeValue ;
+    access:id "?SOME_URI" .
 
-:SomeUri a ao:ValueContainer ;
-    ao:id "?SOME_URI" .
-
-:SomeLiteral a ao:ValueContainer ;
-    ao:id "?SOME_LITERAL" .
+:SomeLiteral a access:AttributeValue ;
+    access:id "?SOME_LITERAL" .

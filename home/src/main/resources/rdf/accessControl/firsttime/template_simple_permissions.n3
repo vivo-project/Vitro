@@ -1,159 +1,153 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/simple-permissions/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
 
-:PolicyTemplate a ao:PolicyTemplate ;
-    ao:priority 1000 ;
-    ao:policyDataSets :DataSets ;
-    ao:rules :RuleSet .
+:PolicyTemplate a access:PolicyTemplate ;
+    access:priority 1000 ;
+    access:policyDataSets :DataSets ;
+    access:rules :RuleSet .
 
-:DataSets a ao:PolicyDataSets ;
-    ao:policyDataSetTemplate :RoleDataSetTemplate ;
-    ao:policyDataSet :PublicDataSet ;
-    ao:policyDataSet :SelfEditorDataSet ;
-    ao:policyDataSet :EditorDataSet ;
-    ao:policyDataSet :CuratorDataSet ;
-    ao:policyDataSet :AdminDataSet .
+:DataSets a access:PolicyDataSets ;
+    access:policyDataSetTemplate :RoleDataSetTemplate ;
+    access:policyDataSet :PublicDataSet ;
+    access:policyDataSet :SelfEditorDataSet ;
+    access:policyDataSet :EditorDataSet ;
+    access:policyDataSet :CuratorDataSet ;
+    access:policyDataSet :AdminDataSet .
 
 #Role data set template
 
-:RoleDataSetTemplate a ao:DataSetTemplate ;
-    ao:dataSetTemplateKey :RoleDataSetTemplateKey ;
-    ao:dataSetKeyTemplate :RoleDataSetKeyTemplate ;
-    ao:dataSetValueTemplate :RoleValueContainerTemplate ;
-    ao:dataSetValueTemplate :RolePermissionValueContainerTemplate .  
+:RoleDataSetTemplate a access:DataSetTemplate ;
+    access:dataSetTemplateKey :RoleDataSetTemplateKey ;
+    access:dataSetKeyTemplate :RoleDataSetKeyTemplate ;
+    access:dataSetValueTemplate :RoleValueContainerTemplate ;
+    access:dataSetValueTemplate :RolePermissionValueContainerTemplate .  
 
-:RoleDataSetTemplateKey a ao:DataSetTemplateKey ;
-    ao:templateKey ai:SubjectRole .
+:RoleDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:templateKey access-individual:SubjectRole .
 
-:RoleDataSetKeyTemplate a ao:DataSetKeyTemplate ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponentTemplate ai:SubjectRole .
+:RoleDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :RoleValueSet;
-    ao:containerTypeTemplate ai:SubjectRole .
+:RoleValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :RoleValueSet;
+    access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePermissionValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :TypeValueSet;
-    ao:defaultValue simplePermission:PageViewablePublic;
-    ao:defaultValue simplePermission:QueryFullModel ;
-    ao:containerTypeTemplate ai:NamedObject .
-
+:RolePermissionValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :TypeValueSet;
+    access:defaultValue simplePermission:PageViewablePublic;
+    access:defaultValue simplePermission:QueryFullModel ;
+    access:containerTypeTemplate access-individual:NamedObject .
 
 #Data sets
 
-:PublicDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :PublicDataSetKey ;
-    ao:dataSetValues ai:PublicRoleValueContainer ;
-    ao:dataSetValues ai:PublicSimplePermissionValueContainer .
+:PublicDataSet a access:PolicyDataSet ;
+    access:dataSetKey :PublicDataSetKey ;
+    access:dataSetValues access-individual:PublicRoleValueContainer ;
+    access:dataSetValues :PublicSimplePermissionValueContainer .
 
-:PublicDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponent auth:PUBLIC .
+:PublicDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponent auth:PUBLIC .
 
-:SelfEditorDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:SelfEditorSimplePermissionValueContainer .
+:SelfEditorDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues :SelfEditorSimplePermissionValueContainer .
 
-:SelfEditorDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponent auth:SELF_EDITOR .
+:SelfEditorDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponent auth:SELF_EDITOR .
 
-:EditorDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :EditorDataSetKey ;
-    ao:dataSetValues ai:EditorRoleValueContainer ;
-    ao:dataSetValues ai:EditorSimplePermissionValueContainer .
+:EditorDataSet a access:PolicyDataSet ;
+    access:dataSetKey :EditorDataSetKey ;
+    access:dataSetValues access-individual:EditorRoleValueContainer ;
+    access:dataSetValues :EditorSimplePermissionValueContainer .
 
-:EditorDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponent auth:EDITOR .
+:EditorDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponent auth:EDITOR .
 
-:CuratorDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :CuratorDataSetKey ;
-    ao:dataSetValues ai:CuratorRoleValueContainer ;
-    ao:dataSetValues ai:CuratorSimplePermissionValueContainer .
+:CuratorDataSet a access:PolicyDataSet ;
+    access:dataSetKey :CuratorDataSetKey ;
+    access:dataSetValues access-individual:CuratorRoleValueContainer ;
+    access:dataSetValues :CuratorSimplePermissionValueContainer .
 
-:CuratorDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponent auth:CURATOR .
+:CuratorDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponent auth:CURATOR .
 
-:AdminDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :AdminDataSetKey  ;
-    ao:dataSetValues ai:AdminRoleValueContainer ;
-    ao:dataSetValues ai:AdminSimplePermissionValueContainer .
+:AdminDataSet a access:PolicyDataSet ;
+    access:dataSetKey :AdminDataSetKey  ;
+    access:dataSetValues access-individual:AdminRoleValueContainer ;
+    access:dataSetValues :AdminSimplePermissionValueContainer .
 
-:AdminDataSetKey  a ao:DataSetKey ;
-    ao:keyComponent ai:NamedObject ;
-    ao:keyComponent ai:ExecuteOperation ;
-    ao:keyComponent auth:ADMIN .
+:AdminDataSetKey  a access:DataSetKey ;
+    access:keyComponent access-individual:NamedObject ;
+    access:keyComponent access-individual:ExecuteOperation ;
+    access:keyComponent auth:ADMIN .
 
-:RuleSet a ao:Rules ;
-    ao:rule :AllowSimplePermission .
+:RuleSet a access:Rules ;
+    access:rule :AllowSimplePermission .
 
-:AllowSimplePermission a ao:Rule;
-    ao:check :IsSimplePermission ;
-    ao:check :IsExecuteOperation ;
-    ao:check :PermissionNameAllowed ;
-    ao:check :SubjectRoleEqualsDataSetRole .
+:AllowSimplePermission a access:Rule;
+    access:check :IsSimplePermission ;
+    access:check :IsExecuteOperation ;
+    access:check :PermissionNameAllowed ;
+    access:check :SubjectRoleEqualsDataSetRole .
 
-:IsExecuteOperation a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:Operation ;
-    ao:value ai:ExecuteOperation .
+:IsExecuteOperation a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:singleValue access-individual:ExecuteOperation .
 
-:PermissionNameAllowed a ao:Check ;
-    ao:operator ai:OneOf ;
-    ao:attribute ai:AccessObjectUri ;
-    ao:templateValue :TypeValueSet .
+:PermissionNameAllowed a access:Check ;
+    access:operator access-individual:OneOf ;
+    access:attribute access-individual:AccessObjectUri ;
+    access:values :TypeValueSet .
 
-:IsSimplePermission a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:value ai:NamedObject .
+:IsSimplePermission a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:singleValue access-individual:NamedObject .
 
-:TypeValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:PublicSimplePermissionValueContainer ;
-    ao:attributeValue ai:SelfEditorSimplePermissionValueContainer ;
-    ao:attributeValue ai:EditorSimplePermissionValueContainer ;
-    ao:attributeValue ai:CuratorSimplePermissionValueContainer ;
-    ao:attributeValue ai:AdminSimplePermissionValueContainer .
+:TypeValueSet a access:AttributeValueSet ;
+    access:attributeValue :PublicSimplePermissionValueContainer ;
+    access:attributeValue :SelfEditorSimplePermissionValueContainer ;
+    access:attributeValue :EditorSimplePermissionValueContainer ;
+    access:attributeValue :CuratorSimplePermissionValueContainer ;
+    access:attributeValue :AdminSimplePermissionValueContainer .
 
-ai:PublicSimplePermissionValueContainer a ao:ValueContainer ;
-    ao:containerType ai:NamedObject .
-ai:SelfEditorSimplePermissionValueContainer a ao:ValueContainer ;
-    ao:containerType ai:NamedObject .
-ai:EditorSimplePermissionValueContainer a ao:ValueContainer ;
-    ao:containerType ai:NamedObject .
-ai:CuratorSimplePermissionValueContainer a ao:ValueContainer ;
-    ao:containerType ai:NamedObject .
-ai:AdminSimplePermissionValueContainer a ao:ValueContainer ;
-    ao:containerType ai:NamedObject .
+:PublicSimplePermissionValueContainer a access:ValueContainer ;
+    access:containerType access-individual:NamedObject .
+:SelfEditorSimplePermissionValueContainer a access:ValueContainer ;
+    access:containerType access-individual:NamedObject .
+:EditorSimplePermissionValueContainer a access:ValueContainer ;
+    access:containerType access-individual:NamedObject .
+:CuratorSimplePermissionValueContainer a access:ValueContainer ;
+    access:containerType access-individual:NamedObject .
+:AdminSimplePermissionValueContainer a access:ValueContainer ;
+    access:containerType access-individual:NamedObject .
 
-:SubjectRoleEqualsDataSetRole a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:SubjectRole ;
-    ao:templateValue :RoleValueSet .
+:SubjectRoleEqualsDataSetRole a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:SubjectRole ;
+    access:values :RoleValueSet .
 
-:RoleValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:PublicRoleValueContainer ;
-    ao:attributeValue ai:SelfEditorRoleValueContainer ;
-    ao:attributeValue ai:EditorRoleValueContainer ;
-    ao:attributeValue ai:CuratorRoleValueContainer ;
-    ao:attributeValue ai:AdminRoleValueContainer .
-
+:RoleValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:PublicRoleValueContainer ;
+    access:attributeValue access-individual:SelfEditorRoleValueContainer ;
+    access:attributeValue access-individual:EditorRoleValueContainer ;
+    access:attributeValue access-individual:CuratorRoleValueContainer ;
+    access:attributeValue access-individual:AdminRoleValueContainer .
 

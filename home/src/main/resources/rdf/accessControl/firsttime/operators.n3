@@ -1,27 +1,22 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:Equals a ao:Operator;
-    ao:id "EQUALS" .
+access-individual:Equals a access:Operator;
+    access:id "EQUALS" .
 
-ai:NotEquals a ao:Operator;
-    ao:id "NOT_EQUALS" .
+access-individual:NotEquals a access:Operator;
+    access:id "NOT_EQUALS" .
 
-ai:OneOf a ao:Operator;
-    ao:id "ONE_OF" .
+access-individual:OneOf a access:Operator;
+    access:id "ONE_OF" .
 
-ai:NotOneOf a ao:Operator;
-    ao:id "NOT_ONE_OF" .
+access-individual:NotOneOf a access:Operator;
+    access:id "NOT_ONE_OF" .
 
-ai:StartsWith a ao:Operator;
-    ao:id "STARTS_WITH" .
+access-individual:StartsWith a access:Operator;
+    access:id "STARTS_WITH" .
 
-ai:SparqlSelectQueryContains a ao:Operator;
-    ao:id "SPARQL_SELECT_QUERY_CONTAINS" .
+access-individual:SparqlSelectQueryContains a access:Operator;
+    access:id "SPARQL_SELECT_QUERY_CONTAINS" .

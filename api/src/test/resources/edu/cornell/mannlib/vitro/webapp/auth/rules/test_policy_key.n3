@@ -5,25 +5,25 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:KeyTestPolicy rdf:type ao:Policy ;
-          ao:policyKey ai:PolicyKeyTest ;
-          ao:rules ai:KeyTestRuleSet .
+access-individual:KeyTestPolicy rdf:type access:Policy ;
+          access:policyKey access-individual:PolicyKeyTest ;
+          access:rules access-individual:KeyTestRuleSet .
 
-ai:KeyTestRuleSet rdf:type ao:Rules ;
-          ao:rule ai:KeyTestRule .
+access-individual:KeyTestRuleSet rdf:type access:Rules ;
+          access:rule access-individual:KeyTestRule .
           
-ai:KeyTestRule rdf:type ao:Rule ;
-          ao:check ai:KeyTestAttribute .
+access-individual:KeyTestRule rdf:type access:Rule ;
+          access:check access-individual:KeyTestAttribute .
           
-ai:KeyTestAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:attribute ai:Operation ;
-         ao:value ai:PublishOperation .
+access-individual:KeyTestAttribute rdf:type access:Check ;
+         access:operator access-individual:Equals ;
+         access:attribute access-individual:Operation ;
+         access:singleValue access-individual:PublishOperation .
 
-ai:PolicyKeyTest rdf:type ao:PolicyKey ;
-          ao:keyComponent ai:ObjectPropertyAccesObject ;
-          ao:keyComponent auth:ADMIN ;
-          ao:keyComponent ai:DisplayOperation .
+access-individual:PolicyKeyTest rdf:type access:PolicyKey ;
+          access:keyComponent access-individual:ObjectPropertyAccesObject ;
+          access:keyComponent auth:ADMIN ;
+          access:keyComponent access-individual:DisplayOperation .

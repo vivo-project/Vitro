@@ -5,20 +5,20 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:ValidTestPolicy rdf:type ao:Policy ;
-          ao:rules ai:ValidRuleSet .
+access-individual:ValidTestPolicy rdf:type access:Policy ;
+          access:rules access-individual:ValidRuleSet .
 
-ai:ValidRuleSet rdf:type ao:Rules ;
-          ao:rule ai:ValidRule .
+access-individual:ValidRuleSet rdf:type access:Rules ;
+          access:rule access-individual:ValidRule .
           
-ai:ValidRule rdf:type ao:Rule ;
-          ao:check ai:ValidAttribute .
+access-individual:ValidRule rdf:type access:Rule ;
+          access:check access-individual:ValidAttribute .
           
-ai:ValidAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:attribute ai:Operation ;
-         ao:value ai:PublishOperation .
+access-individual:ValidAttribute rdf:type access:Check ;
+         access:operator access-individual:Equals ;
+         access:attribute access-individual:Operation ;
+         access:singleValue access-individual:PublishOperation .
 

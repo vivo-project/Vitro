@@ -154,7 +154,7 @@ public class EntityPolicyController {
     }
 
     private static String getValueStatementString(String entityUri, String valueContainerUri) {
-        return "<" + valueContainerUri + "> <" + AUTH_VOCABULARY_PREFIX + "dataValue> <" + entityUri + "> .\n";
+        return "<" + valueContainerUri + "> <" + AUTH_VOCABULARY_PREFIX + "value> <" + entityUri + "> .\n";
     }
 
     public static void deletedEntityEvent(Property oldObj) {

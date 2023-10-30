@@ -5,26 +5,26 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-ai:BrokenPolicyBrokenTestTypeId rdf:type ao:Policy ;
-          ao:rules ai:BrokenTestPolicyRuleSet .
+access-individual:BrokenPolicyBrokenTestTypeId rdf:type access:Policy ;
+          access:rules access-individual:BrokenTestPolicyRuleSet .
 
-ai:BrokenTestPolicyRuleSet rdf:type ao:Rules ;
-          ao:rule ai:BrokenTestRule .
+access-individual:BrokenTestPolicyRuleSet rdf:type access:Rules ;
+          access:rule access-individual:BrokenTestRule .
           
-ai:BrokenTestRule rdf:type ao:Rule ;
-          ao:check ai:ValidTestAttribute ;
-          ao:check ai:BrokenTestAttribute .
+access-individual:BrokenTestRule rdf:type access:Rule ;
+          access:check access-individual:ValidTestAttribute ;
+          access:check access-individual:BrokenTestAttribute .
           
-ai:BrokenTestAttribute rdf:type ao:Check ;
-         ao:operator ai:UnknownTest ;
-         ao:attribute ai:Operation ;
-         ao:value ai:PublishOperation .
+access-individual:BrokenTestAttribute rdf:type access:Check ;
+         access:operator access-individual:UnknownTest ;
+         access:attribute access-individual:Operation ;
+         access:singleValue access-individual:PublishOperation .
          
-ai:ValidTestAttribute rdf:type ao:Check ;
-         ao:operator ai:Equals ;
-         ao:attribute ai:Operation ;
-         ao:value ai:PublishOperation .
+access-individual:ValidTestAttribute rdf:type access:Check ;
+         access:operator access-individual:Equals ;
+         access:attribute access-individual:Operation ;
+         access:singleValue access-individual:PublishOperation .
 

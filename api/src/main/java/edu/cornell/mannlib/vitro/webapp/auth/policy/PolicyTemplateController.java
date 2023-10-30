@@ -16,13 +16,11 @@ public class PolicyTemplateController {
 
     public static void createRoleDataSets(String roleUri) {
 
-        // Execute sparql query to get all data set templates that have ao:templateKey ai:SubjectRole .
+        // Execute sparql query to get all data set templates that have ao:templateKey access-individual:SubjectRole .
         Map<String, String> templates = PolicyLoader.getInstance().getRoleDataSetTemplates();
         for (String templateUri : templates.keySet()) {
             createRoleDataSet(templateUri, roleUri, templates.get(templateUri));
         }
-        // For each data set template:
-        // SPARQL construct Query to get ?dataSetsUri, value container templates
     }
 
     private static void createRoleDataSet(String dataSetTemplateUri, String roleUri, String dataSetsUri) {

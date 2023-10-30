@@ -1,421 +1,417 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix ai: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
-@prefix ao: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/access-allowed-class/> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-class/> .
 
-:PolicyTemplate a ao:PolicyTemplate ;
-    ao:rules :RuleSet ;
-    ao:policyDataSets :DataSets .
+:PolicyTemplate a access:PolicyTemplate ;
+    access:rules :RuleSet ;
+    access:policyDataSets :DataSets .
 
-:DataSets a ao:PolicyDataSets ;
-    ao:policyDataSet :PublicDisplayClassDataSet ;
-    ao:policyDataSet :SelfEditorDisplayClassDataSet ;
-    ao:policyDataSet :EditorDisplayClassDataSet ;
-    ao:policyDataSet :CuratorDisplayClassDataSet ;
-    ao:policyDataSet :AdminDisplayClassDataSet ;
+:DataSets a access:PolicyDataSets ;
+    access:policyDataSet :PublicDisplayClassDataSet ;
+    access:policyDataSet :SelfEditorDisplayClassDataSet ;
+    access:policyDataSet :EditorDisplayClassDataSet ;
+    access:policyDataSet :CuratorDisplayClassDataSet ;
+    access:policyDataSet :AdminDisplayClassDataSet ;
 
-    ao:policyDataSet :PublicUpdateClassDataSet ;
-    ao:policyDataSet :SelfEditorUpdateClassDataSet ;
-    ao:policyDataSet :EditorUpdateClassDataSet ;
-    ao:policyDataSet :CuratorUpdateClassDataSet ;
-    ao:policyDataSet :AdminUpdateClassDataSet ;
+    access:policyDataSet :PublicUpdateClassDataSet ;
+    access:policyDataSet :SelfEditorUpdateClassDataSet ;
+    access:policyDataSet :EditorUpdateClassDataSet ;
+    access:policyDataSet :CuratorUpdateClassDataSet ;
+    access:policyDataSet :AdminUpdateClassDataSet ;
 
-    ao:policyDataSet :SelfEditorPublishClassDataSet ;
-    ao:policyDataSet :EditorPublishClassDataSet ;
-    ao:policyDataSet :CuratorPublishClassDataSet ;
-    ao:policyDataSet :AdminPublishClassDataSet ;
+    access:policyDataSet :SelfEditorPublishClassDataSet ;
+    access:policyDataSet :EditorPublishClassDataSet ;
+    access:policyDataSet :CuratorPublishClassDataSet ;
+    access:policyDataSet :AdminPublishClassDataSet ;
 
-    ao:policyDataSetTemplate :RoleDisplayClassDataSetTemplate ;
-    ao:policyDataSetTemplate :RoleUpdateClassDataSetTemplate ;
-    ao:policyDataSetTemplate :RolePublishClassDataSetTemplate ;
+    access:policyDataSetTemplate :RoleDisplayClassDataSetTemplate ;
+    access:policyDataSetTemplate :RoleUpdateClassDataSetTemplate ;
+    access:policyDataSetTemplate :RolePublishClassDataSetTemplate ;
     .
 
 #Role Display Class data set template
 
-:RoleDisplayClassDataSetTemplate a ao:DataSetTemplate ;
-    ao:dataSetTemplateKey :RoleDisplayClassDataSetTemplateKey ;
-    ao:dataSetKeyTemplate :RoleDisplayClassDataSetKeyTemplate ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValueTemplate :RoleDisplayClassRoleValueContainerTemplate ;
-    ao:dataSetValueTemplate :RoleDisplayClassValueContainerTemplate .  
+:RoleDisplayClassDataSetTemplate a access:DataSetTemplate ;
+    access:dataSetTemplateKey :RoleDisplayClassDataSetTemplateKey ;
+    access:dataSetKeyTemplate :RoleDisplayClassDataSetKeyTemplate ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValueTemplate :RoleDisplayClassRoleValueContainerTemplate ;
+    access:dataSetValueTemplate :RoleDisplayClassValueContainerTemplate .  
 
-:RoleDisplayClassDataSetTemplateKey a ao:DataSetTemplateKey ;
-    ao:templateKey ai:SubjectRole .
+:RoleDisplayClassDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:templateKey access-individual:SubjectRole .
 
-:RoleDisplayClassDataSetKeyTemplate a ao:DataSetKeyTemplate ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent ai:DisplayOperation ;
-    ao:keyComponentTemplate ai:SubjectRole .
+:RoleDisplayClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent access-individual:DisplayOperation ;
+    access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleDisplayClassRoleValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :RoleValueSet;
-    ao:containerTypeTemplate ai:SubjectRole .
+:RoleDisplayClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :RoleValueSet;
+    access:containerTypeTemplate access-individual:SubjectRole .
 
-:RoleDisplayClassValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :AllowedClassValueSet ;
-#    ao:defaultValue ai:defaultUri ;
-    ao:containerTypeTemplate ai:Class .
+:RoleDisplayClassValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :AllowedClassValueSet ;
+#    access:defaultValue access-individual:defaultUri ;
+    access:containerTypeTemplate access-individual:Class .
 
 #Role Update Class data set template
 
-:RoleUpdateClassDataSetTemplate a ao:DataSetTemplate ;
-    ao:dataSetTemplateKey :RoleUpdateClassDataSetTemplateKey ;
-    ao:dataSetKeyTemplate :RoleUpdateClassDataSetKeyTemplate ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:UpdateOperationValueContainer ;
-    ao:dataSetValueTemplate :RoleUpdateClassRoleValueContainerTemplate ;
-    ao:dataSetValueTemplate :RoleUpdateClassValueContainerTemplate .  
+:RoleUpdateClassDataSetTemplate a access:DataSetTemplate ;
+    access:dataSetTemplateKey :RoleUpdateClassDataSetTemplateKey ;
+    access:dataSetKeyTemplate :RoleUpdateClassDataSetKeyTemplate ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:UpdateOperationValueContainer ;
+    access:dataSetValueTemplate :RoleUpdateClassRoleValueContainerTemplate ;
+    access:dataSetValueTemplate :RoleUpdateClassValueContainerTemplate .  
 
-:RoleUpdateClassDataSetTemplateKey a ao:DataSetTemplateKey ;
-    ao:templateKey ai:SubjectRole .
+:RoleUpdateClassDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:templateKey access-individual:SubjectRole .
 
-:RoleUpdateClassDataSetKeyTemplate a ao:DataSetKeyTemplate ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent ai:UpdateOperation ;
-    ao:keyComponentTemplate ai:SubjectRole .
+:RoleUpdateClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent access-individual:UpdateOperation ;
+    access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleUpdateClassRoleValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :RoleValueSet;
-    ao:containerTypeTemplate ai:SubjectRole .
+:RoleUpdateClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :RoleValueSet;
+    access:containerTypeTemplate access-individual:SubjectRole .
 
-:RoleUpdateClassValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :AllowedClassValueSet ;
-#    ao:defaultValue ai:defaultUri ;
-    ao:containerTypeTemplate ai:Class .
+:RoleUpdateClassValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :AllowedClassValueSet ;
+#    access:defaultValue access-individual:defaultUri ;
+    access:containerTypeTemplate access-individual:Class .
 
 #Role Publish Class data set template
 
-:RolePublishClassDataSetTemplate a ao:DataSetTemplate ;
-    ao:dataSetTemplateKey :RolePublishClassDataSetTemplateKey ;
-    ao:dataSetKeyTemplate :RolePublishClassDataSetKeyTemplate ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValueTemplate :RolePublishClassRoleValueContainerTemplate ;
-    ao:dataSetValueTemplate :RolePublishClassValueContainerTemplate .  
+:RolePublishClassDataSetTemplate a access:DataSetTemplate ;
+    access:dataSetTemplateKey :RolePublishClassDataSetTemplateKey ;
+    access:dataSetKeyTemplate :RolePublishClassDataSetKeyTemplate ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValueTemplate :RolePublishClassRoleValueContainerTemplate ;
+    access:dataSetValueTemplate :RolePublishClassValueContainerTemplate .  
 
-:RolePublishClassDataSetTemplateKey a ao:DataSetTemplateKey ;
-    ao:templateKey ai:SubjectRole .
+:RolePublishClassDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:templateKey access-individual:SubjectRole .
 
-:RolePublishClassDataSetKeyTemplate a ao:DataSetKeyTemplate ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent ai:PublishOperation ;
-    ao:keyComponentTemplate ai:SubjectRole .
+:RolePublishClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent access-individual:PublishOperation ;
+    access:keyComponentTemplate access-individual:SubjectRole .
 
-:RolePublishClassRoleValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :RoleValueSet;
-    ao:containerTypeTemplate ai:SubjectRole .
+:RolePublishClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :RoleValueSet;
+    access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePublishClassValueContainerTemplate a ao:ValueContainerTemplate ;
-    ao:relatedValueSet :AllowedClassValueSet ;
-#    ao:defaultValue ai:defaultUri ;
-    ao:containerTypeTemplate ai:Class .
+:RolePublishClassValueContainerTemplate a access:ValueContainerTemplate ;
+    access:relatedValueSet :AllowedClassValueSet ;
+#    access:defaultValue access-individual:defaultUri ;
+    access:containerTypeTemplate access-individual:Class .
 
 ### Public display class uri data sets
 
-:PublicDisplayClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :PublicDisplayClassDataSetKey ;
-    ao:dataSetValues ai:PublicRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:PublicDisplayClassValueContainer .
+:PublicDisplayClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :PublicDisplayClassDataSetKey ;
+    access:dataSetValues access-individual:PublicRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :PublicDisplayClassValueContainer .
 
-:PublicDisplayClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:PUBLIC ;
-    ao:keyComponent ai:DisplayOperation .
+:PublicDisplayClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:PUBLIC ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Self editor display class uri data sets
 
-:SelfEditorDisplayClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorDisplayClassDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorDisplayClassValueContainer .
+:SelfEditorDisplayClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorDisplayClassDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :SelfEditorDisplayClassValueContainer .
 
-:SelfEditorDisplayClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:DisplayOperation .
+:SelfEditorDisplayClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Editor display class uri data sets
 
-:EditorDisplayClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :EditorDisplayClassDataSetKey ;
-    ao:dataSetValues ai:EditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:EditorDisplayClassValueContainer .
+:EditorDisplayClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :EditorDisplayClassDataSetKey ;
+    access:dataSetValues access-individual:EditorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :EditorDisplayClassValueContainer .
 
-:EditorDisplayClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:EDITOR ;
-    ao:keyComponent ai:DisplayOperation .
+:EditorDisplayClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:EDITOR ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Curator display class uri data sets
 
-:CuratorDisplayClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :CuratorDisplayClassDataSetKey ;
-    ao:dataSetValues ai:CuratorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:CuratorDisplayClassValueContainer .
+:CuratorDisplayClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :CuratorDisplayClassDataSetKey ;
+    access:dataSetValues access-individual:CuratorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :CuratorDisplayClassValueContainer .
 
-:CuratorDisplayClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:CURATOR ;
-    ao:keyComponent ai:DisplayOperation .
+:CuratorDisplayClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:CURATOR ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Admin display class uri data sets
 
-:AdminDisplayClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :AdminDisplayClassDataSetKey ;
-    ao:dataSetValues ai:AdminRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:DisplayOperationValueContainer ;
-    ao:dataSetValues ai:AdminDisplayClassValueContainer .
+:AdminDisplayClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :AdminDisplayClassDataSetKey ;
+    access:dataSetValues access-individual:AdminRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:DisplayOperationValueContainer ;
+    access:dataSetValues :AdminDisplayClassValueContainer .
 
-:AdminDisplayClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:ADMIN ;
-    ao:keyComponent ai:DisplayOperation .
+:AdminDisplayClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:ADMIN ;
+    access:keyComponent access-individual:DisplayOperation .
 
 ### Public update class uri data sets
 
-:PublicUpdateClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :PublicUpdateClassDataSetKey ;
-    ao:dataSetValues ai:PublicRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:UpdateOperationValueContainer ;
-    ao:dataSetValues ai:PublicUpdateClassValueContainer .
+:PublicUpdateClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :PublicUpdateClassDataSetKey ;
+    access:dataSetValues access-individual:PublicRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:UpdateOperationValueContainer ;
+    access:dataSetValues :PublicUpdateClassValueContainer .
 
-:PublicUpdateClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:PUBLIC ;
-    ao:keyComponent ai:UpdateOperation .
+:PublicUpdateClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:PUBLIC ;
+    access:keyComponent access-individual:UpdateOperation .
 
 ### Self editor update class uri data sets
 
-:SelfEditorUpdateClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorUpdateClassDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:UpdateOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorUpdateClassValueContainer .
+:SelfEditorUpdateClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorUpdateClassDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:UpdateOperationValueContainer ;
+    access:dataSetValues :SelfEditorUpdateClassValueContainer .
 
-:SelfEditorUpdateClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:UpdateOperation .
+:SelfEditorUpdateClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:UpdateOperation .
 
 ### Editor update class uri data sets
 
-:EditorUpdateClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :EditorUpdateClassDataSetKey ;
-    ao:dataSetValues ai:EditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:UpdateOperationValueContainer ;
-    ao:dataSetValues ai:EditorUpdateClassValueContainer .
+:EditorUpdateClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :EditorUpdateClassDataSetKey ;
+    access:dataSetValues access-individual:EditorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:UpdateOperationValueContainer ;
+    access:dataSetValues :EditorUpdateClassValueContainer .
 
-:EditorUpdateClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:EDITOR ;
-    ao:keyComponent ai:UpdateOperation .
+:EditorUpdateClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:EDITOR ;
+    access:keyComponent access-individual:UpdateOperation .
 
 ### Curator update class uri data sets
 
-:CuratorUpdateClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :CuratorUpdateClassDataSetKey ;
-    ao:dataSetValues ai:CuratorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:UpdateOperationValueContainer ;
-    ao:dataSetValues ai:CuratorUpdateClassValueContainer .
+:CuratorUpdateClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :CuratorUpdateClassDataSetKey ;
+    access:dataSetValues access-individual:CuratorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:UpdateOperationValueContainer ;
+    access:dataSetValues :CuratorUpdateClassValueContainer .
 
-:CuratorUpdateClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:CURATOR ;
-    ao:keyComponent ai:UpdateOperation .
+:CuratorUpdateClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:CURATOR ;
+    access:keyComponent access-individual:UpdateOperation .
 
 ### Admin update class uri data sets
 
-:AdminUpdateClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :AdminUpdateClassDataSetKey ;
-    ao:dataSetValues ai:AdminRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:UpdateOperationValueContainer ;
-    ao:dataSetValues ai:AdminUpdateClassValueContainer .
+:AdminUpdateClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :AdminUpdateClassDataSetKey ;
+    access:dataSetValues access-individual:AdminRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:UpdateOperationValueContainer ;
+    access:dataSetValues :AdminUpdateClassValueContainer .
 
-:AdminUpdateClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:ADMIN ;
-    ao:keyComponent ai:UpdateOperation .
+:AdminUpdateClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:ADMIN ;
+    access:keyComponent access-individual:UpdateOperation .
 
 ### Self editor publish class uri data sets
 
-:SelfEditorPublishClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :SelfEditorPublishClassDataSetKey ;
-    ao:dataSetValues ai:SelfEditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:SelfEditorPublishClassValueContainer .
+:SelfEditorPublishClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :SelfEditorPublishClassDataSetKey ;
+    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :SelfEditorPublishClassValueContainer .
 
-:SelfEditorPublishClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:SELF_EDITOR ;
-    ao:keyComponent ai:PublishOperation .
+:SelfEditorPublishClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Editor publish class uri data sets
 
-:EditorPublishClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :EditorPublishClassDataSetKey ;
-    ao:dataSetValues ai:EditorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:EditorPublishClassValueContainer .
+:EditorPublishClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :EditorPublishClassDataSetKey ;
+    access:dataSetValues access-individual:EditorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :EditorPublishClassValueContainer .
 
-:EditorPublishClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:EDITOR ;
-    ao:keyComponent ai:PublishOperation .
+:EditorPublishClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:EDITOR ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Curator publish class uri data sets
 
-:CuratorPublishClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :CuratorPublishClassDataSetKey ;
-    ao:dataSetValues ai:CuratorRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:CuratorPublishClassValueContainer .
+:CuratorPublishClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :CuratorPublishClassDataSetKey ;
+    access:dataSetValues access-individual:CuratorRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :CuratorPublishClassValueContainer .
 
-:CuratorPublishClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:CURATOR ;
-    ao:keyComponent ai:PublishOperation .
+:CuratorPublishClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:CURATOR ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Admin publish class uri data sets
 
-:AdminPublishClassDataSet a ao:PolicyDataSet ;
-    ao:dataSetKey :AdminPublishClassDataSetKey ;
-    ao:dataSetValues ai:AdminRoleValueContainer ;
-    ao:dataSetValues ai:ClassValueContainer ;
-    ao:dataSetValues ai:PublishOperationValueContainer ;
-    ao:dataSetValues ai:AdminPublishClassValueContainer .
+:AdminPublishClassDataSet a access:PolicyDataSet ;
+    access:dataSetKey :AdminPublishClassDataSetKey ;
+    access:dataSetValues access-individual:AdminRoleValueContainer ;
+    access:dataSetValues access-individual:ClassValueContainer ;
+    access:dataSetValues access-individual:PublishOperationValueContainer ;
+    access:dataSetValues :AdminPublishClassValueContainer .
 
-:AdminPublishClassDataSetKey a ao:DataSetKey ;
-    ao:keyComponent ai:Class ;
-    ao:keyComponent auth:ADMIN ;
-    ao:keyComponent ai:PublishOperation .
+:AdminPublishClassDataSetKey a access:DataSetKey ;
+    access:keyComponent access-individual:Class ;
+    access:keyComponent auth:ADMIN ;
+    access:keyComponent access-individual:PublishOperation .
 
 ### Rules
 
-:RuleSet a ao:Rules ;
-    ao:rule :AllowMatchingClass .
+:RuleSet a access:Rules ;
+    access:rule :AllowMatchingClass .
 
-:AllowMatchingClass a ao:Rule;
-    ao:check :SubjectRoleCheck ;
-    ao:check :OperationCheck ;
-    ao:check :AccessObjectTypeCheck ;
-    ao:check :AccessObjectUriCheck .
+:AllowMatchingClass a access:Rule;
+    access:check :SubjectRoleCheck ;
+    access:check :OperationCheck ;
+    access:check :AccessObjectTypeCheck ;
+    access:check :AccessObjectUriCheck .
 
-:AccessObjectTypeCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:AccessObjectType ;
-    ao:templateValue :AccessObjectTypeValueSet .
+:AccessObjectTypeCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:values :AccessObjectTypeValueSet .
 
-:AccessObjectTypeValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:ClassValueContainer ;
+:AccessObjectTypeValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:ClassValueContainer ;
     .
 
-:OperationCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:Operation ;
-    ao:templateValue :OperationValueSet .
+:OperationCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:values :OperationValueSet .
 
-:OperationValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:DisplayOperationValueContainer ;
-    ao:attributeValue ai:PublishOperationValueContainer ;
-    ao:attributeValue ai:UpdateOperationValueContainer ;
+:OperationValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:DisplayOperationValueContainer ;
+    access:attributeValue access-individual:PublishOperationValueContainer ;
+    access:attributeValue access-individual:UpdateOperationValueContainer ;
     .
 
-:SubjectRoleCheck a ao:Check ;
-    ao:operator ai:Equals ;
-    ao:attribute ai:SubjectRole ;
-    ao:templateValue :RoleValueSet .
+:SubjectRoleCheck a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:SubjectRole ;
+    access:values :RoleValueSet .
 
-:RoleValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:PublicRoleValueContainer ;
-    ao:attributeValue ai:SelfEditorRoleValueContainer ;
-    ao:attributeValue ai:EditorRoleValueContainer ;
-    ao:attributeValue ai:CuratorRoleValueContainer ;
-    ao:attributeValue ai:AdminRoleValueContainer .
+:RoleValueSet a access:AttributeValueSet ;
+    access:attributeValue access-individual:PublicRoleValueContainer ;
+    access:attributeValue access-individual:SelfEditorRoleValueContainer ;
+    access:attributeValue access-individual:EditorRoleValueContainer ;
+    access:attributeValue access-individual:CuratorRoleValueContainer ;
+    access:attributeValue access-individual:AdminRoleValueContainer .
 
-:AccessObjectUriCheck a ao:Check ;
-    ao:operator ai:OneOf ;
-    ao:attribute ai:AccessObjectUri ;
-    ao:templateValue :AllowedClassValueSet .
+:AccessObjectUriCheck a access:Check ;
+    access:operator access-individual:OneOf ;
+    access:attribute access-individual:AccessObjectUri ;
+    access:values :AllowedClassValueSet .
 
-:AllowedClassValueSet a ao:AttributeValueSet ;
-    ao:attributeValue ai:AdminPublishClassValueContainer ;
-    ao:attributeValue ai:AdminDisplayClassValueContainer ;
-    ao:attributeValue ai:AdminUpdateClassValueContainer ;
-    ao:attributeValue ai:CuratorPublishClassValueContainer ;
-    ao:attributeValue ai:CuratorDisplayClassValueContainer ;
-    ao:attributeValue ai:CuratorUpdateClassValueContainer ;
-    ao:attributeValue ai:EditorPublishClassValueContainer ;
-    ao:attributeValue ai:EditorDisplayClassValueContainer ;
-    ao:attributeValue ai:EditorUpdateClassValueContainer ;
-    ao:attributeValue ai:SelfEditorPublishClassValueContainer ;
-    ao:attributeValue ai:SelfEditorDisplayClassValueContainer ;
-    ao:attributeValue ai:SelfEditorUpdateClassValueContainer ;
-    ao:attributeValue ai:PublicDisplayClassValueContainer ;
-    ao:attributeValue ai:PublicUpdateClassValueContainer ;
+:AllowedClassValueSet a access:AttributeValueSet ;
+    access:attributeValue :AdminPublishClassValueContainer ;
+    access:attributeValue :AdminDisplayClassValueContainer ;
+    access:attributeValue :AdminUpdateClassValueContainer ;
+    access:attributeValue :CuratorPublishClassValueContainer ;
+    access:attributeValue :CuratorDisplayClassValueContainer ;
+    access:attributeValue :CuratorUpdateClassValueContainer ;
+    access:attributeValue :EditorPublishClassValueContainer ;
+    access:attributeValue :EditorDisplayClassValueContainer ;
+    access:attributeValue :EditorUpdateClassValueContainer ;
+    access:attributeValue :SelfEditorPublishClassValueContainer ;
+    access:attributeValue :SelfEditorDisplayClassValueContainer ;
+    access:attributeValue :SelfEditorUpdateClassValueContainer ;
+    access:attributeValue :PublicDisplayClassValueContainer ;
+    access:attributeValue :PublicUpdateClassValueContainer ;
     .
 
-ai:AdminPublishClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:AdminPublishClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:AdminDisplayClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:AdminDisplayClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:AdminUpdateClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:AdminUpdateClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:CuratorPublishClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:CuratorPublishClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:CuratorDisplayClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:CuratorDisplayClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:CuratorUpdateClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:CuratorUpdateClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:EditorPublishClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:EditorPublishClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:EditorDisplayClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:EditorDisplayClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:EditorUpdateClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:EditorUpdateClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:SelfEditorPublishClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:SelfEditorPublishClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:SelfEditorDisplayClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:SelfEditorDisplayClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:SelfEditorUpdateClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:SelfEditorUpdateClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:PublicDisplayClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:PublicDisplayClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
 
-ai:PublicUpdateClassValueContainer a ao:ValueContainer ;
-    ao:containerType ai:Class .
+:PublicUpdateClassValueContainer a access:ValueContainer ;
+    access:containerType access-individual:Class .
