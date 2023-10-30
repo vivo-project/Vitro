@@ -12,7 +12,7 @@ public class PasswordChangeRequestSpamMitigation {
 
     private static final Map<String, Integer> requestFrequency = new HashMap<>();
 
-    private static final long INTERVAL_INCREASE_MINUTES = 1;
+    private static final long INTERVAL_INCREASE_MINUTES = 10;
 
     private static boolean initializeHistoryRequestDataIfNotExists(String emailAddress) {
         if (requestHistory.containsKey(emailAddress)) {

@@ -45,10 +45,18 @@ public class ForgotPassword extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
-        Map<String, Object> dataContext = new HashMap<String, Object>();
+        Map<String, Object> dataContext = new HashMap<>();
+        dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
+        dataContext.put("contactUrl", getContactUrl(vreq));
         UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
         I18nBundle i18n = I18n.bundle(vreq);
 
+        if (vreq.getMethod().equalsIgnoreCase("GET")) {
+            dataContext.put("showPasswordChangeForm", true);
+            return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
+        }
+
+        dataContext.put("showPasswordChangeForm", false);
         String email = vreq.getParameter("email");
 
         UserAccount userAccount = getAccountForInternalAuth(email, vreq);
@@ -108,7 +116,7 @@ public class ForgotPassword extends FreemarkerHttpServlet {
     }
 
     private void requestPasswordChange(UserAccount userAccount, UserAccountsDao userAccountsDao) {
-        userAccount.setPasswordLinkExpires(figureExpirationDate().getTime());
+        userAccount.setPasswordLinkExpires(calculateExpirationDate().getTime());
         userAccount.generateEmailKey();
         userAccountsDao.updateUserAccount(userAccount);
     }
@@ -147,9 +155,19 @@ public class ForgotPassword extends FreemarkerHttpServlet {
         }
     }
 
-    private Date figureExpirationDate() {
+    private Date calculateExpirationDate() {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DATE, DAYS_TO_USE_PASSWORD_LINK);
         return c.getTime();
+    }
+
+    private String getForgotPasswordUrl(VitroRequest request) {
+        String contextPath = request.getContextPath();
+        return contextPath + "/forgot-password";
+    }
+
+    private String getContactUrl(VitroRequest request) {
+        String contextPath = request.getContextPath();
+        return contextPath + "/contact";
     }
 }

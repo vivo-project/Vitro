@@ -294,6 +294,46 @@ uil-data:password_reset_label.Vitro
         uil:hasKey      "password_reset_label" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:password_reset_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Reset Password"@en-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_title" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_button.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Reset my password"@en-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_button" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_manual.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "To reset your password, please enter your email address below:"@en-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_manual" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_forgot_email.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "If you don't remember your email, please"@en-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_forgot_email" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_forgot_email_contact_us.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "contact us"@en-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_forgot_email_contact_us" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:startup_status.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;

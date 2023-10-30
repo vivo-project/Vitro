@@ -61,7 +61,13 @@
                 <label for="loginPassword">${i18n().password_capitalized}</label>
                 <input id="loginPassword" name="loginPassword" class="text-field" type="password" required />
 
-                <p class="submit"><input name="loginForm" class="green button" type="submit" value="${i18n().login_button}"/></p>
+                <p class="submit">
+                    <input name="loginForm" class="green button" type="submit" value="${i18n().login_button}"/>
+                </p>
+
+                <p class="forgot-password">
+                    <a href="${forgotPassword}" style="display: block;">${i18n().password_reset_label}</a>
+                </p>
 
                 <#-- NC: remember me won't be ready for r1.2
                 <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />
@@ -72,34 +78,6 @@
                 -->
             </div>
         </form>
-
-        <form id="forgotPasswordForm" action="${forgotPassword}" method="POST" style="margin-top: 10px;">
-            <input type="email" id="email" name="email" style="display: none;" required>
-            <button type="submit" class="forgot-password">${i18n().password_reset_label}</button>
-        </form>
-
-        <script>
-        // JavaScript to synchronize email login fields
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginNameInput = document.getElementById('loginName');
-            const emailInput = document.getElementById('email');
-            emailInput.value = loginNameInput.value;
-
-            loginNameInput.addEventListener('input', function() {
-                emailInput.value = loginNameInput.value;
-            });
-        });
-        </script>
-
-        <style>
-            .forgot-password {
-                background: none;
-                border: none;
-                color: blue;
-                text-decoration: underline;
-                cursor: pointer;
-            }
-        </style>
 
     </section><!-- #log-in -->
 </#macro>
