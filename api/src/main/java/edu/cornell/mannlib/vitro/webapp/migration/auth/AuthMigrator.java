@@ -77,6 +77,8 @@ public class AuthMigrator implements ServletContextListener {
         convertAuthorizationConfiguration();
         log.info("Finished authorization configuration update");
         ss.info(this, secondsSince(begin) + " seconds to migrate auth models");
+        log.info("Reload all policies after migration");
+        PolicyLoader.getInstance().loadPolicies();
     }
 
     protected void initialize(RDFService content, RDFService configuration) {
@@ -85,8 +87,10 @@ public class AuthMigrator implements ServletContextListener {
     }
 
     protected void convertAuthorizationConfiguration() {
-        if (isArmConfiguration()) {
-            migrateArmConfiguration();
+        OntModel userAccountsModel = modelAccess.getOntModelSelector().getUserAccountsModel();
+        ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService, userAccountsModel);
+        if (armMigrator.isArmConfiguation()) {
+            armMigrator.migrateConfiguration();
         } else {
             migrateAnnotationConfiguation();
         }
@@ -101,12 +105,6 @@ public class AuthMigrator implements ServletContextListener {
         spm.migrateConfiguration();
     }
 
-    private void migrateArmConfiguration() {
-        OntModel userAccountsModel = modelAccess.getOntModelSelector().getUserAccountsModel();
-        ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService, userAccountsModel);
-        armMigrator.migrateConfiguration();
-    }
-
     private void migrateAnnotationConfiguation() {
         AnnotationMigrator annotationMigrator = new AnnotationMigrator(contentRdfService, configurationRdfService);
         annotationMigrator.migrateConfiguration();
@@ -117,12 +115,6 @@ public class AuthMigrator implements ServletContextListener {
             return true;
         }
         return false;
-    }
-
-    private boolean isArmConfiguration() {
-        OntModel userAccountsModel = modelAccess.getOntModelSelector().getUserAccountsModel();
-        ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService, userAccountsModel);
-        return armMigrator.isArmConfiguation();
     }
 
     protected long getVersion() {

@@ -114,9 +114,8 @@ public class ArmMigratorTest extends AuthMigratorTest {
         // addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.UPDATE, CLASS_URI);
 
         Map<AccessObjectType, Set<String>> entityTypeMap = armMigrator.getEntityMap();
-        StringBuilder additions = new StringBuilder();
-        armMigrator.collectAdditions(entityTypeMap, additions);
-        String stringResult = additions.toString();
+        armMigrator.collectAdditions(entityTypeMap);
+        String stringResult = armMigrator.additions.toString();
         assertFalse(stringResult.isEmpty());
         assertEquals(33, getCount("\n", stringResult));
         assertEquals(33, getCount(value, stringResult));

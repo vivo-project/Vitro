@@ -40,6 +40,8 @@ public class ArmMigrator {
     protected static final String ARM_SELF_EDITOR = "SELF_EDITOR";
     protected static final String ARM_PUBLIC = "PUBLIC";
     protected static final String ARM_CUSTOM = "CUSTOM";
+    protected StringBuilder removals = new StringBuilder();
+    protected StringBuilder additions = new StringBuilder();
 
     protected static final List<String> armOperations = Arrays.asList(DISPLAY, UPDATE, PUBLISH);
     protected static final List<AccessObjectType> entityTypes =
@@ -104,34 +106,47 @@ public class ArmMigrator {
     public void migrateConfiguration() {
         cleanEntityDataSetValues();
         Map<AccessObjectType, Set<String>> entityTypeMap = getEntityMap();
-        StringBuilder additions = new StringBuilder();
-        collectAdditions(entityTypeMap, additions);
+        collectAdditions(entityTypeMap);
         PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
     }
 
     private void cleanEntityDataSetValues() {
-        StringBuilder removals = getStatementsToRemove();
+        getStatementsToRemove();
         PolicyLoader.getInstance().updateAccessControlModel(removals.toString(), false);
     }
 
     protected StringBuilder getStatementsToRemove() {
-        StringBuilder removals = new StringBuilder();
         for (String role : roleMap.keySet()) {
             String newRole = roleMap.get(role);
-            for (String operation : armOperations) {
-                OperationGroup og = operationMap.get(operation);
-                for (AccessOperation ao : OperationGroup.getOperations(og)) {
-                    for (AccessObjectType aot : entityTypes) {
-                        Set<String> entityUris = PolicyLoader.getInstance().getDataSetValues(ao, aot, newRole);
-                        for (String entityUri : entityUris) {
-                            EntityPolicyController.getDataValueStatements(entityUri, aot, ao,
-                                    Collections.singleton(newRole), removals);
-                        }
-                    }
-                }
-            }
+            getRoleStatementsToRemove(newRole);
         }
         return removals;
+    }
+
+    private void getRoleStatementsToRemove(String role) {
+        for (String operation : armOperations) {
+            OperationGroup og = operationMap.get(operation);
+            getRoleOpGroupStatementsToRemove(role, og);
+        }
+    }
+
+    private void getRoleOpGroupStatementsToRemove(String role, OperationGroup og) {
+        for (AccessOperation ao : OperationGroup.getOperations(og)) {
+            getRoleOperationStatementsToRemove(role, ao);
+        }
+    }
+
+    private void getRoleOperationStatementsToRemove(String role, AccessOperation ao) {
+        for (AccessObjectType aot : entityTypes) {
+            getRoleOperationObjectTypedStatementsToRemove(role, ao, aot);
+        }
+    }
+
+    private void getRoleOperationObjectTypedStatementsToRemove(String role, AccessOperation ao, AccessObjectType aot) {
+        Set<String> entityUris = PolicyLoader.getInstance().getDataSetValues(ao, aot, role);
+        for (String entityUri : entityUris) {
+            EntityPolicyController.getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), removals);
+        }
     }
 
     private Set<String> getFauxByBase(String baseUri) {
@@ -154,51 +169,67 @@ public class ArmMigrator {
         return entities;
     }
 
-    protected void collectAdditions(Map<AccessObjectType, Set<String>> entityTypeMap, StringBuilder additions) {
-
+    protected void collectAdditions(Map<AccessObjectType, Set<String>> entityTypeMap) {
         for (String role : roleMap.keySet()) {
             String newRole = roleMap.get(role);
-            for (String operation : armOperations) {
-                String permissionUri = getArmPermissionSubject(operation, role);
-                Set<String> armEntities = getArmEntites(permissionUri);
-                OperationGroup og = operationMap.get(operation);
-                Set<String> addFauxOP = new HashSet<>();
-                Set<String> addFauxDP = new HashSet<>();
-                for (AccessObjectType type : entityTypes) {
-                    Set<String> allTypeEntitities = entityTypeMap.get(type);
-                    HashSet<String> intersectionEntities = new HashSet<>(armEntities);
-                    intersectionEntities.retainAll(allTypeEntitities);
+            getRoleStatementsToAdd(entityTypeMap, role, newRole);
+        }
+    }
 
-                    // Workaround for ARM behavior
-                    if (AccessObjectType.OBJECT_PROPERTY.equals(type)) {
-                        // find all faux object properties for each of base property from entityUri set
-                        // and add to the list of additional faux object properties
-                        for (String entity : intersectionEntities) {
-                            Set<String> faux = getFauxByBase(entity);
-                            addFauxOP.addAll(faux);
-                        }
-                    }
-                    if (AccessObjectType.DATA_PROPERTY.equals(type)) {
-                        // find all faux data properties for each of base property from entityUri set
-                        // and add to the list of additional faux data properties
-                        for (String entity : intersectionEntities) {
-                            Set<String> faux = getFauxByBase(entity);
-                            addFauxDP.addAll(faux);
-                        }
-                    }
-                    if (AccessObjectType.FAUX_OBJECT_PROPERTY.equals(type)) {
-                        intersectionEntities.addAll(addFauxOP);
-                    }
-                    if (AccessObjectType.FAUX_DATA_PROPERTY.equals(type)) {
-                        intersectionEntities.addAll(addFauxDP);
-                    }
-                    for (AccessOperation ao : OperationGroup.getOperations(og)) {
-                        for (String entityUri : intersectionEntities) {
-                            EntityPolicyController.getDataValueStatements(entityUri, type, ao,
-                                    Collections.singleton(newRole), additions);
-                        }
-                    }
-                }
+    private void getRoleStatementsToAdd(Map<AccessObjectType, Set<String>> entityTypeMap, String role, String newRole) {
+        for (String operation : armOperations) {
+            getRoleOperationStatementsToAdd(entityTypeMap, role, newRole, operation);
+        }
+    }
+
+    private void getRoleOperationStatementsToAdd(Map<AccessObjectType, Set<String>> entityTypeMap, String role,
+            String newRole, String operation) {
+        String permissionUri = getArmPermissionSubject(operation, role);
+        Set<String> armEntities = getArmEntites(permissionUri);
+        OperationGroup og = operationMap.get(operation);
+        Set<String> addFauxOP = new HashSet<>();
+        Set<String> addFauxDP = new HashSet<>();
+        for (AccessObjectType type : entityTypes) {
+            getRoleOperationObjectTypedStatementsToAdd(entityTypeMap, role, newRole, armEntities, og, addFauxOP,
+                    addFauxDP, type);
+        }
+    }
+
+    private void getRoleOperationObjectTypedStatementsToAdd(Map<AccessObjectType, Set<String>> entityTypeMap,
+            String role, String newRole, Set<String> armEntities, OperationGroup og, Set<String> addFauxOP,
+            Set<String> addFauxDP, AccessObjectType type) {
+        Set<String> allTypeEntitities = entityTypeMap.get(type);
+        HashSet<String> intersectionEntities = new HashSet<>(armEntities);
+        intersectionEntities.retainAll(allTypeEntitities);
+
+        // Workaround for ARM behavior
+        if (AccessObjectType.OBJECT_PROPERTY.equals(type)) {
+            // find all faux object properties for each of base property from entityUri set
+            // and add to the list of additional faux object properties
+            for (String entity : intersectionEntities) {
+                Set<String> faux = getFauxByBase(entity);
+                addFauxOP.addAll(faux);
+            }
+        }
+        if (AccessObjectType.DATA_PROPERTY.equals(type)) {
+            // find all faux data properties for each of base property from entityUri set
+            // and add to the list of additional faux data properties
+            for (String entity : intersectionEntities) {
+                Set<String> faux = getFauxByBase(entity);
+                addFauxDP.addAll(faux);
+            }
+        }
+        if (AccessObjectType.FAUX_OBJECT_PROPERTY.equals(type)) {
+            intersectionEntities.addAll(addFauxOP);
+        }
+        if (AccessObjectType.FAUX_DATA_PROPERTY.equals(type)) {
+            intersectionEntities.addAll(addFauxDP);
+        }
+        for (AccessOperation ao : OperationGroup.getOperations(og)) {
+            for (String entityUri : intersectionEntities) {
+                log.info(String.format("Allow %s role to %s %s entity <%s>", role, ao, type, entityUri));
+                EntityPolicyController.getDataValueStatements(entityUri, type, ao, Collections.singleton(newRole),
+                        additions);
             }
         }
     }
