@@ -24,11 +24,11 @@ public class PasswordChangeRequestSpamMitigation {
         requestFrequency.put(emailAddress, 0);
     }
 
-    public static PasswordChangeRequestSpamMitigationResponse isPasswordResetRequestable(UserAccount userAccount) {
-        initializeHistoryRequestDataIfNotExists(userAccount.getEmailAddress());
+    public static PasswordChangeRequestSpamMitigationResponse isPasswordResetRequestable(String emailAddress) {
+        initializeHistoryRequestDataIfNotExists(emailAddress);
 
-        Integer numberOfSuccessiveRequests = requestFrequency.get(userAccount.getEmailAddress());
-        LocalDateTime momentOfFirstRequest = requestHistory.get(userAccount.getEmailAddress());
+        Integer numberOfSuccessiveRequests = requestFrequency.get(emailAddress);
+        LocalDateTime momentOfFirstRequest = requestHistory.get(emailAddress);
         LocalDateTime nextRequestAvailableAt =
             momentOfFirstRequest.plusMinutes(numberOfSuccessiveRequests * INTERVAL_INCREASE_MINUTES);
 
@@ -40,7 +40,7 @@ public class PasswordChangeRequestSpamMitigation {
         }
 
         if (numberOfSuccessiveRequests > 0) {
-            requestHistory.put(userAccount.getEmailAddress(), LocalDateTime.now());
+            requestHistory.put(emailAddress, LocalDateTime.now());
         }
 
         return new PasswordChangeRequestSpamMitigationResponse(true);

@@ -14,6 +14,9 @@
             <p class="submit" style="margin-top: 10px;">
                 <button type="submit" class="green button">${i18n().password_reset_button}</button>
             </p>
+
+            <br/>
+            <p>${i18n().password_reset_forgot_email} <a href="${contactUrl}">${i18n().password_reset_forgot_email_contact_us}</a>.</p>
         </div>
     </form>
 <#else>

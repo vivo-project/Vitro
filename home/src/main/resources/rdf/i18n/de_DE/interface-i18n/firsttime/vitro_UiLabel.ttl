@@ -257,17 +257,17 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "E-Mail zur Passwortwiederherstellung gesendet an "@de-DE ;
+        rdfs:label       "Eine E-Mail zur Wiederherstellung des Passworts wird an "@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_email_sent" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:password_reset_email_non_existing.Vitro
+uil-data:password_reset_email_sent_if_exists.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Die von Ihnen angegebene E-Mail-Adresse ist keinem Benutzerkonto zugeordnet."@de-DE ;
+        rdfs:label       " gesendet, wenn sie mit einem bestehenden Konto verknüpft ist."@de-DE ;
         uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_email_non_existing" ;
+        uil:hasKey      "password_reset_email_sent_if_exists" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:password_reset_too_many_requests.Vitro
@@ -316,6 +316,22 @@ uil-data:password_reset_manual.Vitro
         rdfs:label       "Um Ihr Passwort zurückzusetzen, geben Sie bitte Ihre E-Mail-Adresse ein:"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_manual" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_forgot_email.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Wenn Sie Ihre E-Mail-Adresse nicht mehr wissen, kontaktieren Sie uns bitte unter"@de-DE ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_forgot_email" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:password_reset_forgot_email_contact_us.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Kontakt"@de-DE ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "password_reset_forgot_email_contact_us" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:startup_status.Vitro
