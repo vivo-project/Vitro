@@ -47,7 +47,6 @@ public class ForgotPassword extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
         Map<String, Object> dataContext = new HashMap<>();
         dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
-        dataContext.put("contactUrl", getContactUrl(vreq));
         UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
         I18nBundle i18n = I18n.bundle(vreq);
 
@@ -164,10 +163,5 @@ public class ForgotPassword extends FreemarkerHttpServlet {
     private String getForgotPasswordUrl(VitroRequest request) {
         String contextPath = request.getContextPath();
         return contextPath + "/forgot-password";
-    }
-
-    private String getContactUrl(VitroRequest request) {
-        String contextPath = request.getContextPath();
-        return contextPath + "/contact";
     }
 }

@@ -14,18 +14,18 @@ public class PasswordChangeRequestSpamMitigation {
 
     private static final long INTERVAL_INCREASE_MINUTES = 10;
 
-    private static boolean initializeHistoryRequestDataIfNotExists(String emailAddress) {
+
+    private static void initializeHistoryRequestDataIfNotExists(String emailAddress) {
         if (requestHistory.containsKey(emailAddress)) {
-            return false;
+            return;
         }
 
         requestHistory.put(emailAddress, LocalDateTime.now());
         requestFrequency.put(emailAddress, 0);
-        return true;
     }
 
     public static PasswordChangeRequestSpamMitigationResponse isPasswordResetRequestable(UserAccount userAccount) {
-        boolean justInitialised = initializeHistoryRequestDataIfNotExists(userAccount.getEmailAddress());
+        initializeHistoryRequestDataIfNotExists(userAccount.getEmailAddress());
 
         Integer numberOfSuccessiveRequests = requestFrequency.get(userAccount.getEmailAddress());
         LocalDateTime momentOfFirstRequest = requestHistory.get(userAccount.getEmailAddress());
