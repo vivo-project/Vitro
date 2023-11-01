@@ -90,7 +90,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 
 	protected HttpClient httpClient;
 
-	protected boolean rebuildGraphURICache = true;
 	/**
 	 * Returns an RDFService for a remote repository
 	 * @param readEndpointURI - URI of the read SPARQL endpoint for the knowledge base
