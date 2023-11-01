@@ -115,10 +115,7 @@ public class SearchFilter {
     }
 
     public boolean contains(String valueId) {
-        if (values.containsKey(valueId)) {
-            return true;
-        }
-        return false;
+        return values.containsKey(valueId);
     }
 
     public boolean isLocalizationRequired() {

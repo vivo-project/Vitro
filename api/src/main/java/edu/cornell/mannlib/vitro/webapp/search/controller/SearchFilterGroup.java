@@ -25,9 +25,7 @@ public class SearchFilterGroup {
     }
 
     public void addFilterId(String filterId) {
-        if (!filters.contains(filterId)) {
-            filters.add(filterId);
-        }
+        filters.add(filterId);
     }
 
     public String getId() {

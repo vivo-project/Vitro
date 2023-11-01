@@ -1,8 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.DATE_RANGE_SUFFIX;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.LABEL_DISPLAY_SUFFIX;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.LABEL_SORT_SUFFIX;
-import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.DATE_RANGE_SUFFIX;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public class SolrFieldInitializer {
             SchemaRequest.AddDynamicField request = new SchemaRequest.AddDynamicField(fieldAttributes);
             SchemaResponse.UpdateResponse response = request.process(updateEngine);
             if (response.getStatus() != 0) {
-                throw new Exception("Creation of missing solr field '*" + suffix + "' failed");
+                throw new SolrFieldCreationException("Creation of missing solr field '*" + suffix + "' failed");
             }
             log.info("Solr dynamic field '*" + suffix + "' has been created.");
         }
@@ -146,7 +146,7 @@ public class SolrFieldInitializer {
         SchemaRequest.AddFieldType fieldTyperequest = new SchemaRequest.AddFieldType(getDateRangeFieldTypeDefinition());
         SchemaResponse.UpdateResponse response = fieldTyperequest.process(updateEngine);
         if (response.getStatus() != 0) {
-            throw new Exception("Creation of missing solr field type 'dateRange' failed");
+            throw new SolrFieldCreationException("Creation of missing solr field type 'dateRange' failed");
         }
         log.info("Solr field type 'dateRange' has been created.");
     }
@@ -156,7 +156,7 @@ public class SolrFieldInitializer {
         SchemaRequest.AddDynamicField dynamicFieldrequest = new SchemaRequest.AddDynamicField(fieldAttributes);
         SchemaResponse.UpdateResponse response = dynamicFieldrequest.process(updateEngine);
         if (response.getStatus() != 0) {
-            throw new Exception("Creation of missing solr field '*" + suffix + "' failed");
+            throw new SolrFieldCreationException("Creation of missing solr field '*" + suffix + "' failed");
         }
         log.info("Solr dateRange dynamic field '*_drsim' has been created.");
     }
@@ -177,6 +177,13 @@ public class SolrFieldInitializer {
         fieldAttributes.put("indexed", "true");
         fieldAttributes.put("name", "*" + suffix);
         return fieldAttributes;
+    }
+
+    public static class SolrFieldCreationException extends RuntimeException {
+        
+        public SolrFieldCreationException(String message) {
+            super(message);
+        }
     }
 
 }
