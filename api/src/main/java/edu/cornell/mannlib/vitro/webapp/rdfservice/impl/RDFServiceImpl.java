@@ -9,9 +9,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange.Operation;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -32,16 +40,6 @@ import org.apache.jena.riot.out.NodeFormatter;
 import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.apache.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange.Operation;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
-
 public abstract class RDFServiceImpl implements RDFService {
 
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
@@ -49,6 +47,9 @@ public abstract class RDFServiceImpl implements RDFService {
 	protected String defaultWriteGraphURI;
 	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
 	protected List<ModelChangedListener> registeredJenaListeners = new CopyOnWriteArrayList<ModelChangedListener>();
+	protected final List<String> graphURIs = new CopyOnWriteArrayList<String>(); 
+    protected volatile boolean rebuildGraphURICache = true;
+    protected volatile boolean isRebuildGraphURICacheRunning = false;
 
 	@Override
 	public void newIndividual(String individualURI,
@@ -87,7 +88,20 @@ public abstract class RDFServiceImpl implements RDFService {
        }
     }
 
-	@Override
+    /**
+     * Get a list of all the graph URIs in the RDF store.
+     */
+    @Override
+    public List<String> getGraphURIs() throws RDFServiceException {
+        if (rebuildGraphURICache && !isRebuildGraphURICacheRunning) {
+            rebuildGraphUris();
+        }
+        return graphURIs;
+    }
+    
+	protected abstract void rebuildGraphUris();
+
+    @Override
 	public String getDefaultWriteGraphURI() throws RDFServiceException {
         return defaultWriteGraphURI;
 	}
