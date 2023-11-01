@@ -24,7 +24,6 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
@@ -138,8 +137,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		byte[] changeBytes = new byte[0];
 		try {
 			modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
-			changeBytes = StreamUtils
-					.getBytes(modelChange.getSerializedModel());
+			changeBytes = IOUtils.toByteArray(modelChange.getSerializedModel());
 			modelChange.getSerializedModel().reset();
 		} catch (IOException e) {
 			// leave it empty.
