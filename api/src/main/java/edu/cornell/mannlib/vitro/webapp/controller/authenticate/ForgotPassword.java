@@ -49,12 +49,19 @@ public class ForgotPassword extends FreemarkerHttpServlet {
         Map<String, Object> dataContext = new HashMap<>();
         dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
         dataContext.put("contactUrl", getContactUrl(vreq));
+        dataContext.put("wrongCaptcha", false);
         UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
         I18nBundle i18n = I18n.bundle(vreq);
 
         if (vreq.getMethod().equalsIgnoreCase("GET")) {
-            dataContext.put("showPasswordChangeForm", true);
-            return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
+            return showForm(dataContext);
+        }
+
+        String captchaInput = vreq.getParameter("defaultReal");
+        String captchaDisplay = vreq.getParameter("defaultRealHash");
+        if (!captchaHash(captchaInput).equals(captchaDisplay)) {
+            dataContext.put("wrongCaptcha", true);
+            return showForm(dataContext);
         }
 
         dataContext.put("showPasswordChangeForm", false);
@@ -100,9 +107,23 @@ public class ForgotPassword extends FreemarkerHttpServlet {
         emailMessage.send();
     }
 
+    private String captchaHash(String value) {
+        int hash = 5381;
+        value = value.toUpperCase();
+        for (int i = 0; i < value.length(); i++) {
+            hash = ((hash << 5) + hash) + value.charAt(i);
+        }
+        return String.valueOf(hash);
+    }
+
     private ResponseValues emailSentMessage(Map<String, Object> dataContext, I18nBundle i18n, String email) {
         dataContext.put("message",
             i18n.text("password_reset_email_sent") + email + i18n.text("password_reset_email_sent_if_exists"));
+        return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
+    }
+
+    private ResponseValues showForm(Map<String, Object> dataContext) {
+        dataContext.put("showPasswordChangeForm", true);
         return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
     }
 

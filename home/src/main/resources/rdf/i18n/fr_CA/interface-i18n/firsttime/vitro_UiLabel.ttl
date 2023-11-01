@@ -270,6 +270,14 @@ uil-data:password_reset_email_sent_if_exists.Vitro
         uil:hasKey      "password_reset_email_sent_if_exists" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:wrong_captcha.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Captcha incorrect, réessayez."@fr-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "wrong_captcha" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
