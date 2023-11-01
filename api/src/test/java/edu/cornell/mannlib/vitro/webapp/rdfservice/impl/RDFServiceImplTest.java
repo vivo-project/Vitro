@@ -1,4 +1,4 @@
-package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena;
+package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 
-public class RDFServiceJenaTest {
+public class RDFServiceImplTest {
 
     @Test
     public void getConcurrentGraphUrisTest() throws RDFServiceException, InterruptedException {
@@ -20,7 +20,7 @@ public class RDFServiceJenaTest {
         testDataSet.addNamedModel("test:init1", m1);
         Model m2 = VitroModelFactory.createModel();
         testDataSet.addNamedModel("test:init2", m2);
-        RDFServiceJena rdfService = new RDFServiceModel(testDataSet);
+        RDFServiceImpl rdfService = new RDFServiceModel(testDataSet);
         rdfService.getGraphURIs();
         long i = 0;
         while (rdfService.rebuildGraphURICache) {
