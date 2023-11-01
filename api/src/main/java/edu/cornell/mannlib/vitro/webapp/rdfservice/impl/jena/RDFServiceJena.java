@@ -51,7 +51,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sdb.SDB;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.log4j.lf5.util.StreamUtils;
 
 public abstract class RDFServiceJena extends RDFServiceImpl implements RDFService {
 
@@ -61,7 +60,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     protected volatile boolean rebuildGraphURICache = true;
     protected volatile boolean isRebuildGraphURICacheRunning = false;
-    protected final List<String> graphURIs = new CopyOnWriteArrayList<String>(); 
+    protected final List<String> graphURIs = new CopyOnWriteArrayList<String>();
 
     @Override
 	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
@@ -133,8 +132,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		byte[] changeBytes = new byte[0];
 		try {
 			modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
-			changeBytes = StreamUtils
-					.getBytes(modelChange.getSerializedModel());
+			changeBytes = IOUtils.toByteArray(modelChange.getSerializedModel());
 			modelChange.getSerializedModel().reset();
 		} catch (IOException e) {
 			// leave it empty.
