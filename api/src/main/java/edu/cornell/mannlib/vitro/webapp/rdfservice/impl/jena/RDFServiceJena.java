@@ -31,13 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.Syntax;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.riot.RDFDataMgr;
-
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -58,22 +51,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sdb.SDB;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.core.Quad;
-
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
-import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
-import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
-import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public abstract class RDFServiceJena extends RDFServiceImpl implements RDFService {
 
