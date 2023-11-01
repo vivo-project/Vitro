@@ -9,9 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -57,10 +55,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     private final static Log log = LogFactory.getLog(RDFServiceJena.class);
 
     protected abstract DatasetWrapper getDatasetWrapper();
-
-    protected volatile boolean rebuildGraphURICache = true;
-    protected volatile boolean isRebuildGraphURICacheRunning = false;
-    protected final List<String> graphURIs = new CopyOnWriteArrayList<String>();
 
     @Override
 	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
@@ -310,14 +304,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         } finally {
             dw.close();
         }
-    }
-
-    @Override
-    public List<String> getGraphURIs() throws RDFServiceException {
-        if (rebuildGraphURICache && !isRebuildGraphURICacheRunning) {
-            rebuildGraphUris();
-        }
-        return graphURIs;
     }
 
     protected void rebuildGraphUris() {

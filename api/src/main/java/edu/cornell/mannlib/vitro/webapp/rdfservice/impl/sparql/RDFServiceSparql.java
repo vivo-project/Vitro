@@ -11,11 +11,29 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
+import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,22 +74,6 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Quad;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
-import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
-
 /*
  * API to write, read, and update Vitro's RDF store, with support
  * to allow listening, logging and auditing.
@@ -89,8 +91,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	protected HttpClient httpClient;
 
 	protected boolean rebuildGraphURICache = true;
-	private List<String> graphURIs = null;
-
 	/**
 	 * Returns an RDFService for a remote repository
 	 * @param readEndpointURI - URI of the read SPARQL endpoint for the knowledge base
@@ -384,32 +384,45 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 	}
 
-	/**
-	 * Get a list of all the graph URIs in the RDF store.
-	 */
-	@Override
-	public List<String> getGraphURIs() throws RDFServiceException {
-		if (graphURIs == null || rebuildGraphURICache) {
-			graphURIs = getGraphURIsFromSparqlQuery();
-			rebuildGraphURICache = false;
-		}
-		return graphURIs;
-	}
-
-	private List<String> getGraphURIsFromSparqlQuery() throws RDFServiceException {
-		String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
-		String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }";
-		List<String> graphURIs = new ArrayList<String>();
-		try {
-			graphURIs = getGraphURIsFromSparqlQuery(fastJenaQuery);
-		} catch (Exception e) {
-			log.debug("Unable to use non-standard ARQ query for graph list", e);
-		}
-		if (graphURIs.isEmpty()) {
-			graphURIs = getGraphURIsFromSparqlQuery(standardQuery);
-			Collections.sort(graphURIs);
-		}
-		return graphURIs;
+	protected void rebuildGraphUris() {
+        Thread thread = new VitroBackgroundThread(new Runnable() {
+            public void run() {
+                synchronized (RDFServiceJena.class) {
+                    if (rebuildGraphURICache) {
+                        try {
+                            isRebuildGraphURICacheRunning = true;
+                            Set<String> newGraphUris = new HashSet<>();
+                            try {
+                                String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
+                                newGraphUris.addAll(getGraphURIsFromSparqlQuery(fastJenaQuery));
+                            } catch (Exception e) {
+                                log.debug("Unable to use non-standard ARQ query for graph list", e);
+                            }
+                            if (graphURIs.isEmpty()) {
+                                String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }";
+                                newGraphUris.addAll(getGraphURIsFromSparqlQuery(standardQuery));
+                            }
+                            Set<String> oldGraphUris = new HashSet<String>(graphURIs);
+                            if (newGraphUris.equals(oldGraphUris)) {
+                                return;
+                            }
+                            Set<String> removedGraphUris = new HashSet<String>(oldGraphUris);
+                            removedGraphUris.removeAll(newGraphUris);
+                            graphURIs.removeAll(removedGraphUris);
+                            Set<String> addedGraphUris = new HashSet<String>(newGraphUris);
+                            addedGraphUris.removeAll(oldGraphUris);
+                            graphURIs.addAll(addedGraphUris);
+                        } catch (Exception e) {
+                            log.error(e, e);
+                        } finally {
+                            isRebuildGraphURICacheRunning = false;
+                            rebuildGraphURICache = false;
+                        }
+                    }
+                }
+            }
+        }, "Rebuild graphURI cache thread");
+        thread.start();
 	}
 
 	private List<String> getGraphURIsFromSparqlQuery(String queryString) throws RDFServiceException {

@@ -316,6 +316,10 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             s.close();
         }
 
+        @Override
+        protected void rebuildGraphUris() {
+        }
+
 
     }
 
