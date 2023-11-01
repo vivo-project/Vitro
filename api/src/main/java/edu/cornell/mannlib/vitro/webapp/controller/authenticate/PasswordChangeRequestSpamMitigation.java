@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-
 public class PasswordChangeRequestSpamMitigation {
 
     private static final Map<String, LocalDateTime> requestHistory = new HashMap<>();
