@@ -1,0 +1,197 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+### Ontology
+
+<https://vivoweb.org/ontology/vitro-application/auth/vocabulary> a owl:Ontology .
+
+### Classes
+
+access:PolicyTemplate a owl:Class ;
+    rdfs:label "Policy template"@en-US .
+
+access:Policy a owl:Class ;
+    rdfs:label "Policy"@en-US .
+
+access:PolicyDataSet a owl:Class ;
+    rdfs:label "Policy dataset"@en-US .
+
+access:ValueContainer a owl:Class ;
+    rdfs:label "Value container"@en-US .
+
+access:Rule a owl:Class ;
+    rdfs:label "Access rule"@en-US .
+
+access:Rules a owl:Class ;
+    rdfs:label "Access rule set"@en-US .
+
+access:Check a owl:Class ;
+    rdfs:label "Access rule check"@en-US .
+
+access:Operator a owl:Class ;
+    rdfs:label "Operator"@en-US .
+
+access:Operation a owl:Class ;
+    rdfs:label "Operation"@en-US .
+
+access:ObjectType a owl:Class ;
+    rdfs:label "Object type"@en-US .
+
+access:SubjectType a owl:Class ;
+    rdfs:label "Subject type"@en-US .
+
+access:Attribute a owl:Class ;
+    rdfs:label "Attribute"@en-US .
+
+access:AttributeValue a owl:Class ;
+    rdfs:label "Attribute value"@en-US .
+
+access:Decision a owl:Class ;
+    rdfs:label "Decision"@en-US .
+
+access:DataSetTemplate a owl:Class ;
+    rdfs:label "Data set template"@en-US .
+
+access:DataSetTemplateKey a owl:Class ;
+    rdfs:label "Data set template key"@en-US .
+
+access:DataSetKeyTemplate a owl:Class ;
+    rdfs:label "Data set key template"@en-US .
+
+access:ValueContainerTemplate a owl:Class ;
+    rdfs:label "Value container template"@en-US .
+
+### Data properties
+
+access:id a owl:DatatypeProperty ,
+    owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( access:Operator access:Operation access:Decision access:AttributeValue access:SubjectType access:Attribute access:ObjectType ) ] ;
+    rdfs:label "id"@en-US .
+
+access:priority a owl:DatatypeProperty ,
+    owl:FunctionalProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( access:Policy access:PolicyTemplate access:PolicyDataSet ) ] ;
+    rdfs:label "priority"@en-US . 
+
+### Object properties
+
+access:dataSetValues a owl:ObjectProperty ;
+    rdfs:label "data set values"@en-US ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( access:DataSetTemplate access:PolicyDataSet ) ] ;
+    rdfs:range access:ValueContainer .
+
+access:value a owl:ObjectProperty ;
+    rdfs:label "value"@en-US ;
+    rdfs:domain access:ValueContainer .
+#range any uri
+
+access:operator a owl:ObjectProperty ;
+    rdfs:label "operator"@en-US ;
+    rdfs:domain access:Check ;
+    rdfs:range access:Operator .
+
+access:attribute  a owl:ObjectProperty ;
+    rdfs:label "attribute"@en-US ;
+    rdfs:domain access:Check ;
+    rdfs:range access:Attribute .
+
+access:values a owl:ObjectProperty ;
+    rdfs:label "values"@en-US ;
+    rdfs:domain access:Check ;
+    rdfs:range access:AttributeValueSet .
+
+access:defaultValue a owl:ObjectProperty ;
+    rdfs:label "default template value"@en-US ;
+    rdfs:domain access:ValueContainerTemplate .
+
+access:containerTypeTemplate a owl:ObjectProperty ,
+    owl:FunctionalProperty ;
+    rdfs:label "container type template"@en-US ;
+    rdfs:range access:Attribute ;
+    rdfs:domain access:ValueContainerTemplate .
+
+access:relatedValueSet a owl:ObjectProperty ;
+    rdfs:label "related value set"@en-US ;
+    rdfs:domain access:ValueContainerTemplate ;
+    rdfs:range access:AttributeValueSet .
+
+access:dataSetTemplateKey a owl:ObjectProperty ;
+    rdfs:label "data set template key"@en-US ;
+    rdfs:domain access:DataSetTemplate ;
+    rdfs:range access:DataSetTemplateKey .
+
+access:dataSetValueTemplate a owl:ObjectProperty ;
+    rdfs:label "data set value template"@en-US ;
+    rdfs:domain access:DataSetTemplate ;
+    rdfs:range access:ValueContainerTemplate .
+
+access:templateKey a owl:ObjectProperty ;
+    rdfs:label "template key"@en-US ;
+    rdfs:domain access:DataSetTemplateKey ;
+    rdfs:range access:Attribute .
+
+access:check a owl:ObjectProperty ;
+    rdfs:label "check"@en-US ;
+    rdfs:domain access:Rule ;
+    rdfs:range access:Check .
+
+access:decision a owl:ObjectProperty ;
+    rdfs:label "decision"@en-US ;
+    rdfs:domain access:Rule ;
+    rdfs:range access:Decision .    
+
+access:rules a owl:ObjectProperty ;
+    rdfs:label "rules"@en-US ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( access:Policy access:PolicyTemplate ) ] ;
+    rdfs:range access:Rules .
+
+access:policyDataSets a owl:ObjectProperty ;
+    rdfs:label "policy data sets"@en-US ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( access:Policy access:PolicyTemplate ) ] ;
+    rdfs:range access:PolicyDataSets .
+
+access:policyDataSet a owl:ObjectProperty ;
+    rdfs:label "policy data set"@en-US ;
+    rdfs:domain access:PolicyDataSets ;
+    rdfs:range access:PolicyDataSet .
+
+access:containerType a owl:ObjectProperty ;
+    rdfs:label "container type"@en-US ;
+    rdfs:domain access:ValueContainer ;
+    rdfs:range access:Attribute .
+
+access:singleValue a owl:ObjectProperty ;
+    rdfs:label "single value"@en-US ;
+    rdfs:domain access:Check .
+#range any uri
+
+access:rule a owl:ObjectProperty ;
+    rdfs:label "rule"@en-US ;
+    rdfs:domain access:Rules ;
+    rdfs:range access:Rule .
+
+access:dataSetKey a owl:ObjectProperty ;
+    rdfs:label "data set key"@en-US ;
+    rdfs:domain access:PolicyDataSet ;
+    rdfs:range access:DataSetKey .
+
+access:dataSetKeyTemplate a owl:ObjectProperty ;
+    rdfs:label "data set key template"@en-US ;
+    rdfs:domain access:DataSetTemplate ;
+    rdfs:range access:DataSetKeyTemplate .
+
+access:policyDataSetTemplate a owl:ObjectProperty ;
+    rdfs:label "policy data set template"@en-US ;
+    rdfs:domain access:PolicyDataSets ;
+    rdfs:range access:DataSetTemplate .
+
+access:keyComponent a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( access:DataSetKeyTemplate access:DataSetKey ) ] ;
+    rdfs:label "key component"@en-US .
+#range any uri
