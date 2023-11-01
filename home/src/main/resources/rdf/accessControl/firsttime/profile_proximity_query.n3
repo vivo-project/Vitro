@@ -3,7 +3,7 @@
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-access-individual:PersonProfileProximityToResourceUri a access:ValueContainer ;
+access-individual:PersonProfileProximityToResourceUri a access:AttributeValue ;
     access:id """
     SELECT ?resourceUri WHERE {
         {
