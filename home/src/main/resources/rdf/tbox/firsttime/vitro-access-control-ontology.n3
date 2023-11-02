@@ -122,7 +122,7 @@ access:containerTypeTemplate a owl:ObjectProperty ,
 access:attributeValue a owl:ObjectProperty ;
     rdfs:label "attribute value"@en-US ;
     rdfs:domain access:AttributeValueSet ;
-    rdfs:range access:AttributeValue .
+    rdfs:range access:ValueContainer .
 
 access:relatedValueSet a owl:ObjectProperty ;
     rdfs:label "related value set"@en-US ;
