@@ -50,6 +50,9 @@ access:Attribute a owl:Class ;
 access:AttributeValue a owl:Class ;
     rdfs:label "Attribute value"@en-US .
 
+access:AttributeValueSet a owl:Class ;
+    rdfs:label "Attribute value set"@en-US .
+
 access:Decision a owl:Class ;
     rdfs:label "Decision"@en-US .
 
@@ -115,6 +118,11 @@ access:containerTypeTemplate a owl:ObjectProperty ,
     rdfs:label "container type template"@en-US ;
     rdfs:range access:Attribute ;
     rdfs:domain access:ValueContainerTemplate .
+
+access:attributeValue a owl:ObjectProperty ;
+    rdfs:label "attribute value"@en-US ;
+    rdfs:domain access:AttributeValueSet ;
+    rdfs:range access:AttributeValue .
 
 access:relatedValueSet a owl:ObjectProperty ;
     rdfs:label "related value set"@en-US ;
