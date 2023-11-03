@@ -5,8 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -480,6 +482,19 @@ public abstract class RDFServiceImpl implements RDFService {
 
 	public VitroRequest getVitroRequest() {
 		return vitroRequest;
+	}
+
+	protected void updateGraphURIs(Set<String> newURIs) {
+		Set<String> oldURIs = new HashSet<String>(graphURIs);
+		if (newURIs.equals(oldURIs)) {
+			return;
+		}
+		Set<String> removedURIs = new HashSet<String>(oldURIs);
+		removedURIs.removeAll(newURIs);
+		graphURIs.removeAll(removedURIs);
+		Set<String> addedURIs = new HashSet<String>(newURIs);
+		addedURIs.removeAll(oldURIs);
+		graphURIs.addAll(addedURIs);
 	}
 
 }
