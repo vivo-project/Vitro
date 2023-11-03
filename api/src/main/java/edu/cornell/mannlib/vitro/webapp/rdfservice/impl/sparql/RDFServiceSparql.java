@@ -390,27 +390,18 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 					if (rebuildGraphURICache) {
 						try {
 							isRebuildGraphURICacheRunning = true;
-							Set<String> newGraphUris = new HashSet<>();
+							Set<String> newURIs = new HashSet<>();
 							try {
 								String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
-								newGraphUris.addAll(getGraphURIsFromSparqlQuery(fastJenaQuery));
+								newURIs.addAll(getGraphURIsFromSparqlQuery(fastJenaQuery));
 							} catch (Exception e) {
 								log.debug("Unable to use non-standard ARQ query for graph list", e);
 							}
 							if (graphURIs.isEmpty()) {
 								String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }";
-								newGraphUris.addAll(getGraphURIsFromSparqlQuery(standardQuery));
+								newURIs.addAll(getGraphURIsFromSparqlQuery(standardQuery));
 							}
-							Set<String> oldGraphUris = new HashSet<String>(graphURIs);
-							if (newGraphUris.equals(oldGraphUris)) {
-								return;
-							}
-							Set<String> removedGraphUris = new HashSet<String>(oldGraphUris);
-							removedGraphUris.removeAll(newGraphUris);
-							graphURIs.removeAll(removedGraphUris);
-							Set<String> addedGraphUris = new HashSet<String>(newGraphUris);
-							addedGraphUris.removeAll(oldGraphUris);
-							graphURIs.addAll(addedGraphUris);
+							updateGraphURIs(newURIs);
 						} catch (Exception e) {
 							log.error(e, e);
 						} finally {

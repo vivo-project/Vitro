@@ -315,26 +315,17 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                         try {
                             isRebuildGraphURICacheRunning = true;
                             Dataset d = dw.getDataset();
-                            Set<String> newGraphUris = new HashSet<>();
+                            Set<String> newURIs = new HashSet<>();
                             d.begin(ReadWrite.READ);
                             try {
                                 Iterator<String> nameIt = d.listNames();
                                 while (nameIt.hasNext()) {
-                                    newGraphUris.add(nameIt.next());
+                                    newURIs.add(nameIt.next());
                                 }
                             } finally {
                                 d.end();
                             }
-                            Set<String> oldGraphUris = new HashSet<String>(graphURIs);
-                            if (newGraphUris.equals(oldGraphUris)) {
-                                return;
-                            }
-                            Set<String> removedGraphUris = new HashSet<String>(oldGraphUris);
-                            removedGraphUris.removeAll(newGraphUris);
-                            graphURIs.removeAll(removedGraphUris);
-                            Set<String> addedGraphUris = new HashSet<String>(newGraphUris);
-                            addedGraphUris.removeAll(oldGraphUris);
-                            graphURIs.addAll(addedGraphUris);
+                            updateGraphURIs(newURIs);
                         } catch (Exception e) {
                             log.error(e, e);
                         } finally {
