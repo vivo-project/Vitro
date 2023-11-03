@@ -384,44 +384,44 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	}
 
 	protected void rebuildGraphUris() {
-        Thread thread = new VitroBackgroundThread(new Runnable() {
-            public void run() {
-                synchronized (RDFServiceJena.class) {
-                    if (rebuildGraphURICache) {
-                        try {
-                            isRebuildGraphURICacheRunning = true;
-                            Set<String> newGraphUris = new HashSet<>();
-                            try {
-                                String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
-                                newGraphUris.addAll(getGraphURIsFromSparqlQuery(fastJenaQuery));
-                            } catch (Exception e) {
-                                log.debug("Unable to use non-standard ARQ query for graph list", e);
-                            }
-                            if (graphURIs.isEmpty()) {
-                                String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }";
-                                newGraphUris.addAll(getGraphURIsFromSparqlQuery(standardQuery));
-                            }
-                            Set<String> oldGraphUris = new HashSet<String>(graphURIs);
-                            if (newGraphUris.equals(oldGraphUris)) {
-                                return;
-                            }
-                            Set<String> removedGraphUris = new HashSet<String>(oldGraphUris);
-                            removedGraphUris.removeAll(newGraphUris);
-                            graphURIs.removeAll(removedGraphUris);
-                            Set<String> addedGraphUris = new HashSet<String>(newGraphUris);
-                            addedGraphUris.removeAll(oldGraphUris);
-                            graphURIs.addAll(addedGraphUris);
-                        } catch (Exception e) {
-                            log.error(e, e);
-                        } finally {
-                            isRebuildGraphURICacheRunning = false;
-                            rebuildGraphURICache = false;
-                        }
-                    }
-                }
-            }
-        }, "Rebuild graphURI cache thread");
-        thread.start();
+		Thread thread = new VitroBackgroundThread(new Runnable() {
+			public void run() {
+				synchronized (RDFServiceJena.class) {
+					if (rebuildGraphURICache) {
+						try {
+							isRebuildGraphURICacheRunning = true;
+							Set<String> newGraphUris = new HashSet<>();
+							try {
+								String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
+								newGraphUris.addAll(getGraphURIsFromSparqlQuery(fastJenaQuery));
+							} catch (Exception e) {
+								log.debug("Unable to use non-standard ARQ query for graph list", e);
+							}
+							if (graphURIs.isEmpty()) {
+								String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }";
+								newGraphUris.addAll(getGraphURIsFromSparqlQuery(standardQuery));
+							}
+							Set<String> oldGraphUris = new HashSet<String>(graphURIs);
+							if (newGraphUris.equals(oldGraphUris)) {
+								return;
+							}
+							Set<String> removedGraphUris = new HashSet<String>(oldGraphUris);
+							removedGraphUris.removeAll(newGraphUris);
+							graphURIs.removeAll(removedGraphUris);
+							Set<String> addedGraphUris = new HashSet<String>(newGraphUris);
+							addedGraphUris.removeAll(oldGraphUris);
+							graphURIs.addAll(addedGraphUris);
+						} catch (Exception e) {
+							log.error(e, e);
+						} finally {
+							isRebuildGraphURICacheRunning = false;
+							rebuildGraphURICache = false;
+						}
+					}
+				}
+			}
+		}, "Rebuild graphURI cache thread");
+		thread.start();
 	}
 
 	private List<String> getGraphURIsFromSparqlQuery(String queryString) throws RDFServiceException {

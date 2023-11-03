@@ -48,8 +48,8 @@ public abstract class RDFServiceImpl implements RDFService {
 	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
 	protected List<ModelChangedListener> registeredJenaListeners = new CopyOnWriteArrayList<ModelChangedListener>();
 	protected final List<String> graphURIs = new CopyOnWriteArrayList<String>(); 
-    protected volatile boolean rebuildGraphURICache = true;
-    protected volatile boolean isRebuildGraphURICacheRunning = false;
+	protected volatile boolean rebuildGraphURICache = true;
+	protected volatile boolean isRebuildGraphURICacheRunning = false;
 
 	@Override
 	public void newIndividual(String individualURI,
@@ -88,22 +88,22 @@ public abstract class RDFServiceImpl implements RDFService {
        }
     }
 
-    /**
-     * Get a list of all the graph URIs in the RDF store.
-     */
-    @Override
-    public List<String> getGraphURIs() throws RDFServiceException {
-        if (rebuildGraphURICache && !isRebuildGraphURICacheRunning) {
-            rebuildGraphUris();
-        }
-        return graphURIs;
-    }
-    
+	/**
+	 * Get a list of all the graph URIs in the RDF store.
+	 */
+	@Override
+	public List<String> getGraphURIs() throws RDFServiceException {
+		if (rebuildGraphURICache && !isRebuildGraphURICacheRunning) {
+			rebuildGraphUris();
+		}
+		return graphURIs;
+	}
+	
 	protected abstract void rebuildGraphUris();
 
-    @Override
+	@Override
 	public String getDefaultWriteGraphURI() throws RDFServiceException {
-        return defaultWriteGraphURI;
+		return defaultWriteGraphURI;
 	}
 
 	@Override
