@@ -759,13 +759,10 @@
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]filter[\\/]LanguageFilteringRDFService\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]filter[\\/]LanguageFilteringUtils\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]filter[\\/]LanguageFilterModel\.java" checks="."/>
-    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]filter[\\/]SameAsFilteringRDFServiceFactory\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]ChangeSetImpl\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]ModelChangeImpl\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]RDFServiceFactorySingle\.java" checks="."/>
-    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]RDFServiceImpl\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]RDFServiceUtils\.java" checks="."/>
-    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]jena[\\/]RDFServiceJena\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]jena[\\/]model[\\/]RDFServiceModel\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]jena[\\/]sdb[\\/]RDFServiceFactorySDB\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]jena[\\/]sdb[\\/]RDFServiceSDB\.java" checks="."/>
@@ -773,7 +770,6 @@
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]logging[\\/]LoggingRDFService\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]logging[\\/]LoggingRDFServiceFactory\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]logging[\\/]RDFServiceLogger\.java" checks="."/>
-    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]sparql[\\/]RDFServiceSparql\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]sparql[\\/]RDFServiceSparqlHttp\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]rdfservice[\\/]impl[\\/]virtuoso[\\/]RDFServiceVirtuoso\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]reasoner[\\/]ABoxRecomputer\.java" checks="."/>
