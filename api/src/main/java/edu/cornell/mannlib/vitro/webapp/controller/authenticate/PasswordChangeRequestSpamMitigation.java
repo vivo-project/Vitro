@@ -1,25 +1,21 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PasswordChangeRequestSpamMitigation {
 
-    private static final Map<String, LocalDateTime> requestHistory = new HashMap<>();
+    private static final Map<String, LocalDateTime> requestHistory = new ConcurrentHashMap<>();
 
-    private static final Map<String, Integer> requestFrequency = new HashMap<>();
+    private static final Map<String, Integer> requestFrequency = new ConcurrentHashMap<>();
 
     private static final long INTERVAL_INCREASE_MINUTES = 10;
 
 
     private static void initializeHistoryRequestDataIfNotExists(String emailAddress) {
-        if (requestHistory.containsKey(emailAddress)) {
-            return;
-        }
-
-        requestHistory.put(emailAddress, LocalDateTime.now());
-        requestFrequency.put(emailAddress, 0);
+        requestHistory.putIfAbsent(emailAddress, LocalDateTime.now());
+        requestFrequency.putIfAbsent(emailAddress, 0);
     }
 
     public static PasswordChangeRequestSpamMitigationResponse isPasswordResetRequestable(String emailAddress) {
@@ -45,7 +41,7 @@ public class PasswordChangeRequestSpamMitigation {
     }
 
     public static void requestSuccessfullyHandledAndUserIsNotified(String email) {
-        requestFrequency.computeIfPresent(email, (key, value) -> ++value);
+        requestFrequency.merge(email, 1, Integer::sum);
     }
 
     public static void requestSuccessfullyHandledAndUserPasswordUpdated(String email) {

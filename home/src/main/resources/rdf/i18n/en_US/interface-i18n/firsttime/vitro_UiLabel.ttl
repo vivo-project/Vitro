@@ -342,6 +342,14 @@ uil-data:password_reset_forgot_email_contact_us.Vitro
         uil:hasKey      "password_reset_forgot_email_contact_us" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:functionality_disabled.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Functionality disabled by site admin"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "functionality_disabled" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:startup_status.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;

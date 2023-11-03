@@ -2,33 +2,37 @@
 
 <#-- Template for notifying user about reset password request state -->
 
-<#if showPasswordChangeForm == true>
-    <h1>${i18n().password_reset_title}</h1>
-    <br/>
+<#if isEnabled == true>
+    <#if showPasswordChangeForm == true>
+        <h1>${i18n().password_reset_title}</h1>
+        <br/>
 
-    <form id="forgotPasswordForm" action="${forgotPasswordUrl}" method="POST" style="margin-top: 10px;">
-        <div>
-            <label for="email">${i18n().password_reset_manual}</label>
-            <input type="email" id="email" name="email" class="text-field focus" placeholder="user@example.com" required>
+        <form id="forgotPasswordForm" action="${forgotPasswordUrl}" method="POST" style="margin-top: 10px;">
+            <div>
+                <label for="email">${i18n().password_reset_manual}</label>
+                <input type="email" id="email" name="email" class="text-field focus" placeholder="user@example.com" required>
 
-            <p>
-                <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
-                <input type="text" id="defaultReal" name="defaultReal" required>
-            </p>
+                <p>
+                    <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
+                    <input type="text" id="defaultReal" name="defaultReal" required>
+                </p>
 
-            <p class="submit" style="margin-top: 10px;">
-                <button type="submit" class="green button">${i18n().password_reset_button}</button>
-            </p>
-            <#if wrongCaptcha == true>
-                <p class="errorMessage">${i18n().wrong_captcha}</p>
-            </#if>
+                <p class="submit" style="margin-top: 10px;">
+                    <button type="submit" class="green button">${i18n().password_reset_button}</button>
+                </p>
+                <#if wrongCaptcha == true>
+                    <p class="errorMessage">${i18n().wrong_captcha}</p>
+                </#if>
 
-            <br/>
-            <p>${i18n().password_reset_forgot_email} <a href="${contactUrl}">${i18n().password_reset_forgot_email_contact_us}</a>.</p>
-        </div>
-    </form>
+                <br/>
+                <p>${i18n().password_reset_forgot_email} <a href="${contactUrl}">${i18n().password_reset_forgot_email_contact_us}</a>.</p>
+            </div>
+        </form>
+    <#else>
+        <h1>${message}</h1>
+    </#if>
 <#else>
-    <h1>${message}</h1>
+    <h1>${i18n().functionality_disabled} &#x1F609;.</h1>
 </#if>
 
 <style>
@@ -81,9 +85,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarke
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.realperson.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
-<script type="text/javascript">
-  $(function() {
-    $('#defaultReal').realperson();
-  });
-</script>
 
+<#if isEnabled == true>
+    <script type="text/javascript">
+      $(function() {
+        $('#defaultReal').realperson();
+      });
+    </script>
+</#if>

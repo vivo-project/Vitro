@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -40,28 +41,32 @@ public class ForgotPassword extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ForgotPassword.class.getName());
 
-
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
         // Random time interval sleep so attacker can't calculate whether provided email is bound or not
         sleepForRandomTime();
 
         Map<String, Object> dataContext = new HashMap<>();
-        dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
-        dataContext.put("contactUrl", getContactUrl(vreq));
-        dataContext.put("wrongCaptcha", false);
+        setCommonValues(dataContext, vreq);
         UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
         I18nBundle i18n = I18n.bundle(vreq);
 
+        boolean isEnabled =
+            Boolean.parseBoolean(ConfigurationProperties.getBean(vreq).getProperty("forgotPassword.isEnabled"));
+        dataContext.put("isEnabled", isEnabled);
+        if (!isEnabled) {
+            return showFormIfEnabled(dataContext);
+        }
+
         if (vreq.getMethod().equalsIgnoreCase("GET")) {
-            return showForm(dataContext);
+            return showFormIfEnabled(dataContext);
         }
 
         String captchaInput = vreq.getParameter("defaultReal");
         String captchaDisplay = vreq.getParameter("defaultRealHash");
         if (!captchaHash(captchaInput).equals(captchaDisplay)) {
             dataContext.put("wrongCaptcha", true);
-            return showForm(dataContext);
+            return showFormIfEnabled(dataContext);
         }
 
         dataContext.put("showPasswordChangeForm", false);
@@ -116,13 +121,19 @@ public class ForgotPassword extends FreemarkerHttpServlet {
         return String.valueOf(hash);
     }
 
+    private void setCommonValues(Map<String, Object> dataContext, VitroRequest vreq) {
+        dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
+        dataContext.put("contactUrl", getContactUrl(vreq));
+        dataContext.put("wrongCaptcha", false);
+    }
+
     private ResponseValues emailSentMessage(Map<String, Object> dataContext, I18nBundle i18n, String email) {
         dataContext.put("message",
             i18n.text("password_reset_email_sent") + email + i18n.text("password_reset_email_sent_if_exists"));
         return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
     }
 
-    private ResponseValues showForm(Map<String, Object> dataContext) {
+    private ResponseValues showFormIfEnabled(Map<String, Object> dataContext) {
         dataContext.put("showPasswordChangeForm", true);
         return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
     }

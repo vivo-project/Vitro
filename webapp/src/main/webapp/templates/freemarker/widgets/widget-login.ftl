@@ -65,9 +65,11 @@
                     <input name="loginForm" class="green button" type="submit" value="${i18n().login_button}"/>
                 </p>
 
-                <p class="forgot-password">
-                    <a href="${forgotPassword}" style="display: block;">${i18n().password_reset_label}</a>
-                </p>
+                <#if forgotPasswordEnabled == true>
+                    <p class="forgot-password">
+                        <a href="${forgotPassword}" style="display: block;">${i18n().password_reset_label}</a>
+                    </p>
+                </#if>
 
                 <#-- NC: remember me won't be ready for r1.2
                 <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />

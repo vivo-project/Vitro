@@ -342,6 +342,14 @@ uil-data:wrong_captcha.Vitro
         uil:hasKey      "wrong_captcha" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:functionality_disabled.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Functionality disabled by site admin"@en-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "functionality_disabled" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:startup_status.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
