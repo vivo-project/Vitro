@@ -61,13 +61,13 @@ public class CheckFactory {
         }
     }
 
-
     public static void extendAttribute(Check check, QuerySolution qs) throws Exception {
         String testId = qs.getLiteral("testId").getString();
         if (CheckType.ONE_OF.toString().equals(testId) || CheckType.NOT_ONE_OF.toString().equals(testId)) {
             check.addValue(getValue(qs));
             return;
         }
-        throw new Exception();
+        throw new IllegalArgumentException(
+                String.format("Operator '%s' can't be used in combination with multiple attribute values.", testId));
     }
 }
