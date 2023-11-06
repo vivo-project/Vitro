@@ -1,16 +1,17 @@
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
+import java.util.Optional;
+
 import org.apache.jena.query.QuerySolution;
 
 public class ValueContainerFactory {
 
-    public static AttributeValueContainer create(String value, QuerySolution qs,
-            AttributeValueKey dataSetKey) {
-        String type = getContainerType(qs);
-        if (type == null || dataSetKey == null) {
+    public static AttributeValueContainer create(String value, QuerySolution qs, AttributeValueKey dataSetKey) {
+        Optional<String> type = getContainerType(qs);
+        if (type.isEmpty() || dataSetKey == null) {
             return new AttributeValueContainerImpl(value);
         } else {
-            AttributeValueKey avcKey = getAttributeValueContainerKey(dataSetKey, type);
+            AttributeValueKey avcKey = getAttributeValueContainerKey(dataSetKey, type.get());
             AttributeValueContainer avc = AttributeValuesRegistry.getInstance().get(avcKey);
             if (avc == null) {
                 return createNew(value, qs, dataSetKey, avcKey);
@@ -26,13 +27,22 @@ public class ValueContainerFactory {
         return avc;
     }
 
-    private static AttributeValueContainer createNew(String value, QuerySolution qs,
-            AttributeValueKey dataSetKey, AttributeValueKey avcKey) {
+    private static AttributeValueContainer createNew(String value, QuerySolution qs, AttributeValueKey dataSetKey,
+            AttributeValueKey avcKey) {
         AttributeValueContainer avc;
         avc = new AttributeValueContainerImpl(value);
-        avc.setContainerUri(getContainerUri(qs));
-        avc.setType(getContainerType(qs));
-        avc.setDataSetUri(getDataSetUri(qs));
+        Optional<String> containerUri = getContainerUri(qs);
+        if (containerUri.isPresent()) {
+            avc.setContainerUri(containerUri.get());
+        }
+        Optional<String> type = getContainerType(qs);
+        if (type.isPresent()) {
+            avc.setType(type.get());
+        }
+        Optional<String> dataSetUri = getDataSetUri(qs);
+        if (dataSetUri.isPresent()) {
+            avc.setDataSetUri(dataSetUri.get());
+        }
         avc.setKey(dataSetKey);
         register(avc, avcKey);
         return avc;
@@ -48,27 +58,27 @@ public class ValueContainerFactory {
         AttributeValuesRegistry.getInstance().put(key, avc);
     }
 
-    private static String getContainerUri(QuerySolution qs) {
+    private static Optional<String> getContainerUri(QuerySolution qs) {
         if (qs.contains("attributeValue") && qs.get("attributeValue").isResource()) {
             String uri = qs.getResource("attributeValue").getURI();
-            return uri;
+            return Optional.of(uri);
         }
-        return null;
+        return Optional.empty();
     }
 
-    private static String getContainerType(QuerySolution qs) {
+    private static Optional<String> getContainerType(QuerySolution qs) {
         if (qs.contains("containerType") && qs.get("containerType").isLiteral()) {
             String containerType = qs.getLiteral("containerType").getString();
-            return containerType;
+            return Optional.of(containerType);
         }
-        return null;
+        return Optional.empty();
     }
 
-    private static String getDataSetUri(QuerySolution qs) {
+    private static Optional<String> getDataSetUri(QuerySolution qs) {
         if (qs.contains("dataSetUri") && qs.get("dataSetUri").isResource()) {
             String dataSetUri = qs.getResource("dataSetUri").getURI();
-            return dataSetUri;
+            return Optional.of(dataSetUri);
         }
-        return null;
+        return Optional.empty();
     }
 }
