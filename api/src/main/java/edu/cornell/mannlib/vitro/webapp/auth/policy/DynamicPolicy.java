@@ -63,22 +63,16 @@ public class DynamicPolicy implements Policy {
             String ruleUri = shortenUri(rule.getRuleUri());
             if (rule.match(ar)) {
                 if (rule.isAllowMatched()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Policy '" + policyUri + "' rule '" + ruleUri + "' approved request " + ar);
-                    }
+                    debug("Policy '" + policyUri + "' rule '" + ruleUri + "' approved request " + ar);
                     String message = "Policy '" + policyUri + "' rule '" + ruleUri + "' approved " + ar;
                     return new BasicPolicyDecision(DecisionResult.AUTHORIZED, message);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Policy '" + policyUri + "' rule " + ruleUri + " rejected request " + ar);
-                    }
+                    debug("Policy '" + policyUri + "' rule " + ruleUri + " rejected request " + ar);
                     String message = "Policy '" + policyUri + "' rule '" + ruleUri + "' rejected request" + ar;
                     return new BasicPolicyDecision(DecisionResult.UNAUTHORIZED, message);
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Policy '" + policyUri + "' rule '" + ruleUri + "' didn't match request " + ar);
-                }
+                debug("Policy '" + policyUri + "' rule '" + ruleUri + "' didn't match request " + ar);
             }
         }
 
@@ -98,5 +92,11 @@ public class DynamicPolicy implements Policy {
             return "access-individual:" + uri.substring(VitroVocabulary.AUTH_INDIVIDUAL_PREFIX.length());
         }
         return uri;
+    }
+
+    private static void debug(String message) {
+        if (log.isDebugEnabled()) {
+            log.debug(message);
+        }
     }
 }
