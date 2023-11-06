@@ -2,28 +2,28 @@ package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
 public interface AttributeValueContainer {
 
-    public void add(String value);
+    void add(String value);
 
-    public void remove(String value);
+    void remove(String value);
 
-    public void clear();
+    void clear();
 
-    public boolean contains(String value);
+    boolean contains(String value);
 
-    public boolean containsSingleValue();
+    boolean containsSingleValue();
 
-    public String getSingleValue();
+    String getSingleValue();
 
-    public boolean isEmpty();
+    boolean isEmpty();
 
-    public void setContainerUri(String containerUri);
+    void setContainerUri(String containerUri);
 
-    public String getContainerUri();
+    String getContainerUri();
 
-    public void setType(String containerType);
+    void setType(String containerType);
 
-    public void setDataSetUri(String dataSetUri);
+    void setDataSetUri(String dataSetUri);
 
-    public void setKey(AttributeValueKey key);
+    void setKey(AttributeValueKey key);
 
 }

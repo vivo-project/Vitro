@@ -12,17 +12,18 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
  *
  */
 public interface Policy {
-    public PolicyDecision decide(AuthorizationRequest ar);
 
-    public default String getUri() {
+    PolicyDecision decide(AuthorizationRequest ar);
+
+    default String getUri() {
         return "";
     }
 
-    public default long getPriority() {
+    default long getPriority() {
         return 0;
     }
 
-    public default String getShortUri() {
+    default String getShortUri() {
         return "";
     }
 }
