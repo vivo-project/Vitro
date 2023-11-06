@@ -84,26 +84,28 @@ public class FileUploadController extends FreemarkerHttpServlet {
 		setAllowedMediaTypes();
 	}
 
-	@Override
-	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		AccessObject ra;
-		AccessOperation ao;
-		try {
-			Property predicate = new Property(getPredicateUri(vreq));
-			final OntModel jenaOntModel = vreq.getJenaOntModel();
-			final String subject = getSubjectUri(vreq);
-			if (isUpload(vreq)) {
-				ra = new ObjectPropertyStatementAccessObject(jenaOntModel, subject, predicate,AccessObject.SOME_URI);
-				ao = AccessOperation.ADD;
-			} else { // delete
-				ra = new ObjectPropertyStatementAccessObject(jenaOntModel, subject, predicate, getFileUri(vreq));
-				ao = AccessOperation.DROP;
-			}
-			return new SimpleAuthorizationRequest(ra, ao);
-		} catch (Exception e) {
-			return AuthorizationRequest.UNAUTHORIZED;
-		}
-	}
+    @Override
+    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+        AccessObject accessObject;
+        AccessOperation accessOperation;
+        try {
+            Property predicate = new Property(getPredicateUri(vreq));
+            final OntModel jenaOntModel = vreq.getJenaOntModel();
+            final String subject = getSubjectUri(vreq);
+            if (isUpload(vreq)) {
+                accessObject = new ObjectPropertyStatementAccessObject(jenaOntModel, subject, predicate,
+                        AccessObject.SOME_URI);
+                accessOperation = AccessOperation.ADD;
+            } else { // delete
+                accessObject =
+                        new ObjectPropertyStatementAccessObject(jenaOntModel, subject, predicate, getFileUri(vreq));
+                accessOperation = AccessOperation.DROP;
+            }
+            return new SimpleAuthorizationRequest(accessObject, accessOperation);
+        } catch (Exception e) {
+            return AuthorizationRequest.UNAUTHORIZED;
+        }
+    }
 
 	private String getFileUri(VitroRequest vreq) {
 		return vreq.getParameter(PARAMETER_FILE_URI);
