@@ -37,17 +37,15 @@ public class ObjectPropertyAccessObject extends AccessObject {
     }
 
     private void debug(ObjectProperty property) {
-        if (true) {
-            if (property instanceof FauxObjectPropertyWrapper) {
-                Throwable t = new Throwable();
-                log.error("FauxObjectPropertyWrapper provided in ObjectPropertyAccessObject constructor");
-                log.error(t, t);
-            }
-            if (property == null) {
-                Throwable t = new Throwable();
-                log.error("null provided in ObjectPropertyAccessObject constructor");
-                log.error(t, t);
-            }
+        if (property instanceof FauxObjectPropertyWrapper) {
+            Throwable t = new Throwable();
+            log.error("FauxObjectPropertyWrapper provided in ObjectPropertyAccessObject constructor");
+            log.error(t, t);
+        }
+        if (property == null) {
+            Throwable t = new Throwable();
+            log.error("null provided in ObjectPropertyAccessObject constructor");
+            log.error(t, t);
         }
     }
 }
