@@ -8,22 +8,22 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 
 public interface Check {
 
-    public void setUri(String uri);
+    void setUri(String uri);
 
-    public String getUri();
+    String getUri();
 
-    public boolean check(AuthorizationRequest ar);
+    boolean check(AuthorizationRequest ar);
 
-    public Attribute getAttributeType();
+    Attribute getAttributeType();
 
-    public CheckType getType();
+    CheckType getType();
 
-    public AttributeValueContainer getValues();
+    AttributeValueContainer getValues();
 
-    public void addValue(String value);
+    void addValue(String value);
 
-    public void setType(CheckType valueOf);
+    void setType(CheckType valueOf);
 
-    public long getComputationalCost();
+    long getComputationalCost();
 
 }

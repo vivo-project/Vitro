@@ -11,27 +11,27 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 
 public interface AccessRule {
 
-    public boolean isAllowMatched();
+    boolean isAllowMatched();
 
-    public void setAllowMatched(boolean allowMatched);
+    void setAllowMatched(boolean allowMatched);
 
-    public String getRuleUri();
+    String getRuleUri();
 
-    public void setRuleUri(String ruleUri);
+    void setRuleUri(String ruleUri);
 
-    public List<Check> getChecks();
+    List<Check> getChecks();
 
-    public boolean match(AuthorizationRequest ar);
+    boolean match(AuthorizationRequest ar);
 
-    public void addCheck(Check attr);
+    void addCheck(Check attr);
 
-    public Set<String> getCheckUris();
+    Set<String> getCheckUris();
 
-    public boolean containsCheckUri(String uri);
+    boolean containsCheckUri(String uri);
 
-    public Set<Check> getChecksByType(Attribute type);
+    Set<Check> getChecksByType(Attribute type);
 
-    public long getChecksCount();
+    long getChecksCount();
 
-    public Check getCheck(String uri);
+    Check getCheck(String uri);
 }
