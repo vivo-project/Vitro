@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
+import java.util.Optional;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -18,22 +20,28 @@ public abstract class AccessObject {
     private DataProperty dataProperty;
     private ObjectProperty objectProperty;
 
-    public ObjectProperty getObjectProperty() {
-        return objectProperty;
+    public Optional<ObjectProperty> getObjectProperty() {
+        if (objectProperty != null) {
+            return Optional.of(objectProperty);
+        }
+        return Optional.empty();
     }
 
     public void setObjectProperty(ObjectProperty objectProperty) {
         this.objectProperty = objectProperty;
     }
 
-    public String getUri() {
-        return null;
+    public Optional<String> getUri() {
+        return Optional.empty();
     }
 
     public abstract AccessObjectType getType();
 
-    public AccessObjectStatement getStatement() {
-        return statement;
+    public Optional<AccessObjectStatement> getStatement() {
+        if (statement == null) {
+            return Optional.empty();
+        }
+        return Optional.of(statement);
     };
 
     protected void initializeStatement() {
@@ -44,32 +52,34 @@ public abstract class AccessObject {
 
     public void setStatementOntModel(Model ontModel) {
         initializeStatement();
-        getStatement().setModel(ontModel);
+        statement.setModel(ontModel);
     }
 
     public Model getStatementOntModel() {
-        initializeStatement();
-        return getStatement().getModel();
+        if (statement != null) {
+            return statement.getModel();
+        }
+        return null;
     }
 
     public void setStatementSubject(String subject) {
         initializeStatement();
-        getStatement().setSubject(subject);
+        statement.setSubject(subject);
     }
 
     public String getStatementSubject() {
         initializeStatement();
-        return getStatement().getSubject();
+        return statement.getSubject();
     }
 
     public void setStatementPredicate(Property predicate) {
         initializeStatement();
-        getStatement().setPredicate(predicate);
+        statement.setPredicate(predicate);
     }
 
     protected Property getPredicate() {
         initializeStatement();
-        return getStatement().getPredicate();
+        return statement.getPredicate();
     }
 
     public String getStatementPredicateUri() {
@@ -82,16 +92,19 @@ public abstract class AccessObject {
 
     public void setStatementObject(String objectUri) {
         initializeStatement();
-        this.getStatement().setObject(objectUri);
+        this.statement.setObject(objectUri);
     }
 
     public String getStatementObject() {
         initializeStatement();
-        return getStatement().getObject();
+        return statement.getObject();
     }
 
-    public DataProperty getDataProperty() {
-        return dataProperty;
+    public Optional<DataProperty> getDataProperty() {
+        if (dataProperty == null) {
+            return Optional.empty();
+        }
+        return Optional.of(dataProperty);
     }
 
     public void setDataProperty(DataProperty dataProperty) {
@@ -100,7 +113,7 @@ public abstract class AccessObject {
 
     public String[] getResourceUris() {
         initializeStatement();
-        return getStatement().getResourceUris(getType());
+        return statement.getResourceUris(getType());
     }
 
 }

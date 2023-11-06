@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
+import java.util.Optional;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
@@ -20,12 +22,17 @@ public class AccessObjectUriCheck extends AbstractCheck {
     @Override
     public boolean check(AuthorizationRequest ar) {
         AccessObject ao = ar.getAccessObject();
-        final String inputValue = ao.getUri();
-        if (AttributeValueChecker.test(this, ar, inputValue)) {
-            log.debug("Attribute match requested '" + inputValue + "'");
+        Optional<String> inputValue = ao.getUri();
+        if (!inputValue.isPresent()) {
+            log.debug("Checked access object uri is not present.");
+            return false;
+        }
+        String uri = inputValue.get();
+        if (AttributeValueChecker.test(this, ar, uri)) {
+            log.debug("Attribute match requested '" + uri + "'");
             return true;
         }
-        log.debug("Attribute don't match requested '" + inputValue + "'");
+        log.debug("Attribute don't match requested '" + uri + "'");
         return false;
     }
 
