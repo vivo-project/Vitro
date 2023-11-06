@@ -38,17 +38,15 @@ public class DataPropertyAccessObject extends AccessObject {
     }
 
     private void debug(DataProperty dataProperty) {
-        if (true) {
-            if (dataProperty instanceof FauxDataPropertyWrapper) {
-                Throwable t = new Throwable();
-                log.error("FauxDataPropertyWrapper provided in DataPropertyAccessObject constructor");
-                log.error(t, t);
-            }
-            if (dataProperty == null) {
-                Throwable t = new Throwable();
-                log.error("null provided in DataPropertyAccessObject constructor");
-                log.error(t, t);
-            }
+        if (dataProperty instanceof FauxDataPropertyWrapper) {
+            Throwable t = new Throwable();
+            log.error("FauxDataPropertyWrapper provided in DataPropertyAccessObject constructor");
+            log.error(t, t);
+        }
+        if (dataProperty == null) {
+            Throwable t = new Throwable();
+            log.error("null provided in DataPropertyAccessObject constructor");
+            log.error(t, t);
         }
     }
 }
