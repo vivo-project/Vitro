@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
+import java.util.Optional;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxObjectPropertyWrapper;
@@ -17,23 +19,36 @@ public class FauxObjectPropertyAccessObject extends AccessObject {
         return AccessObjectType.FAUX_OBJECT_PROPERTY;
     }
 
-    public String getUri() {
-        ObjectProperty op = getObjectProperty();
-        if (op instanceof FauxObjectPropertyWrapper) {
-            return ((FauxObjectPropertyWrapper) op).getConfigUri();
+    public Optional<String> getUri() {
+        Optional<ObjectProperty> op = getObjectProperty();
+        if (!op.isPresent()) {
+            return Optional.empty();
         }
-        if (op != null) {
-            return op.getURI();
+        ObjectProperty property = op.get();
+        if (property instanceof FauxObjectPropertyWrapper) {
+            String uri = ((FauxObjectPropertyWrapper) property).getConfigUri();
+            if (uri == null) {
+                return Optional.empty();
+            }
+            return Optional.of(uri);
         }
-        return null;
+        String uri = property.getURI();
+        if (uri == null) {
+            return Optional.empty();
+        }
+        return Optional.of(uri);
     }
 
     @Override
     public String toString() {
-        ObjectProperty op = getObjectProperty();
-        if (op instanceof FauxObjectPropertyWrapper) {
-            return getClass().getSimpleName() + ": " + ((FauxObjectPropertyWrapper) op).getConfigUri();
+        Optional<ObjectProperty> op = getObjectProperty();
+        if (!op.isPresent()) {
+            return getClass().getSimpleName() + ": Object property is not present.";
         }
-        return getClass().getSimpleName() + ": " + (op == null ? op : op.getURI());
+        ObjectProperty property = op.get();
+        if (property instanceof FauxObjectPropertyWrapper) {
+            return getClass().getSimpleName() + ": " + ((FauxObjectPropertyWrapper) property).getConfigUri();
+        }
+        return getClass().getSimpleName() + ": " + (property == null ? "not present." : property.getURI());
     }
 }

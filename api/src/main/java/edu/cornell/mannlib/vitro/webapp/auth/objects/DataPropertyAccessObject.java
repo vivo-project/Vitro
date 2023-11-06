@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
+import java.util.Optional;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.FauxDataPropertyWrapper;
@@ -18,12 +20,16 @@ public class DataPropertyAccessObject extends AccessObject {
     }
 
     @Override
-    public String getUri() {
-        DataProperty dp = getDataProperty();
-        if (dp != null) {
-            return dp.getURI();
+    public Optional<String> getUri() {
+        Optional<DataProperty> dp = getDataProperty();
+        if (dp.isPresent()) {
+            String uri = dp.get().getURI();
+            if (uri == null) {
+                return Optional.empty();
+            }
+            return Optional.of(uri);
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -33,8 +39,8 @@ public class DataPropertyAccessObject extends AccessObject {
 
     @Override
     public String toString() {
-        DataProperty dp = getDataProperty();
-        return getClass().getSimpleName() + ": " + (dp == null ? dp : dp.getURI());
+        Optional<DataProperty> dp = getDataProperty();
+        return getClass().getSimpleName() + ": " + (!dp.isPresent() ? "not present" : dp.get().getURI());
     }
 
     private void debug(DataProperty dataProperty) {

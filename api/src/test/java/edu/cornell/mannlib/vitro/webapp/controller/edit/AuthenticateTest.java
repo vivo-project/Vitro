@@ -156,7 +156,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		PermissionSet adminPermissionSet = new PermissionSet();
 		adminPermissionSet.setUri(URI_DBA);
 		adminPermissionSet.setPermissionUris(Collections
-				.singleton(SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION.getObject().getUri()));
+				.singleton(SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION.getObject().getUri().get()));
 
 		userAccountsDao = new UserAccountsDaoStub();
 		userAccountsDao.addPermissionSet(adminPermissionSet);

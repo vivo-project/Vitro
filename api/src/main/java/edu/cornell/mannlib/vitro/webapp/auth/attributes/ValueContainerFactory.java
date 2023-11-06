@@ -8,7 +8,7 @@ public class ValueContainerFactory {
 
     public static AttributeValueContainer create(String value, QuerySolution qs, AttributeValueKey dataSetKey) {
         Optional<String> type = getContainerType(qs);
-        if (type.isEmpty() || dataSetKey == null) {
+        if (!type.isPresent() || dataSetKey == null) {
             return new AttributeValueContainerImpl(value);
         } else {
             AttributeValueKey avcKey = getAttributeValueContainerKey(dataSetKey, type.get());

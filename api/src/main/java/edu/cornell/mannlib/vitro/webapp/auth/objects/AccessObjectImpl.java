@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
+import java.util.Optional;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 
 /**
@@ -27,8 +29,11 @@ public class AccessObjectImpl extends AccessObject {
     }
 
     @Override
-    public String getUri() {
-        return uri;
+    public Optional<String> getUri() {
+        if (uri == null) {
+            return Optional.empty();
+        }
+        return Optional.of(uri);
     }
 
     @Override
