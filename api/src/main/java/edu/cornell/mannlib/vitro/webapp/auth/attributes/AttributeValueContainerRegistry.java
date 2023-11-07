@@ -3,30 +3,27 @@ package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AttributeValuesRegistry implements AttributeValues {
+public class AttributeValueContainerRegistry {
 
-    private static AttributeValues INSTANCE = new AttributeValuesRegistry();
+    private static AttributeValueContainerRegistry INSTANCE = new AttributeValueContainerRegistry();
     private Map<AttributeValueKey, AttributeValueContainer> valuesMap = new ConcurrentHashMap<>();
 
-    private AttributeValuesRegistry() {
+    private AttributeValueContainerRegistry() {
         INSTANCE = this;
     }
 
-    public static AttributeValues getInstance() {
+    public static AttributeValueContainerRegistry getInstance() {
         return INSTANCE;
     }
 
-    @Override
     public AttributeValueContainer get(AttributeValueKey key) {
         return valuesMap.get(key);
     }
 
-    @Override
     public void put(AttributeValueKey key, AttributeValueContainer values) {
         valuesMap.put(key, values);
     }
 
-    @Override
     public void clear() {
         valuesMap.clear();
     }
