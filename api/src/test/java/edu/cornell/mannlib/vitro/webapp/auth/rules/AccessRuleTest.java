@@ -17,7 +17,7 @@ public class AccessRuleTest {
 
     @Test
     public void testAttributeOrderByComputationalCost() {
-        AccessRule rule = new AccessRuleImpl();
+        AccessRule rule = new FastFailAccessRule();
         Check cheapAttribute = uriCheck("test:cheapAttributeUri", value("test:objectUri"));
         cheapAttribute.setType(EQUALS);
         Check affordableAttribute = uriCheck("test:affordableAttributeUri", value("test:objectUri"));

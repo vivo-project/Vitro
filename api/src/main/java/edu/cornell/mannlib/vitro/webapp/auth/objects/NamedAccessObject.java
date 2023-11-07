@@ -7,23 +7,23 @@ import java.util.Optional;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 
 /**
- * A RequestedAction that can be recognized by a SimplePermission.
+ * A NamedAccessObject to be used for SimplePermission.
  */
-public class AccessObjectImpl extends AccessObject {
+public class NamedAccessObject extends AccessObject {
     private final String uri;
     private AccessObjectType type;
 
-    public AccessObjectImpl() {
+    public NamedAccessObject() {
         this.uri = "";
         this.type = AccessObjectType.NAMED_OBJECT;
     }
 
-    public AccessObjectImpl(String uri, AccessObjectType type) {
+    public NamedAccessObject(String uri, AccessObjectType type) {
         this.uri = uri;
         this.type = type;
     }
 
-    public AccessObjectImpl(String uri) {
+    public NamedAccessObject(String uri) {
         this.uri = uri;
         this.type = AccessObjectType.NAMED_OBJECT;
     }
@@ -43,8 +43,8 @@ public class AccessObjectImpl extends AccessObject {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof AccessObjectImpl) {
-            AccessObjectImpl that = (AccessObjectImpl) o;
+        if (o instanceof NamedAccessObject) {
+            NamedAccessObject that = (NamedAccessObject) o;
             return equivalent(this.uri, that.uri);
         }
         return false;
