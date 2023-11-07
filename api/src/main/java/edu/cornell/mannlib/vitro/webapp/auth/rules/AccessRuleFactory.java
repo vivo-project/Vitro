@@ -18,7 +18,7 @@ public class AccessRuleFactory {
     }
 
     public static AccessRule createRule(QuerySolution qs, AttributeValueKey key) {
-        AccessRule ar = new AccessRuleImpl();
+        AccessRule ar = new FastFailAccessRule();
         String ruleUri = qs.getResource(PolicyLoader.RULE).getURI();
         ar.setRuleUri(ruleUri);
         ar.addCheck(CheckFactory.createCheck(qs, key));

@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObjectImpl;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -73,7 +73,7 @@ public class PageController extends FreemarkerHttpServlet{
             if (StringUtils.isBlank(uri)) {
                 continue;
             }
-            AccessObjectImpl ao = new AccessObjectImpl(uri, AccessObjectType.NAMED_OBJECT);
+            NamedAccessObject ao = new NamedAccessObject(uri, AccessObjectType.NAMED_OBJECT);
             auth = auth.and( new SimpleAuthorizationRequest(ao, AccessOperation.EXECUTE));
         }
         return auth;

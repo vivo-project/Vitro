@@ -19,8 +19,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class AccessRuleImpl implements AccessRule {
-    private static final Log log = LogFactory.getLog(AccessRuleImpl.class);
+public class FastFailAccessRule implements AccessRule {
+    private static final Log log = LogFactory.getLog(FastFailAccessRule.class);
     protected Map<String, Check> checksMap = new HashMap<>();
     protected List<Check> checks = new ArrayList<Check>();
     private static final Comparator<Check> comparator = getAttributeComparator();

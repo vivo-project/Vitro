@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObjectImpl;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 
 public class SimplePermission {
@@ -75,7 +75,7 @@ public class SimplePermission {
 
     private SimplePermission(String uri) {
         this.uri = SimplePermission.NS + uri;
-        AccessObjectImpl ao = new AccessObjectImpl(this.uri, AccessObjectType.NAMED_OBJECT);
+        NamedAccessObject ao = new NamedAccessObject(this.uri, AccessObjectType.NAMED_OBJECT);
         this.ACTION = new SimpleAuthorizationRequest(ao, AccessOperation.EXECUTE);
     }
 }
