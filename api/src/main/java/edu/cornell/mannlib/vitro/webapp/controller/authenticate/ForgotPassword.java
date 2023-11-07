@@ -55,14 +55,14 @@ public class ForgotPassword extends FreemarkerHttpServlet {
         boolean isEnabled = isFunctionalityEnabled(vreq);
         dataContext.put("isEnabled", isEnabled);
         if (!isEnabled || vreq.getMethod().equalsIgnoreCase("GET")) {
-            return showFormIfEnabled(dataContext);
+            return showForm(dataContext);
         }
 
         String captchaInput = vreq.getParameter("defaultReal");
         String captchaDisplay = vreq.getParameter("defaultRealHash");
         if (!captchaHash(captchaInput).equals(captchaDisplay)) {
             dataContext.put("wrongCaptcha", true);
-            return showFormIfEnabled(dataContext);
+            return showForm(dataContext);
         }
 
         dataContext.put("showPasswordChangeForm", false);
@@ -157,12 +157,12 @@ public class ForgotPassword extends FreemarkerHttpServlet {
     }
 
     /**
-     * Shows a password change form if it is enabled in configuration file.
+     * Shows a password change form.
      *
      * @param dataContext The data context for rendering the form.
      * @return A ResponseValues object for displaying the form.
      */
-    private ResponseValues showFormIfEnabled(Map<String, Object> dataContext) {
+    private ResponseValues showForm(Map<String, Object> dataContext) {
         dataContext.put("showPasswordChangeForm", true);
         return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
     }
