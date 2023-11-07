@@ -32,7 +32,6 @@ public class ForbiddenAuthorizationRequest extends AuthorizationRequest {
 
     @Override
     public IdentifierBundle getIds() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

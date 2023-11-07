@@ -26,7 +26,6 @@ public class PolicyTemplateController {
     private static void createRoleDataSet(String dataSetTemplateUri, String roleUri, String dataSetsUri) {
         String role = getRoleShortName(roleUri);
         String dataSetUri = getUriFromTemplate(dataSetTemplateUri, role);
-        // TODO: Check uri doesn't exists in access control graph
         String dataSetKeyUri = dataSetUri + "Key";
         // TODO: Check uri doesn't exists in access control graph
         PolicyLoader policyLoader = PolicyLoader.getInstance();

@@ -115,7 +115,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		} else {
 		    dataPropertyAccessObject = new FauxDataPropertyStatementAccessObject(ontModel, subjectUri, fauxProperty, objectUri);
 		}
-        boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, 
+		boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, 
 		        AuthorizationRequest.or(
 		                new SimpleAuthorizationRequest(dataPropertyAccessObject, AccessOperation.EDIT), 
 		                new SimpleAuthorizationRequest(objectPropertyAccessObject, accessOperation)));

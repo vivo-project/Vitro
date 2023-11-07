@@ -44,7 +44,7 @@ public class AttributeValueChecker {
         }
         String queryTemplate = values.getSingleValue();
         if (StringUtils.isBlank(queryTemplate)) {
-            log.error("SparqlQueryContins template is empty");
+            log.error("SparqlQueryContains template is empty");
             return false;
         }
         AccessObject ao = ar.getAccessObject();
