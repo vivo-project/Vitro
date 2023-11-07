@@ -9,7 +9,7 @@ public class ValueContainerFactory {
     public static AttributeValueContainer create(String value, QuerySolution qs, AttributeValueKey dataSetKey) {
         Optional<String> type = getContainerType(qs);
         if (!type.isPresent() || dataSetKey == null) {
-            return new AttributeValueContainerImpl(value);
+            return new MutableAttributeValueContainer(value);
         } else {
             AttributeValueKey avcKey = getAttributeValueContainerKey(dataSetKey, type.get());
             AttributeValueContainer avc = AttributeValuesRegistry.getInstance().get(avcKey);
@@ -30,7 +30,7 @@ public class ValueContainerFactory {
     private static AttributeValueContainer createNew(String value, QuerySolution qs, AttributeValueKey dataSetKey,
             AttributeValueKey avcKey) {
         AttributeValueContainer avc;
-        avc = new AttributeValueContainerImpl(value);
+        avc = new MutableAttributeValueContainer(value);
         Optional<String> containerUri = getContainerUri(qs);
         if (containerUri.isPresent()) {
             avc.setContainerUri(containerUri.get());

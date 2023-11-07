@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AttributeValueContainerImpl implements AttributeValueContainer {
+public class MutableAttributeValueContainer implements AttributeValueContainer {
 
     private Set<String> values = ConcurrentHashMap.newKeySet();
     private String containerUri;
@@ -16,7 +16,7 @@ public class AttributeValueContainerImpl implements AttributeValueContainer {
         this.containerUri = valueContainerUri;
     }
 
-    public AttributeValueContainerImpl(String value) {
+    public MutableAttributeValueContainer(String value) {
         values.add(value);
     }
 
