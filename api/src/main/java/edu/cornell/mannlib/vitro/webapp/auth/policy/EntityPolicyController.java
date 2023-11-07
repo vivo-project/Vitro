@@ -15,9 +15,8 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainerRegistry;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValues;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValuesRegistry;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -49,8 +48,8 @@ public class EntityPolicyController {
         }
     }
 
-    private static AttributeValues getRegistry() {
-        return AttributeValuesRegistry.getInstance();
+    private static AttributeValueContainerRegistry getRegistry() {
+        return AttributeValueContainerRegistry.getInstance();
     }
 
     public static void revokeAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
@@ -115,7 +114,7 @@ public class EntityPolicyController {
         if (StringUtils.isBlank(entityUri)) {
             return false;
         }
-        AttributeValues registry = getRegistry();
+        AttributeValueContainerRegistry registry = getRegistry();
         AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
         AttributeValueContainer container = registry.get(key);
         if (container == null) {

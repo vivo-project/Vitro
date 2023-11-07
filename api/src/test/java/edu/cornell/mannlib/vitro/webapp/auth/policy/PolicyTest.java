@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValuesRegistry;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainerRegistry;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.Check;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -93,7 +93,7 @@ public class PolicyTest {
         load(PROFILE_PROXIMITY_QUERY);
         load(TEST_DECISIONS);
         RDFServiceModel rdfService = new RDFServiceModel(configurationDataSet);
-        AttributeValuesRegistry.getInstance().clear();
+        AttributeValueContainerRegistry.getInstance().clear();
         PolicyLoader.initialize(rdfService);
         loader = PolicyLoader.getInstance();
         Logger logger = LogManager.getLogger(PolicyLoader.class);
@@ -102,7 +102,7 @@ public class PolicyTest {
 
     @After
     public void finish() {
-        AttributeValuesRegistry.getInstance().clear();
+        AttributeValueContainerRegistry.getInstance().clear();
     }
 
     protected void countRulesAndAttributes(DynamicPolicy policy, int ruleCount, Set<Integer> attrCount) {

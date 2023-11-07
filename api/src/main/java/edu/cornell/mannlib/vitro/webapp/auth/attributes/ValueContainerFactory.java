@@ -12,7 +12,7 @@ public class ValueContainerFactory {
             return new MutableAttributeValueContainer(value);
         } else {
             AttributeValueKey avcKey = getAttributeValueContainerKey(dataSetKey, type.get());
-            AttributeValueContainer avc = AttributeValuesRegistry.getInstance().get(avcKey);
+            AttributeValueContainer avc = AttributeValueContainerRegistry.getInstance().get(avcKey);
             if (avc == null) {
                 return createNew(value, qs, dataSetKey, avcKey);
             } else {
@@ -55,7 +55,7 @@ public class ValueContainerFactory {
     }
 
     private static void register(AttributeValueContainer avc, AttributeValueKey key) {
-        AttributeValuesRegistry.getInstance().put(key, avc);
+        AttributeValueContainerRegistry.getInstance().put(key, avc);
     }
 
     private static Optional<String> getContainerUri(QuerySolution qs) {
