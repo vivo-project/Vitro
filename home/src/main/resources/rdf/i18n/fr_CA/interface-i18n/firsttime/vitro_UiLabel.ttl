@@ -273,7 +273,7 @@ uil-data:password_reset_email_sent_if_exists.Vitro
 uil-data:wrong_captcha.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Captcha incorrect, réessayez."@fr-CA ;
+        rdfs:label       "Les lettres que vous avez saisies ne correspondent pas à celles affichées dans le champ de sécurité. Veuillez réessayer."@fr-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "wrong_captcha" ;
         uil:hasPackage  "Vitro-languages" .
