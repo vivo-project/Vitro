@@ -143,7 +143,7 @@
     owl:FunctionalProperty ;
     rdfs:comment "Type of values for new value container";
     rdfs:label "container type template"@en-US ;
-    rdfs:range :Attribute ;
+    rdfs:range [ a owl:Class ; owl:unionOf  ( :Attribute :ObjectType ) ] ;
     rdfs:domain :ValueContainerTemplate .
 
 :attributeValue a owl:ObjectProperty ;
@@ -211,7 +211,7 @@
     rdfs:comment "Specifies type of container values";
     rdfs:label "container type"@en-US ;
     rdfs:domain :ValueContainer ;
-    rdfs:range :Attribute .
+    rdfs:range :ObjectType .
 
 :singleValue a owl:ObjectProperty ;
     rdfs:comment "Contains single value to check";
