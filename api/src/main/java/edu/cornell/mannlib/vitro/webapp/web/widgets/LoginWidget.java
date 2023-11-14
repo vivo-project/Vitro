@@ -94,7 +94,8 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         values.put(TemplateVariable.FORGOT_PASSWORD.toString(), getForgotPasswordUrl(request));
         values.put(TemplateVariable.FORGOT_PASSWORD_ENABLED.toString(),
-            Boolean.parseBoolean(ConfigurationProperties.getBean(request).getProperty("forgotPassword.isEnabled")));
+            ConfigurationProperties.getBean(request).getProperty("authentication.forgotPassword")
+                .equalsIgnoreCase("enabled"));
 
         boolean showExternalAuth = StringUtils.isNotBlank(
             ConfigurationProperties.getBean(request).getProperty(
