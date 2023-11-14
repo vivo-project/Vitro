@@ -86,6 +86,10 @@
 :ValueContainerTemplate a owl:Class ;
     rdfs:comment "Template to create new value container from";
     rdfs:label "Value container template"@en-US .
+    
+:Configuration a owl:Class ;
+    rdfs:comment "Access control configuration";
+    rdfs:label "Configuration"@en-US .
 
 ### Data properties
 
@@ -102,6 +106,13 @@
     rdfs:range xsd:integer ;
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate :PolicyDataSet ) ] ;
     rdfs:label "priority"@en-US . 
+    
+:version a owl:DatatypeProperty ,
+    owl:FunctionalProperty ;
+    rdfs:comment "Access control configuration version";
+    rdfs:range xsd:integer ;
+    rdfs:domain :Configuration ;
+    rdfs:label "version"@en-US .
 
 ### Object properties
 
