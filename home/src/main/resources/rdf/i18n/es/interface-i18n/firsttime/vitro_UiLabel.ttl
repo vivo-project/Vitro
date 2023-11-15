@@ -329,7 +329,7 @@ uil-data:password_reset_manual.Vitro
 uil-data:password_reset_forgot_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Si no recuerda su dirección de correo electrónico, por favor"@es ;
+        rdfs:label       "Si no recuerdas tu email, por favor"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_forgot_email" ;
         uil:hasPackage  "Vitro-languages" .
