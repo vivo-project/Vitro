@@ -321,7 +321,7 @@ uil-data:password_reset_button.Vitro
 uil-data:password_reset_manual.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Para restablecer su contraseña, por favor ingrese su dirección de correo electrónico a continuación:"@es ;
+        rdfs:label       "Para restablecer la contraseña, introduce tu email a continuación:"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_manual" ;
         uil:hasPackage  "Vitro-languages" .
