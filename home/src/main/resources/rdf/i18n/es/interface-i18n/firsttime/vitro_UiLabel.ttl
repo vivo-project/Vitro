@@ -281,7 +281,7 @@ uil-data:wrong_captcha.Vitro
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Podrás enviar la próxima solicitud el "@es ;
+        rdfs:label       "Podrás enviar una nueva petición el "@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_too_many_requests" ;
         uil:hasPackage  "Vitro-languages" .
