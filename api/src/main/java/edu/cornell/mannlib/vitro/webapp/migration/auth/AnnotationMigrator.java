@@ -31,6 +31,8 @@ import org.apache.jena.query.ResultSet;
 
 public class AnnotationMigrator {
 
+    private static final String ROLE_PREFIX = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
+
     private static final Log log = LogFactory.getLog(AnnotationMigrator.class);
 
     private static final String PREFIX = "http://vitro.mannlib.cornell.edu/ns/vitro/role#";
@@ -184,6 +186,10 @@ public class AnnotationMigrator {
             for (OperationGroup og : groupMap.keySet()) {
                 for (AccessOperation ao : OperationGroup.getOperations(og)) {
                     Set<String> rolesToAdd = groupMap.get(og);
+                    if (!rolesToAdd.isEmpty()) {
+                        log.info(String.format("Granted access to %s %s %s for roles %s", ao, aot, entityUri,
+                                rolesToString(rolesToAdd)));
+                    }
                     EntityPolicyController.getDataValueStatements(entityUri, aot, ao, rolesToAdd, additions);
                     Set<String> rolesToRemove = new HashSet<>(ALL_ROLES);
                     rolesToRemove.removeAll(rolesToAdd);
@@ -192,6 +198,10 @@ public class AnnotationMigrator {
                     // groups
                     if (OperationGroup.PUBLISH_GROUP.equals(og) || OperationGroup.UPDATE_GROUP.equals(og)) {
                         rolesToRemove.remove(ROLE_PUBLIC_URI);
+                    }
+                    if (!rolesToRemove.isEmpty()) {
+                        log.info(String.format("Revoked access to %s %s %s for roles %s", ao, aot, entityUri,
+                                rolesToString(rolesToRemove)));
                     }
                     EntityPolicyController.getDataValueStatements(entityUri, aot, ao, rolesToRemove, removals);
                     log.debug(String.format(
@@ -203,6 +213,21 @@ public class AnnotationMigrator {
         PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
         PolicyLoader.getInstance().updateAccessControlModel(removals.toString(), false);
         return new Long[] { getLineCount(additions.toString()), getLineCount(removals.toString()) };
+    }
+
+    private static Object rolesToString(Set<String> roles) {
+        String result = "";
+        for (String roleUri : roles) {
+            String roleName = roleUri;
+            if (roleName.startsWith(ROLE_PREFIX)) {
+                roleName = roleName.substring(ROLE_PREFIX.length());
+            }
+            if (!result.isEmpty()) {
+                result += ", ";
+            }
+            result += roleName;
+        }
+        return result;
     }
 
     private static String getAnnotationQuery(String typeSpecificPatterns) {
