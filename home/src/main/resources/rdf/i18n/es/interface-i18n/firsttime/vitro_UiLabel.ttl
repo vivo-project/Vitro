@@ -257,7 +257,7 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Se envía un correo de recuperación de contraseña a "@es ;
+        rdfs:label       "Se ha enviado un correo de recuperación de la contraseña a "@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_email_sent" ;
         uil:hasPackage  "Vitro-languages" .
