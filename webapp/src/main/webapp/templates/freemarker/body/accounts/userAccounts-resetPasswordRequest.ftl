@@ -2,7 +2,7 @@
 
 <#-- Template for notifying user about reset password request state -->
 
-<#if isEnabled == true>
+<#if isEnabled && emailConfigured>
     <#if showPasswordChangeForm == true>
         <h1>${i18n().password_reset_title}</h1>
         <br/>
@@ -20,12 +20,14 @@
                 <p class="submit" style="margin-top: 10px;">
                     <button type="submit" class="green button">${i18n().password_reset_button}</button>
                 </p>
-                <#if wrongCaptcha == true>
+                <#if wrongCaptcha>
                     <p class="errorMessage">${i18n().wrong_captcha}</p>
                 </#if>
 
                 <br/>
-                <p>${i18n().password_reset_forgot_email} <a href="${contactUrl}">${i18n().password_reset_forgot_email_contact_us}</a>.</p>
+                <#if contactEmailConfigured>
+                    <p>${i18n().password_reset_forgot_email} <a href="${contactUrl}">${i18n().password_reset_forgot_email_contact_us}</a>.</p>
+                </#if>
             </div>
         </form>
     <#else>

@@ -13,6 +13,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -27,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -137,8 +139,12 @@ public class ForgotPassword extends FreemarkerHttpServlet {
      * @param vreq        The VitroRequest object containing request information.
      */
     private void setCommonValues(Map<String, Object> dataContext, VitroRequest vreq) {
+        ApplicationBean appBean = vreq.getAppBean();
+
         dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
         dataContext.put("contactUrl", getContactUrl(vreq));
+        dataContext.put("emailConfigured", FreemarkerEmailFactory.isConfigured(vreq));
+        dataContext.put("contactEmailConfigured", StringUtils.isNotBlank(appBean.getContactMail()));
         dataContext.put("wrongCaptcha", false);
     }
 
