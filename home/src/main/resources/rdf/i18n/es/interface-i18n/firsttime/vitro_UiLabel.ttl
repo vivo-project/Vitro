@@ -257,7 +257,7 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Se envía un correo de recuperación de contraseña a {0}, si está vinculado a una cuenta existente."@es ;
+        rdfs:label       "Se ha enviado un correo de recuperación de la contraseña a {0}, si está vinculado a una cuenta existente."@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_email_sent" ;
         uil:hasPackage  "Vitro-languages" .
@@ -265,7 +265,7 @@ uil-data:password_reset_email_sent.Vitro
 uil-data:wrong_captcha.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Las letras que has ingresado no coinciden con las que se muestran en el campo de seguridad. Por favor, inténtalo de nuevo."@es ;
+        rdfs:label       "Las letras introducidas no coinciden con las mostradas en el campo de seguridad. Vuelve a intentarlo."@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "wrong_captcha" ;
         uil:hasPackage  "Vitro-languages" .
@@ -273,7 +273,7 @@ uil-data:wrong_captcha.Vitro
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Podrás enviar la próxima solicitud el "@es ;
+        rdfs:label       "Podrás enviar una nueva petición el "@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_too_many_requests" ;
         uil:hasPackage  "Vitro-languages" .
@@ -313,7 +313,7 @@ uil-data:password_reset_button.Vitro
 uil-data:password_reset_manual.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Para restablecer su contraseña, por favor ingrese su dirección de correo electrónico a continuación:"@es ;
+        rdfs:label       "Para restablecer la contraseña, introduce tu email a continuación:"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_manual" ;
         uil:hasPackage  "Vitro-languages" .
@@ -321,7 +321,7 @@ uil-data:password_reset_manual.Vitro
 uil-data:password_reset_forgot_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Si no recuerda su dirección de correo electrónico, por favor"@es ;
+        rdfs:label       "Si no recuerdas tu email, por favor"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_forgot_email" ;
         uil:hasPackage  "Vitro-languages" .
@@ -329,7 +329,7 @@ uil-data:password_reset_forgot_email.Vitro
 uil-data:password_reset_forgot_email_contact_us.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "contáctenos"@es ;
+        rdfs:label       "Contacta con nosotros"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_forgot_email_contact_us" ;
         uil:hasPackage  "Vitro-languages" .
