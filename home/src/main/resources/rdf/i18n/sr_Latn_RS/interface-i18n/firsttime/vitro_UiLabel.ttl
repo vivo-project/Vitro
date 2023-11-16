@@ -257,17 +257,9 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Email za oporavak šifre je poslat na "@sr-Latn-RS ;
+        rdfs:label       "Email za oporavak šifre je poslat na {0}, ako je povezan sa postojećim nalogom."@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_email_sent" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:password_reset_email_sent_if_exists.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       ", ako je povezan sa postojećim nalogom."@sr-Latn-RS ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_email_sent_if_exists" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:wrong_captcha.Vitro

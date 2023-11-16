@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 
 import javax.mail.Message;
@@ -80,10 +82,12 @@ public class ForgotPassword extends FreemarkerHttpServlet {
             return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
         }
 
-        UserAccount userAccount = getAccountForInternalAuth(email, vreq);
-        if (userAccount != null) {
-            requestPasswordChange(userAccount, userAccountsDao);
-            notifyUser(userAccount, i18n, vreq);
+        Optional<UserAccount> userAccountOptional = getAccountForInternalAuth(email, vreq);
+        if (userAccountOptional.isPresent()) {
+            requestPasswordChange(userAccountOptional.get(), userAccountsDao);
+            notifyUser(userAccountOptional.get(), i18n, vreq);
+        } else {
+            log.info("User tried to reset password with an unassociated email: " + email);
         }
 
         PasswordChangeRequestSpamMitigation.requestSuccessfullyHandledAndUserIsNotified(email);
@@ -157,8 +161,7 @@ public class ForgotPassword extends FreemarkerHttpServlet {
      * @return A ResponseValues object containing the email sent message.
      */
     private ResponseValues emailSentMessage(Map<String, Object> dataContext, I18nBundle i18n, String email) {
-        dataContext.put("message",
-            i18n.text("password_reset_email_sent") + email + i18n.text("password_reset_email_sent_if_exists"));
+        dataContext.put("message", i18n.text("password_reset_email_sent", email));
         return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
     }
 
@@ -204,13 +207,13 @@ public class ForgotPassword extends FreemarkerHttpServlet {
      * @param request      The HttpServletRequest for web request information.
      * @return The UserAccount associated with the provided email address.
      */
-    private UserAccount getAccountForInternalAuth(String emailAddress, HttpServletRequest request) {
+    private Optional<UserAccount> getAccountForInternalAuth(String emailAddress, HttpServletRequest request) {
         UserAccountsDao userAccountsDao = getUserAccountsDao(request);
         if (userAccountsDao == null) {
-            log.info("User tried to reset password with an unbound email: " + emailAddress);
-            return null;
+            return Optional.empty();
         }
-        return userAccountsDao.getUserAccountByEmail(emailAddress);
+
+        return Optional.ofNullable(userAccountsDao.getUserAccountByEmail(emailAddress));
     }
 
     /**
@@ -293,13 +296,17 @@ public class ForgotPassword extends FreemarkerHttpServlet {
     }
 
     /**
-     * Checks whether the functionality for resetting passwords is enabled based on configuration properties.
+     * Checks whether the functionality for password recovery is enabled based on the configuration.
      *
-     * @param vreq The VitroRequest object for retrieving configuration properties.
-     * @return `true` if the functionality is enabled, `false` otherwise.
+     * @param vreq The VitroRequest object representing the current request context.
+     * @return 'true' if the functionality is enabled, 'false' otherwise.
+     * @throws NullPointerException If the property "authentication.forgotPassword" is not specified (does not exist)
+     *                              in the configuration file.
      */
     private boolean isFunctionalityEnabled(VitroRequest vreq) {
-        String enabled = ConfigurationProperties.getBean(vreq).getProperty("authentication.forgotPassword");
+        String enabled =
+            Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("authentication.forgotPassword"),
+                "Property authentication.forgotPassword is not specified in configuration file.");
         return enabled.equalsIgnoreCase("enabled");
     }
 

@@ -257,17 +257,9 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Se envía un correo de recuperación de contraseña a "@es ;
+        rdfs:label       "Se envía un correo de recuperación de contraseña a {0}, si está vinculado a una cuenta existente."@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_email_sent" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:password_reset_email_sent_if_exists.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       ", si está vinculado a una cuenta existente."@es ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_email_sent_if_exists" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:wrong_captcha.Vitro
