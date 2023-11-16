@@ -205,7 +205,8 @@ public class ForgotPassword extends FreemarkerHttpServlet {
      *
      * @param emailAddress The email address associated with the user account.
      * @param request      The HttpServletRequest containing the context information.
-     * @return An Optional containing the user account if found, or empty if not found or if the UserAccountsDao is null.
+     * @return An Optional containing the user account if found,
+     *         or empty if not found or if the UserAccountsDao is null.
      */
     private Optional<UserAccount> getAccountForInternalAuth(String emailAddress, HttpServletRequest request) {
         UserAccountsDao userAccountsDao = getUserAccountsDao(request);
