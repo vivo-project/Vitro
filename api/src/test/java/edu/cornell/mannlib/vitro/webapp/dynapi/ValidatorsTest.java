@@ -17,9 +17,13 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.StringLengt
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerArrayParam;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 
 public class ValidatorsTest {
 
@@ -131,29 +135,29 @@ public class ValidatorsTest {
     }
     
     public Data createData(Object input) throws Exception {
-    	Parameter param = new Parameter();
-    	ParameterType paramType = new ParameterType();
-    	
-    	ImplementationType implType = new ImplementationType();
-    	paramType.setImplementationType(implType);
-    	Data data = new Data(param);
     	if (input instanceof String[]) {
-			implType.setClassName(ArrayList.class.getCanonicalName());
-			TestView.setObject(data, Arrays.asList((String[])input));
+            Parameter param = new JsonContainerArrayParam("no-name");
+            Data data = new Data(param);
+			JsonContainer array = new JsonContainer(Type.ARRAY);
+			String[] inputArray = (String[]) input;
+			for (String element : inputArray) {
+			    Data elementData = createStringData(element);
+                array.addValue(elementData);
+            }
+			TestView.setObject(data, array);
+			return data;
     	} else {
-    		
-			implType.setClassName(String.class.getCanonicalName());
-			ImplementationConfig config = new ImplementationConfig();
-			
-			config.setClassName(String.class.getCanonicalName());
-			config.setMethodArguments("");
-			config.setMethodName("toString");
-			config.setStaticMethod(false);
-			implType.setSerializationConfig(config);
+    	    Parameter param = new StringParam("no-name");
+            Data data = new Data(param);
 			TestView.setObject(data,input);
+			return data;
     	}
-    	param.setType(paramType);
-		return data;
     }
 
+    private Data createStringData(String element) throws Exception {
+        Parameter param = new StringParam("no-name");
+        Data data = new Data(param);
+        TestView.setObject(data, element);
+        return data;
+    }
 }

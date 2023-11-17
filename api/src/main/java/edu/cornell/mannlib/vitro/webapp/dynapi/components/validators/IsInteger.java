@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 
 public class IsInteger extends IsNotBlank {
 
@@ -18,7 +19,7 @@ public class IsInteger extends IsNotBlank {
             return false;
         }
         
-        if (data.getParam().isArray()) {
+        if (JsonContainerView.isJsonArray(data.getParam())) {
     		List array = ArrayView.getArray(data);
 			for (Object value : array) {
 				if (!isInteger(value.toString())) {

@@ -20,24 +20,33 @@ public class StringPlainLiteralParam extends Parameter {
 	public StringPlainLiteralParam(String var) {
 		this.setName(var);
 		try {
-			ParameterType type = new ParameterType();
-			type.setName(TYPE_NAME);
-			ImplementationType implType = new ImplementationType();
-			type.setImplementationType(implType);
-			implType.setSerializationConfig(getSerializationConfig());
-			implType.setDeserializationConfig(getDeserializationConfig());	
-			implType.setClassName(Literal.class.getCanonicalName());
-	        RDFType rdfType = new RDFType();
-	        rdfType.setName("string");
-	        type.setRdfType(rdfType);
+			ParameterType type = getPlainStringLiteralType();
 			this.setType(type);
 		} catch (Exception e) {
 			log.error(e, e);
 			throw new RuntimeException(e.getLocalizedMessage());
 		}
 	}
+
+    public static ParameterType getPlainStringLiteralType() {
+        ParameterType type = new ParameterType();
+        type.setName(TYPE_NAME);
+        ImplementationType implType = new ImplementationType();
+        type.setImplementationType(implType);
+        try {
+            implType.setSerializationConfig(getSerializationConfig());
+            implType.setDeserializationConfig(getDeserializationConfig());  
+            implType.setClassName(Literal.class.getCanonicalName());
+            RDFType rdfType = new RDFType();
+            rdfType.setName("string");
+            type.setRdfType(rdfType);
+        } catch (ClassNotFoundException e) {
+            log.error(e, e);
+        }
+        return type;
+    }
 	
-	private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
+	private static ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
 		serializationConfig.setClassName(Literal.class.getCanonicalName());
 		serializationConfig.setMethodName("getLexicalForm");
@@ -46,7 +55,7 @@ public class StringPlainLiteralParam extends Parameter {
 		return serializationConfig;
 	}
 	
-	private ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
+	private static ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
 		serializationConfig.setClassName(ResourceFactory.class.getCanonicalName());
 		serializationConfig.setMethodName("createPlainLiteral");

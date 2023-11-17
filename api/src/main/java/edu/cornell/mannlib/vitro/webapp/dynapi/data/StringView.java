@@ -17,7 +17,7 @@ public class StringView {
 
     public static String getFirstStringValue(DataStore dataStore, String name) {
     	Data data = dataStore.getData(name);
-    	if (data.getParam().isArray()) {
+    	if (JsonContainerView.isJsonArray(data.getParam())) {
     		List array = (List) data.getObject();
     		Object first = array.get(0);
     		return first.toString();

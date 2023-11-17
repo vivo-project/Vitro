@@ -18,11 +18,9 @@ public class SimpleDataView {
 		List<String> result = new LinkedList<>();
 		for (String name : params.getNames()) {
 			Parameter param = params.get(name);
-			if (!param.isArray() && 
-			    !param.isJsonContainer() && 
-			    !JsonView.isJsonNode(param)) {
-				result.add(name);
-			}
+            if (!param.isJsonContainer() && !JsonView.isJsonNode(param)) {
+                result.add(name);
+            }
 		}
 		return result;
 	}

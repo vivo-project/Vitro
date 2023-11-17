@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 
 public class RdfView {
 
@@ -38,16 +40,16 @@ public class RdfView {
 						param.getType().getRdfType().getRDFDataType());
 				List<Literal> list = Collections.singletonList( literal );
 				result.put(name, list);
-			} else if( param.isArray() && param.getType().getValuesType().isLiteral()) {
-				Data data = dataStore.getData(name);
-				List objList = (List) data.getObject();
-				List<Literal> list = new LinkedList<>();
-				for (Object object : objList) {
-					Literal literal = ResourceFactory.createTypedLiteral(object.toString(),
-							param.getType().getValuesType().getRdfType().getRDFDataType());
-					list.add(literal);
-				}
-				result.put(name, list);
+			} else if( JsonContainerView.isJsonArray(param) && param.getType().getValuesType().isLiteral()) {
+                JsonContainer array = (JsonContainer) dataStore.getData(name).getObject();
+                RDFDatatype rdfDataType = param.getType().getValuesType().getRdfType().getRDFDataType();
+                List<String> list = array.getDataAsStringList();
+                List<Literal> literalList = new LinkedList<>();
+                for (String literalString : list) {
+                    Literal literal = ResourceFactory.createTypedLiteral(literalString, rdfDataType);
+                    literalList.add(literal);
+                }
+				result.put(name, literalList);
 			}
 		}
 		return result;
@@ -61,16 +63,12 @@ public class RdfView {
 				Data data = dataStore.getData(name);
 				List<String> list = Collections.singletonList( data.getObject().toString() );
 				result.put(name, list);
-			} else if( param.isArray() && param.getType().getValuesType().isUri()) {
-				Data data = dataStore.getData(name);
-				List objList = (List) data.getObject();
-				List<String> list = new LinkedList<>();
-				for (Object object : objList) {
-					list.add(object.toString());
-				}
-				result.put(name, list);
-			}
-		}
+			} else if( JsonContainerView.isJsonArray(param) && param.getType().getValuesType().isUri()) {
+				JsonContainer array = (JsonContainer) dataStore.getData(name).getObject();
+				List<String> list = array.getDataAsStringList();
+                result.put(name, list);
+            }
+        }
 		return result;
 	}
 	
