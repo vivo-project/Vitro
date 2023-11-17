@@ -301,14 +301,10 @@ public class ForgotPassword extends FreemarkerHttpServlet {
      *
      * @param vreq The VitroRequest object representing the current request context.
      * @return 'true' if the functionality is enabled, 'false' otherwise.
-     * @throws NullPointerException If the property "authentication.forgotPassword" is not specified (does not exist)
-     *                              in the configuration file.
      */
     private boolean isFunctionalityEnabled(VitroRequest vreq) {
-        String enabled =
-            Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("authentication.forgotPassword"),
-                "Property authentication.forgotPassword is not specified in configuration file.");
-        return enabled.equalsIgnoreCase("enabled");
+        String enabled = ConfigurationProperties.getBean(vreq).getProperty("authentication.forgotPassword");
+        return enabled != null && enabled.equalsIgnoreCase("enabled");
     }
 
     /**
