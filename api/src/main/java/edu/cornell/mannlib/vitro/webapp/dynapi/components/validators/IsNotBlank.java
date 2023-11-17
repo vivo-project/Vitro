@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 
 public class IsNotBlank extends AbstractValidator {
@@ -17,7 +18,7 @@ public class IsNotBlank extends AbstractValidator {
     @Override
     public boolean isValid(String name, Data data) {
     	
-    	if (data.getParam().isArray()) {
+    	if (JsonContainerView.isJsonArray(data.getParam())) {
     		List array = ArrayView.getArray(data);
     		if (array.isEmpty()) {
                 log.debug("No values of " + name + " found. Validation failed.");

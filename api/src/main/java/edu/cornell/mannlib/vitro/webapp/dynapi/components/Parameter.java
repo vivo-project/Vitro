@@ -88,10 +88,6 @@ public class Parameter implements Removable {
 		return type.isInternal();
 	}
 
-	public boolean isArray() {
-		return type.isArray();
-	}
-
 	public boolean isString() {
 	    return type.isString();
 	}

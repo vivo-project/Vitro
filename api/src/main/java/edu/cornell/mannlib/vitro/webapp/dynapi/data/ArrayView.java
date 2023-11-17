@@ -1,45 +1,33 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 
 public class ArrayView {
-
-	public static Map<String,List> getSingleDimensionalArrays(Parameters params) {
-		Map<String,List> result = new HashMap<>();
-		for (String name : params.getNames()) {
-			Parameter param = params.get(name);
-			if (param.isArray() && !param.getType().getValuesType().isArray()) {
-				result.put(name, new LinkedList());
-			}
-		}
-		return result;
-	}
 
 	public static boolean isMultiValuedArray(DataStore dataStore, String propertyVar) {
 		if (!isArray(dataStore, propertyVar)) {
 			return false;
 		}
 		Data data = dataStore.getData(propertyVar);
-		List list = (List) data.getObject();
+		JsonContainer array = JsonContainerView.getJsonContainer(dataStore, data.getParam());
+		List list = array.getDataAsStringList();
 		if (list.size() > 1) {
 			return true;
 		}
 		return false;
 	}
 
-	public static boolean isArray(DataStore dataStore, String propertyVar) {
-		Data data = dataStore.getData(propertyVar);
-		return data.getParam().isArray();
+	public static boolean isArray(DataStore dataStore, String paramName) {
+		Data data = dataStore.getData(paramName);
+		return JsonContainerView.isJsonArray(data.getParam());
 	}
 	
-	public static List getArray(Data data) {
-		return (List) data.getObject();
+	public static List<String> getArray(Data data) {
+        JsonContainer array = (JsonContainer) data.getObject();
+        List<String> list = array.getDataAsStringList();
+		return list;
 	}
 
 }

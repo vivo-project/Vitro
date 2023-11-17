@@ -2,14 +2,14 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components.validators;
 
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class NumericRangeValidator extends IsNotBlank {
 
@@ -43,7 +43,7 @@ public class NumericRangeValidator extends IsNotBlank {
             return false;
         }
         
-        if (data.getParam().isArray()) {
+        if (JsonContainerView.isJsonArray(data.getParam())) {
     		List array = ArrayView.getArray(data);
 			for (Object value : array) {
 				if (!isInRange(value.toString())) {

@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.RESTEndpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public class FormDataConverter {
@@ -43,7 +44,7 @@ public class FormDataConverter {
             }
             try {
                 Parameter param = optional.get(name);
-                if (param.isArray()) {
+                if (JsonContainerView.isJsonArray(param)) {
                     readArray(dataStore, name, values, param);
                 } else {
                     readParam(dataStore, name, values, param);
@@ -68,7 +69,7 @@ public class FormDataConverter {
             }
             Parameter param = required.get(name);
 
-            if (param.isArray()) {
+            if (JsonContainerView.isJsonArray(param)) {
                 readArray(dataStore, name, values, param);
             } else {
                 readParam(dataStore, name, values, param);

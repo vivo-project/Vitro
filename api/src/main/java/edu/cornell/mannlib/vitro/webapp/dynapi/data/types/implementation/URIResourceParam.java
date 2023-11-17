@@ -19,18 +19,7 @@ public class URIResourceParam extends Parameter {
 	public URIResourceParam(String var) {
 		this.setName(var);
 		try {		
-    		ParameterType type = new ParameterType();
-    		type.setName(TYPE_NAME);
-    		ImplementationType implType = new ImplementationType();
-    		type.setImplementationType(implType);
-    		ImplementationConfig serializationConfig = getSerializationConfig();
-    		ImplementationConfig deserializationConfig = getDeserializationConfig();
-    		implType.setSerializationConfig(serializationConfig);
-    		implType.setDeserializationConfig(deserializationConfig);	
-			implType.setClassName(Resource.class.getCanonicalName());
-			RDFType rdfType = new RDFType();
-			rdfType.setName(RDFType.ANY_URI);
-			type.setRdfType(rdfType);
+    		ParameterType type = getUriResourceType();
 			this.setType(type);
 		} catch (Exception e) {
 			log.error(e, e);
@@ -38,7 +27,23 @@ public class URIResourceParam extends Parameter {
 		}
 	}
 
-	private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
+    public static ParameterType getUriResourceType() throws ClassNotFoundException {
+        ParameterType type = new ParameterType();
+        type.setName(TYPE_NAME);
+        ImplementationType implType = new ImplementationType();
+        type.setImplementationType(implType);
+        ImplementationConfig serializationConfig = getSerializationConfig();
+        ImplementationConfig deserializationConfig = getDeserializationConfig();
+        implType.setSerializationConfig(serializationConfig);
+        implType.setDeserializationConfig(deserializationConfig);	
+        implType.setClassName(Resource.class.getCanonicalName());
+        RDFType rdfType = new RDFType();
+        rdfType.setName(RDFType.ANY_URI);
+        type.setRdfType(rdfType);
+        return type;
+    }
+
+	private static ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
 		serializationConfig.setClassName(Resource.class.getCanonicalName());
 		serializationConfig.setMethodName("toString");
@@ -47,7 +52,7 @@ public class URIResourceParam extends Parameter {
 		return serializationConfig;
 	}
 	
-	private ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
+	private static ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
 		serializationConfig.setClassName(ResourceImpl.class.getCanonicalName());
 		//invoke constructor

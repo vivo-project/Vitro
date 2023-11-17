@@ -30,6 +30,10 @@ public class RDFType implements Removable {
 			rdfDataType = RDFLangString.rdfLangString;
 			return;		
 		}
+        if (ANY_URI.equals(name)) {
+            rdfDataType = XSDDatatype.XSDanyURI;
+            return;     
+        }
 		rdfDataType = new XSDDatatype(name);
 	}
 

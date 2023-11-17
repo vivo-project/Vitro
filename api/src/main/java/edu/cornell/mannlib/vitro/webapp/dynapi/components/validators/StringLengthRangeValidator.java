@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ArrayView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
@@ -41,8 +42,8 @@ public class StringLengthRangeValidator extends IsNotBlank {
         if (!super.isValid(name, data)) {
             return false;
         }
-    	if (data.getParam().isArray()) {
-    		List array = ArrayView.getArray(data);
+    	if (JsonContainerView.isJsonArray(data.getParam())) {
+    		List<String> array = ArrayView.getArray(data);
 			for (Object value : array) {
 				if (!isLengthInRange(value.toString())) {
 	                log.debug("Length of " + name + " is not in range [" + ((minLength != null) ? minLength : " ") + "-"

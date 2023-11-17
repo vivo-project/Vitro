@@ -7,9 +7,7 @@ public class DataInitializer {
 	
 	public static void initialize(Parameter param, Data data) throws ConversionException {
 		
-		if (param.isArray()) {
-			initializeArray(param, data);
-		} else if (param.isJsonContainer()){
+		if (param.isJsonContainer()){
 			initializeJsonObject(param, data);
 		} else {
 			initializeData(param, data);
