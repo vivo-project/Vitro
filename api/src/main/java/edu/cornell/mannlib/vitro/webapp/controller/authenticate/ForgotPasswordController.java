@@ -34,7 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 @WebServlet(name = "forgot-password", urlPatterns = {"/forgot-password"})
-public class ForgotPassword extends FreemarkerHttpServlet {
+public class ForgotPasswordController extends FreemarkerHttpServlet {
 
     private static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
 
@@ -42,7 +42,7 @@ public class ForgotPassword extends FreemarkerHttpServlet {
 
     private static final String TEMPLATE_NAME = "userAccounts-resetPasswordRequest.ftl";
 
-    private static final Log log = LogFactory.getLog(ForgotPassword.class.getName());
+    private static final Log log = LogFactory.getLog(ForgotPasswordController.class.getName());
 
 
     @Override
