@@ -2,11 +2,10 @@
 
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/nouislider.css"/>')}
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/search-results.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap.min.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap-theme.min.css"/>')}
+${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap-5.3.2/css/bootstrap.min.css"/>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap/js/bootstrap.min.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap-5.3.2/js/bootstrap.min.js"></script>')}
 
 <@searchForm  />
 
@@ -296,11 +295,11 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 
 <#macro searchFormGroupTab group active >
 	<#if active>
-	 	<li class="active form-group-tab">
+	 	<li class="active nav-item form-group-tab">
 	<#else>
-		<li class="form-group-tab">
+		<li class="form-group-tab nav-item">
 	</#if>
-			<a data-toggle="tab" href="#${group.id}">${group.label}</a>
+			<a data-toggle="tab" class="nav-link" href="#${group.id}" id="${group.id}-tab" data-bs-toggle="tab" data-bs-target="#${group.id}" type="button" role="tab" aria-controls="${group.id}" aria-selected="false">${group.label}</a>
 		</li>
 </#macro>
 
@@ -310,7 +309,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 		<#return>
 	</#if>
 		<li class="filter-tab">
-			<a data-toggle="tab" href="#${filter.id}">${filter.name}</a>
+			<a data-toggle="tab" class="nav-link" href="#${filter.id}" id="${filter.id}-tab" data-bs-toggle="tab" data-bs-target="#${filter.id}" type="button" role="tab" aria-controls="${filter.id}" aria-selected="false">${filter.name}</a>
 		</li>
 </#macro>
 
