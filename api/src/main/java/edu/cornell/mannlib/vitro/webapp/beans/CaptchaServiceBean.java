@@ -22,10 +22,13 @@ import net.logicsquad.nanocaptcha.image.noise.StraightLineNoiseProducer;
 
 public class CaptchaServiceBean {
 
+    private static final SecureRandom random = new SecureRandom();
+
+
     public static CaptchaBundle generateChallenge() throws IOException {
         ImageCaptcha imageCaptcha =
             new ImageCaptcha.Builder(200, 75)
-                .addContent(5)
+                .addContent(random.nextInt(2) + 5)
                 .addBackground(new GradiatedBackgroundProducer())
                 .addNoise(new CurvedLineNoiseProducer(getRandomColor(), 2f))
                 .addNoise(new StraightLineNoiseProducer(getRandomColor(), 2))
@@ -46,7 +49,6 @@ public class CaptchaServiceBean {
     }
 
     private static Color getRandomColor() {
-        SecureRandom random = new SecureRandom();
         int r = random.nextInt(256);
         int g = random.nextInt(256);
         int b = random.nextInt(256);
@@ -67,8 +69,6 @@ public class CaptchaServiceBean {
         Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
 
         ArrayList<Font> randomFontList = new ArrayList<>();
-        SecureRandom random = new SecureRandom();
-
         for (int i = 0; i < count; i++) {
             int randomIndex = random.nextInt(fonts.length);
             randomFontList.add(fonts[randomIndex]);
