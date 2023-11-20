@@ -29,10 +29,12 @@
         <label>${i18n().comments_questions} <span class="requiredHint"> *</span></label>
         <textarea name="s34gfd88p9x1" rows="10" cols="90">${comments!}</textarea>
 
-
-    	<p><label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
-
-    		<input type="text" id="defaultReal" name="defaultReal"></p>
+    	<p>
+            <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
+            <img src="data:image/png;base64,${challenge!}" alt="Refresh page if not displayed..." style="vertical-align: middle;">
+            <span><input type="text" id="userSolution" name="userSolution" style="vertical-align: middle;"></span>
+            <input type="text" id="challengeId" name="challengeId" value="${challengeId!}" style="display: none;">
+        </p>
 
         <div class="buttons">
             <br /><input id="submit" type="submit" value="${i18n().send_mail}" />
@@ -51,10 +53,4 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />',
                   '<link rel="stylesheet" href="${urls.base}/css/jquery_plugins/jquery.realperson.css" />')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.realperson.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
-<script type="text/javascript">
-  $(function() {
-    $('#defaultReal').realperson();
-  });
-</script>

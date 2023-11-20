@@ -2,9 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +40,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
     }
 
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {
+    protected ResponseValues processRequest(VitroRequest vreq) throws IOException {
 
         ApplicationBean appBean = vreq.getAppBean();
 
@@ -59,6 +63,11 @@ public class ContactFormController extends FreemarkerHttpServlet {
 
         else {
 
+            CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
+            ContactMailController.getCaptchaChallenges().add(captchaChallenge);
+
+            body.put("challenge", captchaChallenge.getB64Image());
+            body.put("challengeId", captchaChallenge.getCaptchaId());
             body.put("formAction", "submitFeedback");
 
             if (vreq.getHeader("Referer") == null) {
