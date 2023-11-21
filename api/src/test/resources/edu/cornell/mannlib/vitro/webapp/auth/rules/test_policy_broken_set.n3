@@ -22,13 +22,14 @@ access-individual:BrokenRule rdf:type access:Rule ;
 access-individual:BrokenSetAttribute1 rdf:type access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:ObjectUri ;
-    access:values access-individual:AttributeValueSet1 ;
+    access:attributeValue access-individual:valueSet1 ;
     .
     
 access-individual:BrokenSetAttribute2 rdf:type access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:ObjectUri ;
-    access:values access-individual:AttributeValueSet2 .
+    access:attributeValue access-individual:valueSet2 ;
+    .
 
 access-individual:testDataSets rdf:type access:PolicyDataSets ;
     access:policyDataSet access-individual:testDataSet1 ;
@@ -39,14 +40,6 @@ access-individual:testDataSet1 rdf:type access:PolicyDataSet ;
 
 access-individual:testDataSet2 rdf:type access:PolicyDataSet ;
     access:dataSetValues access-individual:valueSet2 .
-
-access-individual:AttributeValueSet1 a access:AttributeValueSet  ;
-    access:attributeValue access-individual:valueSet1 ;
-    .
-
-access-individual:AttributeValueSet2 a access:AttributeValueSet  ;
-    access:attributeValue access-individual:valueSet2 ;
-    .
 
 access-individual:valueSet1 rdf:type access:ValueContainer ;
     access:value <test:value1> ;

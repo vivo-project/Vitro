@@ -154,11 +154,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDisplayObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDisplayObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
@@ -182,11 +183,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RolePublishObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePublishObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
@@ -210,11 +212,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleAddObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleAddObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
@@ -238,11 +241,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDropObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDropObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
@@ -266,11 +270,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleEditObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleEditObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
@@ -294,11 +299,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDisplayDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDisplayDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
@@ -322,11 +328,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RolePublishDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePublishDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
@@ -350,11 +357,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleAddDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleAddDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
@@ -378,11 +386,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDropDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDropDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
@@ -406,11 +415,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleEditDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleEditDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
@@ -434,11 +444,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDisplayFauxObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDisplayFauxObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
@@ -462,11 +473,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RolePublishFauxObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePublishFauxObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
@@ -490,11 +502,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleAddFauxObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleAddFauxObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
@@ -518,11 +531,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDropFauxObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDropFauxObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
@@ -546,11 +560,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleEditFauxObjectPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleEditFauxObjectPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
@@ -574,11 +589,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDisplayFauxDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDisplayFauxDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
@@ -602,11 +618,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RolePublishFauxDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePublishFauxDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
@@ -630,11 +647,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleAddFauxDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleAddFauxDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
@@ -658,11 +676,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDropFauxDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDropFauxDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
@@ -686,11 +705,12 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleEditFauxDataPropertyValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRoleAttribute;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleEditFauxDataPropertyEntityValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedPropertyUriValueSet ;
+    access:relatedValueSet :AccessObjectUriContainsInDataSet ;
+    access:relatedValueSet :StatementPredicateEquals ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
@@ -1740,9 +1760,6 @@
 :AccessObjectTypeEqualsDataSetValue a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:values :AccessObjectTypeValueSet .
-
-:AccessObjectTypeValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:ObjectPropertyValueContainer ;
     access:attributeValue access-individual:DataPropertyValueContainer ;
     access:attributeValue access-individual:FauxObjectPropertyValueContainer ;
@@ -1759,9 +1776,6 @@
 :AccessObjectTypeStatementEquals a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:values :StatementAccessObjectTypeValueSet .
-
-:StatementAccessObjectTypeValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:ObjectPropertyStatementValueContainer ;
     access:attributeValue access-individual:DataPropertyStatementValueContainer ;
     access:attributeValue access-individual:FauxObjectPropertyStatementValueContainer ;
@@ -1771,9 +1785,6 @@
 :OperationEqualsDataSetOperation a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:values :OperationValueSet .
-
-:OperationValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:DisplayOperationValueContainer ;
     access:attributeValue access-individual:PublishOperationValueContainer ;
     access:attributeValue access-individual:EditOperationValueContainer ;
@@ -1784,9 +1795,6 @@
 :SubjectRoleEqualsDataSetRoleAttribute a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:values :RoleValueSet .
-
-:RoleValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:PublicRoleValueContainer ;
     access:attributeValue access-individual:EditorRoleValueContainer ;
     access:attributeValue access-individual:CuratorRoleValueContainer ;
@@ -1795,15 +1803,106 @@
 :StatementPredicateEquals a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:values :AllowedPropertyUriValueSet .
+    access:attributeValue :PublicDisplayObjectPropertyValueContainer ;
+    access:attributeValue :EditorDisplayObjectPropertyValueContainer ;
+    access:attributeValue :CuratorDisplayObjectPropertyValueContainer ;
+    access:attributeValue :AdminDisplayObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicDisplayDataPropertyValueContainer ;
+    access:attributeValue :EditorDisplayDataPropertyValueContainer ;
+    access:attributeValue :CuratorDisplayDataPropertyValueContainer ;
+    access:attributeValue :AdminDisplayDataPropertyValueContainer ;
+
+    access:attributeValue :PublicDisplayFauxObjectPropertyValueContainer ;
+    access:attributeValue :EditorDisplayFauxObjectPropertyValueContainer ;
+    access:attributeValue :CuratorDisplayFauxObjectPropertyValueContainer ;
+    access:attributeValue :AdminDisplayFauxObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicDisplayFauxDataPropertyValueContainer ;   
+    access:attributeValue :EditorDisplayFauxDataPropertyValueContainer ;
+    access:attributeValue :CuratorDisplayFauxDataPropertyValueContainer ;
+    access:attributeValue :AdminDisplayFauxDataPropertyValueContainer ;
+
+    access:attributeValue :EditorPublishObjectPropertyValueContainer ;
+    access:attributeValue :CuratorPublishObjectPropertyValueContainer ;
+    access:attributeValue :AdminPublishObjectPropertyValueContainer ;
+
+    access:attributeValue :EditorPublishDataPropertyValueContainer ;
+    access:attributeValue :CuratorPublishDataPropertyValueContainer ;
+    access:attributeValue :AdminPublishDataPropertyValueContainer ;
+
+    access:attributeValue :EditorPublishFauxObjectPropertyValueContainer ;
+    access:attributeValue :CuratorPublishFauxObjectPropertyValueContainer ;
+    access:attributeValue :AdminPublishFauxObjectPropertyValueContainer ;
+
+    access:attributeValue :EditorPublishFauxDataPropertyValueContainer ;
+    access:attributeValue :CuratorPublishFauxDataPropertyValueContainer ;
+    access:attributeValue :AdminPublishFauxDataPropertyValueContainer ;
+
+    access:attributeValue :PublicEditObjectPropertyValueContainer ;
+    access:attributeValue :EditorEditObjectPropertyValueContainer ;
+    access:attributeValue :CuratorEditObjectPropertyValueContainer ;
+    access:attributeValue :AdminEditObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicAddObjectPropertyValueContainer ;
+    access:attributeValue :EditorAddObjectPropertyValueContainer ;
+    access:attributeValue :CuratorAddObjectPropertyValueContainer ;
+    access:attributeValue :AdminAddObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicDropObjectPropertyValueContainer ;
+    access:attributeValue :EditorDropObjectPropertyValueContainer ;
+    access:attributeValue :CuratorDropObjectPropertyValueContainer ;
+    access:attributeValue :AdminDropObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicEditDataPropertyValueContainer ;
+    access:attributeValue :EditorEditDataPropertyValueContainer ;
+    access:attributeValue :CuratorEditDataPropertyValueContainer ;
+    access:attributeValue :AdminEditDataPropertyValueContainer ;
+
+    access:attributeValue :PublicAddDataPropertyValueContainer ;
+    access:attributeValue :EditorAddDataPropertyValueContainer ;
+    access:attributeValue :CuratorAddDataPropertyValueContainer ;
+    access:attributeValue :AdminAddDataPropertyValueContainer ;
+
+    access:attributeValue :PublicDropDataPropertyValueContainer ;
+    access:attributeValue :EditorDropDataPropertyValueContainer ;
+    access:attributeValue :CuratorDropDataPropertyValueContainer ;
+    access:attributeValue :AdminDropDataPropertyValueContainer ;
+
+    access:attributeValue :PublicEditFauxObjectPropertyValueContainer ;
+    access:attributeValue :EditorEditFauxObjectPropertyValueContainer ;
+    access:attributeValue :CuratorEditFauxObjectPropertyValueContainer ;
+    access:attributeValue :AdminEditFauxObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicAddFauxObjectPropertyValueContainer ;
+    access:attributeValue :EditorAddFauxObjectPropertyValueContainer ;
+    access:attributeValue :CuratorAddFauxObjectPropertyValueContainer ;
+    access:attributeValue :AdminAddFauxObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicDropFauxObjectPropertyValueContainer ;
+    access:attributeValue :EditorDropFauxObjectPropertyValueContainer ;
+    access:attributeValue :CuratorDropFauxObjectPropertyValueContainer ;
+    access:attributeValue :AdminDropFauxObjectPropertyValueContainer ;
+
+    access:attributeValue :PublicEditFauxDataPropertyValueContainer ;
+    access:attributeValue :EditorEditFauxDataPropertyValueContainer ;
+    access:attributeValue :CuratorEditFauxDataPropertyValueContainer ;
+    access:attributeValue :AdminEditFauxDataPropertyValueContainer ;
+
+    access:attributeValue :PublicAddFauxDataPropertyValueContainer ;
+    access:attributeValue :EditorAddFauxDataPropertyValueContainer ;
+    access:attributeValue :CuratorAddFauxDataPropertyValueContainer ;
+    access:attributeValue :AdminAddFauxDataPropertyValueContainer ;
+
+    access:attributeValue :PublicDropFauxDataPropertyValueContainer ;
+    access:attributeValue :EditorDropFauxDataPropertyValueContainer ;
+    access:attributeValue :CuratorDropFauxDataPropertyValueContainer ;
+    access:attributeValue :AdminDropFauxDataPropertyValueContainer ;
+    .
 
 :AccessObjectUriContainsInDataSet a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:values :AllowedPropertyUriValueSet .
-
-:AllowedPropertyUriValueSet a access:AttributeValueSet ;
-
     access:attributeValue :PublicDisplayObjectPropertyValueContainer ;
     access:attributeValue :EditorDisplayObjectPropertyValueContainer ;
     access:attributeValue :CuratorDisplayObjectPropertyValueContainer ;

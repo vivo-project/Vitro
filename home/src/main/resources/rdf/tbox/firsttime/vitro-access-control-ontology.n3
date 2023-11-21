@@ -63,10 +63,6 @@
     rdfs:comment "Resource represents single attribute value, usually specified as literal with :id ";
     rdfs:label "Attribute value"@en-US .
 
-:AttributeValueSet a owl:Class ;
-    rdfs:comment "Container of attribute values to use in checks, should contain all value containers related to the check.";
-    rdfs:label "Attribute value set"@en-US .
-
 :Decision a owl:Class ;
     rdfs:comment "Decision to return in case all checks in a rule match";
     rdfs:label "Decision"@en-US .
@@ -139,12 +135,6 @@
     rdfs:domain :Check ;
     rdfs:range :Attribute .
 
-:values a owl:ObjectProperty ;
-    rdfs:comment "Assign values to :Check";
-    rdfs:label "values"@en-US ;
-    rdfs:domain :Check ;
-    rdfs:range :AttributeValueSet .
-
 :defaultValue a owl:ObjectProperty ;
     rdfs:comment "default value to add into new value container";
     rdfs:label "default template value"@en-US ;
@@ -158,16 +148,16 @@
     rdfs:domain :ValueContainerTemplate .
 
 :attributeValue a owl:ObjectProperty ;
-    rdfs:comment "Value set contains value container";
+    rdfs:comment "Check contains value container";
     rdfs:label "attribute value"@en-US ;
-    rdfs:domain :AttributeValueSet ;
+    rdfs:domain :Check ;
     rdfs:range :ValueContainer .
 
 :relatedValueSet a owl:ObjectProperty ;
-    rdfs:comment "Specify :AttributeValueSet into which new ValueContainer should be added";
+    rdfs:comment "Specify :Check into which new ValueContainer should be added";
     rdfs:label "related value set"@en-US ;
     rdfs:domain :ValueContainerTemplate ;
-    rdfs:range :AttributeValueSet .
+    rdfs:range :Check .
 
 :dataSetTemplateKey a owl:ObjectProperty, 
     owl:FunctionalProperty ;
