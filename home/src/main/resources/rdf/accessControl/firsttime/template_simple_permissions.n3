@@ -9,7 +9,7 @@
 :PolicyTemplate a access:PolicyTemplate ;
     access:priority 1000 ;
     access:policyDataSets :DataSets ;
-    access:rules :RuleSet .
+    access:rule :AllowSimplePermission .
 
 :DataSets a access:PolicyDataSets ;
     access:policyDataSetTemplate :RoleDataSetTemplate ;
@@ -96,9 +96,6 @@
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponent auth:ADMIN .
-
-:RuleSet a access:Rules ;
-    access:rule :AllowSimplePermission .
 
 :AllowSimplePermission a access:Rule;
     access:check :IsSimplePermission ;

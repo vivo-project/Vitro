@@ -9,21 +9,18 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:KeyTestPolicy rdf:type access:Policy ;
-          access:policyKey access-individual:PolicyKeyTest ;
-          access:rules access-individual:KeyTestRuleSet .
-
-access-individual:KeyTestRuleSet rdf:type access:Rules ;
-          access:rule access-individual:KeyTestRule .
-          
+    access:policyKey access-individual:PolicyKeyTest ;
+    access:rule access-individual:KeyTestRule .
+    
 access-individual:KeyTestRule rdf:type access:Rule ;
-          access:check access-individual:KeyTestAttribute .
-          
+    access:check access-individual:KeyTestAttribute .
+    
 access-individual:KeyTestAttribute rdf:type access:Check ;
-         access:operator access-individual:Equals ;
-         access:attribute access-individual:Operation ;
-         access:singleValue access-individual:PublishOperation .
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:singleValue access-individual:PublishOperation .
 
 access-individual:PolicyKeyTest rdf:type access:PolicyKey ;
-          access:keyComponent access-individual:ObjectPropertyAccesObject ;
-          access:keyComponent auth:ADMIN ;
-          access:keyComponent access-individual:DisplayOperation .
+    access:keyComponent access-individual:ObjectPropertyAccesObject ;
+    access:keyComponent auth:ADMIN ;
+    access:keyComponent access-individual:DisplayOperation .

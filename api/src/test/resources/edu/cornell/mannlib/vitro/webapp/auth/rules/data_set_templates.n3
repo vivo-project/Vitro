@@ -11,8 +11,7 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/template/test-data-set-templates/> .
 
 :PolicyTemplate a access:PolicyTemplate ;
-    access:policyDataSets :DataSets ;
-    access:rules :RuleSet .
+    access:policyDataSets :DataSets .
 
 :DataSets a access:PolicyDataSets ;
     access:policyDataSetTemplate :RoleDataSetTemplate1 ;

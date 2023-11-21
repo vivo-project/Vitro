@@ -6,9 +6,6 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-individual-pages/> .
 
 :Policy a access:Policy ;
-    access:rules :RuleSet .
-
-:RuleSet a access:Rules ;
     access:rule :AllowEditRelatedPagesRule ;
     access:rule :AllowEditIndividualPagesRule .
 

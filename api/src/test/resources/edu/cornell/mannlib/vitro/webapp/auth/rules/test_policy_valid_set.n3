@@ -9,54 +9,51 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:ValidTestSetPolicy rdf:type access:PolicyTemplate ;
-      access:policyDataSets access-individual:testDataSets1 ;
-      access:rules access-individual:ValidRuleSet .
-
-access-individual:ValidRuleSet rdf:type access:Rules ;
-      access:rule access-individual:ValidRule .
-      
+    access:policyDataSets access-individual:testDataSets1 ;
+    access:rule access-individual:ValidRule .
+    
 access-individual:ValidRule rdf:type access:Rule ;
-      access:check access-individual:ValidAttribute1 ;
-      access:check access-individual:ValidAttribute2 .
-      
+    access:check access-individual:ValidAttribute1 ;
+    access:check access-individual:ValidAttribute2 .
+    
 access-individual:ValidAttribute1 rdf:type access:Check ;
-     access:operator access-individual:Equals ;
-     access:attribute access-individual:AccessObjectUri ;
-     access:attributeValue access-individual:valueSet1 ;
-     access:attributeValue access-individual:valueSet3 ;
-     .
-     
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectUri ;
+    access:attributeValue access-individual:valueSet1 ;
+    access:attributeValue access-individual:valueSet3 ;
+    .
+    
 access-individual:ValidAttribute2 rdf:type access:Check ;
-     access:operator access-individual:Equals ;
-     access:attribute access-individual:AccessObjectUri ;
-     access:attributeValue access-individual:valueSet4 ;
-     access:attributeValue access-individual:valueSet2 ;
-     .
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectUri ;
+    access:attributeValue access-individual:valueSet4 ;
+    access:attributeValue access-individual:valueSet2 ;
+    .
 
 access-individual:testDataSets1 rdf:type access:PolicyDataSets ;
-     access:policyDataSet access-individual:testDataSet2 ;
-     access:policyDataSet access-individual:testDataSet1 .
+    access:policyDataSet access-individual:testDataSet2 ;
+    access:policyDataSet access-individual:testDataSet1 .
 
 access-individual:testDataSet1 rdf:type access:PolicyDataSet ;
-     access:dataSetValues access-individual:valueSet2 ;
-     access:dataSetValues access-individual:valueSet1 .
-     
+    access:dataSetValues access-individual:valueSet2 ;
+    access:dataSetValues access-individual:valueSet1 .
+    
 access-individual:testDataSet2 rdf:type access:PolicyDataSet ;
-     access:dataSetValues access-individual:valueSet3 ;
-     access:dataSetValues access-individual:valueSet4 .
+    access:dataSetValues access-individual:valueSet3 ;
+    access:dataSetValues access-individual:valueSet4 .
 
 access-individual:valueSet1 rdf:type access:ValueContainer ;
-     access:value <test:value1> ;
-     .
+    access:value <test:value1> ;
+    .
     
 access-individual:valueSet2 rdf:type access:ValueContainer ;
-     access:value <test:value2> ;
-     .
-     
+    access:value <test:value2> ;
+    .
+    
 access-individual:valueSet3 rdf:type access:ValueContainer ;
-     access:value <test:value3> ;
-     .
+    access:value <test:value3> ;
+    .
     
 access-individual:valueSet4 rdf:type access:ValueContainer ;
-     access:value <test:value4> ;
-     .
+    access:value <test:value4> ;
+    .

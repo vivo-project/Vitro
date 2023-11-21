@@ -9,22 +9,19 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:ProximityTestPolicy rdf:type access:Policy ;
-          access:rules access-individual:ProximityRuleSet .
-
-access-individual:ProximityRuleSet rdf:type access:Rules ;
-          access:rule access-individual:AllowPersonEditOwnPublication .
+    access:rule access-individual:AllowPersonEditOwnPublication .
           
 access-individual:AllowPersonEditOwnPublication rdf:type access:Rule ;
-          access:check access-individual:PublicationInProximityAttribute .
+    access:check access-individual:PublicationInProximityAttribute .
           
 access-individual:PublicationInProximityAttribute rdf:type access:Check ;
-         access:operator access-individual:SparqlSelectQueryContains ;
-         access:attribute access-individual:StatementSubjectUri ;
-         access:singleValue access-individual:PublicationProximityToPerson .
+    access:operator access-individual:SparqlSelectQueryContains ;
+    access:attribute access-individual:StatementSubjectUri ;
+    access:singleValue access-individual:PublicationProximityToPerson .
 
 access-individual:PublicationProximityToPerson rdf:type access:ValueContainer ;
-        access:id """
-        SELECT ?resourceUri WHERE {
-                  ?personUri <test:has_publication> ?resourceUri .
-        }
-        """ .
+    access:id """
+    SELECT ?resourceUri WHERE {
+              ?personUri <test:has_publication> ?resourceUri .
+    }
+    """ .
