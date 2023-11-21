@@ -6,7 +6,7 @@
 
 :PolicyTemplate a access:PolicyTemplate ;
     access:priority 8000 ;
-    access:policyDataSets :DataSets ;
+    access:policyDataSet :NotModifiableStatementsPolicyDataSet ;
     access:rule :RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
     access:rule :RestrictObjectPropertyStatementsWithNotModifiableSubject ;
     access:rule :RestrictObjectPropertyStatementsWithNotModifiableObject ;
@@ -84,11 +84,6 @@
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementObjectUri ;
     access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
-
-###DataSets
-
-:DataSets a access:PolicyDataSets ;
-    access:policyDataSet :NotModifiableStatementsPolicyDataSet .
 
 :NotModifiableStatementsPolicyDataSet a access:PolicyDataSet ;
     access:dataSetValues :ProhibitedNamespaceExceptionsValueContainer ;

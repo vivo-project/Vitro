@@ -9,7 +9,7 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:BrokenTestSetPolicy rdf:type access:Policy ;
-    access:policyDataSets access-individual:testDataSets ;
+    access:policyDataSet access-individual:testDataSet1 ;
     access:rule access-individual:BrokenRule .
 
 access-individual:BrokenRule rdf:type access:Rule ;
@@ -25,9 +25,6 @@ access-individual:BrokenAttribute2 rdf:type access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:ObjectUri ;
     access:setValue access-individual:valueSet2 .
-
-access-individual:testDataSets rdf:type access:PolicyDataSets ;
-    access:policyDataSet access-individual:testDataSet1 .
 
 access-individual:testDataSet1 rdf:type access:PolicyDataSet ;
     access:dataSetValues access-individual:valueSet1 .

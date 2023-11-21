@@ -24,9 +24,9 @@ public class PolicyLoaderTest extends PolicyTest {
         Map<String, String> templates = PolicyLoader.getInstance().getRoleDataSetTemplates();
         assertEquals(2, templates.size());
         assertTrue(templates.containsKey(PREFIX + "RoleDataSetTemplate1"));
-        assertEquals(PREFIX + "DataSets", templates.get(PREFIX + "RoleDataSetTemplate1"));
+        assertEquals(PREFIX + "PolicyTemplate", templates.get(PREFIX + "RoleDataSetTemplate1"));
         assertTrue(templates.containsKey(PREFIX + "RoleDataSetTemplate2"));
-        assertEquals(PREFIX + "DataSets", templates.get(PREFIX + "RoleDataSetTemplate2"));
+        assertEquals(PREFIX + "PolicyTemplate", templates.get(PREFIX + "RoleDataSetTemplate2"));
     }
 
     @Test
