@@ -7,13 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.mail.Address;
@@ -32,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -61,7 +60,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private static final String EMAIL_JOURNAL_FILE_DIR = "emailJournal";
     private static final String EMAIL_JOURNAL_FILE_NAME = "contactFormEmails.html";
 
-    private static List<CaptchaBundle> captchaChallenges = Collections.synchronizedList(new ArrayList<>());
+    private String captchaImpl;
 
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
@@ -80,17 +79,32 @@ public class ContactMailController extends FreemarkerHttpServlet {
             return errorNoRecipients();
         }
 
+        captchaImpl = ConfigurationProperties.getBean(vreq).getProperty("captcha.implementation");
+        if (captchaImpl == null) {
+            captchaImpl = "";
+        }
+
         String webusername = nonNullAndTrim(vreq, WEB_USERNAME_PARAM);
         String webuseremail = nonNullAndTrim(vreq, WEB_USEREMAIL_PARAM);
         String comments = nonNullAndTrim(vreq, COMMENTS_PARAM);
         String formType = nonNullAndTrim(vreq, "DeliveryType");
-        String captchaInput = nonNullAndTrim(vreq, "userSolution");
-        String captchaId = nonNullAndTrim(vreq, "challengeId");
 
-        String errorMsg = validateInput(webusername, webuseremail, comments, captchaInput, captchaId);
+        String captchaInput;
+        String captchaId = "";
+        switch(captchaImpl) {
+            case "RECAPTCHA":
+                captchaInput = nonNullAndTrim(vreq, "g-recaptcha-response");
+                break;
+            case "DEFAULT":
+            default:
+                captchaInput = nonNullAndTrim(vreq, "userSolution");
+                captchaId = nonNullAndTrim(vreq, "challengeId");
+        }
+
+        String errorMsg = validateInput(webusername, webuseremail, comments, captchaInput, captchaId, vreq);
 
         if (errorMsg != null) {
-            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments);
+            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, vreq);
         }
 
         String spamReason = checkForSpam(comments, formType);
@@ -310,7 +324,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     }
 
     private String validateInput(String webusername, String webuseremail,
-                                 String comments, String captchaInput, String challengeId) {
+                                 String comments, String captchaInput, String challengeId, VitroRequest vreq) {
 
         if (webusername.isEmpty()) {
             return "Please enter a value in the Full name field.";
@@ -328,10 +342,19 @@ public class ContactMailController extends FreemarkerHttpServlet {
             return "Please enter the contents of the gray box in the security field provided.";
         }
 
-        Optional<CaptchaBundle> optionalChallenge = getChallenge(challengeId);
-        if (optionalChallenge.isPresent() && optionalChallenge.get().getCode().equals(captchaInput)) {
-            return null;
+        switch(captchaImpl) {
+            case "RECAPTCHA":
+                if (CaptchaServiceBean.validateReCaptcha(captchaInput, vreq)){
+                    return null;
+                }
+            case "DEFAULT":
+            default:
+                Optional<CaptchaBundle> optionalChallenge = CaptchaServiceBean.getChallenge(challengeId, vreq.getRemoteAddr());
+                if (optionalChallenge.isPresent() && optionalChallenge.get().getCode().equals(captchaInput)) {
+                    return null;
+                }
         }
+
 
         return "The value you entered in the security field did not match the letters displayed in the gray box.";
     }
@@ -390,18 +413,25 @@ public class ContactMailController extends FreemarkerHttpServlet {
     }
 
     private ResponseValues errorParametersNotValid(String errorMsg, String webusername, String webuseremail,
-                                                   String comments) throws IOException {
+                                                   String comments, VitroRequest vreq) throws IOException {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("errorMessage", errorMsg);
         body.put("formAction", "submitFeedback");
         body.put("webusername", webusername);
         body.put("webuseremail", webuseremail);
         body.put("comments", comments);
+        body.put("captchaToUse", captchaImpl);
 
-        CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
-        ContactMailController.getCaptchaChallenges().add(captchaChallenge);
-        body.put("challenge", captchaChallenge.getB64Image());
-        body.put("challengeId", captchaChallenge.getCaptchaId());
+        if (!captchaImpl.equals("RECAPTCHA")) {
+            CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
+            CaptchaServiceBean.getCaptchaChallenges().put(vreq.getRemoteAddr(), captchaChallenge);
+            body.put("challenge", captchaChallenge.getB64Image());
+            body.put("challengeId", captchaChallenge.getCaptchaId());
+        } else {
+            body.put("siteKey",
+                Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.siteKey"),
+                    "You have to provide a site key through configuration file."));
+        }
 
         return new TemplateResponseValues(TEMPLATE_FORM, body);
     }
@@ -410,19 +440,5 @@ public class ContactMailController extends FreemarkerHttpServlet {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("errorMessage", SPAM_MESSAGE);
         return new TemplateResponseValues(TEMPLATE_ERROR, body);
-    }
-
-    private Optional<CaptchaBundle> getChallenge(String captchaId) {
-        for (CaptchaBundle challenge : captchaChallenges) {
-            if (challenge.getCaptchaId().equals(captchaId)) {
-                captchaChallenges.remove(challenge);
-                return Optional.of(challenge);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public static List<CaptchaBundle> getCaptchaChallenges() {
-        return captchaChallenges;
     }
 }

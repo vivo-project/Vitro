@@ -5,21 +5,21 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
 
-import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
-import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.servlet.annotation.WebServlet;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
-
-import javax.servlet.annotation.WebServlet;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *  Controller for comments ("contact us") page
@@ -34,6 +34,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
     private static final String TEMPLATE_DEFAULT = "contactForm-form.ftl";
     private static final String TEMPLATE_ERROR = "contactForm-error.ftl";
 
+
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Feedback Form";
@@ -41,7 +42,6 @@ public class ContactFormController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) throws IOException {
-
         ApplicationBean appBean = vreq.getAppBean();
 
         String templateName;
@@ -62,13 +62,26 @@ public class ContactFormController extends FreemarkerHttpServlet {
         }
 
         else {
+            String captchaImpl =
+                ConfigurationProperties.getBean(vreq).getProperty("captcha.implementation");
+            if (captchaImpl == null) {
+                captchaImpl = "";
+            }
 
-            CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
-            ContactMailController.getCaptchaChallenges().add(captchaChallenge);
+            if (captchaImpl.equals("RECAPTCHA")) {
+                body.put("siteKey",
+                    Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.siteKey"),
+                        "You have to provide a site key through configuration file."));
+            } else {
+                CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
+                CaptchaServiceBean.getCaptchaChallenges().put(vreq.getRemoteAddr(), captchaChallenge);
 
-            body.put("challenge", captchaChallenge.getB64Image());
-            body.put("challengeId", captchaChallenge.getCaptchaId());
+                body.put("challenge", captchaChallenge.getB64Image());
+                body.put("challengeId", captchaChallenge.getCaptchaId());
+            }
+
             body.put("formAction", "submitFeedback");
+            body.put("captchaToUse", captchaImpl);
 
             if (vreq.getHeader("Referer") == null) {
                 vreq.getSession().setAttribute("contactFormReferer","none");
