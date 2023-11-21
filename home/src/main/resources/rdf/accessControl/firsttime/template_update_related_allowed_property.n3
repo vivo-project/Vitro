@@ -222,9 +222,6 @@
 :AccessObjectTypeCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:values :AccessObjectTypeValueSet .
-
-:AccessObjectTypeValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:ObjectPropertyValueContainer ;
     access:attributeValue access-individual:DataPropertyValueContainer ;
     access:attributeValue access-individual:FauxObjectPropertyValueContainer ;
@@ -247,9 +244,6 @@
 :AccessObjectStatementTypeCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:values :StatementAccessObjectTypeValueSet .
-
-:StatementAccessObjectTypeValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:ObjectPropertyStatementValueContainer ;
     access:attributeValue access-individual:DataPropertyStatementValueContainer ;
     access:attributeValue access-individual:FauxObjectPropertyStatementValueContainer ;
@@ -259,9 +253,6 @@
 :OperationCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:values :OperationValueSet .
-
-:OperationValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:AddOperationValueContainer ;
     access:attributeValue access-individual:DropOperationValueContainer ;
     access:attributeValue access-individual:EditOperationValueContainer ;
@@ -270,23 +261,30 @@
 :SubjectRoleCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:values :RoleValueSet .
-
-:RoleValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:SelfEditorRoleValueContainer .
 
 :StatementPredicateCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:values :AllowedPropertyUriValueSet .
+    access:attributeValue :SelfEditorAddObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorAddDataPropertyValueContainer ;
+    access:attributeValue :SelfEditorAddFauxObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorAddFauxDataPropertyValueContainer ;
+
+    access:attributeValue :SelfEditorEditObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorEditDataPropertyValueContainer ;
+    access:attributeValue :SelfEditorEditFauxObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorEditFauxDataPropertyValueContainer ;
+
+    access:attributeValue :SelfEditorDropObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorDropDataPropertyValueContainer ;
+    access:attributeValue :SelfEditorDropFauxObjectPropertyValueContainer ;
+    access:attributeValue :SelfEditorDropFauxDataPropertyValueContainer ;
+    .
 
 :AccessObjectUriCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:values :AllowedPropertyUriValueSet .
-
-:AllowedPropertyUriValueSet a access:AttributeValueSet ;
-
     access:attributeValue :SelfEditorAddObjectPropertyValueContainer ;
     access:attributeValue :SelfEditorAddDataPropertyValueContainer ;
     access:attributeValue :SelfEditorAddFauxObjectPropertyValueContainer ;

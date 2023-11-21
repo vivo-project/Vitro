@@ -36,11 +36,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleEqualsDataSetRole;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePermissionValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :TypeValueSet;
+    access:relatedValueSet :PermissionNameAllowed;
     access:defaultValue simplePermission:PageViewablePublic;
     access:defaultValue simplePermission:QueryFullModel ;
     access:containerTypeTemplate access-individual:NamedObject .
@@ -114,19 +114,16 @@
 :PermissionNameAllowed a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:values :TypeValueSet .
-
-:IsSimplePermission a access:Check ;
-    access:operator access-individual:Equals ;
-    access:attribute access-individual:AccessObjectType ;
-    access:singleValue access-individual:NamedObject .
-
-:TypeValueSet a access:AttributeValueSet ;
     access:attributeValue :PublicSimplePermissionValueContainer ;
     access:attributeValue :SelfEditorSimplePermissionValueContainer ;
     access:attributeValue :EditorSimplePermissionValueContainer ;
     access:attributeValue :CuratorSimplePermissionValueContainer ;
     access:attributeValue :AdminSimplePermissionValueContainer .
+
+:IsSimplePermission a access:Check ;
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:singleValue access-individual:NamedObject .
 
 :PublicSimplePermissionValueContainer a access:ValueContainer ;
     access:containerType access-individual:NamedObject .
@@ -142,9 +139,6 @@
 :SubjectRoleEqualsDataSetRole a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:values :RoleValueSet .
-
-:RoleValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:PublicRoleValueContainer ;
     access:attributeValue access-individual:SelfEditorRoleValueContainer ;
     access:attributeValue access-individual:EditorRoleValueContainer ;

@@ -51,11 +51,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDisplayClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDisplayClassValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedClassValueSet ;
+    access:relatedValueSet :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
@@ -78,11 +78,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleUpdateClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleUpdateClassValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedClassValueSet ;
+    access:relatedValueSet :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
@@ -105,11 +105,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RolePublishClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :RoleValueSet;
+    access:relatedValueSet :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePublishClassValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AllowedClassValueSet ;
+    access:relatedValueSet :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
@@ -323,18 +323,12 @@
 :AccessObjectTypeCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:values :AccessObjectTypeValueSet .
-
-:AccessObjectTypeValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:ClassValueContainer ;
     .
 
 :OperationCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:values :OperationValueSet .
-
-:OperationValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:DisplayOperationValueContainer ;
     access:attributeValue access-individual:PublishOperationValueContainer ;
     access:attributeValue access-individual:UpdateOperationValueContainer ;
@@ -343,9 +337,6 @@
 :SubjectRoleCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:values :RoleValueSet .
-
-:RoleValueSet a access:AttributeValueSet ;
     access:attributeValue access-individual:PublicRoleValueContainer ;
     access:attributeValue access-individual:SelfEditorRoleValueContainer ;
     access:attributeValue access-individual:EditorRoleValueContainer ;
@@ -355,9 +346,6 @@
 :AccessObjectUriCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:values :AllowedClassValueSet .
-
-:AllowedClassValueSet a access:AttributeValueSet ;
     access:attributeValue :AdminPublishClassValueContainer ;
     access:attributeValue :AdminDisplayClassValueContainer ;
     access:attributeValue :AdminUpdateClassValueContainer ;

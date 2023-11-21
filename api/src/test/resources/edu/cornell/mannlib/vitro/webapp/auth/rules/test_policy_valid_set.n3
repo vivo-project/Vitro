@@ -22,10 +22,6 @@ access-individual:ValidRule rdf:type access:Rule ;
 access-individual:ValidAttribute1 rdf:type access:Check ;
      access:operator access-individual:Equals ;
      access:attribute access-individual:AccessObjectUri ;
-     access:values access-individual:AttributeValueSet1 ;
-     .
-
-access-individual:AttributeValueSet1 a access:AttributeValueSet  ;
      access:attributeValue access-individual:valueSet1 ;
      access:attributeValue access-individual:valueSet3 ;
      .
@@ -33,10 +29,6 @@ access-individual:AttributeValueSet1 a access:AttributeValueSet  ;
 access-individual:ValidAttribute2 rdf:type access:Check ;
      access:operator access-individual:Equals ;
      access:attribute access-individual:AccessObjectUri ;
-     access:values access-individual:AttributeValueSet2 ;
-     .
-
-access-individual:AttributeValueSet2 a access:AttributeValueSet  ;
      access:attributeValue access-individual:valueSet4 ;
      access:attributeValue access-individual:valueSet2 ;
      .

@@ -61,32 +61,32 @@
 :PredicateUriStartWithProhibitedNamespace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:values :ProhibitedNamespaceValueSet .
+    access:attributeValue :ProhibitedNamespaceValueContainer .
 
 :PredicateNotANamespaceException a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:values :ProhibitedNamespaceExceptionsValueSet .
+    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
 
 :SubjectUriStartWithProhibitedNamespace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:values :ProhibitedNamespaceValueSet .
+    access:attributeValue :ProhibitedNamespaceValueContainer .
 
 :StatementSubjectNotOneOfProhibitedExceptions a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:values :ProhibitedNamespaceExceptionsValueSet .    
+    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
 
 :StatementObjectUriStartsWithProhibitedNameSpace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementObjectUri ;
-    access:values :ProhibitedNamespaceValueSet .
+    access:attributeValue :ProhibitedNamespaceValueContainer .
 
 :ObjectUriNotOneOfProhibitedExceptions a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementObjectUri ;
-    access:values :ProhibitedNamespaceExceptionsValueSet .  
+    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
 
 ###DataSets
 
@@ -96,12 +96,6 @@
 :NotModifiableStatementsPolicyDataSet a access:PolicyDataSet ;
     access:dataSetValues :ProhibitedNamespaceExceptionsValueContainer ;
     access:dataSetValues :ProhibitedNamespaceValueContainer .
-
-:ProhibitedNamespaceValueSet a access:AttributeValueSet ;
-    access:attributeValue :ProhibitedNamespaceValueContainer .
-
-:ProhibitedNamespaceExceptionsValueSet a access:AttributeValueSet ;
-    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
 
 :ProhibitedNamespaceExceptionsValueContainer a access:ValueContainer ;
     .
