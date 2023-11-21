@@ -12,7 +12,7 @@
 ### Classes
 
 :PolicyTemplate a owl:Class ;
-    rdfs:comment "Policy template to define set of rules that can be reused by data sets" ; 
+    rdfs:comment "Policy template to define rules that can be reused by data sets" ; 
     rdfs:label "Policy template"@en-US .
 
 :Policy a owl:Class ;
@@ -64,7 +64,7 @@
     rdfs:label "Decision"@en-US .
 
 :DataSetTemplate a owl:Class ;
-    rdfs:comment "Data set template to create new data set: specify new value containers and add them into attribute value sets, create new data set key. Data set template should contain it's own key to be found and used. For example on new role creation new data sets for new role should be created, template key for that example would be access-individual:SubjectRole";
+    rdfs:comment "Data set template to create new data set: specify new value containers and add them into checks, create new data set key. Data set template should contain it's own key to be found and used. For example on new role creation new data sets for new role should be created, template key for that example would be access-individual:SubjectRole";
     rdfs:label "Data set template"@en-US .
 
 :DataSetTemplateKey a owl:Class ;
@@ -186,16 +186,10 @@
     rdfs:domain :Rule ;
     rdfs:range :Decision .    
 
-:policyDataSets a owl:ObjectProperty ;
-    rdfs:comment "Contains policy data sets";
-    rdfs:label "policy data sets"@en-US ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate ) ] ;
-    rdfs:range :PolicyDataSets .
-
 :policyDataSet a owl:ObjectProperty ;
-    rdfs:comment "Data sets container contain data set";
+    rdfs:comment "Contain policy data set";
     rdfs:label "policy data set"@en-US ;
-    rdfs:domain :PolicyDataSets ;
+    rdfs:domain :PolicyTemplate ;
     rdfs:range :PolicyDataSet .
 
 :containerType a owl:ObjectProperty ;
@@ -216,7 +210,7 @@
     rdfs:range :Rule .
 
 :dataSetKey a owl:ObjectProperty ;
-    rdfs:comment "Assign data set template to policy data sets";
+    rdfs:comment "Assign data set template to policy data set";
     rdfs:label "data set key"@en-US ;
     rdfs:domain :PolicyDataSet ;
     rdfs:range :DataSetKey .
@@ -228,9 +222,9 @@
     rdfs:range :DataSetKeyTemplate .
 
 :policyDataSetTemplate a owl:ObjectProperty ;
-    rdfs:comment "Assign data set template to policy data sets";
+    rdfs:comment "Assign data set template to policy data set";
     rdfs:label "policy data set template"@en-US ;
-    rdfs:domain :PolicyDataSets ;
+    rdfs:domain :PolicyTemplate ;
     rdfs:range :DataSetTemplate .
 
 :keyComponent a owl:ObjectProperty ;

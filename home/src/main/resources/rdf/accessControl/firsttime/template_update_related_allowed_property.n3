@@ -8,10 +8,7 @@
 :PolicyTemplate a access:PolicyTemplate ;
     access:rule :AllowMatchingPropertyStatement ;
     access:rule :AllowMatchingProperty ;
-    access:policyDataSets :DataSets .
-
-:DataSets a access:PolicyDataSets ;
-
+ 
     access:policyDataSet :SelfEditorAddObjectPropertyDataSet ;
     access:policyDataSet :SelfEditorAddDataPropertyDataSet ;
     access:policyDataSet :SelfEditorAddFauxObjectPropertyDataSet ;

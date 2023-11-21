@@ -74,9 +74,8 @@ public class PolicyLoader {
             + "SELECT DISTINCT ?" + PRIORITY + " \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?policy access:priority ?set_priority .\n"
-            + "    ?policy access:policyDataSets ?dataSets .\n"
-            + "    ?dataSets access:policyDataSet ?dataSet .\n"
+            + "    ?policyTemplate access:priority ?set_priority .\n"
+            + "    ?policyTemplate access:policyDataSet ?dataSet .\n"
             + "    OPTIONAL {?policy access:priority ?policyPriority" + " . }\n"
             + "    OPTIONAL {?dataSet access:priority ?dataSetPriority" + " . }\n"
             + "    BIND(COALESCE(?dataSetPriority, ?policyPriority, 0 ) as ?" + PRIORITY + " ) .\n"
@@ -89,8 +88,7 @@ public class PolicyLoader {
             + "SELECT DISTINCT ?dataSet \n" + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "       ?policy a access:PolicyTemplate .\n"
-            + "       ?policy access:policyDataSets ?dataSets .\n"
-            + "       ?dataSets access:policyDataSet ?dataSet .\n"
+            + "       ?policy access:policyDataSet ?dataSet .\n"
             + "  }\n"
             + "} ORDER BY ?dataSet";
 
@@ -133,8 +131,7 @@ public class PolicyLoader {
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policy a access:PolicyTemplate .\n"
-            + "    ?policy access:policyDataSets ?policyDataSets .\n"
-            + "    ?policyDataSets access:policyDataSet ?dataSet .\n"
+            + "    ?policy access:policyDataSet ?dataSet .\n"
             + "    ?policy access:rule ?rule .\n"
             + "    ?rule access:check ?check .\n"
             + "    ?check a access:Check .\n"
@@ -180,8 +177,7 @@ public class PolicyLoader {
             + POLICY + " ?dataSet ?testData ?value ?valueId ?valueContainer ( COUNT(?key) AS ?keySize ) \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "  ?" + POLICY + " access:policyDataSets ?policyDataSets .\n"
-            + "  ?policyDataSets access:policyDataSet ?dataSet .\n"
+            + "  ?" + POLICY + " access:policyDataSet ?dataSet .\n"
             + "  ?dataSet access:dataSetKey ?dataSetKeyUri .\n"
             + "  ?dataSet access:dataSetValues ?valueContainer .\n"
             + "  ?valueContainer access:containerType ?containerType .\n"
@@ -203,8 +199,7 @@ public class PolicyLoader {
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "  ?dataSet access:dataSetKey ?dataSetKeyUri .\n"
-            + "  ?" + POLICY + " access:policyDataSets ?policyDataSets .\n"
-            + "  ?policyDataSets access:policyDataSet ?dataSet . \n"
+            + "  ?" + POLICY + " access:policyDataSet ?dataSet . \n"
             + "  ?dataSet access:dataSetValues ?valueContainer . \n"
             + "  ?valueContainer access:containerType ?containerTypeUri . \n"
             + "  ?containerTypeUri access:id ?containerType . \n";
@@ -214,16 +209,16 @@ public class PolicyLoader {
     public static final String DATA_SET_TEMPLATES_QUERY = ""
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/>\n"
-            + "SELECT ?dataSetTemplate ?dataSets ( COUNT(?key) AS ?keySize )\n"
+            + "SELECT ?dataSetTemplate ?policyTemplate ( COUNT(?key) AS ?keySize )\n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?dataSets access:policyDataSetTemplate ?dataSetTemplate .\n"
+            + "    ?policyTemplate access:policyDataSetTemplate ?dataSetTemplate .\n"
             + "    ?dataSetTemplate access:dataSetTemplateKey ?dataSetTemplateKey .\n"
             + "    ?dataSetTemplateKey access:templateKey access-individual:SubjectRole .\n"
             + "    ?dataSetTemplateKey access:templateKey ?key .\n"
             + "  }\n"
             + "}\n"
-            + "GROUP BY ?dataSetTemplate ?dataSets";
+            + "GROUP BY ?dataSetTemplate ?policyTemplate";
 
     public static final String DATA_SET_KEY_TEMPLATE_QUERY = ""
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
@@ -871,11 +866,11 @@ public class PolicyLoader {
                     if (!qs.contains("dataSetTemplate") || !qs.get("dataSetTemplate").isResource()) {
                         return;
                     }
-                    if (!qs.contains("dataSets") || !qs.get("dataSets").isResource()) {
+                    if (!qs.contains("policyTemplate") || !qs.get("policyTemplate").isResource()) {
                         return;
                     }
                     dataSetTemplates.put(qs.getResource("dataSetTemplate").getURI(),
-                            qs.getResource("dataSets").getURI());
+                            qs.getResource("policyTemplate").getURI());
                 }
             });
         } catch (RDFServiceException e) {
