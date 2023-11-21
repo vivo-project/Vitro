@@ -31,10 +31,6 @@
     rdfs:comment "Contains checks to perform. If all checks match, rule returns decision.";
     rdfs:label "Access rule"@en-US .
 
-:Rules a owl:Class ;
-    rdfs:comment "Container for rules";
-    rdfs:label "Access rule set"@en-US .
-
 :Check a owl:Class ;
     rdfs:comment "Check to perform on attribute of request";
     rdfs:label "Access rule check"@en-US .
@@ -190,12 +186,6 @@
     rdfs:domain :Rule ;
     rdfs:range :Decision .    
 
-:rules a owl:ObjectProperty ;
-    rdfs:comment "Contains rules";
-    rdfs:label "rules"@en-US ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate ) ] ;
-    rdfs:range :Rules .
-
 :policyDataSets a owl:ObjectProperty ;
     rdfs:comment "Contains policy data sets";
     rdfs:label "policy data sets"@en-US ;
@@ -222,7 +212,7 @@
 :rule a owl:ObjectProperty ;
     rdfs:comment "Contains a rule";
     rdfs:label "rule"@en-US ;
-    rdfs:domain :Rules ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate ) ] ;
     rdfs:range :Rule .
 
 :dataSetKey a owl:ObjectProperty ;

@@ -9,34 +9,31 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:BrokenTestSetPolicy rdf:type access:Policy ;
-          access:policyDataSets access-individual:testDataSets ;
-          access:rules access-individual:BrokenRuleSet .
+    access:policyDataSets access-individual:testDataSets ;
+    access:rule access-individual:BrokenRule .
 
-access-individual:BrokenRuleSet rdf:type access:Rules ;
-          access:rule access-individual:BrokenRule .
-          
 access-individual:BrokenRule rdf:type access:Rule ;
-          access:check access-individual:BrokenAttribute1 ;
-          access:check access-individual:BrokenAttribute2 .
-          
+    access:check access-individual:BrokenAttribute1 ;
+    access:check access-individual:BrokenAttribute2 .
+
 access-individual:BrokenAttribute1 rdf:type access:Check ;
-         access:operator access-individual:Equals ;
-         access:attribute access-individual:ObjectUri ;
-         access:setValue access-individual:valueSet1 .
-         
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:ObjectUri ;
+    access:setValue access-individual:valueSet1 .
+
 access-individual:BrokenAttribute2 rdf:type access:Check ;
-         access:operator access-individual:Equals ;
-         access:attribute access-individual:ObjectUri ;
-         access:setValue access-individual:valueSet2 .
+    access:operator access-individual:Equals ;
+    access:attribute access-individual:ObjectUri ;
+    access:setValue access-individual:valueSet2 .
 
 access-individual:testDataSets rdf:type access:PolicyDataSets ;
-          access:policyDataSet access-individual:testDataSet1 .
+    access:policyDataSet access-individual:testDataSet1 .
 
 access-individual:testDataSet1 rdf:type access:PolicyDataSet ;
-          access:dataSetValues access-individual:valueSet1 .
+    access:dataSetValues access-individual:valueSet1 .
 
 access-individual:valueSet1 rdf:type access:ValueContainer ;
-        access:value <test:value1> ;
-        access:value <test:value2> ;
-        .        
+    access:value <test:value1> ;
+    access:value <test:value2> ;
+    .    
 

@@ -6,9 +6,6 @@
 
 :Policy a access:Policy ;
     access:priority 9000 ;
-    access:rules :RuleSet .
-
-:RuleSet a access:Rules ;
     access:rule :RestrictEdit ;
     access:rule :RestrictDrop .
 

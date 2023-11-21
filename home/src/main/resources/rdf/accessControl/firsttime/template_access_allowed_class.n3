@@ -6,7 +6,7 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-class/> .
 
 :PolicyTemplate a access:PolicyTemplate ;
-    access:rules :RuleSet ;
+    access:rule :AllowMatchingClass ;
     access:policyDataSets :DataSets .
 
 :DataSets a access:PolicyDataSets ;
@@ -308,11 +308,6 @@
     access:keyComponent access-individual:Class ;
     access:keyComponent auth:ADMIN ;
     access:keyComponent access-individual:PublishOperation .
-
-### Rules
-
-:RuleSet a access:Rules ;
-    access:rule :AllowMatchingClass .
 
 :AllowMatchingClass a access:Rule;
     access:check :SubjectRoleCheck ;

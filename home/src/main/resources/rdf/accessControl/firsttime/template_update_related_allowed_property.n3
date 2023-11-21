@@ -6,7 +6,8 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/update-related-allowed-property/> .
 
 :PolicyTemplate a access:PolicyTemplate ;
-    access:rules :RuleSet ;
+    access:rule :AllowMatchingPropertyStatement ;
+    access:rule :AllowMatchingProperty ;
     access:policyDataSets :DataSets .
 
 :DataSets a access:PolicyDataSets ;
@@ -206,12 +207,6 @@
     access:keyComponent access-individual:FauxDataProperty ;
     access:keyComponent auth:SELF_EDITOR ;
     access:keyComponent access-individual:EditOperation .
-
-### Rules
-
-:RuleSet a access:Rules ;
-    access:rule :AllowMatchingPropertyStatement ;
-    access:rule :AllowMatchingProperty .
 
 :AllowMatchingProperty a access:Rule;
     access:check :SubjectRoleCheck ;

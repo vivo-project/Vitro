@@ -10,9 +10,6 @@
 
 access-individual:BrokenTestSetPolicy rdf:type access:Policy ;
     access:policyDataSets access-individual:testDataSets ;
-    access:rules access-individual:BrokenRuleSet .
-
-access-individual:BrokenRuleSet rdf:type access:Rules ;
     access:rule access-individual:BrokenRule .
     
 access-individual:BrokenRule rdf:type access:Rule ;

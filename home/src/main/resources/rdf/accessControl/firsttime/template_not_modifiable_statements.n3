@@ -7,9 +7,6 @@
 :PolicyTemplate a access:PolicyTemplate ;
     access:priority 8000 ;
     access:policyDataSets :DataSets ;
-    access:rules :RuleSet .
-
-:RuleSet a access:Rules ;
     access:rule :RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
     access:rule :RestrictObjectPropertyStatementsWithNotModifiableSubject ;
     access:rule :RestrictObjectPropertyStatementsWithNotModifiableObject ;

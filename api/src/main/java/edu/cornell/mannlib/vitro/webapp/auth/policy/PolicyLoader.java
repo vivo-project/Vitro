@@ -97,12 +97,11 @@ public class PolicyLoader {
     private static final String NO_DATASET_RULES_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id \n"
+            + "SELECT DISTINCT ?policyUri ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "?policy a access:Policy .\n"
-            + "?policy access:rules ?rules . \n"
-            + "?rules access:rule ?rule . \n"
+            + "?policy access:rule ?rule . \n"
             + "?rule access:check ?check .\n"
             + "OPTIONAL {\n"
             + "  ?check access:operator ?checkTest .\n"
@@ -129,16 +128,14 @@ public class PolicyLoader {
     private static final String DATASET_RULES_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rules ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id "
+            + "SELECT DISTINCT ?policyUri ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id "
             + " ?dataSetUri ?attributeValue ?containerType \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policy a access:PolicyTemplate .\n"
-            + "    ?policy access:rules ?rules .\n"
             + "    ?policy access:policyDataSets ?policyDataSets .\n"
             + "    ?policyDataSets access:policyDataSet ?dataSet .\n"
-            + "    ?rules a access:Rules .\n"
-            + "    ?rules access:rule ?rule .\n"
+            + "    ?policy access:rule ?rule .\n"
             + "    ?rule access:check ?check .\n"
             + "    ?check a access:Check .\n"
             + "    OPTIONAL {\n"
@@ -748,10 +745,6 @@ public class PolicyLoader {
             return true;
         }
         String policy = qs.get("policyUri").asResource().getURI();
-        if (!qs.contains("rules") || !qs.get("rules").isResource()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain rules uri", policy));
-            return true;
-        }
         if (!qs.contains("rule") || !qs.get("rule").isResource()) {
             log.debug(String.format("Query solution for policy <%s> doesn't contain rule uri", policy));
             return true;
