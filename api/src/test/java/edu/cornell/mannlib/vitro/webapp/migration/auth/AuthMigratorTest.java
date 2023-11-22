@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainerRegistry;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSetRegistry;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyTest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
@@ -32,7 +32,7 @@ public class AuthMigratorTest extends PolicyTest {
         load(configurationModel, CONFIGURATION);
         configurationDataSet.replaceNamedModel(ModelNames.DISPLAY, configurationModel);
         load(contentModel, CONTENT);
-        AttributeValueContainerRegistry.getInstance().clear();
+        AttributeValueSetRegistry.getInstance().clear();
         LogManager.getLogger(AnnotationMigrator.class).setLevel(Level.ERROR);
         LogManager.getLogger(ArmMigrator.class).setLevel(Level.ERROR);
     }

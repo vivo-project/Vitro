@@ -35,10 +35,10 @@
 :RoleDisplayClassDataSetTemplate a access:DataSetTemplate ;
     access:dataSetTemplateKey :RoleDisplayClassDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDisplayClassDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:DisplayOperationValueContainer ;
-    access:dataSetValueTemplate :RoleDisplayClassRoleValueContainerTemplate ;
-    access:dataSetValueTemplate :RoleDisplayClassValueContainerTemplate .  
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:dataSetValueTemplate :RoleDisplayClassRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RoleDisplayClassValueSetTemplate .  
 
 :RoleDisplayClassDataSetTemplateKey a access:DataSetTemplateKey ;
     access:templateKey access-individual:SubjectRole .
@@ -48,11 +48,11 @@
     access:keyComponent access-individual:DisplayOperation ;
     access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleDisplayClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
+:RoleDisplayClassRoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
-:RoleDisplayClassValueContainerTemplate a access:ValueContainerTemplate ;
+:RoleDisplayClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
@@ -62,10 +62,10 @@
 :RoleUpdateClassDataSetTemplate a access:DataSetTemplate ;
     access:dataSetTemplateKey :RoleUpdateClassDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleUpdateClassDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:UpdateOperationValueContainer ;
-    access:dataSetValueTemplate :RoleUpdateClassRoleValueContainerTemplate ;
-    access:dataSetValueTemplate :RoleUpdateClassValueContainerTemplate .  
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:UpdateOperationValueSet ;
+    access:dataSetValueTemplate :RoleUpdateClassRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RoleUpdateClassValueSetTemplate .  
 
 :RoleUpdateClassDataSetTemplateKey a access:DataSetTemplateKey ;
     access:templateKey access-individual:SubjectRole .
@@ -75,11 +75,11 @@
     access:keyComponent access-individual:UpdateOperation ;
     access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleUpdateClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
+:RoleUpdateClassRoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
-:RoleUpdateClassValueContainerTemplate a access:ValueContainerTemplate ;
+:RoleUpdateClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
@@ -89,10 +89,10 @@
 :RolePublishClassDataSetTemplate a access:DataSetTemplate ;
     access:dataSetTemplateKey :RolePublishClassDataSetTemplateKey ;
     access:dataSetKeyTemplate :RolePublishClassDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:PublishOperationValueContainer ;
-    access:dataSetValueTemplate :RolePublishClassRoleValueContainerTemplate ;
-    access:dataSetValueTemplate :RolePublishClassValueContainerTemplate .  
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:dataSetValueTemplate :RolePublishClassRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RolePublishClassValueSetTemplate .  
 
 :RolePublishClassDataSetTemplateKey a access:DataSetTemplateKey ;
     access:templateKey access-individual:SubjectRole .
@@ -102,11 +102,11 @@
     access:keyComponent access-individual:PublishOperation ;
     access:keyComponentTemplate access-individual:SubjectRole .
 
-:RolePublishClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
+:RolePublishClassRoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePublishClassValueContainerTemplate a access:ValueContainerTemplate ;
+:RolePublishClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
@@ -115,10 +115,10 @@
 
 :PublicDisplayClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :PublicDisplayClassDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:DisplayOperationValueContainer ;
-    access:dataSetValues :PublicDisplayClassValueContainer .
+    access:dataSetValues access-individual:PublicRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:dataSetValues :PublicDisplayClassValueSet .
 
 :PublicDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -129,10 +129,10 @@
 
 :SelfEditorDisplayClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :SelfEditorDisplayClassDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:DisplayOperationValueContainer ;
-    access:dataSetValues :SelfEditorDisplayClassValueContainer .
+    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:dataSetValues :SelfEditorDisplayClassValueSet .
 
 :SelfEditorDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -143,10 +143,10 @@
 
 :EditorDisplayClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :EditorDisplayClassDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:DisplayOperationValueContainer ;
-    access:dataSetValues :EditorDisplayClassValueContainer .
+    access:dataSetValues access-individual:EditorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:dataSetValues :EditorDisplayClassValueSet .
 
 :EditorDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -157,10 +157,10 @@
 
 :CuratorDisplayClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :CuratorDisplayClassDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:DisplayOperationValueContainer ;
-    access:dataSetValues :CuratorDisplayClassValueContainer .
+    access:dataSetValues access-individual:CuratorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:dataSetValues :CuratorDisplayClassValueSet .
 
 :CuratorDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -171,10 +171,10 @@
 
 :AdminDisplayClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :AdminDisplayClassDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:DisplayOperationValueContainer ;
-    access:dataSetValues :AdminDisplayClassValueContainer .
+    access:dataSetValues access-individual:AdminRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:dataSetValues :AdminDisplayClassValueSet .
 
 :AdminDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -185,10 +185,10 @@
 
 :PublicUpdateClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :PublicUpdateClassDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:UpdateOperationValueContainer ;
-    access:dataSetValues :PublicUpdateClassValueContainer .
+    access:dataSetValues access-individual:PublicRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:UpdateOperationValueSet ;
+    access:dataSetValues :PublicUpdateClassValueSet .
 
 :PublicUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -199,10 +199,10 @@
 
 :SelfEditorUpdateClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :SelfEditorUpdateClassDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:UpdateOperationValueContainer ;
-    access:dataSetValues :SelfEditorUpdateClassValueContainer .
+    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:UpdateOperationValueSet ;
+    access:dataSetValues :SelfEditorUpdateClassValueSet .
 
 :SelfEditorUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -213,10 +213,10 @@
 
 :EditorUpdateClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :EditorUpdateClassDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:UpdateOperationValueContainer ;
-    access:dataSetValues :EditorUpdateClassValueContainer .
+    access:dataSetValues access-individual:EditorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:UpdateOperationValueSet ;
+    access:dataSetValues :EditorUpdateClassValueSet .
 
 :EditorUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -227,10 +227,10 @@
 
 :CuratorUpdateClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :CuratorUpdateClassDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:UpdateOperationValueContainer ;
-    access:dataSetValues :CuratorUpdateClassValueContainer .
+    access:dataSetValues access-individual:CuratorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:UpdateOperationValueSet ;
+    access:dataSetValues :CuratorUpdateClassValueSet .
 
 :CuratorUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -241,10 +241,10 @@
 
 :AdminUpdateClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :AdminUpdateClassDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:UpdateOperationValueContainer ;
-    access:dataSetValues :AdminUpdateClassValueContainer .
+    access:dataSetValues access-individual:AdminRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:UpdateOperationValueSet ;
+    access:dataSetValues :AdminUpdateClassValueSet .
 
 :AdminUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -255,10 +255,10 @@
 
 :SelfEditorPublishClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :SelfEditorPublishClassDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:PublishOperationValueContainer ;
-    access:dataSetValues :SelfEditorPublishClassValueContainer .
+    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:dataSetValues :SelfEditorPublishClassValueSet .
 
 :SelfEditorPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -269,10 +269,10 @@
 
 :EditorPublishClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :EditorPublishClassDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:PublishOperationValueContainer ;
-    access:dataSetValues :EditorPublishClassValueContainer .
+    access:dataSetValues access-individual:EditorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:dataSetValues :EditorPublishClassValueSet .
 
 :EditorPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -283,10 +283,10 @@
 
 :CuratorPublishClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :CuratorPublishClassDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:PublishOperationValueContainer ;
-    access:dataSetValues :CuratorPublishClassValueContainer .
+    access:dataSetValues access-individual:CuratorRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:dataSetValues :CuratorPublishClassValueSet .
 
 :CuratorPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -297,10 +297,10 @@
 
 :AdminPublishClassDataSet a access:PolicyDataSet ;
     access:dataSetKey :AdminPublishClassDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueContainer ;
-    access:dataSetValues access-individual:ClassValueContainer ;
-    access:dataSetValues access-individual:PublishOperationValueContainer ;
-    access:dataSetValues :AdminPublishClassValueContainer .
+    access:dataSetValues access-individual:AdminRoleValueSet ;
+    access:dataSetValues access-individual:ClassValueSet ;
+    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:dataSetValues :AdminPublishClassValueSet .
 
 :AdminPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
@@ -316,83 +316,83 @@
 :AccessObjectTypeCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:attributeValue access-individual:ClassValueContainer ;
+    access:attributeValue access-individual:ClassValueSet ;
     .
 
 :OperationCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:attributeValue access-individual:DisplayOperationValueContainer ;
-    access:attributeValue access-individual:PublishOperationValueContainer ;
-    access:attributeValue access-individual:UpdateOperationValueContainer ;
+    access:attributeValue access-individual:DisplayOperationValueSet ;
+    access:attributeValue access-individual:PublishOperationValueSet ;
+    access:attributeValue access-individual:UpdateOperationValueSet ;
     .
 
 :SubjectRoleCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:attributeValue access-individual:PublicRoleValueContainer ;
-    access:attributeValue access-individual:SelfEditorRoleValueContainer ;
-    access:attributeValue access-individual:EditorRoleValueContainer ;
-    access:attributeValue access-individual:CuratorRoleValueContainer ;
-    access:attributeValue access-individual:AdminRoleValueContainer .
+    access:attributeValue access-individual:PublicRoleValueSet ;
+    access:attributeValue access-individual:SelfEditorRoleValueSet ;
+    access:attributeValue access-individual:EditorRoleValueSet ;
+    access:attributeValue access-individual:CuratorRoleValueSet ;
+    access:attributeValue access-individual:AdminRoleValueSet .
 
 :AccessObjectUriCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:attributeValue :AdminPublishClassValueContainer ;
-    access:attributeValue :AdminDisplayClassValueContainer ;
-    access:attributeValue :AdminUpdateClassValueContainer ;
-    access:attributeValue :CuratorPublishClassValueContainer ;
-    access:attributeValue :CuratorDisplayClassValueContainer ;
-    access:attributeValue :CuratorUpdateClassValueContainer ;
-    access:attributeValue :EditorPublishClassValueContainer ;
-    access:attributeValue :EditorDisplayClassValueContainer ;
-    access:attributeValue :EditorUpdateClassValueContainer ;
-    access:attributeValue :SelfEditorPublishClassValueContainer ;
-    access:attributeValue :SelfEditorDisplayClassValueContainer ;
-    access:attributeValue :SelfEditorUpdateClassValueContainer ;
-    access:attributeValue :PublicDisplayClassValueContainer ;
-    access:attributeValue :PublicUpdateClassValueContainer ;
+    access:attributeValue :AdminPublishClassValueSet ;
+    access:attributeValue :AdminDisplayClassValueSet ;
+    access:attributeValue :AdminUpdateClassValueSet ;
+    access:attributeValue :CuratorPublishClassValueSet ;
+    access:attributeValue :CuratorDisplayClassValueSet ;
+    access:attributeValue :CuratorUpdateClassValueSet ;
+    access:attributeValue :EditorPublishClassValueSet ;
+    access:attributeValue :EditorDisplayClassValueSet ;
+    access:attributeValue :EditorUpdateClassValueSet ;
+    access:attributeValue :SelfEditorPublishClassValueSet ;
+    access:attributeValue :SelfEditorDisplayClassValueSet ;
+    access:attributeValue :SelfEditorUpdateClassValueSet ;
+    access:attributeValue :PublicDisplayClassValueSet ;
+    access:attributeValue :PublicUpdateClassValueSet ;
     .
 
-:AdminPublishClassValueContainer a access:ValueContainer ;
+:AdminPublishClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:AdminDisplayClassValueContainer a access:ValueContainer ;
+:AdminDisplayClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:AdminUpdateClassValueContainer a access:ValueContainer ;
+:AdminUpdateClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:CuratorPublishClassValueContainer a access:ValueContainer ;
+:CuratorPublishClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:CuratorDisplayClassValueContainer a access:ValueContainer ;
+:CuratorDisplayClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:CuratorUpdateClassValueContainer a access:ValueContainer ;
+:CuratorUpdateClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:EditorPublishClassValueContainer a access:ValueContainer ;
+:EditorPublishClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:EditorDisplayClassValueContainer a access:ValueContainer ;
+:EditorDisplayClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:EditorUpdateClassValueContainer a access:ValueContainer ;
+:EditorUpdateClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:SelfEditorPublishClassValueContainer a access:ValueContainer ;
+:SelfEditorPublishClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:SelfEditorDisplayClassValueContainer a access:ValueContainer ;
+:SelfEditorDisplayClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:SelfEditorUpdateClassValueContainer a access:ValueContainer ;
+:SelfEditorUpdateClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:PublicDisplayClassValueContainer a access:ValueContainer ;
+:PublicDisplayClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .
 
-:PublicUpdateClassValueContainer a access:ValueContainer ;
+:PublicUpdateClassValueSet a access:ValueSet ;
     access:containerType access-individual:Class .

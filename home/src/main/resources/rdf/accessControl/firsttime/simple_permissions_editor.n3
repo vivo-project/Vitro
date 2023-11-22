@@ -4,7 +4,7 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
 
-:EditorSimplePermissionValueContainer
+:EditorSimplePermissionValueSet
     # permissions for EDITOR and above.
     access:value simplePermission:DoBackEndEditing ;
     access:value simplePermission:SeeIndividualEditingPanel ;

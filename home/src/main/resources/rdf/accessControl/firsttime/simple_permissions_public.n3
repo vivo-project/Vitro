@@ -4,7 +4,7 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
 
-:PublicSimplePermissionValueContainer  
+:PublicSimplePermissionValueSet  
     # permissions for ANY user, even if they are not logged in.
     access:value simplePermission:QueryFullModel ;
     access:value simplePermission:PageViewablePublic ;

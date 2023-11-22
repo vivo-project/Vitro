@@ -3,9 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.ValueContainerFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.ValueSetFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import org.apache.jena.query.QuerySolution;
 
@@ -17,32 +17,32 @@ public class CheckFactory {
         Attribute type = Attribute.valueOf(typeId);
         String testId = qs.getLiteral("testId").getString();
         String value = getValue(qs);
-        AttributeValueContainer container = ValueContainerFactory.create(value, qs, dataSetKey);
+        AttributeValueSet set = ValueSetFactory.create(value, qs, dataSetKey);
         Check check = null;
         switch (type) {
             case SUBJECT_ROLE_URI:
-                check = new SubjectRoleCheck(checkUri, container);
+                check = new SubjectRoleCheck(checkUri, set);
                 break;
             case OPERATION:
-                check = new OperationCheck(checkUri, container);
+                check = new OperationCheck(checkUri, set);
                 break;
             case ACCESS_OBJECT_URI:
-                check = new AccessObjectUriCheck(checkUri, container);
+                check = new AccessObjectUriCheck(checkUri, set);
                 break;
             case ACCESS_OBJECT_TYPE:
-                check = new AccessObjectTypeCheck(checkUri, container);
+                check = new AccessObjectTypeCheck(checkUri, set);
                 break;
             case SUBJECT_TYPE:
-                check = new SubjectTypeCheck(checkUri, container);
+                check = new SubjectTypeCheck(checkUri, set);
                 break;
             case STATEMENT_PREDICATE_URI:
-                check = new StatementPredicateUriCheck(checkUri, container);
+                check = new StatementPredicateUriCheck(checkUri, set);
                 break;
             case STATEMENT_SUBJECT_URI:
-                check = new StatementSubjectUriCheck(checkUri, container);
+                check = new StatementSubjectUriCheck(checkUri, set);
                 break;
             case STATEMENT_OBJECT_URI:
-                check = new StatementObjectUriCheck(checkUri, container);
+                check = new StatementObjectUriCheck(checkUri, set);
                 break;
             default:
                 check = null;

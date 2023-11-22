@@ -19,7 +19,7 @@ access-individual:PublicationInProximityAttribute rdf:type access:Check ;
     access:attribute access-individual:StatementSubjectUri ;
     access:singleValue access-individual:PublicationProximityToPerson .
 
-access-individual:PublicationProximityToPerson rdf:type access:ValueContainer ;
+access-individual:PublicationProximityToPerson rdf:type access:ValueSet ;
     access:id """
     SELECT ?resourceUri WHERE {
               ?personUri <test:has_publication> ?resourceUri .

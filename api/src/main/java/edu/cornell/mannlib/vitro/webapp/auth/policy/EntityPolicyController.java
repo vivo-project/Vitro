@@ -14,8 +14,8 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainerRegistry;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSetRegistry;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.lang3.StringUtils;
@@ -48,21 +48,21 @@ public class EntityPolicyController {
         }
     }
 
-    private static AttributeValueContainerRegistry getRegistry() {
-        return AttributeValueContainerRegistry.getInstance();
+    private static AttributeValueSetRegistry getRegistry() {
+        return AttributeValueSetRegistry.getInstance();
     }
 
     public static void revokeAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
         AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
-        AttributeValueContainer container = getRegistry().get(key);
-        if (container != null) {
-            if (container.contains(entityUri)) {
-                container.remove(entityUri);
-                String toRemove = getValueStatementString(entityUri, container.getContainerUri());
+        AttributeValueSet set = getRegistry().get(key);
+        if (set != null) {
+            if (set.contains(entityUri)) {
+                set.remove(entityUri);
+                String toRemove = getValueStatementString(entityUri, set.getValueSetUri());
                 getLoader().updateAccessControlModel(toRemove, false);
             }
         } else {
-            reduceInactiveValueContainer(entityUri, aot, ao, role);
+            reduceInactiveValueSet(entityUri, aot, ao, role);
         }
     }
 
@@ -70,7 +70,7 @@ public class EntityPolicyController {
         return PolicyLoader.getInstance();
     }
 
-    private static void reduceInactiveValueContainer(String entityUri, AccessObjectType aot, AccessOperation ao,
+    private static void reduceInactiveValueSet(String entityUri, AccessObjectType aot, AccessOperation ao,
             String role) {
         StringBuilder removals = new StringBuilder();
         getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), removals);
@@ -79,15 +79,15 @@ public class EntityPolicyController {
 
     public static void grantAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
         AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
-        AttributeValueContainer container = getRegistry().get(key);
-        if (container != null) {
-            if (!container.contains(entityUri)) {
-                container.add(entityUri);
-                String toAdd = getValueStatementString(entityUri, container.getContainerUri());
+        AttributeValueSet set = getRegistry().get(key);
+        if (set != null) {
+            if (!set.contains(entityUri)) {
+                set.add(entityUri);
+                String toAdd = getValueStatementString(entityUri, set.getValueSetUri());
                 getLoader().updateAccessControlModel(toAdd, true);
             }
         } else {
-            extendInactiveValueContainer(entityUri, aot, ao, role);
+            extendInactiveValueSet(entityUri, aot, ao, role);
             loadPolicy(aot, ao, role);
         }
     }
@@ -103,7 +103,7 @@ public class EntityPolicyController {
         }
     }
 
-    private static void extendInactiveValueContainer(String entityUri, AccessObjectType aot, AccessOperation ao,
+    private static void extendInactiveValueSet(String entityUri, AccessObjectType aot, AccessOperation ao,
             String role) {
         StringBuilder additions = new StringBuilder();
         getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), additions);
@@ -114,13 +114,13 @@ public class EntityPolicyController {
         if (StringUtils.isBlank(entityUri)) {
             return false;
         }
-        AttributeValueContainerRegistry registry = getRegistry();
+        AttributeValueSetRegistry registry = getRegistry();
         AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
-        AttributeValueContainer container = registry.get(key);
-        if (container == null) {
+        AttributeValueSet set = registry.get(key);
+        if (set == null) {
             return false;
         }
-        return container.contains(entityUri);
+        return set.contains(entityUri);
     }
 
     public static List<String> getGrantedRoles(String entityUri, AccessOperation ao, AccessObjectType aot,
@@ -143,17 +143,17 @@ public class EntityPolicyController {
             return;
         }
         for (String role : selectedRoles) {
-            String valueContainerUri = getValueContainerUri(aot, ao, role);
-            if (valueContainerUri == null) {
-                log.debug(String.format("Policy value container wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
+            String valueSetUri = getValueSetUri(aot, ao, role);
+            if (valueSetUri == null) {
+                log.debug(String.format("Policy value set wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
                 continue;
             }
-            sb.append(getValueStatementString(entityUri, valueContainerUri));
+            sb.append(getValueStatementString(entityUri, valueSetUri));
         }
     }
 
-    private static String getValueStatementString(String entityUri, String valueContainerUri) {
-        return "<" + valueContainerUri + "> <" + AUTH_VOCABULARY_PREFIX + "value> <" + entityUri + "> .\n";
+    private static String getValueStatementString(String entityUri, String valueSetUri) {
+        return "<" + valueSetUri + "> <" + AUTH_VOCABULARY_PREFIX + "value> <" + entityUri + "> .\n";
     }
 
     public static void deletedEntityEvent(Property oldObj) {
@@ -175,12 +175,12 @@ public class EntityPolicyController {
         return values.contains(entityUri);
     }
 
-    private static String getValueContainerUri(AccessObjectType aot, AccessOperation ao, String role) {
+    private static String getValueSetUri(AccessObjectType aot, AccessOperation ao, String role) {
         String key = aot.toString() + "." + ao.toString() + "." + role;
         if (policyKeyToDataValueMap.containsKey(key)) {
             return policyKeyToDataValueMap.get(key);
         }
-        String uri = getLoader().getEntityValueContainerUri(ao, aot, role);
+        String uri = getLoader().getEntityValueSetUri(ao, aot, role);
         policyKeyToDataValueMap.put(key, uri);
         return uri;
     }

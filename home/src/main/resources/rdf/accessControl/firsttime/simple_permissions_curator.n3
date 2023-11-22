@@ -4,7 +4,7 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
 
-:CuratorSimplePermissionValueContainer
+:CuratorSimplePermissionValueSet
     access:value simplePermission:EditOntology ;
     access:value simplePermission:EditSiteInformation ;
     access:value simplePermission:SeeVerbosePropertyInformation ;

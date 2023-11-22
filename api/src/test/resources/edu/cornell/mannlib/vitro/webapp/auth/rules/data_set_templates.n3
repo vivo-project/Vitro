@@ -21,9 +21,9 @@
 :RoleDataSetTemplate1 a access:DataSetTemplate ;
     access:dataSetTemplateKey :RoleDataSetTemplateKey1 ;
     access:dataSetKeyTemplate :RoleDataSetKeyTemplate1 ;
-    access:dataSetValues access-individual:PublicRoleValueContainer ;
-    access:dataSetValueTemplate :RoleValueContainerTemplate1 ;
-    access:dataSetValueTemplate :RolePermissionValueContainerTemplate1 .  
+    access:dataSetValues access-individual:PublicRoleValueSet ;
+    access:dataSetValueTemplate :RoleValueSetTemplate1 ;
+    access:dataSetValueTemplate :RolePermissionValueSetTemplate1 .  
 
 :RoleDataSetTemplateKey1 a access:DataSetTemplateKey ;
     access:templateKey access-individual:SubjectRole .
@@ -33,11 +33,11 @@
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleValueContainerTemplate1 a access:ValueContainerTemplate ;
+:RoleValueSetTemplate1 a access:ValueSetTemplate ;
     access:relatedCheck :RoleValueSet;
     access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePermissionValueContainerTemplate1 a access:ValueContainerTemplate ;
+:RolePermissionValueSetTemplate1 a access:ValueSetTemplate ;
     access:relatedCheck :TypeValueSet;
     access:defaultValue simplePermission:PageViewablePublic;
     access:defaultValue simplePermission:QueryFullModel ;
@@ -47,8 +47,8 @@
 :RoleDataSetTemplate2 a access:DataSetTemplate ;
     access:dataSetTemplateKey :RoleDataSetTemplateKey2 ;
     access:dataSetKeyTemplate :RoleDataSetKeyTemplate2 ;
-    access:dataSetValueTemplate :RoleValueContainerTemplate2 ;
-    access:dataSetValueTemplate :RolePermissionValueContainerTemplate2 .  
+    access:dataSetValueTemplate :RoleValueSetTemplate2 ;
+    access:dataSetValueTemplate :RolePermissionValueSetTemplate2 .  
 
 :RoleDataSetTemplateKey2 a access:DataSetTemplateKey ;
     access:templateKey access-individual:SubjectRole .
@@ -57,23 +57,23 @@
     access:keyComponent access-individual:ObjectPropertyAccesObject ;
     access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleValueContainerTemplate2 a access:ValueContainerTemplate ;
+:RoleValueSetTemplate2 a access:ValueSetTemplate ;
     access:relatedCheck :RoleValueSet;
     access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePermissionValueContainerTemplate2 a access:ValueContainerTemplate ;
+:RolePermissionValueSetTemplate2 a access:ValueSetTemplate ;
     access:relatedCheck :TypeValueSet;
     access:containerTypeTemplate access-individual:NamedObject .
 
 :PublicDataSet a access:PolicyDataSet ;
     access:dataSetKey :PublicDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueContainer ;
-    access:dataSetValues access-individual:PublicSimplePermissionValueContainer .
+    access:dataSetValues access-individual:PublicRoleValueSet ;
+    access:dataSetValues access-individual:PublicSimplePermissionValueSet .
 
 :PublicDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponent auth:PUBLIC .
 
-access-individual:PublicSimplePermissionValueContainer a access:ValueContainer ;
+access-individual:PublicSimplePermissionValueSet a access:ValueSet ;
     access:containerType access-individual:NamedObject .

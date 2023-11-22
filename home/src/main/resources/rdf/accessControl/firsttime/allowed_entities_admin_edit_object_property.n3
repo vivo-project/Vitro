@@ -3,5 +3,5 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-property/> .
 
-:AdminEditObjectPropertyValueContainer access:value
+:AdminEditObjectPropertyValueSet access:value
     <http://www.w3.org/2000/01/rdf-schema#label> .

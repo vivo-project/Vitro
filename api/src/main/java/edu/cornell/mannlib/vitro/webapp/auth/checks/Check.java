@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 public interface Check {
@@ -18,7 +18,7 @@ public interface Check {
 
     CheckType getType();
 
-    AttributeValueContainer getValues();
+    AttributeValueSet getValues();
 
     void addValue(String value);
 

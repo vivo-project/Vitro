@@ -20,12 +20,12 @@
     rdfs:label "Policy"@en-US .
 
 :PolicyDataSet a owl:Class ;
-    rdfs:comment "Data set to load policy instance with values defined in it. Contains value containers used by checks. While loading policy from data set value containers not specified in current data set are ignored (not used by checks)." ;
+    rdfs:comment "Data set to load policy instance with values defined in it. Contains value sets used by checks. While loading policy from data set value containers not specified in current data set are ignored (not used by checks)." ;
     rdfs:label "Policy dataset"@en-US .
 
-:ValueContainer a owl:Class ;
+:ValueSet a owl:Class ;
     rdfs:comment "Container for values" ; 
-    rdfs:label "Value container"@en-US .
+    rdfs:label "Value set"@en-US .
 
 :Rule a owl:Class ;
     rdfs:comment "Contains checks to perform. If all checks match, rule returns decision.";
@@ -64,7 +64,7 @@
     rdfs:label "Decision"@en-US .
 
 :DataSetTemplate a owl:Class ;
-    rdfs:comment "Data set template to create new data set: specify new value containers and add them into checks, create new data set key. Data set template should contain it's own key to be found and used. For example on new role creation new data sets for new role should be created, template key for that example would be access-individual:SubjectRole";
+    rdfs:comment "Data set template to create new data set: specify new value sets and add them into checks, create new data set key. Data set template should contain it's own key to be found and used. For example on new role creation new data sets for new role should be created, template key for that example would be access-individual:SubjectRole";
     rdfs:label "Data set template"@en-US .
 
 :DataSetTemplateKey a owl:Class ;
@@ -75,9 +75,9 @@
     rdfs:comment "Template of data set key to find data set";
     rdfs:label "Data set key template"@en-US .
 
-:ValueContainerTemplate a owl:Class ;
-    rdfs:comment "Template to create new value container from";
-    rdfs:label "Value container template"@en-US .
+:ValueSetTemplate a owl:Class ;
+    rdfs:comment "Template to create new value set from";
+    rdfs:label "Value set template"@en-US .
     
 :Configuration a owl:Class ;
     rdfs:comment "Access control configuration";
@@ -109,15 +109,15 @@
 ### Object properties
 
 :dataSetValues a owl:ObjectProperty ;
-    rdfs:comment "Data set/data set template contains value container";
+    rdfs:comment "Data set/data set template contains value set";
     rdfs:label "data set values"@en-US ;
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :DataSetTemplate :PolicyDataSet ) ] ;
-    rdfs:range :ValueContainer .
+    rdfs:range :ValueSet .
 
 :value a owl:ObjectProperty ;
-    rdfs:comment "Assign value to value container (any URI or :AttributeValue with :id to define literal value)";
+    rdfs:comment "Assign value to value set (any URI or :AttributeValue with :id to define literal value)";
     rdfs:label "value"@en-US ;
-    rdfs:domain :ValueContainer .
+    rdfs:domain :ValueSet .
 
 :operator a owl:ObjectProperty ;
     rdfs:comment "Set type of check to perform";
@@ -132,27 +132,27 @@
     rdfs:range :Attribute .
 
 :defaultValue a owl:ObjectProperty ;
-    rdfs:comment "default value to add into new value container";
+    rdfs:comment "default value to add into new value set";
     rdfs:label "default template value"@en-US ;
-    rdfs:domain :ValueContainerTemplate .
+    rdfs:domain :ValueSetTemplate .
 
 :containerTypeTemplate a owl:ObjectProperty ,
     owl:FunctionalProperty ;
-    rdfs:comment "Type of values for new value container";
-    rdfs:label "container type template"@en-US ;
+    rdfs:comment "Type of values for new value set";
+    rdfs:label "set type template"@en-US ;
     rdfs:range [ a owl:Class ; owl:unionOf  ( :Attribute :ObjectType ) ] ;
-    rdfs:domain :ValueContainerTemplate .
+    rdfs:domain :ValueSetTemplate .
 
 :attributeValue a owl:ObjectProperty ;
-    rdfs:comment "Check contains value container";
+    rdfs:comment "Check contains value set";
     rdfs:label "attribute value"@en-US ;
     rdfs:domain :Check ;
-    rdfs:range :ValueContainer .
+    rdfs:range :ValueSet .
 
 :relatedCheck a owl:ObjectProperty ;
-    rdfs:comment "Specifies :Check into which new ValueContainer should be added";
+    rdfs:comment "Specifies :Check into which new ValueSet should be added";
     rdfs:label "related check"@en-US ;
-    rdfs:domain :ValueContainerTemplate ;
+    rdfs:domain :ValueSetTemplate ;
     rdfs:range :Check .
 
 :dataSetTemplateKey a owl:ObjectProperty, 
@@ -163,10 +163,10 @@
     rdfs:range :DataSetTemplateKey .
 
 :dataSetValueTemplate a owl:ObjectProperty ;
-    rdfs:comment "Contains value container template";
+    rdfs:comment "Contains value set template";
     rdfs:label "data set value template"@en-US ;
     rdfs:domain :DataSetTemplate ;
-    rdfs:range :ValueContainerTemplate .
+    rdfs:range :ValueSetTemplate .
 
 :templateKey a owl:ObjectProperty ;
     rdfs:comment "Attribute to use as a template key";
@@ -193,9 +193,9 @@
     rdfs:range :PolicyDataSet .
 
 :containerType a owl:ObjectProperty ;
-    rdfs:comment "Specifies type of container values";
-    rdfs:label "container type"@en-US ;
-    rdfs:domain :ValueContainer ;
+    rdfs:comment "Specifies type of set values";
+    rdfs:label "set type"@en-US ;
+    rdfs:domain :ValueSet ;
     rdfs:range :ObjectType .
 
 :singleValue a owl:ObjectProperty ;

@@ -4,7 +4,7 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
 
-:SelfEditorSimplePermissionValueContainer
+:SelfEditorSimplePermissionValueSet
     # permissions for ANY logged-in user.
     access:value simplePermission:DoFrontEndEditing ;
     access:value simplePermission:EditOwnAccount ;

@@ -2,19 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class AbstractCheck implements Check {
 
-    private AttributeValueContainer values;
+    private AttributeValueSet values;
     private String uri;
     private long computationalCost;
 
     private CheckType testType = CheckType.EQUALS;
 
-    public AbstractCheck(String uri, AttributeValueContainer values) {
+    public AbstractCheck(String uri, AttributeValueSet values) {
         this.uri = uri;
         this.values = values;
     }
@@ -42,7 +42,7 @@ public abstract class AbstractCheck implements Check {
     }
 
     @Override
-    public AttributeValueContainer getValues() {
+    public AttributeValueSet getValues() {
         return values;
     }
 

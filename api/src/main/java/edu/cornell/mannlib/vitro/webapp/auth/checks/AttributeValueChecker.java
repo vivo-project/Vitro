@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.checks;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +37,7 @@ public class AttributeValueChecker {
     }
 
     private static boolean sparqlQueryContains(Check attr, AuthorizationRequest ar, String[] inputValues) {
-        AttributeValueContainer values = attr.getValues();
+        AttributeValueSet values = attr.getValues();
         if (!values.containsSingleValue()) {
             log.error("SparqlQueryContains more than  one value");
             return false;
@@ -67,7 +67,7 @@ public class AttributeValueChecker {
     }
 
     private static boolean contains(Check attr, String... inputValues) {
-        AttributeValueContainer values = attr.getValues();
+        AttributeValueSet values = attr.getValues();
         for (String inputValue : inputValues) {
             if (values.contains(inputValue)) {
                 return true;
@@ -77,7 +77,7 @@ public class AttributeValueChecker {
     }
 
     private static boolean equals(Check attr, String... inputValues) {
-        AttributeValueContainer values = attr.getValues();
+        AttributeValueSet values = attr.getValues();
         if (!values.containsSingleValue()) {
             return false;
         }
@@ -90,7 +90,7 @@ public class AttributeValueChecker {
     }
 
     private static boolean startsWith(Check attr, String... inputValues) {
-        AttributeValueContainer values = attr.getValues();
+        AttributeValueSet values = attr.getValues();
         if (!values.containsSingleValue()) {
             return false;
         }
