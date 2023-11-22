@@ -58,44 +58,44 @@
 :PredicateUriStartWithProhibitedNamespace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:attributeValue :ProhibitedNamespaceValueContainer .
+    access:attributeValue :ProhibitedNamespaceValueSet .
 
 :PredicateNotANamespaceException a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
+    access:attributeValue :ProhibitedNamespaceExceptionsValueSet .
 
 :SubjectUriStartWithProhibitedNamespace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:attributeValue :ProhibitedNamespaceValueContainer .
+    access:attributeValue :ProhibitedNamespaceValueSet .
 
 :StatementSubjectNotOneOfProhibitedExceptions a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
+    access:attributeValue :ProhibitedNamespaceExceptionsValueSet .
 
 :StatementObjectUriStartsWithProhibitedNameSpace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementObjectUri ;
-    access:attributeValue :ProhibitedNamespaceValueContainer .
+    access:attributeValue :ProhibitedNamespaceValueSet .
 
 :ObjectUriNotOneOfProhibitedExceptions a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementObjectUri ;
-    access:attributeValue :ProhibitedNamespaceExceptionsValueContainer .
+    access:attributeValue :ProhibitedNamespaceExceptionsValueSet .
 
 :NotModifiableStatementsPolicyDataSet a access:PolicyDataSet ;
-    access:dataSetValues :ProhibitedNamespaceExceptionsValueContainer ;
-    access:dataSetValues :ProhibitedNamespaceValueContainer .
+    access:dataSetValues :ProhibitedNamespaceExceptionsValueSet ;
+    access:dataSetValues :ProhibitedNamespaceValueSet .
 
-:ProhibitedNamespaceExceptionsValueContainer a access:ValueContainer ;
+:ProhibitedNamespaceExceptionsValueSet a access:ValueSet ;
     .
 
-:ProhibitedNamespaceValueContainer a access:ValueContainer ;
+:ProhibitedNamespaceValueSet a access:ValueSet ;
     .
 
-:ProhibitedNamespaceExceptionsValueContainer
+:ProhibitedNamespaceExceptionsValueSet
     access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#moniker> ;
     access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime> ;
     access:value <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ;
@@ -106,7 +106,7 @@
     access:value <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#linkURL> ;
     .
 
-:ProhibitedNamespaceValueContainer
+:ProhibitedNamespaceValueSet
     access:value  :prohibitedNamespacePrefix ; 
     .
 

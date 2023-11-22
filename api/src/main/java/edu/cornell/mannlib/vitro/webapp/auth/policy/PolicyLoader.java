@@ -127,7 +127,7 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?policyUri ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id "
-            + " ?dataSetUri ?attributeValue ?containerType \n"
+            + " ?dataSetUri ?attributeValue ?setElementsType \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policy a access:PolicyTemplate .\n"
@@ -156,8 +156,8 @@ public class PolicyLoader {
             + "      ?attributeValue access:value ?value .\n"
             + "      ?dataSet access:dataSetValues ?attributeValue .\n"
             + "      OPTIONAL {\n"
-            + "        ?attributeValue access:containerType ?containerTypeUri .\n"
-            + "        ?containerTypeUri access:id ?containerType ."
+            + "        ?attributeValue access:containerType ?setElementsTypeUri .\n"
+            + "        ?setElementsTypeUri access:id ?setElementsType ."
             + "      }\n"
             + "      OPTIONAL {?value access:id ?lit_value . }\n"
             + "    }\n"
@@ -174,35 +174,35 @@ public class PolicyLoader {
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT DISTINCT ?"
-            + POLICY + " ?dataSet ?testData ?value ?valueId ?valueContainer ( COUNT(?key) AS ?keySize ) \n"
+            + POLICY + " ?dataSet ?testData ?value ?valueId ?valueSet ( COUNT(?key) AS ?keySize ) \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "  ?" + POLICY + " access:policyDataSet ?dataSet .\n"
             + "  ?dataSet access:dataSetKey ?dataSetKeyUri .\n"
-            + "  ?dataSet access:dataSetValues ?valueContainer .\n"
-            + "  ?valueContainer access:containerType ?containerType .\n"
-            + "  ?containerType access:id ?containerId .\n"
-            + "  OPTIONAL { ?valueContainer access:value ?value .\n"
+            + "  ?dataSet access:dataSetValues ?valueSet .\n"
+            + "  ?valueSet access:containerType ?setElementsType .\n"
+            + "  ?setElementsType access:id ?setElementsId .\n"
+            + "  OPTIONAL { ?valueSet access:value ?value .\n"
             + "    OPTIONAL { ?value access:id ?valueId . }\n"
             + "  }\n"
             + "  ?dataSetKeyUri access:keyComponent ?key .\n";
 
     private static final String policyKeyTemplateSuffix =
-            "}} GROUP BY ?" + POLICY + " ?dataSet ?value ?valueId ?testData ?valueContainer";
+            "}} GROUP BY ?" + POLICY + " ?dataSet ?value ?valueId ?testData ?valueSet";
 
     private static final String policyStatementByKeyTemplatePrefix = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "CONSTRUCT { \n"
-            + "  ?valueContainer access:value <%s> .\n"
+            + "  ?valueSet access:value <%s> .\n"
             + "}\n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "  ?dataSet access:dataSetKey ?dataSetKeyUri .\n"
             + "  ?" + POLICY + " access:policyDataSet ?dataSet . \n"
-            + "  ?dataSet access:dataSetValues ?valueContainer . \n"
-            + "  ?valueContainer access:containerType ?containerTypeUri . \n"
-            + "  ?containerTypeUri access:id ?containerType . \n";
+            + "  ?dataSet access:dataSetValues ?valueSet . \n"
+            + "  ?valueSet access:containerType ?setElementsTypeUri . \n"
+            + "  ?setElementsTypeUri access:id ?setElementsType . \n";
 
     private static final String policyStatementByKeyTemplateSuffix = "}}";
 
@@ -263,40 +263,40 @@ public class PolicyLoader {
 
     public static final String DATA_SET_VALUE_TEMPLATE_QUERY = ""
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT ?valueContainer \n"
+            + "SELECT ?valueSet \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?dataSetTemplate access:dataSetValues ?valueContainer .\n"
+            + "    ?dataSetTemplate access:dataSetValues ?valueSet .\n"
             + "  }\n"
             + "}\n";
 
-    public static final String DATA_SET_VALUE_CONTAINER_TEMPLATES_TEMPLATE_QUERY = ""
+    public static final String DATA_SET_VALUE_SET_TEMPLATES_TEMPLATE_QUERY = ""
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT ?valueContainerTemplate \n"
+            + "SELECT ?valueSetTemplate \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?dataSetTemplate access:dataSetValueTemplate ?valueContainerTemplate .\n"
+            + "    ?dataSetTemplate access:dataSetValueTemplate ?valueSetTemplate .\n"
             + "  }\n"
             + "}\n";
 
-    public static final String CONSTRUCT_VALUE_CONTAINER_QUERY = ""
+    public static final String CONSTRUCT_VALUE_SET_QUERY = ""
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "CONSTRUCT {\n"
-            + "  ?relatedCheck access:attributeValue ?valueContainer .\n"
-            + "  ?valueContainer a access:ValueContainer .\n"
-            + "  ?valueContainer access:containerType ?containerType .\n"
-            + "  ?valueContainer access:value ?newRoleUri .\n"
-            + "  ?valueContainer access:value ?dataValue ."
+            + "  ?relatedCheck access:attributeValue ?valueSet .\n"
+            + "  ?valueSet a access:ValueSet .\n"
+            + "  ?valueSet access:containerType ?setElementsType .\n"
+            + "  ?valueSet access:value ?newRoleUri .\n"
+            + "  ?valueSet access:value ?dataValue ."
             + "}\n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?valueContainerTemplateUri access:relatedCheck ?relatedCheck .\n"
-            + "    ?valueContainerTemplateUri access:containerTypeTemplate ?containerType .\n"
+            + "    ?valueSetTemplateUri access:relatedCheck ?relatedCheck .\n"
+            + "    ?valueSetTemplateUri access:containerTypeTemplate ?setElementsType .\n"
             + "    OPTIONAL {\n"
-            + "      ?valueContainerTemplateUri access:defaultValue ?dataValue .\n"
+            + "      ?valueSetTemplateUri access:defaultValue ?dataValue .\n"
             + "    }\n"
             + "    OPTIONAL {\n"
-            + "      FILTER ( str(?containerType) = 'https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole' )\n"
+            + "      FILTER ( str(?setElementsType) = 'https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole' )\n"
             + "      BIND(?role as ?newRoleUri)\n"
             + "    }"
             + "  }"
@@ -432,7 +432,7 @@ public class PolicyLoader {
         String queryText = getDataSetByKeyQuery(new String[] { role },
                 new String[] { ao.toString(), aot.toString() });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
-        pss.setLiteral("containerId", aot.toString());
+        pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
         debug("SPARQL Query to get policy data set values:\n %s", queryText);
         try {
@@ -464,13 +464,13 @@ public class PolicyLoader {
         return values;
     }
 
-    public String getEntityValueContainerUri(AccessOperation ao, AccessObjectType aot, String role) {
+    public String getEntityValueSetUri(AccessOperation ao, AccessObjectType aot, String role) {
         long expectedSize = 3;
         String queryText = getDataSetByKeyQuery(new String[] { role }, new String[] { ao.toString(), aot.toString() });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
-        pss.setLiteral("containerId", aot.toString());
+        pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
-        debug("SPARQL Query to get entity value container uri:\n %s", queryText);
+        debug("SPARQL Query to get entity value set uri:\n %s", queryText);
         String[] uri = new String[1];
         try {
             rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
@@ -485,7 +485,7 @@ public class PolicyLoader {
                         log.error("wrong key size. Expected " + expectedSize + ". Actual " + keySize );
                         return;
                     }
-                    uri[0] = qs.getResource("valueContainer").getURI();
+                    uri[0] = qs.getResource("valueSet").getURI();
                 }
             });
         } catch (RDFServiceException e) {
@@ -499,7 +499,7 @@ public class PolicyLoader {
         String queryText = getPolicyDataSetValueStatementByKeyQuery(entityUri, new String[] { role },
                 new String[] { ao.toString(), aot.toString() });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
-        pss.setLiteral("containerType", aot.toString());
+        pss.setLiteral("setElementsType", aot.toString());
         queryText = pss.toString();
         debug("SPARQL Query to get policy data set values:\n %s", queryText);
         Model m = VitroModelFactory.createModel();
@@ -922,7 +922,7 @@ public class PolicyLoader {
     }
 
     public List<String> getDataSetValuesFromTemplate(String templateUri) {
-        List<String> valueContainers = new LinkedList<>();
+        List<String> valueSets = new LinkedList<>();
         ParameterizedSparqlString pss = new ParameterizedSparqlString(DATA_SET_VALUE_TEMPLATE_QUERY);
         pss.setIri("dataSetTemplate", templateUri);
         final String queryText = pss.toString();
@@ -931,46 +931,46 @@ public class PolicyLoader {
             rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
-                    if (qs.contains("valueContainer") && qs.get("valueContainer").isResource()) {
-                        valueContainers.add(qs.getResource("valueContainer").getURI());
+                    if (qs.contains("valueSet") && qs.get("valueSet").isResource()) {
+                        valueSets.add(qs.getResource("valueSet").getURI());
                     }
                 }
             });
         } catch (RDFServiceException e) {
             log.error(e, e);
         }
-        return valueContainers;
+        return valueSets;
     }
 
     public List<String> getDataSetValueTemplatesFromTemplate(String templateUri) {
-        List<String> valueContainerTemplates = new LinkedList<>();
+        List<String> valueSetTemplates = new LinkedList<>();
         ParameterizedSparqlString pss =
-                new ParameterizedSparqlString(DATA_SET_VALUE_CONTAINER_TEMPLATES_TEMPLATE_QUERY);
+                new ParameterizedSparqlString(DATA_SET_VALUE_SET_TEMPLATES_TEMPLATE_QUERY);
         pss.setIri("dataSetTemplate", templateUri);
         final String queryText = pss.toString();
-        debug("SPARQL Query to get data set value container templates from data set template:\n %s", queryText);
+        debug("SPARQL Query to get data set value set templates from data set template:\n %s", queryText);
         try {
             rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
-                    if (qs.contains("valueContainerTemplate") && qs.get("valueContainerTemplate").isResource()) {
-                        valueContainerTemplates.add(qs.getResource("valueContainerTemplate").getURI());
+                    if (qs.contains("valueSetTemplate") && qs.get("valueSetTemplate").isResource()) {
+                        valueSetTemplates.add(qs.getResource("valueSetTemplate").getURI());
                     }
                 }
             });
         } catch (RDFServiceException e) {
             log.error(e, e);
         }
-        return valueContainerTemplates;
+        return valueSetTemplates;
     }
 
-    public void constructValueContainer(String valueContainerTemplateUri, String valueContainer, String role,
+    public void constructValueSet(String valueSetTemplateUri, String valueSet, String role,
             Model dataSetModel) {
-        ParameterizedSparqlString pss = new ParameterizedSparqlString(CONSTRUCT_VALUE_CONTAINER_QUERY);
-        pss.setIri("valueContainerTemplateUri", valueContainerTemplateUri);
-        pss.setIri("valueContainer", valueContainer);
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(CONSTRUCT_VALUE_SET_QUERY);
+        pss.setIri("valueSetTemplateUri", valueSetTemplateUri);
+        pss.setIri("valueSet", valueSet);
         pss.setIri("role", role);
-        debug("SPARQL Construct Query to create value container \n %s", pss.toString());
+        debug("SPARQL Construct Query to create value set \n %s", pss.toString());
         try {
             rdfService.sparqlConstructQuery(pss.toString(), dataSetModel);
         } catch (RDFServiceException e) {

@@ -15,12 +15,12 @@ public class AttributeValueKeyTest {
         AttributeValueKey key1 = new AttributeValueKey();
         key1.setObjectType(AccessObjectType.FAUX_DATA_PROPERTY);
         key1.setOperation(AccessOperation.DISPLAY);
-        key1.setContainerType(AccessObjectType.FAUX_DATA_PROPERTY.toString());
+        key1.setType(AccessObjectType.FAUX_DATA_PROPERTY.toString());
         key1.setRole(PolicyTest.ADMIN);
         AttributeValueKey key2 = new AttributeValueKey();
         key2.setObjectType(AccessObjectType.FAUX_DATA_PROPERTY);
         key2.setOperation(AccessOperation.DISPLAY);
-        key2.setContainerType("FAUX_DATA_PROPERTY");
+        key2.setType("FAUX_DATA_PROPERTY");
         key2.setRole(PolicyTest.ADMIN);
         assertEquals(key1, key2);
         Map<AttributeValueKey, String> map = new HashedMap<>();

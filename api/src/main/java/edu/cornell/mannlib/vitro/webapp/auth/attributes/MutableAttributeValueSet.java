@@ -4,25 +4,25 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MutableAttributeValueContainer implements AttributeValueContainer {
+public class MutableAttributeValueSet implements AttributeValueSet {
 
     private Set<String> values = ConcurrentHashMap.newKeySet();
-    private String containerUri;
+    private String valueSetUri;
     private String type;
     private AttributeValueKey key;
     private String dataSetUri;
 
-    public void setContainerUri(String valueContainerUri) {
-        this.containerUri = valueContainerUri;
+    public void setValueSetUri(String valueSetUri) {
+        this.valueSetUri = valueSetUri;
     }
 
-    public MutableAttributeValueContainer(String value) {
+    public MutableAttributeValueSet(String value) {
         values.add(value);
     }
 
     @Override
-    public String getContainerUri() {
-        return containerUri;
+    public String getValueSetUri() {
+        return valueSetUri;
     }
 
     @Override
@@ -80,8 +80,8 @@ public class MutableAttributeValueContainer implements AttributeValueContainer {
     }
 
     @Override
-    public void setKey(AttributeValueKey valueContainerKey) {
-        this.key = valueContainerKey;
+    public void setKey(AttributeValueKey valueSetKey) {
+        this.key = valueSetKey;
     }
 
     @Override

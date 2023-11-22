@@ -60,7 +60,7 @@ public class PolicyLoaderTest extends PolicyTest {
         load(DATA_SET);
         List<String> values = PolicyLoader.getInstance().getDataSetValuesFromTemplate(PREFIX + "RoleDataSetTemplate1");
         assertEquals(1, values.size());
-        assertEquals(values.get(0), AUTH_INDIVIDUAL_PREFIX + "PublicRoleValueContainer");
+        assertEquals(values.get(0), AUTH_INDIVIDUAL_PREFIX + "PublicRoleValueSet");
     }
 
     @Test

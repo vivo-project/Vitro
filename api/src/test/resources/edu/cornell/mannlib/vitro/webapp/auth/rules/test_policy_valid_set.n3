@@ -39,18 +39,18 @@ access-individual:testDataSet2 rdf:type access:PolicyDataSet ;
     access:dataSetValues access-individual:valueSet3 ;
     access:dataSetValues access-individual:valueSet4 .
 
-access-individual:valueSet1 rdf:type access:ValueContainer ;
+access-individual:valueSet1 rdf:type access:ValueSet ;
     access:value <test:value1> ;
     .
     
-access-individual:valueSet2 rdf:type access:ValueContainer ;
+access-individual:valueSet2 rdf:type access:ValueSet ;
     access:value <test:value2> ;
     .
     
-access-individual:valueSet3 rdf:type access:ValueContainer ;
+access-individual:valueSet3 rdf:type access:ValueSet ;
     access:value <test:value3> ;
     .
     
-access-individual:valueSet4 rdf:type access:ValueContainer ;
+access-individual:valueSet4 rdf:type access:ValueSet ;
     access:value <test:value4> ;
     .

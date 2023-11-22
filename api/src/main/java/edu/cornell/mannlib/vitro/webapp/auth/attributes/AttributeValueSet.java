@@ -1,6 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
-public interface AttributeValueContainer {
+public interface AttributeValueSet {
 
     void add(String value);
 
@@ -16,11 +16,11 @@ public interface AttributeValueContainer {
 
     boolean isEmpty();
 
-    void setContainerUri(String containerUri);
+    void setValueSetUri(String valueSetUri);
 
-    String getContainerUri();
+    String getValueSetUri();
 
-    void setType(String containerType);
+    void setType(String type);
 
     void setDataSetUri(String dataSetUri);
 

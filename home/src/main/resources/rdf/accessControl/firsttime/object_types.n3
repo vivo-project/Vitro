@@ -35,29 +35,29 @@ access-individual:NamedObject a access:ObjectType ;
 
 #Object type value containers
 
-access-individual:ObjectPropertyValueContainer a access:ValueContainer ;
+access-individual:ObjectPropertyValueSet a access:ValueSet ;
     access:value access-individual:ObjectProperty .
 
-access-individual:DataPropertyValueContainer a access:ValueContainer ;
+access-individual:DataPropertyValueSet a access:ValueSet ;
     access:value access-individual:DataProperty .
 
-access-individual:FauxObjectPropertyValueContainer a access:ValueContainer ;
+access-individual:FauxObjectPropertyValueSet a access:ValueSet ;
     access:value access-individual:FauxObjectProperty .
 
-access-individual:FauxDataPropertyValueContainer a access:ValueContainer ;
+access-individual:FauxDataPropertyValueSet a access:ValueSet ;
     access:value access-individual:FauxDataProperty .
 
-access-individual:ObjectPropertyStatementValueContainer a access:ValueContainer ;
+access-individual:ObjectPropertyStatementValueSet a access:ValueSet ;
     access:value access-individual:ObjectPropertyStatement .
 
-access-individual:DataPropertyStatementValueContainer a access:ValueContainer ;
+access-individual:DataPropertyStatementValueSet a access:ValueSet ;
     access:value access-individual:DataPropertyStatement .
 
-access-individual:FauxObjectPropertyStatementValueContainer a access:ValueContainer ;
+access-individual:FauxObjectPropertyStatementValueSet a access:ValueSet ;
     access:value access-individual:FauxObjectPropertyStatement .
 
-access-individual:FauxDataPropertyStatementValueContainer a access:ValueContainer ;
+access-individual:FauxDataPropertyStatementValueSet a access:ValueSet ;
     access:value access-individual:FauxDataPropertyStatement .
 
-access-individual:ClassValueContainer a access:ValueContainer ;
+access-individual:ClassValueSet a access:ValueSet ;
     access:value access-individual:Class .

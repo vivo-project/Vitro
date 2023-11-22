@@ -29,7 +29,7 @@ access-individual:BrokenAttribute2 rdf:type access:Check ;
 access-individual:testDataSet1 rdf:type access:PolicyDataSet ;
     access:dataSetValues access-individual:valueSet1 .
 
-access-individual:valueSet1 rdf:type access:ValueContainer ;
+access-individual:valueSet1 rdf:type access:ValueSet ;
     access:value <test:value1> ;
     access:value <test:value2> ;
     .    

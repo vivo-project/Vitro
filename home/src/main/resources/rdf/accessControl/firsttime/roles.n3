@@ -4,17 +4,17 @@
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-access-individual:PublicRoleValueContainer a access:ValueContainer ;
+access-individual:PublicRoleValueSet a access:ValueSet ;
     access:value auth:PUBLIC .
 
-access-individual:SelfEditorRoleValueContainer a access:ValueContainer ;
+access-individual:SelfEditorRoleValueSet a access:ValueSet ;
     access:value auth:SELF_EDITOR .
 
-access-individual:EditorRoleValueContainer a access:ValueContainer ;
+access-individual:EditorRoleValueSet a access:ValueSet ;
     access:value auth:EDITOR .
 
-access-individual:CuratorRoleValueContainer a access:ValueContainer ;
+access-individual:CuratorRoleValueSet a access:ValueSet ;
     access:value auth:CURATOR .
 
-access-individual:AdminRoleValueContainer a access:ValueContainer ;
+access-individual:AdminRoleValueSet a access:ValueSet ;
     access:value auth:ADMIN .

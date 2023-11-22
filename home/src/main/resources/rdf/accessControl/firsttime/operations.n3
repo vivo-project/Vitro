@@ -24,23 +24,23 @@ access-individual:EditOperation a access:Operation ;
 access-individual:ExecuteOperation a access:Operation ;
     access:id "EXECUTE" .
 
-access-individual:DisplayOperationValueContainer a access:ValueContainer ;
+access-individual:DisplayOperationValueSet a access:ValueSet ;
     access:value access-individual:DisplayOperation .
 
-access-individual:UpdateOperationValueContainer a access:ValueContainer ;
+access-individual:UpdateOperationValueSet a access:ValueSet ;
     access:value access-individual:UpdateOperation .
 
-access-individual:PublishOperationValueContainer a access:ValueContainer ;
+access-individual:PublishOperationValueSet a access:ValueSet ;
     access:value access-individual:PublishOperation .
 
-access-individual:AddOperationValueContainer a access:ValueContainer ;
+access-individual:AddOperationValueSet a access:ValueSet ;
     access:value access-individual:AddOperation .
 
-access-individual:DropOperationValueContainer a access:ValueContainer ;
+access-individual:DropOperationValueSet a access:ValueSet ;
     access:value access-individual:DropOperation .
 
-access-individual:EditOperationValueContainer a access:ValueContainer ;
+access-individual:EditOperationValueSet a access:ValueSet ;
     access:value access-individual:EditOperation .
 
-access-individual:ExecuteOperationValueContainer a access:ValueContainer ;
+access-individual:ExecuteOperationValueSet a access:ValueSet ;
     access:value access-individual:ExecuteOperation .

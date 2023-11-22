@@ -21,8 +21,8 @@
 :RoleDataSetTemplate a access:DataSetTemplate ;
     access:dataSetTemplateKey :RoleDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDataSetKeyTemplate ;
-    access:dataSetValueTemplate :RoleValueContainerTemplate ;
-    access:dataSetValueTemplate :RolePermissionValueContainerTemplate .  
+    access:dataSetValueTemplate :RoleValueSetTemplate ;
+    access:dataSetValueTemplate :RolePermissionValueSetTemplate .  
 
 :RoleDataSetTemplateKey a access:DataSetTemplateKey ;
     access:templateKey access-individual:SubjectRole .
@@ -32,11 +32,11 @@
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponentTemplate access-individual:SubjectRole .
 
-:RoleValueContainerTemplate a access:ValueContainerTemplate ;
+:RoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleEqualsDataSetRole;
     access:containerTypeTemplate access-individual:SubjectRole .
 
-:RolePermissionValueContainerTemplate a access:ValueContainerTemplate ;
+:RolePermissionValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :PermissionNameAllowed;
     access:defaultValue simplePermission:PageViewablePublic;
     access:defaultValue simplePermission:QueryFullModel ;
@@ -46,8 +46,8 @@
 
 :PublicDataSet a access:PolicyDataSet ;
     access:dataSetKey :PublicDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueContainer ;
-    access:dataSetValues :PublicSimplePermissionValueContainer .
+    access:dataSetValues access-individual:PublicRoleValueSet ;
+    access:dataSetValues :PublicSimplePermissionValueSet .
 
 :PublicDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
@@ -56,8 +56,8 @@
 
 :SelfEditorDataSet a access:PolicyDataSet ;
     access:dataSetKey :SelfEditorDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueContainer ;
-    access:dataSetValues :SelfEditorSimplePermissionValueContainer .
+    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
+    access:dataSetValues :SelfEditorSimplePermissionValueSet .
 
 :SelfEditorDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
@@ -66,8 +66,8 @@
 
 :EditorDataSet a access:PolicyDataSet ;
     access:dataSetKey :EditorDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueContainer ;
-    access:dataSetValues :EditorSimplePermissionValueContainer .
+    access:dataSetValues access-individual:EditorRoleValueSet ;
+    access:dataSetValues :EditorSimplePermissionValueSet .
 
 :EditorDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
@@ -76,8 +76,8 @@
 
 :CuratorDataSet a access:PolicyDataSet ;
     access:dataSetKey :CuratorDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueContainer ;
-    access:dataSetValues :CuratorSimplePermissionValueContainer .
+    access:dataSetValues access-individual:CuratorRoleValueSet ;
+    access:dataSetValues :CuratorSimplePermissionValueSet .
 
 :CuratorDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
@@ -86,8 +86,8 @@
 
 :AdminDataSet a access:PolicyDataSet ;
     access:dataSetKey :AdminDataSetKey  ;
-    access:dataSetValues access-individual:AdminRoleValueContainer ;
-    access:dataSetValues :AdminSimplePermissionValueContainer .
+    access:dataSetValues access-individual:AdminRoleValueSet ;
+    access:dataSetValues :AdminSimplePermissionValueSet .
 
 :AdminDataSetKey  a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
@@ -108,34 +108,34 @@
 :PermissionNameAllowed a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:attributeValue :PublicSimplePermissionValueContainer ;
-    access:attributeValue :SelfEditorSimplePermissionValueContainer ;
-    access:attributeValue :EditorSimplePermissionValueContainer ;
-    access:attributeValue :CuratorSimplePermissionValueContainer ;
-    access:attributeValue :AdminSimplePermissionValueContainer .
+    access:attributeValue :PublicSimplePermissionValueSet ;
+    access:attributeValue :SelfEditorSimplePermissionValueSet ;
+    access:attributeValue :EditorSimplePermissionValueSet ;
+    access:attributeValue :CuratorSimplePermissionValueSet ;
+    access:attributeValue :AdminSimplePermissionValueSet .
 
 :IsSimplePermission a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:singleValue access-individual:NamedObject .
 
-:PublicSimplePermissionValueContainer a access:ValueContainer ;
+:PublicSimplePermissionValueSet a access:ValueSet ;
     access:containerType access-individual:NamedObject .
-:SelfEditorSimplePermissionValueContainer a access:ValueContainer ;
+:SelfEditorSimplePermissionValueSet a access:ValueSet ;
     access:containerType access-individual:NamedObject .
-:EditorSimplePermissionValueContainer a access:ValueContainer ;
+:EditorSimplePermissionValueSet a access:ValueSet ;
     access:containerType access-individual:NamedObject .
-:CuratorSimplePermissionValueContainer a access:ValueContainer ;
+:CuratorSimplePermissionValueSet a access:ValueSet ;
     access:containerType access-individual:NamedObject .
-:AdminSimplePermissionValueContainer a access:ValueContainer ;
+:AdminSimplePermissionValueSet a access:ValueSet ;
     access:containerType access-individual:NamedObject .
 
 :SubjectRoleEqualsDataSetRole a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:attributeValue access-individual:PublicRoleValueContainer ;
-    access:attributeValue access-individual:SelfEditorRoleValueContainer ;
-    access:attributeValue access-individual:EditorRoleValueContainer ;
-    access:attributeValue access-individual:CuratorRoleValueContainer ;
-    access:attributeValue access-individual:AdminRoleValueContainer .
+    access:attributeValue access-individual:PublicRoleValueSet ;
+    access:attributeValue access-individual:SelfEditorRoleValueSet ;
+    access:attributeValue access-individual:EditorRoleValueSet ;
+    access:attributeValue access-individual:CuratorRoleValueSet ;
+    access:attributeValue access-individual:AdminRoleValueSet .
 

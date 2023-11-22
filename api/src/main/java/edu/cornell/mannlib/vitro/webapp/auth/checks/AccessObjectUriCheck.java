@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.checks;
 import java.util.Optional;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.logging.Log;
@@ -15,8 +15,8 @@ public class AccessObjectUriCheck extends AbstractCheck {
 
     private static final Log log = LogFactory.getLog(AccessObjectUriCheck.class);
 
-    public AccessObjectUriCheck(String uri, AttributeValueContainer container) {
-        super(uri, container);
+    public AccessObjectUriCheck(String uri, AttributeValueSet set) {
+        super(uri, set);
     }
 
     @Override

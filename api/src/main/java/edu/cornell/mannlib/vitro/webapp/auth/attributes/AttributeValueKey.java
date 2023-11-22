@@ -8,16 +8,16 @@ public class AttributeValueKey {
     private AccessOperation ao;
     private AccessObjectType aot;
     private String role;
-    private String containerType;
+    private String type;
 
     public AttributeValueKey() {
     }
 
-    public AttributeValueKey(AccessOperation ao, AccessObjectType aot, String role, String containerType) {
+    public AttributeValueKey(AccessOperation ao, AccessObjectType aot, String role, String type) {
         this.ao = ao;
         this.aot = aot;
         this.role = role;
-        this.containerType = containerType;
+        this.type = type;
     }
 
     public AccessOperation getAccessOperation() {
@@ -44,16 +44,16 @@ public class AttributeValueKey {
         this.role = role;
     }
 
-    public String getContainerType() {
-        return containerType;
+    public String getType() {
+        return type;
     }
 
-    public void setContainerType(String containerType) {
-        this.containerType = containerType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public AttributeValueKey clone() {
-        return new AttributeValueKey(ao, aot, role, containerType);
+        return new AttributeValueKey(ao, aot, role, type);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class AttributeValueKey {
                 .append(getAccessOperation(), compared.getAccessOperation())
                 .append(getObjectType(), compared.getObjectType())
                 .append(getRole(), compared.getRole())
-                .append(getContainerType(), compared.getContainerType())
+                .append(getType(), compared.getType())
                 .isEquals();
     }
 
@@ -80,7 +80,7 @@ public class AttributeValueKey {
                 .append(getAccessOperation())
                 .append(getObjectType())
                 .append(getRole())
-                .append(getContainerType())
+                .append(getType())
                 .toHashCode();
     }
 }

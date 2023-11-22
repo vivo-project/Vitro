@@ -4,7 +4,7 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
 
-:AdminSimplePermissionValueContainer
+:AdminSimplePermissionValueSet
     access:value simplePermission:AccessSpecialDataModels ;
     access:value simplePermission:EnableDeveloperPanel ;
     access:value simplePermission:LoginDuringMaintenance ;

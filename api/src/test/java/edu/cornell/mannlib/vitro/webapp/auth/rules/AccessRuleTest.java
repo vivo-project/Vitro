@@ -7,8 +7,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueContainer;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.MutableAttributeValueContainer;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.MutableAttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.AccessObjectUriCheck;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.Check;
 import org.junit.Test;
@@ -33,11 +33,11 @@ public class AccessRuleTest {
         assertEquals(expensiveAttribute.getUri(), list.get(2).getUri());
     }
 
-    private AttributeValueContainer value(String value) {
-        return new MutableAttributeValueContainer(value);
+    private AttributeValueSet value(String value) {
+        return new MutableAttributeValueSet(value);
     }
 
-    private Check uriCheck(String uri, AttributeValueContainer avc) {
+    private Check uriCheck(String uri, AttributeValueSet avc) {
         return new AccessObjectUriCheck(uri, avc);
     }
 }

@@ -56,25 +56,25 @@ public class PolicyTemplateController {
                     dataSetModel.createProperty(PREFIX_AO + "keyComponent"), dataSetModel.createResource(key)));
         }
 
-        List<String> valueContainerUris = policyLoader.getDataSetValuesFromTemplate(dataSetTemplateUri);
-        for (String valueContainerUri : valueContainerUris) {
-            // Add ?dataSetUri ao:dataSetValues ?valueContainerUri .
+        List<String> valueSetUris = policyLoader.getDataSetValuesFromTemplate(dataSetTemplateUri);
+        for (String valueSetUri : valueSetUris) {
+            // Add ?dataSetUri ao:dataSetValues ?valueSetUri .
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                     dataSetModel.createProperty(PREFIX_AO + "dataSetValues"),
-                    dataSetModel.createResource(valueContainerUri)));
+                    dataSetModel.createResource(valueSetUri)));
         }
 
-        List<String> valueContainerTemplateUris = policyLoader.getDataSetValueTemplatesFromTemplate(dataSetTemplateUri);
+        List<String> valueSetTemplateUris = policyLoader.getDataSetValueTemplatesFromTemplate(dataSetTemplateUri);
 
-        for (String valueContainerTemplateUri : valueContainerTemplateUris) {
-            String valueContainerUri = getUriFromTemplate(valueContainerTemplateUri, role);
+        for (String valueSetTemplateUri : valueSetTemplateUris) {
+            String valueSetUri = getUriFromTemplate(valueSetTemplateUri, role);
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                     dataSetModel.createProperty(PREFIX_AO + "dataSetValues"),
-                    dataSetModel.createResource(valueContainerUri)));
+                    dataSetModel.createResource(valueSetUri)));
 
-            policyLoader.constructValueContainer(valueContainerTemplateUri, valueContainerUri, roleUri, dataSetModel);
+            policyLoader.constructValueSet(valueSetTemplateUri, valueSetUri, roleUri, dataSetModel);
             // TODO: Check uri doesn't exists in access control graph
-            // If value container template is subject role, then role uri should be added to the container
+            // If value set template is subject role, then role uri should be added to the set
         }
         policyLoader.updateAccessControlModel(dataSetModel, true);
     }
