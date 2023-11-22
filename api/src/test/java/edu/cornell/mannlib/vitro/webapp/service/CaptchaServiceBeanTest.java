@@ -6,9 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.cache.Cache;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
@@ -68,28 +68,27 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
     public void getChallenge_MatchingCaptchaIdAndRemoteAddress_ReturnsCaptchaBundle() {
         // Given
         String captchaId = "sampleCaptchaId";
-        String remoteAddress = "sampleRemoteAddress";
         CaptchaBundle sampleChallenge = new CaptchaBundle("sampleB64Image", "sampleCode", captchaId);
-        CaptchaServiceBean.getCaptchaChallenges().put(remoteAddress, sampleChallenge);
+        CaptchaServiceBean.getCaptchaChallenges().put(captchaId, sampleChallenge);
 
         // When
-        Map<String, CaptchaBundle> captchaChallenges = CaptchaServiceBean.getCaptchaChallenges();
-        Optional<CaptchaBundle> result = CaptchaServiceBean.getChallenge(captchaId, remoteAddress);
+        Cache<String, CaptchaBundle> captchaChallenges = CaptchaServiceBean.getCaptchaChallenges();
+        Optional<CaptchaBundle> result = CaptchaServiceBean.getChallenge(captchaId);
 
         // Then
         assertTrue(result.isPresent());
         assertEquals(sampleChallenge, result.get());
-        assertTrue(captchaChallenges.isEmpty()); // Ensure the challenge is removed from the map
+        assertEquals(0, captchaChallenges.size());
     }
 
     @Test
     public void getChallenge_NonMatchingCaptchaIdAndRemoteAddress_ReturnsEmptyOptional() {
         // When
-        Map<String, CaptchaBundle> captchaChallenges = CaptchaServiceBean.getCaptchaChallenges();
-        Optional<CaptchaBundle> result = CaptchaServiceBean.getChallenge("nonMatchingId", "nonMatchingAddress");
+        Cache<String, CaptchaBundle> captchaChallenges = CaptchaServiceBean.getCaptchaChallenges();
+        Optional<CaptchaBundle> result = CaptchaServiceBean.getChallenge("nonMatchingId");
 
         // Then
         assertFalse(result.isPresent());
-        assertTrue(captchaChallenges.isEmpty()); // Ensure the map remains empty
+        assertEquals(0, captchaChallenges.size());
     }
 }

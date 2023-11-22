@@ -349,7 +349,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 }
             case "DEFAULT":
             default:
-                Optional<CaptchaBundle> optionalChallenge = CaptchaServiceBean.getChallenge(challengeId, vreq.getRemoteAddr());
+                Optional<CaptchaBundle> optionalChallenge = CaptchaServiceBean.getChallenge(challengeId);
                 if (optionalChallenge.isPresent() && optionalChallenge.get().getCode().equals(captchaInput)) {
                     return null;
                 }
@@ -424,7 +424,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
         if (!captchaImpl.equals("RECAPTCHA")) {
             CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
-            CaptchaServiceBean.getCaptchaChallenges().put(vreq.getRemoteAddr(), captchaChallenge);
+            CaptchaServiceBean.getCaptchaChallenges().put(captchaChallenge.getCaptchaId(), captchaChallenge);
             body.put("challenge", captchaChallenge.getB64Image());
             body.put("challengeId", captchaChallenge.getCaptchaId());
         } else {

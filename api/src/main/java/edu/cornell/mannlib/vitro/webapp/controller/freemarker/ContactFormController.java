@@ -74,7 +74,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
                         "You have to provide a site key through configuration file."));
             } else {
                 CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
-                CaptchaServiceBean.getCaptchaChallenges().put(vreq.getRemoteAddr(), captchaChallenge);
+                CaptchaServiceBean.getCaptchaChallenges().put(captchaChallenge.getCaptchaId(), captchaChallenge);
 
                 body.put("challenge", captchaChallenge.getB64Image());
                 body.put("challengeId", captchaChallenge.getCaptchaId());

@@ -9,11 +9,13 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import net.logicsquad.nanocaptcha.image.ImageCaptcha;
@@ -45,7 +47,11 @@ public class CaptchaServiceBean {
 
     private static final Log log = LogFactory.getLog(CaptchaServiceBean.class.getName());
 
-    private static final ConcurrentHashMap<String, CaptchaBundle> captchaChallenges = new ConcurrentHashMap<>();
+    private static final Cache<String, CaptchaBundle> captchaChallenges =
+        CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
 
 
     /**
@@ -103,20 +109,19 @@ public class CaptchaServiceBean {
 
     /**
      * Retrieves a CAPTCHA challenge for a specific host based on the provided CAPTCHA ID
-     * and remote address. Removes the challenge from the storage after retrieval.
+     * Removes the challenge from the storage after retrieval.
      *
-     * @param captchaId     The CAPTCHA ID to match.
-     * @param remoteAddress The remote address associated with the host.
+     * @param captchaId The CAPTCHA ID to match.
      * @return An Optional containing the CaptchaBundle if a matching challenge is found,
      * or an empty Optional otherwise.
      */
-    public static Optional<CaptchaBundle> getChallenge(String captchaId, String remoteAddress) {
-        CaptchaBundle challengeForHost = captchaChallenges.getOrDefault(remoteAddress, new CaptchaBundle("", "", ""));
-        captchaChallenges.remove(remoteAddress);
-
-        if (!challengeForHost.getCaptchaId().equals(captchaId)) {
+    public static Optional<CaptchaBundle> getChallenge(String captchaId) {
+        CaptchaBundle challengeForHost = captchaChallenges.getIfPresent(captchaId);
+        if (challengeForHost == null) {
             return Optional.empty();
         }
+
+        captchaChallenges.invalidate(captchaId);
 
         return Optional.of(challengeForHost);
     }
@@ -126,7 +131,7 @@ public class CaptchaServiceBean {
      *
      * @return A ConcurrentHashMap with host addresses as keys and CaptchaBundle objects as values.
      */
-    public static ConcurrentHashMap<String, CaptchaBundle> getCaptchaChallenges() {
+    public static Cache<String, CaptchaBundle> getCaptchaChallenges() {
         return captchaChallenges;
     }
 
