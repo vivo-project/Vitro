@@ -290,7 +290,7 @@ public class PolicyLoader {
             + "}\n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?valueContainerTemplateUri access:relatedValueSet ?relatedCheck .\n"
+            + "    ?valueContainerTemplateUri access:relatedCheck ?relatedCheck .\n"
             + "    ?valueContainerTemplateUri access:containerTypeTemplate ?containerType .\n"
             + "    OPTIONAL {\n"
             + "      ?valueContainerTemplateUri access:defaultValue ?dataValue .\n"

@@ -33,11 +33,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :SubjectRoleEqualsDataSetRole;
+    access:relatedCheck :SubjectRoleEqualsDataSetRole;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePermissionValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :PermissionNameAllowed;
+    access:relatedCheck :PermissionNameAllowed;
     access:defaultValue simplePermission:PageViewablePublic;
     access:defaultValue simplePermission:QueryFullModel ;
     access:containerTypeTemplate access-individual:NamedObject .

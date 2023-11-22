@@ -49,11 +49,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleDisplayClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :SubjectRoleCheck;
+    access:relatedCheck :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleDisplayClassValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AccessObjectUriCheck ;
+    access:relatedCheck :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
@@ -76,11 +76,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RoleUpdateClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :SubjectRoleCheck;
+    access:relatedCheck :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RoleUpdateClassValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AccessObjectUriCheck ;
+    access:relatedCheck :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
@@ -103,11 +103,11 @@
     access:keyComponentTemplate access-individual:SubjectRole .
 
 :RolePublishClassRoleValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :SubjectRoleCheck;
+    access:relatedCheck :SubjectRoleCheck;
     access:containerTypeTemplate access-individual:SubjectRole .
 
 :RolePublishClassValueContainerTemplate a access:ValueContainerTemplate ;
-    access:relatedValueSet :AccessObjectUriCheck ;
+    access:relatedCheck :AccessObjectUriCheck ;
 #    access:defaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 

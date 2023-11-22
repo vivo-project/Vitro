@@ -149,9 +149,9 @@
     rdfs:domain :Check ;
     rdfs:range :ValueContainer .
 
-:relatedValueSet a owl:ObjectProperty ;
-    rdfs:comment "Specify :Check into which new ValueContainer should be added";
-    rdfs:label "related value set"@en-US ;
+:relatedCheck a owl:ObjectProperty ;
+    rdfs:comment "Specifies :Check into which new ValueContainer should be added";
+    rdfs:label "related check"@en-US ;
     rdfs:domain :ValueContainerTemplate ;
     rdfs:range :Check .
 
