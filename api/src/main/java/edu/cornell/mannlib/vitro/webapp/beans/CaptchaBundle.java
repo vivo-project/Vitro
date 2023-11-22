@@ -2,6 +2,13 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Objects;
 
+/**
+ * Represents a bundle containing a CAPTCHA image in Base64 format, the associated code,
+ * and a unique challenge identifier.
+ *
+ * @author Ivan Mrsulja
+ * @version 1.0
+ */
 public class CaptchaBundle {
 
     private final String b64Image;

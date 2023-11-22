@@ -1,13 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +30,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+
+/**
+ * This class provides services related to CAPTCHA challenges and reCAPTCHA validation.
+ * It includes methods for generating CAPTCHA challenges, validating reCAPTCHA responses,
+ * and managing CAPTCHA challenges for specific hosts.
+ *
+ * @author Ivan Mrsulja
+ * @version 1.0
+ */
 public class CaptchaServiceBean {
 
     private static final SecureRandom random = new SecureRandom();
@@ -42,6 +48,13 @@ public class CaptchaServiceBean {
     private static final ConcurrentHashMap<String, CaptchaBundle> captchaChallenges = new ConcurrentHashMap<>();
 
 
+    /**
+     * Validates a reCAPTCHA response using Google's reCAPTCHA API.
+     *
+     * @param recaptchaResponse The reCAPTCHA response to validate.
+     * @param vreq              The VitroRequest associated with the validation.
+     * @return True if the reCAPTCHA response is valid, false otherwise.
+     */
     public static boolean validateReCaptcha(String recaptchaResponse, VitroRequest vreq) {
         String secretKey =
             Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.secretKey"),
@@ -66,6 +79,13 @@ public class CaptchaServiceBean {
         return false;
     }
 
+    /**
+     * Generates a new CAPTCHA challenge using the nanocaptcha library.
+     *
+     * @return A CaptchaBundle containing the CAPTCHA image in Base64 format, the content,
+     * and a unique identifier.
+     * @throws IOException If an error occurs during image conversion.
+     */
     public static CaptchaBundle generateChallenge() throws IOException {
         ImageCaptcha imageCaptcha =
             new ImageCaptcha.Builder(200, 75)
@@ -81,6 +101,15 @@ public class CaptchaServiceBean {
             UUID.randomUUID().toString());
     }
 
+    /**
+     * Retrieves a CAPTCHA challenge for a specific host based on the provided CAPTCHA ID
+     * and remote address. Removes the challenge from the storage after retrieval.
+     *
+     * @param captchaId     The CAPTCHA ID to match.
+     * @param remoteAddress The remote address associated with the host.
+     * @return An Optional containing the CaptchaBundle if a matching challenge is found,
+     * or an empty Optional otherwise.
+     */
     public static Optional<CaptchaBundle> getChallenge(String captchaId, String remoteAddress) {
         CaptchaBundle challengeForHost = captchaChallenges.getOrDefault(remoteAddress, new CaptchaBundle("", "", ""));
         captchaChallenges.remove(remoteAddress);
@@ -92,10 +121,22 @@ public class CaptchaServiceBean {
         return Optional.of(challengeForHost);
     }
 
+    /**
+     * Gets the map containing CAPTCHA challenges for different hosts.
+     *
+     * @return A ConcurrentHashMap with host addresses as keys and CaptchaBundle objects as values.
+     */
     public static ConcurrentHashMap<String, CaptchaBundle> getCaptchaChallenges() {
         return captchaChallenges;
     }
 
+    /**
+     * Converts a BufferedImage object to Base64 format.
+     *
+     * @param image The BufferedImage to convert.
+     * @return The Base64-encoded string representation of the image.
+     * @throws IOException If an error occurs during image conversion.
+     */
     private static String convertToBase64(BufferedImage image) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "png", baos);
@@ -104,6 +145,11 @@ public class CaptchaServiceBean {
         return Base64.getEncoder().encodeToString(imageBytes);
     }
 
+    /**
+     * Generates a random Color object.
+     *
+     * @return A randomly generated Color object.
+     */
     private static Color getRandomColor() {
         int r = random.nextInt(256);
         int g = random.nextInt(256);

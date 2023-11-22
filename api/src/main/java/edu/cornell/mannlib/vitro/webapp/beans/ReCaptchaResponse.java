@@ -2,6 +2,14 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Date;
 
+/**
+ * Represents the response from Google's reCAPTCHA API.
+ * It includes information about the success of the reCAPTCHA verification,
+ * the timestamp of the challenge, and the hostname associated with the verification.
+ *
+ * @author Ivan Mrsulja
+ * @version 1.0
+ */
 public class ReCaptchaResponse {
 
     private boolean success;
