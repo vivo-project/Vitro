@@ -19,19 +19,19 @@
 :SubjectRoleOneOfEditorsCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:SubjectRole ;
-    access:singleValue auth:ADMIN ;
-    access:singleValue auth:CURATOR ;
-    access:singleValue auth:EDITOR .
+    access:value auth:ADMIN ;
+    access:value auth:CURATOR ;
+    access:value auth:EDITOR .
 
 :SubjectRoleIsSelfEditor a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:singleValue auth:SELF_EDITOR .
+    access:value auth:SELF_EDITOR .
 
 :IsAddOperation a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:singleValue access-individual:AddOperation .
+    access:value access-individual:AddOperation .
 
 :AllowEditRelatedPagesRule a access:Rule;
     access:check :SubjectRoleIsSelfEditor ;
@@ -44,22 +44,22 @@
 :PredicateIsSomePredicate a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:singleValue :SomeUri .
+    access:value :SomeUri .
 
 :ObjectUriIsSomeUri a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:StatementObjectUri ;
-    access:singleValue :SomeUri .
+    access:value :SomeUri .
 
 :SubjectUriIsProfileRelatedResource a access:Check ;
     access:operator access-individual:SparqlSelectQueryContains ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:singleValue access-individual:PersonProfileProximityToResourceUri .
+    access:value access-individual:PersonProfileProximityToResourceUri .
 
 :IsObjectPropertyStatement a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:singleValue access-individual:ObjectPropertyStatement .
+    access:value access-individual:ObjectPropertyStatement .
 
 :SomeUri a access:AttributeValue ;
     access:id "?SOME_URI" .

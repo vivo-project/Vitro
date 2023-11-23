@@ -103,7 +103,7 @@
 :IsExecuteOperation a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:singleValue access-individual:ExecuteOperation .
+    access:value access-individual:ExecuteOperation .
 
 :PermissionNameAllowed a access:Check ;
     access:operator access-individual:OneOf ;
@@ -117,7 +117,7 @@
 :IsSimplePermission a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:singleValue access-individual:NamedObject .
+    access:value access-individual:NamedObject .
 
 :PublicSimplePermissionValueSet a access:ValueSet ;
     access:containerType access-individual:NamedObject .

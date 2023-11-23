@@ -47,12 +47,12 @@
 :IsObjectPropertyStatement a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:singleValue access-individual:ObjectPropertyStatement .
+    access:value access-individual:ObjectPropertyStatement .
 
 :IsDataPropertyStatement a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:singleValue access-individual:DataPropertyStatement .
+    access:value access-individual:DataPropertyStatement .
 
 ### Not modifiable property statement attributes
 :PredicateUriStartWithProhibitedNamespace a access:Check ;
