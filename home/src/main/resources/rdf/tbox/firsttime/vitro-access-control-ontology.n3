@@ -141,7 +141,7 @@
     rdfs:comment "Type of values for new value set";
     rdfs:label "set type template"@en-US ;
     rdfs:range [ a owl:Class ; owl:unionOf  ( :Attribute :ObjectType ) ] ;
-    rdfs:domain :ValueSetTemplate .
+    rdfs:domain [ a owl:Class ; owl:unionOf ( :ValueSet :ValueSetTemplate ) ] .
 
 :attributeValue a owl:ObjectProperty ;
     rdfs:comment "Check contains value set";
@@ -191,12 +191,6 @@
     rdfs:label "policy data set"@en-US ;
     rdfs:domain :PolicyTemplate ;
     rdfs:range :PolicyDataSet .
-
-:containerType a owl:ObjectProperty ;
-    rdfs:comment "Specifies type of set values";
-    rdfs:label "set type"@en-US ;
-    rdfs:domain :ValueSet ;
-    rdfs:range :ObjectType .
 
 :rule a owl:ObjectProperty ;
     rdfs:comment "Contains a rule";

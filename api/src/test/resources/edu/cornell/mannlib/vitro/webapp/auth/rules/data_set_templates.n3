@@ -76,4 +76,4 @@
     access:keyComponent auth:PUBLIC .
 
 access-individual:PublicSimplePermissionValueSet a access:ValueSet ;
-    access:containerType access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .

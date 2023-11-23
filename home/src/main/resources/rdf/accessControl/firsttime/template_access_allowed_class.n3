@@ -356,43 +356,43 @@
     .
 
 :AdminPublishClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :AdminDisplayClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :AdminUpdateClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :CuratorPublishClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :CuratorDisplayClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :CuratorUpdateClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :EditorPublishClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :EditorDisplayClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :EditorUpdateClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :SelfEditorPublishClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :SelfEditorDisplayClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :SelfEditorUpdateClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :PublicDisplayClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 :PublicUpdateClassValueSet a access:ValueSet ;
-    access:containerType access-individual:Class .
+    access:containsElementsOfType access-individual:Class .

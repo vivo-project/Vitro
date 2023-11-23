@@ -120,15 +120,15 @@
     access:value access-individual:NamedObject .
 
 :PublicSimplePermissionValueSet a access:ValueSet ;
-    access:containerType access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 :SelfEditorSimplePermissionValueSet a access:ValueSet ;
-    access:containerType access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 :EditorSimplePermissionValueSet a access:ValueSet ;
-    access:containerType access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 :CuratorSimplePermissionValueSet a access:ValueSet ;
-    access:containerType access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 :AdminSimplePermissionValueSet a access:ValueSet ;
-    access:containerType access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 
 :SubjectRoleEqualsDataSetRole a access:Check ;
     access:operator access-individual:Equals ;
