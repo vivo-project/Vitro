@@ -108,11 +108,11 @@
 :PermissionNameAllowed a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:attributeValue :PublicSimplePermissionValueSet ;
-    access:attributeValue :SelfEditorSimplePermissionValueSet ;
-    access:attributeValue :EditorSimplePermissionValueSet ;
-    access:attributeValue :CuratorSimplePermissionValueSet ;
-    access:attributeValue :AdminSimplePermissionValueSet .
+    access:values :PublicSimplePermissionValueSet ;
+    access:values :SelfEditorSimplePermissionValueSet ;
+    access:values :EditorSimplePermissionValueSet ;
+    access:values :CuratorSimplePermissionValueSet ;
+    access:values :AdminSimplePermissionValueSet .
 
 :IsSimplePermission a access:Check ;
     access:operator access-individual:Equals ;
@@ -133,9 +133,9 @@
 :SubjectRoleEqualsDataSetRole a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:attributeValue access-individual:PublicRoleValueSet ;
-    access:attributeValue access-individual:SelfEditorRoleValueSet ;
-    access:attributeValue access-individual:EditorRoleValueSet ;
-    access:attributeValue access-individual:CuratorRoleValueSet ;
-    access:attributeValue access-individual:AdminRoleValueSet .
+    access:values access-individual:PublicRoleValueSet ;
+    access:values access-individual:SelfEditorRoleValueSet ;
+    access:values access-individual:EditorRoleValueSet ;
+    access:values access-individual:CuratorRoleValueSet ;
+    access:values access-individual:AdminRoleValueSet .
 

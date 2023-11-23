@@ -58,32 +58,32 @@
 :PredicateUriStartWithProhibitedNamespace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:attributeValue :ProhibitedNamespaceValueSet .
+    access:values :ProhibitedNamespaceValueSet .
 
 :PredicateNotANamespaceException a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:attributeValue :ProhibitedNamespaceExceptionsValueSet .
+    access:values :ProhibitedNamespaceExceptionsValueSet .
 
 :SubjectUriStartWithProhibitedNamespace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:attributeValue :ProhibitedNamespaceValueSet .
+    access:values :ProhibitedNamespaceValueSet .
 
 :StatementSubjectNotOneOfProhibitedExceptions a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:attributeValue :ProhibitedNamespaceExceptionsValueSet .
+    access:values :ProhibitedNamespaceExceptionsValueSet .
 
 :StatementObjectUriStartsWithProhibitedNameSpace a access:Check ;
     access:operator access-individual:StartsWith ;
     access:attribute access-individual:StatementObjectUri ;
-    access:attributeValue :ProhibitedNamespaceValueSet .
+    access:values :ProhibitedNamespaceValueSet .
 
 :ObjectUriNotOneOfProhibitedExceptions a access:Check ;
     access:operator access-individual:NotOneOf ;
     access:attribute access-individual:StatementObjectUri ;
-    access:attributeValue :ProhibitedNamespaceExceptionsValueSet .
+    access:values :ProhibitedNamespaceExceptionsValueSet .
 
 :NotModifiableStatementsPolicyDataSet a access:PolicyDataSet ;
     access:dataSetValues :ProhibitedNamespaceExceptionsValueSet ;

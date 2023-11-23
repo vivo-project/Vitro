@@ -214,10 +214,10 @@
 :AccessObjectTypeCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:attributeValue access-individual:ObjectPropertyValueSet ;
-    access:attributeValue access-individual:DataPropertyValueSet ;
-    access:attributeValue access-individual:FauxObjectPropertyValueSet ;
-    access:attributeValue access-individual:FauxDataPropertyValueSet ;
+    access:values access-individual:ObjectPropertyValueSet ;
+    access:values access-individual:DataPropertyValueSet ;
+    access:values access-individual:FauxObjectPropertyValueSet ;
+    access:values access-individual:FauxDataPropertyValueSet ;
     .
 
 :AllowMatchingPropertyStatement a access:Rule;
@@ -236,61 +236,61 @@
 :AccessObjectStatementTypeCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:attributeValue access-individual:ObjectPropertyStatementValueSet ;
-    access:attributeValue access-individual:DataPropertyStatementValueSet ;
-    access:attributeValue access-individual:FauxObjectPropertyStatementValueSet ;
-    access:attributeValue access-individual:FauxDataPropertyStatementValueSet ;
+    access:values access-individual:ObjectPropertyStatementValueSet ;
+    access:values access-individual:DataPropertyStatementValueSet ;
+    access:values access-individual:FauxObjectPropertyStatementValueSet ;
+    access:values access-individual:FauxDataPropertyStatementValueSet ;
     .
 
 :OperationCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:attributeValue access-individual:AddOperationValueSet ;
-    access:attributeValue access-individual:DropOperationValueSet ;
-    access:attributeValue access-individual:EditOperationValueSet ;
+    access:values access-individual:AddOperationValueSet ;
+    access:values access-individual:DropOperationValueSet ;
+    access:values access-individual:EditOperationValueSet ;
     .
 
 :SubjectRoleCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:attributeValue access-individual:SelfEditorRoleValueSet .
+    access:values access-individual:SelfEditorRoleValueSet .
 
 :StatementPredicateCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:attributeValue :SelfEditorAddObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorAddDataPropertyValueSet ;
-    access:attributeValue :SelfEditorAddFauxObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorAddFauxDataPropertyValueSet ;
+    access:values :SelfEditorAddObjectPropertyValueSet ;
+    access:values :SelfEditorAddDataPropertyValueSet ;
+    access:values :SelfEditorAddFauxObjectPropertyValueSet ;
+    access:values :SelfEditorAddFauxDataPropertyValueSet ;
 
-    access:attributeValue :SelfEditorEditObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorEditDataPropertyValueSet ;
-    access:attributeValue :SelfEditorEditFauxObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorEditFauxDataPropertyValueSet ;
+    access:values :SelfEditorEditObjectPropertyValueSet ;
+    access:values :SelfEditorEditDataPropertyValueSet ;
+    access:values :SelfEditorEditFauxObjectPropertyValueSet ;
+    access:values :SelfEditorEditFauxDataPropertyValueSet ;
 
-    access:attributeValue :SelfEditorDropObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorDropDataPropertyValueSet ;
-    access:attributeValue :SelfEditorDropFauxObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorDropFauxDataPropertyValueSet ;
+    access:values :SelfEditorDropObjectPropertyValueSet ;
+    access:values :SelfEditorDropDataPropertyValueSet ;
+    access:values :SelfEditorDropFauxObjectPropertyValueSet ;
+    access:values :SelfEditorDropFauxDataPropertyValueSet ;
     .
 
 :AccessObjectUriCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
-    access:attributeValue :SelfEditorAddObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorAddDataPropertyValueSet ;
-    access:attributeValue :SelfEditorAddFauxObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorAddFauxDataPropertyValueSet ;
+    access:values :SelfEditorAddObjectPropertyValueSet ;
+    access:values :SelfEditorAddDataPropertyValueSet ;
+    access:values :SelfEditorAddFauxObjectPropertyValueSet ;
+    access:values :SelfEditorAddFauxDataPropertyValueSet ;
 
-    access:attributeValue :SelfEditorEditObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorEditDataPropertyValueSet ;
-    access:attributeValue :SelfEditorEditFauxObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorEditFauxDataPropertyValueSet ;
+    access:values :SelfEditorEditObjectPropertyValueSet ;
+    access:values :SelfEditorEditDataPropertyValueSet ;
+    access:values :SelfEditorEditFauxObjectPropertyValueSet ;
+    access:values :SelfEditorEditFauxDataPropertyValueSet ;
 
-    access:attributeValue :SelfEditorDropObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorDropDataPropertyValueSet ;
-    access:attributeValue :SelfEditorDropFauxObjectPropertyValueSet ;
-    access:attributeValue :SelfEditorDropFauxDataPropertyValueSet ;
+    access:values :SelfEditorDropObjectPropertyValueSet ;
+    access:values :SelfEditorDropDataPropertyValueSet ;
+    access:values :SelfEditorDropFauxObjectPropertyValueSet ;
+    access:values :SelfEditorDropFauxDataPropertyValueSet ;
     .
 
 :SelfEditorAddObjectPropertyValueSet a access:ValueSet ;
