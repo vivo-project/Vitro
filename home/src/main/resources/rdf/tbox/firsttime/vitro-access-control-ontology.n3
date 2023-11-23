@@ -143,9 +143,9 @@
     rdfs:range [ a owl:Class ; owl:unionOf  ( :Attribute :ObjectType ) ] ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( :ValueSet :ValueSetTemplate ) ] .
 
-:attributeValue a owl:ObjectProperty ;
-    rdfs:comment "Check contains value set";
-    rdfs:label "attribute value"@en-US ;
+:values a owl:ObjectProperty ;
+    rdfs:comment "Multiple values";
+    rdfs:label "values"@en-US ;
     rdfs:domain :Check ;
     rdfs:range :ValueSet .
 
