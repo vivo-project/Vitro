@@ -3,8 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.ValueSetFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import org.apache.jena.query.QuerySolution;

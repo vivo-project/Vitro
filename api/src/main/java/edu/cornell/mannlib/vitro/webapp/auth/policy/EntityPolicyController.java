@@ -14,9 +14,9 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSetRegistry;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
