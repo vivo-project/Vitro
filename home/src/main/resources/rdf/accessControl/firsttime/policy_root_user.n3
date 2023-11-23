@@ -6,10 +6,10 @@
 
 :Policy a access:Policy ;
     access:priority 10000 ;
-    access:rule :AllowRootUserRule .
+    access:hasRule :AllowRootUserRule .
 
 :AllowRootUserRule a access:Rule;
-    access:check :IsRootUserCheck .
+    access:requiresCheck :IsRootUserCheck .
 
 :IsRootUserCheck a access:Check ;
     access:operator access-individual:Equals ;

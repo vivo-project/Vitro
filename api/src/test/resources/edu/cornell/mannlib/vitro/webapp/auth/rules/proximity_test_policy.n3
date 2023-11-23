@@ -9,10 +9,10 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:ProximityTestPolicy rdf:type access:Policy ;
-    access:rule access-individual:AllowPersonEditOwnPublication .
+    access:hasRule access-individual:AllowPersonEditOwnPublication .
           
 access-individual:AllowPersonEditOwnPublication rdf:type access:Rule ;
-    access:check access-individual:PublicationInProximityAttribute .
+    access:requiresCheck access-individual:PublicationInProximityAttribute .
           
 access-individual:PublicationInProximityAttribute rdf:type access:Check ;
     access:operator access-individual:SparqlSelectQueryContains ;

@@ -8,7 +8,7 @@
 
 :PolicyTemplate a access:PolicyTemplate ;
     access:priority 1000 ;
-    access:rule :AllowSimplePermission ;
+    access:hasRule :AllowSimplePermission ;
     access:policyDataSetTemplate :RoleDataSetTemplate ;
     access:policyDataSet :PublicDataSet ;
     access:policyDataSet :SelfEditorDataSet ;
@@ -95,10 +95,10 @@
     access:keyComponent auth:ADMIN .
 
 :AllowSimplePermission a access:Rule;
-    access:check :IsSimplePermission ;
-    access:check :IsExecuteOperation ;
-    access:check :PermissionNameAllowed ;
-    access:check :SubjectRoleEqualsDataSetRole .
+    access:requiresCheck :IsSimplePermission ;
+    access:requiresCheck :IsExecuteOperation ;
+    access:requiresCheck :PermissionNameAllowed ;
+    access:requiresCheck :SubjectRoleEqualsDataSetRole .
 
 :IsExecuteOperation a access:Check ;
     access:operator access-individual:Equals ;

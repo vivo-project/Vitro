@@ -10,10 +10,10 @@
 
 access-individual:KeyTestPolicy rdf:type access:Policy ;
     access:policyKey access-individual:PolicyKeyTest ;
-    access:rule access-individual:KeyTestRule .
+    access:hasRule access-individual:KeyTestRule .
     
 access-individual:KeyTestRule rdf:type access:Rule ;
-    access:check access-individual:KeyTestAttribute .
+    access:requiresCheck access-individual:KeyTestAttribute .
     
 access-individual:KeyTestAttribute rdf:type access:Check ;
     access:operator access-individual:Equals ;

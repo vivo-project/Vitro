@@ -9,11 +9,11 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:BrokenPolicyType rdf:type access:Policy ;
-    access:rule access-individual:BrokenTestRule .
+    access:hasRule access-individual:BrokenTestRule .
   
 access-individual:BrokenTestRule rdf:type access:Rule ;
-    access:check access-individual:ValidTestAttribute ;
-    access:check access-individual:BrokenTestAttribute .
+    access:requiresCheck access-individual:ValidTestAttribute ;
+    access:requiresCheck access-individual:BrokenTestAttribute .
   
 access-individual:BrokenTestAttribute rdf:type access:Check ;
     access:operator access-individual:Equals ;

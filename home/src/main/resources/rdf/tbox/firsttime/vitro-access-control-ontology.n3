@@ -55,9 +55,9 @@
     rdfs:comment "Attribute to check";
     rdfs:label "Attribute"@en-US .
 
-:AttributeValue a owl:Class ;
-    rdfs:comment "Resource represents single attribute value, usually specified as literal with :id ";
-    rdfs:label "Attribute value"@en-US .
+:Value a owl:Class ;
+    rdfs:comment "Resource represents single value, usually specified as literal with :id ";
+    rdfs:label "Value"@en-US .
 
 :Decision a owl:Class ;
     rdfs:comment "Decision to return in case all checks in a rule match";
@@ -89,7 +89,7 @@
     owl:FunctionalProperty ;
     rdfs:comment "Set string identifier";
     rdfs:range xsd:string ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Operator :Operation :Decision :AttributeValue :SubjectType :Attribute :ObjectType ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Operator :Operation :Decision :Value :SubjectType :Attribute :ObjectType ) ] ;
     rdfs:label "id"@en-US .
 
 :priority a owl:DatatypeProperty ,
@@ -115,7 +115,7 @@
     rdfs:range :ValueSet .
 
 :value a owl:ObjectProperty ;
-    rdfs:comment "Assign one value (any URI or :AttributeValue with :id to define literal value)";
+    rdfs:comment "Assign one value (any URI or :Value with :id to define literal value)";
     rdfs:label "value"@en-US ;
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSet :Check ) ] .
 
@@ -174,9 +174,9 @@
     rdfs:domain :DataSetTemplateKey ;
     rdfs:range :Attribute .
 
-:check a owl:ObjectProperty ;
-    rdfs:comment "contains check";
-    rdfs:label "check"@en-US ;
+:requiresCheck a owl:ObjectProperty ;
+    rdfs:comment "Requires check";
+    rdfs:label "requires check"@en-US ;
     rdfs:domain :Rule ;
     rdfs:range :Check .
 
@@ -192,9 +192,9 @@
     rdfs:domain :PolicyTemplate ;
     rdfs:range :PolicyDataSet .
 
-:rule a owl:ObjectProperty ;
-    rdfs:comment "Contains a rule";
-    rdfs:label "rule"@en-US ;
+:hasRule a owl:ObjectProperty ;
+    rdfs:comment "Assgins a rule to a policy or policy template";
+    rdfs:label "has rule"@en-US ;
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate ) ] ;
     rdfs:range :Rule .
 

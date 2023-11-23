@@ -6,15 +6,15 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-individual-pages/> .
 
 :Policy a access:Policy ;
-    access:rule :AllowEditRelatedPagesRule ;
-    access:rule :AllowEditIndividualPagesRule .
+    access:hasRule :AllowEditRelatedPagesRule ;
+    access:hasRule :AllowEditIndividualPagesRule .
 
 :AllowEditIndividualPagesRule a access:Rule;
-    access:check :SubjectRoleOneOfEditorsCheck ;
-    access:check :IsAddOperation ;
-    access:check :IsObjectPropertyStatement ;
-    access:check :ObjectUriIsSomeUri ;
-    access:check :PredicateIsSomePredicate .
+    access:requiresCheck :SubjectRoleOneOfEditorsCheck ;
+    access:requiresCheck :IsAddOperation ;
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :ObjectUriIsSomeUri ;
+    access:requiresCheck :PredicateIsSomePredicate .
 
 :SubjectRoleOneOfEditorsCheck a access:Check ;
     access:operator access-individual:OneOf ;
@@ -34,12 +34,12 @@
     access:value access-individual:AddOperation .
 
 :AllowEditRelatedPagesRule a access:Rule;
-    access:check :SubjectRoleIsSelfEditor ;
-    access:check :SubjectUriIsProfileRelatedResource ;
-    access:check :IsAddOperation ;
-    access:check :IsObjectPropertyStatement ;
-    access:check :ObjectUriIsSomeUri ;
-    access:check :PredicateIsSomePredicate .
+    access:requiresCheck :SubjectRoleIsSelfEditor ;
+    access:requiresCheck :SubjectUriIsProfileRelatedResource ;
+    access:requiresCheck :IsAddOperation ;
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :ObjectUriIsSomeUri ;
+    access:requiresCheck :PredicateIsSomePredicate .
 
 :PredicateIsSomePredicate a access:Check ;
     access:operator access-individual:Equals ;
@@ -61,8 +61,8 @@
     access:attribute access-individual:AccessObjectType ;
     access:value access-individual:ObjectPropertyStatement .
 
-:SomeUri a access:AttributeValue ;
+:SomeUri a access:Value ;
     access:id "?SOME_URI" .
 
-:SomeLiteral a access:AttributeValue ;
+:SomeLiteral a access:Value ;
     access:id "?SOME_LITERAL" .

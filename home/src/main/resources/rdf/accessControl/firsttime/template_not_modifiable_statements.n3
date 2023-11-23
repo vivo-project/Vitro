@@ -7,42 +7,42 @@
 :PolicyTemplate a access:PolicyTemplate ;
     access:priority 8000 ;
     access:policyDataSet :NotModifiableStatementsPolicyDataSet ;
-    access:rule :RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
-    access:rule :RestrictObjectPropertyStatementsWithNotModifiableSubject ;
-    access:rule :RestrictObjectPropertyStatementsWithNotModifiableObject ;
-    access:rule :RestrictDataPropertyStatementsWithNotModifiableSubject ;
-    access:rule :RestrictDataPropertyStatementsWithNotModifiablePredicate ;
+    access:hasRule :RestrictObjectPropertyStatementsWithNotModifiablePredicate ;
+    access:hasRule :RestrictObjectPropertyStatementsWithNotModifiableSubject ;
+    access:hasRule :RestrictObjectPropertyStatementsWithNotModifiableObject ;
+    access:hasRule :RestrictDataPropertyStatementsWithNotModifiableSubject ;
+    access:hasRule :RestrictDataPropertyStatementsWithNotModifiablePredicate ;
     .
 
 :RestrictObjectPropertyStatementsWithNotModifiableSubject a access:Rule ;
     access:decision access-individual:Deny ;
-    access:check :IsObjectPropertyStatement ;
-    access:check :SubjectUriStartWithProhibitedNamespace ;
-    access:check :StatementSubjectNotOneOfProhibitedExceptions .
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :SubjectUriStartWithProhibitedNamespace ;
+    access:requiresCheck :StatementSubjectNotOneOfProhibitedExceptions .
 
 :RestrictObjectPropertyStatementsWithNotModifiablePredicate a access:Rule ;
     access:decision access-individual:Deny ;
-    access:check :IsObjectPropertyStatement ;
-    access:check :PredicateUriStartWithProhibitedNamespace ;
-    access:check :PredicateNotANamespaceException .
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :PredicateUriStartWithProhibitedNamespace ;
+    access:requiresCheck :PredicateNotANamespaceException .
 
 :RestrictObjectPropertyStatementsWithNotModifiableObject a access:Rule ;
     access:decision access-individual:Deny ;
-    access:check :IsObjectPropertyStatement ;
-    access:check :StatementObjectUriStartsWithProhibitedNameSpace ;
-    access:check :ObjectUriNotOneOfProhibitedExceptions .
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :StatementObjectUriStartsWithProhibitedNameSpace ;
+    access:requiresCheck :ObjectUriNotOneOfProhibitedExceptions .
 
 :RestrictDataPropertyStatementsWithNotModifiableSubject a access:Rule ;
     access:decision access-individual:Deny ;
-    access:check :IsDataPropertyStatement ;
-    access:check :SubjectUriStartWithProhibitedNamespace ;
-    access:check :StatementSubjectNotOneOfProhibitedExceptions .
+    access:requiresCheck :IsDataPropertyStatement ;
+    access:requiresCheck :SubjectUriStartWithProhibitedNamespace ;
+    access:requiresCheck :StatementSubjectNotOneOfProhibitedExceptions .
 
 :RestrictDataPropertyStatementsWithNotModifiablePredicate a access:Rule ;
     access:decision access-individual:Deny ;
-    access:check :IsDataPropertyStatement ;
-    access:check :PredicateUriStartWithProhibitedNamespace ;
-    access:check :PredicateNotANamespaceException .
+    access:requiresCheck :IsDataPropertyStatement ;
+    access:requiresCheck :PredicateUriStartWithProhibitedNamespace ;
+    access:requiresCheck :PredicateNotANamespaceException .
 
 :IsObjectPropertyStatement a access:Check ;
     access:operator access-individual:Equals ;
@@ -110,6 +110,6 @@
     access:value  :prohibitedNamespacePrefix ; 
     .
 
-:prohibitedNamespacePrefix a access:AttributeValue ;
+:prohibitedNamespacePrefix a access:Value ;
     access:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;
     

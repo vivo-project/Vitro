@@ -9,10 +9,10 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:ValidTestPolicy rdf:type access:Policy ;
-    access:rule access-individual:ValidRule .
+    access:hasRule access-individual:ValidRule .
     
 access-individual:ValidRule rdf:type access:Rule ;
-    access:check access-individual:ValidAttribute .
+    access:requiresCheck access-individual:ValidAttribute .
     
 access-individual:ValidAttribute rdf:type access:Check ;
     access:operator access-individual:Equals ;
