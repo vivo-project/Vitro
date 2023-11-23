@@ -156,7 +156,7 @@ public class PolicyLoader {
             + "      ?attributeValue access:value ?value .\n"
             + "      ?dataSet access:dataSetValues ?attributeValue .\n"
             + "      OPTIONAL {\n"
-            + "        ?attributeValue access:containerType ?setElementsTypeUri .\n"
+            + "        ?attributeValue access:containsElementsOfType ?setElementsTypeUri .\n"
             + "        ?setElementsTypeUri access:id ?setElementsType ."
             + "      }\n"
             + "      OPTIONAL {?value access:id ?lit_value . }\n"
@@ -180,7 +180,7 @@ public class PolicyLoader {
             + "  ?" + POLICY + " access:policyDataSet ?dataSet .\n"
             + "  ?dataSet access:dataSetKey ?dataSetKeyUri .\n"
             + "  ?dataSet access:dataSetValues ?valueSet .\n"
-            + "  ?valueSet access:containerType ?setElementsType .\n"
+            + "  ?valueSet access:containsElementsOfType ?setElementsType .\n"
             + "  ?setElementsType access:id ?setElementsId .\n"
             + "  OPTIONAL { ?valueSet access:value ?value .\n"
             + "    OPTIONAL { ?value access:id ?valueId . }\n"
@@ -201,7 +201,7 @@ public class PolicyLoader {
             + "  ?dataSet access:dataSetKey ?dataSetKeyUri .\n"
             + "  ?" + POLICY + " access:policyDataSet ?dataSet . \n"
             + "  ?dataSet access:dataSetValues ?valueSet . \n"
-            + "  ?valueSet access:containerType ?setElementsTypeUri . \n"
+            + "  ?valueSet access:containsElementsOfType ?setElementsTypeUri . \n"
             + "  ?setElementsTypeUri access:id ?setElementsType . \n";
 
     private static final String policyStatementByKeyTemplateSuffix = "}}";
@@ -284,7 +284,7 @@ public class PolicyLoader {
             + "CONSTRUCT {\n"
             + "  ?relatedCheck access:attributeValue ?valueSet .\n"
             + "  ?valueSet a access:ValueSet .\n"
-            + "  ?valueSet access:containerType ?setElementsType .\n"
+            + "  ?valueSet access:containsElementsOfType ?setElementsType .\n"
             + "  ?valueSet access:value ?newRoleUri .\n"
             + "  ?valueSet access:value ?dataValue ."
             + "}\n"

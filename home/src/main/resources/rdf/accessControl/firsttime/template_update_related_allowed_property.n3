@@ -294,28 +294,28 @@
     .
 
 :SelfEditorAddObjectPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:ObjectProperty .
+    access:containsElementsOfType access-individual:ObjectProperty .
 :SelfEditorAddDataPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:DataProperty .
+    access:containsElementsOfType access-individual:DataProperty .
 :SelfEditorAddFauxObjectPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:FauxObjectProperty .
+    access:containsElementsOfType access-individual:FauxObjectProperty .
 :SelfEditorAddFauxDataPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:FauxDataProperty .
+    access:containsElementsOfType access-individual:FauxDataProperty .
 
 :SelfEditorEditObjectPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:ObjectProperty .
+    access:containsElementsOfType access-individual:ObjectProperty .
 :SelfEditorEditDataPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:DataProperty .
+    access:containsElementsOfType access-individual:DataProperty .
 :SelfEditorEditFauxObjectPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:FauxObjectProperty .
+    access:containsElementsOfType access-individual:FauxObjectProperty .
 :SelfEditorEditFauxDataPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:FauxDataProperty .
+    access:containsElementsOfType access-individual:FauxDataProperty .
 
 :SelfEditorDropObjectPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:ObjectProperty .
+    access:containsElementsOfType access-individual:ObjectProperty .
 :SelfEditorDropDataPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:DataProperty .
+    access:containsElementsOfType access-individual:DataProperty .
 :SelfEditorDropFauxObjectPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:FauxObjectProperty .
+    access:containsElementsOfType access-individual:FauxObjectProperty .
 :SelfEditorDropFauxDataPropertyValueSet a access:ValueSet ;
-    access:containerType access-individual:FauxDataProperty .
+    access:containsElementsOfType access-individual:FauxDataProperty .
