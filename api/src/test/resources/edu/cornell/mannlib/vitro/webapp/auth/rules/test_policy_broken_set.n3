@@ -11,11 +11,11 @@
 access-individual:BrokenTestSetPolicy rdf:type access:Policy ;
     access:policyDataSet access-individual:testDataSet1 ;
     access:policyDataSet access-individual:testDataSet2 ;
-    access:rule access-individual:BrokenRule .
+    access:hasRule access-individual:BrokenRule .
     
 access-individual:BrokenRule rdf:type access:Rule ;
-    access:check access-individual:BrokenSetAttribute1 ;
-    access:check access-individual:BrokenSetAttribute2 .
+    access:requiresCheck access-individual:BrokenSetAttribute1 ;
+    access:requiresCheck access-individual:BrokenSetAttribute2 .
     
 access-individual:BrokenSetAttribute1 rdf:type access:Check ;
     access:operator access-individual:NotOneOf ;

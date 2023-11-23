@@ -11,11 +11,11 @@
 access-individual:ValidTestSetPolicy rdf:type access:PolicyTemplate ;
     access:policyDataSet access-individual:testDataSet2 ;
     access:policyDataSet access-individual:testDataSet1 ;
-    access:rule access-individual:ValidRule .
+    access:hasRule access-individual:ValidRule .
     
 access-individual:ValidRule rdf:type access:Rule ;
-    access:check access-individual:ValidAttribute1 ;
-    access:check access-individual:ValidAttribute2 .
+    access:requiresCheck access-individual:ValidAttribute1 ;
+    access:requiresCheck access-individual:ValidAttribute2 .
     
 access-individual:ValidAttribute1 rdf:type access:Check ;
     access:operator access-individual:Equals ;

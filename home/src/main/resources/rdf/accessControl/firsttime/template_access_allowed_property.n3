@@ -6,8 +6,8 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-property/> .
 
 :PolicyTemplate a access:PolicyTemplate ;
-    access:rule :AllowMatchingPropertyStatement ;
-    access:rule :AllowMatchingProperty ;
+    access:hasRule :AllowMatchingPropertyStatement ;
+    access:hasRule :AllowMatchingProperty ;
 
     access:policyDataSet :PublicDisplayObjectPropertyDataSet ;
     access:policyDataSet :EditorDisplayObjectPropertyDataSet ;
@@ -1745,10 +1745,10 @@
     access:keyComponent access-individual:PublishOperation .
 
 :AllowMatchingProperty a access:Rule;
-    access:check :SubjectRoleEqualsDataSetRoleAttribute ;
-    access:check :OperationEqualsDataSetOperation ;
-    access:check :AccessObjectTypeEqualsDataSetValue ;
-    access:check :AccessObjectUriContainsInDataSet .
+    access:requiresCheck :SubjectRoleEqualsDataSetRoleAttribute ;
+    access:requiresCheck :OperationEqualsDataSetOperation ;
+    access:requiresCheck :AccessObjectTypeEqualsDataSetValue ;
+    access:requiresCheck :AccessObjectUriContainsInDataSet .
 
 :AccessObjectTypeEqualsDataSetValue a access:Check ;
     access:operator access-individual:Equals ;
@@ -1760,10 +1760,10 @@
     .
 
 :AllowMatchingPropertyStatement a access:Rule;
-    access:check :SubjectRoleEqualsDataSetRoleAttribute ;
-    access:check :OperationEqualsDataSetOperation ;
-    access:check :AccessObjectTypeStatementEquals ;
-    access:check :StatementPredicateEquals ;
+    access:requiresCheck :SubjectRoleEqualsDataSetRoleAttribute ;
+    access:requiresCheck :OperationEqualsDataSetOperation ;
+    access:requiresCheck :AccessObjectTypeStatementEquals ;
+    access:requiresCheck :StatementPredicateEquals ;
     .
 
 :AccessObjectTypeStatementEquals a access:Check ;

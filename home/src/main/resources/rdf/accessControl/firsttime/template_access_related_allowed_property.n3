@@ -6,8 +6,8 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/related-allowed-property/> .
 
 :PolicyTemplate a access:PolicyTemplate ;
-    access:rule :AllowMatchingPropertyStatement ;
-    access:rule :AllowMatchingProperty ;
+    access:hasRule :AllowMatchingPropertyStatement ;
+    access:hasRule :AllowMatchingProperty ;
 
     access:policyDataSet :SelfEditorDisplayObjectPropertyDataSet ;
     access:policyDataSet :SelfEditorDisplayDataPropertyDataSet ;
@@ -140,10 +140,10 @@
     access:keyComponent access-individual:PublishOperation .
 
 :AllowMatchingProperty a access:Rule;
-    access:check :SubjectRoleCheck ;
-    access:check :OperationCheck ;
-    access:check :AccessObjectTypeCheck ;
-    access:check :AccessObjectUriCheck .
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectTypeCheck ;
+    access:requiresCheck :AccessObjectUriCheck .
 
 :AccessObjectTypeCheck a access:Check ;
     access:operator access-individual:Equals ;
@@ -155,10 +155,10 @@
     .
 
 :AllowMatchingPropertyStatement a access:Rule;
-    access:check :SubjectRoleCheck ;
-    access:check :OperationCheck ;
-    access:check :AccessObjectStatementTypeCheck ;
-    access:check :StatementPredicateCheck ;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectStatementTypeCheck ;
+    access:requiresCheck :StatementPredicateCheck ;
     .
 
 :AccessObjectStatementTypeCheck a access:Check ;
