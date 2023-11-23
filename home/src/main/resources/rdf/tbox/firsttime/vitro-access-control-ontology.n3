@@ -120,7 +120,7 @@
 :value a owl:ObjectProperty ;
     rdfs:comment "Assign one value (any URI or :AttributeValuePattern with :id to define literal value)";
     rdfs:label "value"@en-US ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSet :Check ) ] .
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSetTemplate :ValueSet :Check ) ] .
 
 :operator a owl:ObjectProperty ;
     rdfs:comment "Set type of check to perform";
@@ -133,11 +133,6 @@
     rdfs:label "attribute"@en-US ;
     rdfs:domain :Check ;
     rdfs:range :AttributeType .
-
-:hasDefaultValue a owl:ObjectProperty ;
-    rdfs:comment "default value to add into new value set";
-    rdfs:label "has default value"@en-US ;
-    rdfs:domain :ValueSetTemplate .
 
 :containsElementsOfType a owl:ObjectProperty ,
     owl:FunctionalProperty ;
