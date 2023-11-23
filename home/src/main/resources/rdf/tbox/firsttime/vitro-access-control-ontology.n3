@@ -40,22 +40,25 @@
     rdfs:label "Operator"@en-US .
 
 :Operation a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
     rdfs:comment "Access operation";
     rdfs:label "Operation"@en-US .
 
 :ObjectType a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
     rdfs:comment "Type of access object";
     rdfs:label "Object type"@en-US .
 
 :SubjectType a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
     rdfs:comment "Type of subject(user, non-personal entity) requested access";
     rdfs:label "Subject type"@en-US .
 
 :AttributeType a owl:Class ;
-    rdfs:comment "Attribute to check";
-    rdfs:label "Attribute"@en-US .
+    rdfs:comment "Attribute type to check";
+    rdfs:label "Attribute type"@en-US .
 
-:Value a owl:Class ;
+:AttributeValuePattern a owl:Class ;
     rdfs:comment "Resource represents single value, usually specified as literal with :id ";
     rdfs:label "Value"@en-US .
 
@@ -89,7 +92,7 @@
     owl:FunctionalProperty ;
     rdfs:comment "Set string identifier";
     rdfs:range xsd:string ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Operator :Operation :Decision :Value :SubjectType :AttributeType :ObjectType ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Operator :Decision :AttributeValuePattern :AttributeType ) ] ;
     rdfs:label "id"@en-US .
 
 :priority a owl:DatatypeProperty ,
@@ -115,7 +118,7 @@
     rdfs:range :ValueSet .
 
 :value a owl:ObjectProperty ;
-    rdfs:comment "Assign one value (any URI or :Value with :id to define literal value)";
+    rdfs:comment "Assign one value (any URI or :AttributeValuePattern with :id to define literal value)";
     rdfs:label "value"@en-US ;
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSet :Check ) ] .
 
@@ -140,7 +143,7 @@
     owl:FunctionalProperty ;
     rdfs:comment "Type of values for new value set";
     rdfs:label "set type template"@en-US ;
-    rdfs:range [ a owl:Class ; owl:unionOf  ( :AttributeType :ObjectType ) ] ;
+    rdfs:range [ a owl:Class ; owl:unionOf  ( :AttributeType :AttributeValuePattern ) ] ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( :ValueSet :ValueSetTemplate ) ] .
 
 :values a owl:ObjectProperty ;
