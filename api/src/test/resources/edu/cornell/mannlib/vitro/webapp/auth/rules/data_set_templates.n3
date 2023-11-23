@@ -35,13 +35,13 @@
 
 :RoleValueSetTemplate1 a access:ValueSetTemplate ;
     access:relatedCheck :RoleValueSet;
-    access:containerTypeTemplate access-individual:SubjectRole .
+    access:containsElementsOfType access-individual:SubjectRole .
 
 :RolePermissionValueSetTemplate1 a access:ValueSetTemplate ;
     access:relatedCheck :TypeValueSet;
     access:defaultValue simplePermission:PageViewablePublic;
     access:defaultValue simplePermission:QueryFullModel ;
-    access:containerTypeTemplate access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 
 
 :RoleDataSetTemplate2 a access:DataSetTemplate ;
@@ -59,11 +59,11 @@
 
 :RoleValueSetTemplate2 a access:ValueSetTemplate ;
     access:relatedCheck :RoleValueSet;
-    access:containerTypeTemplate access-individual:SubjectRole .
+    access:containsElementsOfType access-individual:SubjectRole .
 
 :RolePermissionValueSetTemplate2 a access:ValueSetTemplate ;
     access:relatedCheck :TypeValueSet;
-    access:containerTypeTemplate access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 
 :PublicDataSet a access:PolicyDataSet ;
     access:dataSetKey :PublicDataSetKey ;
