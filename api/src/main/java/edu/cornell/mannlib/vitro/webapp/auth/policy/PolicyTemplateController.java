@@ -1,8 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_VOCABULARY_PREFIX;
+
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,8 +15,6 @@ import org.apache.jena.rdf.model.impl.StatementImpl;
 public class PolicyTemplateController {
 
     private static final Log log = LogFactory.getLog(PolicyTemplateController.class);
-    private static final String PREFIX_AO = "https://vivoweb.org/ontology/vitro-application/auth/vocabulary/";
-
     public static void createRoleDataSets(String roleUri) {
 
         // Execute sparql query to get all data set templates that have ao:templateKey access-individual:SubjectRole .
@@ -31,36 +32,48 @@ public class PolicyTemplateController {
         PolicyLoader policyLoader = PolicyLoader.getInstance();
         List<String> keys = policyLoader.getDataSetKeysFromTemplate(dataSetTemplateUri);
         List<String> keyTemplates = policyLoader.getDataSetKeyTemplatesFromTemplate(dataSetTemplateUri);
+
+        Model dataSetModel = VitroModelFactory.createModel();
+
         for (String keyTemplate : keyTemplates) {
             if (keyTemplate.equals("https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole")) {
-                keys.add(roleUri);
+                String roleKeyUri = dataSetUri + role + "RoleUri";
+                dataSetModel.add(new StatementImpl(dataSetModel.createResource(roleKeyUri),
+                        dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "id"),
+                        dataSetModel.createLiteral(roleUri)));
+                dataSetModel.add(new StatementImpl(dataSetModel.createResource(roleKeyUri),
+                        dataSetModel.createProperty(VitroVocabulary.RDF_TYPE),
+                        dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "SubjectRoleUri")));
+                keys.add(roleKeyUri);
             } else {
                 log.error(String.format("Not recognized key template found '%s'", keyTemplate));
                 return;
             }
         }
-        Model dataSetModel = VitroModelFactory.createModel();
         // Add ?dataSets ao:policyDataSet dataSetUri .
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetsUri),
-                dataSetModel.createProperty(PREFIX_AO + "policyDataSet"), dataSetModel.createResource(dataSetUri)));
+                dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "policyDataSet"),
+                dataSetModel.createResource(dataSetUri)));
 
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                 dataSetModel.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                dataSetModel.createResource(PREFIX_AO + "PolicyDataSet")));
+                dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "PolicyDataSet")));
 
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
-                dataSetModel.createProperty(PREFIX_AO + "dataSetKey"), dataSetModel.createResource(dataSetKeyUri)));
+                dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "dataSetKey"),
+                dataSetModel.createResource(dataSetKeyUri)));
 
         for (String key : keys) {
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetKeyUri),
-                    dataSetModel.createProperty(PREFIX_AO + "keyComponent"), dataSetModel.createResource(key)));
+                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "keyComponent"),
+                    dataSetModel.createResource(key)));
         }
 
         List<String> valueSetUris = policyLoader.getDataSetValuesFromTemplate(dataSetTemplateUri);
         for (String valueSetUri : valueSetUris) {
             // Add ?dataSetUri ao:dataSetValues ?valueSetUri .
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
-                    dataSetModel.createProperty(PREFIX_AO + "dataSetValues"),
+                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "dataSetValues"),
                     dataSetModel.createResource(valueSetUri)));
         }
 
@@ -69,7 +82,7 @@ public class PolicyTemplateController {
         for (String valueSetTemplateUri : valueSetTemplateUris) {
             String valueSetUri = getUriFromTemplate(valueSetTemplateUri, role);
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
-                    dataSetModel.createProperty(PREFIX_AO + "dataSetValues"),
+                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "dataSetValues"),
                     dataSetModel.createResource(valueSetUri)));
 
             policyLoader.constructValueSet(valueSetTemplateUri, valueSetUri, roleUri, dataSetModel);

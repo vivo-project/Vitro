@@ -248,6 +248,10 @@ public class PolicyLoader {
             + "      ?keyComponent a access:Operation .\n"
             + "      BIND('OPERATION' as ?type)\n"
             + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?keyComponent a access:SubjectRoleUri .\n"
+            + "      BIND('SUBJECT_ROLE_URI' as ?type)\n"
+            + "    }\n"
             + "  }\n"
             + "}\n";
 
@@ -429,8 +433,8 @@ public class PolicyLoader {
     public Set<String> getDataSetValues(AccessOperation ao, AccessObjectType aot, String role) {
         Set<String> values = new HashSet<>();
         long expectedSize = 3;
-        String queryText = getDataSetByKeyQuery(new String[] { role },
-                new String[] { ao.toString(), aot.toString() });
+        String queryText = getDataSetByKeyQuery(new String[] {},
+                new String[] { ao.toString(), aot.toString(), role });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
@@ -466,7 +470,7 @@ public class PolicyLoader {
 
     public String getEntityValueSetUri(AccessOperation ao, AccessObjectType aot, String role) {
         long expectedSize = 3;
-        String queryText = getDataSetByKeyQuery(new String[] { role }, new String[] { ao.toString(), aot.toString() });
+        String queryText = getDataSetByKeyQuery(new String[] { }, new String[] { ao.toString(), aot.toString(), role });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
@@ -496,8 +500,8 @@ public class PolicyLoader {
 
     public void modifyPolicyDataSetValue(String entityUri, AccessOperation ao, AccessObjectType aot, String role,
             boolean isAdd) {
-        String queryText = getPolicyDataSetValueStatementByKeyQuery(entityUri, new String[] { role },
-                new String[] { ao.toString(), aot.toString() });
+        String queryText = getPolicyDataSetValueStatementByKeyQuery(entityUri, new String[] { },
+                new String[] { ao.toString(), aot.toString(), role });
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsType", aot.toString());
         queryText = pss.toString();
@@ -833,6 +837,9 @@ public class PolicyLoader {
                             }
                             if (Attribute.ACCESS_OBJECT_TYPE.toString().equals(type)) {
                                 compositeKey.setObjectType(AccessObjectType.valueOf(id));
+                            }
+                            if (Attribute.SUBJECT_ROLE_URI.toString().equals(type)) {
+                                compositeKey.setRole(id);
                             }
                         }
                     } else {

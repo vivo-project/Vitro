@@ -122,7 +122,7 @@
 
 :PublicDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:PUBLIC ;
+    access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Self editor display class uri data sets
@@ -136,7 +136,7 @@
 
 :SelfEditorDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Editor display class uri data sets
@@ -150,7 +150,7 @@
 
 :EditorDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:EDITOR ;
+    access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Curator display class uri data sets
@@ -164,7 +164,7 @@
 
 :CuratorDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:CURATOR ;
+    access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Admin display class uri data sets
@@ -178,7 +178,7 @@
 
 :AdminDisplayClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:ADMIN ;
+    access:keyComponent access-individual:AdminRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Public update class uri data sets
@@ -192,7 +192,7 @@
 
 :PublicUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:PUBLIC ;
+    access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:UpdateOperation .
 
 ### Self editor update class uri data sets
@@ -206,7 +206,7 @@
 
 :SelfEditorUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:UpdateOperation .
 
 ### Editor update class uri data sets
@@ -220,7 +220,7 @@
 
 :EditorUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:EDITOR ;
+    access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:UpdateOperation .
 
 ### Curator update class uri data sets
@@ -234,7 +234,7 @@
 
 :CuratorUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:CURATOR ;
+    access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:UpdateOperation .
 
 ### Admin update class uri data sets
@@ -248,7 +248,7 @@
 
 :AdminUpdateClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:ADMIN ;
+    access:keyComponent access-individual:AdminRoleUri ;
     access:keyComponent access-individual:UpdateOperation .
 
 ### Self editor publish class uri data sets
@@ -262,7 +262,7 @@
 
 :SelfEditorPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 ### Editor publish class uri data sets
@@ -276,7 +276,7 @@
 
 :EditorPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:EDITOR ;
+    access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 ### Curator publish class uri data sets
@@ -290,7 +290,7 @@
 
 :CuratorPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:CURATOR ;
+    access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 ### Admin publish class uri data sets
@@ -304,7 +304,7 @@
 
 :AdminPublishClassDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:Class ;
-    access:keyComponent auth:ADMIN ;
+    access:keyComponent access-individual:AdminRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 :AllowMatchingClass a access:Rule;

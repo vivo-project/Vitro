@@ -49,6 +49,11 @@
     rdfs:comment "Type of access object";
     rdfs:label "Object type"@en-US .
 
+:SubjectRoleUri a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Subject role uri pattern";
+    rdfs:label "subject role uri"@en-US .
+
 :SubjectType a owl:Class ;
     rdfs:subClassOf :AttributeValuePattern ;
     rdfs:comment "Type of subject(user, non-personal entity) requested access";
@@ -214,7 +219,14 @@
     rdfs:domain :PolicyTemplate ;
     rdfs:range :DataSetTemplate .
 
+:keyComponentTemplate a owl:ObjectProperty ;
+    rdfs:comment "Specify component of combined key";
+    rdfs:domain :DataSetKeyTemplate ;
+    rdfs:range :AttributeType ;
+    rdfs:label "key component"@en-US .
+
 :keyComponent a owl:ObjectProperty ;
     rdfs:comment "Specify component of combined key";
     rdfs:domain [ a owl:Class ; owl:unionOf ( :DataSetKeyTemplate :DataSetKey ) ] ;
+    rdfs:range :AttributeValuePattern ;
     rdfs:label "key component"@en-US .

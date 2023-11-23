@@ -44,7 +44,7 @@ public class UpdateRelatedAllowedPropertiesPolicyTemplateTest extends PolicyTest
         EntityPolicyController.grantAccess("test:entity", type, ao, roleUri);
         DynamicPolicy policy = null;
         String dataSet =
-                loader.getDataSetUriByKey(new String[] { roleUri }, new String[] { ao.toString(), type.toString() });
+                loader.getDataSetUriByKey(new String[] { }, new String[] { ao.toString(), type.toString(), roleUri });
         policy = loader.loadPolicyFromTemplateDataSet(dataSet);
         countRulesAndAttributes(policy, rulesCount, attrCount);
         Set<String> values = loader.getDataSetValues(ao, type, roleUri);
