@@ -159,7 +159,7 @@
 :RoleDisplayObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
 #Role PublishObjectProperty data set template
@@ -188,7 +188,7 @@
 :RolePublishObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
 #Role AddObjectProperty data set template
@@ -217,7 +217,7 @@
 :RoleAddObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
 #Role DropObjectProperty data set template
@@ -246,7 +246,7 @@
 :RoleDropObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
 #Role EditObjectProperty data set template
@@ -275,7 +275,7 @@
 :RoleEditObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:ObjectProperty .
 
 #Role DisplayDataProperty data set template
@@ -304,7 +304,7 @@
 :RoleDisplayDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
 #Role PublishDataProperty data set template
@@ -333,7 +333,7 @@
 :RolePublishDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
 #Role AddDataProperty data set template
@@ -362,7 +362,7 @@
 :RoleAddDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
 #Role DropDataProperty data set template
@@ -391,7 +391,7 @@
 :RoleDropDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
 #Role EditDataProperty data set template
@@ -420,7 +420,7 @@
 :RoleEditDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:DataProperty .
 
 #Role DisplayFauxObjectProperty data set template
@@ -449,7 +449,7 @@
 :RoleDisplayFauxObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
 #Role PublishFauxObjectProperty data set template
@@ -478,7 +478,7 @@
 :RolePublishFauxObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
 #Role AddFauxObjectProperty data set template
@@ -507,7 +507,7 @@
 :RoleAddFauxObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
 #Role DropFauxObjectProperty data set template
@@ -536,7 +536,7 @@
 :RoleDropFauxObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
 #Role EditFauxObjectProperty data set template
@@ -565,7 +565,7 @@
 :RoleEditFauxObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxObjectProperty .
 
 #Role DisplayFauxDataProperty data set template
@@ -594,7 +594,7 @@
 :RoleDisplayFauxDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
 #Role PublishFauxDataProperty data set template
@@ -623,7 +623,7 @@
 :RolePublishFauxDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
 #Role AddFauxDataProperty data set template
@@ -652,7 +652,7 @@
 :RoleAddFauxDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
 #Role DropFauxDataProperty data set template
@@ -681,7 +681,7 @@
 :RoleDropFauxDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
 #Role EditFauxDataProperty data set template
@@ -710,7 +710,7 @@
 :RoleEditFauxDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:FauxDataProperty .
 
 

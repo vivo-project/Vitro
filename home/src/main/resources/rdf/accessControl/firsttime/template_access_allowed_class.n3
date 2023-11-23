@@ -54,7 +54,7 @@
 
 :RoleDisplayClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
 #Role Update Class data set template
@@ -81,7 +81,7 @@
 
 :RoleUpdateClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
 #Role Publish Class data set template
@@ -108,7 +108,7 @@
 
 :RolePublishClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
-#    access:defaultValue access-individual:defaultUri ;
+#    access:hasDefaultValue access-individual:defaultUri ;
     access:containerTypeTemplate access-individual:Class .
 
 ### Public display class uri data sets
