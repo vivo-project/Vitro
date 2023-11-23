@@ -293,7 +293,7 @@ public class PolicyLoader {
             + "    ?valueSetTemplateUri access:relatedCheck ?relatedCheck .\n"
             + "    ?valueSetTemplateUri access:containerTypeTemplate ?setElementsType .\n"
             + "    OPTIONAL {\n"
-            + "      ?valueSetTemplateUri access:defaultValue ?dataValue .\n"
+            + "      ?valueSetTemplateUri access:hasDefaultValue ?dataValue .\n"
             + "    }\n"
             + "    OPTIONAL {\n"
             + "      FILTER ( str(?setElementsType) = 'https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole' )\n"

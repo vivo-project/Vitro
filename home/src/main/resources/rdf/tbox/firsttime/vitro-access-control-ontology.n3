@@ -131,9 +131,9 @@
     rdfs:domain :Check ;
     rdfs:range :Attribute .
 
-:defaultValue a owl:ObjectProperty ;
+:hasDefaultValue a owl:ObjectProperty ;
     rdfs:comment "default value to add into new value set";
-    rdfs:label "default template value"@en-US ;
+    rdfs:label "has default value"@en-US ;
     rdfs:domain :ValueSetTemplate .
 
 :containerTypeTemplate a owl:ObjectProperty ,

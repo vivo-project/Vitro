@@ -38,8 +38,8 @@
 
 :RolePermissionValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :PermissionNameAllowed;
-    access:defaultValue simplePermission:PageViewablePublic;
-    access:defaultValue simplePermission:QueryFullModel ;
+    access:hasDefaultValue simplePermission:PageViewablePublic;
+    access:hasDefaultValue simplePermission:QueryFullModel ;
     access:containerTypeTemplate access-individual:NamedObject .
 
 #Data sets
