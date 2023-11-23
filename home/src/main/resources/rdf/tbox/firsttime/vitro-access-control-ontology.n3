@@ -51,7 +51,7 @@
     rdfs:comment "Type of subject(user, non-personal entity) requested access";
     rdfs:label "Subject type"@en-US .
 
-:Attribute a owl:Class ;
+:AttributeType a owl:Class ;
     rdfs:comment "Attribute to check";
     rdfs:label "Attribute"@en-US .
 
@@ -89,7 +89,7 @@
     owl:FunctionalProperty ;
     rdfs:comment "Set string identifier";
     rdfs:range xsd:string ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Operator :Operation :Decision :Value :SubjectType :Attribute :ObjectType ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Operator :Operation :Decision :Value :SubjectType :AttributeType :ObjectType ) ] ;
     rdfs:label "id"@en-US .
 
 :priority a owl:DatatypeProperty ,
@@ -129,7 +129,7 @@
     rdfs:comment "Set attribute that should be checked";
     rdfs:label "attribute"@en-US ;
     rdfs:domain :Check ;
-    rdfs:range :Attribute .
+    rdfs:range :AttributeType .
 
 :hasDefaultValue a owl:ObjectProperty ;
     rdfs:comment "default value to add into new value set";
@@ -140,7 +140,7 @@
     owl:FunctionalProperty ;
     rdfs:comment "Type of values for new value set";
     rdfs:label "set type template"@en-US ;
-    rdfs:range [ a owl:Class ; owl:unionOf  ( :Attribute :ObjectType ) ] ;
+    rdfs:range [ a owl:Class ; owl:unionOf  ( :AttributeType :ObjectType ) ] ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( :ValueSet :ValueSetTemplate ) ] .
 
 :values a owl:ObjectProperty ;
@@ -172,7 +172,7 @@
     rdfs:comment "Attribute to use as a template key";
     rdfs:label "template key"@en-US ;
     rdfs:domain :DataSetTemplateKey ;
-    rdfs:range :Attribute .
+    rdfs:range :AttributeType .
 
 :requiresCheck a owl:ObjectProperty ;
     rdfs:comment "Requires check";

@@ -3,29 +3,29 @@
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-access-individual:Subject a access:Attribute ;
+access-individual:Subject a access:AttributeType ;
     access:id "SUBJECT" .
 
-access-individual:SubjectRole a access:Attribute ;
+access-individual:SubjectRole a access:AttributeType ;
     access:id "SUBJECT_ROLE_URI" .
 
-access-individual:SubjectType a access:Attribute ;
+access-individual:SubjectType a access:AttributeType ;
     access:id "SUBJECT_TYPE" .
 
-access-individual:AccessObjectUri a access:Attribute ;
+access-individual:AccessObjectUri a access:AttributeType ;
     access:id "ACCESS_OBJECT_URI" .
 
-access-individual:AccessObjectType a access:Attribute ;
+access-individual:AccessObjectType a access:AttributeType ;
     access:id "ACCESS_OBJECT_TYPE" .
 
-access-individual:Operation a access:Attribute ;
+access-individual:Operation a access:AttributeType ;
     access:id "OPERATION" .
 
-access-individual:StatementPredicateUri a access:Attribute ;
+access-individual:StatementPredicateUri a access:AttributeType ;
     access:id "STATEMENT_PREDICATE_URI" .
 
-access-individual:StatementSubjectUri a access:Attribute ;
+access-individual:StatementSubjectUri a access:AttributeType ;
     access:id "STATEMENT_SUBJECT_URI" .
 
-access-individual:StatementObjectUri a access:Attribute ;
+access-individual:StatementObjectUri a access:AttributeType ;
     access:id "STATEMENT_OBJECT_URI" .
