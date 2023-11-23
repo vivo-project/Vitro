@@ -31,7 +31,7 @@
 
 :SelfEditorDisplayObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Display data property data sets
@@ -46,7 +46,7 @@
 
 :SelfEditorDisplayDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:DataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Display faux object property data sets
@@ -61,7 +61,7 @@
 
 :SelfEditorDisplayFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Display faux data property data sets
@@ -76,7 +76,7 @@
 
 :SelfEditorDisplayFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
 ### Publish object property data sets
@@ -91,7 +91,7 @@
 
 :SelfEditorPublishObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 ### Publish data property data sets
@@ -106,7 +106,7 @@
 
 :SelfEditorPublishDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:DataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 ### Publish faux object property data sets
@@ -121,7 +121,7 @@
 
 :SelfEditorPublishFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 ### Publish faux data property data sets
@@ -136,7 +136,7 @@
 
 :SelfEditorPublishFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
 :AllowMatchingProperty a access:Rule;

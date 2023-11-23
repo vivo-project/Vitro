@@ -73,7 +73,7 @@
 :PublicDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent auth:PUBLIC .
+    access:keyComponent access-individual:PublicRoleUri .
 
 access-individual:PublicSimplePermissionValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:NamedObject .

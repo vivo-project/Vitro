@@ -37,7 +37,7 @@
 
 :SelfEditorAddObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
 ### Add data property data sets
@@ -52,7 +52,7 @@
 
 :SelfEditorAddDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:DataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
 ### Add faux object property data sets
@@ -67,7 +67,7 @@
 
 :SelfEditorAddFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
 ### Add faux data property data sets
@@ -82,7 +82,7 @@
 
 :SelfEditorAddFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
 ### Drop object property data sets
@@ -97,7 +97,7 @@
 
 :SelfEditorDropObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
 ### Drop data property data sets
@@ -112,7 +112,7 @@
 
 :SelfEditorDropDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:DataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
 ### Drop faux object property data sets
@@ -127,7 +127,7 @@
 
 :SelfEditorDropFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
 ### Drop faux data property data sets
@@ -142,7 +142,7 @@
 
 :SelfEditorDropFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
 ### Edit object property data sets
@@ -157,7 +157,7 @@
 
 :SelfEditorEditObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
 ### Edit data property data sets
@@ -172,7 +172,7 @@
 
 :SelfEditorEditDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:DataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
 ### Edit faux object property data sets
@@ -187,7 +187,7 @@
 
 :SelfEditorEditFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
 ### Edit faux data property data sets
@@ -202,7 +202,7 @@
 
 :SelfEditorEditFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent auth:SELF_EDITOR ;
+    access:keyComponent access-individual:SelfEditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
 :AllowMatchingProperty a access:Rule;

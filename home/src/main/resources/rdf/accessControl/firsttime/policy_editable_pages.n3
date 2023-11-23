@@ -19,14 +19,14 @@
 :SubjectRoleOneOfEditorsCheck a access:Check ;
     access:operator access-individual:OneOf ;
     access:attribute access-individual:SubjectRole ;
-    access:value auth:ADMIN ;
-    access:value auth:CURATOR ;
-    access:value auth:EDITOR .
+    access:value access-individual:AdminRoleUri ;
+    access:value access-individual:CuratorRoleUri ;
+    access:value access-individual:EditorRoleUri .
 
 :SubjectRoleIsSelfEditor a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
-    access:value auth:SELF_EDITOR .
+    access:value access-individual:SelfEditorRoleUri .
 
 :IsAddOperation a access:Check ;
     access:operator access-individual:Equals ;

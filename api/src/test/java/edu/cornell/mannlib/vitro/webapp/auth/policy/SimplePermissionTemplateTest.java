@@ -134,8 +134,8 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         // Create custom data set
         PolicyTemplateController.createRoleDataSets(CUSTOM);
         // Get data set uri by key: role uri and named object
-        String dataSetUri = loader.getDataSetUriByKey(new String[] { CUSTOM },
-                new String[] { AccessObjectType.NAMED_OBJECT.toString(), AccessOperation.EXECUTE.toString() });
+        String dataSetUri = loader.getDataSetUriByKey(new String[] {  },
+                new String[] { AccessObjectType.NAMED_OBJECT.toString(), AccessOperation.EXECUTE.toString(), CUSTOM });
 
         assertTrue(dataSetUri != null);
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);

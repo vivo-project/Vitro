@@ -52,7 +52,7 @@
 :PublicDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent auth:PUBLIC .
+    access:keyComponent access-individual:PublicRoleUri .
 
 :SelfEditorDataSet a access:PolicyDataSet ;
     access:dataSetKey :SelfEditorDataSetKey ;
@@ -62,7 +62,7 @@
 :SelfEditorDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent auth:SELF_EDITOR .
+    access:keyComponent access-individual:SelfEditorRoleUri .
 
 :EditorDataSet a access:PolicyDataSet ;
     access:dataSetKey :EditorDataSetKey ;
@@ -72,7 +72,7 @@
 :EditorDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent auth:EDITOR .
+    access:keyComponent access-individual:EditorRoleUri .
 
 :CuratorDataSet a access:PolicyDataSet ;
     access:dataSetKey :CuratorDataSetKey ;
@@ -82,7 +82,7 @@
 :CuratorDataSetKey a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent auth:CURATOR .
+    access:keyComponent access-individual:CuratorRoleUri .
 
 :AdminDataSet a access:PolicyDataSet ;
     access:dataSetKey :AdminDataSetKey  ;
@@ -92,7 +92,7 @@
 :AdminDataSetKey  a access:DataSetKey ;
     access:keyComponent access-individual:NamedObject ;
     access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent auth:ADMIN .
+    access:keyComponent access-individual:AdminRoleUri .
 
 :AllowSimplePermission a access:Rule;
     access:requiresCheck :IsSimplePermission ;

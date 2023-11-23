@@ -50,8 +50,8 @@ public class PolicyLoaderTest extends PolicyTest {
     @Test
     public void getDataSetUriByKeyTest() {
         load(DATA_SET);
-        String uri = PolicyLoader.getInstance().getDataSetUriByKey(new String[] { PUBLIC },
-                new String[] { NAMED_OBJECT.toString(), EXECUTE.toString() });
+        String uri = PolicyLoader.getInstance().getDataSetUriByKey(new String[] {  },
+                new String[] { NAMED_OBJECT.toString(), EXECUTE.toString(), PUBLIC });
         assertEquals(PREFIX + "PublicDataSet", uri);
     }
 

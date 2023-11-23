@@ -4,17 +4,32 @@
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
+access-individual:PublicRoleUri a access:SubjectRoleUri ;
+    access:id "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC" .
+
+access-individual:SelfEditorRoleUri a access:SubjectRoleUri ;
+    access:id "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR" .
+
+access-individual:EditorRoleUri a access:SubjectRoleUri ;
+    access:id "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR" .
+
+access-individual:CuratorRoleUri a access:SubjectRoleUri ;
+    access:id "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR" .
+
+access-individual:AdminRoleUri a access:SubjectRoleUri ;
+    access:id "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN" .
+
 access-individual:PublicRoleValueSet a access:ValueSet ;
-    access:value auth:PUBLIC .
+    access:value access-individual:PublicRoleUri .
 
 access-individual:SelfEditorRoleValueSet a access:ValueSet ;
-    access:value auth:SELF_EDITOR .
+    access:value access-individual:SelfEditorRoleUri .
 
 access-individual:EditorRoleValueSet a access:ValueSet ;
-    access:value auth:EDITOR .
+    access:value access-individual:EditorRoleUri .
 
 access-individual:CuratorRoleValueSet a access:ValueSet ;
-    access:value auth:CURATOR .
+    access:value access-individual:CuratorRoleUri .
 
 access-individual:AdminRoleValueSet a access:ValueSet ;
-    access:value auth:ADMIN .
+    access:value access-individual:AdminRoleUri .

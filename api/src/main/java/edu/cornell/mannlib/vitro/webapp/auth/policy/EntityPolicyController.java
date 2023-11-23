@@ -94,7 +94,7 @@ public class EntityPolicyController {
 
     private static void loadPolicy(AccessObjectType aot, AccessOperation ao, String role) {
         String dataSetUri =
-                getLoader().getDataSetUriByKey(new String[] { role }, new String[] { ao.toString(), aot.toString() });
+                getLoader().getDataSetUriByKey(new String[] { }, new String[] { ao.toString(), aot.toString(), role });
         if (dataSetUri != null) {
             DynamicPolicy policy = getLoader().loadPolicyFromTemplateDataSet(dataSetUri);
             if (policy != null) {
