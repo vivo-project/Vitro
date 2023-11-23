@@ -231,7 +231,7 @@
 :RelationCheck a access:Check ;
     access:operator access-individual:SparqlSelectQueryContains ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:singleValue access-individual:PersonProfileProximityToResourceUri .
+    access:value access-individual:PersonProfileProximityToResourceUri .
 
 :AccessObjectStatementTypeCheck a access:Check ;
     access:operator access-individual:Equals ;

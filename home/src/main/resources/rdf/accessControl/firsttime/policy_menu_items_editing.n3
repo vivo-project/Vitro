@@ -26,24 +26,24 @@
 :IsEditOperationCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:singleValue access-individual:EditOperation .
+    access:value access-individual:EditOperation .
 
 :IsDropOperationCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:singleValue access-individual:DropOperation .
+    access:value access-individual:DropOperation .
 
 :IsObjectPropertyStatement a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
-    access:singleValue access-individual:ObjectPropertyStatement .
+    access:value access-individual:ObjectPropertyStatement .
 
 :PredicateUriEqualsHomeMenuItem a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:StatementPredicateUri ;
-    access:singleValue <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
+    access:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
 
 :ObjectUriEqualsHasElement a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:StatementObjectUri ;
-    access:singleValue <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .
+    access:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

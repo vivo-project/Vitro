@@ -17,7 +17,7 @@ access-individual:AllowPersonEditOwnPublication rdf:type access:Rule ;
 access-individual:PublicationInProximityAttribute rdf:type access:Check ;
     access:operator access-individual:SparqlSelectQueryContains ;
     access:attribute access-individual:StatementSubjectUri ;
-    access:singleValue access-individual:PublicationProximityToPerson .
+    access:value access-individual:PublicationProximityToPerson .
 
 access-individual:PublicationProximityToPerson rdf:type access:ValueSet ;
     access:id """

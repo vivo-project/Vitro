@@ -17,5 +17,5 @@ access-individual:ValidRule rdf:type access:Rule ;
 access-individual:ValidAttribute rdf:type access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:singleValue access-individual:PublishOperation .
+    access:value access-individual:PublishOperation .
 

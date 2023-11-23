@@ -115,9 +115,9 @@
     rdfs:range :ValueSet .
 
 :value a owl:ObjectProperty ;
-    rdfs:comment "Assign value to value set (any URI or :AttributeValue with :id to define literal value)";
+    rdfs:comment "Assign one value (any URI or :AttributeValue with :id to define literal value)";
     rdfs:label "value"@en-US ;
-    rdfs:domain :ValueSet .
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSet :Check ) ] .
 
 :operator a owl:ObjectProperty ;
     rdfs:comment "Set type of check to perform";
@@ -197,11 +197,6 @@
     rdfs:label "set type"@en-US ;
     rdfs:domain :ValueSet ;
     rdfs:range :ObjectType .
-
-:singleValue a owl:ObjectProperty ;
-    rdfs:comment "Contains single value to check";
-    rdfs:label "single value"@en-US ;
-    rdfs:domain :Check .
 
 :rule a owl:ObjectProperty ;
     rdfs:comment "Contains a rule";

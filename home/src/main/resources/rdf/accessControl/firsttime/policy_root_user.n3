@@ -14,5 +14,5 @@
 :IsRootUserCheck a access:Check ;
     access:operator access-individual:Equals ;
     access:attribute access-individual:SubjectType ;
-    access:singleValue access-individual:RootUserSubject .
+    access:value access-individual:RootUserSubject .
 
