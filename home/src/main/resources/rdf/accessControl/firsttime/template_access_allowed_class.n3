@@ -50,12 +50,12 @@
 
 :RoleDisplayClassRoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleCheck;
-    access:containerTypeTemplate access-individual:SubjectRole .
+    access:containsElementsOfType access-individual:SubjectRole .
 
 :RoleDisplayClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
 #    access:hasDefaultValue access-individual:defaultUri ;
-    access:containerTypeTemplate access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 #Role Update Class data set template
 
@@ -77,12 +77,12 @@
 
 :RoleUpdateClassRoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleCheck;
-    access:containerTypeTemplate access-individual:SubjectRole .
+    access:containsElementsOfType access-individual:SubjectRole .
 
 :RoleUpdateClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
 #    access:hasDefaultValue access-individual:defaultUri ;
-    access:containerTypeTemplate access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 #Role Publish Class data set template
 
@@ -104,12 +104,12 @@
 
 :RolePublishClassRoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleCheck;
-    access:containerTypeTemplate access-individual:SubjectRole .
+    access:containsElementsOfType access-individual:SubjectRole .
 
 :RolePublishClassValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriCheck ;
 #    access:hasDefaultValue access-individual:defaultUri ;
-    access:containerTypeTemplate access-individual:Class .
+    access:containsElementsOfType access-individual:Class .
 
 ### Public display class uri data sets
 

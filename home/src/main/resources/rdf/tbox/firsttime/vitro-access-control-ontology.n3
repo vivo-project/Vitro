@@ -136,7 +136,7 @@
     rdfs:label "has default value"@en-US ;
     rdfs:domain :ValueSetTemplate .
 
-:containerTypeTemplate a owl:ObjectProperty ,
+:containsElementsOfType a owl:ObjectProperty ,
     owl:FunctionalProperty ;
     rdfs:comment "Type of values for new value set";
     rdfs:label "set type template"@en-US ;

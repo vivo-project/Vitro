@@ -34,13 +34,13 @@
 
 :RoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleEqualsDataSetRole;
-    access:containerTypeTemplate access-individual:SubjectRole .
+    access:containsElementsOfType access-individual:SubjectRole .
 
 :RolePermissionValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :PermissionNameAllowed;
     access:hasDefaultValue simplePermission:PageViewablePublic;
     access:hasDefaultValue simplePermission:QueryFullModel ;
-    access:containerTypeTemplate access-individual:NamedObject .
+    access:containsElementsOfType access-individual:NamedObject .
 
 #Data sets
 
