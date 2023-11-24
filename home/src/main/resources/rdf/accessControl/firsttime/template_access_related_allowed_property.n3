@@ -9,14 +9,14 @@
     access:hasRule :AllowMatchingPropertyStatement ;
     access:hasRule :AllowMatchingProperty ;
 
-    access:policyDataSet :SelfEditorDisplayObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorDisplayDataPropertyDataSet ;
-    access:policyDataSet :SelfEditorDisplayFauxObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorDisplayFauxDataPropertyDataSet ;
-    access:policyDataSet :SelfEditorPublishObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorPublishDataPropertyDataSet ;
-    access:policyDataSet :SelfEditorPublishFauxObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorPublishFauxDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorDisplayObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorDisplayDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorDisplayFauxObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorDisplayFauxDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorPublishObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorPublishDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorPublishFauxObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorPublishFauxDataPropertyDataSet ;
     .
 
 ### Display object property data sets

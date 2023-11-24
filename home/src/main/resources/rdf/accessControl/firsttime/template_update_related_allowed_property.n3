@@ -9,20 +9,20 @@
     access:hasRule :AllowMatchingPropertyStatement ;
     access:hasRule :AllowMatchingProperty ;
  
-    access:policyDataSet :SelfEditorAddObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorAddDataPropertyDataSet ;
-    access:policyDataSet :SelfEditorAddFauxObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorAddFauxDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorAddObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorAddDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorAddFauxObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorAddFauxDataPropertyDataSet ;
 
-    access:policyDataSet :SelfEditorEditObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorEditDataPropertyDataSet ;
-    access:policyDataSet :SelfEditorEditFauxObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorEditFauxDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorEditObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorEditDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorEditFauxObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorEditFauxDataPropertyDataSet ;
 
-    access:policyDataSet :SelfEditorDropObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorDropDataPropertyDataSet ;
-    access:policyDataSet :SelfEditorDropFauxObjectPropertyDataSet ;
-    access:policyDataSet :SelfEditorDropFauxDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorDropObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorDropDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorDropFauxObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorDropFauxDataPropertyDataSet ;
     .
 
 ### Add object property data sets
