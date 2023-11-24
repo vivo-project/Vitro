@@ -17,12 +17,12 @@ access-individual:BrokenRule rdf:type access:Rule ;
     access:requiresCheck access-individual:BrokenAttribute2 .
 
 access-individual:BrokenAttribute1 rdf:type access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:ObjectUri ;
     access:setValue access-individual:valueSet1 .
 
 access-individual:BrokenAttribute2 rdf:type access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:ObjectUri ;
     access:setValue access-individual:valueSet2 .
 

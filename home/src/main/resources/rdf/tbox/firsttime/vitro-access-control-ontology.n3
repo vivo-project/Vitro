@@ -127,9 +127,9 @@
     rdfs:label "value"@en-US ;
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSetTemplate :ValueSet :Check ) ] .
 
-:operator a owl:ObjectProperty ;
-    rdfs:comment "Set type of check to perform";
-    rdfs:label "operator"@en-US ;
+:useOperator a owl:ObjectProperty ;
+    rdfs:comment "Use operator in :Check";
+    rdfs:label "use operator"@en-US ;
     rdfs:domain :Check ;
     rdfs:range :Operator .
 

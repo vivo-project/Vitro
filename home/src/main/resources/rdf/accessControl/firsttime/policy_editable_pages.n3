@@ -17,19 +17,19 @@
     access:requiresCheck :PredicateIsSomePredicate .
 
 :SubjectRoleOneOfEditorsCheck a access:Check ;
-    access:operator access-individual:OneOf ;
+    access:useOperator access-individual:OneOf ;
     access:attribute access-individual:SubjectRole ;
     access:value access-individual:AdminRoleUri ;
     access:value access-individual:CuratorRoleUri ;
     access:value access-individual:EditorRoleUri .
 
 :SubjectRoleIsSelfEditor a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
     access:value access-individual:SelfEditorRoleUri .
 
 :IsAddOperation a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:Operation ;
     access:value access-individual:AddOperation .
 
@@ -42,22 +42,22 @@
     access:requiresCheck :PredicateIsSomePredicate .
 
 :PredicateIsSomePredicate a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:StatementPredicateUri ;
     access:value :SomeUri .
 
 :ObjectUriIsSomeUri a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:StatementObjectUri ;
     access:value :SomeUri .
 
 :SubjectUriIsProfileRelatedResource a access:Check ;
-    access:operator access-individual:SparqlSelectQueryContains ;
+    access:useOperator access-individual:SparqlSelectQueryContains ;
     access:attribute access-individual:StatementSubjectUri ;
     access:value access-individual:PersonProfileProximityToResourceUri .
 
 :IsObjectPropertyStatement a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:value access-individual:ObjectPropertyStatement .
 

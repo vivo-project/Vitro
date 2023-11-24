@@ -18,14 +18,14 @@ access-individual:ValidRule rdf:type access:Rule ;
     access:requiresCheck access-individual:ValidAttribute2 .
     
 access-individual:ValidAttribute1 rdf:type access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectUri ;
     access:values access-individual:valueSet1 ;
     access:values access-individual:valueSet3 ;
     .
     
 access-individual:ValidAttribute2 rdf:type access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectUri ;
     access:values access-individual:valueSet4 ;
     access:values access-individual:valueSet2 ;
