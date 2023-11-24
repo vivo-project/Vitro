@@ -46,8 +46,8 @@
 
 :PublicDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues :PublicSimplePermissionValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet :PublicSimplePermissionValueSet .
 
 :PublicDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:NamedObject ;
@@ -56,8 +56,8 @@
 
 :SelfEditorDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues :SelfEditorSimplePermissionValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet :SelfEditorSimplePermissionValueSet .
 
 :SelfEditorDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:NamedObject ;
@@ -66,8 +66,8 @@
 
 :EditorDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues :EditorSimplePermissionValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet :EditorSimplePermissionValueSet .
 
 :EditorDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:NamedObject ;
@@ -76,8 +76,8 @@
 
 :CuratorDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues :CuratorSimplePermissionValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet :CuratorSimplePermissionValueSet .
 
 :CuratorDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:NamedObject ;
@@ -86,8 +86,8 @@
 
 :AdminDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDataSetKey  ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues :AdminSimplePermissionValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet :AdminSimplePermissionValueSet .
 
 :AdminDataSetKey  a access:DataSetKey ;
     access:hasKeyComponent access-individual:NamedObject ;

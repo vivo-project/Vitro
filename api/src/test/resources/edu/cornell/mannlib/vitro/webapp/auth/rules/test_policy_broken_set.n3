@@ -30,10 +30,10 @@ access-individual:BrokenSetAttribute2 rdf:type access:Check ;
     .
 
 access-individual:testDataSet1 rdf:type access:DataSet ;
-    access:dataSetValues access-individual:valueSet1 .
+    access:hasRelatedValueSet access-individual:valueSet1 .
 
 access-individual:testDataSet2 rdf:type access:DataSet ;
-    access:dataSetValues access-individual:valueSet2 .
+    access:hasRelatedValueSet access-individual:valueSet2 .
 
 access-individual:valueSet1 rdf:type access:ValueSet ;
     access:value <test:value1> ;

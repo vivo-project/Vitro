@@ -27,7 +27,7 @@ access-individual:BrokenAttribute2 rdf:type access:Check ;
     access:setValue access-individual:valueSet2 .
 
 access-individual:testDataSet1 rdf:type access:DataSet ;
-    access:dataSetValues access-individual:valueSet1 .
+    access:hasRelatedValueSet access-individual:valueSet1 .
 
 access-individual:valueSet1 rdf:type access:ValueSet ;
     access:value <test:value1> ;

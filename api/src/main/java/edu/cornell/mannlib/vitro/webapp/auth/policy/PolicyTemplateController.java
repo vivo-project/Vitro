@@ -3,7 +3,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_VOCABULARY_PREFIX;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,8 @@ public class PolicyTemplateController {
     private static final Log log = LogFactory.getLog(PolicyTemplateController.class);
     public static void createRoleDataSets(String roleUri) {
 
-        // Execute sparql query to get all data set templates that have ao:hasTemplateKeyComponent access-individual:SubjectRole .
+        // Execute sparql query to get all data set templates that have ao:hasTemplateKeyComponent
+        // access-individual:SubjectRole .
         Map<String, String> templates = PolicyLoader.getInstance().getRoleDataSetTemplates();
         for (String templateUri : templates.keySet()) {
             createRoleDataSet(templateUri, roleUri, templates.get(templateUri));
@@ -72,9 +72,9 @@ public class PolicyTemplateController {
 
         List<String> valueSetUris = policyLoader.getDataSetValuesFromTemplate(dataSetTemplateUri);
         for (String valueSetUri : valueSetUris) {
-            // Add ?dataSetUri ao:dataSetValues ?valueSetUri .
+            // Add ?dataSetUri ao:hasRelatedValueSet ?valueSetUri .
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
-                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "dataSetValues"),
+                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasRelatedValueSet"),
                     dataSetModel.createResource(valueSetUri)));
         }
 
@@ -83,7 +83,7 @@ public class PolicyTemplateController {
         for (String valueSetTemplateUri : valueSetTemplateUris) {
             String valueSetUri = getUriFromTemplate(valueSetTemplateUri, role);
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
-                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "dataSetValues"),
+                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasRelatedValueSet"),
                     dataSetModel.createResource(valueSetUri)));
 
             policyLoader.constructValueSet(valueSetTemplateUri, valueSetUri, roleUri, dataSetModel);

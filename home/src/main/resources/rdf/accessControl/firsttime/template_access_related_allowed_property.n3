@@ -23,11 +23,11 @@
 
 :SelfEditorDisplayObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorDisplayObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :SelfEditorDisplayObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDisplayObjectPropertyValueSet .
 
 :SelfEditorDisplayObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -38,11 +38,11 @@
 
 :SelfEditorDisplayDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorDisplayDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :SelfEditorDisplayDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDisplayDataPropertyValueSet .
 
 :SelfEditorDisplayDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -53,11 +53,11 @@
 
 :SelfEditorDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorDisplayFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :SelfEditorDisplayFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDisplayFauxObjectPropertyValueSet .
 
 :SelfEditorDisplayFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -68,11 +68,11 @@
 
 :SelfEditorDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorDisplayFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :SelfEditorDisplayFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDisplayFauxDataPropertyValueSet .
 
 :SelfEditorDisplayFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -83,11 +83,11 @@
 
 :SelfEditorPublishObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorPublishObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :SelfEditorPublishObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorPublishObjectPropertyValueSet .
 
 :SelfEditorPublishObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -98,11 +98,11 @@
 
 :SelfEditorPublishDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorPublishDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :SelfEditorPublishDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorPublishDataPropertyValueSet .
 
 :SelfEditorPublishDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -113,11 +113,11 @@
 
 :SelfEditorPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorPublishFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :SelfEditorPublishFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorPublishFauxObjectPropertyValueSet .
 
 :SelfEditorPublishFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -128,11 +128,11 @@
 
 :SelfEditorPublishFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorPublishFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:SelfEditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :SelfEditorPublishFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorPublishFauxDataPropertyValueSet .
 
 :SelfEditorPublishFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
