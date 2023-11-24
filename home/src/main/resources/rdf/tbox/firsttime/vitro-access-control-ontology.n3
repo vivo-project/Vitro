@@ -116,9 +116,9 @@
 
 ### Object properties
 
-:dataSetValues a owl:ObjectProperty ;
-    rdfs:comment "Data set/data set template contains value set";
-    rdfs:label "data set values"@en-US ;
+:hasRelatedValueSet a owl:ObjectProperty ;
+    rdfs:comment "Specifies value sets related to :DataSetTemplate or :DataSet.";
+    rdfs:label "has related value set"@en-US ;
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :DataSetTemplate :DataSet ) ] ;
     rdfs:range :ValueSet .
 

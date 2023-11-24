@@ -138,9 +138,9 @@
 :RoleDisplayObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDisplayObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDisplayObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
     access:dataSetValueTemplate :RoleDisplayObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDisplayObjectPropertyEntityValueSetTemplate .  
 
@@ -167,9 +167,9 @@
 :RolePublishObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RolePublishObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RolePublishObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
     access:dataSetValueTemplate :RolePublishObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RolePublishObjectPropertyEntityValueSetTemplate .  
 
@@ -196,9 +196,9 @@
 :RoleAddObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleAddObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleAddObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
     access:dataSetValueTemplate :RoleAddObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleAddObjectPropertyEntityValueSetTemplate .  
 
@@ -225,9 +225,9 @@
 :RoleDropObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDropObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDropObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
     access:dataSetValueTemplate :RoleDropObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDropObjectPropertyEntityValueSetTemplate .  
 
@@ -254,9 +254,9 @@
 :RoleEditObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleEditObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleEditObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
     access:dataSetValueTemplate :RoleEditObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleEditObjectPropertyEntityValueSetTemplate .  
 
@@ -283,9 +283,9 @@
 :RoleDisplayDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDisplayDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDisplayDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
     access:dataSetValueTemplate :RoleDisplayDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDisplayDataPropertyEntityValueSetTemplate .  
 
@@ -312,9 +312,9 @@
 :RolePublishDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RolePublishDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RolePublishDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
     access:dataSetValueTemplate :RolePublishDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RolePublishDataPropertyEntityValueSetTemplate .  
 
@@ -341,9 +341,9 @@
 :RoleAddDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleAddDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleAddDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
     access:dataSetValueTemplate :RoleAddDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleAddDataPropertyEntityValueSetTemplate .  
 
@@ -370,9 +370,9 @@
 :RoleDropDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDropDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDropDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
     access:dataSetValueTemplate :RoleDropDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDropDataPropertyEntityValueSetTemplate .  
 
@@ -399,9 +399,9 @@
 :RoleEditDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleEditDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleEditDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
     access:dataSetValueTemplate :RoleEditDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleEditDataPropertyEntityValueSetTemplate .  
 
@@ -428,9 +428,9 @@
 :RoleDisplayFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDisplayFauxObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDisplayFauxObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
     access:dataSetValueTemplate :RoleDisplayFauxObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDisplayFauxObjectPropertyEntityValueSetTemplate .  
 
@@ -457,9 +457,9 @@
 :RolePublishFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RolePublishFauxObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RolePublishFauxObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
     access:dataSetValueTemplate :RolePublishFauxObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RolePublishFauxObjectPropertyEntityValueSetTemplate .  
 
@@ -486,9 +486,9 @@
 :RoleAddFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleAddFauxObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleAddFauxObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
     access:dataSetValueTemplate :RoleAddFauxObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleAddFauxObjectPropertyEntityValueSetTemplate .  
 
@@ -515,9 +515,9 @@
 :RoleDropFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDropFauxObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDropFauxObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
     access:dataSetValueTemplate :RoleDropFauxObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDropFauxObjectPropertyEntityValueSetTemplate .  
 
@@ -544,9 +544,9 @@
 :RoleEditFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleEditFauxObjectPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleEditFauxObjectPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
     access:dataSetValueTemplate :RoleEditFauxObjectPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleEditFauxObjectPropertyEntityValueSetTemplate .  
 
@@ -573,9 +573,9 @@
 :RoleDisplayFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDisplayFauxDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDisplayFauxDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
     access:dataSetValueTemplate :RoleDisplayFauxDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDisplayFauxDataPropertyEntityValueSetTemplate .  
 
@@ -602,9 +602,9 @@
 :RolePublishFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RolePublishFauxDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RolePublishFauxDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
     access:dataSetValueTemplate :RolePublishFauxDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RolePublishFauxDataPropertyEntityValueSetTemplate .  
 
@@ -631,9 +631,9 @@
 :RoleAddFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleAddFauxDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleAddFauxDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
     access:dataSetValueTemplate :RoleAddFauxDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleAddFauxDataPropertyEntityValueSetTemplate .  
 
@@ -660,9 +660,9 @@
 :RoleDropFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDropFauxDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleDropFauxDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
     access:dataSetValueTemplate :RoleDropFauxDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleDropFauxDataPropertyEntityValueSetTemplate .  
 
@@ -689,9 +689,9 @@
 :RoleEditFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleEditFauxDataPropertyDataSetTemplateKey ;
     access:hasDataSetKeyTemplate :RoleEditFauxDataPropertyDataSetKeyTemplate ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
     access:dataSetValueTemplate :RoleEditFauxDataPropertyValueSetTemplate ;
     access:dataSetValueTemplate :RoleEditFauxDataPropertyEntityValueSetTemplate .  
 
@@ -719,11 +719,11 @@
 
 :PublicDropFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDropFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :PublicDropFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :PublicDropFauxDataPropertyValueSet .
 
 :PublicDropFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -732,11 +732,11 @@
 
 :EditorDropFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDropFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :EditorDropFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :EditorDropFauxDataPropertyValueSet .
 
 :EditorDropFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -745,11 +745,11 @@
 
 :CuratorDropFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDropFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :CuratorDropFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDropFauxDataPropertyValueSet .
 
 :CuratorDropFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -758,11 +758,11 @@
 
 :AdminDropFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDropFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :AdminDropFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :AdminDropFauxDataPropertyValueSet .
 
 :AdminDropFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -773,11 +773,11 @@
 
 :PublicAddFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicAddFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :PublicAddFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :PublicAddFauxDataPropertyValueSet .
 
 :PublicAddFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -786,11 +786,11 @@
 
 :EditorAddFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorAddFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :EditorAddFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :EditorAddFauxDataPropertyValueSet .
 
 :EditorAddFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -799,11 +799,11 @@
 
 :CuratorAddFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorAddFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :CuratorAddFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :CuratorAddFauxDataPropertyValueSet .
 
 :CuratorAddFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -812,11 +812,11 @@
 
 :AdminAddFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminAddFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :AdminAddFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :AdminAddFauxDataPropertyValueSet .
 
 :AdminAddFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -827,11 +827,11 @@
 
 :PublicEditFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicEditFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :PublicEditFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :PublicEditFauxDataPropertyValueSet .
 
 :PublicEditFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -840,11 +840,11 @@
 
 :EditorEditFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorEditFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :EditorEditFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :EditorEditFauxDataPropertyValueSet .
 
 :EditorEditFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -853,11 +853,11 @@
 
 :CuratorEditFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorEditFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :CuratorEditFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :CuratorEditFauxDataPropertyValueSet .
 
 :CuratorEditFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -866,11 +866,11 @@
 
 :AdminEditFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminEditFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :AdminEditFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :AdminEditFauxDataPropertyValueSet .
 
 :AdminEditFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -881,11 +881,11 @@
 
 :PublicDropFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDropFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :PublicDropFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :PublicDropFauxObjectPropertyValueSet .
 
 :PublicDropFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -894,11 +894,11 @@
 
 :EditorDropFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDropFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :EditorDropFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :EditorDropFauxObjectPropertyValueSet .
 
 :EditorDropFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -907,11 +907,11 @@
 
 :CuratorDropFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDropFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :CuratorDropFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDropFauxObjectPropertyValueSet .
 
 :CuratorDropFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -920,11 +920,11 @@
 
 :AdminDropFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDropFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :AdminDropFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :AdminDropFauxObjectPropertyValueSet .
 
 :AdminDropFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -935,11 +935,11 @@
 
 :PublicAddFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicAddFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :PublicAddFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :PublicAddFauxObjectPropertyValueSet .
 
 :PublicAddFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -948,11 +948,11 @@
 
 :EditorAddFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorAddFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :EditorAddFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :EditorAddFauxObjectPropertyValueSet .
 
 :EditorAddFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -961,11 +961,11 @@
 
 :CuratorAddFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorAddFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :CuratorAddFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :CuratorAddFauxObjectPropertyValueSet .
 
 :CuratorAddFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -974,11 +974,11 @@
 
 :AdminAddFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminAddFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :AdminAddFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :AdminAddFauxObjectPropertyValueSet .
 
 :AdminAddFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -989,11 +989,11 @@
 
 :PublicEditFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicEditFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :PublicEditFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :PublicEditFauxObjectPropertyValueSet .
 
 :PublicEditFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1002,11 +1002,11 @@
 
 :EditorEditFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorEditFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :EditorEditFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :EditorEditFauxObjectPropertyValueSet .
 
 :EditorEditFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1015,11 +1015,11 @@
 
 :CuratorEditFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorEditFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :CuratorEditFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :CuratorEditFauxObjectPropertyValueSet .
 
 :CuratorEditFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1028,11 +1028,11 @@
 
 :AdminEditFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminEditFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :AdminEditFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :AdminEditFauxObjectPropertyValueSet .
 
 :AdminEditFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1043,11 +1043,11 @@
 
 :PublicDropDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDropDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :PublicDropDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :PublicDropDataPropertyValueSet .
 
 :PublicDropDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1056,11 +1056,11 @@
 
 :EditorDropDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDropDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :EditorDropDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :EditorDropDataPropertyValueSet .
 
 :EditorDropDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1069,11 +1069,11 @@
 
 :CuratorDropDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDropDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :CuratorDropDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDropDataPropertyValueSet .
 
 :CuratorDropDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1082,11 +1082,11 @@
 
 :AdminDropDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDropDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :AdminDropDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :AdminDropDataPropertyValueSet .
 
 :AdminDropDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1097,11 +1097,11 @@
 
 :PublicAddDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicAddDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :PublicAddDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :PublicAddDataPropertyValueSet .
 
 :PublicAddDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1110,11 +1110,11 @@
 
 :EditorAddDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorAddDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :EditorAddDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :EditorAddDataPropertyValueSet .
 
 :EditorAddDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1123,11 +1123,11 @@
 
 :CuratorAddDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorAddDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :CuratorAddDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :CuratorAddDataPropertyValueSet .
 
 :CuratorAddDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1136,11 +1136,11 @@
 
 :AdminAddDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminAddDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :AdminAddDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :AdminAddDataPropertyValueSet .
 
 :AdminAddDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1151,11 +1151,11 @@
 
 :PublicEditDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicEditDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :PublicEditDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :PublicEditDataPropertyValueSet .
 
 :PublicEditDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1164,11 +1164,11 @@
 
 :EditorEditDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorEditDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :EditorEditDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :EditorEditDataPropertyValueSet .
 
 :EditorEditDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1177,11 +1177,11 @@
 
 :CuratorEditDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorEditDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :CuratorEditDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :CuratorEditDataPropertyValueSet .
 
 :CuratorEditDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1190,11 +1190,11 @@
 
 :AdminEditDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminEditDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :AdminEditDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :AdminEditDataPropertyValueSet .
 
 :AdminEditDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1205,11 +1205,11 @@
 
 :PublicDropObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDropObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :PublicDropObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :PublicDropObjectPropertyValueSet .
 
 :PublicDropObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1218,11 +1218,11 @@
 
 :EditorDropObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDropObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :EditorDropObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :EditorDropObjectPropertyValueSet .
 
 :EditorDropObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1231,11 +1231,11 @@
 
 :CuratorDropObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDropObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :CuratorDropObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDropObjectPropertyValueSet .
 
 :CuratorDropObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1244,11 +1244,11 @@
 
 :AdminDropObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDropObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DropOperationValueSet ;
-    access:dataSetValues :AdminDropObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DropOperationValueSet ;
+    access:hasRelatedValueSet :AdminDropObjectPropertyValueSet .
 
 :AdminDropObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1259,11 +1259,11 @@
 
 :PublicAddObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicAddObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :PublicAddObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :PublicAddObjectPropertyValueSet .
 
 :PublicAddObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1272,11 +1272,11 @@
 
 :EditorAddObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorAddObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :EditorAddObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :EditorAddObjectPropertyValueSet .
 
 :EditorAddObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1285,11 +1285,11 @@
 
 :CuratorAddObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorAddObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :CuratorAddObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :CuratorAddObjectPropertyValueSet .
 
 :CuratorAddObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1298,11 +1298,11 @@
 
 :AdminAddObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminAddObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:AddOperationValueSet ;
-    access:dataSetValues :AdminAddObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:AddOperationValueSet ;
+    access:hasRelatedValueSet :AdminAddObjectPropertyValueSet .
 
 :AdminAddObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1313,11 +1313,11 @@
 
 :PublicEditObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicEditObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :PublicEditObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :PublicEditObjectPropertyValueSet .
 
 :PublicEditObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1326,11 +1326,11 @@
 
 :EditorEditObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorEditObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :EditorEditObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :EditorEditObjectPropertyValueSet .
 
 :EditorEditObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1339,11 +1339,11 @@
 
 :CuratorEditObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorEditObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :CuratorEditObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :CuratorEditObjectPropertyValueSet .
 
 :CuratorEditObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1352,11 +1352,11 @@
 
 :AdminEditObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminEditObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:EditOperationValueSet ;
-    access:dataSetValues :AdminEditObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:EditOperationValueSet ;
+    access:hasRelatedValueSet :AdminEditObjectPropertyValueSet .
 
 :AdminEditObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1368,11 +1368,11 @@
 
 :PublicDisplayObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDisplayObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :PublicDisplayObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :PublicDisplayObjectPropertyValueSet .
 
 :PublicDisplayObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1381,11 +1381,11 @@
 
 :EditorDisplayObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDisplayObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :EditorDisplayObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :EditorDisplayObjectPropertyValueSet .
 
 :EditorDisplayObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1394,11 +1394,11 @@
 
 :CuratorDisplayObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDisplayObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :CuratorDisplayObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDisplayObjectPropertyValueSet .
 
 :CuratorDisplayObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1407,11 +1407,11 @@
 
 :AdminDisplayObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDisplayObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :AdminDisplayObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :AdminDisplayObjectPropertyValueSet .
 
 :AdminDisplayObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1422,11 +1422,11 @@
 
 :PublicDisplayDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDisplayDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :PublicDisplayDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :PublicDisplayDataPropertyValueSet .
 
 :PublicDisplayDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1435,11 +1435,11 @@
 
 :EditorDisplayDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDisplayDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :EditorDisplayDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :EditorDisplayDataPropertyValueSet .
 
 :EditorDisplayDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1448,11 +1448,11 @@
 
 :CuratorDisplayDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDisplayDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :CuratorDisplayDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDisplayDataPropertyValueSet .
 
 :CuratorDisplayDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1461,11 +1461,11 @@
 
 :AdminDisplayDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDisplayDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :AdminDisplayDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :AdminDisplayDataPropertyValueSet .
 
 :AdminDisplayDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1476,11 +1476,11 @@
 
 :PublicDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDisplayFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :PublicDisplayFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :PublicDisplayFauxObjectPropertyValueSet .
 
 :PublicDisplayFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1489,11 +1489,11 @@
 
 :EditorDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDisplayFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :EditorDisplayFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :EditorDisplayFauxObjectPropertyValueSet .
 
 :EditorDisplayFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1502,11 +1502,11 @@
 
 :CuratorDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDisplayFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :CuratorDisplayFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDisplayFauxObjectPropertyValueSet .
 
 :CuratorDisplayFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1515,11 +1515,11 @@
 
 :AdminDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDisplayFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :AdminDisplayFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :AdminDisplayFauxObjectPropertyValueSet .
 
 :AdminDisplayFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1530,11 +1530,11 @@
 
 :PublicDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :PublicDisplayFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:PublicRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :PublicDisplayFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :PublicDisplayFauxDataPropertyValueSet .
 
 :PublicDisplayFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -1543,11 +1543,11 @@
 
 :EditorDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDisplayFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :EditorDisplayFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :EditorDisplayFauxDataPropertyValueSet .
 
 :EditorDisplayFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -1556,11 +1556,11 @@
 
 :CuratorDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDisplayFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :CuratorDisplayFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDisplayFauxDataPropertyValueSet .
 
 :CuratorDisplayFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -1569,11 +1569,11 @@
 
 :AdminDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDisplayFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:DisplayOperationValueSet ;
-    access:dataSetValues :AdminDisplayFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :AdminDisplayFauxDataPropertyValueSet .
 
 :AdminDisplayFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -1584,11 +1584,11 @@
 
 :EditorPublishObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :EditorPublishObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :EditorPublishObjectPropertyValueSet .
 
 :EditorPublishObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1597,11 +1597,11 @@
 
 :CuratorPublishObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorPublishObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :CuratorPublishObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :CuratorPublishObjectPropertyValueSet .
 
 :CuratorPublishObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1610,11 +1610,11 @@
 
 :AdminPublishObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminPublishObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyValueSet ;
-    access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :AdminPublishObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :AdminPublishObjectPropertyValueSet .
 
 :AdminPublishObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:ObjectProperty ;
@@ -1625,11 +1625,11 @@
 
 :EditorPublishDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :EditorPublishDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :EditorPublishDataPropertyValueSet .
 
 :EditorPublishDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1638,11 +1638,11 @@
 
 :CuratorPublishDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorPublishDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :CuratorPublishDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :CuratorPublishDataPropertyValueSet .
 
 :CuratorPublishDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1651,11 +1651,11 @@
 
 :AdminPublishDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminPublishDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:DataPropertyValueSet ;
-    access:dataSetValues access-individual:DataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :AdminPublishDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :AdminPublishDataPropertyValueSet .
 
 :AdminPublishDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:DataProperty ;
@@ -1666,11 +1666,11 @@
 
 :EditorPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :EditorPublishFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :EditorPublishFauxObjectPropertyValueSet .
 
 :EditorPublishFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1679,11 +1679,11 @@
 
 :CuratorPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorPublishFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :CuratorPublishFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :CuratorPublishFauxObjectPropertyValueSet .
 
 :CuratorPublishFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1692,11 +1692,11 @@
 
 :AdminPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminPublishFauxObjectPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
-    access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :AdminPublishFauxObjectPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :AdminPublishFauxObjectPropertyValueSet .
 
 :AdminPublishFauxObjectPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxObjectProperty ;
@@ -1707,11 +1707,11 @@
 
 :EditorPublishFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:EditorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :EditorPublishFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :EditorPublishFauxDataPropertyValueSet .
 
 :EditorPublishFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -1720,11 +1720,11 @@
 
 :CuratorPublishFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorPublishFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:CuratorRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :CuratorPublishFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :CuratorPublishFauxDataPropertyValueSet .
 
 :CuratorPublishFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;
@@ -1733,11 +1733,11 @@
 
 :AdminPublishFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :AdminPublishFauxDataPropertyDataSetKey ;
-    access:dataSetValues access-individual:AdminRoleValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyValueSet ;
-    access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
-    access:dataSetValues access-individual:PublishOperationValueSet ;
-    access:dataSetValues :AdminPublishFauxDataPropertyValueSet .
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :AdminPublishFauxDataPropertyValueSet .
 
 :AdminPublishFauxDataPropertyDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:FauxDataProperty ;

@@ -154,7 +154,7 @@ public class PolicyLoader {
             + "    OPTIONAL {\n"
             + "      ?check access:values ?attributeValue .\n"
             + "      ?attributeValue access:value ?value .\n"
-            + "      ?dataSet access:dataSetValues ?attributeValue .\n"
+            + "      ?dataSet access:hasRelatedValueSet ?attributeValue .\n"
             + "      OPTIONAL {\n"
             + "        ?attributeValue access:containsElementsOfType ?setElementsTypeUri .\n"
             + "        ?setElementsTypeUri access:id ?setElementsType ."
@@ -179,7 +179,7 @@ public class PolicyLoader {
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "  ?" + POLICY + " access:hasDataSet ?dataSet .\n"
             + "  ?dataSet access:hasDataSetKey ?dataSetKeyUri .\n"
-            + "  ?dataSet access:dataSetValues ?valueSet .\n"
+            + "  ?dataSet access:hasRelatedValueSet ?valueSet .\n"
             + "  ?valueSet access:containsElementsOfType ?setElementsType .\n"
             + "  ?setElementsType access:id ?setElementsId .\n"
             + "  OPTIONAL { ?valueSet access:value ?value .\n"
@@ -200,7 +200,7 @@ public class PolicyLoader {
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "  ?dataSet access:hasDataSetKey ?dataSetKeyUri .\n"
             + "  ?" + POLICY + " access:hasDataSet ?dataSet . \n"
-            + "  ?dataSet access:dataSetValues ?valueSet . \n"
+            + "  ?dataSet access:hasRelatedValueSet ?valueSet . \n"
             + "  ?valueSet access:containsElementsOfType ?setElementsTypeUri . \n"
             + "  ?setElementsTypeUri access:id ?setElementsType . \n";
 
@@ -270,7 +270,7 @@ public class PolicyLoader {
             + "SELECT ?valueSet \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?dataSetTemplate access:dataSetValues ?valueSet .\n"
+            + "    ?dataSetTemplate access:hasRelatedValueSet ?valueSet .\n"
             + "  }\n"
             + "}\n";
 
@@ -561,8 +561,8 @@ public class PolicyLoader {
         }
         int i = 0;
         for (String id : ids) {
-            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent ?uri%d . ?uri%d access:id \"%s\" . \n", i,
-                    i, id));
+            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent ?uri%d . ?uri%d access:id \"%s\" . \n",
+                    i, i, id));
             i++;
         }
         query.append(policyStatementByKeyTemplateSuffix);
@@ -576,8 +576,8 @@ public class PolicyLoader {
         }
         int i = 0;
         for (String id : ids) {
-            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent ?uri%d .\n  ?uri%d access:id \"%s\" . \n",
-                    i, i, id));
+            query.append(String.format(
+                    "  ?dataSetKeyUri access:hasKeyComponent ?uri%d .\n  ?uri%d access:id \"%s\" . \n", i, i, id));
             i++;
         }
         query.append(policyKeyTemplateSuffix);

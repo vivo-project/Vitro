@@ -86,8 +86,8 @@
     access:values :ProhibitedNamespaceExceptionsValueSet .
 
 :NotModifiableStatementsPolicyDataSet a access:DataSet ;
-    access:dataSetValues :ProhibitedNamespaceExceptionsValueSet ;
-    access:dataSetValues :ProhibitedNamespaceValueSet .
+    access:hasRelatedValueSet :ProhibitedNamespaceExceptionsValueSet ;
+    access:hasRelatedValueSet :ProhibitedNamespaceValueSet .
 
 :ProhibitedNamespaceExceptionsValueSet a access:ValueSet ;
     .
