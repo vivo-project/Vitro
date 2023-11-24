@@ -19,9 +19,9 @@
     rdfs:comment "Policy to define access rules" ; 
     rdfs:label "Policy"@en-US .
 
-:PolicyDataSet a owl:Class ;
+:DataSet a owl:Class ;
     rdfs:comment "Data set to load policy instance with values defined in it. Contains value sets used by checks. While loading policy from data set value containers not specified in current data set are ignored (not used by checks)." ;
-    rdfs:label "Policy dataset"@en-US .
+    rdfs:label "Dataset"@en-US .
 
 :ValueSet a owl:Class ;
     rdfs:comment "Container for values" ; 
@@ -102,9 +102,9 @@
 
 :priority a owl:DatatypeProperty ,
     owl:FunctionalProperty ;
-    rdfs:comment "Set priority to :Policy, :PolicyTemplate or :PolicyDataSet";
+    rdfs:comment "Set priority to :Policy, :PolicyTemplate or :DataSet";
     rdfs:range xsd:integer ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate :PolicyDataSet ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate :DataSet ) ] ;
     rdfs:label "priority"@en-US . 
     
 :version a owl:DatatypeProperty ,
@@ -119,7 +119,7 @@
 :dataSetValues a owl:ObjectProperty ;
     rdfs:comment "Data set/data set template contains value set";
     rdfs:label "data set values"@en-US ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :DataSetTemplate :PolicyDataSet ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :DataSetTemplate :DataSet ) ] ;
     rdfs:range :ValueSet .
 
 :value a owl:ObjectProperty ;
@@ -193,7 +193,7 @@
     rdfs:comment "Relates policy template to data set";
     rdfs:label "has data set"@en-US ;
     rdfs:domain :PolicyTemplate ;
-    rdfs:range :PolicyDataSet .
+    rdfs:range :DataSet .
 
 :hasRule a owl:ObjectProperty ;
     rdfs:comment "Assgins a rule to a policy or policy template";
@@ -204,7 +204,7 @@
 :dataSetKey a owl:ObjectProperty ;
     rdfs:comment "Assign data set template to policy data set";
     rdfs:label "data set key"@en-US ;
-    rdfs:domain :PolicyDataSet ;
+    rdfs:domain :DataSet ;
     rdfs:range :DataSetKey .
 
 :dataSetKeyTemplate a owl:ObjectProperty ;

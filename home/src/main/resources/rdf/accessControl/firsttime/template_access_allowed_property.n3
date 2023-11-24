@@ -717,7 +717,7 @@
 
 ### Drop faux data property data sets
 
-:PublicDropFauxDataPropertyDataSet a access:PolicyDataSet ;
+:PublicDropFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDropFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -730,7 +730,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:EditorDropFauxDataPropertyDataSet a access:PolicyDataSet ;
+:EditorDropFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDropFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -743,7 +743,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:CuratorDropFauxDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorDropFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDropFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -756,7 +756,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:AdminDropFauxDataPropertyDataSet a access:PolicyDataSet ;
+:AdminDropFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDropFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -771,7 +771,7 @@
 
 ### Add faux data property data sets
 
-:PublicAddFauxDataPropertyDataSet a access:PolicyDataSet ;
+:PublicAddFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicAddFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -784,7 +784,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:EditorAddFauxDataPropertyDataSet a access:PolicyDataSet ;
+:EditorAddFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorAddFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -797,7 +797,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:CuratorAddFauxDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorAddFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorAddFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -810,7 +810,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:AdminAddFauxDataPropertyDataSet a access:PolicyDataSet ;
+:AdminAddFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminAddFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -825,7 +825,7 @@
 
 ### Edit faux data property data sets
 
-:PublicEditFauxDataPropertyDataSet a access:PolicyDataSet ;
+:PublicEditFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicEditFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -838,7 +838,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:EditorEditFauxDataPropertyDataSet a access:PolicyDataSet ;
+:EditorEditFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorEditFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -851,7 +851,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:CuratorEditFauxDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorEditFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorEditFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -864,7 +864,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:AdminEditFauxDataPropertyDataSet a access:PolicyDataSet ;
+:AdminEditFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminEditFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -879,7 +879,7 @@
 
 ### Drop faux object property data sets
 
-:PublicDropFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicDropFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDropFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -892,7 +892,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:EditorDropFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorDropFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDropFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -905,7 +905,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:CuratorDropFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorDropFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDropFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -918,7 +918,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:AdminDropFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminDropFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDropFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -933,7 +933,7 @@
 
 ### Add faux object property data sets
 
-:PublicAddFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicAddFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicAddFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -946,7 +946,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:EditorAddFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorAddFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorAddFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -959,7 +959,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:CuratorAddFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorAddFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorAddFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -972,7 +972,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:AdminAddFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminAddFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminAddFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -987,7 +987,7 @@
 
 ### Edit faux object property data sets
 
-:PublicEditFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicEditFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicEditFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1000,7 +1000,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:EditorEditFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorEditFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorEditFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1013,7 +1013,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:CuratorEditFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorEditFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorEditFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1026,7 +1026,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:AdminEditFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminEditFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminEditFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1041,7 +1041,7 @@
 
 ### Drop data property data sets
 
-:PublicDropDataPropertyDataSet a access:PolicyDataSet ;
+:PublicDropDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDropDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1054,7 +1054,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:EditorDropDataPropertyDataSet a access:PolicyDataSet ;
+:EditorDropDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDropDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1067,7 +1067,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:CuratorDropDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorDropDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDropDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1080,7 +1080,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:AdminDropDataPropertyDataSet a access:PolicyDataSet ;
+:AdminDropDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDropDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1095,7 +1095,7 @@
 
 ### Add data property data sets
 
-:PublicAddDataPropertyDataSet a access:PolicyDataSet ;
+:PublicAddDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicAddDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1108,7 +1108,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:EditorAddDataPropertyDataSet a access:PolicyDataSet ;
+:EditorAddDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorAddDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1121,7 +1121,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:CuratorAddDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorAddDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorAddDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1134,7 +1134,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:AdminAddDataPropertyDataSet a access:PolicyDataSet ;
+:AdminAddDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminAddDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1149,7 +1149,7 @@
 
 ### Edit data property data sets
 
-:PublicEditDataPropertyDataSet a access:PolicyDataSet ;
+:PublicEditDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicEditDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1162,7 +1162,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:EditorEditDataPropertyDataSet a access:PolicyDataSet ;
+:EditorEditDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorEditDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1175,7 +1175,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:CuratorEditDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorEditDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorEditDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1188,7 +1188,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:AdminEditDataPropertyDataSet a access:PolicyDataSet ;
+:AdminEditDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminEditDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1203,7 +1203,7 @@
 
 ### Drop object property data sets
 
-:PublicDropObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicDropObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDropObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1216,7 +1216,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:EditorDropObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorDropObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDropObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1229,7 +1229,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:CuratorDropObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorDropObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDropObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1242,7 +1242,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DropOperation .
 
-:AdminDropObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminDropObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDropObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1257,7 +1257,7 @@
 
 ### Add object property data sets
 
-:PublicAddObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicAddObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicAddObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1270,7 +1270,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:EditorAddObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorAddObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorAddObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1283,7 +1283,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:CuratorAddObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorAddObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorAddObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1296,7 +1296,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:AddOperation .
 
-:AdminAddObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminAddObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminAddObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1311,7 +1311,7 @@
 
 ### Edit object property data sets
 
-:PublicEditObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicEditObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicEditObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1324,7 +1324,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:EditorEditObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorEditObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorEditObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1337,7 +1337,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:CuratorEditObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorEditObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorEditObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1350,7 +1350,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:EditOperation .
 
-:AdminEditObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminEditObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminEditObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1366,7 +1366,7 @@
 
 ### Display object property data sets
 
-:PublicDisplayObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicDisplayObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDisplayObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1379,7 +1379,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:EditorDisplayObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorDisplayObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDisplayObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1392,7 +1392,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:CuratorDisplayObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorDisplayObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDisplayObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1405,7 +1405,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:AdminDisplayObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminDisplayObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDisplayObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1420,7 +1420,7 @@
 
 ### Display data property data sets
 
-:PublicDisplayDataPropertyDataSet a access:PolicyDataSet ;
+:PublicDisplayDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDisplayDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1433,7 +1433,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:EditorDisplayDataPropertyDataSet a access:PolicyDataSet ;
+:EditorDisplayDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDisplayDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1446,7 +1446,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:CuratorDisplayDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorDisplayDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDisplayDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1459,7 +1459,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:AdminDisplayDataPropertyDataSet a access:PolicyDataSet ;
+:AdminDisplayDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDisplayDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1474,7 +1474,7 @@
 
 ### Display faux object property data sets
 
-:PublicDisplayFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:PublicDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDisplayFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1487,7 +1487,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:EditorDisplayFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDisplayFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1500,7 +1500,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:CuratorDisplayFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDisplayFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1513,7 +1513,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:AdminDisplayFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDisplayFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1528,7 +1528,7 @@
 
 ### Display faux data property data sets
 
-:PublicDisplayFauxDataPropertyDataSet a access:PolicyDataSet ;
+:PublicDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :PublicDisplayFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -1541,7 +1541,7 @@
     access:keyComponent access-individual:PublicRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:EditorDisplayFauxDataPropertyDataSet a access:PolicyDataSet ;
+:EditorDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorDisplayFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -1554,7 +1554,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:CuratorDisplayFauxDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorDisplayFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -1567,7 +1567,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:DisplayOperation .
 
-:AdminDisplayFauxDataPropertyDataSet a access:PolicyDataSet ;
+:AdminDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminDisplayFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -1582,7 +1582,7 @@
 
 ### Publish object property data sets
 
-:EditorPublishObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorPublishObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorPublishObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1595,7 +1595,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:CuratorPublishObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorPublishObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorPublishObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1608,7 +1608,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:AdminPublishObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminPublishObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminPublishObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -1623,7 +1623,7 @@
 
 ### Publish data property data sets
 
-:EditorPublishDataPropertyDataSet a access:PolicyDataSet ;
+:EditorPublishDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorPublishDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1636,7 +1636,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:CuratorPublishDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorPublishDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorPublishDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1649,7 +1649,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:AdminPublishDataPropertyDataSet a access:PolicyDataSet ;
+:AdminPublishDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminPublishDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -1664,7 +1664,7 @@
 
 ### Publish faux object property data sets
 
-:EditorPublishFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:EditorPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorPublishFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1677,7 +1677,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:CuratorPublishFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:CuratorPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorPublishFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1690,7 +1690,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:AdminPublishFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:AdminPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminPublishFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -1705,7 +1705,7 @@
 
 ### Publish faux data property data sets
 
-:EditorPublishFauxDataPropertyDataSet a access:PolicyDataSet ;
+:EditorPublishFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :EditorPublishFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -1718,7 +1718,7 @@
     access:keyComponent access-individual:EditorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:CuratorPublishFauxDataPropertyDataSet a access:PolicyDataSet ;
+:CuratorPublishFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :CuratorPublishFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -1731,7 +1731,7 @@
     access:keyComponent access-individual:CuratorRoleUri ;
     access:keyComponent access-individual:PublishOperation .
 
-:AdminPublishFauxDataPropertyDataSet a access:PolicyDataSet ;
+:AdminPublishFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :AdminPublishFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
