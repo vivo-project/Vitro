@@ -110,6 +110,6 @@
     access:value  :prohibitedNamespacePrefix ; 
     .
 
-:prohibitedNamespacePrefix a access:AttributeValuePattern ;
+:prohibitedNamespacePrefix a access:AttributeValuePrefix ;
     access:id "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ;
     
