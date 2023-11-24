@@ -105,30 +105,30 @@
     access:policyDataSet :CuratorDropFauxDataPropertyDataSet ;
     access:policyDataSet :AdminDropFauxDataPropertyDataSet ;
 
-    access:policyDataSetTemplate :RoleDisplayObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RolePublishObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleAddObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleDropObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDisplayObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RolePublishObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleAddObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDropObjectPropertyDataSetTemplate ;
 
-    access:policyDataSetTemplate :RoleEditObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleDisplayDataPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RolePublishDataPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleAddDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleEditObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDisplayDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RolePublishDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleAddDataPropertyDataSetTemplate ;
 
-    access:policyDataSetTemplate :RoleDropDataPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleEditDataPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleDisplayFauxObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RolePublishFauxObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDropDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleEditDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDisplayFauxObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RolePublishFauxObjectPropertyDataSetTemplate ;
 
-    access:policyDataSetTemplate :RoleAddFauxObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleDropFauxObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleEditFauxObjectPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleDisplayFauxDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleAddFauxObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDropFauxObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleEditFauxObjectPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDisplayFauxDataPropertyDataSetTemplate ;
 
-    access:policyDataSetTemplate :RolePublishFauxDataPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleAddFauxDataPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleDropFauxDataPropertyDataSetTemplate ;
-    access:policyDataSetTemplate :RoleEditFauxDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RolePublishFauxDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleAddFauxDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDropFauxDataPropertyDataSetTemplate ;
+    access:hasDataSetTemplate :RoleEditFauxDataPropertyDataSetTemplate ;
     .
 
 

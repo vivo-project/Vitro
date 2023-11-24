@@ -213,9 +213,9 @@
     rdfs:domain :DataSetTemplate ;
     rdfs:range :DataSetKeyTemplate .
 
-:policyDataSetTemplate a owl:ObjectProperty ;
-    rdfs:comment "Assign data set template to policy data set";
-    rdfs:label "policy data set template"@en-US ;
+:hasDataSetTemplate a owl:ObjectProperty ;
+    rdfs:comment "Relates policy template to data set template";
+    rdfs:label "has data set template"@en-US ;
     rdfs:domain :PolicyTemplate ;
     rdfs:range :DataSetTemplate .
 
