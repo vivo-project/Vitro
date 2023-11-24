@@ -136,7 +136,7 @@
 #Role DisplayObjectProperty data set template
 
 :RoleDisplayObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDisplayObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDisplayObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDisplayObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -165,7 +165,7 @@
 #Role PublishObjectProperty data set template
 
 :RolePublishObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RolePublishObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RolePublishObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RolePublishObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -194,7 +194,7 @@
 #Role AddObjectProperty data set template
 
 :RoleAddObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleAddObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleAddObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleAddObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -223,7 +223,7 @@
 #Role DropObjectProperty data set template
 
 :RoleDropObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDropObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDropObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDropObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -252,7 +252,7 @@
 #Role EditObjectProperty data set template
 
 :RoleEditObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleEditObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleEditObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleEditObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -281,7 +281,7 @@
 #Role DisplayDataProperty data set template
 
 :RoleDisplayDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDisplayDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDisplayDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDisplayDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -310,7 +310,7 @@
 #Role PublishDataProperty data set template
 
 :RolePublishDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RolePublishDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RolePublishDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RolePublishDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -339,7 +339,7 @@
 #Role AddDataProperty data set template
 
 :RoleAddDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleAddDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleAddDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleAddDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -368,7 +368,7 @@
 #Role DropDataProperty data set template
 
 :RoleDropDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDropDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDropDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDropDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -397,7 +397,7 @@
 #Role EditDataProperty data set template
 
 :RoleEditDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleEditDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleEditDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleEditDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -426,7 +426,7 @@
 #Role DisplayFauxObjectProperty data set template
 
 :RoleDisplayFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDisplayFauxObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDisplayFauxObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDisplayFauxObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -455,7 +455,7 @@
 #Role PublishFauxObjectProperty data set template
 
 :RolePublishFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RolePublishFauxObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RolePublishFauxObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RolePublishFauxObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -484,7 +484,7 @@
 #Role AddFauxObjectProperty data set template
 
 :RoleAddFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleAddFauxObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleAddFauxObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleAddFauxObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -513,7 +513,7 @@
 #Role DropFauxObjectProperty data set template
 
 :RoleDropFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDropFauxObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDropFauxObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDropFauxObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -542,7 +542,7 @@
 #Role EditFauxObjectProperty data set template
 
 :RoleEditFauxObjectPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleEditFauxObjectPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleEditFauxObjectPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleEditFauxObjectPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -571,7 +571,7 @@
 #Role DisplayFauxDataProperty data set template
 
 :RoleDisplayFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDisplayFauxDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDisplayFauxDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDisplayFauxDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
@@ -600,7 +600,7 @@
 #Role PublishFauxDataProperty data set template
 
 :RolePublishFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RolePublishFauxDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RolePublishFauxDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RolePublishFauxDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
@@ -629,7 +629,7 @@
 #Role AddFauxDataProperty data set template
 
 :RoleAddFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleAddFauxDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleAddFauxDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleAddFauxDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
@@ -658,7 +658,7 @@
 #Role DropFauxDataProperty data set template
 
 :RoleDropFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDropFauxDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDropFauxDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDropFauxDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
@@ -687,7 +687,7 @@
 #Role EditFauxDataProperty data set template
 
 :RoleEditFauxDataPropertyDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleEditFauxDataPropertyDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleEditFauxDataPropertyDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleEditFauxDataPropertyDataSetKeyTemplate ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;

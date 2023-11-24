@@ -158,10 +158,10 @@
     rdfs:domain :ValueSetTemplate ;
     rdfs:range :Check .
 
-:dataSetTemplateKey a owl:ObjectProperty, 
+:hasDataSetTemplateKey a owl:ObjectProperty, 
     owl:FunctionalProperty ;
     rdfs:comment "Specify data set template key";
-    rdfs:label "data set template key"@en-US ;
+    rdfs:label "has data set template key"@en-US ;
     rdfs:domain :DataSetTemplate ;
     rdfs:range :DataSetTemplateKey .
 

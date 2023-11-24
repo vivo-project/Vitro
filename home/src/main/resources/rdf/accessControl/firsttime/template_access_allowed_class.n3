@@ -33,7 +33,7 @@
 #Role Display Class data set template
 
 :RoleDisplayClassDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDisplayClassDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDisplayClassDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDisplayClassDataSetKeyTemplate ;
     access:dataSetValues access-individual:ClassValueSet ;
     access:dataSetValues access-individual:DisplayOperationValueSet ;
@@ -60,7 +60,7 @@
 #Role Update Class data set template
 
 :RoleUpdateClassDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleUpdateClassDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleUpdateClassDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleUpdateClassDataSetKeyTemplate ;
     access:dataSetValues access-individual:ClassValueSet ;
     access:dataSetValues access-individual:UpdateOperationValueSet ;
@@ -87,7 +87,7 @@
 #Role Publish Class data set template
 
 :RolePublishClassDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RolePublishClassDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RolePublishClassDataSetTemplateKey ;
     access:dataSetKeyTemplate :RolePublishClassDataSetKeyTemplate ;
     access:dataSetValues access-individual:ClassValueSet ;
     access:dataSetValues access-individual:PublishOperationValueSet ;

@@ -19,7 +19,7 @@
 #Role data set template
 
 :RoleDataSetTemplate a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDataSetTemplateKey ;
+    access:hasDataSetTemplateKey :RoleDataSetTemplateKey ;
     access:dataSetKeyTemplate :RoleDataSetKeyTemplate ;
     access:dataSetValueTemplate :RoleValueSetTemplate ;
     access:dataSetValueTemplate :RolePermissionValueSetTemplate .  
