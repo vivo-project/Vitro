@@ -41,7 +41,7 @@
     access:dataSetValueTemplate :RoleDisplayClassValueSetTemplate .  
 
 :RoleDisplayClassDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDisplayClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:Class ;
@@ -68,7 +68,7 @@
     access:dataSetValueTemplate :RoleUpdateClassValueSetTemplate .  
 
 :RoleUpdateClassDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleUpdateClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:Class ;
@@ -95,7 +95,7 @@
     access:dataSetValueTemplate :RolePublishClassValueSetTemplate .  
 
 :RolePublishClassDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RolePublishClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:Class ;

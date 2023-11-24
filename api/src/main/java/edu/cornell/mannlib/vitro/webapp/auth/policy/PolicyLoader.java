@@ -214,8 +214,8 @@ public class PolicyLoader {
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policyTemplate access:hasDataSetTemplate ?dataSetTemplate .\n"
             + "    ?dataSetTemplate access:hasDataSetTemplateKey ?dataSetTemplateKey .\n"
-            + "    ?dataSetTemplateKey access:templateKey access-individual:SubjectRole .\n"
-            + "    ?dataSetTemplateKey access:templateKey ?key .\n"
+            + "    ?dataSetTemplateKey access:hasTemplateKeyComponent access-individual:SubjectRole .\n"
+            + "    ?dataSetTemplateKey access:hasTemplateKeyComponent ?key .\n"
             + "  }\n"
             + "}\n"
             + "GROUP BY ?dataSetTemplate ?policyTemplate";

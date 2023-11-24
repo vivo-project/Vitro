@@ -17,7 +17,7 @@ public class PolicyTemplateController {
     private static final Log log = LogFactory.getLog(PolicyTemplateController.class);
     public static void createRoleDataSets(String roleUri) {
 
-        // Execute sparql query to get all data set templates that have ao:templateKey access-individual:SubjectRole .
+        // Execute sparql query to get all data set templates that have ao:hasTemplateKeyComponent access-individual:SubjectRole .
         Map<String, String> templates = PolicyLoader.getInstance().getRoleDataSetTemplates();
         for (String templateUri : templates.keySet()) {
             createRoleDataSet(templateUri, roleUri, templates.get(templateUri));

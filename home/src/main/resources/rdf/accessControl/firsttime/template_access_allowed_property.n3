@@ -145,7 +145,7 @@
     access:dataSetValueTemplate :RoleDisplayObjectPropertyEntityValueSetTemplate .  
 
 :RoleDisplayObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDisplayObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:ObjectProperty ;
@@ -174,7 +174,7 @@
     access:dataSetValueTemplate :RolePublishObjectPropertyEntityValueSetTemplate .  
 
 :RolePublishObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RolePublishObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:ObjectProperty ;
@@ -203,7 +203,7 @@
     access:dataSetValueTemplate :RoleAddObjectPropertyEntityValueSetTemplate .  
 
 :RoleAddObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleAddObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:ObjectProperty ;
@@ -232,7 +232,7 @@
     access:dataSetValueTemplate :RoleDropObjectPropertyEntityValueSetTemplate .  
 
 :RoleDropObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDropObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:ObjectProperty ;
@@ -261,7 +261,7 @@
     access:dataSetValueTemplate :RoleEditObjectPropertyEntityValueSetTemplate .  
 
 :RoleEditObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleEditObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:ObjectProperty ;
@@ -290,7 +290,7 @@
     access:dataSetValueTemplate :RoleDisplayDataPropertyEntityValueSetTemplate .  
 
 :RoleDisplayDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDisplayDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:DataProperty ;
@@ -319,7 +319,7 @@
     access:dataSetValueTemplate :RolePublishDataPropertyEntityValueSetTemplate .  
 
 :RolePublishDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RolePublishDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:DataProperty ;
@@ -348,7 +348,7 @@
     access:dataSetValueTemplate :RoleAddDataPropertyEntityValueSetTemplate .  
 
 :RoleAddDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleAddDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:DataProperty ;
@@ -377,7 +377,7 @@
     access:dataSetValueTemplate :RoleDropDataPropertyEntityValueSetTemplate .  
 
 :RoleDropDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDropDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:DataProperty ;
@@ -406,7 +406,7 @@
     access:dataSetValueTemplate :RoleEditDataPropertyEntityValueSetTemplate .  
 
 :RoleEditDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleEditDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:DataProperty ;
@@ -435,7 +435,7 @@
     access:dataSetValueTemplate :RoleDisplayFauxObjectPropertyEntityValueSetTemplate .  
 
 :RoleDisplayFauxObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDisplayFauxObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxObjectProperty ;
@@ -464,7 +464,7 @@
     access:dataSetValueTemplate :RolePublishFauxObjectPropertyEntityValueSetTemplate .  
 
 :RolePublishFauxObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RolePublishFauxObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxObjectProperty ;
@@ -493,7 +493,7 @@
     access:dataSetValueTemplate :RoleAddFauxObjectPropertyEntityValueSetTemplate .  
 
 :RoleAddFauxObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleAddFauxObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxObjectProperty ;
@@ -522,7 +522,7 @@
     access:dataSetValueTemplate :RoleDropFauxObjectPropertyEntityValueSetTemplate .  
 
 :RoleDropFauxObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDropFauxObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxObjectProperty ;
@@ -551,7 +551,7 @@
     access:dataSetValueTemplate :RoleEditFauxObjectPropertyEntityValueSetTemplate .  
 
 :RoleEditFauxObjectPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleEditFauxObjectPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxObjectProperty ;
@@ -580,7 +580,7 @@
     access:dataSetValueTemplate :RoleDisplayFauxDataPropertyEntityValueSetTemplate .  
 
 :RoleDisplayFauxDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDisplayFauxDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxDataProperty ;
@@ -609,7 +609,7 @@
     access:dataSetValueTemplate :RolePublishFauxDataPropertyEntityValueSetTemplate .  
 
 :RolePublishFauxDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RolePublishFauxDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxDataProperty ;
@@ -638,7 +638,7 @@
     access:dataSetValueTemplate :RoleAddFauxDataPropertyEntityValueSetTemplate .  
 
 :RoleAddFauxDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleAddFauxDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxDataProperty ;
@@ -667,7 +667,7 @@
     access:dataSetValueTemplate :RoleDropFauxDataPropertyEntityValueSetTemplate .  
 
 :RoleDropFauxDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDropFauxDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxDataProperty ;
@@ -696,7 +696,7 @@
     access:dataSetValueTemplate :RoleEditFauxDataPropertyEntityValueSetTemplate .  
 
 :RoleEditFauxDataPropertyDataSetTemplateKey a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleEditFauxDataPropertyDataSetKeyTemplate a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:FauxDataProperty ;

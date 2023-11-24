@@ -26,7 +26,7 @@
     access:dataSetValueTemplate :RolePermissionValueSetTemplate1 .  
 
 :RoleDataSetTemplateKey1 a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDataSetKeyTemplate1 a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:NamedObject ;
@@ -51,7 +51,7 @@
     access:dataSetValueTemplate :RolePermissionValueSetTemplate2 .  
 
 :RoleDataSetTemplateKey2 a access:DataSetTemplateKey ;
-    access:templateKey access-individual:SubjectRole .
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDataSetKeyTemplate2 a access:DataSetKeyTemplate ;
     access:keyComponent access-individual:ObjectPropertyAccesObject ;
