@@ -25,9 +25,9 @@
     access:policyDataSet :CuratorPublishClassDataSet ;
     access:policyDataSet :AdminPublishClassDataSet ;
 
-    access:policyDataSetTemplate :RoleDisplayClassDataSetTemplate ;
-    access:policyDataSetTemplate :RoleUpdateClassDataSetTemplate ;
-    access:policyDataSetTemplate :RolePublishClassDataSetTemplate ;
+    access:hasDataSetTemplate :RoleDisplayClassDataSetTemplate ;
+    access:hasDataSetTemplate :RoleUpdateClassDataSetTemplate ;
+    access:hasDataSetTemplate :RolePublishClassDataSetTemplate ;
     .
 
 #Role Display Class data set template

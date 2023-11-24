@@ -212,7 +212,7 @@ public class PolicyLoader {
             + "SELECT ?dataSetTemplate ?policyTemplate ( COUNT(?key) AS ?keySize )\n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "    ?policyTemplate access:policyDataSetTemplate ?dataSetTemplate .\n"
+            + "    ?policyTemplate access:hasDataSetTemplate ?dataSetTemplate .\n"
             + "    ?dataSetTemplate access:dataSetTemplateKey ?dataSetTemplateKey .\n"
             + "    ?dataSetTemplateKey access:templateKey access-individual:SubjectRole .\n"
             + "    ?dataSetTemplateKey access:templateKey ?key .\n"
