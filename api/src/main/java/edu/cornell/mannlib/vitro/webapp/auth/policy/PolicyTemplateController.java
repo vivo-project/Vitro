@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_INDIVIDUAL_PREFIX;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_VOCABULARY_PREFIX;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
 
@@ -37,14 +38,14 @@ public class PolicyTemplateController {
         Model dataSetModel = VitroModelFactory.createModel();
 
         for (String keyTemplate : keyTemplates) {
-            if (keyTemplate.equals("https://vivoweb.org/ontology/vitro-application/auth/individual/SubjectRole")) {
-                String roleKeyUri = dataSetUri + role + "RoleUri";
-                dataSetModel.add(new StatementImpl(dataSetModel.createResource(roleKeyUri),
-                        dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "id"),
-                        dataSetModel.createLiteral(roleUri)));
-                dataSetModel.add(new StatementImpl(dataSetModel.createResource(roleKeyUri),
-                        dataSetModel.createProperty(RDF_TYPE),
-                        dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "SubjectRoleUri")));
+            if (keyTemplate.equals(AUTH_INDIVIDUAL_PREFIX + "SubjectRole")) {
+                String roleKeyUri = null;
+                List<String> roleValuePatterns = PolicyLoader.getInstance().getSubjectRoleValuePattern(roleUri);
+                if (roleValuePatterns.isEmpty()) {
+                    roleKeyUri = createSubjectRoleUri(roleUri, dataSetModel);
+                } else {
+                    roleKeyUri = roleValuePatterns.get(0);
+                }
                 keys.add(roleKeyUri);
             } else {
                 log.error(String.format("Not recognized key template found '%s'", keyTemplate));
@@ -91,6 +92,18 @@ public class PolicyTemplateController {
             // If value set template is subject role, then role uri should be added to the set
         }
         policyLoader.updateAccessControlModel(dataSetModel, true);
+    }
+
+    public static String createSubjectRoleUri(String roleUri, Model dataSetModel) {
+        String roleShortName = getRoleShortName(roleUri);
+        String roleValueSetUri = AUTH_INDIVIDUAL_PREFIX + roleShortName + "RoleUri";
+        dataSetModel.add(new StatementImpl(dataSetModel.createResource(roleValueSetUri),
+                dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "id"),
+                dataSetModel.createLiteral(roleUri)));
+        dataSetModel.add(new StatementImpl(dataSetModel.createResource(roleValueSetUri),
+                dataSetModel.createProperty(RDF_TYPE),
+                dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "SubjectRoleUri")));
+        return roleValueSetUri;
     }
 
     private static String getRoleShortName(String roleUri) {
