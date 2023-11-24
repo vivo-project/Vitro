@@ -95,7 +95,7 @@ public class SimplePermissionMigrator {
             }
         }
     }
-    
+
     private static String getShortName(String entityUri) {
         return entityUri.substring(entityUri.lastIndexOf('#') + 1);
     }
