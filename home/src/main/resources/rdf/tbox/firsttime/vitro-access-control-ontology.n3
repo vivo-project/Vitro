@@ -201,13 +201,13 @@
     rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate ) ] ;
     rdfs:range :Rule .
 
-:dataSetKey a owl:ObjectProperty ;
+:hasDataSetKey a owl:ObjectProperty ;
     rdfs:comment "Assign data set template to policy data set";
     rdfs:label "data set key"@en-US ;
     rdfs:domain :DataSet ;
     rdfs:range :DataSetKey .
 
-:dataSetKeyTemplate a owl:ObjectProperty ;
+:hasDataSetKeyTemplate a owl:ObjectProperty ;
     rdfs:comment "Assign data set key template to data set template";
     rdfs:label "data set key template"@en-US ;
     rdfs:domain :DataSetTemplate ;

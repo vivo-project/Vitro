@@ -20,7 +20,7 @@
 
 :RoleDataSetTemplate a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDataSetTemplateKey ;
-    access:dataSetKeyTemplate :RoleDataSetKeyTemplate ;
+    access:hasDataSetKeyTemplate :RoleDataSetKeyTemplate ;
     access:dataSetValueTemplate :RoleValueSetTemplate ;
     access:dataSetValueTemplate :RolePermissionValueSetTemplate .  
 
@@ -45,7 +45,7 @@
 #Data sets
 
 :PublicDataSet a access:DataSet ;
-    access:dataSetKey :PublicDataSetKey ;
+    access:hasDataSetKey :PublicDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues :PublicSimplePermissionValueSet .
 
@@ -55,7 +55,7 @@
     access:keyComponent access-individual:PublicRoleUri .
 
 :SelfEditorDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorDataSetKey ;
+    access:hasDataSetKey :SelfEditorDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues :SelfEditorSimplePermissionValueSet .
 
@@ -65,7 +65,7 @@
     access:keyComponent access-individual:SelfEditorRoleUri .
 
 :EditorDataSet a access:DataSet ;
-    access:dataSetKey :EditorDataSetKey ;
+    access:hasDataSetKey :EditorDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues :EditorSimplePermissionValueSet .
 
@@ -75,7 +75,7 @@
     access:keyComponent access-individual:EditorRoleUri .
 
 :CuratorDataSet a access:DataSet ;
-    access:dataSetKey :CuratorDataSetKey ;
+    access:hasDataSetKey :CuratorDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues :CuratorSimplePermissionValueSet .
 
@@ -85,7 +85,7 @@
     access:keyComponent access-individual:CuratorRoleUri .
 
 :AdminDataSet a access:DataSet ;
-    access:dataSetKey :AdminDataSetKey  ;
+    access:hasDataSetKey :AdminDataSetKey  ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues :AdminSimplePermissionValueSet .
 

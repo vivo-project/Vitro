@@ -28,7 +28,7 @@
 ### Add object property data sets
 
 :SelfEditorAddObjectPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorAddObjectPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorAddObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -43,7 +43,7 @@
 ### Add data property data sets
 
 :SelfEditorAddDataPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorAddDataPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorAddDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -58,7 +58,7 @@
 ### Add faux object property data sets
 
 :SelfEditorAddFauxObjectPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorAddFauxObjectPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorAddFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -73,7 +73,7 @@
 ### Add faux data property data sets
 
 :SelfEditorAddFauxDataPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorAddFauxDataPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorAddFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
@@ -88,7 +88,7 @@
 ### Drop object property data sets
 
 :SelfEditorDropObjectPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorDropObjectPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorDropObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -103,7 +103,7 @@
 ### Drop data property data sets
 
 :SelfEditorDropDataPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorDropDataPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorDropDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -118,7 +118,7 @@
 ### Drop faux object property data sets
 
 :SelfEditorDropFauxObjectPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorDropFauxObjectPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorDropFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -133,7 +133,7 @@
 ### Drop faux data property data sets
 
 :SelfEditorDropFauxDataPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorDropFauxDataPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorDropFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;
@@ -148,7 +148,7 @@
 ### Edit object property data sets
 
 :SelfEditorEditObjectPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorEditObjectPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorEditObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
     access:dataSetValues access-individual:ObjectPropertyStatementValueSet ;
@@ -163,7 +163,7 @@
 ### Edit data property data sets
 
 :SelfEditorEditDataPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorEditDataPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorEditDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
     access:dataSetValues access-individual:DataPropertyStatementValueSet ;
@@ -178,7 +178,7 @@
 ### Edit faux object property data sets
 
 :SelfEditorEditFauxObjectPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorEditFauxObjectPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorEditFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyStatementValueSet ;
@@ -193,7 +193,7 @@
 ### Edit faux data property data sets
 
 :SelfEditorEditFauxDataPropertyDataSet a access:DataSet ;
-    access:dataSetKey :SelfEditorEditFauxDataPropertyDataSetKey ;
+    access:hasDataSetKey :SelfEditorEditFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyStatementValueSet ;

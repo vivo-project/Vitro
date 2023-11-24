@@ -20,7 +20,7 @@
 
 :RoleDataSetTemplate1 a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDataSetTemplateKey1 ;
-    access:dataSetKeyTemplate :RoleDataSetKeyTemplate1 ;
+    access:hasDataSetKeyTemplate :RoleDataSetKeyTemplate1 ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValueTemplate :RoleValueSetTemplate1 ;
     access:dataSetValueTemplate :RolePermissionValueSetTemplate1 .  
@@ -46,7 +46,7 @@
 
 :RoleDataSetTemplate2 a access:DataSetTemplate ;
     access:hasDataSetTemplateKey :RoleDataSetTemplateKey2 ;
-    access:dataSetKeyTemplate :RoleDataSetKeyTemplate2 ;
+    access:hasDataSetKeyTemplate :RoleDataSetKeyTemplate2 ;
     access:dataSetValueTemplate :RoleValueSetTemplate2 ;
     access:dataSetValueTemplate :RolePermissionValueSetTemplate2 .  
 
@@ -66,7 +66,7 @@
     access:containsElementsOfType access-individual:NamedObject .
 
 :PublicDataSet a access:DataSet ;
-    access:dataSetKey :PublicDataSetKey ;
+    access:hasDataSetKey :PublicDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:PublicSimplePermissionValueSet .
 
