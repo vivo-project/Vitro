@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Test;
 
 public class PolicyLoaderTest extends PolicyTest {
@@ -73,5 +76,19 @@ public class PolicyLoaderTest extends PolicyTest {
         AttributeValueKey compositeKey = PolicyLoader.getInstance().getDataSetKey(PREFIX + "PublicDataSet");
         assertEquals(expectedKey, compositeKey);
 
+    }
+
+    @Test
+    public void getSubjectRoleValuePatternTest() {
+        List<String> patterns = loader.getSubjectRoleValuePattern(CUSTOM);
+        assertTrue(patterns.isEmpty());
+
+        Model tmpModel = ModelFactory.createDefaultModel();
+        PolicyTemplateController.createSubjectRoleUri(CUSTOM, tmpModel);
+        accessControlModel.add(tmpModel);
+        configurationDataSet.replaceNamedModel(ModelNames.ACCESS_CONTROL, accessControlModel);
+        patterns = loader.getSubjectRoleValuePattern(CUSTOM);
+        assertTrue(!patterns.isEmpty());
+        assertEquals(1, patterns.size());
     }
 }

@@ -230,6 +230,16 @@ public class PolicyLoader {
             + "  }\n"
             + "}\n";
 
+    public static final String ROLE_VALUE_PATTERNS_QUERY = ""
+            + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "SELECT ?rolePattern \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?rolePattern a access:SubjectRoleUri .\n"
+            + "    ?rolePattern access:id ?roleUri .\n"
+            + "  }\n"
+            + "}\n";
+
     public static final String DATA_SET_KEY_QUERY = ""
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
             + "SELECT ?keyComponent ?id ?type \n"
@@ -983,6 +993,28 @@ public class PolicyLoader {
         } catch (RDFServiceException e) {
             log.error(e, e);
         }
+    }
+
+    public List<String> getSubjectRoleValuePattern(String roleUri) {
+        List<String> rolePatterns = new LinkedList<>();
+        ParameterizedSparqlString pss =
+                new ParameterizedSparqlString(ROLE_VALUE_PATTERNS_QUERY);
+        pss.setLiteral("roleUri", roleUri);
+        final String queryText = pss.toString();
+        debug("SPARQL Query to get uri of role value patterns:\n %s", queryText);
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    if (qs.contains("rolePattern") && qs.get("rolePattern").isResource()) {
+                        rolePatterns.add(qs.getResource("rolePattern").getURI());
+                    }
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return rolePatterns;
     }
 
 }
