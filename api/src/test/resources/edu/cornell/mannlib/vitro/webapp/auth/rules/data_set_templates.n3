@@ -65,7 +65,7 @@
     access:relatedCheck :TypeValueSet;
     access:containsElementsOfType access-individual:NamedObject .
 
-:PublicDataSet a access:PolicyDataSet ;
+:PublicDataSet a access:DataSet ;
     access:dataSetKey :PublicDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:PublicSimplePermissionValueSet .

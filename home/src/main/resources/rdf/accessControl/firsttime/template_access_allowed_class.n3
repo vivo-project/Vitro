@@ -113,7 +113,7 @@
 
 ### Public display class uri data sets
 
-:PublicDisplayClassDataSet a access:PolicyDataSet ;
+:PublicDisplayClassDataSet a access:DataSet ;
     access:dataSetKey :PublicDisplayClassDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -127,7 +127,7 @@
 
 ### Self editor display class uri data sets
 
-:SelfEditorDisplayClassDataSet a access:PolicyDataSet ;
+:SelfEditorDisplayClassDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorDisplayClassDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -141,7 +141,7 @@
 
 ### Editor display class uri data sets
 
-:EditorDisplayClassDataSet a access:PolicyDataSet ;
+:EditorDisplayClassDataSet a access:DataSet ;
     access:dataSetKey :EditorDisplayClassDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -155,7 +155,7 @@
 
 ### Curator display class uri data sets
 
-:CuratorDisplayClassDataSet a access:PolicyDataSet ;
+:CuratorDisplayClassDataSet a access:DataSet ;
     access:dataSetKey :CuratorDisplayClassDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -169,7 +169,7 @@
 
 ### Admin display class uri data sets
 
-:AdminDisplayClassDataSet a access:PolicyDataSet ;
+:AdminDisplayClassDataSet a access:DataSet ;
     access:dataSetKey :AdminDisplayClassDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -183,7 +183,7 @@
 
 ### Public update class uri data sets
 
-:PublicUpdateClassDataSet a access:PolicyDataSet ;
+:PublicUpdateClassDataSet a access:DataSet ;
     access:dataSetKey :PublicUpdateClassDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -197,7 +197,7 @@
 
 ### Self editor update class uri data sets
 
-:SelfEditorUpdateClassDataSet a access:PolicyDataSet ;
+:SelfEditorUpdateClassDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorUpdateClassDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -211,7 +211,7 @@
 
 ### Editor update class uri data sets
 
-:EditorUpdateClassDataSet a access:PolicyDataSet ;
+:EditorUpdateClassDataSet a access:DataSet ;
     access:dataSetKey :EditorUpdateClassDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -225,7 +225,7 @@
 
 ### Curator update class uri data sets
 
-:CuratorUpdateClassDataSet a access:PolicyDataSet ;
+:CuratorUpdateClassDataSet a access:DataSet ;
     access:dataSetKey :CuratorUpdateClassDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -239,7 +239,7 @@
 
 ### Admin update class uri data sets
 
-:AdminUpdateClassDataSet a access:PolicyDataSet ;
+:AdminUpdateClassDataSet a access:DataSet ;
     access:dataSetKey :AdminUpdateClassDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -253,7 +253,7 @@
 
 ### Self editor publish class uri data sets
 
-:SelfEditorPublishClassDataSet a access:PolicyDataSet ;
+:SelfEditorPublishClassDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorPublishClassDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -267,7 +267,7 @@
 
 ### Editor publish class uri data sets
 
-:EditorPublishClassDataSet a access:PolicyDataSet ;
+:EditorPublishClassDataSet a access:DataSet ;
     access:dataSetKey :EditorPublishClassDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -281,7 +281,7 @@
 
 ### Curator publish class uri data sets
 
-:CuratorPublishClassDataSet a access:PolicyDataSet ;
+:CuratorPublishClassDataSet a access:DataSet ;
     access:dataSetKey :CuratorPublishClassDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;
@@ -295,7 +295,7 @@
 
 ### Admin publish class uri data sets
 
-:AdminPublishClassDataSet a access:PolicyDataSet ;
+:AdminPublishClassDataSet a access:DataSet ;
     access:dataSetKey :AdminPublishClassDataSetKey ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues access-individual:ClassValueSet ;

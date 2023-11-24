@@ -21,7 +21,7 @@
 
 ### Display object property data sets
 
-:SelfEditorDisplayObjectPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorDisplayObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorDisplayObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -36,7 +36,7 @@
 
 ### Display data property data sets
 
-:SelfEditorDisplayDataPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorDisplayDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorDisplayDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -51,7 +51,7 @@
 
 ### Display faux object property data sets
 
-:SelfEditorDisplayFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorDisplayFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorDisplayFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -66,7 +66,7 @@
 
 ### Display faux data property data sets
 
-:SelfEditorDisplayFauxDataPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorDisplayFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorDisplayFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;
@@ -81,7 +81,7 @@
 
 ### Publish object property data sets
 
-:SelfEditorPublishObjectPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorPublishObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorPublishObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:ObjectPropertyValueSet ;
@@ -96,7 +96,7 @@
 
 ### Publish data property data sets
 
-:SelfEditorPublishDataPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorPublishDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorPublishDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:DataPropertyValueSet ;
@@ -111,7 +111,7 @@
 
 ### Publish faux object property data sets
 
-:SelfEditorPublishFauxObjectPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorPublishFauxObjectPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxObjectPropertyValueSet ;
@@ -126,7 +126,7 @@
 
 ### Publish faux data property data sets
 
-:SelfEditorPublishFauxDataPropertyDataSet a access:PolicyDataSet ;
+:SelfEditorPublishFauxDataPropertyDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorPublishFauxDataPropertyDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues access-individual:FauxDataPropertyValueSet ;

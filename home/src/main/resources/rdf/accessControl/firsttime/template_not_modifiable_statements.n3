@@ -85,7 +85,7 @@
     access:attribute access-individual:StatementObjectUri ;
     access:values :ProhibitedNamespaceExceptionsValueSet .
 
-:NotModifiableStatementsPolicyDataSet a access:PolicyDataSet ;
+:NotModifiableStatementsPolicyDataSet a access:DataSet ;
     access:dataSetValues :ProhibitedNamespaceExceptionsValueSet ;
     access:dataSetValues :ProhibitedNamespaceValueSet .
 

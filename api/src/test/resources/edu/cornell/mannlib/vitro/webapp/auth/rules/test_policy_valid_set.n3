@@ -31,11 +31,11 @@ access-individual:ValidAttribute2 rdf:type access:Check ;
     access:values access-individual:valueSet2 ;
     .
 
-access-individual:testDataSet1 rdf:type access:PolicyDataSet ;
+access-individual:testDataSet1 rdf:type access:DataSet ;
     access:dataSetValues access-individual:valueSet2 ;
     access:dataSetValues access-individual:valueSet1 .
     
-access-individual:testDataSet2 rdf:type access:PolicyDataSet ;
+access-individual:testDataSet2 rdf:type access:DataSet ;
     access:dataSetValues access-individual:valueSet3 ;
     access:dataSetValues access-individual:valueSet4 .
 

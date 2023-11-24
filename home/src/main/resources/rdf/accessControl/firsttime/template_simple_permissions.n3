@@ -44,7 +44,7 @@
 
 #Data sets
 
-:PublicDataSet a access:PolicyDataSet ;
+:PublicDataSet a access:DataSet ;
     access:dataSetKey :PublicDataSetKey ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValues :PublicSimplePermissionValueSet .
@@ -54,7 +54,7 @@
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponent access-individual:PublicRoleUri .
 
-:SelfEditorDataSet a access:PolicyDataSet ;
+:SelfEditorDataSet a access:DataSet ;
     access:dataSetKey :SelfEditorDataSetKey ;
     access:dataSetValues access-individual:SelfEditorRoleValueSet ;
     access:dataSetValues :SelfEditorSimplePermissionValueSet .
@@ -64,7 +64,7 @@
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponent access-individual:SelfEditorRoleUri .
 
-:EditorDataSet a access:PolicyDataSet ;
+:EditorDataSet a access:DataSet ;
     access:dataSetKey :EditorDataSetKey ;
     access:dataSetValues access-individual:EditorRoleValueSet ;
     access:dataSetValues :EditorSimplePermissionValueSet .
@@ -74,7 +74,7 @@
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponent access-individual:EditorRoleUri .
 
-:CuratorDataSet a access:PolicyDataSet ;
+:CuratorDataSet a access:DataSet ;
     access:dataSetKey :CuratorDataSetKey ;
     access:dataSetValues access-individual:CuratorRoleValueSet ;
     access:dataSetValues :CuratorSimplePermissionValueSet .
@@ -84,7 +84,7 @@
     access:keyComponent access-individual:ExecuteOperation ;
     access:keyComponent access-individual:CuratorRoleUri .
 
-:AdminDataSet a access:PolicyDataSet ;
+:AdminDataSet a access:DataSet ;
     access:dataSetKey :AdminDataSetKey  ;
     access:dataSetValues access-individual:AdminRoleValueSet ;
     access:dataSetValues :AdminSimplePermissionValueSet .
