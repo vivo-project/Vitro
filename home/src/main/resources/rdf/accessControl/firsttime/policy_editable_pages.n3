@@ -61,8 +61,6 @@
     access:attribute access-individual:AccessObjectType ;
     access:value access-individual:ObjectPropertyStatement .
 
-:SomeUri a access:AttributeValuePattern ;
+:SomeUri a access:AttributeUriValue ;
     access:id "?SOME_URI" .
 
-:SomeLiteral a access:AttributeValuePattern ;
-    access:id "?SOME_LITERAL" .
