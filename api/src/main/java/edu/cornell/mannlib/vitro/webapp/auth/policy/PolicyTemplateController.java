@@ -60,7 +60,7 @@ public class PolicyTemplateController {
                 dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "PolicyDataSet")));
 
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
-                dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "dataSetKey"),
+                dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasDataSetKey"),
                 dataSetModel.createResource(dataSetKeyUri)));
 
         for (String key : keys) {
