@@ -86,14 +86,18 @@ public class SimplePermissionMigrator {
             for (String entityUri : toGrant) {
                 policyLoader.addEntityToPolicyDataSet(entityUri, AccessObjectType.NAMED_OBJECT, AccessOperation.EXECUTE,
                         role);
-                log.info(String.format("Granted simple permission %s to role %s ", entityUri, role));
+                log.info(String.format("Allow role %s to %s ", getShortName(role), getShortName(entityUri)));
             }
             for (String entityUri : toRevoke) {
                 policyLoader.removeEntityFromPolicyDataSet(entityUri, AccessObjectType.NAMED_OBJECT,
                         AccessOperation.EXECUTE, role);
-                log.info(String.format("Revoked simple permission %s from role %s ", entityUri, role));
+                log.info(String.format("Disallow role %s to %s ", getShortName(role), getShortName(entityUri)));
             }
         }
+    }
+    
+    private static String getShortName(String entityUri) {
+        return entityUri.substring(entityUri.lastIndexOf('#') + 1);
     }
 
     Set<String> getPermissionSets() {
