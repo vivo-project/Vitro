@@ -42,13 +42,12 @@ public class ArmMigratorTest extends AuthMigratorTest {
     public void initArmMigration() {
         userAccountsModel = ModelFactory.createOntologyModel();
         configurationDataSet.addNamedModel(ModelNames.USER_ACCOUNTS, userAccountsModel);
-        addUserAccountsStatement(PolicyTest.CUSTOM, VitroVocabulary.PERMISSIONSET, VitroVocabulary.RDF_TYPE);
-        armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet),
-                userAccountsModel);
     }
 
     @Test
     public void isArmConfigurationTest() {
+        armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet),
+                userAccountsModel);
         assertFalse(armMigrator.isArmConfiguation());
         addArmStatement(ArmMigrator.ARM_ADMIN, ArmMigrator.DISPLAY, OBJECT_PROPERTY_URI);
         assertTrue(armMigrator.isArmConfiguation());
@@ -69,6 +68,8 @@ public class ArmMigratorTest extends AuthMigratorTest {
 
     @Test
     public void getEntityMapTest() {
+        armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet),
+                userAccountsModel);
         Map<AccessObjectType, Set<String>> map = armMigrator.getEntityMap();
         assertFalse(map.isEmpty());
         assertEquals(1, map.get(AccessObjectType.OBJECT_PROPERTY).size());
@@ -80,6 +81,8 @@ public class ArmMigratorTest extends AuthMigratorTest {
 
     @Test
     public void getStatementsToRemoveTest() {
+        armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet),
+                userAccountsModel);
         StringBuilder removals = armMigrator.getStatementsToRemove();
         assertTrue(StringUtils.isBlank(removals.toString()));
         EntityPolicyController.updateEntityDataSet("test:entity", AccessObjectType.CLASS,
@@ -90,6 +93,10 @@ public class ArmMigratorTest extends AuthMigratorTest {
 
     @Test
     public void migrateConfigurationTest() {
+        addUserAccountsStatement(PolicyTest.CUSTOM, VitroVocabulary.PERMISSIONSET, VitroVocabulary.RDF_TYPE);
+        armMigrator = new ArmMigrator(new RDFServiceModel(contentModel), new RDFServiceModel(configurationDataSet),
+                userAccountsModel);
+
         addArmStatement(ArmMigrator.ARM_ADMIN, ArmMigrator.DISPLAY, OBJECT_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_EDITOR, ArmMigrator.PUBLISH, OBJECT_PROPERTY_URI);
         addArmStatement(ArmMigrator.ARM_CURATOR, ArmMigrator.UPDATE, OBJECT_PROPERTY_URI);
