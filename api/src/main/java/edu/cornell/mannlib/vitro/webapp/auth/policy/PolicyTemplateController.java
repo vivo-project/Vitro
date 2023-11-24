@@ -1,11 +1,12 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_VOCABULARY_PREFIX;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
+
 
 import java.util.List;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +43,7 @@ public class PolicyTemplateController {
                         dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "id"),
                         dataSetModel.createLiteral(roleUri)));
                 dataSetModel.add(new StatementImpl(dataSetModel.createResource(roleKeyUri),
-                        dataSetModel.createProperty(VitroVocabulary.RDF_TYPE),
+                        dataSetModel.createProperty(RDF_TYPE),
                         dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "SubjectRoleUri")));
                 keys.add(roleKeyUri);
             } else {
@@ -56,7 +57,7 @@ public class PolicyTemplateController {
                 dataSetModel.createResource(dataSetUri)));
 
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
-                dataSetModel.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                dataSetModel.createProperty(RDF_TYPE),
                 dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "PolicyDataSet")));
 
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
@@ -65,7 +66,7 @@ public class PolicyTemplateController {
 
         for (String key : keys) {
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetKeyUri),
-                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "keyComponent"),
+                    dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasKeyComponent"),
                     dataSetModel.createResource(key)));
         }
 

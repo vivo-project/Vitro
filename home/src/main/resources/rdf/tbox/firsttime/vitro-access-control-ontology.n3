@@ -172,8 +172,8 @@
     rdfs:range :ValueSetTemplate .
 
 :hasTemplateKeyComponent a owl:ObjectProperty ;
-    rdfs:comment "Attribute to use as a template key";
-    rdfs:label "template key"@en-US ;
+    rdfs:comment "Specifies ttribute type to use as a template key";
+    rdfs:label "has template key component"@en-US ;
     rdfs:domain :DataSetTemplateKey ;
     rdfs:range :AttributeType .
 
@@ -219,14 +219,14 @@
     rdfs:domain :PolicyTemplate ;
     rdfs:range :DataSetTemplate .
 
-:keyComponentTemplate a owl:ObjectProperty ;
+:hasKeyComponentTemplate a owl:ObjectProperty ;
     rdfs:comment "Specify component of combined key";
     rdfs:domain :DataSetKeyTemplate ;
     rdfs:range :AttributeType ;
-    rdfs:label "key component"@en-US .
+    rdfs:label "has key component template"@en-US .
 
-:keyComponent a owl:ObjectProperty ;
+:hasKeyComponent a owl:ObjectProperty ;
     rdfs:comment "Specify component of combined key";
     rdfs:domain [ a owl:Class ; owl:unionOf ( :DataSetKeyTemplate :DataSetKey ) ] ;
     rdfs:range :AttributeValuePattern ;
-    rdfs:label "key component"@en-US .
+    rdfs:label "has key component"@en-US .

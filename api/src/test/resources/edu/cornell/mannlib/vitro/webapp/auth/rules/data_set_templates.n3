@@ -29,9 +29,9 @@
     access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDataSetKeyTemplate1 a access:DataSetKeyTemplate ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponentTemplate access-individual:SubjectRole .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
 
 :RoleValueSetTemplate1 a access:ValueSetTemplate ;
     access:relatedCheck :RoleValueSet;
@@ -54,8 +54,8 @@
     access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDataSetKeyTemplate2 a access:DataSetKeyTemplate ;
-    access:keyComponent access-individual:ObjectPropertyAccesObject ;
-    access:keyComponentTemplate access-individual:SubjectRole .
+    access:hasKeyComponent access-individual:ObjectPropertyAccesObject ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
 
 :RoleValueSetTemplate2 a access:ValueSetTemplate ;
     access:relatedCheck :RoleValueSet;
@@ -71,9 +71,9 @@
     access:dataSetValues access-individual:PublicSimplePermissionValueSet .
 
 :PublicDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent access-individual:PublicRoleUri .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:PublicRoleUri .
 
 access-individual:PublicSimplePermissionValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:NamedObject .

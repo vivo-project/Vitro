@@ -185,7 +185,7 @@ public class PolicyLoader {
             + "  OPTIONAL { ?valueSet access:value ?value .\n"
             + "    OPTIONAL { ?value access:id ?valueId . }\n"
             + "  }\n"
-            + "  ?dataSetKeyUri access:keyComponent ?key .\n";
+            + "  ?dataSetKeyUri access:hasKeyComponent ?key .\n";
 
     private static final String policyKeyTemplateSuffix =
             "}} GROUP BY ?" + POLICY + " ?dataSet ?value ?valueId ?testData ?valueSet";
@@ -226,7 +226,7 @@ public class PolicyLoader {
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?dataSetTemplate access:hasDataSetKeyTemplate ?dataSetKeyTemplate .\n"
-            + "    ?dataSetKeyTemplate access:keyComponent ?keyComponent .\n"
+            + "    ?dataSetKeyTemplate access:hasKeyComponent ?keyComponent .\n"
             + "  }\n"
             + "}\n";
 
@@ -236,7 +236,7 @@ public class PolicyLoader {
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?dataSet access:hasDataSetKey ?dataSetKey ."
-            + "    ?dataSetKey access:keyComponent ?keyComponent .\n"
+            + "    ?dataSetKey access:hasKeyComponent ?keyComponent .\n"
             + "    OPTIONAL {\n"
             + "      ?keyComponent access:id ?id .\n"
             + "    }\n"
@@ -261,7 +261,7 @@ public class PolicyLoader {
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?dataSetTemplate access:hasDataSetKeyTemplate ?dataSetKeyTemplate .\n"
-            + "    ?dataSetKeyTemplate access:keyComponentTemplate ?keyComponentTemplate .\n"
+            + "    ?dataSetKeyTemplate access:hasKeyComponentTemplate ?keyComponentTemplate .\n"
             + "  }\n"
             + "}\n";
 
@@ -557,11 +557,11 @@ public class PolicyLoader {
         StringBuilder query = new StringBuilder();
         query.append(String.format(policyStatementByKeyTemplatePrefix, entityUri));
         for (String uri : uris) {
-            query.append(String.format("  ?dataSetKeyUri access:keyComponent <%s> . \n", uri));
+            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent <%s> . \n", uri));
         }
         int i = 0;
         for (String id : ids) {
-            query.append(String.format("  ?dataSetKeyUri access:keyComponent ?uri%d . ?uri%d access:id \"%s\" . \n", i,
+            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent ?uri%d . ?uri%d access:id \"%s\" . \n", i,
                     i, id));
             i++;
         }
@@ -572,11 +572,11 @@ public class PolicyLoader {
     private static String getDataSetByKeyQuery(String[] uris, String[] ids) {
         StringBuilder query = new StringBuilder(policyKeyTemplatePrefix);
         for (String uri : uris) {
-            query.append(String.format("  ?dataSetKeyUri access:keyComponent <%s> . \n", uri));
+            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent <%s> . \n", uri));
         }
         int i = 0;
         for (String id : ids) {
-            query.append(String.format("  ?dataSetKeyUri access:keyComponent ?uri%d .\n  ?uri%d access:id \"%s\" . \n",
+            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent ?uri%d .\n  ?uri%d access:id \"%s\" . \n",
                     i, i, id));
             i++;
         }
