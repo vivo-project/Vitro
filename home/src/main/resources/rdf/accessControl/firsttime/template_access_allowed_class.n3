@@ -8,22 +8,22 @@
 :PolicyTemplate a access:PolicyTemplate ;
     access:hasRule :AllowMatchingClass ;
 
-    access:policyDataSet :PublicDisplayClassDataSet ;
-    access:policyDataSet :SelfEditorDisplayClassDataSet ;
-    access:policyDataSet :EditorDisplayClassDataSet ;
-    access:policyDataSet :CuratorDisplayClassDataSet ;
-    access:policyDataSet :AdminDisplayClassDataSet ;
+    access:hasDataSet :PublicDisplayClassDataSet ;
+    access:hasDataSet :SelfEditorDisplayClassDataSet ;
+    access:hasDataSet :EditorDisplayClassDataSet ;
+    access:hasDataSet :CuratorDisplayClassDataSet ;
+    access:hasDataSet :AdminDisplayClassDataSet ;
 
-    access:policyDataSet :PublicUpdateClassDataSet ;
-    access:policyDataSet :SelfEditorUpdateClassDataSet ;
-    access:policyDataSet :EditorUpdateClassDataSet ;
-    access:policyDataSet :CuratorUpdateClassDataSet ;
-    access:policyDataSet :AdminUpdateClassDataSet ;
+    access:hasDataSet :PublicUpdateClassDataSet ;
+    access:hasDataSet :SelfEditorUpdateClassDataSet ;
+    access:hasDataSet :EditorUpdateClassDataSet ;
+    access:hasDataSet :CuratorUpdateClassDataSet ;
+    access:hasDataSet :AdminUpdateClassDataSet ;
 
-    access:policyDataSet :SelfEditorPublishClassDataSet ;
-    access:policyDataSet :EditorPublishClassDataSet ;
-    access:policyDataSet :CuratorPublishClassDataSet ;
-    access:policyDataSet :AdminPublishClassDataSet ;
+    access:hasDataSet :SelfEditorPublishClassDataSet ;
+    access:hasDataSet :EditorPublishClassDataSet ;
+    access:hasDataSet :CuratorPublishClassDataSet ;
+    access:hasDataSet :AdminPublishClassDataSet ;
 
     access:hasDataSetTemplate :RoleDisplayClassDataSetTemplate ;
     access:hasDataSetTemplate :RoleUpdateClassDataSetTemplate ;

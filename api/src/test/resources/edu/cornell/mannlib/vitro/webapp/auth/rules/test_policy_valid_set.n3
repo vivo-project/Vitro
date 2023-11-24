@@ -9,8 +9,8 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 access-individual:ValidTestSetPolicy rdf:type access:PolicyTemplate ;
-    access:policyDataSet access-individual:testDataSet2 ;
-    access:policyDataSet access-individual:testDataSet1 ;
+    access:hasDataSet access-individual:testDataSet2 ;
+    access:hasDataSet access-individual:testDataSet1 ;
     access:hasRule access-individual:ValidRule .
     
 access-individual:ValidRule rdf:type access:Rule ;

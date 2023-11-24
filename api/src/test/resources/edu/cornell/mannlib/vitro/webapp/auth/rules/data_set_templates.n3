@@ -13,7 +13,7 @@
 :PolicyTemplate a access:PolicyTemplate ;
     access:hasDataSetTemplate :RoleDataSetTemplate1 ;
     access:hasDataSetTemplate :RoleDataSetTemplate2 ;
-    access:policyDataSet :PublicDataSet .
+    access:hasDataSet :PublicDataSet .
 
 #Role data set templates
 

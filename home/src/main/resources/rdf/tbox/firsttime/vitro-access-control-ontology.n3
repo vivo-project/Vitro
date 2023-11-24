@@ -189,9 +189,9 @@
     rdfs:domain :Rule ;
     rdfs:range :Decision .    
 
-:policyDataSet a owl:ObjectProperty ;
-    rdfs:comment "Contain policy data set";
-    rdfs:label "policy data set"@en-US ;
+:hasDataSet a owl:ObjectProperty ;
+    rdfs:comment "Relates policy template to data set";
+    rdfs:label "has data set"@en-US ;
     rdfs:domain :PolicyTemplate ;
     rdfs:range :PolicyDataSet .
 

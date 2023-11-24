@@ -10,11 +10,11 @@
     access:priority 1000 ;
     access:hasRule :AllowSimplePermission ;
     access:hasDataSetTemplate :RoleDataSetTemplate ;
-    access:policyDataSet :PublicDataSet ;
-    access:policyDataSet :SelfEditorDataSet ;
-    access:policyDataSet :EditorDataSet ;
-    access:policyDataSet :CuratorDataSet ;
-    access:policyDataSet :AdminDataSet .
+    access:hasDataSet :PublicDataSet ;
+    access:hasDataSet :SelfEditorDataSet ;
+    access:hasDataSet :EditorDataSet ;
+    access:hasDataSet :CuratorDataSet ;
+    access:hasDataSet :AdminDataSet .
 
 #Role data set template
 

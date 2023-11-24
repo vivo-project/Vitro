@@ -9,101 +9,101 @@
     access:hasRule :AllowMatchingPropertyStatement ;
     access:hasRule :AllowMatchingProperty ;
 
-    access:policyDataSet :PublicDisplayObjectPropertyDataSet ;
-    access:policyDataSet :EditorDisplayObjectPropertyDataSet ;
-    access:policyDataSet :CuratorDisplayObjectPropertyDataSet ;
-    access:policyDataSet :AdminDisplayObjectPropertyDataSet ;
+    access:hasDataSet :PublicDisplayObjectPropertyDataSet ;
+    access:hasDataSet :EditorDisplayObjectPropertyDataSet ;
+    access:hasDataSet :CuratorDisplayObjectPropertyDataSet ;
+    access:hasDataSet :AdminDisplayObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicDisplayDataPropertyDataSet ;
-    access:policyDataSet :EditorDisplayDataPropertyDataSet ;
-    access:policyDataSet :CuratorDisplayDataPropertyDataSet ;
-    access:policyDataSet :AdminDisplayDataPropertyDataSet ;
+    access:hasDataSet :PublicDisplayDataPropertyDataSet ;
+    access:hasDataSet :EditorDisplayDataPropertyDataSet ;
+    access:hasDataSet :CuratorDisplayDataPropertyDataSet ;
+    access:hasDataSet :AdminDisplayDataPropertyDataSet ;
 
-    access:policyDataSet :PublicDisplayFauxObjectPropertyDataSet ;
-    access:policyDataSet :EditorDisplayFauxObjectPropertyDataSet ;
-    access:policyDataSet :CuratorDisplayFauxObjectPropertyDataSet ;
-    access:policyDataSet :AdminDisplayFauxObjectPropertyDataSet ;
+    access:hasDataSet :PublicDisplayFauxObjectPropertyDataSet ;
+    access:hasDataSet :EditorDisplayFauxObjectPropertyDataSet ;
+    access:hasDataSet :CuratorDisplayFauxObjectPropertyDataSet ;
+    access:hasDataSet :AdminDisplayFauxObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicDisplayFauxDataPropertyDataSet ;
-    access:policyDataSet :EditorDisplayFauxDataPropertyDataSet ;
-    access:policyDataSet :CuratorDisplayFauxDataPropertyDataSet ;
-    access:policyDataSet :AdminDisplayFauxDataPropertyDataSet ;
+    access:hasDataSet :PublicDisplayFauxDataPropertyDataSet ;
+    access:hasDataSet :EditorDisplayFauxDataPropertyDataSet ;
+    access:hasDataSet :CuratorDisplayFauxDataPropertyDataSet ;
+    access:hasDataSet :AdminDisplayFauxDataPropertyDataSet ;
 
-    access:policyDataSet :EditorPublishObjectPropertyDataSet ;
-    access:policyDataSet :CuratorPublishObjectPropertyDataSet ;
-    access:policyDataSet :AdminPublishObjectPropertyDataSet ;
+    access:hasDataSet :EditorPublishObjectPropertyDataSet ;
+    access:hasDataSet :CuratorPublishObjectPropertyDataSet ;
+    access:hasDataSet :AdminPublishObjectPropertyDataSet ;
 
-    access:policyDataSet :EditorPublishDataPropertyDataSet ;
-    access:policyDataSet :CuratorPublishDataPropertyDataSet ;
-    access:policyDataSet :AdminPublishDataPropertyDataSet ;
+    access:hasDataSet :EditorPublishDataPropertyDataSet ;
+    access:hasDataSet :CuratorPublishDataPropertyDataSet ;
+    access:hasDataSet :AdminPublishDataPropertyDataSet ;
 
-    access:policyDataSet :EditorPublishFauxObjectPropertyDataSet ;
-    access:policyDataSet :CuratorPublishFauxObjectPropertyDataSet ;
-    access:policyDataSet :AdminPublishFauxObjectPropertyDataSet ;
+    access:hasDataSet :EditorPublishFauxObjectPropertyDataSet ;
+    access:hasDataSet :CuratorPublishFauxObjectPropertyDataSet ;
+    access:hasDataSet :AdminPublishFauxObjectPropertyDataSet ;
 
-    access:policyDataSet :EditorPublishFauxDataPropertyDataSet ;
-    access:policyDataSet :CuratorPublishFauxDataPropertyDataSet ;
-    access:policyDataSet :AdminPublishFauxDataPropertyDataSet ;
+    access:hasDataSet :EditorPublishFauxDataPropertyDataSet ;
+    access:hasDataSet :CuratorPublishFauxDataPropertyDataSet ;
+    access:hasDataSet :AdminPublishFauxDataPropertyDataSet ;
 
-    access:policyDataSet :PublicEditObjectPropertyDataSet ;
-    access:policyDataSet :EditorEditObjectPropertyDataSet ;
-    access:policyDataSet :CuratorEditObjectPropertyDataSet ;
-    access:policyDataSet :AdminEditObjectPropertyDataSet ;
+    access:hasDataSet :PublicEditObjectPropertyDataSet ;
+    access:hasDataSet :EditorEditObjectPropertyDataSet ;
+    access:hasDataSet :CuratorEditObjectPropertyDataSet ;
+    access:hasDataSet :AdminEditObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicAddObjectPropertyDataSet ;
-    access:policyDataSet :EditorAddObjectPropertyDataSet ;
-    access:policyDataSet :CuratorAddObjectPropertyDataSet ;
-    access:policyDataSet :AdminAddObjectPropertyDataSet ;
+    access:hasDataSet :PublicAddObjectPropertyDataSet ;
+    access:hasDataSet :EditorAddObjectPropertyDataSet ;
+    access:hasDataSet :CuratorAddObjectPropertyDataSet ;
+    access:hasDataSet :AdminAddObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicDropObjectPropertyDataSet ;
-    access:policyDataSet :EditorDropObjectPropertyDataSet ;
-    access:policyDataSet :CuratorDropObjectPropertyDataSet ;
-    access:policyDataSet :AdminDropObjectPropertyDataSet ;
+    access:hasDataSet :PublicDropObjectPropertyDataSet ;
+    access:hasDataSet :EditorDropObjectPropertyDataSet ;
+    access:hasDataSet :CuratorDropObjectPropertyDataSet ;
+    access:hasDataSet :AdminDropObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicEditDataPropertyDataSet ;
-    access:policyDataSet :EditorEditDataPropertyDataSet ;
-    access:policyDataSet :CuratorEditDataPropertyDataSet ;
-    access:policyDataSet :AdminEditDataPropertyDataSet ;
+    access:hasDataSet :PublicEditDataPropertyDataSet ;
+    access:hasDataSet :EditorEditDataPropertyDataSet ;
+    access:hasDataSet :CuratorEditDataPropertyDataSet ;
+    access:hasDataSet :AdminEditDataPropertyDataSet ;
 
-    access:policyDataSet :PublicAddDataPropertyDataSet ;
-    access:policyDataSet :EditorAddDataPropertyDataSet ;
-    access:policyDataSet :CuratorAddDataPropertyDataSet ;
-    access:policyDataSet :AdminAddDataPropertyDataSet ;
+    access:hasDataSet :PublicAddDataPropertyDataSet ;
+    access:hasDataSet :EditorAddDataPropertyDataSet ;
+    access:hasDataSet :CuratorAddDataPropertyDataSet ;
+    access:hasDataSet :AdminAddDataPropertyDataSet ;
 
-    access:policyDataSet :PublicDropDataPropertyDataSet ;
-    access:policyDataSet :EditorDropDataPropertyDataSet ;
-    access:policyDataSet :CuratorDropDataPropertyDataSet ;
-    access:policyDataSet :AdminDropDataPropertyDataSet ;
+    access:hasDataSet :PublicDropDataPropertyDataSet ;
+    access:hasDataSet :EditorDropDataPropertyDataSet ;
+    access:hasDataSet :CuratorDropDataPropertyDataSet ;
+    access:hasDataSet :AdminDropDataPropertyDataSet ;
 
-    access:policyDataSet :PublicEditFauxObjectPropertyDataSet ;
-    access:policyDataSet :EditorEditFauxObjectPropertyDataSet ;
-    access:policyDataSet :CuratorEditFauxObjectPropertyDataSet ;
-    access:policyDataSet :AdminEditFauxObjectPropertyDataSet ;
+    access:hasDataSet :PublicEditFauxObjectPropertyDataSet ;
+    access:hasDataSet :EditorEditFauxObjectPropertyDataSet ;
+    access:hasDataSet :CuratorEditFauxObjectPropertyDataSet ;
+    access:hasDataSet :AdminEditFauxObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicAddFauxObjectPropertyDataSet ;
-    access:policyDataSet :EditorAddFauxObjectPropertyDataSet ;
-    access:policyDataSet :CuratorAddFauxObjectPropertyDataSet ;
-    access:policyDataSet :AdminAddFauxObjectPropertyDataSet ;
+    access:hasDataSet :PublicAddFauxObjectPropertyDataSet ;
+    access:hasDataSet :EditorAddFauxObjectPropertyDataSet ;
+    access:hasDataSet :CuratorAddFauxObjectPropertyDataSet ;
+    access:hasDataSet :AdminAddFauxObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicDropFauxObjectPropertyDataSet ;
-    access:policyDataSet :EditorDropFauxObjectPropertyDataSet ;
-    access:policyDataSet :CuratorDropFauxObjectPropertyDataSet ;
-    access:policyDataSet :AdminDropFauxObjectPropertyDataSet ;
+    access:hasDataSet :PublicDropFauxObjectPropertyDataSet ;
+    access:hasDataSet :EditorDropFauxObjectPropertyDataSet ;
+    access:hasDataSet :CuratorDropFauxObjectPropertyDataSet ;
+    access:hasDataSet :AdminDropFauxObjectPropertyDataSet ;
 
-    access:policyDataSet :PublicEditFauxDataPropertyDataSet ;
-    access:policyDataSet :EditorEditFauxDataPropertyDataSet ;
-    access:policyDataSet :CuratorEditFauxDataPropertyDataSet ;
-    access:policyDataSet :AdminEditFauxDataPropertyDataSet ;
+    access:hasDataSet :PublicEditFauxDataPropertyDataSet ;
+    access:hasDataSet :EditorEditFauxDataPropertyDataSet ;
+    access:hasDataSet :CuratorEditFauxDataPropertyDataSet ;
+    access:hasDataSet :AdminEditFauxDataPropertyDataSet ;
 
-    access:policyDataSet :PublicAddFauxDataPropertyDataSet ;
-    access:policyDataSet :EditorAddFauxDataPropertyDataSet ;
-    access:policyDataSet :CuratorAddFauxDataPropertyDataSet ;
-    access:policyDataSet :AdminAddFauxDataPropertyDataSet ;
+    access:hasDataSet :PublicAddFauxDataPropertyDataSet ;
+    access:hasDataSet :EditorAddFauxDataPropertyDataSet ;
+    access:hasDataSet :CuratorAddFauxDataPropertyDataSet ;
+    access:hasDataSet :AdminAddFauxDataPropertyDataSet ;
 
-    access:policyDataSet :PublicDropFauxDataPropertyDataSet ;
-    access:policyDataSet :EditorDropFauxDataPropertyDataSet ;
-    access:policyDataSet :CuratorDropFauxDataPropertyDataSet ;
-    access:policyDataSet :AdminDropFauxDataPropertyDataSet ;
+    access:hasDataSet :PublicDropFauxDataPropertyDataSet ;
+    access:hasDataSet :EditorDropFauxDataPropertyDataSet ;
+    access:hasDataSet :CuratorDropFauxDataPropertyDataSet ;
+    access:hasDataSet :AdminDropFauxDataPropertyDataSet ;
 
     access:hasDataSetTemplate :RoleDisplayObjectPropertyDataSetTemplate ;
     access:hasDataSetTemplate :RolePublishObjectPropertyDataSetTemplate ;

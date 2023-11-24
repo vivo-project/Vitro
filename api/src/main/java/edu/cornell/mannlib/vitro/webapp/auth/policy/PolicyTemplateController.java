@@ -50,9 +50,9 @@ public class PolicyTemplateController {
                 return;
             }
         }
-        // Add ?dataSets ao:policyDataSet dataSetUri .
+        // Add ?dataSets ao:hasDataSet dataSetUri .
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetsUri),
-                dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "policyDataSet"),
+                dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasDataSet"),
                 dataSetModel.createResource(dataSetUri)));
 
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
