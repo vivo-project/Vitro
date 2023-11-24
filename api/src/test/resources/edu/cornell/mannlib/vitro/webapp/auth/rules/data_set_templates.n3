@@ -19,7 +19,7 @@
 
 
 :RoleDataSetTemplate1 a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDataSetTemplateKey1 ;
+    access:hasDataSetTemplateKey :RoleDataSetTemplateKey1 ;
     access:dataSetKeyTemplate :RoleDataSetKeyTemplate1 ;
     access:dataSetValues access-individual:PublicRoleValueSet ;
     access:dataSetValueTemplate :RoleValueSetTemplate1 ;
@@ -45,7 +45,7 @@
 
 
 :RoleDataSetTemplate2 a access:DataSetTemplate ;
-    access:dataSetTemplateKey :RoleDataSetTemplateKey2 ;
+    access:hasDataSetTemplateKey :RoleDataSetTemplateKey2 ;
     access:dataSetKeyTemplate :RoleDataSetKeyTemplate2 ;
     access:dataSetValueTemplate :RoleValueSetTemplate2 ;
     access:dataSetValueTemplate :RolePermissionValueSetTemplate2 .  
