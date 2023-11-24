@@ -3,6 +3,7 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-property/> .
 
 :PolicyTemplate a access:PolicyTemplate ;
@@ -159,7 +160,7 @@
 :RoleDisplayObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:value access-individual:defaultUri ;
+    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role PublishObjectProperty data set template
@@ -188,7 +189,7 @@
 :RolePublishObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:value access-individual:defaultUri ;
+    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role AddObjectProperty data set template
@@ -217,7 +218,7 @@
 :RoleAddObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:value access-individual:defaultUri ;
+    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role DropObjectProperty data set template
@@ -246,7 +247,7 @@
 :RoleDropObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:value access-individual:defaultUri ;
+    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role EditObjectProperty data set template
@@ -275,7 +276,7 @@
 :RoleEditObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:value access-individual:defaultUri ;
+    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role DisplayDataProperty data set template
