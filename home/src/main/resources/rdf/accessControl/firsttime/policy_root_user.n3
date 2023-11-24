@@ -12,7 +12,7 @@
     access:requiresCheck :IsRootUserCheck .
 
 :IsRootUserCheck a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:SubjectType ;
     access:value access-individual:RootUserSubject .
 

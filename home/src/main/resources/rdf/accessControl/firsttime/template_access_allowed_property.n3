@@ -1751,7 +1751,7 @@
     access:requiresCheck :AccessObjectUriContainsInDataSet .
 
 :AccessObjectTypeEqualsDataSetValue a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:values access-individual:ObjectPropertyValueSet ;
     access:values access-individual:DataPropertyValueSet ;
@@ -1767,7 +1767,7 @@
     .
 
 :AccessObjectTypeStatementEquals a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:values access-individual:ObjectPropertyStatementValueSet ;
     access:values access-individual:DataPropertyStatementValueSet ;
@@ -1776,7 +1776,7 @@
     .
 
 :OperationEqualsDataSetOperation a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:Operation ;
     access:values access-individual:DisplayOperationValueSet ;
     access:values access-individual:PublishOperationValueSet ;
@@ -1786,7 +1786,7 @@
     .
 
 :SubjectRoleEqualsDataSetRoleAttribute a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
     access:values access-individual:PublicRoleValueSet ;
     access:values access-individual:EditorRoleValueSet ;
@@ -1794,7 +1794,7 @@
     access:values access-individual:AdminRoleValueSet .
 
 :StatementPredicateEquals a access:Check ;
-    access:operator access-individual:OneOf ;
+    access:useOperator access-individual:OneOf ;
     access:attribute access-individual:StatementPredicateUri ;
     access:values :PublicDisplayObjectPropertyValueSet ;
     access:values :EditorDisplayObjectPropertyValueSet ;
@@ -1894,7 +1894,7 @@
     .
 
 :AccessObjectUriContainsInDataSet a access:Check ;
-    access:operator access-individual:OneOf ;
+    access:useOperator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
     access:values :PublicDisplayObjectPropertyValueSet ;
     access:values :EditorDisplayObjectPropertyValueSet ;

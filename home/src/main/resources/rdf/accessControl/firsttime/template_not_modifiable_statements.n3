@@ -45,43 +45,43 @@
     access:requiresCheck :PredicateNotANamespaceException .
 
 :IsObjectPropertyStatement a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:value access-individual:ObjectPropertyStatement .
 
 :IsDataPropertyStatement a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:value access-individual:DataPropertyStatement .
 
 ### Not modifiable property statement attributes
 :PredicateUriStartWithProhibitedNamespace a access:Check ;
-    access:operator access-individual:StartsWith ;
+    access:useOperator access-individual:StartsWith ;
     access:attribute access-individual:StatementPredicateUri ;
     access:values :ProhibitedNamespaceValueSet .
 
 :PredicateNotANamespaceException a access:Check ;
-    access:operator access-individual:NotOneOf ;
+    access:useOperator access-individual:NotOneOf ;
     access:attribute access-individual:StatementPredicateUri ;
     access:values :ProhibitedNamespaceExceptionsValueSet .
 
 :SubjectUriStartWithProhibitedNamespace a access:Check ;
-    access:operator access-individual:StartsWith ;
+    access:useOperator access-individual:StartsWith ;
     access:attribute access-individual:StatementSubjectUri ;
     access:values :ProhibitedNamespaceValueSet .
 
 :StatementSubjectNotOneOfProhibitedExceptions a access:Check ;
-    access:operator access-individual:NotOneOf ;
+    access:useOperator access-individual:NotOneOf ;
     access:attribute access-individual:StatementSubjectUri ;
     access:values :ProhibitedNamespaceExceptionsValueSet .
 
 :StatementObjectUriStartsWithProhibitedNameSpace a access:Check ;
-    access:operator access-individual:StartsWith ;
+    access:useOperator access-individual:StartsWith ;
     access:attribute access-individual:StatementObjectUri ;
     access:values :ProhibitedNamespaceValueSet .
 
 :ObjectUriNotOneOfProhibitedExceptions a access:Check ;
-    access:operator access-individual:NotOneOf ;
+    access:useOperator access-individual:NotOneOf ;
     access:attribute access-individual:StatementObjectUri ;
     access:values :ProhibitedNamespaceExceptionsValueSet .
 

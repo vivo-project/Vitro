@@ -146,7 +146,7 @@
     access:requiresCheck :AccessObjectUriCheck .
 
 :AccessObjectTypeCheck a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:values access-individual:ObjectPropertyValueSet ;
     access:values access-individual:DataPropertyValueSet ;
@@ -162,7 +162,7 @@
     .
 
 :AccessObjectStatementTypeCheck a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:AccessObjectType ;
     access:values access-individual:ObjectPropertyStatementValueSet ;
     access:values access-individual:DataPropertyStatementValueSet ;
@@ -171,19 +171,19 @@
     .
 
 :OperationCheck a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:Operation ;
     access:values access-individual:DisplayOperationValueSet ;
     access:values access-individual:PublishOperationValueSet ;
     .
 
 :SubjectRoleCheck a access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
     access:values access-individual:SelfEditorRoleValueSet .
 
 :StatementPredicateCheck a access:Check ;
-    access:operator access-individual:OneOf ;
+    access:useOperator access-individual:OneOf ;
     access:attribute access-individual:StatementPredicateUri ;
     access:values :SelfEditorDisplayObjectPropertyValueSet ;
     access:values :SelfEditorDisplayDataPropertyValueSet ;
@@ -196,7 +196,7 @@
     .
 
 :AccessObjectUriCheck a access:Check ;
-    access:operator access-individual:OneOf ;
+    access:useOperator access-individual:OneOf ;
     access:attribute access-individual:AccessObjectUri ;
     access:values :SelfEditorDisplayObjectPropertyValueSet ;
     access:values :SelfEditorDisplayDataPropertyValueSet ;

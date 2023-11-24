@@ -15,7 +15,7 @@ access-individual:AllowPersonEditOwnPublication rdf:type access:Rule ;
     access:requiresCheck access-individual:PublicationInProximityAttribute .
           
 access-individual:PublicationInProximityAttribute rdf:type access:Check ;
-    access:operator access-individual:SparqlSelectQueryContains ;
+    access:useOperator access-individual:SparqlSelectQueryContains ;
     access:attribute access-individual:StatementSubjectUri ;
     access:value access-individual:PublicationProximityToPerson .
 

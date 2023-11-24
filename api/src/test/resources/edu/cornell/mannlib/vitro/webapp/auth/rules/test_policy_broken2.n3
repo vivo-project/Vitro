@@ -16,11 +16,11 @@ access-individual:BrokenTestRule rdf:type access:Rule ;
     access:requiresCheck access-individual:BrokenTestAttribute .
   
 access-individual:BrokenTestAttribute rdf:type access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:value access-individual:PublishOperation .
  
 access-individual:ValidTestAttribute rdf:type access:Check ;
-    access:operator access-individual:Equals ;
+    access:useOperator access-individual:Equals ;
     access:attribute access-individual:Operation ;
     access:value access-individual:PublishOperation .
 
