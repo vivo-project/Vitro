@@ -171,7 +171,7 @@
     rdfs:domain :DataSetTemplate ;
     rdfs:range :ValueSetTemplate .
 
-:templateKey a owl:ObjectProperty ;
+:hasTemplateKeyComponent a owl:ObjectProperty ;
     rdfs:comment "Attribute to use as a template key";
     rdfs:label "template key"@en-US ;
     rdfs:domain :DataSetTemplateKey ;
