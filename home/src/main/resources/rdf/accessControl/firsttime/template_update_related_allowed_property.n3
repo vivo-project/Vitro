@@ -36,9 +36,9 @@
     access:dataSetValues :SelfEditorAddObjectPropertyValueSet .
 
 :SelfEditorAddObjectPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:AddOperation .
+    access:hasKeyComponent access-individual:ObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:AddOperation .
 
 ### Add data property data sets
 
@@ -51,9 +51,9 @@
     access:dataSetValues :SelfEditorAddDataPropertyValueSet .
 
 :SelfEditorAddDataPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:DataProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:AddOperation .
+    access:hasKeyComponent access-individual:DataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:AddOperation .
 
 ### Add faux object property data sets
 
@@ -66,9 +66,9 @@
     access:dataSetValues :SelfEditorAddFauxObjectPropertyValueSet .
 
 :SelfEditorAddFauxObjectPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:AddOperation .
+    access:hasKeyComponent access-individual:FauxObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:AddOperation .
 
 ### Add faux data property data sets
 
@@ -81,9 +81,9 @@
     access:dataSetValues :SelfEditorAddFauxDataPropertyValueSet .
 
 :SelfEditorAddFauxDataPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:AddOperation .
+    access:hasKeyComponent access-individual:FauxDataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:AddOperation .
 
 ### Drop object property data sets
 
@@ -96,9 +96,9 @@
     access:dataSetValues :SelfEditorDropObjectPropertyValueSet .
 
 :SelfEditorDropObjectPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:DropOperation .
+    access:hasKeyComponent access-individual:ObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DropOperation .
 
 ### Drop data property data sets
 
@@ -111,9 +111,9 @@
     access:dataSetValues :SelfEditorDropDataPropertyValueSet .
 
 :SelfEditorDropDataPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:DataProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:DropOperation .
+    access:hasKeyComponent access-individual:DataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DropOperation .
 
 ### Drop faux object property data sets
 
@@ -126,9 +126,9 @@
     access:dataSetValues :SelfEditorDropFauxObjectPropertyValueSet .
 
 :SelfEditorDropFauxObjectPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:DropOperation .
+    access:hasKeyComponent access-individual:FauxObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DropOperation .
 
 ### Drop faux data property data sets
 
@@ -141,9 +141,9 @@
     access:dataSetValues :SelfEditorDropFauxDataPropertyValueSet .
 
 :SelfEditorDropFauxDataPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:DropOperation .
+    access:hasKeyComponent access-individual:FauxDataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DropOperation .
 
 ### Edit object property data sets
 
@@ -156,9 +156,9 @@
     access:dataSetValues :SelfEditorEditObjectPropertyValueSet .
 
 :SelfEditorEditObjectPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:ObjectProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:EditOperation .
+    access:hasKeyComponent access-individual:ObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:EditOperation .
 
 ### Edit data property data sets
 
@@ -171,9 +171,9 @@
     access:dataSetValues :SelfEditorEditDataPropertyValueSet .
 
 :SelfEditorEditDataPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:DataProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:EditOperation .
+    access:hasKeyComponent access-individual:DataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:EditOperation .
 
 ### Edit faux object property data sets
 
@@ -186,9 +186,9 @@
     access:dataSetValues :SelfEditorEditFauxObjectPropertyValueSet .
 
 :SelfEditorEditFauxObjectPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:FauxObjectProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:EditOperation .
+    access:hasKeyComponent access-individual:FauxObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:EditOperation .
 
 ### Edit faux data property data sets
 
@@ -201,9 +201,9 @@
     access:dataSetValues :SelfEditorEditFauxDataPropertyValueSet .
 
 :SelfEditorEditFauxDataPropertyDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:FauxDataProperty ;
-    access:keyComponent access-individual:SelfEditorRoleUri ;
-    access:keyComponent access-individual:EditOperation .
+    access:hasKeyComponent access-individual:FauxDataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:EditOperation .
 
 :AllowMatchingProperty a access:Rule;
     access:requiresCheck :SubjectRoleCheck ;

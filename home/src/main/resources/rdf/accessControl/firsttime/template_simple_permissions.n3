@@ -28,9 +28,9 @@
     access:hasTemplateKeyComponent access-individual:SubjectRole .
 
 :RoleDataSetKeyTemplate a access:DataSetKeyTemplate ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponentTemplate access-individual:SubjectRole .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
 
 :RoleValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :SubjectRoleEqualsDataSetRole;
@@ -50,9 +50,9 @@
     access:dataSetValues :PublicSimplePermissionValueSet .
 
 :PublicDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent access-individual:PublicRoleUri .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:PublicRoleUri .
 
 :SelfEditorDataSet a access:DataSet ;
     access:hasDataSetKey :SelfEditorDataSetKey ;
@@ -60,9 +60,9 @@
     access:dataSetValues :SelfEditorSimplePermissionValueSet .
 
 :SelfEditorDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent access-individual:SelfEditorRoleUri .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri .
 
 :EditorDataSet a access:DataSet ;
     access:hasDataSetKey :EditorDataSetKey ;
@@ -70,9 +70,9 @@
     access:dataSetValues :EditorSimplePermissionValueSet .
 
 :EditorDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent access-individual:EditorRoleUri .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:EditorRoleUri .
 
 :CuratorDataSet a access:DataSet ;
     access:hasDataSetKey :CuratorDataSetKey ;
@@ -80,9 +80,9 @@
     access:dataSetValues :CuratorSimplePermissionValueSet .
 
 :CuratorDataSetKey a access:DataSetKey ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent access-individual:CuratorRoleUri .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:CuratorRoleUri .
 
 :AdminDataSet a access:DataSet ;
     access:hasDataSetKey :AdminDataSetKey  ;
@@ -90,9 +90,9 @@
     access:dataSetValues :AdminSimplePermissionValueSet .
 
 :AdminDataSetKey  a access:DataSetKey ;
-    access:keyComponent access-individual:NamedObject ;
-    access:keyComponent access-individual:ExecuteOperation ;
-    access:keyComponent access-individual:AdminRoleUri .
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:AdminRoleUri .
 
 :AllowSimplePermission a access:Rule;
     access:requiresCheck :IsSimplePermission ;

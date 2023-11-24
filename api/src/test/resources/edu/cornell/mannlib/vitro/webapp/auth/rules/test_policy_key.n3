@@ -21,6 +21,6 @@ access-individual:KeyTestAttribute rdf:type access:Check ;
     access:value access-individual:PublishOperation .
 
 access-individual:PolicyKeyTest rdf:type access:PolicyKey ;
-    access:keyComponent access-individual:ObjectPropertyAccesObject ;
-    access:keyComponent access-individual:AdminRoleUri ;
-    access:keyComponent access-individual:DisplayOperation .
+    access:hasKeyComponent access-individual:ObjectPropertyAccesObject ;
+    access:hasKeyComponent access-individual:AdminRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation .
