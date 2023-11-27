@@ -56,12 +56,16 @@ public class NamedAccessObject extends AccessObject {
 
     @Override
     public String toString() {
-        return "SimpleRequestedAction['" + uri + "']";
+        return getShortName(uri);
     }
 
     @Override
     public AccessObjectType getType() {
         return type;
+    }
+
+    private static String getShortName(String entityUri) {
+        return entityUri.substring(entityUri.lastIndexOf('#') + 1);
     }
 
 }
