@@ -15,7 +15,7 @@ public class PolicyDecisionPoint {
 
     public static PolicyDecision decide(AuthorizationRequest ar) {
         PolicyDecision pd = null;
-        PolicyDecisionLogger logger = new PolicyDecisionLogger(ar.getIds(), ar.getAccessObject());
+        PolicyDecisionLogger logger = new PolicyDecisionLogger(ar);
         PolicyStore store = PolicyStore.getInstance();
         for (Policy policy : store.getList()) {
             try {
