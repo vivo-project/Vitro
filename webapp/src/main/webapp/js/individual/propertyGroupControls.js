@@ -4,8 +4,8 @@ $(document).ready(function(){
 
     $.extend(this, individualLocalName);
     adjustFontSize();
-    padSectionBottoms();
-    checkLocationHash();
+    // padSectionBottoms();
+    // checkLocationHash();
 
     // ensures that shorter property group sections don't cause the page to "jump around"
     // when the tabs are clicked
@@ -19,24 +19,19 @@ $(document).ready(function(){
     }
 
     // controls the property group tabs
-    $('#show-all-tabs').click(function() {
-        console.log("Show all 1")
-
-        $(".tab-content>section.tab-pane").addClass('show active')
-    });
-
-    let showAllBtn = $('#show-all-tabs');
+    let showAllBtn = $('#show-all-tabs')[0];
 
     showAllBtn.addEventListener('show.bs.tab', function (event) {
-        $(".tab-content>section.tab-pane").addClass('show active')
-    })
-
-    showAllBtn.addEventListener('shown.bs.tab', function (event) {
-        $(".tab-content>section.tab-pane").addClass('show active')
-    })
+        event.preventDefault()
+        $('.propertyTabsList.nav.nav-tabs > li').each(function() {
+            $(this).attr("aria-selected", "false");
+            $(this).removeClass("active");
+        });
+        
+        $('#show-all-tabs').addClass("active").attr("aria-selected", "true");
+        $(".tab-content>section.tab-pane").addClass('active show')    })
 
     showAllBtn.addEventListener('hide.bs.tab', function (event) {
-        console.log("hide all 2")
         $(".tab-content>section.tab-pane").removeClass('show active')
     })
 
