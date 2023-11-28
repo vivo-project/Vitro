@@ -80,6 +80,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
                 body.put("challengeId", captchaChallenge.getCaptchaId());
             }
 
+            body.put("contextPath", vreq.getContextPath());
             body.put("formAction", "submitFeedback");
             body.put("captchaToUse", captchaImpl);
 

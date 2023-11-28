@@ -421,6 +421,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         body.put("webuseremail", webuseremail);
         body.put("comments", comments);
         body.put("captchaToUse", captchaImpl);
+        body.put("contextPath", vreq.getContextPath());
 
         if (!captchaImpl.equals("RECAPTCHA")) {
             CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();

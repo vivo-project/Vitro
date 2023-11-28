@@ -37,7 +37,11 @@
             <!-- Your custom captcha implementation -->
             <p>
                 <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
-                <img src="data:image/png;base64,${challenge!}" alt="Refresh page if not displayed..." style="vertical-align: middle;">
+                <div class="captcha-container">
+                    <span><input id="refresh" type="button" value="↻" /></span>
+                    <img id="captchaImage" src="data:image/png;base64,${challenge!}" alt="Refresh page if not displayed..." style="vertical-align: middle;">
+                </div>
+                <br />
                 <span><input type="text" id="userSolution" name="userSolution" style="vertical-align: middle;"></span>
                 <input type="text" id="challengeId" name="challengeId" value="${challengeId!}" style="display: none;">
             </p>
@@ -69,6 +73,29 @@ ${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.j
             var recaptchaResponse = grecaptcha.getResponse();
             console.log(recaptchaResponse);
             document.getElementById('g-recaptcha-response').value = recaptchaResponse;
+        });
+    </script>
+<#else>
+    <script>
+        $(document).ready(function () {
+            $('#refresh').click(function () {
+                var oldChallengeId = $('#challengeId').val();
+
+                $.ajax({
+                    url: '${contextPath}/refreshCaptcha',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { oldChallengeId: oldChallengeId },
+                    success: function (data) {
+                        $('#userSolution').val('');
+                        $('#challengeId').val(data.challengeId);
+                        $('#captchaImage').attr('src', 'data:image/png;base64,' + data.challenge);
+                    },
+                    error: function () {
+                        console.error('Error while refreshing captcha');
+                    }
+                });
+            });
         });
     </script>
 </#if>
