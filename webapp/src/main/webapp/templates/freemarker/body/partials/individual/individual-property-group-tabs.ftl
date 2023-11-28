@@ -21,11 +21,11 @@
     	    <#assign groupNameHtmlId = "${i18n().properties}" >
         </#if>
         <#if tabCount = 1 >
-            <li class="nav-link active" data-bs-toggle="tab" data-bs-target="#${groupNameHtmlId?replace("/","-")}" type="button" role="tab" id="${groupNameHtmlId?replace("/","-")}-tab" aria-controls="${groupNameHtmlId?replace("/","-")}" aria-selected="true" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
+            <li class="nav-link active" data-bs-toggle="tab" data-bs-target="#${groupNameHtmlId?replace("/","-")}-section" type="button" role="tab" id="${groupNameHtmlId?replace("/","-")}-tab" aria-controls="${groupNameHtmlId?replace("/","-")}" aria-selected="true" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
             <li class="groupTabSpacer">&nbsp;</li>
             <#assign tabCount = 2>
         <#else>
-            <li class="nav-link" data-bs-toggle="tab" data-bs-target="#${groupNameHtmlId?replace("/","-")}" type="button" role="tab" id="${groupNameHtmlId?replace("/","-")}-tab" aria-controls="${groupNameHtmlId?replace("/","-")}" aria-selected="false" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
+            <li class="nav-link" data-bs-toggle="tab" data-bs-target="#${groupNameHtmlId?replace("/","-")}-section" type="button" role="tab" id="${groupNameHtmlId?replace("/","-")}-tab" aria-controls="${groupNameHtmlId?replace("/","-")}" aria-selected="false" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
             <li class="groupTabSpacer">&nbsp;</li>
         </#if>
     </#if>
@@ -47,10 +47,10 @@
         <#assign verbose = (verbosePropertySwitch.currentValue)!false>
         
         <#if tabCount = 1 >
-            <section id="${groupNameHtmlId?replace("/","-")}" class="tab-pane fade show active property-group" role="tabpanel" aria-labelledby="${groupNameHtmlId?replace("/","-")}-tab" role="region">
+            <section id="${groupNameHtmlId?replace("/","-")}-section" class="tab-pane fade show active property-group" role="tabpanel" aria-labelledby="${groupNameHtmlId?replace("/","-")}-tab" role="region">
             <#assign tabCount = 2>
         <#else>
-            <section id="${groupNameHtmlId?replace("/","-")}" class="tab-pane fade property-group" role="tabpanel" aria-labelledby="${groupNameHtmlId?replace("/","-")}-tab" role="region">
+            <section id="${groupNameHtmlId?replace("/","-")}-section" class="tab-pane fade property-group" role="tabpanel" aria-labelledby="${groupNameHtmlId?replace("/","-")}-tab" role="region">
         </#if>
 
         <nav id="scroller" class="scroll-up hidden" role="navigation">

@@ -29,7 +29,8 @@ $(document).ready(function(){
         });
         
         $('#show-all-tabs').addClass("active").attr("aria-selected", "true");
-        $(".tab-content>section.tab-pane").addClass('active show')    })
+        $(".tab-content>section.tab-pane").addClass('active show')    
+    })
 
     showAllBtn.addEventListener('hide.bs.tab', function (event) {
         $(".tab-content>section.tab-pane").removeClass('show active')
