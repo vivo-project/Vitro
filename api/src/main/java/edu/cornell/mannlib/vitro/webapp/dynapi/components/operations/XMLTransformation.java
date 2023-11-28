@@ -6,20 +6,17 @@ import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -28,12 +25,16 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
 
 public class XMLTransformation extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(XMLTransformation.class);
+    private static final ErrorListener errorListener = createXMLErrorListener();
     private Parameter xsltParam;
     private Parameter inputXmlParam;
     private Parameter outputXmlParam;
@@ -96,6 +97,7 @@ public class XMLTransformation extends AbstractOperation {
                   InputStream styleInputStream = IOUtils.toInputStream(defaultValue, StandardCharsets.UTF_8);
                   Source stylesource = new StreamSource(styleInputStream);
                   TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+                  transformerFactory.setErrorListener(errorListener);
                   transformTemplates = transformerFactory.newTemplates(stylesource);
               }
           }
@@ -112,6 +114,7 @@ public class XMLTransformation extends AbstractOperation {
         InputStream styleInputStream = IOUtils.toInputStream(styles, StandardCharsets.UTF_8);
         Source stylesource = new StreamSource(styleInputStream);
         TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+        transformerFactory.setErrorListener(errorListener);
         Transformer transformer = transformerFactory.newTransformer(stylesource);
         if (transformer == null) {
             throw new Exception("Failed to initialize transformer. Check styles.");
@@ -153,5 +156,24 @@ public class XMLTransformation extends AbstractOperation {
         }
 
         return result;
+    }
+    
+    private static ErrorListener createXMLErrorListener() {
+        return new ErrorListener() {
+            @Override
+            public void warning(TransformerException e) throws TransformerException {
+                log.warn(e, e);
+            }
+
+            @Override
+            public void error(TransformerException e) throws TransformerException {
+                log.error(e, e);
+            }
+
+            @Override
+            public void fatalError(TransformerException e) throws TransformerException {
+                log.error(e, e);
+            }
+        };
     }
 }
