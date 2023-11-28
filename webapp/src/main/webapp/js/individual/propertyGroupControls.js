@@ -19,35 +19,56 @@ $(document).ready(function(){
     }
 
     // controls the property group tabs
-    $.each($('li.clickable'), function() {
-        var groupName = $(this).attr("groupName");
-        var $propertyGroupLi = $(this);
+    $('#show-all-tabs').click(function() {
+        console.log("Show all 1")
 
-        $(this).click(function() {
-
-            if ( $propertyGroupLi.attr("class") == "nonSelectedGroupTab clickable" ) {
-                $.each($('li.selectedGroupTab'), function() {
-                    $(this).removeClass("selectedGroupTab clickable");
-                    $(this).addClass("nonSelectedGroupTab clickable");
-                });
-                $propertyGroupLi.removeClass("nonSelectedGroupTab clickable");
-                $propertyGroupLi.addClass("selectedGroupTab clickable");
-            }
-            if ( $propertyGroupLi.attr("groupname") == "viewAll" ) {
-                processViewAllTab();
-            }
-            else {
-                padSectionBottoms();
-                var $visibleSection = $('section.property-group:visible');
-                $visibleSection.hide();
-                $('h2[pgroup=tabs]').addClass("hidden");
-                $('nav#scroller').addClass("hidden");
-                $('section#' + groupName).show();
-            }
-            manageLocalStorage();
-            return false;
-        });
+        $(".tab-content>section.tab-pane").addClass('show active')
     });
+
+    let showAllBtn = $('#show-all-tabs');
+
+    showAllBtn.addEventListener('show.bs.tab', function (event) {
+        $(".tab-content>section.tab-pane").addClass('show active')
+    })
+
+    showAllBtn.addEventListener('shown.bs.tab', function (event) {
+        $(".tab-content>section.tab-pane").addClass('show active')
+    })
+
+    showAllBtn.addEventListener('hide.bs.tab', function (event) {
+        console.log("hide all 2")
+        $(".tab-content>section.tab-pane").removeClass('show active')
+    })
+
+    // $.each($('li.clickable'), function() {
+    //     var groupName = $(this).attr("groupName");
+    //     var $propertyGroupLi = $(this);
+
+    //     $(this).click(function() {
+
+    //         if ( $propertyGroupLi.attr("class") == "nonSelectedGroupTab clickable" ) {
+    //             $.each($('li.selectedGroupTab'), function() {
+    //                 $(this).removeClass("selectedGroupTab clickable");
+    //                 $(this).addClass("nonSelectedGroupTab clickable");
+    //             });
+    //             $propertyGroupLi.removeClass("nonSelectedGroupTab clickable");
+    //             $propertyGroupLi.addClass("selectedGroupTab clickable");
+    //         }
+    //         if ( $propertyGroupLi.attr("groupname") == "viewAll" ) {
+    //             processViewAllTab();
+    //         }
+    //         else {
+    //             padSectionBottoms();
+    //             var $visibleSection = $('section.property-group:visible');
+    //             $visibleSection.hide();
+    //             $('h2[pgroup=tabs]').addClass("hidden");
+    //             $('nav#scroller').addClass("hidden");
+    //             $('section#' + groupName).show();
+    //         }
+    //         manageLocalStorage();
+    //         return false;
+    //     });
+    // });
 
     function processViewAllTab() {
         $.each($('section.property-group'), function() {

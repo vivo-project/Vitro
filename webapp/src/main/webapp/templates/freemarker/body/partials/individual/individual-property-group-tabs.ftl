@@ -7,8 +7,9 @@
 <#assign tabCount = 1 >
 <#assign sectionCount = 1 >
 <!-- ${propertyGroups.all?size} -->
-<ul class="propertyTabsList">
+<ul class="propertyTabsList nav nav-tabs">
     <li  class="groupTabSpacer">&nbsp;</li>
+
 <#list propertyGroups.all as groupTabs>
     <#if ( groupTabs.properties?size > 0 ) >
         <#assign groupName = groupTabs.getName(nameForOtherGroup)>
@@ -20,26 +21,38 @@
     	    <#assign groupNameHtmlId = "${i18n().properties}" >
         </#if>
         <#if tabCount = 1 >
-            <li class="selectedGroupTab clickable" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
+            <li class="nav-link active" data-bs-toggle="tab" data-bs-target="#${groupNameHtmlId?replace("/","-")}" type="button" role="tab" id="${groupNameHtmlId?replace("/","-")}-tab" aria-controls="${groupNameHtmlId?replace("/","-")}" aria-selected="true" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
             <li class="groupTabSpacer">&nbsp;</li>
             <#assign tabCount = 2>
         <#else>
-            <li class="nonSelectedGroupTab clickable" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
+            <li class="nav-link" data-bs-toggle="tab" data-bs-target="#${groupNameHtmlId?replace("/","-")}" type="button" role="tab" id="${groupNameHtmlId?replace("/","-")}-tab" aria-controls="${groupNameHtmlId?replace("/","-")}" aria-selected="false" groupName="${groupNameHtmlId?replace("/","-")}">${p.capitalizeGroupName(groupName)}</li>
             <li class="groupTabSpacer">&nbsp;</li>
         </#if>
     </#if>
 </#list>
+
 <#if (propertyGroups.all?size > 1) >
-    <li  class="nonSelectedGroupTab clickable" groupName="viewAll">${i18n().view_all_capitalized}</li>
-    <li  class="groupTabSpacer">&nbsp;</li>
+    <li class="nav-link" id="show-all-tabs" groupName="viewAll" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">${i18n().view_all_capitalized}</li>
+    <li class="groupTabSpacer">&nbsp;</li>
 </#if>
 </ul>
+
+<div class="tab-content property-tabs">
+<#assign tabCount = 1 >
+
 <#list propertyGroups.all as group>
     <#if (group.properties?size > 0)>
         <#assign groupName = group.getName(nameForOtherGroup)>
         <#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
         <#assign verbose = (verbosePropertySwitch.currentValue)!false>
-        <section id="${groupNameHtmlId?replace("/","-")}" class="property-group" role="region" style="<#if (sectionCount > 1) >display:none<#else>display:block</#if>">
+        
+        <#if tabCount = 1 >
+            <section id="${groupNameHtmlId?replace("/","-")}" class="tab-pane fade show active property-group" role="tabpanel" aria-labelledby="${groupNameHtmlId?replace("/","-")}-tab" role="region">
+            <#assign tabCount = 2>
+        <#else>
+            <section id="${groupNameHtmlId?replace("/","-")}" class="tab-pane fade property-group" role="tabpanel" aria-labelledby="${groupNameHtmlId?replace("/","-")}-tab" role="region">
+        </#if>
+
         <nav id="scroller" class="scroll-up hidden" role="navigation">
             <a href="#branding" title="${i18n().scroll_to_menus}" >
                 <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
@@ -62,6 +75,7 @@
         <#assign sectionCount = 2 >
     </#if>
 </#list>
+</div>
 <script>
     var individualLocalName = "${individual.localName}";
 </script>

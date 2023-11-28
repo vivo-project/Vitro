@@ -2,10 +2,10 @@
 
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/nouislider.css"/>')}
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/search-results.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap-5.3.2/css/bootstrap.min.css"/>')}
+${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/bootstrap-5.3.2/css/bootstrap.min.css"/>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap-5.3.2/js/bootstrap.min.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.3.2/js/bootstrap.min.js"></script>')}
 
 <@searchForm  />
 
