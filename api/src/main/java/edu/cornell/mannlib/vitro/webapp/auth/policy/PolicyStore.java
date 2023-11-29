@@ -90,7 +90,7 @@ public class PolicyStore implements Policies {
 
     @Override
     public List<Policy> getList() {
-        return new ArrayList<>(policyList);
+        return policyList;
     }
 
     @Override
