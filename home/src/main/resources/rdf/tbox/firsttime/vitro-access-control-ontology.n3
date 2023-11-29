@@ -140,7 +140,8 @@
 :value a owl:ObjectProperty ;
     rdfs:comment "Assign one value (any URI or :AttributeValuePattern with :id to define literal value)";
     rdfs:label "value"@en-US ;
-    rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSetTemplate :ValueSet :Check ) ] .
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSetTemplate :ValueSet :Check ) ] ;
+    rdfs:range :AttributeValuePattern .
 
 :useOperator a owl:ObjectProperty ;
     rdfs:comment "Use operator in :Check";
