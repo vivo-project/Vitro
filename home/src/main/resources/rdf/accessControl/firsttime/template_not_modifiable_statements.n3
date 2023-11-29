@@ -15,31 +15,31 @@
     .
 
 :RestrictObjectPropertyStatementsWithNotModifiableSubject a access:Rule ;
-    access:decision access-individual:Deny ;
+    access:hasDecision access-individual:Deny ;
     access:requiresCheck :IsObjectPropertyStatement ;
     access:requiresCheck :SubjectUriStartWithProhibitedNamespace ;
     access:requiresCheck :StatementSubjectNotOneOfProhibitedExceptions .
 
 :RestrictObjectPropertyStatementsWithNotModifiablePredicate a access:Rule ;
-    access:decision access-individual:Deny ;
+    access:hasDecision access-individual:Deny ;
     access:requiresCheck :IsObjectPropertyStatement ;
     access:requiresCheck :PredicateUriStartWithProhibitedNamespace ;
     access:requiresCheck :PredicateNotANamespaceException .
 
 :RestrictObjectPropertyStatementsWithNotModifiableObject a access:Rule ;
-    access:decision access-individual:Deny ;
+    access:hasDecision access-individual:Deny ;
     access:requiresCheck :IsObjectPropertyStatement ;
     access:requiresCheck :StatementObjectUriStartsWithProhibitedNameSpace ;
     access:requiresCheck :ObjectUriNotOneOfProhibitedExceptions .
 
 :RestrictDataPropertyStatementsWithNotModifiableSubject a access:Rule ;
-    access:decision access-individual:Deny ;
+    access:hasDecision access-individual:Deny ;
     access:requiresCheck :IsDataPropertyStatement ;
     access:requiresCheck :SubjectUriStartWithProhibitedNamespace ;
     access:requiresCheck :StatementSubjectNotOneOfProhibitedExceptions .
 
 :RestrictDataPropertyStatementsWithNotModifiablePredicate a access:Rule ;
-    access:decision access-individual:Deny ;
+    access:hasDecision access-individual:Deny ;
     access:requiresCheck :IsDataPropertyStatement ;
     access:requiresCheck :PredicateUriStartWithProhibitedNamespace ;
     access:requiresCheck :PredicateNotANamespaceException .

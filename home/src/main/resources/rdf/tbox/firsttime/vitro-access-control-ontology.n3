@@ -151,8 +151,8 @@
 
 :hasTypeToCheck a owl:ObjectProperty ,
     owl:FunctionalProperty ;
-    rdfs:comment "Set attribute that should be checked";
-    rdfs:label "attribute"@en-US ;
+    rdfs:comment "Set attribute type that should be checked";
+    rdfs:label "has type to check"@en-US ;
     rdfs:domain :Check ;
     rdfs:range :AttributeType .
 
@@ -200,9 +200,9 @@
     rdfs:domain :Rule ;
     rdfs:range :Check .
 
-:decision a owl:ObjectProperty ;
+:hasDecision a owl:ObjectProperty ;
     rdfs:comment "Decision to return in case of all checks match";
-    rdfs:label "decision"@en-US ;
+    rdfs:label "has decision"@en-US ;
     rdfs:domain :Rule ;
     rdfs:range :Decision .    
 
