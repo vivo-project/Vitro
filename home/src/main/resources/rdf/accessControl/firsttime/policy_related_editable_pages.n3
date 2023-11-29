@@ -3,43 +3,28 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-individual-pages/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-related-individual-pages/> .
 
 :Policy a access:Policy ;
-    access:hasRule :AllowEditRelatedPagesRule ;
-    access:hasRule :AllowEditIndividualPagesRule .
+    access:hasRule :AllowEditRelatedPagesRule .
 
-:AllowEditIndividualPagesRule a access:Rule;
-    access:requiresCheck :SubjectRoleOneOfEditorsCheck ;
-    access:requiresCheck :IsAddOperation ;
+:AllowEditRelatedPagesRule a access:Rule;
+    access:requiresCheck :SubjectRoleIsSelfEditor ;
+    access:requiresCheck :SubjectUriIsProfileRelatedResource ;
+    access:requiresCheck :IsEditOperation ;
     access:requiresCheck :IsObjectPropertyStatement ;
     access:requiresCheck :ObjectUriIsSomeUri ;
     access:requiresCheck :PredicateIsSomePredicate .
-
-:SubjectRoleOneOfEditorsCheck a access:Check ;
-    access:useOperator access-individual:OneOf ;
-    access:attribute access-individual:SubjectRole ;
-    access:value access-individual:AdminRoleUri ;
-    access:value access-individual:CuratorRoleUri ;
-    access:value access-individual:EditorRoleUri .
 
 :SubjectRoleIsSelfEditor a access:Check ;
     access:useOperator access-individual:Equals ;
     access:attribute access-individual:SubjectRole ;
     access:value access-individual:SelfEditorRoleUri .
 
-:IsAddOperation a access:Check ;
+:IsEditOperation a access:Check ;
     access:useOperator access-individual:Equals ;
     access:attribute access-individual:Operation ;
-    access:value access-individual:AddOperation .
-
-:AllowEditRelatedPagesRule a access:Rule;
-    access:requiresCheck :SubjectRoleIsSelfEditor ;
-    access:requiresCheck :SubjectUriIsProfileRelatedResource ;
-    access:requiresCheck :IsAddOperation ;
-    access:requiresCheck :IsObjectPropertyStatement ;
-    access:requiresCheck :ObjectUriIsSomeUri ;
-    access:requiresCheck :PredicateIsSomePredicate .
+    access:value access-individual:EditOperation .
 
 :PredicateIsSomePredicate a access:Check ;
     access:useOperator access-individual:Equals ;
