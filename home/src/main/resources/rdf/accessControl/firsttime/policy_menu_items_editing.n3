@@ -10,14 +10,14 @@
     access:hasRule :RestrictDrop .
 
 :RestrictEdit a access:Rule ;
-    access:decision access-individual:Deny ;
+    access:hasDecision access-individual:Deny ;
     access:requiresCheck :IsEditOperationCheck ;
     access:requiresCheck :IsObjectPropertyStatement ;
     access:requiresCheck :PredicateUriEqualsHomeMenuItem ;
     access:requiresCheck :ObjectUriEqualsHasElement .
 
 :RestrictDrop a access:Rule ;
-    access:decision access-individual:Deny ;
+    access:hasDecision access-individual:Deny ;
     access:requiresCheck :IsDropOperationCheck ;
     access:requiresCheck :IsObjectPropertyStatement ;
     access:requiresCheck :PredicateUriEqualsHomeMenuItem ;
