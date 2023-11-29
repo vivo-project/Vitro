@@ -1,7 +1,7 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-property/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-:AdminDropObjectPropertyValueSet access:value
+:EditorPublishDataPropertyValueSet access:value
     <http://www.w3.org/2000/01/rdf-schema#label> .
